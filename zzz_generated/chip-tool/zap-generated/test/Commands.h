@@ -32869,139 +32869,40 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read mandatory non-global attribute: Status\n");
-            err = TestReadMandatoryNonGlobalAttributeStatus_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Test Harness Client reads Status attribute from Server DUT\n");
+            err = TestTestHarnessClientReadsStatusAttributeFromServerDut_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read mandatory non-global attribute constraints: Status\n");
-            err = TestReadMandatoryNonGlobalAttributeConstraintsStatus_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Test Harness Client reads Order attribute from Server DUT\n");
+            err = TestTestHarnessClientReadsOrderAttributeFromServerDut_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Write the default values to mandatory non-global attribute: Status\n");
-            err = TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeStatus_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Test Harness Client reads Description attribute from Server DUT\n");
+            err = TestTestHarnessClientReadsDescriptionAttributeFromServerDut_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads back the mandatory non-global attribute: Status\n");
-            err = TestReadsBackTheMandatoryNonGlobalAttributeStatus_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Test Harness Client reads BatVoltage from Server DUT\n");
+            err = TestTestHarnessClientReadsBatVoltageFromServerDut_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read mandatory non-global attribute: Order\n");
-            err = TestReadMandatoryNonGlobalAttributeOrder_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Test Harness Client reads BatPercentRemaining from Server DUT\n");
+            err = TestTestHarnessClientReadsBatPercentRemainingFromServerDut_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read mandatory non-global attribute constraints: Order\n");
-            err = TestReadMandatoryNonGlobalAttributeConstraintsOrder_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Test Harness Client reads BatTimeRemaining from Server DUT\n");
+            err = TestTestHarnessClientReadsBatTimeRemainingFromServerDut_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Write the default values to mandatory non-global attribute: Order\n");
-            err = TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeOrder_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Test Harness Client reads BatChargeLevel from Server DUT\n");
+            err = TestTestHarnessClientReadsBatChargeLevelFromServerDut_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Reads back the mandatory non-global attribute: Order\n");
-            err = TestReadsBackTheMandatoryNonGlobalAttributeOrder_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Test Harness Client reads ActiveBatFaults from Server DUT\n");
+            err = TestTestHarnessClientReadsActiveBatFaultsFromServerDut_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Read mandatory non-global attribute: Description\n");
-            err = TestReadMandatoryNonGlobalAttributeDescription_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Read mandatory non-global attribute constraints: Description\n");
-            err = TestReadMandatoryNonGlobalAttributeConstraintsDescription_10();
-            break;
-        case 11:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 11 : Write the default values to mandatory non-global attribute: Description\n");
-            err = TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeDescription_11();
-            break;
-        case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Reads back the mandatory non-global attribute: Description\n");
-            err = TestReadsBackTheMandatoryNonGlobalAttributeDescription_12();
-            break;
-        case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Read mandatory non-global attribute: BatChargeLevel\n");
-            err = TestReadMandatoryNonGlobalAttributeBatChargeLevel_13();
-            break;
-        case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Read mandatory non-global attribute constraints: BatChargeLevel\n");
-            err = TestReadMandatoryNonGlobalAttributeConstraintsBatChargeLevel_14();
-            break;
-        case 15:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 15 : Write the default values to mandatory non-global attribute: BatChargeLevel\n");
-            err = TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeBatChargeLevel_15();
-            break;
-        case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : Reads back the mandatory non-global attribute: BatChargeLevel\n");
-            err = TestReadsBackTheMandatoryNonGlobalAttributeBatChargeLevel_16();
-            break;
-        case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : Read mandatory non-global attribute: BatChargeState\n");
-            err = TestReadMandatoryNonGlobalAttributeBatChargeState_17();
-            break;
-        case 18:
-            ChipLogProgress(chipTool, " ***** Test Step 18 : Read mandatory non-global attribute constraints: BatChargeState\n");
-            err = TestReadMandatoryNonGlobalAttributeConstraintsBatChargeState_18();
-            break;
-        case 19:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 19 : Write the default values to mandatory non-global attribute: BatChargeState\n");
-            err = TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeBatChargeState_19();
-            break;
-        case 20:
-            ChipLogProgress(chipTool, " ***** Test Step 20 : Reads back the mandatory non-global attribute: BatChargeState\n");
-            err = TestReadsBackTheMandatoryNonGlobalAttributeBatChargeState_20();
-            break;
-        case 21:
-            ChipLogProgress(chipTool, " ***** Test Step 21 : Read optional non-global attribute: BatVoltage\n");
-            err = TestReadOptionalNonGlobalAttributeBatVoltage_21();
-            break;
-        case 22:
-            ChipLogProgress(chipTool, " ***** Test Step 22 : Read optional non-global attribute constraints: BatVoltage\n");
-            err = TestReadOptionalNonGlobalAttributeConstraintsBatVoltage_22();
-            break;
-        case 23:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 23 : Write the default values to optional non-global attribute: BatVoltage\n");
-            err = TestWriteTheDefaultValuesToOptionalNonGlobalAttributeBatVoltage_23();
-            break;
-        case 24:
-            ChipLogProgress(chipTool, " ***** Test Step 24 : Reads back the optional non-global attribute: BatVoltage\n");
-            err = TestReadsBackTheOptionalNonGlobalAttributeBatVoltage_24();
-            break;
-        case 25:
-            ChipLogProgress(chipTool, " ***** Test Step 25 : Read optional non-global attribute: BatPercentRemaining\n");
-            err = TestReadOptionalNonGlobalAttributeBatPercentRemaining_25();
-            break;
-        case 26:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 26 : Read optional non-global attribute constraints: BatPercentRemaining\n");
-            err = TestReadOptionalNonGlobalAttributeConstraintsBatPercentRemaining_26();
-            break;
-        case 27:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 27 : Write the default values to optional non-global attribute: BatPercentRemaining\n");
-            err = TestWriteTheDefaultValuesToOptionalNonGlobalAttributeBatPercentRemaining_27();
-            break;
-        case 28:
-            ChipLogProgress(chipTool, " ***** Test Step 28 : Reads back the optional non-global attribute: BatPercentRemaining\n");
-            err = TestReadsBackTheOptionalNonGlobalAttributeBatPercentRemaining_28();
-            break;
-        case 29:
-            ChipLogProgress(chipTool, " ***** Test Step 29 : Read optional non-global attribute: BatTimeRemaining\n");
-            err = TestReadOptionalNonGlobalAttributeBatTimeRemaining_29();
-            break;
-        case 30:
-            ChipLogProgress(chipTool, " ***** Test Step 30 : Read optional non-global attribute constraints: BatTimeRemaining\n");
-            err = TestReadOptionalNonGlobalAttributeConstraintsBatTimeRemaining_30();
-            break;
-        case 31:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 31 : Write the default values to optional non-global attribute: BatTimeRemaining\n");
-            err = TestWriteTheDefaultValuesToOptionalNonGlobalAttributeBatTimeRemaining_31();
-            break;
-        case 32:
-            ChipLogProgress(chipTool, " ***** Test Step 32 : Reads back the optional non-global attribute: BatTimeRemaining\n");
-            err = TestReadsBackTheOptionalNonGlobalAttributeBatTimeRemaining_32();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Test Harness Client reads BatChargeState from Server DUT\n");
+            err = TestTestHarnessClientReadsBatChargeStateFromServerDut_9();
             break;
         }
 
@@ -33014,7 +32915,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 33;
+    const uint16_t mTestCount = 10;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -33043,9 +32944,9 @@ private:
         (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, uint8_t status)
+    static void OnSuccessCallback_2(void * context, uint8_t order)
     {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_2(status);
+        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_2(order);
     }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
@@ -33053,16 +32954,19 @@ private:
         (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_3(); }
+    static void OnSuccessCallback_3(void * context, chip::CharSpan description)
+    {
+        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_3(description);
+    }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context, uint8_t status)
+    static void OnSuccessCallback_4(void * context, uint32_t batteryVoltage)
     {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_4(status);
+        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_4(batteryVoltage);
     }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
@@ -33070,9 +32974,9 @@ private:
         (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context, uint8_t order)
+    static void OnSuccessCallback_5(void * context, uint8_t batteryPercentRemaining)
     {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_5(order);
+        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_5(batteryPercentRemaining);
     }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
@@ -33080,9 +32984,9 @@ private:
         (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, uint8_t order)
+    static void OnSuccessCallback_6(void * context, uint32_t batteryTimeRemaining)
     {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_6(order);
+        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_6(batteryTimeRemaining);
     }
 
     static void OnFailureCallback_7(void * context, CHIP_ERROR error)
@@ -33090,16 +32994,19 @@ private:
         (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_7(); }
+    static void OnSuccessCallback_7(void * context, uint8_t batteryChargeLevel)
+    {
+        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_7(batteryChargeLevel);
+    }
 
     static void OnFailureCallback_8(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context, uint8_t order)
+    static void OnSuccessCallback_8(void * context, const chip::app::DataModel::DecodableList<uint8_t> & activeBatteryFaults)
     {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_8(order);
+        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_8(activeBatteryFaults);
     }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
@@ -33107,221 +33014,9 @@ private:
         (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context, chip::CharSpan description)
+    static void OnSuccessCallback_9(void * context, uint8_t batteryChargeState)
     {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_9(description);
-    }
-
-    static void OnFailureCallback_10(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_10(error);
-    }
-
-    static void OnSuccessCallback_10(void * context, chip::CharSpan description)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_10(description);
-    }
-
-    static void OnFailureCallback_11(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_11(error);
-    }
-
-    static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_11(); }
-
-    static void OnFailureCallback_12(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_12(error);
-    }
-
-    static void OnSuccessCallback_12(void * context, chip::CharSpan description)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_12(description);
-    }
-
-    static void OnFailureCallback_13(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_13(error);
-    }
-
-    static void OnSuccessCallback_13(void * context, uint8_t batteryChargeLevel)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_13(batteryChargeLevel);
-    }
-
-    static void OnFailureCallback_14(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_14(error);
-    }
-
-    static void OnSuccessCallback_14(void * context, uint8_t batteryChargeLevel)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_14(batteryChargeLevel);
-    }
-
-    static void OnFailureCallback_15(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_15(error);
-    }
-
-    static void OnSuccessCallback_15(void * context) { (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_15(); }
-
-    static void OnFailureCallback_16(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_16(error);
-    }
-
-    static void OnSuccessCallback_16(void * context, uint8_t batteryChargeLevel)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_16(batteryChargeLevel);
-    }
-
-    static void OnFailureCallback_17(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_17(error);
-    }
-
-    static void OnSuccessCallback_17(void * context, uint8_t batteryChargeState)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_17(batteryChargeState);
-    }
-
-    static void OnFailureCallback_18(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_18(error);
-    }
-
-    static void OnSuccessCallback_18(void * context, uint8_t batteryChargeState)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_18(batteryChargeState);
-    }
-
-    static void OnFailureCallback_19(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_19(error);
-    }
-
-    static void OnSuccessCallback_19(void * context) { (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_19(); }
-
-    static void OnFailureCallback_20(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_20(error);
-    }
-
-    static void OnSuccessCallback_20(void * context, uint8_t batteryChargeState)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_20(batteryChargeState);
-    }
-
-    static void OnFailureCallback_21(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_21(error);
-    }
-
-    static void OnSuccessCallback_21(void * context, uint32_t batteryVoltage)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_21(batteryVoltage);
-    }
-
-    static void OnFailureCallback_22(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_22(error);
-    }
-
-    static void OnSuccessCallback_22(void * context, uint32_t batteryVoltage)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_22(batteryVoltage);
-    }
-
-    static void OnFailureCallback_23(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_23(error);
-    }
-
-    static void OnSuccessCallback_23(void * context) { (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_23(); }
-
-    static void OnFailureCallback_24(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_24(error);
-    }
-
-    static void OnSuccessCallback_24(void * context, uint32_t batteryVoltage)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_24(batteryVoltage);
-    }
-
-    static void OnFailureCallback_25(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_25(error);
-    }
-
-    static void OnSuccessCallback_25(void * context, uint8_t batteryPercentRemaining)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_25(batteryPercentRemaining);
-    }
-
-    static void OnFailureCallback_26(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_26(error);
-    }
-
-    static void OnSuccessCallback_26(void * context, uint8_t batteryPercentRemaining)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_26(batteryPercentRemaining);
-    }
-
-    static void OnFailureCallback_27(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_27(error);
-    }
-
-    static void OnSuccessCallback_27(void * context) { (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_27(); }
-
-    static void OnFailureCallback_28(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_28(error);
-    }
-
-    static void OnSuccessCallback_28(void * context, uint8_t batteryPercentRemaining)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_28(batteryPercentRemaining);
-    }
-
-    static void OnFailureCallback_29(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_29(error);
-    }
-
-    static void OnSuccessCallback_29(void * context, uint32_t batteryTimeRemaining)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_29(batteryTimeRemaining);
-    }
-
-    static void OnFailureCallback_30(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_30(error);
-    }
-
-    static void OnSuccessCallback_30(void * context, uint32_t batteryTimeRemaining)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_30(batteryTimeRemaining);
-    }
-
-    static void OnFailureCallback_31(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_31(error);
-    }
-
-    static void OnSuccessCallback_31(void * context) { (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_31(); }
-
-    static void OnFailureCallback_32(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnFailureResponse_32(error);
-    }
-
-    static void OnSuccessCallback_32(void * context, uint32_t batteryTimeRemaining)
-    {
-        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_32(batteryTimeRemaining);
+        (static_cast<Test_TC_PS_2_1 *>(context))->OnSuccessResponse_9(batteryChargeState);
     }
 
     //
@@ -33334,7 +33029,7 @@ private:
         return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
-    CHIP_ERROR TestReadMandatoryNonGlobalAttributeStatus_1()
+    CHIP_ERROR TestTestHarnessClientReadsStatusAttributeFromServerDut_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PowerSourceClusterTest cluster;
@@ -33355,12 +33050,13 @@ private:
 
     void OnSuccessResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
+        VerifyOrReturn(CheckConstraintType("status", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("status", status, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("status", status, 3));
         NextTest();
     }
 
-    CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsStatus_2()
+    CHIP_ERROR TestTestHarnessClientReadsOrderAttributeFromServerDut_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PowerSourceClusterTest cluster;
@@ -33368,7 +33064,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Status::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Order::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
@@ -33379,39 +33075,38 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint8_t status)
+    void OnSuccessResponse_2(uint8_t order)
     {
-        VerifyOrReturn(CheckConstraintType("status", "", "PowerSourceStatus"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("status", status, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("status", status, 3));
+        VerifyOrReturn(CheckConstraintType("order", "", "uint8"));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeStatus_3()
+    CHIP_ERROR TestTestHarnessClientReadsDescriptionAttributeFromServerDut_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PowerSourceClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        uint8_t statusArgument;
-        statusArgument = 0;
 
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PowerSource::Attributes::Status::TypeInfo>(
-            statusArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Description::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(chip::CharSpan description)
+    {
+        VerifyOrReturn(CheckConstraintType("description", "", "string"));
         NextTest();
     }
 
-    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeStatus_4()
+    CHIP_ERROR TestTestHarnessClientReadsBatVoltageFromServerDut_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PowerSourceClusterTest cluster;
@@ -33419,7 +33114,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Status::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryVoltage::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
@@ -33430,14 +33125,13 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(uint8_t status)
+    void OnSuccessResponse_4(uint32_t batteryVoltage)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
+        VerifyOrReturn(CheckConstraintType("batteryVoltage", "", "uint32"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadMandatoryNonGlobalAttributeOrder_5()
+    CHIP_ERROR TestTestHarnessClientReadsBatPercentRemainingFromServerDut_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PowerSourceClusterTest cluster;
@@ -33445,7 +33139,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Order::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryPercentRemaining::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
@@ -33456,14 +33150,15 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5(uint8_t order)
+    void OnSuccessResponse_5(uint8_t batteryPercentRemaining)
     {
-        VerifyOrReturn(CheckValue("order", order, 0));
-
+        VerifyOrReturn(CheckConstraintType("batteryPercentRemaining", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("batteryPercentRemaining", batteryPercentRemaining, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("batteryPercentRemaining", batteryPercentRemaining, 200));
         NextTest();
     }
 
-    CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsOrder_6()
+    CHIP_ERROR TestTestHarnessClientReadsBatTimeRemainingFromServerDut_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PowerSourceClusterTest cluster;
@@ -33471,7 +33166,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Order::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryTimeRemaining::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
@@ -33482,37 +33177,40 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(uint8_t order)
+    void OnSuccessResponse_6(uint32_t batteryTimeRemaining)
     {
-        VerifyOrReturn(CheckConstraintType("order", "", "uint8"));
+        VerifyOrReturn(CheckConstraintType("batteryTimeRemaining", "", "uint32"));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeOrder_7()
+    CHIP_ERROR TestTestHarnessClientReadsBatChargeLevelFromServerDut_7()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PowerSourceClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        uint8_t orderArgument;
-        orderArgument = 0;
 
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PowerSource::Attributes::Order::TypeInfo>(
-            orderArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeLevel::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(uint8_t batteryChargeLevel)
+    {
+        VerifyOrReturn(CheckConstraintType("batteryChargeLevel", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("batteryChargeLevel", batteryChargeLevel, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("batteryChargeLevel", batteryChargeLevel, 2));
         NextTest();
     }
 
-    void OnSuccessResponse_7() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeOrder_8()
+    CHIP_ERROR TestTestHarnessClientReadsActiveBatFaultsFromServerDut_8()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PowerSourceClusterTest cluster;
@@ -33520,7 +33218,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Order::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::ActiveBatteryFaults::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
@@ -33531,14 +33229,13 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8(uint8_t order)
+    void OnSuccessResponse_8(const chip::app::DataModel::DecodableList<uint8_t> & activeBatteryFaults)
     {
-        VerifyOrReturn(CheckValue("order", order, 0));
-
+        VerifyOrReturn(CheckConstraintType("activeBatteryFaults", "", "list"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadMandatoryNonGlobalAttributeDescription_9()
+    CHIP_ERROR TestTestHarnessClientReadsBatChargeStateFromServerDut_9()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PowerSourceClusterTest cluster;
@@ -33546,7 +33243,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Description::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeState::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
@@ -33557,598 +33254,11 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9(chip::CharSpan description)
+    void OnSuccessResponse_9(uint8_t batteryChargeState)
     {
-        VerifyOrReturn(CheckValueAsString("description", description, chip::CharSpan("", 0)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsDescription_10()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Description::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_10(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_10(chip::CharSpan description)
-    {
-        VerifyOrReturn(CheckConstraintType("description", "", "string"));
-        VerifyOrReturn(CheckConstraintMaxLength("description", description.size(), 60));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeDescription_11()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-        chip::CharSpan descriptionArgument;
-        descriptionArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PowerSource::Attributes::Description::TypeInfo>(
-            descriptionArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_11(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-        NextTest();
-    }
-
-    void OnSuccessResponse_11() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeDescription_12()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Description::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_12(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_12(chip::CharSpan description)
-    {
-        VerifyOrReturn(CheckValueAsString("description", description, chip::CharSpan("", 0)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadMandatoryNonGlobalAttributeBatChargeLevel_13()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeLevel::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_13(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_13(uint8_t batteryChargeLevel)
-    {
-        VerifyOrReturn(CheckValue("batteryChargeLevel", batteryChargeLevel, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsBatChargeLevel_14()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeLevel::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_14(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_14(uint8_t batteryChargeLevel)
-    {
-        VerifyOrReturn(CheckConstraintType("batteryChargeLevel", "", "BatChargeLevel"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("batteryChargeLevel", batteryChargeLevel, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("batteryChargeLevel", batteryChargeLevel, 2));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeBatChargeLevel_15()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-        uint8_t batteryChargeLevelArgument;
-        batteryChargeLevelArgument = 0;
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeLevel::TypeInfo>(
-            batteryChargeLevelArgument, this, OnSuccessCallback_15, OnFailureCallback_15));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_15(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-        NextTest();
-    }
-
-    void OnSuccessResponse_15() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeBatChargeLevel_16()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeLevel::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_16(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_16(uint8_t batteryChargeLevel)
-    {
-        VerifyOrReturn(CheckValue("batteryChargeLevel", batteryChargeLevel, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadMandatoryNonGlobalAttributeBatChargeState_17()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeState::TypeInfo>(
-            this, OnSuccessCallback_17, OnFailureCallback_17, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_17(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_17(uint8_t batteryChargeState)
-    {
-        VerifyOrReturn(CheckValue("batteryChargeState", batteryChargeState, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsBatChargeState_18()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeState::TypeInfo>(
-            this, OnSuccessCallback_18, OnFailureCallback_18, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_18(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_18(uint8_t batteryChargeState)
-    {
-        VerifyOrReturn(CheckConstraintType("batteryChargeState", "", "uint8"));
+        VerifyOrReturn(CheckConstraintType("batteryChargeState", "", "enum8"));
         VerifyOrReturn(CheckConstraintMinValue<uint8_t>("batteryChargeState", batteryChargeState, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("batteryChargeState", batteryChargeState, 3));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeBatChargeState_19()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-        uint8_t batteryChargeStateArgument;
-        batteryChargeStateArgument = 0;
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeState::TypeInfo>(
-            batteryChargeStateArgument, this, OnSuccessCallback_19, OnFailureCallback_19));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_19(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-        NextTest();
-    }
-
-    void OnSuccessResponse_19() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeBatChargeState_20()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeState::TypeInfo>(
-            this, OnSuccessCallback_20, OnFailureCallback_20, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_20(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_20(uint8_t batteryChargeState)
-    {
-        VerifyOrReturn(CheckValue("batteryChargeState", batteryChargeState, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadOptionalNonGlobalAttributeBatVoltage_21()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryVoltage::TypeInfo>(
-            this, OnSuccessCallback_21, OnFailureCallback_21, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_21(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_21(uint32_t batteryVoltage)
-    {
-        VerifyOrReturn(CheckValue("batteryVoltage", batteryVoltage, 0UL));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadOptionalNonGlobalAttributeConstraintsBatVoltage_22()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryVoltage::TypeInfo>(
-            this, OnSuccessCallback_22, OnFailureCallback_22, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_22(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_22(uint32_t batteryVoltage)
-    {
-        VerifyOrReturn(CheckConstraintType("batteryVoltage", "", "uint32"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToOptionalNonGlobalAttributeBatVoltage_23()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-        uint32_t batteryVoltageArgument;
-        batteryVoltageArgument = 0UL;
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryVoltage::TypeInfo>(
-            batteryVoltageArgument, this, OnSuccessCallback_23, OnFailureCallback_23));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_23(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-        NextTest();
-    }
-
-    void OnSuccessResponse_23() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackTheOptionalNonGlobalAttributeBatVoltage_24()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryVoltage::TypeInfo>(
-            this, OnSuccessCallback_24, OnFailureCallback_24, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_24(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_24(uint32_t batteryVoltage)
-    {
-        VerifyOrReturn(CheckValue("batteryVoltage", batteryVoltage, 0UL));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadOptionalNonGlobalAttributeBatPercentRemaining_25()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryPercentRemaining::TypeInfo>(
-            this, OnSuccessCallback_25, OnFailureCallback_25, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_25(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_25(uint8_t batteryPercentRemaining)
-    {
-        VerifyOrReturn(CheckValue("batteryPercentRemaining", batteryPercentRemaining, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadOptionalNonGlobalAttributeConstraintsBatPercentRemaining_26()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryPercentRemaining::TypeInfo>(
-            this, OnSuccessCallback_26, OnFailureCallback_26, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_26(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_26(uint8_t batteryPercentRemaining)
-    {
-        VerifyOrReturn(CheckConstraintType("batteryPercentRemaining", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("batteryPercentRemaining", batteryPercentRemaining, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("batteryPercentRemaining", batteryPercentRemaining, 200));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToOptionalNonGlobalAttributeBatPercentRemaining_27()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-        uint8_t batteryPercentRemainingArgument;
-        batteryPercentRemainingArgument = 0;
-
-        ReturnErrorOnFailure(
-            cluster.WriteAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryPercentRemaining::TypeInfo>(
-                batteryPercentRemainingArgument, this, OnSuccessCallback_27, OnFailureCallback_27));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_27(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-        NextTest();
-    }
-
-    void OnSuccessResponse_27() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackTheOptionalNonGlobalAttributeBatPercentRemaining_28()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryPercentRemaining::TypeInfo>(
-            this, OnSuccessCallback_28, OnFailureCallback_28, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_28(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_28(uint8_t batteryPercentRemaining)
-    {
-        VerifyOrReturn(CheckValue("batteryPercentRemaining", batteryPercentRemaining, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadOptionalNonGlobalAttributeBatTimeRemaining_29()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryTimeRemaining::TypeInfo>(
-            this, OnSuccessCallback_29, OnFailureCallback_29, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_29(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_29(uint32_t batteryTimeRemaining)
-    {
-        VerifyOrReturn(CheckValue("batteryTimeRemaining", batteryTimeRemaining, 0UL));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadOptionalNonGlobalAttributeConstraintsBatTimeRemaining_30()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryTimeRemaining::TypeInfo>(
-            this, OnSuccessCallback_30, OnFailureCallback_30, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_30(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_30(uint32_t batteryTimeRemaining)
-    {
-        VerifyOrReturn(CheckConstraintType("batteryTimeRemaining", "", "uint32"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToOptionalNonGlobalAttributeBatTimeRemaining_31()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-        uint32_t batteryTimeRemainingArgument;
-        batteryTimeRemainingArgument = 0UL;
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryTimeRemaining::TypeInfo>(
-            batteryTimeRemainingArgument, this, OnSuccessCallback_31, OnFailureCallback_31));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_31(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-        NextTest();
-    }
-
-    void OnSuccessResponse_31() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackTheOptionalNonGlobalAttributeBatTimeRemaining_32()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::PowerSourceClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryTimeRemaining::TypeInfo>(
-            this, OnSuccessCallback_32, OnFailureCallback_32, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_32(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_32(uint32_t batteryTimeRemaining)
-    {
-        VerifyOrReturn(CheckValue("batteryTimeRemaining", batteryTimeRemaining, 0UL));
-
         NextTest();
     }
 };
@@ -56002,6 +55112,7 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("fullMotionDuration", 0, UINT16_MAX, &mFullMotionDuration);
     }
 
     ~Test_TC_WNCV_4_1() {}
@@ -56040,13 +55151,13 @@ public:
             err = TestThSendsDownOrCloseCommandToDut_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : TH waits for 5-15 seconds movement(s) on the DUT\n");
-            err = TestThWaitsFor515SecondsMovementsOnTheDut_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH waits for x seconds movement(s) on the DUT\n");
+            err = TestThWaitsForXSecondsMovementsOnTheDut_2();
             break;
         case 3:
             ChipLogProgress(chipTool,
                             " ***** Test Step 3 : If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_LF && WNCV_LF"))
+            if (ShouldSkip("WNCV_PA_LF && WNCV_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"))
             {
                 NextTest();
                 return;
@@ -56058,70 +55169,20 @@ public:
             err = TestWait1000ms_4();
             break;
         case 5:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 5 : If (PA_LF & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_LF && WNCV_LF"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestIfPaLfLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : TH set a timeout of X minutes for failure\n");
+            err = TestThSetATimeoutOfXMinutesForFailure_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : TH set a timeout of 5-10 minutes for failure\n");
-            err = TestThSetATimeoutOf510MinutesForFailure_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : TH reads OperationalStatus attribute from DUT\n");
+            err = TestThReadsOperationalStatusAttributeFromDut_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : TH reads OperationalStatus attribute from DUT\n");
-            err = TestThReadsOperationalStatusAttributeFromDut_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 1000ms\n");
+            err = TestWait1000ms_7();
             break;
         case 8:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 8 : If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_LF && WNCV_LF"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestIfPaLfLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 9 : If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_LF && WNCV_LF"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestIfPaLfLfThReadsCurrentPositionLiftPercentageAttributeFromDut_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Wait 1000ms\n");
-            err = TestWait1000ms_10();
-            break;
-        case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : TH reads OperationalStatus attribute from DUT\n");
-            err = TestThReadsOperationalStatusAttributeFromDut_11();
-            break;
-        case 12:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 12 : If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_LF && WNCV_LF"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestIfPaLfLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_12();
-            break;
-        case 13:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 13 : If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_LF && WNCV_LF"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestIfPaLfLfThReadsCurrentPositionLiftPercentageAttributeFromDut_13();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : TH reads OperationalStatus attribute from DUT\n");
+            err = TestThReadsOperationalStatusAttributeFromDut_8();
             break;
         }
 
@@ -56134,11 +55195,12 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 14;
+    const uint16_t mTestCount = 9;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mFullMotionDuration;
 
     void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
     {
@@ -56159,25 +55221,14 @@ private:
         (static_cast<Test_TC_WNCV_4_1 *>(context))->OnSuccessResponse_3(currentPositionLiftPercent100ths);
     }
 
-    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnFailureResponse_5(error);
+        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_5(void * context,
-                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    static void OnSuccessCallback_6(void * context, uint8_t operationalStatus)
     {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnSuccessResponse_5(targetPositionLiftPercent100ths);
-    }
-
-    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnFailureResponse_7(error);
-    }
-
-    static void OnSuccessCallback_7(void * context, uint8_t operationalStatus)
-    {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnSuccessResponse_7(operationalStatus);
+        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnSuccessResponse_6(operationalStatus);
     }
 
     static void OnFailureCallback_8(void * context, CHIP_ERROR error)
@@ -56185,53 +55236,9 @@ private:
         (static_cast<Test_TC_WNCV_4_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context,
-                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    static void OnSuccessCallback_8(void * context, uint8_t operationalStatus)
     {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnSuccessResponse_8(currentPositionLiftPercent100ths);
-    }
-
-    static void OnFailureCallback_9(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnFailureResponse_9(error);
-    }
-
-    static void OnSuccessCallback_9(void * context,
-                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
-    {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnSuccessResponse_9(currentPositionLiftPercentage);
-    }
-
-    static void OnFailureCallback_11(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnFailureResponse_11(error);
-    }
-
-    static void OnSuccessCallback_11(void * context, uint8_t operationalStatus)
-    {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnSuccessResponse_11(operationalStatus);
-    }
-
-    static void OnFailureCallback_12(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnFailureResponse_12(error);
-    }
-
-    static void OnSuccessCallback_12(void * context,
-                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
-    {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnSuccessResponse_12(currentPositionLiftPercent100ths);
-    }
-
-    static void OnFailureCallback_13(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnFailureResponse_13(error);
-    }
-
-    static void OnSuccessCallback_13(void * context,
-                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
-    {
-        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnSuccessResponse_13(currentPositionLiftPercentage);
+        (static_cast<Test_TC_WNCV_4_1 *>(context))->OnSuccessResponse_8(operationalStatus);
     }
 
     //
@@ -56272,10 +55279,10 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestThWaitsFor515SecondsMovementsOnTheDut_2()
+    CHIP_ERROR TestThWaitsForXSecondsMovementsOnTheDut_2()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(5000);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
     }
 
     CHIP_ERROR TestIfPaLfLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_3()
@@ -56316,43 +55323,13 @@ private:
         return WaitForMs(1000);
     }
 
-    CHIP_ERROR TestIfPaLfLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_5()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_5, OnFailureCallback_5, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_5(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
-    {
-        VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "percent100ths"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionLiftPercent100ths",
-                                                                    targetPositionLiftPercent100ths, 10000U));
-        NextTest();
-    }
-
-    CHIP_ERROR TestThSetATimeoutOf510MinutesForFailure_6()
+    CHIP_ERROR TestThSetATimeoutOfXMinutesForFailure_5()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(5000);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
     }
 
-    CHIP_ERROR TestThReadsOperationalStatusAttributeFromDut_7()
+    CHIP_ERROR TestThReadsOperationalStatusAttributeFromDut_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
@@ -56361,23 +55338,30 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7, true));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_7(CHIP_ERROR error)
+    void OnFailureResponse_6(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(uint8_t operationalStatus)
+    void OnSuccessResponse_6(uint8_t operationalStatus)
     {
-        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
+        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
+
         NextTest();
     }
 
-    CHIP_ERROR TestIfPaLfLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_8()
+    CHIP_ERROR TestWait1000ms_7()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestThReadsOperationalStatusAttributeFromDut_8()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
@@ -56385,9 +55369,8 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_8, OnFailureCallback_8, true));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -56397,130 +55380,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    void OnSuccessResponse_8(uint8_t operationalStatus)
     {
-        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "percent100ths"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
-                                                                    currentPositionLiftPercent100ths, 10000U));
-        NextTest();
-    }
+        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
 
-    CHIP_ERROR TestIfPaLfLfThReadsCurrentPositionLiftPercentageAttributeFromDut_9()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_9, OnFailureCallback_9, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_9(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_9(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
-    {
-        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "percent"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWait1000ms_10()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestThReadsOperationalStatusAttributeFromDut_11()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_11(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_11(uint8_t operationalStatus)
-    {
-        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestIfPaLfLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_12()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_12, OnFailureCallback_12, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_12(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_12(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
-    {
-        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "percent100ths"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
-                                                                    currentPositionLiftPercent100ths, 10000U));
-        NextTest();
-    }
-
-    CHIP_ERROR TestIfPaLfLfThReadsCurrentPositionLiftPercentageAttributeFromDut_13()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_13, OnFailureCallback_13, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_13(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_13(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
-    {
-        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "percent"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
         NextTest();
     }
 };
@@ -56534,6 +55397,7 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("fullMotionDuration", 0, UINT16_MAX, &mFullMotionDuration);
     }
 
     ~Test_TC_WNCV_4_2() {}
@@ -56572,13 +55436,13 @@ public:
             err = TestThSendsDownOrCloseCommandToDut_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : TH waits for 5-15 seconds movement(s) on the DUT\n");
-            err = TestThWaitsFor515SecondsMovementsOnTheDut_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : TH waits for X seconds movement(s) on the DUT\n");
+            err = TestThWaitsForXSecondsMovementsOnTheDut_2();
             break;
         case 3:
             ChipLogProgress(chipTool,
                             " ***** Test Step 3 : If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_TL && WNCV_TL"))
+            if (ShouldSkip("WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONLIFTPERCENT100THS"))
             {
                 NextTest();
                 return;
@@ -56590,75 +55454,20 @@ public:
             err = TestWait1000ms_4();
             break;
         case 5:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 5 : If (PA_TL & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT\n");
-            err = TestIfPaTlTlThReadsTargetPositionTiltPercent100thsAttributeFromDut_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : TH set a timeout of X minutes for failure\n");
+            err = TestThSetATimeoutOfXMinutesForFailure_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : TH set a timeout of 5-10 minutes for failure\n");
-            err = TestThSetATimeoutOf510MinutesForFailure_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : TH reads OperationalStatus attribute from DUT\n");
+            err = TestThReadsOperationalStatusAttributeFromDut_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : TH reads OperationalStatus attribute from DUT\n");
-            err = TestThReadsOperationalStatusAttributeFromDut_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 1000ms\n");
+            err = TestWait1000ms_7();
             break;
         case 8:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 8 : If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_TL && WNCV_TL"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestIfPaTlTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 9 : If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_TL && WNCV_TL"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestIfPaTlTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 10 : If (PA_TL & TL) TH reads CurrentPositionTiltPercentage attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_TL && WNCV_TL"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestIfPaTlTlThReadsCurrentPositionTiltPercentageAttributeFromDut_10();
-            break;
-        case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Wait 1000ms\n");
-            err = TestWait1000ms_11();
-            break;
-        case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : TH reads OperationalStatus attribute from DUT\n");
-            err = TestThReadsOperationalStatusAttributeFromDut_12();
-            break;
-        case 13:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 13 : If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_TL && WNCV_TL"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestIfPaTlTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_13();
-            break;
-        case 14:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 14 : If (PA_TL & TL) TH reads CurrentPositionTiltPercentage attribute from DUT\n");
-            if (ShouldSkip("WNCV_PA_TL && WNCV_TL"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestIfPaTlTlThReadsCurrentPositionTiltPercentageAttributeFromDut_14();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : TH reads OperationalStatus attribute from DUT\n");
+            err = TestThReadsOperationalStatusAttributeFromDut_8();
             break;
         }
 
@@ -56671,11 +55480,12 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 15;
+    const uint16_t mTestCount = 9;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mFullMotionDuration;
 
     void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
     {
@@ -56696,25 +55506,14 @@ private:
         (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_3(currentPositionTiltPercent100ths);
     }
 
-    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
     {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnFailureResponse_5(error);
+        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_5(void * context,
-                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
+    static void OnSuccessCallback_6(void * context, uint8_t operationalStatus)
     {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_5(targetPositionTiltPercent100ths);
-    }
-
-    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnFailureResponse_7(error);
-    }
-
-    static void OnSuccessCallback_7(void * context, uint8_t operationalStatus)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_7(operationalStatus);
+        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_6(operationalStatus);
     }
 
     static void OnFailureCallback_8(void * context, CHIP_ERROR error)
@@ -56722,64 +55521,9 @@ private:
         (static_cast<Test_TC_WNCV_4_2 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context,
-                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    static void OnSuccessCallback_8(void * context, uint8_t operationalStatus)
     {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_8(currentPositionTiltPercent100ths);
-    }
-
-    static void OnFailureCallback_9(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnFailureResponse_9(error);
-    }
-
-    static void OnSuccessCallback_9(void * context,
-                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_9(currentPositionTiltPercent100ths);
-    }
-
-    static void OnFailureCallback_10(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnFailureResponse_10(error);
-    }
-
-    static void OnSuccessCallback_10(void * context,
-                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_10(currentPositionTiltPercentage);
-    }
-
-    static void OnFailureCallback_12(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnFailureResponse_12(error);
-    }
-
-    static void OnSuccessCallback_12(void * context, uint8_t operationalStatus)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_12(operationalStatus);
-    }
-
-    static void OnFailureCallback_13(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnFailureResponse_13(error);
-    }
-
-    static void OnSuccessCallback_13(void * context,
-                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_13(currentPositionTiltPercent100ths);
-    }
-
-    static void OnFailureCallback_14(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnFailureResponse_14(error);
-    }
-
-    static void OnSuccessCallback_14(void * context,
-                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
-    {
-        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_14(currentPositionTiltPercentage);
+        (static_cast<Test_TC_WNCV_4_2 *>(context))->OnSuccessResponse_8(operationalStatus);
     }
 
     //
@@ -56820,10 +55564,10 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestThWaitsFor515SecondsMovementsOnTheDut_2()
+    CHIP_ERROR TestThWaitsForXSecondsMovementsOnTheDut_2()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(5000);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
     }
 
     CHIP_ERROR TestIfPaTlTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_3()
@@ -56864,43 +55608,13 @@ private:
         return WaitForMs(1000);
     }
 
-    CHIP_ERROR TestIfPaTlTlThReadsTargetPositionTiltPercent100thsAttributeFromDut_5()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_5, OnFailureCallback_5, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_5(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
-    {
-        VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "percent100ths"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionTiltPercent100ths",
-                                                                    targetPositionTiltPercent100ths, 10000U));
-        NextTest();
-    }
-
-    CHIP_ERROR TestThSetATimeoutOf510MinutesForFailure_6()
+    CHIP_ERROR TestThSetATimeoutOfXMinutesForFailure_5()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(5000);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
     }
 
-    CHIP_ERROR TestThReadsOperationalStatusAttributeFromDut_7()
+    CHIP_ERROR TestThReadsOperationalStatusAttributeFromDut_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
@@ -56909,23 +55623,30 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7, true));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_7(CHIP_ERROR error)
+    void OnFailureResponse_6(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(uint8_t operationalStatus)
+    void OnSuccessResponse_6(uint8_t operationalStatus)
     {
-        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
+        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
+
         NextTest();
     }
 
-    CHIP_ERROR TestIfPaTlTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_8()
+    CHIP_ERROR TestWait1000ms_7()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestThReadsOperationalStatusAttributeFromDut_8()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
@@ -56933,9 +55654,8 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_8, OnFailureCallback_8, true));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -56945,156 +55665,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    void OnSuccessResponse_8(uint8_t operationalStatus)
     {
-        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
-        NextTest();
-    }
+        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
 
-    CHIP_ERROR TestIfPaTlTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_9()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_9, OnFailureCallback_9, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_9(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_9(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
-    {
-        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "percent100ths"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
-                                                                    currentPositionTiltPercent100ths, 10000U));
-        NextTest();
-    }
-
-    CHIP_ERROR TestIfPaTlTlThReadsCurrentPositionTiltPercentageAttributeFromDut_10()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_10, OnFailureCallback_10, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_10(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_10(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
-    {
-        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "percent"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
-        NextTest();
-    }
-
-    CHIP_ERROR TestWait1000ms_11()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestThReadsOperationalStatusAttributeFromDut_12()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_12(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_12(uint8_t operationalStatus)
-    {
-        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestIfPaTlTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_13()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_13, OnFailureCallback_13, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_13(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_13(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
-    {
-        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "percent100ths"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
-                                                                    currentPositionTiltPercent100ths, 10000U));
-        NextTest();
-    }
-
-    CHIP_ERROR TestIfPaTlTlThReadsCurrentPositionTiltPercentageAttributeFromDut_14()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_14, OnFailureCallback_14, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_14(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_14(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
-    {
-        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "percent"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
         NextTest();
     }
 };
@@ -88013,24 +86587,6 @@ public:
             }
             err = TestSendsResetWatermarksToDut_1();
             break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapUsed attribute value from DUT\n");
-            if (ShouldSkip("A_CURRENTHEAPUSED"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadsCurrentHeapUsedAttributeValueFromDut_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHeapHighWaterMark attribute value from DUT\n");
-            if (ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_3();
-            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -88042,7 +86598,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 2;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -88054,26 +86610,6 @@ private:
 
         VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
         NextTest();
-    }
-
-    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnFailureResponse_2(error);
-    }
-
-    static void OnSuccessCallback_2(void * context, uint64_t currentHeapUsed)
-    {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_2(currentHeapUsed);
-    }
-
-    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnFailureResponse_3(error);
-    }
-
-    static void OnSuccessCallback_3(void * context, uint64_t currentHeapHighWatermark)
-    {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_3(currentHeapHighWatermark);
     }
 
     //
@@ -88113,57 +86649,6 @@ private:
     }
 
     void OnSuccessResponse_1() { NextTest(); }
-
-    CHIP_ERROR TestReadsCurrentHeapUsedAttributeValueFromDut_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(uint64_t currentHeapUsed)
-    {
-        VerifyOrReturn(CheckConstraintType("currentHeapUsed", "", "uint64"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ListFreer listFreer;
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3, true));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_3(uint64_t currentHeapHighWatermark)
-    {
-        VerifyOrReturn(CheckConstraintType("currentHeapHighWatermark", "", "uint64"));
-        NextTest();
-    }
 };
 
 class TestSubscribe_OnOff : public TestCommand

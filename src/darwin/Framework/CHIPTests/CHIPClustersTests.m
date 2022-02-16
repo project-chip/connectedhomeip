@@ -17396,7 +17396,8 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 }
 - (void)testSendClusterTest_TC_PS_2_1_000001_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read mandatory non-global attribute: Status"];
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Test Harness Client reads Status attribute from Server DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -17404,13 +17405,21 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read mandatory non-global attribute: Status Error: %@", err);
+        NSLog(@"Test Harness Client reads Status attribute from Server DUT Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 3);
+            }
         }
 
         [expectation fulfill];
@@ -17420,76 +17429,57 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 }
 - (void)testSendClusterTest_TC_PS_2_1_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read mandatory non-global attribute constraints: Status"];
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Test Harness Client reads Order attribute from Server DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read mandatory non-global attribute constraints: Status Error: %@", err);
+    [cluster readAttributeOrderWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Test Harness Client reads Order attribute from Server DUT Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-            }
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 3);
-            }
-        }
 
         [expectation fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_PS_2_1_000003_WriteAttribute
+- (void)testSendClusterTest_TC_PS_2_1_000003_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Write the default values to mandatory non-global attribute: Status"];
+        [self expectationWithDescription:@"Test Harness Client reads Description attribute from Server DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    id statusArgument;
-    statusArgument = [NSNumber numberWithUnsignedChar:0];
-    [cluster writeAttributeStatusWithValue:statusArgument
-                         completionHandler:^(NSError * _Nullable err) {
-                             NSLog(@"Write the default values to mandatory non-global attribute: Status Error: %@", err);
+    [cluster readAttributeDescriptionWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Test Harness Client reads Description attribute from Server DUT Error: %@", err);
 
-                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
-                             [expectation fulfill];
-                         }];
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PS_2_1_000004_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back the mandatory non-global attribute: Status"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Test Harness Client reads BatVoltage from Server DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads back the mandatory non-global attribute: Status Error: %@", err);
+    [cluster readAttributeBatteryVoltageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Test Harness Client reads BatVoltage from Server DUT Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
 
         [expectation fulfill];
     }];
@@ -17498,497 +17488,8 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 }
 - (void)testSendClusterTest_TC_PS_2_1_000005_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read mandatory non-global attribute: Order"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeOrderWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read mandatory non-global attribute: Order Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000006_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read mandatory non-global attribute constraints: Order"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeOrderWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read mandatory non-global attribute constraints: Order Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000007_WriteAttribute
-{
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Write the default values to mandatory non-global attribute: Order"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    id orderArgument;
-    orderArgument = [NSNumber numberWithUnsignedChar:0];
-    [cluster writeAttributeOrderWithValue:orderArgument
-                        completionHandler:^(NSError * _Nullable err) {
-                            NSLog(@"Write the default values to mandatory non-global attribute: Order Error: %@", err);
-
-                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
-                            [expectation fulfill];
-                        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000008_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back the mandatory non-global attribute: Order"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeOrderWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads back the mandatory non-global attribute: Order Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000009_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read mandatory non-global attribute: Description"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeDescriptionWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read mandatory non-global attribute: Description Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertTrue([actualValue isEqualToString:@""]);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000010_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Read mandatory non-global attribute constraints: Description"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeDescriptionWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read mandatory non-global attribute constraints: Description Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertLessThanOrEqual([actualValue length], 60);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000011_WriteAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Write the default values to mandatory non-global attribute: Description"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    id descriptionArgument;
-    descriptionArgument = @"";
-    [cluster writeAttributeDescriptionWithValue:descriptionArgument
-                              completionHandler:^(NSError * _Nullable err) {
-                                  NSLog(@"Write the default values to mandatory non-global attribute: Description Error: %@", err);
-
-                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
-                                  [expectation fulfill];
-                              }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000012_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Reads back the mandatory non-global attribute: Description"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeDescriptionWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads back the mandatory non-global attribute: Description Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertTrue([actualValue isEqualToString:@""]);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000013_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read mandatory non-global attribute: BatChargeLevel"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryChargeLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read mandatory non-global attribute: BatChargeLevel Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000014_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Read mandatory non-global attribute constraints: BatChargeLevel"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryChargeLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read mandatory non-global attribute constraints: BatChargeLevel Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-            }
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 2);
-            }
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000015_WriteAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Write the default values to mandatory non-global attribute: BatChargeLevel"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    id batteryChargeLevelArgument;
-    batteryChargeLevelArgument = [NSNumber numberWithUnsignedChar:0];
-    [cluster
-        writeAttributeBatteryChargeLevelWithValue:batteryChargeLevelArgument
-                                completionHandler:^(NSError * _Nullable err) {
-                                    NSLog(@"Write the default values to mandatory non-global attribute: BatChargeLevel Error: %@",
-                                        err);
-
-                                    XCTAssertEqual(
-                                        [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
-                                    [expectation fulfill];
-                                }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000016_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Reads back the mandatory non-global attribute: BatChargeLevel"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryChargeLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads back the mandatory non-global attribute: BatChargeLevel Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000017_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read mandatory non-global attribute: BatChargeState"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryChargeStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read mandatory non-global attribute: BatChargeState Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000018_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Read mandatory non-global attribute constraints: BatChargeState"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryChargeStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read mandatory non-global attribute constraints: BatChargeState Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-            }
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 3);
-            }
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000019_WriteAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Write the default values to mandatory non-global attribute: BatChargeState"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    id batteryChargeStateArgument;
-    batteryChargeStateArgument = [NSNumber numberWithUnsignedChar:0];
-    [cluster
-        writeAttributeBatteryChargeStateWithValue:batteryChargeStateArgument
-                                completionHandler:^(NSError * _Nullable err) {
-                                    NSLog(@"Write the default values to mandatory non-global attribute: BatChargeState Error: %@",
-                                        err);
-
-                                    XCTAssertEqual(
-                                        [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
-                                    [expectation fulfill];
-                                }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000020_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Reads back the mandatory non-global attribute: BatChargeState"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryChargeStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads back the mandatory non-global attribute: BatChargeState Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000021_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read optional non-global attribute: BatVoltage"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryVoltageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read optional non-global attribute: BatVoltage Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000022_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Read optional non-global attribute constraints: BatVoltage"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryVoltageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read optional non-global attribute constraints: BatVoltage Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000023_WriteAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Write the default values to optional non-global attribute: BatVoltage"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    id batteryVoltageArgument;
-    batteryVoltageArgument = [NSNumber numberWithUnsignedInt:0UL];
-    [cluster
-        writeAttributeBatteryVoltageWithValue:batteryVoltageArgument
-                            completionHandler:^(NSError * _Nullable err) {
-                                NSLog(@"Write the default values to optional non-global attribute: BatVoltage Error: %@", err);
-
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
-                                [expectation fulfill];
-                            }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000024_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back the optional non-global attribute: BatVoltage"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryVoltageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads back the optional non-global attribute: BatVoltage Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000025_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read optional non-global attribute: BatPercentRemaining"];
+        [self expectationWithDescription:@"Test Harness Client reads BatPercentRemaining from Server DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -17996,32 +17497,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeBatteryPercentRemainingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read optional non-global attribute: BatPercentRemaining Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000026_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Read optional non-global attribute constraints: BatPercentRemaining"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryPercentRemainingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read optional non-global attribute constraints: BatPercentRemaining Error: %@", err);
+        NSLog(@"Test Harness Client reads BatPercentRemaining from Server DUT Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -18043,49 +17519,51 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_PS_2_1_000027_WriteAttribute
+- (void)testSendClusterTest_TC_PS_2_1_000006_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Write the default values to optional non-global attribute: BatPercentRemaining"];
+        [self expectationWithDescription:@"Test Harness Client reads BatTimeRemaining from Server DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    id batteryPercentRemainingArgument;
-    batteryPercentRemainingArgument = [NSNumber numberWithUnsignedChar:0];
-    [cluster writeAttributeBatteryPercentRemainingWithValue:batteryPercentRemainingArgument
-                                          completionHandler:^(NSError * _Nullable err) {
-                                              NSLog(@"Write the default values to optional non-global attribute: "
-                                                    @"BatPercentRemaining Error: %@",
-                                                  err);
+    [cluster readAttributeBatteryTimeRemainingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Test Harness Client reads BatTimeRemaining from Server DUT Error: %@", err);
 
-                                              XCTAssertEqual(
-                                                  [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
-                                              [expectation fulfill];
-                                          }];
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_PS_2_1_000028_ReadAttribute
+- (void)testSendClusterTest_TC_PS_2_1_000007_ReadAttribute
 {
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Reads back the optional non-global attribute: BatPercentRemaining"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Test Harness Client reads BatChargeLevel from Server DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeBatteryPercentRemainingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads back the optional non-global attribute: BatPercentRemaining Error: %@", err);
+    [cluster readAttributeBatteryChargeLevelWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Test Harness Client reads BatChargeLevel from Server DUT Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 2);
+            }
         }
 
         [expectation fulfill];
@@ -18093,94 +17571,51 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_PS_2_1_000029_ReadAttribute
+- (void)testSendClusterTest_TC_PS_2_1_000008_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read optional non-global attribute: BatTimeRemaining"];
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Test Harness Client reads ActiveBatFaults from Server DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeBatteryTimeRemainingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read optional non-global attribute: BatTimeRemaining Error: %@", err);
+    [cluster readAttributeActiveBatteryFaultsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Test Harness Client reads ActiveBatFaults from Server DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_PS_2_1_000009_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Test Harness Client reads BatChargeState from Server DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeBatteryChargeStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Test Harness Client reads BatChargeState from Server DUT Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
+            }
         }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000030_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Read optional non-global attribute constraints: BatTimeRemaining"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryTimeRemainingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read optional non-global attribute constraints: BatTimeRemaining Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000031_WriteAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Write the default values to optional non-global attribute: BatTimeRemaining"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    id batteryTimeRemainingArgument;
-    batteryTimeRemainingArgument = [NSNumber numberWithUnsignedInt:0UL];
-    [cluster
-        writeAttributeBatteryTimeRemainingWithValue:batteryTimeRemainingArgument
-                                  completionHandler:^(NSError * _Nullable err) {
-                                      NSLog(
-                                          @"Write the default values to optional non-global attribute: BatTimeRemaining Error: %@",
-                                          err);
-
-                                      XCTAssertEqual(
-                                          [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
-                                      [expectation fulfill];
-                                  }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PS_2_1_000032_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Reads back the optional non-global attribute: BatTimeRemaining"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeBatteryTimeRemainingWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads back the optional non-global attribute: BatTimeRemaining Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 3);
+            }
         }
 
         [expectation fulfill];
@@ -30771,11 +30206,11 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 }
 - (void)testSendClusterTest_TC_WNCV_4_1_000002_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"TH waits for 5-15 seconds movement(s) on the DUT"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH waits for x seconds movement(s) on the DUT"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 5000);
-    [self waitForExpectationsWithTimeout:(5000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_4_1_000003_ReadAttribute
 {
@@ -30825,49 +30260,15 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     WaitForMs(expectation, queue, 1000);
     [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_1_000005_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_4_1_000005_WaitForMs
 {
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_LF & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_LF & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_1_000006_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"TH set a timeout of 5-10 minutes for failure"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH set a timeout of X minutes for failure"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 5000);
-    [self waitForExpectationsWithTimeout:(5000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_1_000007_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_4_1_000006_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads OperationalStatus attribute from DUT"];
 
@@ -30881,80 +30282,17 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
         [expectation fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_1_000008_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_1_000009_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 100);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_1_000010_WaitForMs
+- (void)testSendClusterTest_TC_WNCV_4_1_000007_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 1000ms"];
 
@@ -30962,7 +30300,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     WaitForMs(expectation, queue, 1000);
     [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_1_000011_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_4_1_000008_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads OperationalStatus attribute from DUT"];
 
@@ -30976,76 +30314,13 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
         [expectation fulfill];
     }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_1_000012_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_1_000013_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 100);
-                }
-            }
-
-            [expectation fulfill];
-        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -31079,11 +30354,11 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 }
 - (void)testSendClusterTest_TC_WNCV_4_2_000002_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"TH waits for 5-15 seconds movement(s) on the DUT"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH waits for X seconds movement(s) on the DUT"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 5000);
-    [self waitForExpectationsWithTimeout:(5000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_4_2_000003_ReadAttribute
 {
@@ -31133,49 +30408,15 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     WaitForMs(expectation, queue, 1000);
     [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_2_000005_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_4_2_000005_WaitForMs
 {
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_TL & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_TL & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_2_000006_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"TH set a timeout of 5-10 minutes for failure"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TH set a timeout of X minutes for failure"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 5000);
-    [self waitForExpectationsWithTimeout:(5000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_2_000007_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_4_2_000006_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads OperationalStatus attribute from DUT"];
 
@@ -31189,101 +30430,17 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
         [expectation fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_2_000008_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_2_000009_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_2_000010_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_TL & TL) TH reads CurrentPositionTiltPercentage attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_TL & TL) TH reads CurrentPositionTiltPercentage attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 100);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_2_000011_WaitForMs
+- (void)testSendClusterTest_TC_WNCV_4_2_000007_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 1000ms"];
 
@@ -31291,7 +30448,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     WaitForMs(expectation, queue, 1000);
     [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_2_000012_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_4_2_000008_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TH reads OperationalStatus attribute from DUT"];
 
@@ -31305,76 +30462,13 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
         [expectation fulfill];
     }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_2_000013_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_4_2_000014_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"If (PA_TL & TL) TH reads CurrentPositionTiltPercentage attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"If (PA_TL & TL) TH reads CurrentPositionTiltPercentage attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 100);
-                }
-            }
-
-            [expectation fulfill];
-        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -48988,54 +48082,6 @@ NSNumber * _Nonnull ourFabricIndex;
 
     [cluster resetWatermarksWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Sends ResetWatermarks to DUT Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_SWDIAG_3_1_000002_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads CurrentHeapUsed attribute value from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHeapUsedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads CurrentHeapUsed attribute value from DUT Error: %@", err);
-
-        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
-            [expectation fulfill];
-            return;
-        }
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_SWDIAG_3_1_000003_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads CurrentHeapHighWaterMark attribute value from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHeapHighWatermarkWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads CurrentHeapHighWaterMark attribute value from DUT Error: %@", err);
-
-        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
-            [expectation fulfill];
-            return;
-        }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
