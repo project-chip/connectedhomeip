@@ -93,8 +93,8 @@ class HostApp(Enum):
             yield 'chip-shell'
             yield 'chip-shell.map'
         elif self == HostApp.CERT_TOOL:
-            yield 'cert-tool'
-            yield 'cert-tool.map'
+            yield 'chip-cert'
+            yield 'chip-cert.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 

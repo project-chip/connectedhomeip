@@ -256,7 +256,11 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
         {
             uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
             MutableByteSpan mac(macBuffer);
-            chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
+            if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
+                Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
+            }
 
             const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
                                                  .SetPeerId(fabricInfo.GetPeerId())
@@ -293,7 +297,11 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
     MutableByteSpan mac(macBuffer);
-    chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
+    if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
+        Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
+    }
     advertiseParameters.SetMac(mac);
 
     uint16_t value;

@@ -24,6 +24,8 @@ static_library("transport") {
   sources = [
     "CryptoContext.cpp",
     "CryptoContext.h",
+    "GroupPeerMessageCounter.cpp",
+    "GroupPeerMessageCounter.h",
     "GroupSession.h",
     "MessageCounter.cpp",
     "MessageCounter.h",

@@ -45112,11 +45112,6 @@ NSNumber * _Nonnull ourFabricIndex;
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
-        }
-
         [expectation fulfill];
     }];
 
@@ -45140,11 +45135,6 @@ NSNumber * _Nonnull ourFabricIndex;
         }
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
-        }
 
         [expectation fulfill];
     }];

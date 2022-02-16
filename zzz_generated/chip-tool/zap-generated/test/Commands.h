@@ -81421,8 +81421,7 @@ private:
 
     void OnSuccessResponse_2(uint64_t currentHeapUsed)
     {
-        VerifyOrReturn(CheckValue("currentHeapUsed", currentHeapUsed, 0ULL));
-
+        VerifyOrReturn(CheckConstraintType("currentHeapUsed", "", "uint64"));
         NextTest();
     }
 
@@ -81448,8 +81447,7 @@ private:
 
     void OnSuccessResponse_3(uint64_t currentHeapHighWatermark)
     {
-        VerifyOrReturn(CheckValue("currentHeapHighWatermark", currentHeapHighWatermark, 0ULL));
-
+        VerifyOrReturn(CheckConstraintType("currentHeapHighWatermark", "", "uint64"));
         NextTest();
     }
 };
@@ -91699,7 +91697,7 @@ private:
 
         request.groupKeySet.groupKeySetID = 417U;
         request.groupKeySet.groupKeySecurityPolicy =
-            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(1);
         request.groupKeySet.epochKey0.SetNonNull();
         request.groupKeySet.epochKey0.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
