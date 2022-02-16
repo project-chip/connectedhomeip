@@ -102,6 +102,8 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::P6WiFiDriver::GetInstance()));
 } // namespace
 
+void OnTriggerUpdateTimerHandler(Layer * systemLayer, void * appState);
+
 AppTask AppTask::sAppTask;
 
 void NetWorkCommissioningInstInit()
@@ -247,7 +249,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 {
-    if (btnIdx != APP_FUNCTION_BUTTON_IDX)
+    if (btnIdx != APP_FUNCTION_BUTTON_IDX && btnIdx != APP_UPDATE_BUTTON_IDX)
     {
         return;
     }
@@ -260,6 +262,11 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
     if (btnIdx == APP_FUNCTION_BUTTON_IDX)
     {
         button_event.Handler = FunctionHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+    if (btnIdx == APP_UPDATE_BUTTON_IDX)
+    {
+        button_event.Handler = UpdateButtonHandler;
         sAppTask.PostEvent(&button_event);
     }
 }
@@ -342,6 +349,14 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
             P6_LOG("Factory Reset has been Canceled");
         }
+    }
+}
+
+void AppTask::UpdateButtonHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.Action == APP_BUTTON_RELEASED)
+    {
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2000), OnTriggerUpdateTimerHandler, nullptr);
     }
 }
 
@@ -428,4 +443,19 @@ void AppTask::UpdateClusterState(void)
     //{
     // P6_LOG("ERR: updating on/off %x", status);
     //}
+}
+
+void OnTriggerUpdateTimerHandler(Layer * systemLayer, void * appState)
+{
+    NodeId nodeId = 1;
+    FabricIndex fabIndex = 1;
+    EndpointId endpointId = 0;
+    P6_LOG("Triggering immediate OTA update query with hardcoded parameters:");
+    P6_LOG("Provider NodeId: %lu", nodeId);
+    P6_LOG("Provider FabricIndex: %lu", fabIndex);
+    P6_LOG("Provider EndpointId: %lu", endpointId);
+
+    OTARequestor *req  = static_cast<OTARequestor *>(GetRequestorInstance());
+    req->TestModeSetProviderParameters(nodeId, fabIndex, endpointId);
+    req->TriggerImmediateQuery();
 }

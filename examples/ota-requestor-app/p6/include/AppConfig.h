@@ -27,10 +27,10 @@
 
 #define APP_TASK_NAME "APP"
 
-#define APP_LIGHT_BUTTON_IDX 0
+#define APP_UPDATE_BUTTON_IDX 0
 #define APP_FUNCTION_BUTTON_IDX 1
 
-#define APP_LIGHT_BUTTON CYBSP_USER_BTN1
+#define APP_UPDATE_BUTTON CYBSP_USER_BTN1
 #define APP_FUNCTION_BUTTON CYBSP_USER_BTN2
 #define APP_BUTTON_DEBOUNCE_PERIOD_MS 50
 
@@ -38,7 +38,7 @@
 #define APP_BUTTON_RELEASED 1
 
 #define SYSTEM_STATE_LED CYBSP_USER_LED1
-#define LIGHT_LED CYBSP_USER_LED2
+#define UPDATE_LED CYBSP_USER_LED2
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
