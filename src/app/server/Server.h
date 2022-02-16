@@ -95,6 +95,10 @@ public:
 
     void Shutdown();
 
+    void ScheduleFactoryReset();
+
+    static void FactoryReset(intptr_t arg);
+
     static Server & GetInstance() { return sServer; }
 
 private:

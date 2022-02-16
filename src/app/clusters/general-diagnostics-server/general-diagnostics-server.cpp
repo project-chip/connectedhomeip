@@ -195,11 +195,24 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     }
 
     // Gets called when the device has been rebooted.
-    void OnDeviceRebooted() override
+    void OnDeviceRebooted(uint8_t bootReason) override
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
 
         ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReasons::Id);
+
+        for (auto endpoint : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+        {
+            Events::BootReason::Type event{ static_cast<BootReasonType>(bootReason) };
+            EventNumber eventNumber;
+
+            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent);
+            if (CHIP_NO_ERROR != err)
+            {
+                ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record BootReason event: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+        }
     }
 
     // Get called when the Node detects a hardware fault has been raised.

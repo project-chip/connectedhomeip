@@ -298,7 +298,10 @@ void GenericPlatformManagerImpl<ImplClass>::HandleDeviceRebooted(intptr_t arg)
 
     if (generalDiagnosticsDelegate != nullptr)
     {
-        generalDiagnosticsDelegate->OnDeviceRebooted();
+        uint8_t bootReason;
+
+        if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
+            generalDiagnosticsDelegate->OnDeviceRebooted(bootReason);
     }
 
     // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
@@ -306,8 +309,8 @@ void GenericPlatformManagerImpl<ImplClass>::HandleDeviceRebooted(intptr_t arg)
     {
         uint32_t softwareVersion;
 
-        ReturnOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
-        platformManagerDelegate->OnStartUp(softwareVersion);
+        if (ConfigurationMgr().GetSoftwareVersion(softwareVersion) == CHIP_NO_ERROR)
+            platformManagerDelegate->OnStartUp(softwareVersion);
     }
 }
 

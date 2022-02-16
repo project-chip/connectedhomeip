@@ -70,7 +70,7 @@ public:
      * @brief
      *   Called after the current device is rebooted.
      */
-    virtual void OnDeviceRebooted() {}
+    virtual void OnDeviceRebooted(uint8_t bootReason) {}
 
     /**
      * @brief
