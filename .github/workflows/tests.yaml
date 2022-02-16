@@ -29,7 +29,7 @@ concurrency:
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
-        timeout-minutes: 120
+        timeout-minutes: 140
 
         strategy:
             matrix:
@@ -142,7 +142,7 @@ jobs:
                   retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 120
+        timeout-minutes: 140
 
         strategy:
             matrix:
