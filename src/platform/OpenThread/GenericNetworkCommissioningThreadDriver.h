@@ -59,9 +59,9 @@ public:
     }
 
 private:
-    size_t currentIterating = 0;
-    size_t itemCount        = 0;
-    size_t kItemSize        = sizeof(T);
+    size_t currentIterating           = 0;
+    size_t itemCount                  = 0;
+    static constexpr size_t kItemSize = sizeof(T);
     T * mpScanResponse;
 };
 

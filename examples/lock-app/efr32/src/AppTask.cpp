@@ -48,9 +48,9 @@
 #include <platform/ThreadStackManager.h>
 #endif
 #ifdef SL_WIFI
+#include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
-#include "wfx_host_events.h"
 #endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
@@ -83,7 +83,8 @@ bool sIsWiFiProvisioned = false;
 bool sIsWiFiEnabled     = false;
 bool sIsWiFiAttached    = false;
 
-app::Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD

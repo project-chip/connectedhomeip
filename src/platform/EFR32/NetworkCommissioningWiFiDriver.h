@@ -30,7 +30,6 @@ constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
-
 // class SlScanResponseIterator : public Iterator<WiFiScanResponse>
 // {
 // public:
@@ -45,7 +44,8 @@ constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 
 //         item.security = mpScanResults[mIternum].authmode;
 //         item.ssidLen =
-//             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+//             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid),
+//             chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
 //         item.channel  = mpScanResults[mIternum].primary;
 //         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
 //         item.rssi     = mpScanResults[mIternum].rssi;
@@ -62,6 +62,48 @@ constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 //     const wifi_ap_record_t * mpScanResults;
 //     size_t mIternum = 0;
 // };
+
+template <typename T>
+class SlScanResponseIterator : public Iterator<T>
+{
+public:
+    SlScanResponseIterator(T * apScanResponse) : mpScanResponse(apScanResponse) {}
+    size_t Count() override { return itemCount; }
+    bool Next(T & item) override
+    {
+        if (mpScanResponse == nullptr || currentIterating >= itemCount)
+        {
+            return false;
+        }
+        item = mpScanResponse[currentIterating];
+        currentIterating++;
+        return true;
+    }
+    void Release() override
+    {
+        itemCount = currentIterating = 0;
+        Platform::MemoryFree(mpScanResponse);
+        mpScanResponse = nullptr;
+    }
+
+    void Add(T * pResponse)
+    {
+        size_t tempCount = itemCount + 1;
+        mpScanResponse   = static_cast<T *>(Platform::MemoryRealloc(mpScanResponse, kItemSize * tempCount));
+        if (mpScanResponse)
+        {
+            // first item at index. update after the copy.
+            memcpy(&(mpScanResponse[itemCount]), pResponse, kItemSize);
+            itemCount = tempCount;
+        }
+    }
+
+private:
+    size_t currentIterating           = 0;
+    size_t itemCount                  = 0;
+    static constexpr size_t kItemSize = sizeof(T);
+    T * mpScanResponse;
+};
 
 class SlWiFiDriver final : public WiFiDriver
 {
@@ -110,10 +152,9 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
-    uint8_t ConvertSecuritytype(wfx_sec_t security);
+    uint8_t ConvertSecuritytype(uint8_t security);
 
     void OnConnectWiFiNetwork();
-    void OnScanWiFiNetworkDone();
     static SlWiFiDriver & GetInstance()
     {
         static SlWiFiDriver instance;
@@ -122,11 +163,12 @@ public:
 
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
-    CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
+    bool StartScanWiFiNetworks(ByteSpan ssid);
+    static void OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult);
 
     WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
-    WiFiNetwork mSavedNetwork = {};
-    WiFiNetwork mStagingNetwork = {};
+    WiFiNetwork mSavedNetwork         = {};
+    WiFiNetwork mStagingNetwork       = {};
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
 };

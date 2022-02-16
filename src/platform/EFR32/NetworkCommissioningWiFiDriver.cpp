@@ -30,6 +30,10 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
+namespace {
+NetworkCommissioning::WiFiScanResponse * sScanResult;
+SlScanResponseIterator<NetworkCommissioning::WiFiScanResponse> mScanResponseIter(sScanResult);
+} // namespace
 
 CHIP_ERROR SlWiFiDriver::Init()
 {
@@ -40,17 +44,19 @@ CHIP_ERROR SlWiFiDriver::Init()
     mpConnectCallback     = nullptr;
 
     // If reading fails, wifi is not provisioned, no need to go further.
-    err = EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_WiFiSSID, mSavedNetwork.ssid,
-                                                        sizeof(mSavedNetwork.ssid), ssidLen);
-    VerifyOrReturnError(err==CHIP_NO_ERROR, CHIP_NO_ERROR); 
+    err =
+        EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid), ssidLen);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
     err = EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_WiFiPSK, mSavedNetwork.credentials,
-                                                        sizeof(mSavedNetwork.credentials), credentialsLen);
-    VerifyOrReturnError(err==CHIP_NO_ERROR, CHIP_NO_ERROR); 
+                                          sizeof(mSavedNetwork.credentials), credentialsLen);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;
+
+    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
     return err;
 }
 
@@ -60,8 +66,7 @@ CHIP_ERROR SlWiFiDriver::CommitConfiguration()
 
     ReturnErrorOnFailure(EFR32Config::WriteConfigValueStr(EFR32Config::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
     ReturnErrorOnFailure(EFR32Config::WriteConfigValueStr(EFR32Config::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
-    ReturnErrorOnFailure(EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_WiFiSEC, &securityType,
-                                                      sizeof(securityType)));
+    ReturnErrorOnFailure(EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
 
     mSavedNetwork = mStagingNetwork;
     return CHIP_NO_ERROR;
@@ -116,17 +121,17 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
 {
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     // Set the wifi configuration
-    wfx_wifi_provision_t wifiConfig;
-    memset(&wifiConfig, 0, sizeof(wifiConfig));
+    wfx_wifi_provision_t wifiConfig = {};
     memcpy(wifiConfig.ssid, ssid, ssidLen);
     memcpy(wifiConfig.passkey, key, keyLen);
     wifiConfig.security = WFX_SEC_WPA2;
 
+    ChipLogProgress(NetworkProvisioning, "Setting up connetion for WiFi SSID: %s", wifiConfig.ssid);
     // Configure the WFX WiFi interface.
     wfx_set_wifi_provision(&wifiConfig);
-
-    //ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
-    return ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
+    ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
+    ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
+    return CHIP_NO_ERROR;
 }
 
 void SlWiFiDriver::OnConnectWiFiNetwork()
@@ -141,20 +146,18 @@ void SlWiFiDriver::OnConnectWiFiNetwork()
 
 void SlWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kUnknownError;
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
 
-    ChipLogProgress(NetworkProvisioning, "Sl NetworkCommissioning connecting to SSID: %s", mStagingNetwork.ssid);
-
-    err = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
-                             reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
+    err = ConnectWiFiNetwork(mStagingNetwork.ssid, mStagingNetwork.ssidLen, mStagingNetwork.credentials,
+                             mStagingNetwork.credentialsLen);
     if (err == CHIP_NO_ERROR)
     {
         mpConnectCallback = callback;
-        networkingStatus = Status::kSuccess;
+        networkingStatus  = Status::kSuccess;
     }
 
 exit:
@@ -166,7 +169,7 @@ exit:
     }
 }
 
-uint8_t SlWiFiDriver::ConvertSecuritytype(wfx_sec_t security)
+uint8_t SlWiFiDriver::ConvertSecuritytype(uint8_t security)
 {
     uint8_t securityType = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
     if (security == WFX_SEC_NONE)
@@ -189,64 +192,54 @@ uint8_t SlWiFiDriver::ConvertSecuritytype(wfx_sec_t security)
     {
         securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
     }
-    // wfx_sec_t support more type 
+    // wfx_sec_t support more type
 
     return securityType;
 }
 
-CHIP_ERROR SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
+bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
-    if (ssid.data()) // ssid is given, only scan this network
+    bool scanStarted = false;
+    ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");
+    if (ssid.size()) // ssid is given, only scan this network
     {
+        char cSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {};
+        memcpy(cSsid, ssid.data(), ssid.size());
+        scanStarted = wfx_start_scan(cSsid, OnScanWiFiNetworkDone);
     }
     else // scan all networks
     {
+        scanStarted = wfx_start_scan(nullptr, OnScanWiFiNetworkDone);
     }
-    return CHIP_NO_ERROR;
+    return scanStarted;
 }
 
-void SlWiFiDriver::OnScanWiFiNetworkDone()
+void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
 {
-    // uint8_t ap_num = NumAP;
-    // if (!ap_num)
-    // {
-    //     ChipLogProgress(DeviceLayer, "No AP found");
-    //     if (mpScanCallback != nullptr)
-    //     {
-    //         mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), nullptr);
-    //         mpScanCallback = nullptr;
-    //     }
-    //     return;
-    // }
-    // cy_wcm_scan_result_t * ScanResult = &scan_result_list[0];
+    ChipLogProgress(DeviceLayer, "OnScanWiFiNetworkDone");
+    if (!aScanResult)
+    {
+        if (GetInstance().mpScanCallback != nullptr)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([]() {
+                GetInstance().mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+                GetInstance().mpScanCallback = nullptr;
+            });
+        }
+    }
+    else
+    {
+        NetworkCommissioning::WiFiScanResponse scanResponse = { 0 };
 
-    // if (ScanResult)
-    // {
-    //     if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_num, ScanResult]() {
-    //             SlScanResponseIterator iter(ap_num, ScanResult);
-    //             if (GetInstance().mpScanCallback)
-    //             {
-    //                 GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
-    //                 GetInstance().mpScanCallback = nullptr;
-    //             }
-    //             else
-    //             {
-    //                 ChipLogError(DeviceLayer, "can't find the ScanCallback function");
-    //             }
-    //         }))
-    //     {
-    //         ChipLogProgress(DeviceLayer, "ScheduleLambda OK");
-    //     }
-    // }
-    // else
-    // {
-    //     ChipLogError(DeviceLayer, "can't get ap_records ");
-    //     if (mpScanCallback)
-    //     {
-    //         mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-    //         mpScanCallback = nullptr;
-    //     }
-    // }
+        scanResponse.security = GetInstance().ConvertSecuritytype(aScanResult->security);
+        scanResponse.channel  = aScanResult->chan;
+        scanResponse.rssi     = aScanResult->rssi;
+        scanResponse.ssidLen  = strnlen(aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
+        memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
+
+        mScanResponseIter.Add(&scanResponse);
+    }
 }
 
 void SlWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
@@ -254,8 +247,9 @@ void SlWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
     if (callback != nullptr)
     {
         mpScanCallback = callback;
-        if (StartScanWiFiNetworks(ssid) != CHIP_NO_ERROR)
+        if (!StartScanWiFiNetworks(ssid))
         {
+            ChipLogError(DeviceLayer, "ScanWiFiNetworks failed to start");
             mpScanCallback = nullptr;
             callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         }
@@ -265,8 +259,8 @@ void SlWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
 CHIP_ERROR GetConnectedNetwork(Network & network)
 {
     wfx_wifi_provision_t wifiConfig;
-    
-    if (!wfx_is_sta_connected() || !wfx_get_wifi_provision(&wifiConfig) )
+
+    if (!wfx_is_sta_connected() || !wfx_get_wifi_provision(&wifiConfig))
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }

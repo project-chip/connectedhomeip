@@ -21,8 +21,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
+#include <platform/internal/BLEManager.h>
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
@@ -151,17 +151,11 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 {
-    char ssid[65];
-    size_t len = 0;
-
-    /* See if we have SSID in our Keys */
-    if ((Internal::EFR32Config::ReadConfigValueStr(Internal::EFR32Config::kConfigKey_WiFiSSID, ssid, sizeof(ssid) - 1, len) ==
-         CHIP_NO_ERROR) &&
-        (ssid[0] != 0))
+    wfx_wifi_provision_t wifiConfig;
+    if (wfx_get_wifi_provision(&wifiConfig))
     {
-        return true;
+        return (wifiConfig.ssid[0] != 0);
     }
-
     return false;
 }
 
@@ -169,6 +163,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 {
     return wfx_is_sta_mode_enabled();
 }
+
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
 {
     DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
@@ -183,11 +178,13 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiF
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectInterval(System::Clock::Timeout val)
 {
     mWiFiStationReconnectInterval = val;
     return CHIP_NO_ERROR;
 }
+
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
@@ -307,18 +304,7 @@ void ConnectivityManagerImpl::DriveStationState()
             {
                 if (mWiFiStationState != kWiFiStationState_Connecting)
                 {
-                    wfx_wifi_provision_t wcfg;
-                    size_t sz;
-
-                    (void) Internal::EFR32Config::ReadConfigValueStr(Internal::EFR32Config::kConfigKey_WiFiSSID, wcfg.ssid,
-                                                                     sizeof(wcfg.ssid), sz);
-                    (void) Internal::EFR32Config::ReadConfigValueStr(Internal::EFR32Config::kConfigKey_WiFiPSK, wcfg.passkey,
-                                                                     sizeof(wcfg.passkey), sz);
-                    (void) Internal::EFR32Config::ReadConfigValueBin(Internal::EFR32Config::kConfigKey_WiFiSEC, &wcfg.security,
-                                                                     sizeof(wcfg.security), sz);
-                    wfx_set_wifi_provision(&wcfg);
-
-                    ChipLogProgress(DeviceLayer, "Attempting to connect WiFi (%s)", wcfg.ssid);
+                    ChipLogProgress(DeviceLayer, "Attempting to connect WiFi");
                     if ((serr = wfx_connect_to_ap()) != SL_STATUS_OK)
                     {
                         ChipLogError(DeviceLayer, "wfx_connect_to_ap failed");
