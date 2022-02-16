@@ -77,7 +77,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR 
         FillNodeDataFromTxt(key, val, nodeData);
     }
 
-    proxy->OnNodeDiscoveryComplete(nodeData);
+    proxy->OnNodeDiscovered(nodeData);
     proxy->Release();
 }
 
@@ -86,7 +86,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
     if (CHIP_NO_ERROR != error)
     {
-        proxy->OnNodeIdResolutionFailed(PeerId(), error);
+        proxy->OnOperationalNodeResolutionFailed(PeerId(), error);
         proxy->Release();
         return;
     }
@@ -95,7 +95,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
 
     if (result == nullptr)
     {
-        proxy->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
+        proxy->OnOperationalNodeResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
         proxy->Release();
         return;
     }
@@ -106,7 +106,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     error = ExtractIdFromInstanceName(result->mName, &peerId);
     if (CHIP_NO_ERROR != error)
     {
-        proxy->OnNodeIdResolutionFailed(PeerId(), error);
+        proxy->OnOperationalNodeResolutionFailed(PeerId(), error);
         proxy->Release();
         return;
     }
@@ -137,7 +137,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     LogErrorOnFailure(sDnssdCache.Insert(nodeData));
 #endif
-    proxy->OnNodeIdResolved(nodeData);
+    proxy->OnOperationalNodeResolved(nodeData);
     proxy->Release();
 }
 
@@ -620,7 +620,7 @@ bool ResolverProxy::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::
         ResolvedNodeData nodeData;
         if (sDnssdCache.Lookup(peerId, nodeData) == CHIP_NO_ERROR)
         {
-            mDelegate->OnNodeIdResolved(nodeData);
+            mDelegate->OnOperationalNodeResolved(nodeData);
             mDelegate->Release();
             return true;
         }
