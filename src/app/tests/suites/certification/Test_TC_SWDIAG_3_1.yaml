@@ -41,20 +41,22 @@ tests:
           # TODO: Say something about the values?
           value: {}
 
+    #Disabled due to issue #830
     - label: "Reads CurrentHeapUsed attribute value from DUT"
       optional: true
+      disabled: true
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
       PICS: A_CURRENTHEAPUSED
       response:
-          constraints:
-              type: uint64
+          value: 0
 
+    #Disabled due to issue #830
     - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
       optional: true
+      disabled: true
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
       PICS: A_CURRENTHEAPHIGHWATERMARK
       response:
-          constraints:
-              type: uint64
+          value: 0

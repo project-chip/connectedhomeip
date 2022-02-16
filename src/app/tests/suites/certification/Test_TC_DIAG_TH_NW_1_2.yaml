@@ -15,6 +15,7 @@
 name: 51.2. TC-DIAG-TH_NW-1.2 Attributes [DUT Server]
 
 config:
+    nodeId: 0x12344321
     cluster: "Thread Network Diagnostics"
     endpoint: 0
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #Issue disabled this due to #14225
     - label: "read Channel attribute value"
@@ -116,14 +121,16 @@ tests:
       command: "readAttribute"
       attribute: "NeighborTableList"
       response:
-          value: []
+          constraints:
+              type: list
 
     - label: "read RouteTable attribute value"
       disabled: true
       command: "readAttribute"
       attribute: "RouteTableList"
       response:
-          value: []
+          constraints:
+              type: list
 
     - label: "read PartitionId attribute value"
       command: "readAttribute"

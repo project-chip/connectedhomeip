@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 62.2.1. [TC-PS-2.1] Attributes with server as DUT
+name: 60.2.1. [TC-PS-2.1] Attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Power Source"
     endpoint: 1
 
@@ -22,381 +23,38 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "Read mandatory non-global attribute: Status"
-      command: "readAttribute"
-      attribute: "Status"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute constraints: Status"
+    - label: "Test Harness Client reads Status attribute from Server DUT"
       command: "readAttribute"
       attribute: "Status"
       response:
           constraints:
-              type: PowerSourceStatus
+              type: enum8
               minValue: 0
               maxValue: 3
 
-    - label:
-          "Write the default values to mandatory non-global attribute: Status"
-      command: "writeAttribute"
-      attribute: "Status"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the mandatory non-global attribute: Status"
-      command: "readAttribute"
-      attribute: "Status"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute: Order"
-      command: "readAttribute"
-      attribute: "Order"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute constraints: Order"
+    - label: "Test Harness Client reads Order attribute from Server DUT"
       command: "readAttribute"
       attribute: "Order"
       response:
           constraints:
               type: uint8
 
-    - label: "Write the default values to mandatory non-global attribute: Order"
-      command: "writeAttribute"
-      attribute: "Order"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the mandatory non-global attribute: Order"
-      command: "readAttribute"
-      attribute: "Order"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute: Description"
-      command: "readAttribute"
-      attribute: "Description"
-      response:
-          value: ""
-
-    - label: "Read mandatory non-global attribute constraints: Description"
+    - label: "Test Harness Client reads Description attribute from Server DUT"
       command: "readAttribute"
       attribute: "Description"
       response:
           constraints:
               type: string
-              maxLength: 60
 
+    #Issue disabled below steps due to #13758
     - label:
-          "Write the default values to mandatory non-global attribute:
-          Description"
-      command: "writeAttribute"
-      attribute: "Description"
-      arguments:
-          value: ""
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the mandatory non-global attribute: Description"
-      command: "readAttribute"
-      attribute: "Description"
-      response:
-          value: ""
-
-    #issue disabled this due to #13758
-    - label: "Read mandatory non-global attribute: WiredCurrentType"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredCurrentType"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute constraints: WiredCurrentType"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredCurrentType"
-      response:
-          constraints:
-              type: WiredCurrentType
-              minValue: 0
-              maxValue: 1
-
-    - label:
-          "Write the default values to mandatory non-global attribute:
-          WiredCurrentType"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "WiredCurrentType"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the mandatory non-global attribute: WiredCurrentType"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredCurrentType"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute: BatChargeLevel"
-      command: "readAttribute"
-      attribute: "BatteryChargeLevel"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute constraints: BatChargeLevel"
-      command: "readAttribute"
-      attribute: "BatteryChargeLevel"
-      response:
-          constraints:
-              type: BatChargeLevel
-              minValue: 0
-              maxValue: 2
-
-    - label:
-          "Write the default values to mandatory non-global attribute:
-          BatChargeLevel"
-      command: "writeAttribute"
-      attribute: "BatteryChargeLevel"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the mandatory non-global attribute: BatChargeLevel"
-      command: "readAttribute"
-      attribute: "BatteryChargeLevel"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute: BatReplacementNeeded"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatReplacementNeeded"
-      response:
-          value: 0
-
-    - label:
-          "Read mandatory non-global attribute constraints: BatReplacementNeeded"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatChargeLevel"
-      response:
-          constraints:
-              type: bool
-
-    - label:
-          "Write the default values to mandatory non-global attribute:
-          BatReplacementNeeded"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatReplacementNeeded"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Reads back the mandatory non-global attribute: BatReplacementNeeded"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatReplacementNeeded"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute: BatReplaceability"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatReplaceability"
-      response:
-          value: 0
-
-    - label:
-          "Read mandatory non-global attribute constraints: BatReplaceability"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatReplaceability"
-      response:
-          constraints:
-              type: BatReplaceability
-              minValue: 0
-              maxValue: 3
-
-    - label:
-          "Write the default values to mandatory non-global attribute:
-          BatReplaceability"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatReplaceability"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the mandatory non-global attribute: BatReplaceability"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatReplaceability"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute: BatReplacementDescription"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatReplacementDescription"
-      response:
-          value: ""
-
-    - label:
-          "Read mandatory non-global attribute constraints:
-          BatReplacementDescription"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatReplacementDescription"
-      response:
-          constraints:
-              type: string
-              maxLength: 60
-
-    - label:
-          "Write the default values to mandatory non-global attribute:
-          BatReplacementDescription"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatReplacementDescription"
-      arguments:
-          value: ""
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Reads back the mandatory non-global attribute:
-          BatReplacementDescription"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatReplacementDescription"
-      response:
-          value: ""
-
-    - label: "Read mandatory non-global attribute: BatQuantity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatQuantity"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute constraints: BatQuantity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatQuantity"
-      response:
-          constraints:
-              type: uint8
-
-    - label:
-          "Write the default values to mandatory non-global attribute:
-          BatQuantity"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatQuantity"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the mandatory non-global attribute: BatQuantity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatQuantity"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute: BatChargeState"
-      command: "readAttribute"
-      attribute: "BatteryChargeState"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute constraints: BatChargeState"
-      command: "readAttribute"
-      attribute: "BatteryChargeState"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 3
-
-    - label:
-          "Write the default values to mandatory non-global attribute:
-          BatChargeState"
-      command: "writeAttribute"
-      attribute: "BatteryChargeState"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the mandatory non-global attribute: BatChargeState"
-      command: "readAttribute"
-      attribute: "BatteryChargeState"
-      response:
-          value: 0
-
-    - label: "Read mandatory non-global attribute: BatFunctionalWhileCharging"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatFunctionalWhileCharging"
-      response:
-          value: 0
-
-    - label:
-          "Read mandatory non-global attribute constraints:
-          BatFunctionalWhileCharging"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatFunctionalWhileCharging"
-      response:
-          constraints:
-              type: bool
-
-    - label:
-          "Write the default values to mandatory non-global attribute:
-          BatFunctionalWhileCharging"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatFunctionalWhileCharging"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Reads back the mandatory non-global attribute:
-          BatFunctionalWhileCharging"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatFunctionalWhileCharging"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: WiredAssessedInputVoltage"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredAssessedInputVoltage"
-      response:
-          value: 0
-
-    - label:
-          "Read optional non-global attribute constraints:
-          WiredAssessedInputVoltage"
+          "Test Harness Client reads WiredAssessedInputVoltage attribue from
+          Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "WiredAssessedInputVoltage"
@@ -405,35 +63,8 @@ tests:
               type: uint32
 
     - label:
-          "Write the default values to optional non-global attribute:
-          WiredAssessedInputVoltage"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "WiredAssessedInputVoltage"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Reads back the optional non-global attribute:
-          WiredAssessedInputVoltage"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredAssessedInputVoltage"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: WiredAssessedInputFrequency"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredAssessedInputFrequency"
-      response:
-          value: 0
-
-    - label:
-          "Read optional non-global attribute constraints:
-          WiredAssessedInputFrequency"
+          "Test Harness Client reads WiredAssessedInputFrequency attribute from
+          Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "WiredAssessedInputFrequency"
@@ -442,34 +73,19 @@ tests:
               type: uint16
 
     - label:
-          "Write the default values to optional non-global attribute:
-          WiredAssessedInputFrequency"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "WiredAssessedInputFrequency"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Reads back the optional non-global attribute:
-          WiredAssessedInputFrequency"
+          "Test Harness Client reads WiredCurrentType attribute from Server DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "WiredAssessedInputFrequency"
+      attribute: "WiredCurrentType"
       response:
-          value: 0
-
-    - label: "Read optional non-global attribute: WiredAssessedCurrent"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredAssessedCurrent"
-      response:
-          value: 0
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 1
 
     - label:
-          "Read optional non-global attribute constraints: WiredAssessedCurrent"
+          "Test Harness Client reads WiredAssessedCurrent attribute from Server
+          DUT"
       disabled: true
       command: "readAttribute"
       attribute: "WiredAssessedCurrent"
@@ -477,34 +93,7 @@ tests:
           constraints:
               type: uint32
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          WiredAssessedCurrent"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "WiredAssessedCurrent"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Reads back the optional non-global attribute: WiredAssessedCurrent"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredAssessedCurrent"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: WiredNominalVoltage"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredNominalVoltage"
-      response:
-          value: 0
-
-    - label:
-          "Read optional non-global attribute constraints: WiredNominalVoltage"
+    - label: "Test Harness Client reads WiredNominalVoltage from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "WiredNominalVoltage"
@@ -512,33 +101,7 @@ tests:
           constraints:
               type: uint32
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          WiredNominalVoltage"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "WiredNominalVoltage"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: WiredNominalVoltage"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredNominalVoltage"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: WiredMaximumCurrent"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredMaximumCurrent"
-      response:
-          value: 0
-
-    - label:
-          "Read optional non-global attribute constraints: WiredMaximumCurrent"
+    - label: "Test Harness Client reads WiredMaximumCurrent from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "WiredMaximumCurrent"
@@ -546,58 +109,15 @@ tests:
           constraints:
               type: uint32
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          WiredMaximumCurrent"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "WiredMaximumCurrent"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: WiredMaximumCurrent"
+    - label: "Test Harness Client reads WiredPresent from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "WiredMaximumCurrent"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: WiredPresent"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredPresent"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute constraints: WiredPresent"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredPresent"
       response:
           constraints:
               type: bool
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          WiredPresent"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "WiredPresent"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: WiredPresent"
-      disabled: true
-      command: "readAttribute"
-      attribute: "WiredPresent"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: ActiveWiredFaults"
+    - label: "Test Harness Client reads ActiveWiredFaults from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "ActiveWiredFaults"
@@ -605,42 +125,14 @@ tests:
           constraints:
               type: list
 
-    - label: "Read optional non-global attribute: BatVoltage"
-      command: "readAttribute"
-      attribute: "BatteryVoltage"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute constraints: BatVoltage"
+    - label: "Test Harness Client reads BatVoltage from Server DUT"
       command: "readAttribute"
       attribute: "BatteryVoltage"
       response:
           constraints:
               type: uint32
 
-    - label:
-          "Write the default values to optional non-global attribute: BatVoltage"
-      command: "writeAttribute"
-      attribute: "BatteryVoltage"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: BatVoltage"
-      command: "readAttribute"
-      attribute: "BatteryVoltage"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: BatPercentRemaining"
-      command: "readAttribute"
-      attribute: "BatteryPercentRemaining"
-      response:
-          value: 0
-
-    - label:
-          "Read optional non-global attribute constraints: BatPercentRemaining"
+    - label: "Test Harness Client reads BatPercentRemaining from Server DUT"
       command: "readAttribute"
       attribute: "BatteryPercentRemaining"
       response:
@@ -649,59 +141,41 @@ tests:
               minValue: 0
               maxValue: 200
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          BatPercentRemaining"
-      command: "writeAttribute"
-      attribute: "BatteryPercentRemaining"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: BatPercentRemaining"
-      command: "readAttribute"
-      attribute: "BatteryPercentRemaining"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: BatTimeRemaining"
-      command: "readAttribute"
-      attribute: "BatteryTimeRemaining"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute constraints: BatTimeRemaining"
+    - label: "Test Harness Client reads BatTimeRemaining from Server DUT"
       command: "readAttribute"
       attribute: "BatteryTimeRemaining"
       response:
           constraints:
               type: uint32
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          BatTimeRemaining"
-      command: "writeAttribute"
-      attribute: "BatteryTimeRemaining"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: BatTimeRemaining"
+    - label: "Test Harness Client reads BatChargeLevel from Server DUT"
       command: "readAttribute"
-      attribute: "BatteryTimeRemaining"
+      attribute: "BatteryChargeLevel"
       response:
-          value: 0
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
 
-    - label: "Read optional non-global attribute: BatPresent"
+    - label: "Test Harness Client reads BatReplacementNeeded from Server DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "BatPresent"
+      attribute: "BatReplacementNeeded"
       response:
-          value: 0
+          constraints:
+              type: bool
 
-    - label: "Read optional non-global attribute constraints: BatPresent"
+    - label: "Test Harness Client reads BatReplaceability from Server DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "BatReplaceability"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label: "Test Harness Client reads BatPresent from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "BatPresent"
@@ -709,75 +183,34 @@ tests:
           constraints:
               type: bool
 
-    - label:
-          "Write the default values to optional non-global attribute: BatPresent"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatPresent"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: BatPresent"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatPresent"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: ActiveBatFaults"
-      disabled: true
+    - label: "Test Harness Client reads ActiveBatFaults from Server DUT"
       command: "readAttribute"
       attribute: "ActiveBatteryFaults"
       response:
           constraints:
               type: list
 
-    - label: "Read optional non-global attribute: BatCommonDesignation"
+    - label:
+          "Test Harness Client reads BatReplacementDescription from Server DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "BatCommonDesignation"
+      attribute: "BatReplacementDescription"
       response:
-          value: 0
+          constraints:
+              type: string
+              maxLength: 60
 
-    - label:
-          "Read optional non-global attribute constraints: BatCommonDesignation"
+    - label: "Test Harness Client reads BatCommonDesignation from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "BatCommonDesignation"
       response:
           constraints:
               type: uint32
+              minValue: 0
+              maxValue: 80
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          BatCommonDesignation"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatCommonDesignation"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Reads back the optional non-global attribute: BatCommonDesignation"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatCommonDesignation"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: BatANSIDesignation"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatANSIDesignation"
-      response:
-          value: ""
-
-    - label:
-          "Read optional non-global attribute constraints: BatANSIDesignation"
+    - label: "Test Harness Client reads BatANSIDesignation from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "BatANSIDesignation"
@@ -786,32 +219,7 @@ tests:
               type: string
               maxLength: 20
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          BatANSIDesignation"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatANSIDesignation"
-      arguments:
-          value: ""
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: BatANSIDesignation"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatANSIDesignation"
-      response:
-          value: ""
-
-    - label: "Read optional non-global attribute: BatIECDesignation"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatIECDesignation"
-      response:
-          value: ""
-
-    - label: "Read optional non-global attribute constraints: BatIECDesignation"
+    - label: "Test Harness Client reads BatIECDesignation from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "BatIECDesignation"
@@ -820,67 +228,17 @@ tests:
               type: string
               maxLength: 20
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          BatIECDesignation"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatIECDesignation"
-      arguments:
-          value: ""
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: BatIECDesignation"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatIECDesignation"
-      response:
-          value: ""
-
-    - label: "Read optional non-global attribute: BatApprovedChemistry"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatApprovedChemistry"
-      response:
-          value: 0
-
-    - label:
-          "Read optional non-global attribute constraints: BatApprovedChemistry"
+    - label: "Test Harness Client reads BatApprovedChemistry from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "BatApprovedChemistry"
       response:
           constraints:
               type: uint32
+              minValue: 0
+              maxValue: 32
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          BatApprovedChemistry"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatApprovedChemistry"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "Reads back the optional non-global attribute: BatApprovedChemistry"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatApprovedChemistry"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute: BatCapacity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatCapacity"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute constraints: BatCapacity"
+    - label: "Test Harness Client reads BatCapacity from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "BatCapacity"
@@ -888,33 +246,24 @@ tests:
           constraints:
               type: uint32
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          BatCapacity"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatCapacity"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: BatCapacity"
+    - label: "Test Harness Client reads BatQuantity from Server DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "BatCapacity"
+      attribute: "BatQuantity"
       response:
-          value: 0
+          constraints:
+              type: uint8
 
-    - label: "Read optional non-global attribute: BatTimeToFullCharge"
-      disabled: true
+    - label: "Test Harness Client reads BatChargeState from Server DUT"
       command: "readAttribute"
-      attribute: "BatTimeToFullCharge"
+      attribute: "BatteryChargeState"
       response:
-          value: 0
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
 
-    - label:
-          "Read optional non-global attribute constraints: BatTimeToFullCharge"
+    - label: "Test Harness Client reads BatTimeToFullCharge from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "BatTimeToFullCharge"
@@ -923,32 +272,15 @@ tests:
               type: uint32
 
     - label:
-          "Write the default values to optional non-global attribute:
-          BatTimeToFullCharge"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatTimeToFullCharge"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: BatTimeToFullCharge"
+          "Test Harness Client reads BatFunctionalWhileCharging from Server DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "BatTimeToFullCharge"
+      attribute: "BatFunctionalWhileCharging"
       response:
-          value: 0
+          constraints:
+              type: bool
 
-    - label: "Read optional non-global attribute: BatChargingCurrent"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatChargingCurrent"
-      response:
-          value: 0
-
-    - label:
-          "Read optional non-global attribute constraints: BatChargingCurrent"
+    - label: "Test Harness Client reads BatChargingCurrent from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "BatChargingCurrent"
@@ -956,25 +288,7 @@ tests:
           constraints:
               type: uint32
 
-    - label:
-          "Write the default values to optional non-global attribute:
-          BatChargingCurrent"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "BatChargingCurrent"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back the optional non-global attribute: BatChargingCurrent"
-      disabled: true
-      command: "readAttribute"
-      attribute: "BatChargingCurrent"
-      response:
-          value: 0
-
-    - label: "Read optional non-global attribute : ActiveBatChargeFaults"
+    - label: "Test Harness Client reads ActiveBatChargeFaults from Server DUT"
       disabled: true
       command: "readAttribute"
       attribute: "ActiveBatChargeFaults"

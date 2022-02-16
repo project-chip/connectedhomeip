@@ -17,31 +17,39 @@ name:
     as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
+    fullMotionDuration:
+        type: INT16U
+        defaultValue: 6000
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH sends DownOrClose command to DUT"
       command: "DownOrClose"
 
-    - label: "TH waits for 5-15 seconds movement(s) on the DUT"
+    - label: "TH waits for X seconds movement(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
+                value: fullMotionDuration
 
     - label:
           "If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONLIFTPERCENT100THS"
       response:
           constraints:
               type: percent100ths
@@ -74,70 +82,43 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: "WNCV_PA_TL && WNCV_TL && A_TARGETPOSITIONTILTPERCENT100THS"
       response:
           value: 3000
 
-    - label:
-          "If (PA_TL & TL) TH reads TargetPositionTiltPercent100ths attribute
-          from DUT"
-      command: "readAttribute"
-      attribute: "TargetPositionTiltPercent100ths"
-      response:
-          constraints:
-              type: percent100ths
-              minValue: 1
-              maxValue: 10000
-
-    - label: "TH set a timeout of 5-10 minutes for failure"
+    - label: "TH set a timeout of X minutes for failure"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
+                value: fullMotionDuration
 
-    #Need Bitwise operator support #14491
     - label: "TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
-          constraints:
-              type: map8
+          value: 0
 
     - label:
           "If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute
           from DUT"
+      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONTILTPERCENT100THS"
       response:
-          constraints:
-              type: uint16
-
-    - label:
-          "If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute
-          from DUT"
-      command: "readAttribute"
-      attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
-      response:
-          constraints:
-              type: percent100ths
-              minValue: 0
-              maxValue: 10000
+          value: 3000
 
     - label:
           "If (PA_TL & TL) TH reads CurrentPositionTiltPercentage attribute from
           DUT"
+      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONTILTPERCENTAGE"
       response:
-          constraints:
-              type: percent
-              minValue: 0
-              maxValue: 100
+          value: 30
 
     - label: "TH sends GoToTiltPercentage command to DUT"
       disabled: true
@@ -147,7 +128,7 @@ tests:
               - name: "TiltPercentageValue"
                 value: 60
               - name: "TiltPercent100thsValue"
-                value: 6000
+                value: 6005
 
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
@@ -163,26 +144,24 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: "WNCV_PA_TL && WNCV_TL && A_TARGETPOSITIONTILTPERCENT100THS"
       response:
-          value: 6000
+          value: 6005
 
-    - label: "TH waits for 5-15 seconds movement(s) on the DUT"
+    - label: "TH waits for X seconds movement(s) on the DUT"
       disabled: true
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
+                value: fullMotionDuration
 
-    #Need Bitwise operator support #14491
     - label: "TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
-          constraints:
-              type: map8
+          value: 0
 
     - label:
           "If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute
@@ -190,21 +169,9 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONTILTPERCENT100THS"
       response:
-          value: 6000
-
-    - label:
-          "If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths attribute
-          from DUT"
-      command: "readAttribute"
-      attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
-      response:
-          constraints:
-              type: percent100ths
-              minValue: 1
-              maxValue: 10000
+          value: 6005
 
     - label:
           "If (PA_TL & TL) TH reads CurrentPositionTiltPercentage attribute from
@@ -212,18 +179,6 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONTILTPERCENTAGE"
       response:
           value: 60
-
-    - label:
-          "If (PA_TL & TL) TH reads CurrentPositionTiltPercentage attribute from
-          DUT"
-      command: "readAttribute"
-      attribute: "CurrentPositionTiltPercentage"
-      PICS: "WNCV_PA_TL && WNCV_TL"
-      response:
-          constraints:
-              type: percent
-              minValue: 0
-              maxValue: 100

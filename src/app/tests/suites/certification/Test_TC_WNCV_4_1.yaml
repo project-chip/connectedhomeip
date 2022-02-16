@@ -17,31 +17,39 @@ name:
     as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
+    fullMotionDuration:
+        type: INT16U
+        defaultValue: 6000
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH sends DownOrClose command to DUT"
       command: "DownOrClose"
 
-    - label: "TH waits for 5-15 seconds movement(s) on the DUT"
+    - label: "TH waits for x seconds movement(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
+                value: fullMotionDuration
 
     - label:
           "If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: "WNCV_PA_LF && WNCV_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"
       response:
           constraints:
               type: percent100ths
@@ -74,60 +82,43 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: "WNCV_PA_LF && WNCV_LF && A_TARGETPOSITIONLIFTPERCENT100THS"
       response:
           value: 2500
 
-    - label:
-          "If (PA_LF & LF) TH reads TargetPositionLiftPercent100ths attribute
-          from DUT"
-      command: "readAttribute"
-      attribute: "TargetPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
-      response:
-          constraints:
-              type: percent100ths
-              minValue: 1
-              maxValue: 10000
-
-    - label: "TH set a timeout of 5-10 minutes for failure"
+    - label: "TH set a timeout of X minutes for failure"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
-    #Need Bitwise operator support #14491
+                value: fullMotionDuration
+
     - label: "TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
-          constraints:
-              type: map8
+          value: 0
 
     - label:
           "If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute
           from DUT"
+      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: "WNCV_PA_LF && WNCV_LF && A_CURRENTPOSITIONLIFTPERCENT100THS"
       response:
-          constraints:
-              type: percent100ths
-              minValue: 1
-              maxValue: 10000
+          value: 2500
 
     - label:
           "If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from
           DUT"
       command: "readAttribute"
+      disabled: true
       attribute: "CurrentPositionLiftPercentage"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: "WNCV_PA_LF && WNCV_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"
       response:
-          constraints:
-              type: percent
-              minValue: 0
-              maxValue: 100
+          value: 25
 
     #Disabled due to issue #14230
     - label: "TH sends GoToLiftPercentage command to DUT"
@@ -138,7 +129,7 @@ tests:
               - name: "LiftPercentageValue"
                 value: 75
               - name: "LiftPercent100thsValue"
-                value: 7500
+                value: 7520
 
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
@@ -154,26 +145,24 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: "WNCV_PA_LF && WNCV_LF && A_TARGETPOSITIONLIFTPERCENT100THS"
       response:
-          value: 7500
+          value: 7520
 
-    - label: "TH waits for 5-15 seconds movement(s) on the DUT"
+    - label: "TH waits for x seconds movement(s) on the DUT"
       disabled: true
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 5000
+                value: fullMotionDuration
 
-    #Need Bitwise operator support #14491
     - label: "TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
-          constraints:
-              type: map8
+          value: 0
 
     - label:
           "If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute
@@ -181,40 +170,16 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: "WNCV_PA_LF && WNCV_LF && A_CURRENTPOSITIONLIFTPERCENT100THS"
       response:
-          value: 7500
-
-    - label:
-          "If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute
-          from DUT"
-      command: "readAttribute"
-      attribute: "CurrentPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
-      response:
-          constraints:
-              type: percent100ths
-              minValue: 1
-              maxValue: 10000
+          value: 7520
 
     - label:
           "If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from
           DUT"
       disabled: true
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: "WNCV_PA_LF && WNCV_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
       response:
-          value: 7500
-
-    - label:
-          "If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from
-          DUT"
-      PICS: "WNCV_PA_LF && WNCV_LF"
-      command: "readAttribute"
-      attribute: "CurrentPositionLiftPercentage"
-      response:
-          constraints:
-              type: percent
-              minValue: 0
-              maxValue: 100
+          value: 75

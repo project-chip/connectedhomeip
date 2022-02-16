@@ -223,17 +223,25 @@ PICS:
           attribute?"
       id: A_CURRENTPOSITIONTILTPERCENTAGE
 
-    - label: "Does the device implement the Lift feature ?"
-      id: WNCV_LF
+    - label:
+          "Does the device implement the CurrentPositionLiftPercent100ths
+          attribute?"
+      id: A_CURRENTPOSITIONLIFTPERCENT100THS
 
-    - label: "Does the device implement the Tilt feature ?"
-      id: WNCV_TL
+    - label:
+          "Does the device implement the CurrentPositionTiltPercent100ths
+          attribute?"
+      id: A_CURRENTPOSITIONTILTPERCENT100THS
 
-    - label: "Does the device implement the Position Aware Lift feature ?"
-      id: WNCV_PA_LF
+    - label:
+          "Does the device implement the TargetPositionLiftPercent100ths
+          attribute?"
+      id: A_TARGETPOSITIONLIFTPERCENT100THS
 
-    - label: "Does the device implement the Position Aware Tilt feature ?"
-      id: WNCV_PA_TL
+    - label:
+          "Does the device implement the TargetPositionTiltPercent100ths
+          attribute?"
+      id: A_TARGETPOSITIONTILTPERCENT100THS
 
       # On/Off Cluster
     - label: "Does the device implement the OnOff attribute?"
