@@ -198,20 +198,17 @@ static void TestConfigurationMgr_GetPrimaryMACAddress(nlTestSuite * inSuite, voi
     {
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
     }
-    else
-    {
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    }
 
     err = ConfigurationMgr().GetPrimaryMACAddress(mac6Bytes);
     if (mac6Bytes.size() != ConfigurationManager::kPrimaryMACAddressLength)
     {
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
     }
-    else
-    {
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    }
+
+    // NOTICE for above:
+    //   no validation for CHIP_NO_ERROR:
+    //    - there is no guarantee in CI that a valid IP address exists,
+    //      expecially if running in emulators (zephyr and qemu)
 }
 
 /**
