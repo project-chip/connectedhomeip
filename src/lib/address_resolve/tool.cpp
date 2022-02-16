@@ -68,7 +68,6 @@ public:
 
 private:
     AddressResolve::NodeLookupHandle mSelfHandle;
-    bool mDone = false;
 };
 
 PrintOutNodeListener gListener;
