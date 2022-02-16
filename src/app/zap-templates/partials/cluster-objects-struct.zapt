@@ -12,7 +12,6 @@ namespace {{asUpperCamelCase name}} {
         {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
         {{/zcl_struct_items}}
 
-        CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
         {{#unless struct_contains_array}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
         {{/unless}}
@@ -27,6 +26,14 @@ namespace {{asUpperCamelCase name}} {
         void SetFabricIndex(chip::FabricIndex fabricIndex_) {
             {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
         }
+
+        CHIP_ERROR EncodeForWrite(TLV::TLVWriter &writer, TLV::Tag tag) const;
+        CHIP_ERROR EncodeForRead(TLV::TLVWriter &writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const;
+
+    private:
+        CHIP_ERROR DoEncode(TLV::TLVWriter &writer, TLV::Tag tag, const Optional<FabricIndex> &accessingFabricIndex) const;
+        {{else}}
+        CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
         {{/if}}
     };
 
@@ -58,7 +65,36 @@ namespace {{asUpperCamelCase name}} {
 } // namespace {{asUpperCamelCase name}}
 {{else}}
 namespace {{asUpperCamelCase name}} {
-CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
+{{#if struct_is_fabric_scoped}}
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter &writer, TLV::Tag tag) const
+{
+    return DoEncode(writer, tag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter &writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
+{
+    return DoEncode(writer, tag, Optional<FabricIndex>(accessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter &writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    {{#zcl_struct_items}}
+    {{#if (isStrEqual label ../struct_fabric_idx_field)}}
+      if (accessingFabricIndex.HasValue()) {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+      }
+    {{else}}
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    {{/if}}
+    {{/zcl_struct_items}}
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+{{else}}
+CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const
+{
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_struct_items}}
@@ -67,6 +103,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
+{{/if}}
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
     CHIP_ERROR err = CHIP_NO_ERROR;
