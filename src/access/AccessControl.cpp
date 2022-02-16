@@ -165,13 +165,13 @@ AccessControl::Delegate AccessControl::mDefaultDelegate;
 
 CHIP_ERROR AccessControl::Init()
 {
-    ChipLogDetail(DataManagement, "AccessControl: initializing");
+    ChipLogProgress(DataManagement, "AccessControl: initializing");
     return mDelegate.Init();
 }
 
 CHIP_ERROR AccessControl::Finish()
 {
-    ChipLogDetail(DataManagement, "AccessControl: finishing");
+    ChipLogProgress(DataManagement, "AccessControl: finishing");
     return mDelegate.Finish();
 }
 
@@ -181,25 +181,26 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 #if CHIP_DETAIL_LOGGING
     {
         char buf[6 * kCharsPerCatForLogging];
-        ChipLogDetail(DataManagement,
-                      "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%" PRIu16 " p=%c",
-                      subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
-                      ChipLogValueX64(subjectDescriptor.subject), GetCatStringForLogging(buf, sizeof(buf), subjectDescriptor.cats),
-                      ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
+        ChipLogProgress(DataManagement,
+                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%" PRIu16 " p=%c",
+                        subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
+                        ChipLogValueX64(subjectDescriptor.subject),
+                        GetCatStringForLogging(buf, sizeof(buf), subjectDescriptor.cats), ChipLogValueMEI(requestPath.cluster),
+                        requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
     }
 #endif
 
     // Don't check if using default delegate (e.g. test code that isn't testing access control)
     if (&mDelegate == &mDefaultDelegate)
     {
-        ChipLogDetail(DataManagement, "AccessControl: disabled (this will go away)");
+        ChipLogProgress(DataManagement, "AccessControl: disabled (this will go away)");
         return CHIP_NO_ERROR;
     }
 
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
     if (subjectDescriptor.authMode == AuthMode::kPase)
     {
-        ChipLogDetail(DataManagement, "AccessControl: implicit admin (PASE)");
+        ChipLogProgress(DataManagement, "AccessControl: implicit admin (PASE)");
         return CHIP_NO_ERROR;
     }
 
@@ -305,7 +306,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 
     // No entry was found which passed all checks: access is denied.
-    ChipLogDetail(DataManagement, "AccessControl: denied");
+    ChipLogProgress(DataManagement, "AccessControl: denied");
     return CHIP_ERROR_ACCESS_DENIED;
 }
 
@@ -326,9 +327,9 @@ bool AccessControl::IsValid(const Entry & entry)
     SuccessOrExit(entry.GetSubjectCount(subjectCount));
     SuccessOrExit(entry.GetTargetCount(targetCount));
 
-    ChipLogDetail(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
-                  GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode), static_cast<int>(subjectCount),
-                  static_cast<int>(targetCount));
+    ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
+                    GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode), static_cast<int>(subjectCount),
+                    static_cast<int>(targetCount));
 
     // Fabric index must be defined.
     VerifyOrExit(fabricIndex != kUndefinedFabricIndex, log = "invalid fabric index");
@@ -351,7 +352,7 @@ bool AccessControl::IsValid(const Entry & entry)
         SuccessOrExit(entry.GetSubject(i, subject));
         const bool kIsCase  = authMode == AuthMode::kCase;
         const bool kIsGroup = authMode == AuthMode::kGroup;
-        ChipLogDetail(DataManagement, "  validating subject 0x" ChipLogFormatX64, ChipLogValueX64(subject));
+        ChipLogProgress(DataManagement, "  validating subject 0x" ChipLogFormatX64, ChipLogValueX64(subject));
         VerifyOrExit((kIsCase && IsValidCaseNodeId(subject)) || (kIsGroup && IsValidGroupNodeId(subject)), log = "invalid subject");
     }
 
