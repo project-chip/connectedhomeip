@@ -58,6 +58,7 @@ private:
     void DispatchEvent(AppEvent * event);
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void UpdateButtonHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
