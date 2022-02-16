@@ -386,7 +386,9 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
             }
             else
             {
-                ChipLogError(Discovery, "Attempt to mDNS broadcast failed:  %s", chip::ErrorStr(err));
+                char ifaceName[20];
+                info->mInterfaceId.GetInterfaceName(ifaceName, sizeof(ifaceName));
+                ChipLogError(Discovery, "Attempt to mDNS broadcast failed on %s:  %s", ifaceName, chip::ErrorStr(err));
                 lastError = err;
             }
             return chip::Loop::Continue;
