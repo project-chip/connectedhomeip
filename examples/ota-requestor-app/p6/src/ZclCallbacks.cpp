@@ -24,8 +24,6 @@
 #include "AppConfig.h"
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "ClusterManager.h"
-
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
