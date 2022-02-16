@@ -51,7 +51,6 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 constexpr uint8_t kUpdateTokenLen            = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen         = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
 constexpr size_t kUriMaxLen                  = 256;
-constexpr uint32_t kMinimumDelayedActionTime = 120; // Spec mentions delayed action time should be at least 120 seconds
 
 // Arbitrary BDX Transfer Params
 constexpr uint32_t kMaxBdxBlockSize                 = 1024;
@@ -210,13 +209,11 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
             case UserConsentState::kObtaining:
                 queryStatus          = OTAQueryStatus::kBusy;
-                delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
                 break;
 
             case UserConsentState::kDenied:
             case UserConsentState::kUnknown:
                 queryStatus          = OTAQueryStatus::kNotAvailable;
-                delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
                 break;
             }
         }
@@ -228,17 +225,14 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     case kRespondWithBusy:
         queryStatus          = OTAQueryStatus::kBusy;
-        delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
         break;
 
     case kRespondWithNotAvailable:
         queryStatus          = OTAQueryStatus::kNotAvailable;
-        delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
         break;
 
     default:
         queryStatus          = OTAQueryStatus::kNotAvailable;
-        delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
         break;
     }
 
