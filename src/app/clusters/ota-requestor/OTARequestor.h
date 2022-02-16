@@ -127,7 +127,7 @@ public:
      * Called to set optional requestorCanConsent value provided by Requestor.
      */
     void SetRequestorCanConsent(bool requestorCanConsent) { mRequestorCanConsent.SetValue(requestorCanConsent); }
-    
+
     // Application notifies the Requestor on the user consent action, TRUE if consent is given,
     // FALSE otherwise
     void OnUserConsent(bool result);
