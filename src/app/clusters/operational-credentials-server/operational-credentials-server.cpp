@@ -527,6 +527,10 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
 
+    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
+                     AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen,
+                 nocResponse = OperationalCertStatus::kInvalidNOC);
+
     err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
@@ -747,6 +751,10 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
 
+        VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
+                         AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen,
+                     err = CHIP_ERROR_INCORRECT_STATE);
+
         // Always generate a new operational keypair for any new CSRRequest
         if (gFabricBeingCommissioned.GetOperationalKey() != nullptr)
         {
@@ -814,6 +822,10 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
+
+    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
+                     AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen,
+                 status = EMBER_ZCL_STATUS_FAILURE);
 
     // TODO: Ensure we do not duplicate roots in storage, and detect "same key, different cert" errors
     // TODO: Validate cert signature prior to setting.

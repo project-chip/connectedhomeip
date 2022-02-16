@@ -32,11 +32,11 @@ public:
     /////////// DiscoverCommand Interface /////////
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
-        ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager()));
-        chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
+        ReturnErrorOnFailure(mDNSResolver.Init(chip::DeviceLayer::UDPEndPointManager()));
+        mDNSResolver.SetResolverDelegate(this);
         ChipLogProgress(chipTool, "Dnssd: Searching for NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
-        return chip::Dnssd::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetCompressedFabricId(fabricId),
-                                                               chip::Inet::IPAddressType::kAny);
+        return mDNSResolver.ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetCompressedFabricId(fabricId),
+                                          chip::Inet::IPAddressType::kAny);
     }
 
     void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override
@@ -71,6 +71,9 @@ public:
         SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     }
     void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override {}
+
+private:
+    chip::Dnssd::ResolverProxy mDNSResolver;
 };
 
 class Update : public DiscoverCommand

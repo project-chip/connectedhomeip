@@ -69,6 +69,12 @@ static void InitServer(intptr_t context)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     sWiFiNetworkCommissioningInstance.Init();
+
+    SetRequestorInstance(&gRequestorCore);
+    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 }
 
 } // namespace
@@ -106,10 +112,4 @@ extern "C" void app_main()
     }
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
-
-    SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 }

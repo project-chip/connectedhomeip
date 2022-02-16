@@ -73,9 +73,9 @@
 // Default of 8 ECs is not sufficient for some of the unit tests
 // that try to validate multiple simultaneous interactions.
 //
-#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 16
+#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 24
 
-#define CHIP_IM_MAX_NUM_READ_HANDLER 5
+#define CHIP_IM_MAX_NUM_READ_HANDLER 8
 
 #define CONFIG_IM_BUILD_FOR_UNIT_TEST 1
 

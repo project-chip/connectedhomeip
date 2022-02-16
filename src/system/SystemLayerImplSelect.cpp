@@ -75,9 +75,8 @@ CHIP_ERROR LayerImplSelect::Shutdown()
             dispatch_source_cancel(timer->mTimerSource);
             dispatch_release(timer->mTimerSource);
         }
-
-        mTimerPool.Release(timer);
     }
+    mTimerPool.ReleaseAll();
 #else  // CHIP_SYSTEM_CONFIG_USE_DISPATCH
     mTimerList.Clear();
     mTimerPool.ReleaseAll();
