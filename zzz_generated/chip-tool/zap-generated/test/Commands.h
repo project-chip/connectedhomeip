@@ -50654,7 +50654,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_5, OnFailureCallback_5));
+                this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50682,7 +50682,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_6, OnFailureCallback_6));
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50710,7 +50710,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_7, OnFailureCallback_7));
+                this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50738,7 +50738,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_8, OnFailureCallback_8));
+                this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51021,7 +51021,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_5, OnFailureCallback_5));
+                this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51049,7 +51049,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_6, OnFailureCallback_6));
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51077,7 +51077,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_7, OnFailureCallback_7));
+                this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51105,7 +51105,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_8, OnFailureCallback_8));
+                this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51282,7 +51282,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51312,7 +51312,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51582,7 +51582,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51612,7 +51612,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
