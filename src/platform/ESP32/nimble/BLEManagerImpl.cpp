@@ -1069,7 +1069,7 @@ void BLEManagerImpl::HandleC3CharRead(struct ble_gatt_char_context * param)
     chip::System::PacketBufferHandle bufferHandle;
 
     uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
-    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId, sizeof(rotatingDeviceIdUniqueId));
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
     uint16_t lifetimeCounter = 0;
     BitFlags<AdditionalDataFields> additionalDataFields;
 

@@ -45,7 +45,7 @@ using namespace chip::Encoding::LittleEndian;
 using chip::Encoding::BytesToUppercaseHexString;
 
 CHIP_ERROR
-AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeCounter, MutableByteSpan uniqueId,
+AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeCounter, const ByteSpan & uniqueId,
                                                               PacketBufferHandle & bufferHandle,
                                                               BitFlags<AdditionalDataFields> additionalDataFields)
 {
@@ -73,7 +73,7 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeC
     return writer.Finalize(&bufferHandle);
 }
 
-CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsBinary(uint16_t lifetimeCounter, MutableByteSpan uniqueId,
+CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsBinary(uint16_t lifetimeCounter, const ByteSpan & uniqueId,
                                                                             MutableByteSpan & rotatingDeviceIdBuffer)
 {
     uint8_t hashOutputBuffer[kSHA256_Hash_Length];
@@ -105,7 +105,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsBinary(uint
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsHexString(uint16_t lifetimeCounter, MutableByteSpan uniqueId,
+CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsHexString(uint16_t lifetimeCounter, const ByteSpan & uniqueId,
                                                                                char * rotatingDeviceIdBuffer,
                                                                                size_t rotatingDeviceIdBufferSize,
                                                                                size_t & rotatingDeviceIdValueOutputSize)

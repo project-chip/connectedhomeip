@@ -507,7 +507,7 @@ void DnssdServer::StartServer(Optional<Dnssd::CommissioningMode> mode)
 CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
 {
     uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
-    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId, sizeof(rotatingDeviceIdUniqueId));
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
     uint16_t lifetimeCounter               = 0;
     size_t rotatingDeviceIdValueOutputSize = 0;
 
