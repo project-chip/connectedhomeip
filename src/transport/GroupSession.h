@@ -27,7 +27,10 @@ namespace Transport {
 class GroupSession : public Session
 {
 public:
-    GroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group), mFabricIndex(fabricIndex) {}
+    GroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
+    {
+        SetFabricIndex(fabricIndex);
+    }
     ~GroupSession() { NotifySessionReleased(); }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroup; }
@@ -37,18 +40,20 @@ public:
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
-        Access::SubjectDescriptor isd;
-        isd.authMode = Access::AuthMode::kGroup;
-        // TODO: fill other group subjects fields
-        return isd; // return an empty ISD for unauthenticated session.
+        Access::SubjectDescriptor subjectDescriptor;
+        subjectDescriptor.authMode    = Access::AuthMode::kGroup;
+        subjectDescriptor.subject     = NodeIdFromGroupId(mGroupId);
+        subjectDescriptor.fabricIndex = GetFabricIndex();
+        return subjectDescriptor;
     }
 
     bool RequireMRP() const override { return false; }
 
     const ReliableMessageProtocolConfig & GetMRPConfig() const override
     {
+        static const ReliableMessageProtocolConfig cfg(GetLocalMRPConfig());
         VerifyOrDie(false);
-        return gDefaultMRPConfig;
+        return cfg;
     }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override
@@ -58,11 +63,12 @@ public:
     }
 
     GroupId GetGroupId() const { return mGroupId; }
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+
+    NodeId GetSourceNodeId() { return mSourceNodeId; }
 
 private:
     const GroupId mGroupId;
-    const FabricIndex mFabricIndex;
+    const NodeId mSourceNodeId;
 };
 
 /*
@@ -81,9 +87,9 @@ public:
      * @return the session found or allocated, nullptr if not found and allocation failed.
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocEntry(GroupId group, FabricIndex fabricIndex)
+    Optional<SessionHandle> AllocEntry(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId)
     {
-        GroupSession * entry = mEntries.CreateObject(group, fabricIndex);
+        GroupSession * entry = mEntries.CreateObject(group, fabricIndex, sourceNodeId);
         if (entry != nullptr)
         {
             return MakeOptional<SessionHandle>(*entry);
@@ -122,7 +128,7 @@ public:
     /**
      * @brief Deletes an entry from the object pool
      *
-     * @param entry
+     * @param entry The GroupSession entry to delete
      */
     void DeleteEntry(GroupSession * entry) { mEntries.ReleaseObject(entry); }
 

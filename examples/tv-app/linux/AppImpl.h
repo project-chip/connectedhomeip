@@ -23,148 +23,81 @@
 #pragma once
 
 #include <app-common/zap-generated/enums.h>
-#include <app/util/ContentApp.h>
-#include <app/util/ContentAppPlatform.h>
+#include <app/app-platform/ContentApp.h>
+#include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/attribute-storage.h>
 #include <functional>
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "include/account-login/AccountLoginManager.h"
+#include "include/application-basic/ApplicationBasicManager.h"
+#include "include/application-launcher/ApplicationLauncherManager.h"
+#include "include/channel/ChannelManager.h"
+#include "include/content-launcher/ContentLauncherManager.h"
+#include "include/keypad-input/KeypadInputManager.h"
+#include "include/media-playback/MediaPlaybackManager.h"
+#include "include/target-navigator/TargetNavigatorManager.h"
+#include <app/clusters/account-login-server/account-login-delegate.h>
+#include <app/clusters/application-basic-server/application-basic-delegate.h>
+#include <app/clusters/application-launcher-server/application-launcher-delegate.h>
+#include <app/clusters/channel-server/channel-delegate.h>
+#include <app/clusters/content-launch-server/content-launch-delegate.h>
+#include <app/clusters/keypad-input-server/keypad-input-delegate.h>
+#include <app/clusters/media-playback-server/media-playback-delegate.h>
+#include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 namespace chip {
 namespace AppPlatform {
 
-class DLL_EXPORT ApplicationBasicImpl : public ApplicationBasic
-{
-public:
-    virtual ~ApplicationBasicImpl() {}
+using AccountLoginDelegate        = app::Clusters::AccountLogin::Delegate;
+using ApplicationBasicDelegate    = app::Clusters::ApplicationBasic::Delegate;
+using ApplicationLauncherDelegate = app::Clusters::ApplicationLauncher::Delegate;
+using ChannelDelegate             = app::Clusters::Channel::Delegate;
+using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
+using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
+using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
+using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
+using SupportedStreamingProtocol  = app::Clusters::ContentLauncher::SupportedStreamingProtocol;
 
-    inline const char * GetVendorName() override { return mVendorName; };
-    inline uint16_t GetVendorId() override { return mVendorId; };
-    inline const char * GetApplicationName() override { return mApplicationName; };
-    inline uint16_t GetProductId() override { return mProductId; };
-    inline app::Clusters::ApplicationBasic::ApplicationStatusEnum GetApplicationStatus() override { return mApplicationStatus; };
-    inline const char * GetApplicationVersion() override { return mApplicationVersion; };
+static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 
-    inline void SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus) override
-    {
-        mApplicationStatus = applicationStatus;
-    };
-
-    void SetVendorName(const char * szVendorName);
-    inline void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; };
-    void SetApplicationName(const char * szApplicationName);
-    inline void SetProductId(uint16_t productId) { mProductId = productId; };
-    void SetApplicationVersion(const char * szApplicationVersion);
-
-protected:
-    static const int kVendorNameSize         = 32;
-    static const int kApplicationNameSize    = 32;
-    static const int kApplicationVersionSize = 32;
-
-    char mVendorName[kVendorNameSize];
-    uint16_t mVendorId;
-    char mApplicationName[kApplicationNameSize];
-    uint16_t mProductId;
-    app::Clusters::ApplicationBasic::ApplicationStatusEnum mApplicationStatus =
-        app::Clusters::ApplicationBasic::ApplicationStatusEnum::kStopped;
-    char mApplicationVersion[kApplicationVersionSize];
-};
-
-class DLL_EXPORT AccountLoginImpl : public AccountLogin
-{
-public:
-    virtual ~AccountLoginImpl() {}
-
-    inline void SetSetupPIN(uint32_t setupPIN) override { mSetupPIN = setupPIN; };
-    uint32_t GetSetupPIN(const char * tempAccountId) override;
-    bool Login(const char * tempAccountId, uint32_t setupPin) override;
-
-protected:
-    uint32_t mSetupPIN = 0;
-};
-
-class DLL_EXPORT KeypadInputImpl : public KeypadInput
-{
-public:
-    virtual ~KeypadInputImpl() {}
-
-protected:
-};
-
-class DLL_EXPORT ApplicationLauncherImpl : public ApplicationLauncher
-{
-public:
-    virtual ~ApplicationLauncherImpl() {}
-
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type LaunchApp(ApplicationLauncherApplication application,
-                                                                                         std::string data) override;
-
-protected:
-};
-
-class DLL_EXPORT ContentLauncherImpl : public ContentLauncher
-{
-public:
-    virtual ~ContentLauncherImpl() {}
-
-    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type LaunchContent(std::list<Parameter> parameterList,
-                                                                                       bool autoplay, std::string data) override;
-
-protected:
-};
-
-class DLL_EXPORT MediaPlaybackImpl : public MediaPlayback
-{
-public:
-    virtual ~MediaPlaybackImpl() {}
-
-protected:
-};
-
-class DLL_EXPORT TargetNavigatorImpl : public TargetNavigator
-{
-public:
-    TargetNavigatorImpl() : TargetNavigator{ { "home", "search", "info", "guide", "menu" }, 0 } {};
-    virtual ~TargetNavigatorImpl() {}
-
-protected:
-};
-
-class DLL_EXPORT ChannelImpl : public Channel
-{
-public:
-    virtual ~ChannelImpl() {}
-
-protected:
-};
+// for this platform, appid is just vendor id
+#define BuildAppId(vid) std::to_string(vid).c_str()
 
 class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion);
+                   const char * szApplicationVersion, const char * setupPIN) :
+        mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
+                                  szApplicationVersion),
+        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate({ "image/*", "video/*" },
+                                                                  to_underlying(SupportedStreamingProtocol::kDash) |
+                                                                      to_underlying(SupportedStreamingProtocol::kHls)),
+        mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
-    inline ApplicationBasic * GetApplicationBasic() override { return &mApplicationBasic; };
-    inline AccountLogin * GetAccountLogin() override { return &mAccountLogin; };
-    inline KeypadInput * GetKeypadInput() override { return &mKeypadInput; };
-    inline ApplicationLauncher * GetApplicationLauncher() override { return &mApplicationLauncher; };
-    inline ContentLauncher * GetContentLauncher() override { return &mContentLauncher; };
-    inline MediaPlayback * GetMediaPlayback() override { return &mMediaPlayback; };
-    inline TargetNavigator * GetTargetNavigator() override { return &mTargetNavigator; };
-    inline Channel * GetChannel() override { return &mChannel; };
+    AccountLoginDelegate * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
+    ApplicationBasicDelegate * GetApplicationBasicDelegate() override { return &mApplicationBasicDelegate; };
+    ApplicationLauncherDelegate * GetApplicationLauncherDelegate() override { return &mApplicationLauncherDelegate; };
+    ChannelDelegate * GetChannelDelegate() override { return &mChannelDelegate; };
+    ContentLauncherDelegate * GetContentLauncherDelegate() override { return &mContentLauncherDelegate; };
+    KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
+    MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
+    TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
 
 protected:
-    ApplicationBasicImpl mApplicationBasic;
-    AccountLoginImpl mAccountLogin;
-    KeypadInputImpl mKeypadInput;
-    ApplicationLauncherImpl mApplicationLauncher;
-    ContentLauncherImpl mContentLauncher;
-    MediaPlaybackImpl mMediaPlayback;
-    TargetNavigatorImpl mTargetNavigator;
-    ChannelImpl mChannel;
+    ApplicationBasicManager mApplicationBasicDelegate;
+    AccountLoginManager mAccountLoginDelegate;
+    ApplicationLauncherManager mApplicationLauncherDelegate;
+    ChannelManager mChannelDelegate;
+    ContentLauncherManager mContentLauncherDelegate;
+    KeypadInputManager mKeypadInputDelegate;
+    MediaPlaybackManager mMediaPlaybackDelegate;
+    TargetNavigatorManager mTargetNavigatorDelegate;
 };
 
 class DLL_EXPORT ContentAppFactoryImpl : public ContentAppFactory
@@ -174,14 +107,27 @@ public:
     ContentAppFactoryImpl();
     virtual ~ContentAppFactoryImpl() {}
 
-    ContentApp * LoadContentAppByVendorId(uint16_t vendorId);
-    ContentApp * LoadContentAppByAppId(ApplicationLauncherApplication application);
+    // Lookup CatalogVendor App for this client (vendor id/product id client)
+    // and then write it to destinationApp
+    // return error if not found
+    CHIP_ERROR LookupCatalogVendorApp(uint16_t vendorId, uint16_t productId, CatalogVendorApp * destinationApp) override;
+
+    // Lookup ContentApp for this catalog id / app id and load it
+    ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) override;
+
+    // Gets the catalog vendor ID used by this platform
+    uint16_t GetPlatformCatalogVendorId() override;
+
+    // Converts application (any catalog) into the platform's catalog Vendor
+    // and then writes it to destinationApp
+    CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) override;
 
 protected:
-    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1"),
-                                                      ContentAppImpl("Vendor2", 2222, "App2", 22, "Version2"),
-                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3"),
-                                                      ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2") };
+    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1", "34567890"),
+                                                      ContentAppImpl("Vendor2", 65521, "App2", 32768, "Version2", "20202021"),
+                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
+                                                      ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2",
+                                                                     "20202021") };
 };
 
 } // namespace AppPlatform

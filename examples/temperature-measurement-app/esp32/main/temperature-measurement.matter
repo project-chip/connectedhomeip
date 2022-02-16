@@ -6,6 +6,68 @@ struct LabelStruct {
     CHAR_STRING<16> value = 1;
 }
 
+server cluster AccessControl = 31 {
+  enum AuthMode : ENUM8 {
+    kPase = 1;
+    kCase = 2;
+    kGroup = 3;
+  }
+
+  enum ChangeTypeEnum : ENUM8 {
+    kChanged = 0;
+    kAdded = 1;
+    kRemoved = 2;
+  }
+
+  enum Privilege : ENUM8 {
+    kView = 1;
+    kProxyView = 2;
+    kOperate = 3;
+    kManage = 4;
+    kAdminister = 5;
+  }
+
+  struct AccessControlEntry {
+    fabric_idx fabricIndex = 0;
+    Privilege privilege = 1;
+    AuthMode authMode = 2;
+    nullable INT64U subjects[] = 3;
+    nullable Target targets[] = 4;
+  }
+
+  struct Target {
+    nullable cluster_id cluster = 0;
+    nullable endpoint_no endpoint = 1;
+    nullable devtype_id deviceType = 2;
+  }
+
+  struct ExtensionEntry {
+    fabric_idx fabricIndex = 0;
+    OCTET_STRING<254> data = 1;
+  }
+
+  info event AccessControlEntryChanged = 0 {
+    fabric_idx adminFabricIndex = 0;
+    nullable node_id adminNodeID = 1;
+    nullable INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    nullable AccessControlEntry latestValue = 4;
+  }
+
+  info event AccessControlExtensionChanged = 1 {
+    fabric_idx adminFabricIndex = 0;
+    nullable node_id adminNodeID = 1;
+    nullable INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    nullable ExtensionEntry latestValue = 4;
+  }
+
+  attribute AccessControlEntry acl[] = 0;
+  attribute ExtensionEntry extension[] = 1;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 server cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatus : ENUM8 {
     kWindowNotOpen = 0;
@@ -37,9 +99,9 @@ server cluster AdministratorCommissioning = 60 {
     INT16U passcodeID = 5;
   }
 
-  command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  command RevokeCommissioning(): DefaultSuccess = 2;
+  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 server cluster Basic = 40 {
@@ -57,7 +119,7 @@ server cluster Basic = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u interactionModelVersion = 0;
+  readonly attribute int16u dataModelRevision = 0;
   readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
@@ -136,14 +198,14 @@ server cluster EthernetNetworkDiagnostics = 55 {
     k400g = 9;
   }
 
-  readonly attribute enum8 PHYRate = 0;
-  readonly attribute boolean fullDuplex = 1;
+  readonly attribute nullable PHYRateType PHYRate = 0;
+  readonly attribute nullable boolean fullDuplex = 1;
   readonly attribute int64u packetRxCount = 2;
   readonly attribute int64u packetTxCount = 3;
   readonly attribute int64u txErrCount = 4;
   readonly attribute int64u collisionCount = 5;
   readonly attribute int64u overrunCount = 6;
-  readonly attribute boolean carrierDetect = 7;
+  readonly attribute nullable boolean carrierDetect = 7;
   readonly attribute int64u timeSinceReset = 8;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
@@ -155,7 +217,7 @@ server cluster FixedLabel = 64 {
 }
 
 server cluster GeneralCommissioning = 48 {
-  enum GeneralCommissioningError : ENUM8 {
+  enum CommissioningError : ENUM8 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -168,12 +230,12 @@ server cluster GeneralCommissioning = 48 {
     kIndoorOutdoor = 2;
   }
 
-  struct BasicCommissioningInfoType {
-    INT32U failSafeExpiryLengthMs = 0;
+  struct BasicCommissioningInfo {
+    INT16U failSafeExpiryLengthSeconds = 0;
   }
 
   attribute int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute enum8 regulatoryConfig = 2;
   readonly attribute enum8 locationCapability = 3;
   readonly global attribute bitmap32 featureMap = 65532;
@@ -193,17 +255,17 @@ server cluster GeneralCommissioning = 48 {
   }
 
   response struct ArmFailSafeResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct CommissioningCompleteResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
@@ -264,11 +326,13 @@ server cluster GeneralDiagnostics = 51 {
 
   struct NetworkInterfaceType {
     CHAR_STRING<32> name = 0;
-    BOOLEAN fabricConnected = 1;
-    BOOLEAN offPremiseServicesReachableIPv4 = 2;
-    BOOLEAN offPremiseServicesReachableIPv6 = 3;
+    BOOLEAN isOperational = 1;
+    nullable BOOLEAN offPremiseServicesReachableIPv4 = 2;
+    nullable BOOLEAN offPremiseServicesReachableIPv6 = 3;
     OCTET_STRING<8> hardwareAddress = 4;
-    InterfaceType type = 5;
+    OCTET_STRING IPv4Addresses[] = 5;
+    OCTET_STRING IPv6Addresses[] = 6;
+    InterfaceType type = 7;
   }
 
   critical event HardwareFaultChange = 0 {
@@ -332,6 +396,12 @@ server cluster NetworkCommissioning = 49 {
     k60g = 4;
   }
 
+  bitmap NetworkCommissioningFeature : BITMAP32 {
+    kWiFiNetworkInterface = 0x1;
+    kThreadNetworkInterface = 0x2;
+    kEthernetNetworkInterface = 0x4;
+  }
+
   struct NetworkInfo {
     OCTET_STRING networkID = 0;
     BOOLEAN connected = 1;
@@ -362,9 +432,9 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u scanMaxTimeSeconds = 2;
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
-  readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string<32> lastNetworkID = 6;
-  readonly attribute int32u lastConnectErrorValue = 7;
+  readonly attribute nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute nullable octet_string<32> lastNetworkID = 6;
+  readonly attribute nullable int32s lastConnectErrorValue = 7;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -421,7 +491,7 @@ server cluster NetworkCommissioning = 49 {
 }
 
 server cluster OperationalCredentials = 62 {
-  enum NodeOperationalCertStatus : ENUM8 {
+  enum OperationalCertStatus : ENUM8 {
     kSuccess = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
@@ -437,7 +507,7 @@ server cluster OperationalCredentials = 62 {
   struct NOCStruct {
     fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
-    OCTET_STRING icac = 2;
+    nullable OCTET_STRING icac = 2;
   }
 
   struct FabricDescriptor {
@@ -450,7 +520,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
-  readonly attribute FabricDescriptor fabricsList[] = 1;
+  readonly attribute FabricDescriptor fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
@@ -473,16 +543,16 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING attestationNonce = 0;
   }
 
+  request struct CSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
+  }
+
   request struct CertificateChainRequestRequest {
     INT8U certificateType = 0;
   }
 
-  request struct OpCSRRequestRequest {
-    OCTET_STRING CSRNonce = 0;
-  }
-
   request struct RemoveFabricRequest {
-    INT8U fabricIndex = 0;
+    fabric_idx fabricIndex = 0;
   }
 
   request struct RemoveTrustedRootCertificateRequest {
@@ -503,26 +573,26 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING signature = 1;
   }
 
+  response struct CSRResponse {
+    OCTET_STRING NOCSRElements = 0;
+    OCTET_STRING attestationSignature = 1;
+  }
+
   response struct CertificateChainResponse {
     OCTET_STRING certificate = 0;
   }
 
   response struct NOCResponse {
-    INT8U statusCode = 0;
-    INT8U fabricIndex = 1;
-    CHAR_STRING debugText = 2;
-  }
-
-  response struct OpCSRResponse {
-    OCTET_STRING NOCSRElements = 0;
-    OCTET_STRING attestationSignature = 1;
+    OperationalCertStatus statusCode = 0;
+    optional fabric_idx fabricIndex = 1;
+    optional CHAR_STRING debugText = 2;
   }
 
   command AddNOC(AddNOCRequest): NOCResponse = 6;
   command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
   command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
   command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
   command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
@@ -580,6 +650,10 @@ server cluster UnitLocalization = 45 {
     kKelvin = 2;
   }
 
+  bitmap UnitLocalizationFeature : BITMAP32 {
+    kTemperatureUnit = 0x1;
+  }
+
   attribute TempUnit temperatureUnit = 0;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
@@ -634,11 +708,11 @@ server cluster WiFiNetworkDiagnostics = 54 {
     WiFiConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute octet_string<6> bssid = 0;
-  readonly attribute enum8 securityType = 1;
-  readonly attribute enum8 wiFiVersion = 2;
-  readonly attribute int16u channelNumber = 3;
-  readonly attribute int8s rssi = 4;
+  readonly attribute nullable octet_string<6> bssid = 0;
+  readonly attribute nullable SecurityType securityType = 1;
+  readonly attribute nullable WiFiVersionType wiFiVersion = 2;
+  readonly attribute nullable int16u channelNumber = 3;
+  readonly attribute nullable int8s rssi = 4;
   readonly attribute int32u beaconLostCount = 5;
   readonly attribute int32u beaconRxCount = 6;
   readonly attribute int32u packetMulticastRxCount = 7;
@@ -653,6 +727,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 
 endpoint 0 {
+  server  cluster AccessControl;
   server  cluster AdministratorCommissioning;
   server  cluster Basic;
   server  cluster Descriptor;

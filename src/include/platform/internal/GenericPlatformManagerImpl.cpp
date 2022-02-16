@@ -27,6 +27,7 @@
 
 #include <inttypes.h>
 #include <new>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -122,6 +123,8 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 
     // TODO Initialize the Software Update Manager object.
 
+    _ScheduleWork(HandleDeviceRebooted, 0);
+
 exit:
     return err;
 }
@@ -129,9 +132,8 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
-    CHIP_ERROR err;
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
-    err = UDPEndPointManager()->Shutdown();
+    CHIP_ERROR err = UDPEndPointManager()->Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     ChipLogError(DeviceLayer, "BLE shutdown");
@@ -285,6 +287,27 @@ void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bo
     if (messageLayerIsActive != self.mMsgLayerWasActive)
     {
         self.mMsgLayerWasActive = messageLayerIsActive;
+    }
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl<ImplClass>::HandleDeviceRebooted(intptr_t arg)
+{
+    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
+    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
+
+    if (generalDiagnosticsDelegate != nullptr)
+    {
+        generalDiagnosticsDelegate->OnDeviceRebooted();
+    }
+
+    // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
+    if (platformManagerDelegate != nullptr)
+    {
+        uint32_t softwareVersion;
+
+        ReturnOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
+        platformManagerDelegate->OnStartUp(softwareVersion);
     }
 }
 

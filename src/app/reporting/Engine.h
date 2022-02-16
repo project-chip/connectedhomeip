@@ -118,6 +118,13 @@ private:
                                    const ConcreteReadAttributePath & aClusterInfo,
                                    AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
+    // If version match, it means don't send, if version mismatch, it means send.
+    // If client sends the same path with multiple data versions, client will get the data back per the spec, because at least one
+    // of those will fail to match.  This function should return false if either nothing in the list matches the given
+    // endpoint+cluster in the path or there is an entry in the list that matches the endpoint+cluster in the path but does not
+    // match the current data version of that cluster.
+    bool IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath);
+
     /**
      * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
      * it would clear dirty flag for that subscription
@@ -171,7 +178,7 @@ private:
      *  mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
      *
      */
-    BitMapObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
+    ObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     uint32_t mReservedSize = 0;

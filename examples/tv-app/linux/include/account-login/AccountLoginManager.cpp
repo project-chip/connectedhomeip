@@ -23,15 +23,28 @@
 using namespace std;
 using namespace chip::app::Clusters::AccountLogin;
 
-bool AccountLoginManager::HandleLogin(const chip::CharSpan & tempAccountIdentifier, const chip::CharSpan & setupPin)
+AccountLoginManager::AccountLoginManager(const char * setupPin)
+{
+    CopyString(mSetupPin, sizeof(mSetupPin), setupPin);
+}
+
+bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin)
 {
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
     string setupPinString(setupPin.data(), setupPin.size());
     ChipLogProgress(Zcl, "temporary account id: %s", tempAccountIdentifierString.c_str());
     ChipLogProgress(Zcl, "setup pin %s", setupPinString.c_str());
 
-    // TODO: Insert your code here to handle login request
-    return true;
+    if (strcmp(mSetupPin, setupPinString.c_str()) == 0)
+    {
+        ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin success");
+        return true;
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin failed expected pin %s", mSetupPin);
+        return false;
+    }
 }
 
 bool AccountLoginManager::HandleLogout()
@@ -40,12 +53,14 @@ bool AccountLoginManager::HandleLogout()
     return true;
 }
 
-Commands::GetSetupPINResponse::Type AccountLoginManager::HandleGetSetupPin(const chip::CharSpan & tempAccountIdentifier)
+void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
+                                            const CharSpan & tempAccountIdentifier)
 {
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
-    ChipLogProgress(Zcl, "temporary account id: %s", tempAccountIdentifierString.c_str());
-    // TODO: Insert your code here to handle get setup pin
-    Commands::GetSetupPINResponse::Type response;
-    response.setupPIN = chip::CharSpan::fromCharString("tempPin123");
-    return response;
+
+    GetSetupPINResponse response;
+    ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPin);
+
+    response.setupPIN = CharSpan::fromCharString(mSetupPin);
+    helper.Success(response);
 }

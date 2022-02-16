@@ -79,7 +79,6 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ethernet-network-diagnostics-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/localization-configuration-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-format-localization-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/unit-localization-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/wifi-network-diagnostics-server"                      
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/wake-on-lan-server"                      
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/pump-configuration-and-control-server"
@@ -199,15 +198,15 @@ pw_proto_library(locking_service
 
 pw_proto_library(wifi_service
   SOURCES
-    ${CHIP_ROOT}/examples/ipv6only-app/common/wifi_service/wifi_service.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/wifi_service.proto
   INPUTS
-    ${CHIP_ROOT}/examples/ipv6only-app/common/wifi_service/wifi_service.options
+    ${CHIP_ROOT}/examples/common/pigweed/protos/wifi_service.options
   PREFIX
     wifi_service
   DEPS
     pw_protobuf.common_protos
   STRIP_PREFIX
-    ${CHIP_ROOT}/examples/ipv6only-app/common/wifi_service
+    ${CHIP_ROOT}/examples/common/pigweed/protos
 )
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC
@@ -238,6 +237,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
                        "-DPW_RPC_LOCKING_SERVICE=1"
-                       "-DPW_RPC_TRACING_SERVICE=1")
+                       "-DPW_RPC_TRACING_SERVICE=1"
+                       "-DPW_RPC_WIFI_SERVICE=1")
 
 endif (CONFIG_ENABLE_PW_RPC)

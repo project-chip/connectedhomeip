@@ -36,43 +36,15 @@ using namespace ::chip::DeviceLayer;
 
 void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
 {
-    std::string qrCode;
-    std::string manualPairingCode;
+    chip::SetupPayload payload;
 
-    if (GetQRCode(qrCode, aRendezvousFlags) == CHIP_NO_ERROR)
+    CHIP_ERROR err = GetSetupPayload(payload, aRendezvousFlags);
+    if (err != CHIP_NO_ERROR)
     {
-        chip::Platform::ScopedMemoryBuffer<char> qrCodeBuffer;
-        const size_t qrCodeBufferMaxSize = strlen(kQrCodeBaseUrl) + strlen(kUrlDataAssignmentPhrase) + 3 * qrCode.size() + 1;
-        qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
-
-        ChipLogProgress(AppServer, "SetupQRCode: [%s]", qrCode.c_str());
-        if (GetQRCodeUrl(qrCodeBuffer.Get(), qrCodeBufferMaxSize, qrCode) == CHIP_NO_ERROR)
-        {
-            ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:\r\n    %s", qrCodeBuffer.Get());
-        }
-    }
-    else
-    {
-        ChipLogError(AppServer, "Getting QR code failed!");
+        ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
     }
 
-    if (GetManualPairingCode(manualPairingCode, aRendezvousFlags) == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "Manual pairing code: [%s]", manualPairingCode.c_str());
-    }
-    else
-    {
-        ChipLogError(AppServer, "Getting manual pairing code failed!");
-    }
-
-    if (GetLongManualPairingCode(manualPairingCode, aRendezvousFlags) == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "Long manual pairing code: [%s]", manualPairingCode.c_str());
-    }
-    else
-    {
-        ChipLogError(AppServer, "Getting long manual pairing code failed!");
-    }
+    PrintOnboardingCodes(payload);
 }
 
 void PrintOnboardingCodes(const chip::SetupPayload & payload)
@@ -105,6 +77,16 @@ void PrintOnboardingCodes(const chip::SetupPayload & payload)
     else
     {
         ChipLogError(AppServer, "Getting manual pairing code failed!");
+    }
+
+    // Hand a copy of the payload to GetLongManualPairingCode.
+    if (GetLongManualPairingCode(manualPairingCode, chip::SetupPayload(payload)) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Long manual pairing code: [%s]", manualPairingCode.c_str());
+    }
+    else
+    {
+        ChipLogError(AppServer, "Getting long manual pairing code failed!");
     }
 }
 
@@ -167,20 +149,13 @@ CHIP_ERROR GetQRCode(std::string & aQRCode, chip::RendezvousInformationFlags aRe
         return err;
     }
 
-    // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
-    // generating payload
-    err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(aQRCode);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "Generating QR Code failed: %s", chip::ErrorStr(err));
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
+    return GetQRCode(aQRCode, payload);
 }
 
 CHIP_ERROR GetQRCode(std::string & aQRCode, const chip::SetupPayload & payload)
 {
+    // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
+    // generating payload
     CHIP_ERROR err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(aQRCode);
     if (err != CHIP_NO_ERROR)
     {
@@ -215,18 +190,10 @@ CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::Rendezvo
         ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
         return err;
     }
-
-    err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aManualPairingCode);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "Generating Manual Pairing Code failed: %s", chip::ErrorStr(err));
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
+    return GetManualPairingCode(aManualPairingCode, payload);
 }
 
-CHIP_ERROR GetLongManualPairingCode(std::string & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags)
+CHIP_ERROR GetLongManualPairingCode(std::string & aLongManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags)
 {
     chip::SetupPayload payload;
 
@@ -236,9 +203,16 @@ CHIP_ERROR GetLongManualPairingCode(std::string & aManualPairingCode, chip::Rend
         ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
         return err;
     }
+    return GetLongManualPairingCode(aLongManualPairingCode, std::move(payload));
+}
 
+CHIP_ERROR GetLongManualPairingCode(std::string & aLongManualPairingCode, chip::SetupPayload && payload)
+{
+    // To get payloadDecimalStringRepresentation to produce a long manual
+    // pairing code, the commissioning flow in the payload needs to be kCustom.
     payload.commissioningFlow = chip::CommissioningFlow::kCustom;
-    err                       = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aManualPairingCode);
+
+    CHIP_ERROR err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aLongManualPairingCode);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "Generating long manual pairing code failed: %s", chip::ErrorStr(err));

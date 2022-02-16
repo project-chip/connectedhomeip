@@ -31,7 +31,8 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     mIOContext = ioContext;
     mTransport = transport;
 
-    ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager));
+    ReturnErrorOnFailure(PlatformMemoryUser::Init());
+    ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager, &mStorage));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
@@ -82,7 +83,7 @@ CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 
 CHIP_ERROR MessagingContext::CreateSessionBobToFriends()
 {
-    mSessionBobToFriends.Grab(mSessionManager.CreateGroupSession(GetFriendsGroupId(), mSrcFabricIndex).Value());
+    mSessionBobToFriends.Grab(mSessionManager.CreateGroupSession(GetFriendsGroupId(), mSrcFabricIndex, GetBobNodeId()).Value());
     return CHIP_NO_ERROR;
 }
 
@@ -118,13 +119,13 @@ void MessagingContext::ExpireSessionBobToFriends()
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
-    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress, gDefaultMRPConfig).Value(),
+    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress, GetLocalMRPConfig()).Value(),
                                        delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
-    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mBobAddress, gDefaultMRPConfig).Value(),
+    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mBobAddress, GetLocalMRPConfig()).Value(),
                                        delegate);
 }
 

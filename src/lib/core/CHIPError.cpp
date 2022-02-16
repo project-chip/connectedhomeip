@@ -545,9 +545,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION.AsInteger():
         desc = "Incompatible data schema version";
         break;
-    case CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION.AsInteger():
-        desc = "Update Required Version mismatch";
-        break;
     case CHIP_ERROR_ACCESS_DENIED.AsInteger():
         desc = "The CHIP message is not granted access";
         break;
@@ -691,6 +688,12 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB.AsInteger():
         desc = "Malformed Interaction Model Data Version Filter IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Status Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Timed Request Message";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -79,6 +79,9 @@ public:
     static const Key kConfigKey_WiFiPassword;
     static const Key kConfigKey_WiFiSecurity;
     static const Key kConfigKey_WiFiMode;
+    static const Key kConfigKey_Spake2pIterationCount;
+    static const Key kConfigKey_Spake2pSalt;
+    static const Key kConfigKey_Spake2pVerifier;
 
     // CHIP Counter keys
     static const Key kCounterKey_RebootCount;

@@ -129,7 +129,7 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
 
         // currently IPv6 addresses do not work for some reason
         bool foundV4 = false;
-        for (int i = 0; i < nodeData.numIPs; ++i)
+        for (unsigned i = 0; i < nodeData.numIPs; ++i)
         {
             if (nodeData.ipAddress[i].IsIPv4())
             {
@@ -149,7 +149,7 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
         client->SetVendorId(nodeData.vendorId);
         client->SetProductId(nodeData.productId);
         client->SetDeviceName(nodeData.deviceName);
-        client->SetRotatingId(nodeData.rotatingId);
+        client->SetRotatingId(nodeData.rotatingId, nodeData.rotatingIdLen);
 
         // Call the registered mUserConfirmationProvider, if any.
         if (mUserConfirmationProvider != nullptr)

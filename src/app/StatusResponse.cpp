@@ -54,7 +54,7 @@ CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && a
 #endif
     StatusIB status;
     ReturnErrorOnFailure(response.GetStatus(status.mStatus));
-    ChipLogProgress(InteractionModel, "Received status response, status is %" PRIu8, to_underlying(status.mStatus));
+    ChipLogProgress(InteractionModel, "Received status response, status is %u", to_underlying(status.mStatus));
 
     if (status.mStatus == Protocols::InteractionModel::Status::Success)
     {

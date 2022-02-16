@@ -23,10 +23,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
-#include <app/util/ContentAppPlatform.h>
+#include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/af.h>
-
-#include <iostream>
 
 #include "include/account-login/AccountLoginManager.h"
 #include "include/application-basic/ApplicationBasicManager.h"
@@ -49,8 +47,9 @@ using namespace chip;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::AppPlatform;
+using namespace chip::app::Clusters;
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
+bool emberAfBasicClusterMfgSpecificPingCallback(app::CommandHandler * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -59,9 +58,14 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * comm
 namespace {
 static AccountLoginManager accountLoginManager;
 static ApplicationBasicManager applicationBasicManager;
-static ApplicationLauncherManager applicationLauncherManager;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+static ApplicationLauncherManager applicationLauncherManager(true);
+#else  // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+static ApplicationLauncherManager applicationLauncherManager(false);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 static AudioOutputManager audioOutputManager;
 static ChannelManager channelManager;
+static ContentLauncherManager contentLauncherManager;
 static KeypadInputManager keypadInputManager;
 static LowPowerManager lowPowerManager;
 static MediaInputManager mediaInputManager;
@@ -72,23 +76,117 @@ static WakeOnLanManager wakeOnLanManager;
 
 void ApplicationInit() {}
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+class MyUserPrompter : public UserPrompter
+{
+    // tv should override this with a dialog prompt
+    inline void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    {
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    {
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    {
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override { return; }
+};
+
+MyUserPrompter gMyUserPrompter;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+class MyPincodeService : public PincodeService
+{
+    uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    {
+        return ContentAppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
+    }
+};
+MyPincodeService gMyPincodeService;
+
+class MyPostCommissioningListener : public PostCommissioningListener
+{
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) override
+    {
+
+        // TODO:
+        // - the endpointId chosen should come from the App Platform (determined based upon vid/pid of node)
+        // - the cluster(s) chosen should come from the App Platform
+        constexpr EndpointId kBindingClusterEndpoint = 0;
+
+        GroupId groupId       = kUndefinedGroupId;
+        EndpointId endpointId = 1;
+        ClusterId clusterId   = kInvalidClusterId;
+
+        ChipLogProgress(Controller, "Attempting to create Binding");
+
+        ContentAppPlatform::GetInstance().CreateBindingWithCallback(device, kBindingClusterEndpoint, nodeId, groupId, endpointId,
+                                                                    clusterId, OnSuccessResponse, OnFailureResponse);
+    }
+
+    /* Callback when command results in success */
+    static void OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
+    {
+        ChipLogProgress(Controller, "OnSuccessResponse - Binding Add Successfully");
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->PostCommissioningSucceeded();
+        }
+    }
+
+    /* Callback when command results in failure */
+    static void OnFailureResponse(void * context, CHIP_ERROR error)
+    {
+        ChipLogProgress(Controller, "OnFailureResponse - Binding Add Failed");
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->PostCommissioningFailed(error);
+        }
+    }
+};
+
+MyPostCommissioningListener gMyPostCommissioningListener;
+
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 int main(int argc, char * argv[])
 {
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    chip::AppPlatform::ContentAppFactoryImpl factory;
+    ContentAppFactoryImpl factory;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    chip::AppPlatform::AppPlatform::GetInstance().SetupAppPlatform();
-    chip::AppPlatform::AppPlatform::GetInstance().SetContentAppFactory(&factory);
+    ContentAppPlatform::GetInstance().SetupAppPlatform();
+    ContentAppPlatform::GetInstance().SetContentAppFactory(&factory);
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+    if (cdc != nullptr)
+    {
+        cdc->SetPincodeService(&gMyPincodeService);
+        cdc->SetUserPrompter(&gMyUserPrompter);
+        cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 #if defined(ENABLE_CHIP_SHELL)
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    chip::Shell::RegisterAppPlatformCommands();
+    Shell::RegisterAppPlatformCommands();
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #endif
 
@@ -99,72 +197,72 @@ int main(int argc, char * argv[])
 
 void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDelegate");
-    chip::app::Clusters::ContentLauncher::SetDelegate(endpoint, new ContentLauncherManager(endpoint));
+    ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDefaultDelegate");
+    ContentLauncher::SetDefaultDelegate(endpoint, &contentLauncherManager);
 }
 
 void emberAfAccountLoginClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: AccountLogin::SetDefaultDelegate");
-    chip::app::Clusters::AccountLogin::SetDefaultDelegate(endpoint, &accountLoginManager);
+    AccountLogin::SetDefaultDelegate(endpoint, &accountLoginManager);
 }
 
 void emberAfApplicationBasicClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationBasic::SetDefaultDelegate");
-    chip::app::Clusters::ApplicationBasic::SetDefaultDelegate(endpoint, &applicationBasicManager);
+    ApplicationBasic::SetDefaultDelegate(endpoint, &applicationBasicManager);
 }
 
 void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationLauncher::SetDefaultDelegate");
-    chip::app::Clusters::ApplicationLauncher::SetDefaultDelegate(endpoint, &applicationLauncherManager);
+    ApplicationLauncher::SetDefaultDelegate(endpoint, &applicationLauncherManager);
 }
 
 void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
-    chip::app::Clusters::AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
+    AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
 }
 
 void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: Channel::SetDefaultDelegate");
-    chip::app::Clusters::Channel::SetDefaultDelegate(endpoint, &channelManager);
+    Channel::SetDefaultDelegate(endpoint, &channelManager);
 }
 
 void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: KeypadInput::SetDefaultDelegate");
-    chip::app::Clusters::KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
+    KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
-    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
+    LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
 }
 
 void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: MediaInput::SetDefaultDelegate");
-    chip::app::Clusters::MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
+    MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
 }
 
 void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: MediaPlayback::SetDefaultDelegate");
-    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
+    MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
 }
 
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
-    chip::app::Clusters::TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
+    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
 }
 
-void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
+void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: WakeOnLanManager::SetDefaultDelegate");
-    chip::app::Clusters::WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
+    WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
 }

@@ -985,7 +985,7 @@ void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_
             DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (mpConnectCallback != nullptr)
                 {
-                    // TODO: Replace this with actual thread attach result.
+                    // TODO(#14175): Replace this with actual thread attach result.
                     this_->mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
                     this_->mpConnectCallback = nullptr;
                 }
@@ -997,7 +997,7 @@ void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_
             DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (this_->mpConnectCallback != nullptr)
                 {
-                    // TODO: Replace this with actual thread attach result.
+                    // TODO(#14175): Replace this with actual thread attach result.
                     this_->mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
                     this_->mpConnectCallback = nullptr;
                 }

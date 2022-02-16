@@ -15,6 +15,7 @@
 name: 21.9.2. [TC-MC-7.2] Rename Output Verification
 
 config:
+    nodeId: 0x12344321
     cluster: "Audio Output"
     endpoint: 1
 
@@ -22,12 +23,16 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #Disabled due to issue- #13029
     - label: "Reads the OutputList attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "audio output list"
+      attribute: "OutputList"
       response:
           saveAs: audioOutputListValues
           constraints:
@@ -48,6 +53,6 @@ tests:
     - label: "Reads the OutputList attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "audio output list"
+      attribute: "OutputList"
       response:
           value: audioOutputListValues

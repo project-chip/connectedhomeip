@@ -38,10 +38,9 @@ function throwErrorIfUndefined(item, errorMsg, conditions)
 
 function checkIsInsideClusterBlock(context, name)
 {
-  const clusterName = context.name;
-  const clusterSide = context.side;
+  const clusterName = context.name ? context.name : context.clusterName;
+  const clusterSide = context.side ? context.side : context.clusterSide;
   const errorMsg    = name + ': Not inside a ({#chip_server_clusters}} block.';
-
   throwErrorIfUndefined(context, errorMsg, [ clusterName, clusterSide ]);
 
   return { clusterName, clusterSide };
@@ -164,21 +163,16 @@ function chip_server_global_responses(options)
   return asBlocks.call(this, getServerGlobalAttributeResponses(this), options);
 }
 
-async function if_in_global_responses(options)
+async function if_basic_global_response(options)
 {
   const attribute          = this.response.arguments[0];
   const globalResponses    = await getServerGlobalAttributeResponses(this);
-  const responseTypeExists = globalResponses.find(
-      // Some fields of item/attribute here may be undefined.
-      item => item.isArray == attribute.isArray && item.isStruct == attribute.isStruct && item.chipType == attribute.chipType
-          && item.isNullable == attribute.isNullable && item.isOptional == attribute.isOptional)
+  const complexType        = attribute.isNullable || attribute.isOptional || attribute.isStruct || attribute.isArray;
+  const responseTypeExists = globalResponses.find(item => item.chipType == attribute.chipType);
 
-  if (responseTypeExists)
-  {
+  if (!complexType && responseTypeExists) {
     return options.fn(this);
-  }
-  else
-  {
+  } else {
     return options.inverse(this);
   }
 }
@@ -275,11 +269,14 @@ function chip_cluster_command_arguments(options)
 function chip_cluster_command_arguments_with_structs_expanded(options)
 {
   const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_command_arguments');
-  const commands  = getCommands.call(this.parent, 'chip_cluster_commands_argments_with_structs_expanded');
+  const commands  = getCommands.call(this.parent, 'chip_cluster_command_arguments_with_structs_expanded');
 
   const filter = command => command.id == commandId;
   return asBlocks.call(this, commands.then(items => {
     const item = items.find(filter);
+    if (item === undefined) {
+      return [];
+    }
     return item.expandedArguments || item.arguments;
   }),
       options);
@@ -468,6 +465,33 @@ async function if_chip_enum(type, options)
   return templateUtil.templatePromise(this.global, result);
 }
 
+async function if_chip_complex(options)
+{
+  // `zcl_command_arguments` has an `isArray` property and `type`
+  // contains the array element type.
+  if (this.isArray) {
+    return options.fn(this);
+  }
+
+  // zcl_attributes iterators does not expose an `isArray` property
+  // and `entryType` contains the array element type, while `type`
+  // contains the atomic type, which is array in this case.
+  // https://github.com/project-chip/zap/issues/412
+  if (this.type == 'array') {
+    return options.fn(this);
+  }
+
+  let pkgId       = await templateUtil.ensureZclPackageId(this);
+  let checkResult = await zclHelper.isStruct(this.global.db, this.type, pkgId);
+  let result;
+  if (checkResult != 'unknown') {
+    result = options.fn(this);
+  } else {
+    result = options.inverse(this);
+  }
+  return templateUtil.templatePromise(this.global, result);
+}
+
 //
 // Module exports
 //
@@ -492,6 +516,7 @@ exports.chip_available_cluster_commands                      = chip_available_cl
 exports.chip_endpoints                                       = chip_endpoints;
 exports.chip_endpoint_clusters                               = chip_endpoint_clusters;
 exports.if_chip_enum                                         = if_chip_enum;
-exports.if_in_global_responses                               = if_in_global_responses;
+exports.if_chip_complex                                      = if_chip_complex;
+exports.if_basic_global_response                             = if_basic_global_response;
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
 exports.chip_shared_structs                                  = chip_shared_structs;

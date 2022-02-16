@@ -50,8 +50,9 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
         return CHIP_NO_ERROR;
     }
 
-    mListenPort    = params.listenPort;
-    mFabricStorage = params.fabricStorage;
+    mListenPort               = params.listenPort;
+    mFabricStorage            = params.fabricStorage;
+    mFabricIndependentStorage = params.fabricIndependentStorage;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -70,6 +71,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.bleLayer = mSystemState->BleLayer();
 #endif
     }
+
+    params.fabricIndependentStorage = mFabricIndependentStorage;
 
     return InitSystemState(params);
 }
@@ -131,25 +134,20 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    if (params.imDelegate == nullptr)
-    {
-        params.imDelegate = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
-    }
-
     stateParams.fabricTable           = chip::Platform::New<FabricTable>();
     stateParams.sessionMgr            = chip::Platform::New<SessionManager>();
     stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
     ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
-    ReturnErrorOnFailure(
-        stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr, stateParams.messageCounterManager));
+
+    ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
+                                                      stateParams.messageCounterManager, params.fabricIndependentStorage));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
     InitDataModelHandler(stateParams.exchangeMgr);
 
-    stateParams.imDelegate = params.imDelegate;
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -172,8 +170,6 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerNOC                  = params.controllerNOC;
     controllerParams.controllerICAC                 = params.controllerICAC;
     controllerParams.controllerRCAC                 = params.controllerRCAC;
-    controllerParams.fabricIndex                    = params.fabricIndex;
-    controllerParams.fabricId                       = params.fabricId;
     controllerParams.storageDelegate                = params.storageDelegate;
 
     controllerParams.systemState        = mSystemState;
@@ -199,7 +195,8 @@ CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, Device
 
     CommissionerInitParams commissionerParams;
     PopulateInitParams(commissionerParams, params);
-    commissionerParams.pairingDelegate = params.pairingDelegate;
+    commissionerParams.pairingDelegate     = params.pairingDelegate;
+    commissionerParams.defaultCommissioner = params.defaultCommissioner;
 
     CHIP_ERROR err = commissioner.Init(commissionerParams);
     return err;
@@ -218,13 +215,19 @@ CHIP_ERROR DeviceControllerFactory::ServiceEvents()
 
 DeviceControllerFactory::~DeviceControllerFactory()
 {
+    Shutdown();
+}
+
+void DeviceControllerFactory::Shutdown()
+{
     if (mSystemState != nullptr)
     {
         mSystemState->Release();
         chip::Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
-    mFabricStorage = nullptr;
+    mFabricStorage            = nullptr;
+    mFabricIndependentStorage = nullptr;
 }
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
@@ -292,10 +295,10 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mSessionMgr = nullptr;
     }
 
-    if (mIMDelegate != nullptr)
+    if (mFabrics != nullptr)
     {
-        chip::Platform::Delete(mIMDelegate);
-        mIMDelegate = nullptr;
+        chip::Platform::Delete(mFabrics);
+        mFabrics = nullptr;
     }
 
     return CHIP_NO_ERROR;

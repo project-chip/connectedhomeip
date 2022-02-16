@@ -6,13 +6,22 @@
   {{#if (isLiteralNull expected)}}
     XCTAssertTrue({{actual}} == nil);
   {{else}}
+    {{#if (chip_tests_variables_has expected)}}
+      {{! Expected value is also a nullable. }}
+      if ({{expected}} == nil) {
+        XCTAssertTrue({{actual}} == nil);
+      } else {
+    {{/if}}
     XCTAssertFalse({{actual}} == nil);
     {{>check_test_value actual=actual expected=expected cluster=cluster isNullable=false}}
+    {{#if (chip_tests_variables_has expected)}}
+    }
+    {{/if}}
   {{/if}}
 {{else if isArray}}
     XCTAssertEqual([{{actual}} count], {{expected.length}});
     {{#each expected}}
-      {{>check_test_value actual=(concat ../actual "[" @index "]") expected=this cluster=../cluster isArray=false type=../type}}
+      {{>check_test_value actual=(concat ../actual "[" @index "]") expected=this cluster=../cluster isArray=false type=../type parent=../parent}}
     {{/each}}
 {{else}}
   {{#if_is_struct type}}
@@ -28,11 +37,7 @@
         than "global") that are not present in the struct ? }}
   {{else}}
     {{#if (chip_tests_variables_has expected)}}
-      {{#if (isString type)}}
       XCTAssertEqualObjects({{actual}}, {{expected}});
-      {{else}}
-      XCTAssertEqual([{{actual}} {{asObjectiveCNumberType "" type true}}Value], {{expected}});
-      {{/if}}
     {{else if (isOctetString type)}}
       XCTAssertTrue([{{actual}} isEqualToData:[[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral expected}}" length:{{expected.length}}]]);
     {{else if (isCharString type)}}

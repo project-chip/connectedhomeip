@@ -353,7 +353,7 @@ class EntryStorage
 {
 public:
     // ACL support
-    static constexpr size_t kNumberOfFabrics  = CHIP_CONFIG_MAX_DEVICE_ADMINS;
+    static constexpr size_t kNumberOfFabrics  = CHIP_CONFIG_MAX_FABRICS;
     static constexpr size_t kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
     static EntryStorage acl[kNumberOfFabrics * kEntriesPerFabric];
 
@@ -1069,12 +1069,13 @@ public:
         CHIP_ERROR err = LoadFromFlash();
         if (err != CHIP_NO_ERROR)
         {
+            ChipLogDetail(DataManagement, "AccessControl: unable to load stored ACL entries; using empty list instead");
             for (auto & storage : EntryStorage::acl)
             {
                 storage.Clear();
             }
         }
-        return err;
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Finish() override
@@ -1309,17 +1310,11 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
-AccessControl::Delegate & GetAccessControlDelegate()
+AccessControl::Delegate & GetAccessControlDelegate(PersistentStorageDelegate * storageDelegate)
 {
     static AccessControlDelegate accessControlDelegate;
-    return accessControlDelegate;
-}
-
-void SetAccessControlDelegateStorage(chip::PersistentStorageDelegate * storageDelegate)
-{
-    ChipLogDetail(DataManagement, "Examples::SetAccessControlDelegateStorage");
-    AccessControlDelegate & accessControlDelegate = static_cast<AccessControlDelegate &>(GetAccessControlDelegate());
     accessControlDelegate.SetStorageDelegate(storageDelegate);
+    return accessControlDelegate;
 }
 
 } // namespace Examples

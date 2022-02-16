@@ -42,6 +42,7 @@ into an existing Matter network and can be controlled by this network.
 -   [Testing the example](#testing-the-example)
     -   [Testing using CHIPTool](#testing-using-chiptool)
     -   [Testing Device Firmware Upgrade](#testing-device-firmware-upgrade)
+    -   [Device Tracing](#device-tracing)
 
 <hr>
 
@@ -218,6 +219,11 @@ following states are possible:
 -   _Solid On_ &mdash; The light bulb is on.
 
 -   _Off_ &mdash; The light bulb is off.
+
+**LED 3** can be used to identify the device. The LED starts blinking evenly
+(500 ms on/500 ms off) when the Identify command of the Identify cluster is
+received. The command's argument can be used to specify the duration of the
+effect.
 
 **Button 1** can be used for the following purposes:
 
@@ -564,3 +570,16 @@ From within the console you can then invoke rpcs:
         rpcs.chip.rpc.Lighting.Get()
 
         rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
+
+## Device Tracing
+
+Device tracing is available to analyze the device performance. To turn on
+tracing, build with RPC enabled. See
+[Using the RPC console](#building-with-pigweed-rpcs).
+
+Obtain tracing json file.
+
+```
+    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -d {PORT} -o {OUTPUT_FILE} \
+    -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
+```

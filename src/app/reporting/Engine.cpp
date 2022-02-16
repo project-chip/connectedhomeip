@@ -47,6 +47,24 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
+bool Engine::IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath)
+{
+    bool existPathMatch       = false;
+    bool existVersionMismatch = false;
+    for (auto filter = aDataVersionFilterList; filter != nullptr; filter = filter->mpNext)
+    {
+        if (aPath.mEndpointId == filter->mEndpointId && aPath.mClusterId == filter->mClusterId)
+        {
+            existPathMatch = true;
+            if (!IsClusterDataVersionEqual(filter->mEndpointId, filter->mClusterId, filter->mDataVersion.Value()))
+            {
+                existVersionMismatch = true;
+            }
+        }
+    }
+    return existPathMatch && !existVersionMismatch;
+}
+
 CHIP_ERROR
 Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                             AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
@@ -111,6 +129,13 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     continue;
                 }
             }
+            else
+            {
+                if (IsClusterDataVersionMatch(apReadHandler->GetDataVersionFilterlist(), readPath))
+                {
+                    continue;
+                }
+            }
 
             // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty paths.
             TLV::TLVWriter attributeBackup;
@@ -126,6 +151,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                              "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
                              ChipLogValueMEI(pathForRetrieval.mClusterId), err.Format());
 
+                // If error is not CHIP_ERROR_BUFFER_TOO_SMALL and is not CHIP_ERROR_NO_MEMORY, rollback and encode status.
+                // Otherwise, if partial data allowed, save the encode state.
+                // Otherwise roll back. If we have already encoded some chunks, we are done; otherwise encode status.
+
                 if (encodeState.AllowPartialData() && ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY)))
                 {
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
@@ -138,12 +167,15 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     attributeReportIBs.Rollback(attributeBackup);
                     apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
 
-                    // Try to encode our error as a status response.
-                    err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
-                    if (err != CHIP_NO_ERROR)
+                    if (err != CHIP_ERROR_NO_MEMORY && err != CHIP_ERROR_BUFFER_TOO_SMALL)
                     {
-                        // OK, just roll back again and give up.
-                        attributeReportIBs.Rollback(attributeBackup);
+                        // Try to encode our error as a status response.
+                        err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            // OK, just roll back again and give up.
+                            attributeReportIBs.Rollback(attributeBackup);
+                        }
                     }
                 }
             }
@@ -329,6 +361,10 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
 
+    // Reserved size for the uint8_t InteractionModelRevision flag, which takes up 1 byte for the control tag and 1 byte for the
+    // context tag, 1 byte for value
+    const uint32_t kReservedSizeForIMRevision = 1 + 1 + 1;
+
     // Reserved size for the end of report message, which is an end-of-container (i.e 1 byte for the control tag).
     const uint32_t kReservedSizeForEndOfReportMessage = 1;
 
@@ -362,7 +398,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         reportDataBuilder.SubscriptionId(subscriptionId);
     }
 
-    SuccessOrExit(err = reportDataWriter.ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
+    SuccessOrExit(err = reportDataWriter.ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForIMRevision +
+                                                       kReservedSizeForEndOfReportMessage));
 
     {
         bool hasMoreChunksForAttributes = false;
@@ -388,7 +425,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     }
 
     SuccessOrExit(reportDataBuilder.GetError());
-    SuccessOrExit(err = reportDataWriter.UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
+    SuccessOrExit(err = reportDataWriter.UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForIMRevision +
+                                                         kReservedSizeForEndOfReportMessage));
     if (hasMoreChunks)
     {
         reportDataBuilder.MoreChunkedMessages(true);

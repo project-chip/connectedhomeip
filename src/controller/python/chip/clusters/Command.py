@@ -161,21 +161,7 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
         transaction), device, c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), commandPath.EndpointId, commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV))
 
 
-_deviceController = None
-
-
-def SetDeviceController(deviceCtrl):
-    global _deviceController
-    _deviceController = deviceCtrl
-
-
-def GetDeviceController():
-    global _deviceController
-    return _deviceController
-
-
-def Init(devCtrl):
-    SetDeviceController(devCtrl)
+def Init():
     handle = chip.native.GetLibraryHandle()
 
     # Uses one of the type decorators as an indicator for everything being

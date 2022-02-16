@@ -30,9 +30,12 @@
 #include <support/CHIPMem.h>
 
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <lib/support/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/NetworkCommissioningDriver.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
@@ -50,6 +53,16 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
+
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
+} // namespace
+
+void NetWorkCommissioningInstInit()
+{
+    sWiFiNetworkCommissioningInstance.Init();
+}
 
 #ifdef CONFIG_PLATFORM_8721D
 #define STATUS_LED_GPIO_NUM PB_5
@@ -69,12 +82,9 @@ AmebaOTAImageProcessor gImageProcessor;
 #endif
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-extern "C" void amebaQueryImageCmdHandler(uint32_t nodeId, uint32_t fabricId)
+extern "C" void amebaQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd
-    gRequestorCore.TestModeSetProviderParameters(nodeId, fabricId, chip::kRootEndpointId);
-
     static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
 
@@ -147,31 +157,34 @@ static Identify gIdentify1 = {
 
 extern "C" void ChipTest(void)
 {
-    printf("In ChipTest()\r\n");
+    ChipLogProgress(DeviceLayer, "Lighting App Demo!");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    printf("initPrefr\n");
     initPref();
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
-    err                           = deviceMgr.Init(&EchoCallbacks);
 
+    err = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
-        printf("DeviceManagerInit() - ERROR!\r\n");
+        ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!\r\n");
     }
     else
     {
-        printf("DeviceManagerInit() - OK\r\n");
+        ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
     }
 
     chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    NetWorkCommissioningInstInit();
 
-    // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    if (RTW_SUCCESS != wifi_is_connected_to_ap())
+    {
+        // QR code will be used with CHIP Tool
+        PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    }
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
 

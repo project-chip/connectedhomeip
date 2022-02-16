@@ -54,15 +54,23 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build Android CHIPTool and CHIPTest
+            - name: Build Android CHIPTool and CHIPTest (ARM)
               run: |
                 ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-{arm,arm64}-chip-*' build"
-            # - name: Build Android Studio build (arm64 only)
-            #   run: |
-            #     ./scripts/run_in_build_env.sh \
-            #       "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-androidstudio-arm64-chip-tool' build"
+                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm-chip-*' build"
+            - name: Clean out build output
+              run: rm -rf ./out
+            - name: Build Android CHIPTool and CHIPTest (ARM64)
+              run: |
+                ./scripts/run_in_build_env.sh \
+                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm64-chip-*' build"
             - name: Run Android build rule tests
               run: |
                 ./scripts/run_in_build_env.sh \
                   "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test.tests"
+            - name: Clean out build output
+              run: rm -rf ./out
+            # - name: Build Android Studio build (arm64 only)
+            #   run: |
+            #     ./scripts/run_in_build_env.sh \
+            #       "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-androidstudio-arm64-chip-tool' build"

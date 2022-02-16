@@ -665,7 +665,6 @@ CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Cry
  * @brief Generate a new X.509 DER encoded Node operational certificate
  *
  * @param requestParams   Certificate request parameters.
- * @param issuerLevel     Indicates if the issuer is a root CA or an intermediate CA
  * @param subjectPubkey   The public key of subject
  * @param issuerKeypair   The certificate signing key
  * @param x509Cert        Buffer to store signed certificate in X.509 DER format.
@@ -775,9 +774,8 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1::AS
 CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::TLVWriter & writer, uint64_t tag);
 
 /**
- * Extract the FabricID from a CHIP certificate in ByteSpan TLV-encoded
- * form.  This does not perform any sort of validation on the certificate
- * structure other than parsing it.
+ * Extract the Fabric ID from an operational certificate that has already been
+ * parsed.
  *
  * This function can be used to extract Fabric ID from an ICA certificate.
  * These certificates may not contain a NodeID, so ExtractNodeIdFabricIdFromOpCert()
@@ -837,6 +835,16 @@ CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats);
  * @return CHIP_ERROR_BUFFER_TOO_SMALL if the passed-in CATs array is too small.
  */
 CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats);
+
+/**
+ * Extract the and Fabric ID from an operational certificate in ByteSpan TLV-encoded
+ * form.  This does not perform any sort of validation on the certificate
+ * structure other than parsing it.
+ *
+ * Can return any error that can be returned from parsing the cert or from the
+ * ChipCertificateData* version of ExtractNodeIdFabricIdFromOpCert.
+ */
+CHIP_ERROR ExtractFabricIdFromCert(const ByteSpan & opcert, FabricId * fabricId);
 
 /**
  * Extract Node ID and Fabric ID from an operational certificate in ByteSpan TLV-encoded

@@ -17,6 +17,8 @@
 
 #include <app/server/Server.h>
 
+#include <access/examples/ExampleAccessControlDelegate.h>
+
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
@@ -64,6 +66,21 @@ constexpr bool isRendezvousBypassed()
 #endif
 }
 
+void StopEventLoop(intptr_t arg)
+{
+    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
+}
+
+void DispatchShutDownEvent(intptr_t arg)
+{
+    // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
+    chip::DeviceLayer::PlatformManagerDelegate * platformManagerDelegate = chip::DeviceLayer::PlatformMgr().GetDelegate();
+    if (platformManagerDelegate != nullptr)
+    {
+        platformManagerDelegate->OnShutDown();
+    }
+}
+
 } // namespace
 
 namespace chip {
@@ -87,13 +104,12 @@ Server::Server() :
             .idAllocator    = &mSessionIDAllocator,
             .fabricTable    = &mFabrics,
             .clientPool     = &mCASEClientPool,
-            .imDelegate     = nullptr,
         },
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
     }), mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage),
-    mAttributePersister(mDeviceStorage)
+    mAttributePersister(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
@@ -112,13 +128,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     // handler.
     SetAttributePersistenceProvider(&mAttributePersister);
 
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-    err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
-    SuccessOrExit(err);
-#elif CHIP_DEVICE_LAYER_TARGET_LINUX
-    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
-#endif
-
     InitDataModelHandler(&mExchangeMgr);
 
     err = mFabrics.Init(&mDeviceStorage);
@@ -128,6 +137,11 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
     SetGroupDataProvider(&mGroupsProvider);
+
+    // Access control must be initialized after mDeviceStorage.
+    err = mAccessControl.Init();
+    SuccessOrExit(err);
+    Access::SetAccessControl(mAccessControl);
 
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
@@ -158,7 +172,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     SuccessOrExit(err);
 
-    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager);
+    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, &mDeviceStorage);
     SuccessOrExit(err);
 
     err = mExchangeMgr.Init(&mSessions);
@@ -255,8 +269,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                     Transport::PeerAddress::Multicast(fabric.GetFabricIndex(), groupInfo.group_id), true);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %" PRIu8,
-                                 groupInfo.group_id, fabric.GetFabricIndex());
+                    ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %u", groupInfo.group_id,
+                                 fabric.GetFabricIndex());
                     break;
                 }
             }
@@ -278,11 +292,17 @@ exit:
     return err;
 }
 
+void Server::DispatchShutDownAndStopEventLoop()
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(DispatchShutDownEvent);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+}
+
 void Server::Shutdown()
 {
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-    mExchangeMgr.Shutdown();
+    LogErrorOnFailure(mExchangeMgr.Shutdown());
     mSessions.Shutdown();
     mTransports.Close();
     mCommissioningWindowManager.Shutdown();

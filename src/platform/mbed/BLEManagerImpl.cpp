@@ -420,10 +420,11 @@ struct CHIPService : public ble::GattServer::EventHandler
     {
         ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params.connHandle, params.attHandle);
 
-        // FIXME: ACK hack
-#if (defined(MBED_CONF_APP_USE_GATT_INDICATION_ACK_HACK) && (MBED_CONF_APP_USE_GATT_INDICATION_ACK_HACK != 0))
+        // Note: This is applicable to both notification and indication: If a
+        // notification is sent then onDataSent is called as soon as the data
+        // has been pushed into the Bluetooth controller. For indication, onDataSent
+        // is called when the confirmation has been received.
         onConfirmationReceived(params);
-#endif
     }
 
     void onDataWritten(const GattWriteCallbackParams & params) override

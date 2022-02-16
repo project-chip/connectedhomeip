@@ -47,16 +47,16 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
+ * 0xFFF1: Test vendor
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x235A
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x514C: qpg lighting-app
+ * 0x8005: example lighting-app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x514C
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -116,14 +116,14 @@
 #define CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI 1
 
 /**
- *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
- *    Maximum number of administrators that can provision the device. Each admin
- *    can provision the device with their unique operational credentials and manage
- *    their access control lists.
+ *    Maximum number of fabrics the device can participate in.  Each fabric can
+ *    provision the device with its unique operational credentials and manage
+ *    its own access control lists.
  */
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 4 // 3 fabrics + 1 for rotation slack
+#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
 
 /**
  *  @name Interaction Model object pool configuration.
@@ -133,7 +133,6 @@
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
  *      * #CHIP_IM_MAX_NUM_READ_HANDLER
- *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
@@ -155,13 +154,6 @@
  * @brief Defines the maximum number of ReadHandler, limits the number of active read transactions on server.
  */
 #define CHIP_IM_MAX_NUM_READ_HANDLER 3
-
-/**
- * @def CHIP_IM_MAX_NUM_READ_CLIENT
- *
- * @brief Defines the maximum number of ReadClient, limits the number of active read transactions on client.
- */
-#define CHIP_IM_MAX_NUM_READ_CLIENT 2
 
 /**
  * @def CHIP_IM_MAX_REPORTS_IN_FLIGHT

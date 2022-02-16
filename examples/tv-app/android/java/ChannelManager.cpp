@@ -25,6 +25,7 @@
 #include <lib/support/JniTypeWrappers.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters::Channel;
 
 /** @brief Channel  Cluster Init
@@ -50,7 +51,7 @@ void ChannelManager::NewManager(jint endpoint, jobject manager)
     chip::app::Clusters::Channel::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
-CHIP_ERROR ChannelManager::HandleGetChannelList(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -83,7 +84,7 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(chip::app::AttributeValueEncoder
             if (jcallSign != NULL)
             {
                 JniUtfString callsign(env, jcallSign);
-                channelInfo.callSign = callsign.charSpan();
+                channelInfo.callSign = Optional<CharSpan>(callsign.charSpan());
             }
 
             jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
@@ -91,7 +92,7 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(chip::app::AttributeValueEncoder
             if (jname != NULL)
             {
                 JniUtfString name(env, jname);
-                channelInfo.name = name.charSpan();
+                channelInfo.name = Optional<CharSpan>(name.charSpan());
             }
 
             jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
@@ -99,7 +100,7 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(chip::app::AttributeValueEncoder
             if (jaffiliateCallSign != NULL)
             {
                 JniUtfString affiliateCallSign(env, jaffiliateCallSign);
-                channelInfo.affiliateCallSign = affiliateCallSign.charSpan();
+                channelInfo.affiliateCallSign = Optional<CharSpan>(affiliateCallSign.charSpan());
             }
 
             jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
@@ -125,7 +126,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChannelManager::HandleGetLineup(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
 {
     chip::app::Clusters::Channel::Structs::LineupInfo::Type lineupInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -153,7 +154,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(chip::app::AttributeValueEncoder & aE
         if (jlineupName != NULL)
         {
             JniUtfString lineupName(env, jlineupName);
-            lineupInfo.lineupName = lineupName.charSpan();
+            lineupInfo.lineupName = Optional<CharSpan>(lineupName.charSpan());
         }
 
         jfieldID postalCodeFild = env->GetFieldID(channelLineupClazz, "postalCode", "Ljava/lang/String;");
@@ -161,7 +162,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(chip::app::AttributeValueEncoder & aE
         if (jpostalCode != NULL)
         {
             JniUtfString postalCode(env, jpostalCode);
-            lineupInfo.postalCode = postalCode.charSpan();
+            lineupInfo.postalCode = Optional<CharSpan>(postalCode.charSpan());
         }
 
         jfieldID lineupInfoTypeFild = env->GetFieldID(channelLineupClazz, "lineupInfoTypeEnum", "I");
@@ -180,7 +181,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChannelManager::HandleGetCurrentChannel(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEncoder)
 {
     chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -199,7 +200,7 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(chip::app::AttributeValueEnco
         if (jcallSign != NULL)
         {
             JniUtfString callsign(env, jcallSign);
-            channelInfo.callSign = callsign.charSpan();
+            channelInfo.callSign = Optional<CharSpan>(callsign.charSpan());
         }
 
         jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
@@ -207,7 +208,7 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(chip::app::AttributeValueEnco
         if (jname != NULL)
         {
             JniUtfString name(env, jname);
-            channelInfo.name = name.charSpan();
+            channelInfo.name = Optional<CharSpan>(name.charSpan());
         }
 
         jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
@@ -215,7 +216,7 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(chip::app::AttributeValueEnco
         if (jaffiliateCallSign != NULL)
         {
             JniUtfString affiliateCallSign(env, jaffiliateCallSign);
-            channelInfo.affiliateCallSign = affiliateCallSign.charSpan();
+            channelInfo.affiliateCallSign = Optional<CharSpan>(affiliateCallSign.charSpan());
         }
 
         jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
@@ -238,14 +239,12 @@ exit:
     return err;
 }
 
-void ChannelManager::HandleChangeChannel(
-    const chip::CharSpan & match,
-    chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & responser)
+void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match)
 {
     std::string name(match.data(), match.size());
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    Commands::ChangeChannelResponse::Type response;
+    ChangeChannelResponseType response;
     response.channelMatch.majorNumber = 0;
     response.channelMatch.minorNumber = 0;
 
@@ -277,7 +276,7 @@ void ChannelManager::HandleChangeChannel(
         if (jcallSign != NULL)
         {
             JniUtfString callsign(env, jcallSign);
-            response.channelMatch.callSign = callsign.charSpan();
+            response.channelMatch.callSign = Optional<CharSpan>(callsign.charSpan());
         }
 
         jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
@@ -285,14 +284,14 @@ void ChannelManager::HandleChangeChannel(
         if (jname != NULL)
         {
             JniUtfString junitname(env, jname);
-            response.channelMatch.name = junitname.charSpan();
+            response.channelMatch.name = Optional<CharSpan>(junitname.charSpan());
         }
         jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
         jstring jaffiliateCallSign          = static_cast<jstring>(env->GetObjectField(channelObject, getJaffiliateCallSignField));
         if (jaffiliateCallSign != NULL)
         {
             JniUtfString affiliateCallSign(env, jaffiliateCallSign);
-            response.channelMatch.affiliateCallSign = affiliateCallSign.charSpan();
+            response.channelMatch.affiliateCallSign = Optional<CharSpan>(affiliateCallSign.charSpan());
         }
 
         jfieldID majorNumField            = env->GetFieldID(channelClass, "majorNumber", "I");
@@ -303,7 +302,7 @@ void ChannelManager::HandleChangeChannel(
         jint jminorNum                    = env->GetIntField(channelObject, minorNumField);
         response.channelMatch.minorNumber = static_cast<uint16_t>(jminorNum);
 
-        responser.Success(response);
+        helper.Success(response);
     }
 
 exit:

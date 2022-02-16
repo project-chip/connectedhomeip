@@ -32,8 +32,8 @@
 #define QR_CODE_FREEZE 1.0 * NSEC_PER_SEC
 
 // The expected Vendor ID for CHIP demos
-// 0x235A: Chip's Vendor Id
-#define EXAMPLE_VENDOR_ID 0x235A
+// 0xFFF1: Chip's Vendor Id
+#define EXAMPLE_VENDOR_ID 0xFFF1
 
 #define EXAMPLE_VENDOR_TAG_IP 1
 #define MAX_IP_LEN 46
@@ -692,6 +692,9 @@
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }
+    // track this device
+    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
+    CHIPSetDevicePaired(deviceId, YES);
     [self setVendorIDOnAccessory];
 }
 

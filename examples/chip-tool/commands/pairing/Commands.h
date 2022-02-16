@@ -165,7 +165,7 @@ public:
 class StartUdcServerCommand : public CHIPCommand
 {
 public:
-    StartUdcServerCommand() : CHIPCommand("start-udc-server") {}
+    StartUdcServerCommand(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("start-udc-server", credsIssuerConfig) {}
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(300); }
 
     CHIP_ERROR RunCommand() override
@@ -196,9 +196,9 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
         make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
         make_unique<PairOnNetworkInstanceName>(credsIssuerConfig),
-        // TODO - enable CommissionedListCommand once DNS Cache is implemented
+        // TODO(#13973) - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
-        make_unique<StartUdcServerCommand>(),
+        make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),
     };
 

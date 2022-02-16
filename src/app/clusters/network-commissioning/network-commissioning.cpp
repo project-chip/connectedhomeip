@@ -64,11 +64,11 @@ NetworkCommissioning::WiFiBand ToClusterObjectEnum(DeviceLayer::NetworkCommissio
     using ClusterObject     = NetworkCommissioning::WiFiBand;
     using PlatfromInterface = DeviceLayer::NetworkCommissioning::WiFiBand;
 
-    static_assert(to_underlying(ClusterObject::k2g4) == to_underlying(PlatfromInterface::k2g4), "k2g4 valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k3g65) == to_underlying(PlatfromInterface::k3g65), "k3g65 valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k5g) == to_underlying(PlatfromInterface::k5g), "k5g valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k6g) == to_underlying(PlatfromInterface::k6g), "k6g valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k60g) == to_underlying(PlatfromInterface::k60g), "k60g valus mismatch.");
+    static_assert(to_underlying(ClusterObject::k2g4) == to_underlying(PlatfromInterface::k2g4), "k2g4 value mismatch.");
+    static_assert(to_underlying(ClusterObject::k3g65) == to_underlying(PlatfromInterface::k3g65), "k3g65 value mismatch.");
+    static_assert(to_underlying(ClusterObject::k5g) == to_underlying(PlatfromInterface::k5g), "k5g value mismatch.");
+    static_assert(to_underlying(ClusterObject::k6g) == to_underlying(PlatfromInterface::k6g), "k6g value mismatch.");
+    static_assert(to_underlying(ClusterObject::k60g) == to_underlying(PlatfromInterface::k60g), "k60g value mismatch.");
 
     return static_cast<ClusterObject>(to_underlying(band));
 }
@@ -82,6 +82,9 @@ CHIP_ERROR Instance::Init()
     ReturnErrorOnFailure(
         DeviceLayer::PlatformMgrImpl().AddEventHandler(_OnCommissioningComplete, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init());
+    mLastNetworkingStatusValue.SetNull();
+    mLastConnectErrorValue.SetNull();
+    mLastNetworkIDLen = 0;
     return CHIP_NO_ERROR;
 }
 
@@ -108,37 +111,41 @@ void Instance::InvokeCommand(HandlerContext & ctxt)
     switch (ctxt.mRequestPath.mCommandId)
     {
     case Commands::ScanNetworks::Id:
-        VerifyOrReturn((mType & kFeatureMapWireless) != 0);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
+                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
         HandleCommand<Commands::ScanNetworks::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleScanNetworks(ctx, req); });
         return;
 
     case Commands::AddOrUpdateWiFiNetwork::Id:
-        VerifyOrReturn(mType == kFeatureMapWiFi);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface));
         HandleCommand<Commands::AddOrUpdateWiFiNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleAddOrUpdateWiFiNetwork(ctx, req); });
         return;
 
     case Commands::AddOrUpdateThreadNetwork::Id:
-        VerifyOrReturn(mType == kFeatureMapThread);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
         HandleCommand<Commands::AddOrUpdateThreadNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleAddOrUpdateThreadNetwork(ctx, req); });
         return;
 
     case Commands::RemoveNetwork::Id:
-        VerifyOrReturn((mType & kFeatureMapWireless) != 0);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
+                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
         HandleCommand<Commands::RemoveNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleRemoveNetwork(ctx, req); });
         return;
 
     case Commands::ConnectNetwork::Id:
-        VerifyOrReturn((mType & kFeatureMapWireless) != 0);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
+                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
         HandleCommand<Commands::ConnectNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleConnectNetwork(ctx, req); });
         return;
 
     case Commands::ReorderNetwork::Id:
-        VerifyOrReturn((mType & kFeatureMapWireless) != 0);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
+                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
         HandleCommand<Commands::ReorderNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleReorderNetwork(ctx, req); });
         return;
@@ -174,14 +181,14 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         });
 
     case Attributes::ScanMaxTimeSeconds::Id:
-        if (mType & kFeatureMapWireless)
+        if (mpWirelessDriver != nullptr)
         {
             return aEncoder.Encode(mpWirelessDriver->GetScanNetworkTimeoutSeconds());
         }
         return CHIP_NO_ERROR;
 
     case Attributes::ConnectMaxTimeSeconds::Id:
-        if (mType & kFeatureMapWireless)
+        if (mpWirelessDriver != nullptr)
         {
             return aEncoder.Encode(mpWirelessDriver->GetConnectNetworkTimeoutSeconds());
         }
@@ -190,18 +197,24 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::InterfaceEnabled::Id:
         return aEncoder.Encode(mpBaseDriver->GetEnabled());
 
-    // TODO: Add support to the following attributes
     case Attributes::LastNetworkingStatus::Id:
-        return aEncoder.Encode(NetworkCommissioningStatus::kSuccess);
+        return aEncoder.Encode(mLastNetworkingStatusValue);
 
     case Attributes::LastNetworkID::Id:
-        return aEncoder.Encode(ByteSpan());
+        if (mLastNetworkIDLen == 0)
+        {
+            return aEncoder.EncodeNull();
+        }
+        else
+        {
+            return aEncoder.Encode(ByteSpan(mLastNetworkID, mLastNetworkIDLen));
+        }
 
     case Attributes::LastConnectErrorValue::Id:
-        return aEncoder.Encode(Attributes::LastConnectErrorValue::TypeInfo::Type(0));
+        return aEncoder.Encode(mLastConnectErrorValue);
 
     case Attributes::FeatureMap::Id:
-        return aEncoder.Encode(mType);
+        return aEncoder.Encode(mFeatureFlags);
 
     default:
         return CHIP_NO_ERROR;
@@ -223,19 +236,20 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 
 void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
 {
-    switch (mType)
+
+    if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
     {
-    case kFeatureMapWiFi:
         mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(req.ssid, this);
-        return;
-    case kFeatureMapThread:
+    }
+    else if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
+    {
         mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<ThreadDriver *>()->ScanNetworks(this);
-        return;
-    default:
+    }
+    else
+    {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-        return;
     }
 }
 
@@ -262,6 +276,15 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
+    if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
+        return;
+    }
+
+    mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
+    memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
+
     mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 }
@@ -289,6 +312,12 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
     response.debugText        = errorText;
     response.errorValue       = interfaceStatus;
     commandHandle->AddResponseData(mPath, response);
+
+    mLastNetworkIDLen = mConnectingNetworkIDLen;
+    memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(commissioningError));
+    mLastConnectErrorValue.SetNonNull(interfaceStatus);
+
     if (commissioningError == Status::kSuccess)
     {
         // TODO: Pass the actual network id to device control server.
@@ -307,6 +336,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
         // We may receive the callback after it and should make it noop.
         return;
     }
+
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(status));
+    mLastConnectErrorValue.SetNull();
+    mLastNetworkIDLen = 0;
 
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
@@ -362,6 +395,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
         return;
     }
 
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(status));
+    mLastConnectErrorValue.SetNull();
+    mLastNetworkIDLen = 0;
+
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
     WiFiScanResponse scanResponse;
@@ -414,7 +451,8 @@ void Instance::_OnCommissioningComplete(const DeviceLayer::ChipDeviceEvent * eve
 
 void Instance::OnCommissioningComplete(CHIP_ERROR err)
 {
-    VerifyOrReturn((mType & kFeatureMapWireless) != 0);
+    VerifyOrReturn(mpWirelessDriver != nullptr);
+
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "Commissioning complete, notify platform driver to persist network credentails.");
@@ -425,6 +463,24 @@ void Instance::OnCommissioningComplete(CHIP_ERROR err)
         ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentails.");
         mpWirelessDriver->RevertConfiguration();
     }
+}
+
+bool NullNetworkDriver::GetEnabled()
+{
+    // Disable the interface and it cannot be enabled since there are no physical interfaces.
+    return false;
+}
+
+uint8_t NullNetworkDriver::GetMaxNetworks()
+{
+    // The minimal value of MaxNetworks should be 1 per spec.
+    return 1;
+}
+
+DeviceLayer::NetworkCommissioning::NetworkIterator * NullNetworkDriver::GetNetworks()
+{
+    // Instance::Read accepts nullptr as an empty NetworkIterator.
+    return nullptr;
 }
 
 } // namespace NetworkCommissioning

@@ -106,7 +106,7 @@ void InteractionModelEngine::Shutdown()
 
     for (auto & writeHandler : mWriteHandlers)
     {
-        VerifyOrDie(writeHandler.IsFree());
+        writeHandler.Abort();
     }
 
     mReportingEngine.Shutdown();
@@ -274,9 +274,9 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
                 if (handler->IsFromSubscriber(*apExchangeContext))
                 {
                     ChipLogProgress(InteractionModel,
-                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %" PRIu8,
+                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
                                     ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
-                                    apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex());
+                                    apExchangeContext->GetSessionHandle()->GetFabricIndex());
                     mReadHandlers.ReleaseObject(handler);
                 }
 
@@ -404,6 +404,15 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
     CHIP_ERROR err                             = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
+
+    // Group Message can only be an InvokeCommandRequest or WriteRequest
+    if (apExchangeContext->IsGroupExchangeContext() &&
+        !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest) &&
+        !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
+    {
+        ChipLogProgress(InteractionModel, "Msg type %d not supported for group message", aPayloadHeader.GetMessageType());
+        return err;
+    }
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
@@ -572,9 +581,6 @@ void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, cons
 
     if (handler)
     {
-        // TODO: Figure out who is responsible for handling checking
-        // apCommandObj->IsTimedInvoke() for commands that require a timed
-        // invoke and have a CommandHandlerInterface handling them.
         CommandHandlerInterface::HandlerContext context(apCommandObj, aCommandPath, apPayload);
         handler->InvokeCommand(context);
 
@@ -590,7 +596,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, cons
     DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
 }
 
-bool InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
 {
     return ServerClusterCommandExists(aCommandPath);
 }

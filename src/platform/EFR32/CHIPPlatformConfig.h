@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,40 +42,9 @@
 
 // ==================== Security Adaptations ====================
 
-#define CHIP_CONFIG_USE_OPENSSL_ECC 0
-#define CHIP_CONFIG_USE_MICRO_ECC 0
-
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL 0
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT 1
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS 0
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_PLATFORM 0
-
 // FIXME: EFR32 set to MBED-TLS (But this is third-party repo in CHIP, not SDK)
 
-#define CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL 0
-#define CHIP_CONFIG_AES_IMPLEMENTATION_AESNI 0
-#define CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS 1
-#define CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM 0
-
 // FIXME: EFR32 currently set to CHIP (Does this use Entropy.cpp ?)
-
-#define CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL 0
-#define CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG 1
-#define CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM 0
-
-#define CHIP_CONFIG_ENABLE_PASE_INITIATOR 0
-#define CHIP_CONFIG_ENABLE_PASE_RESPONDER 1
-#define CHIP_CONFIG_ENABLE_CASE_INITIATOR 1
-
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG0 0
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG1 0
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG2 0
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG3 0
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG4 1
-
-#define CHIP_CONFIG_ENABLE_KEY_EXPORT_INITIATOR 0
-
-#define CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT 0
 
 // ==================== General Configuration Overrides ====================
 
@@ -112,30 +81,16 @@
 #endif // CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
 
 /**
- *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
- *    Maximum number of administrators that can provision the device. Each admin
- *    can provision the device with their unique operational credentials and manage
- *    their access control lists.
+ *    Maximum number of fabrics the device can participate in.  Each fabric can
+ *    provision the device with its unique operational credentials and manage
+ *    its own access control lists.
  */
-#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 5 // 4 fabrics + 1 for rotation slack
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 5 // 4 fabrics + 1 for rotation slack
 #endif
-
-// ==================== Security Configuration Overrides ====================
-
-#ifndef CHIP_CONFIG_MAX_APPLICATION_GROUPS
-#define CHIP_CONFIG_MAX_APPLICATION_GROUPS 4
-#endif // CHIP_CONFIG_MAX_APPLICATION_GROUPS
-
-#ifndef CHIP_CONFIG_DEBUG_CERT_VALIDATION
-#define CHIP_CONFIG_DEBUG_CERT_VALIDATION 0
-#endif // CHIP_CONFIG_DEBUG_CERT_VALIDATION
-
-#ifndef CHIP_CONFIG_ENABLE_CASE_RESPONDER
-#define CHIP_CONFIG_ENABLE_CASE_RESPONDER 1
-#endif // CHIP_CONFIG_ENABLE_CASE_RESPONDER
 
 // ==================== FreeRTOS Configuration Overrides ====================
 #ifndef CHIP_CONFIG_FREERTOS_USE_STATIC_TASK

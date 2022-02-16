@@ -27,7 +27,6 @@
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
-#include <app/InteractionModelDelegate.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -102,6 +101,9 @@ private:
     // Note: should use decltype(EmberAfEndpointType::clusterCount) here, but af-types is including app specific generated files.
     uint8_t mClusterIndex, mEndClusterIndex;
     uint16_t mAttributeIndex, mEndAttributeIndex;
+    // For dealing with global attributes that are not part of the attribute
+    // metadata.
+    uint8_t mGlobalAttributeIndex, mGlobalAttributeEndIndex;
 
     ConcreteAttributePath mOutputPath;
 

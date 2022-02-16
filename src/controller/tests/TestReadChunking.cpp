@@ -75,7 +75,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x
     DECLARE_DYNAMIC_ATTRIBUTE(0x00000005, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -84,7 +84,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTR
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint3Clusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpoint3Clusters);
 
@@ -111,7 +111,39 @@ public:
 void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                        const app::StatusIB & aStatus)
 {
-    if (aPath.mAttributeId != kTestListAttribute)
+    if (aPath.mAttributeId == Globals::Attributes::ServerGeneratedCommandList::Id)
+    {
+        app::DataModel::DecodableList<CommandId> v;
+        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
+        auto it          = v.begin();
+        size_t arraySize = 0;
+        while (it.Next())
+        {
+            NL_TEST_ASSERT(gSuite, false);
+        }
+        NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, arraySize == 0);
+    }
+    else if (aPath.mAttributeId == Globals::Attributes::ClientGeneratedCommandList::Id)
+    {
+        app::DataModel::DecodableList<CommandId> v;
+        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
+        auto it          = v.begin();
+        size_t arraySize = 0;
+        while (it.Next())
+        {
+            NL_TEST_ASSERT(gSuite, false);
+        }
+        NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, arraySize == 0);
+    }
+    else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
+    {
+        // Nothing to check for this one; depends on the endpoint.
+    }
+    else if (aPath.mAttributeId != kTestListAttribute)
     {
         uint8_t v;
         NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
@@ -129,7 +161,7 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         }
         NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(gSuite, arraySize = 5);
+        NL_TEST_ASSERT(gSuite, arraySize == 5);
     }
     mAttributeCount++;
 }
@@ -140,11 +172,16 @@ class TestAttrAccess : public app::AttributeAccessInterface
 {
 public:
     // Register for the Test Cluster cluster on all endpoints.
-    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id) {}
+    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id)
+    {
+        registerAttributeAccessOverride(this);
+    }
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override;
 };
+
+TestAttrAccess gAttrAccess;
 
 CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
@@ -196,16 +233,13 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    TestAttrAccess testServer;
 
     // Initialize the ember side server logic
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0);
-
-    // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -238,7 +272,7 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
         // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
         // times this can run without seeing expected results.
         //
-        for (int j = 0; j < 10 && !readCallback.mOnReportEnd; j++)
+        for (int j = 0; j < 20 && !readCallback.mOnReportEnd; j++)
         {
             ctx.DrainAndServiceIO();
             chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
@@ -246,9 +280,11 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
         }
 
         //
-        // Always returns the same number of attributes read (5 + revision = 6).
+        // Always returns the same number of attributes read (5 + revision +
+        // AttributeList + ClientGeneratedCommandList +
+        // ServerGeneratedCommandList = 9).
         //
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 6);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 9);
         readCallback.mAttributeCount = 0;
 
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -261,6 +297,8 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
             break;
         }
     }
+
+    emberAfClearDynamicEndpoint(0);
 }
 
 // Similar to the test above, but for the list chunking feature.
@@ -269,16 +307,13 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    TestAttrAccess testServer;
 
     // Initialize the ember side server logic
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0);
-
-    // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, Span<DataVersion>(dataVersionStorage));
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestListAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -335,6 +370,8 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
             break;
         }
     }
+
+    emberAfClearDynamicEndpoint(0);
 }
 
 // Read an attribute that can never fit into the buffer. Result in an empty report, server should shutdown the transaction.
@@ -343,16 +380,13 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    TestAttrAccess testServer;
 
     // Initialize the ember side server logic
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0);
-
-    // Register our fake attribute access interface.
-    registerAttributeAccessOverride(&testServer);
+    DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, Span<DataVersion>(dataVersionStorage));
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestBadAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -389,6 +423,8 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
 
     // Sanity check
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(0);
 }
 
 // clang-format off

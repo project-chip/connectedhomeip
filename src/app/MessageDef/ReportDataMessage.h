@@ -32,22 +32,22 @@
 
 #include "AttributeReportIBs.h"
 #include "EventReportIBs.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 
 namespace chip {
 namespace app {
 namespace ReportDataMessage {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_SubscriptionId      = 0,
-    kCsTag_AttributeReportIBs  = 1,
-    kCsTag_EventReports        = 2,
-    kCsTag_MoreChunkedMessages = 3,
-    kCsTag_SuppressResponse    = 4,
+    kSubscriptionId      = 0,
+    kAttributeReportIBs  = 1,
+    kEventReports        = 2,
+    kMoreChunkedMessages = 3,
+    kSuppressResponse    = 4,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -121,7 +121,7 @@ public:
     CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     /**
@@ -179,7 +179,6 @@ private:
     AttributeReportIBs::Builder mAttributeReportIBsBuilder;
     EventReportIBs::Builder mEventReportsBuilder;
 };
-}; // namespace ReportDataMessage
-
-}; // namespace app
-}; // namespace chip
+} // namespace ReportDataMessage
+} // namespace app
+} // namespace chip

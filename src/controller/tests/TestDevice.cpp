@@ -22,6 +22,7 @@
 #include <inet/IPAddress.h>
 #include <inetInetLayer.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -51,6 +52,8 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     ExchangeManager exchangeMgr;
     Inet::UDPEndPointManagerImpl udpEndPointManager;
     System::LayerImpl systemLayer;
+    chip::TestPersistentStorageDelegate deviceStorage;
+
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer blelayer;
 #endif // CONFIG_NETWORK_LAYER_BLE
@@ -72,7 +75,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
                       BleListenParameters(&blelayer)
 #endif
     );
-    sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager);
+    sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager, &deviceStorage;);
     exchangeMgr.Init(&sessionManager);
     messageCounterManager.Init(&exchangeMgr);
 

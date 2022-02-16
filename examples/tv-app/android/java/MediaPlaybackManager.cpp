@@ -27,6 +27,8 @@
 #include "MediaPlaybackManager.h"
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
 
 /** @brief Media PlayBack Cluster Init
@@ -84,59 +86,62 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
     return HandleMediaRequestGetAttribute(MEDIA_PLAYBACK_ATTRIBUTE_SEEK_RANGE_END);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePlay()
+void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0));
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePause()
+void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PAUSE, 0);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PAUSE, 0));
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStop()
+void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0));
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleFastForward()
+void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0));
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePrevious()
+void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0));
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleRewind()
+void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0));
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSkipBackward(const uint64_t & deltaPositionMilliseconds)
+void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                              const uint64_t & deltaPositionMilliseconds)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds));
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSkipForward(const uint64_t & deltaPositionMilliseconds)
+void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                             const uint64_t & deltaPositionMilliseconds)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds));
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSeekRequest(const uint64_t & positionMilliseconds)
+void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                      const uint64_t & positionMilliseconds)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds));
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleNext()
+void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0));
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStartOverRequest()
+void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0);
+    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0));
 }
 
 void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
@@ -250,11 +255,11 @@ exit:
     return response;
 }
 
-Structs::PlaybackPosition::Type MediaPlaybackManager::HandleGetSampledPosition()
+CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
     Structs::PlaybackPosition::Type response;
     response.updatedAt = 0;
-    response.position  = 0;
+    response.position  = Nullable<uint64_t>(0);
 
     jobject positionObj;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -279,7 +284,7 @@ Structs::PlaybackPosition::Type MediaPlaybackManager::HandleGetSampledPosition()
         jclass inputClass    = env->GetObjectClass(positionObj);
         jfieldID positionId  = env->GetFieldID(inputClass, "position", "J");
         jfieldID updatedAtId = env->GetFieldID(inputClass, "updatedAt", "J");
-        response.position    = static_cast<uint64_t>(env->GetIntField(positionObj, positionId));
+        response.position    = Nullable<uint64_t>(static_cast<uint64_t>(env->GetIntField(positionObj, positionId)));
         response.updatedAt   = static_cast<uint64_t>(env->GetIntField(positionObj, updatedAtId));
     }
 
@@ -289,5 +294,5 @@ exit:
         ChipLogError(Zcl, "MediaPlaybackManager::GetAttribute status error: %s", err.AsString());
     }
 
-    return response;
+    return aEncoder.Encode(response);
 }

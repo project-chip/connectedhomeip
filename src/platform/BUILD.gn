@@ -69,9 +69,9 @@ if (chip_device_platform != "none") {
 
   if (chip_stack_lock_tracking == "auto") {
     if (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
-        chip_device_platform == "android") {
+        chip_device_platform == "android" || current_os == "freertos") {
       # TODO: should be fatal for development. Change once bugs are fixed
-      chip_stack_lock_tracking = "log"
+      chip_stack_lock_tracking = "fatal"
     } else {
       # TODO: may want to enable at least logging for embedded to find bugs
       # this needs tuning depending on how many resources various platforms have
@@ -300,6 +300,14 @@ if (chip_device_platform != "none") {
       "PersistedStorage.cpp",
       "PlatformEventSupport.cpp",
     ]
+
+    # Linux has its own NetworkCommissioningThreadDriver
+    if (chip_enable_openthread && chip_device_platform != "linux") {
+      sources += [
+        "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
+        "OpenThread/GenericNetworkCommissioningThreadDriver.h",
+      ]
+    }
 
     if (chip_enable_ota_requestor) {
       sources += [

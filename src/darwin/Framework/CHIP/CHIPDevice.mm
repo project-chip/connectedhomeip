@@ -105,7 +105,7 @@ private:
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override;
 
     void ReportError(CHIP_ERROR err);
-    void ReportError(EmberAfStatus status);
+    void ReportError(const StatusIB & status);
     void ReportError(NSError * _Nullable err);
 
 private:
@@ -222,7 +222,7 @@ void SubscriptionCallback::OnAttributeData(
     }
 
     if (aStatus.mStatus != Status::Success) {
-        ReportError(ToEmberAfStatus(aStatus.mStatus));
+        ReportError(aStatus);
         return;
     }
 
@@ -273,7 +273,7 @@ void SubscriptionCallback::OnSubscriptionEstablished(uint64_t aSubscriptionId)
 
 void SubscriptionCallback::ReportError(CHIP_ERROR err) { ReportError([CHIPError errorForCHIPErrorCode:err]); }
 
-void SubscriptionCallback::ReportError(EmberAfStatus status) { ReportError([CHIPError errorForZCLErrorCode:status]); }
+void SubscriptionCallback::ReportError(const StatusIB & status) { ReportError([CHIPError errorForIMStatus:status]); }
 
 void SubscriptionCallback::ReportError(NSError * _Nullable err)
 {

@@ -27,7 +27,6 @@
 #include <type_traits>
 
 #include <app/CommandPathParams.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
@@ -111,7 +110,6 @@ public:
          * receives an OnDone call to destroy and free the object.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
-         * @param[in] aStatusIB       The status code including IM status code and optional cluster status code
          * @param[in] aError          A system error code that conveys the overall error code.
          */
         virtual void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) {}

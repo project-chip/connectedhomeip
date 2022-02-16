@@ -15,6 +15,7 @@
 name: 10.3.1. [TC-DM-3.1] Network Commissioning Attributes
 
 config:
+    nodeId: 0x12344321
     cluster: "Network Commissioning"
     endpoint: 0
 
@@ -22,11 +23,14 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Query MaxNetworks"
       command: "readAttribute"
       attribute: "MaxNetworks"
-      disabled: true
       optional: true
       response:
           constraints:
@@ -35,7 +39,6 @@ tests:
     - label: "Query Networks"
       command: "readAttribute"
       attribute: "Networks"
-      disabled: true
       optional: true
       response:
           constraints:

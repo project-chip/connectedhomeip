@@ -30,6 +30,8 @@ import time
 import ctypes
 import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
+from chip.ChipStack import *
+import chip.FabricAdmin
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -101,11 +103,13 @@ class TestResult:
 
 
 class BaseTestHelper:
-    def __init__(self, nodeid: int):
-        self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
-            controllerNodeId=nodeid)
+    def __init__(self, nodeid: int, testCommissioner: bool = False):
+        self.chipStack = ChipStack('/tmp/repl_storage.json')
+        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
+            fabricId=1, fabricIndex=1)
+        self.devCtrl = self.fabricAdmin.NewController(nodeid, testCommissioner)
+        self.controllerNodeId = nodeid
         self.logger = logger
-        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController()
 
     def _WaitForOneDiscoveredDevice(self, timeoutSeconds: int = 2):
         print("Waiting for device responses...")
@@ -133,11 +137,80 @@ class BaseTestHelper:
 
     def TestKeyExchange(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Conducting key exchange with device {}".format(ip))
-        if not self.devCtrl.ConnectIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(ip))
             return False
         self.logger.info("Device finished key exchange.")
+        return True
+
+    def TestUsedTestCommissioner(self):
+        return self.devCtrl.GetTestCommissionerUsed()
+
+    async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
+        self.logger.info("Opening Commissioning Window")
+
+        await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(100), timedRequestTimeoutMs=10000)
+
+        self.logger.info("Creating 2nd Fabric Admin")
+        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
+
+        self.logger.info("Creating Device Controller on 2nd Fabric")
+        devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
+
+        if not devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+            self.logger.info(
+                "Failed to finish key exchange with device {}".format(ip))
+            return False
+
+        #
+        # Shutting down controllers results in races where the resolver still delivers
+        # resolution results to a now destroyed controller. Add a sleep for now to work around
+        # it while #14555 is being resolved.
+        time.sleep(1)
+
+        #
+        # Shut-down all the controllers (which will free them up as well as de-initialize the
+        # stack as well.
+        #
+        self.logger.info(
+            "Shutting down controllers & fabrics and re-initing stack...")
+
+        ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
+        chip.FabricAdmin.FabricAdmin.ShutdownAll()
+
+        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
+            fabricId=1, fabricIndex=1)
+        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
+
+        self.devCtrl = self.fabricAdmin.NewController(self.controllerNodeId)
+        devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
+
+        data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
+        data2 = await devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
+
+        # Read out noclist from each fabric, and each should contain two NOCs.
+        nocList1 = data1[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
+        nocList2 = data2[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
+
+        if (len(nocList1) != 2 or len(nocList2) != 2):
+            self.logger.error("Got back invalid nocList")
+            return False
+
+        data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=False)
+        data2 = await devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=False)
+
+        # Read out current fabric from each fabric, and both should be different.
+        currentFabric1 = data1[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        currentFabric2 = data2[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        if (currentFabric1 == currentFabric2):
+            self.logger.error(
+                "Got back fabric indices that match for two different fabrics!")
+            return False
+
+        devCtrl2.Shutdown()
+        fabricAdmin2.Shutdown()
+
         return True
 
     def TestCloseSession(self, nodeid: int):
@@ -222,9 +295,9 @@ class BaseTestHelper:
     def TestReadBasicAttributes(self, nodeid: int, endpoint: int, group: int):
         basic_cluster_attrs = {
             "VendorName": "TEST_VENDOR",
-            "VendorID": 9050,
+            "VendorID": 0xFFF1,
             "ProductName": "TEST_PRODUCT",
-            "ProductID": 65279,
+            "ProductID": 0x8001,
             "NodeLabel": "Test",
             "Location": "XX",
             "HardwareVersion": 0,
@@ -260,7 +333,7 @@ class BaseTestHelper:
         requests = [
             AttributeWriteRequest("Basic", "NodeLabel", "Test"),
             AttributeWriteRequest("Basic", "Location",
-                                  "a pretty loooooooooooooog string", IM.Status.Failure),
+                                  "a pretty loooooooooooooog string", IM.Status.InvalidValue),
         ]
         failed_zcl = []
         for req in requests:

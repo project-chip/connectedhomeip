@@ -53,14 +53,19 @@ static void HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR 
     }
 
     DiscoveredNodeData nodeData;
+
     Platform::CopyString(nodeData.hostName, result->mHostName);
     Platform::CopyString(nodeData.instanceName, result->mName);
 
-    if (result->mAddress.HasValue() && nodeData.numIPs < DiscoveredNodeData::kMaxIPAddresses)
+    if (result->mAddress.HasValue())
     {
-        nodeData.ipAddress[nodeData.numIPs]   = result->mAddress.Value();
-        nodeData.interfaceId[nodeData.numIPs] = result->mInterface;
-        nodeData.numIPs++;
+        nodeData.ipAddress[0] = result->mAddress.Value();
+        nodeData.interfaceId  = result->mInterface;
+        nodeData.numIPs       = 1;
+    }
+    else
+    {
+        nodeData.numIPs = 0;
     }
 
     nodeData.port = result->mPort;
@@ -83,13 +88,19 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), error);
         proxy->Release();
+        return;
     }
+
+    VerifyOrDie(proxy != nullptr);
 
     if (result == nullptr)
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
         proxy->Release();
+        return;
     }
+
+    VerifyOrDie(proxy != nullptr);
 
     PeerId peerId;
     error = ExtractIdFromInstanceName(result->mName, &peerId);
@@ -97,7 +108,10 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), error);
         proxy->Release();
+        return;
     }
+
+    VerifyOrDie(proxy != nullptr);
 
     ResolvedNodeData nodeData;
     Platform::CopyString(nodeData.mHostName, result->mHostName);
@@ -119,6 +133,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     }
 
     nodeData.LogNodeIdResolved();
+    nodeData.PrioritizeAddresses();
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     LogErrorOnFailure(sDnssdCache.Insert(nodeData));
 #endif
@@ -235,18 +250,6 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Opti
     VerifyOrReturnError(optional.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
 
     auto retryInterval = isIdle ? optional.Value().mIdleRetransTimeout : optional.Value().mActiveRetransTimeout;
-
-    // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value
-    // change or device type change.
-    // TODO: Is this really the best place to set these? Seems like it should be passed
-    // in with the correct values and set one level up from here.
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
-    ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
-    // Increment default MRP retry intervals by SED poll period to be on the safe side
-    // and avoid unnecessary retransmissions.
-    retryInterval += isIdle ? sedPollingConfig.SlowPollingIntervalMS : sedPollingConfig.FastPollingIntervalMS;
-#endif
 
     if (retryInterval > kMaxRetryInterval)
     {
@@ -400,6 +403,18 @@ CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceN
                                                      instanceName, maxLength);
 }
 
+void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type, CHIP_ERROR error)
+{
+    if (CHIP_NO_ERROR == error)
+    {
+        ChipLogProgress(Discovery, "mDNS service published: %s", type);
+    }
+    else
+    {
+        ChipLogProgress(Discovery, "mDNS service published error: %s", chip::ErrorStr(error));
+    }
+}
+
 CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
                                                  const char ** subTypes, size_t subTypeSize,
                                                  const OperationalAdvertisingParameters & params)
@@ -437,7 +452,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
 
-    ReturnErrorOnFailure(ChipDnssdPublishService(&service));
+    ReturnErrorOnFailure(ChipDnssdPublishService(&service, HandleDnssdPublish, this));
 
 #ifdef DETAIL_LOGGING
     printf("printEntries port=%u, mTextEntrySize=%zu, mSubTypeSize=%zu\n", port, textEntrySize, subTypeSize);
@@ -540,11 +555,19 @@ CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
     return ChipDnssdFinalizeServiceUpdate();
 }
 
-CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type,
-                                                Resolver::CacheBypass dnssdCacheBypass)
+CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     ReturnErrorOnFailure(InitImpl());
-    return mResolverProxy.ResolveNodeId(peerId, type, dnssdCacheBypass);
+    return mResolverProxy.ResolveNodeId(peerId, type);
+}
+
+bool DiscoveryImplPlatform::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
+{
+    if (InitImpl() != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+    return mResolverProxy.ResolveNodeIdFromInternalCache(peerId, type);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
@@ -574,24 +597,10 @@ Resolver & chip::Dnssd::Resolver::Instance()
     return DiscoveryImplPlatform::GetInstance();
 }
 
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->Retain();
-
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    if (dnssdCacheBypass == Resolver::CacheBypass::Off)
-    {
-        /* see if the entry is cached and use it.... */
-        ResolvedNodeData nodeData;
-        if (sDnssdCache.Lookup(peerId, nodeData) == CHIP_NO_ERROR)
-        {
-            mDelegate->OnNodeIdResolved(nodeData);
-            mDelegate->Release();
-            return CHIP_NO_ERROR;
-        }
-    }
-#endif
 
     DnssdService service;
 
@@ -600,6 +609,24 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressTy
     service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
     service.mAddressType = type;
     return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
+}
+
+bool ResolverProxy::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
+{
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    if (mDelegate != nullptr)
+    {
+        /* see if the entry is cached and use it.... */
+        ResolvedNodeData nodeData;
+        if (sDnssdCache.Lookup(peerId, nodeData) == CHIP_NO_ERROR)
+        {
+            mDelegate->OnNodeIdResolved(nodeData);
+            mDelegate->Release();
+            return true;
+        }
+    }
+#endif
+    return false;
 }
 
 CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)

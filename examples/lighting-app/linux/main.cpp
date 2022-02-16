@@ -64,6 +64,10 @@ void ApplicationInit() {}
 
 int main(int argc, char * argv[])
 {
+#if PW_RPC_ENABLED
+    chip::rpc::Init();
+#endif
+
     if (ChipLinuxAppInit(argc, argv) != 0)
     {
         return -1;

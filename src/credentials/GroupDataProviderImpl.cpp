@@ -717,14 +717,14 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     chip::KeysetId prev            = 0xffff;
     bool first                     = true;
 
-    uint16_t keyset_id            = 0;
-    KeySet::SecurityPolicy policy = KeySet::SecurityPolicy::kStandard;
-    uint8_t keys_count            = 0;
+    uint16_t keyset_id                       = 0;
+    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kStandard;
+    uint8_t keys_count                       = 0;
     OperationalKey operational_keys[KeySet::kEpochKeysMax];
 
     KeySetData() = default;
     KeySetData(chip::FabricIndex fabric, chip::KeysetId id) : fabric_index(fabric) { keyset_id = id; }
-    KeySetData(chip::FabricIndex fabric, chip::KeysetId id, KeySet::SecurityPolicy policy_id, uint8_t num_keys) :
+    KeySetData(chip::FabricIndex fabric, chip::KeysetId id, GroupDataProvider::SecurityPolicy policy_id, uint8_t num_keys) :
         fabric_index(fabric), keyset_id(id), policy(policy_id), keys_count(num_keys)
     {}
 
@@ -738,7 +738,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
 
     void Clear() override
     {
-        policy     = KeySet::SecurityPolicy::kStandard;
+        policy     = GroupDataProvider::SecurityPolicy::kStandard;
         keys_count = 0;
         memset(operational_keys, 0x00, sizeof(operational_keys));
         next = 0xffff;
@@ -891,6 +891,8 @@ void GroupDataProviderImpl::Finish()
     mGroupKeyIterators.ReleaseAll();
     mEndpointIterators.ReleaseAll();
     mKeySetIterators.ReleaseAll();
+    mGroupSessionsIterator.ReleaseAll();
+    mKeyContexPool.ReleaseAll();
 }
 
 //
@@ -987,7 +989,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     {
         // Insert last
         VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        // TODO: VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         fabric.group_count++;
     }
 
@@ -1102,9 +1104,11 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     if (!group.Find(mStorage, fabric, group_id))
     {
         // New group
+        // TODO: VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         ReturnErrorOnFailure(EndpointData(fabric_index, group_id, endpoint_id).Save(mStorage));
         // Save the new group into the fabric
         group.group_id       = group_id;
+        group.name[0]        = 0;
         group.first_endpoint = endpoint_id;
         group.endpoint_count = 1;
         group.next           = fabric.first_group;
@@ -1432,7 +1436,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
 
     // Insert last
     VerifyOrReturnError(fabric.map_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(fabric.map_count < mMaxGroupKeysPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+    // TODO: VerifyOrReturnError(fabric.map_count < mMaxGroupKeysPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     map.next = 0;
     ReturnErrorOnFailure(map.Save(mStorage));
@@ -1596,17 +1600,18 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     keyset.policy     = in_keyset.policy;
     keyset.keys_count = in_keyset.num_keys_used;
     memset(keyset.operational_keys, 0x00, sizeof(keyset.operational_keys));
+    keyset.operational_keys[0].start_time = in_keyset.epoch_keys[0].start_time;
+    keyset.operational_keys[1].start_time = in_keyset.epoch_keys[1].start_time;
+    keyset.operational_keys[2].start_time = in_keyset.epoch_keys[2].start_time;
 
     // Store the operational keys and hash instead of the epoch keys
     for (size_t i = 0; i < in_keyset.num_keys_used; ++i)
     {
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        uint8_t key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-        MutableByteSpan key_span(key, sizeof(key));
+        MutableByteSpan key_span(keyset.operational_keys[i].value);
         ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, key_span));
-        ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(ByteSpan(key, sizeof(key)), keyset.operational_keys[i].hash));
+        ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(key_span, keyset.operational_keys[i].hash));
     }
-
     if (found)
     {
         // Update existing keyset info, keep next
@@ -1638,8 +1643,11 @@ CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint
     out_keyset.keyset_id     = keyset.keyset_id;
     out_keyset.policy        = keyset.policy;
     out_keyset.num_keys_used = keyset.keys_count;
-    // Epoch keys are not read back
+    // Epoch keys are not read back, only start times
     memset(out_keyset.epoch_keys, 0x00, sizeof(out_keyset.epoch_keys));
+    out_keyset.epoch_keys[0].start_time = keyset.operational_keys[0].start_time;
+    out_keyset.epoch_keys[1].start_time = keyset.operational_keys[1].start_time;
+    out_keyset.epoch_keys[2].start_time = keyset.operational_keys[2].start_time;
     return CHIP_NO_ERROR;
 }
 
@@ -1710,8 +1718,11 @@ bool GroupDataProviderImpl::KeySetIteratorImpl::Next(KeySet & output)
     output.keyset_id     = keyset.keyset_id;
     output.policy        = keyset.policy;
     output.num_keys_used = keyset.keys_count;
-    // Epoch keys are not read back
+    // Epoch keys are not read back, only start times
     memset(output.epoch_keys, 0x00, sizeof(output.epoch_keys));
+    output.epoch_keys[0].start_time = keyset.operational_keys[0].start_time;
+    output.epoch_keys[1].start_time = keyset.operational_keys[1].start_time;
+    output.epoch_keys[2].start_time = keyset.operational_keys[2].start_time;
     return true;
 }
 
@@ -1806,19 +1817,20 @@ void GroupDataProviderImpl::GroupKeyContext::Release()
     mProvider.mKeyContexPool.ReleaseObject(this);
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::EncryptMessage(MutableByteSpan & plaintext, const ByteSpan & aad,
-                                                                  const ByteSpan & nonce, MutableByteSpan & out_mic) const
-{
-    uint8_t * output = plaintext.data();
-    return Crypto::AES_CCM_encrypt(plaintext.data(), plaintext.size(), aad.data(), aad.size(), mKeyValue,
-                                   Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output, out_mic.data(),
-                                   out_mic.size());
-}
-
-CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptMessage(MutableByteSpan & ciphertext, const ByteSpan & aad,
-                                                                  const ByteSpan & nonce, const ByteSpan & mic) const
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::EncryptMessage(const ByteSpan & plaintext, const ByteSpan & aad,
+                                                                  const ByteSpan & nonce, MutableByteSpan & mic,
+                                                                  MutableByteSpan & ciphertext) const
 {
     uint8_t * output = ciphertext.data();
+    return Crypto::AES_CCM_encrypt(plaintext.data(), plaintext.size(), aad.data(), aad.size(), mKeyValue,
+                                   Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output, mic.data(), mic.size());
+}
+
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad,
+                                                                  const ByteSpan & nonce, const ByteSpan & mic,
+                                                                  MutableByteSpan & plaintext) const
+{
+    uint8_t * output = plaintext.data();
     return Crypto::AES_CCM_decrypt(ciphertext.data(), ciphertext.size(), aad.data(), aad.size(), mic.data(), mic.size(), mKeyValue,
                                    Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output);
 }
@@ -1938,9 +1950,10 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
         if (key.hash == mSessionId)
         {
             mKeyContext.SetKey(ByteSpan(key.value, sizeof(key.value)), mSessionId);
-            output.fabric_index = fabric.fabric_index;
-            output.group_id     = mapping.group_id;
-            output.key          = &mKeyContext;
+            output.fabric_index    = fabric.fabric_index;
+            output.group_id        = mapping.group_id;
+            output.security_policy = keyset.policy;
+            output.key             = &mKeyContext;
             return true;
         }
     }

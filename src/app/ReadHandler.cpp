@@ -98,6 +98,7 @@ ReadHandler::~ReadHandler()
 
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
+    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpDataVersionFilterList);
 }
 
 void ReadHandler::Close()
@@ -129,6 +130,11 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
     if (err != CHIP_NO_ERROR)
     {
         Close();
+    }
+    else
+    {
+        // Mark read handler dirty for read/subscribe priming stage
+        mDirty = true;
     }
 
     return err;
@@ -256,7 +262,7 @@ bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContex
 {
     return (IsType(InteractionType::Subscribe) &&
             GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
-            GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetFabricIndex());
+            GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->GetFabricIndex());
 }
 
 CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -291,7 +297,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
 #endif
-
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {
@@ -300,6 +305,16 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     else if (err == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(ProcessAttributePathList(attributePathListParser));
+        DataVersionFilterIBs::Parser dataVersionFilterListParser;
+        err = readRequestParser.GetDataVersionFilters(&dataVersionFilterListParser);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(ProcessDataVersionFilterList(dataVersionFilterListParser));
+        }
     }
     ReturnErrorOnFailure(err);
     err = readRequestParser.GetEventRequests(&eventPathListParser);
@@ -351,7 +366,6 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrExit(TLV::AnonymousTag() == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
         ClusterInfo clusterInfo;
         AttributePathIB::Parser path;
         err = path.Init(reader);
@@ -413,6 +427,36 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     }
 
 exit:
+    return err;
+}
+
+CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    aDataVersionFilterListParser.GetReader(&reader);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        ClusterInfo clusterInfo;
+        ClusterPathIB::Parser path;
+        DataVersionFilterIB::Parser filter;
+        ReturnErrorOnFailure(filter.Init(reader));
+        DataVersion version = 0;
+        ReturnErrorOnFailure(filter.GetDataVersion(&version));
+        clusterInfo.mDataVersion.SetValue(version);
+        ReturnErrorOnFailure(filter.GetPath(&path));
+        ReturnErrorOnFailure(path.GetEndpoint(&(clusterInfo.mEndpointId)));
+        ReturnErrorOnFailure(path.GetCluster(&(clusterInfo.mClusterId)));
+        VerifyOrReturnError(clusterInfo.IsValidDataVersionFilter(), CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB);
+        ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFront(mpDataVersionFilterList, clusterInfo));
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
     return err;
 }
 
@@ -589,6 +633,16 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     else if (err == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(ProcessAttributePathList(attributePathListParser));
+        DataVersionFilterIBs::Parser dataVersionFilterListParser;
+        err = subscribeRequestParser.GetDataVersionFilters(&dataVersionFilterListParser);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(ProcessDataVersionFilterList(dataVersionFilterListParser));
+        }
     }
     ReturnErrorOnFailure(err);
 

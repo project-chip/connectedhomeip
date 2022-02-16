@@ -55,15 +55,13 @@ struct SetupParams
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
 
-    FabricIndex fabricIndex = kMinValidFabricIndex;
-    FabricId fabricId       = kUndefinedFabricId;
-
     uint16_t controllerVendorId;
 
     // The Device Pairing Delegated used to initialize a Commissioner
     DevicePairingDelegate * pairingDelegate = nullptr;
 
     Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
+    CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
 
 // TODO everything other than the fabric storage here should be removed.
@@ -72,9 +70,9 @@ struct FactoryInitParams
 {
     FabricStorage * fabricStorage                                 = nullptr;
     System::Layer * systemLayer                                   = nullptr;
+    PersistentStorageDelegate * fabricIndependentStorage          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
-    DeviceControllerInteractionModelDelegate * imDelegate         = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -94,6 +92,7 @@ public:
     }
 
     CHIP_ERROR Init(FactoryInitParams params);
+    void Shutdown();
     CHIP_ERROR SetupController(SetupParams params, DeviceController & controller);
     CHIP_ERROR SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner);
 
@@ -109,6 +108,22 @@ public:
     DeviceControllerFactory(DeviceControllerFactory const &) = delete;
     void operator=(DeviceControllerFactory const &) = delete;
 
+    //
+    // Some clients do not prefer a complete shutdown of the stack being initiated if
+    // all device controllers have ceased to exist. To avoid that, this method has been
+    // created to permit retention of the underlying system state to avoid that.
+    //
+    void RetainSystemState() { (void) mSystemState->Retain(); }
+
+    //
+    // To initiate shutdown of the stack upon termination of all resident controllers in the
+    // system, invoke this method to decrement the refcount on the system state and consequently,
+    // shut-down the stack.
+    //
+    // This should only be invoked if a matching call to RetainSystemState() was called prior.
+    //
+    void ReleaseSystemState() { mSystemState->Release(); }
+
 private:
     DeviceControllerFactory(){};
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
@@ -116,8 +131,9 @@ private:
     CHIP_ERROR InitSystemState();
 
     uint16_t mListenPort;
-    FabricStorage * mFabricStorage             = nullptr;
-    DeviceControllerSystemState * mSystemState = nullptr;
+    FabricStorage * mFabricStorage                        = nullptr;
+    DeviceControllerSystemState * mSystemState            = nullptr;
+    PersistentStorageDelegate * mFabricIndependentStorage = nullptr;
 };
 
 } // namespace Controller

@@ -39,31 +39,49 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAclWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeAclWithMinInterval:(uint16_t)minInterval
-                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAclWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                      subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeExtensionWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeExtensionWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeExtensionWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeExtensionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -76,25 +94,42 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPAccountLogin : CHIPCluster
 
-- (void)getSetupPINRequestWithParams:(CHIPAccountLoginClusterGetSetupPINRequestParams *)params
-                   completionHandler:(void (^)(CHIPAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
-- (void)loginRequestWithParams:(CHIPAccountLoginClusterLoginRequestParams *)params
-             completionHandler:(StatusCompletion)completionHandler;
-- (void)logoutRequestWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)getSetupPINWithParams:(CHIPAccountLoginClusterGetSetupPINParams *)params
+            completionHandler:(void (^)(CHIPAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler;
+- (void)loginWithParams:(CHIPAccountLoginClusterLoginParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)logoutWithCompletionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -115,40 +150,58 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWindowStatusWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeWindowStatusWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeWindowStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAdminFabricIndexWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAdminFabricIndexWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAdminFabricIndexWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAdminVendorIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAdminVendorIdWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAdminVendorIdWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -163,69 +216,95 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeVendorNameWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeVendorNameWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeVendorIdWithCompletionHandler:(void (^)(
+- (void)readAttributeVendorIDWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeVendorIdWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeVendorIDWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeApplicationNameWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeApplicationNameWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeApplicationNameWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeProductIdWithCompletionHandler:(void (^)(
+- (void)readAttributeProductIDWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeProductIdWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeProductIDWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeApplicationStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeApplicationStatusWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
-                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                             reportHandler:
-                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeApplicationWithCompletionHandler:(void (^)(
+                                                          CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
+                                                          NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeApplicationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:
+                                           (void (^)(CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
+                                               NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeApplicationVersionWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeApplicationVersionWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeApplicationVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAllowedVendorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAllowedVendorListWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAllowedVendorListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -238,37 +317,63 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPApplicationLauncher : CHIPCluster
 
-- (void)hideAppRequestWithParams:(CHIPApplicationLauncherClusterHideAppRequestParams *)params
-               completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
-- (void)launchAppRequestWithParams:(CHIPApplicationLauncherClusterLaunchAppRequestParams *)params
-                 completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler;
-- (void)stopAppRequestWithParams:(CHIPApplicationLauncherClusterStopAppRequestParams *)params
-               completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
+- (void)hideAppWithParams:(CHIPApplicationLauncherClusterHideAppParams *)params
+        completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler;
+- (void)launchAppWithParams:(CHIPApplicationLauncherClusterLaunchAppParams *)params
+          completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler;
+- (void)stopAppWithParams:(CHIPApplicationLauncherClusterStopAppParams *)params
+        completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeApplicationLauncherListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeApplicationLauncherListWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
-                                         subscriptionEstablished:
-                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                   reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                     NSError * _Nullable error))reportHandler;
+- (void)readAttributeCatalogListWithCompletionHandler:(void (^)(
+                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCatalogListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeCurrentAppWithCompletionHandler:(void (^)(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
+                                                         NSError * _Nullable error))completionHandler;
+- (void)writeAttributeCurrentAppWithValue:(CHIPApplicationLauncherClusterApplicationEP * _Nullable)value
+                        completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeCurrentAppWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
+                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -281,39 +386,56 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPAudioOutput : CHIPCluster
 
-- (void)renameOutputRequestWithParams:(CHIPAudioOutputClusterRenameOutputRequestParams *)params
-                    completionHandler:(StatusCompletion)completionHandler;
-- (void)selectOutputRequestWithParams:(CHIPAudioOutputClusterSelectOutputRequestParams *)params
-                    completionHandler:(StatusCompletion)completionHandler;
+- (void)renameOutputWithParams:(CHIPAudioOutputClusterRenameOutputParams *)params
+             completionHandler:(StatusCompletion)completionHandler;
+- (void)selectOutputWithParams:(CHIPAudioOutputClusterSelectOutputParams *)params
+             completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeAudioOutputListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAudioOutputListWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeOutputListWithCompletionHandler:(void (^)(
+                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeOutputListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeCurrentAudioOutputWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentAudioOutputWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
-                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                              reportHandler:
-                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeCurrentOutputWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentOutputWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                         reportHandler:
+                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -332,16 +454,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBarrierMovingStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBarrierMovingStateWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBarrierMovingStateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeBarrierSafetyStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBarrierSafetyStatusWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBarrierSafetyStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -349,8 +471,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBarrierCapabilitiesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBarrierCapabilitiesWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBarrierCapabilitiesWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -358,24 +480,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBarrierPositionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBarrierPositionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBarrierPositionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -388,71 +528,70 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBasic : CHIPCluster
 
-- (void)readAttributeInteractionModelVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeInteractionModelVersionWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
-                                         subscriptionEstablished:
-                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
-                                                                     NSError * _Nullable error))reportHandler;
+- (void)readAttributeDataModelRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeDataModelRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeVendorNameWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeVendorNameWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeVendorIDWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeVendorIDWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeVendorIDWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeProductNameWithCompletionHandler:(void (^)(
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeProductNameWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeProductNameWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeProductIDWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeProductIDWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeProductIDWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeNodeLabelWithCompletionHandler:(void (^)(
                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNodeLabelWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNodeLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeLocationWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLocationWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeLocationWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLocationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeHardwareVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeHardwareVersionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeHardwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeHardwareVersionStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeHardwareVersionStringWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeHardwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -460,16 +599,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSoftwareVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSoftwareVersionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSoftwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSoftwareVersionStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSoftwareVersionStringWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSoftwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -477,38 +616,38 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeManufacturingDateWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeManufacturingDateWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeManufacturingDateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePartNumberWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePartNumberWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePartNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeProductURLWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeProductURLWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeProductURLWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeProductLabelWithCompletionHandler:(void (^)(
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeProductLabelWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeProductLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSerialNumberWithCompletionHandler:(void (^)(
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSerialNumberWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSerialNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -516,8 +655,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLocalConfigDisabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLocalConfigDisabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeLocalConfigDisabledWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLocalConfigDisabledWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -525,30 +664,48 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeReachableWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeReachableWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeReachableWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeUniqueIDWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeUniqueIDWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeUniqueIDWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -564,8 +721,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOutOfServiceWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOutOfServiceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOutOfServiceWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOutOfServiceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -573,31 +730,49 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributePresentValueWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributePresentValueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributePresentValueWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePresentValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeStatusFlagsWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeStatusFlagsWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStatusFlagsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -613,18 +788,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)bindWithParams:(CHIPBindingClusterBindParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)unbindWithParams:(CHIPBindingClusterUnbindParams *)params completionHandler:(StatusCompletion)completionHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -639,23 +832,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStateValueWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeStateValueWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStateValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -695,37 +906,55 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActionListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActionListWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActionListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeEndpointListWithCompletionHandler:(void (^)(
                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeEndpointListWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEndpointListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSetupUrlWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSetupUrlWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSetupUrlWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -738,18 +967,144 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBridgedDeviceBasic : CHIPCluster
 
+- (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeVendorNameWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeVendorIDWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeVendorIDWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeProductNameWithCompletionHandler:(void (^)(
+                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeProductNameWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeNodeLabelWithCompletionHandler:(void (^)(
+                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNodeLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeHardwareVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeHardwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                           reportHandler:
+                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeHardwareVersionStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeHardwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                       subscriptionEstablished:
+                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                 reportHandler:
+                                                     (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeSoftwareVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeSoftwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                           reportHandler:
+                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeSoftwareVersionStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeSoftwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                       subscriptionEstablished:
+                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                 reportHandler:
+                                                     (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeManufacturingDateWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeManufacturingDateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributePartNumberWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributePartNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeProductURLWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeProductURLWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeProductLabelWithCompletionHandler:(void (^)(
+                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeProductLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:
+                                            (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeSerialNumberWithCompletionHandler:(void (^)(
+                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeSerialNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:
+                                            (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeReachableWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeReachableWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -762,33 +1117,66 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPChannel : CHIPCluster
 
-- (void)changeChannelByNumberRequestWithParams:(CHIPChannelClusterChangeChannelByNumberRequestParams *)params
-                             completionHandler:(StatusCompletion)completionHandler;
-- (void)changeChannelRequestWithParams:(CHIPChannelClusterChangeChannelRequestParams *)params
-                     completionHandler:(void (^)(CHIPChannelClusterChangeChannelResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
-- (void)skipChannelRequestWithParams:(CHIPChannelClusterSkipChannelRequestParams *)params
-                   completionHandler:(StatusCompletion)completionHandler;
+- (void)changeChannelWithParams:(CHIPChannelClusterChangeChannelParams *)params
+              completionHandler:(void (^)(CHIPChannelClusterChangeChannelResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler;
+- (void)changeChannelByNumberWithParams:(CHIPChannelClusterChangeChannelByNumberParams *)params
+                      completionHandler:(StatusCompletion)completionHandler;
+- (void)skipChannelWithParams:(CHIPChannelClusterSkipChannelParams *)params completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeChannelListWithCompletionHandler:(void (^)(
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeChannelListWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeChannelListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeLineupWithCompletionHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
+                                                     NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeLineupWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                  reportHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
+                                                    NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeCurrentChannelWithCompletionHandler:(void (^)(CHIPChannelClusterChannelInfo * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentChannelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:(void (^)(CHIPChannelClusterChannelInfo * _Nullable value,
+                                                            NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -837,77 +1225,77 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentHueWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentHueWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentHueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentSaturationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentSaturationWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentSaturationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRemainingTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRemainingTimeWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRemainingTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentXWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentXWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentXWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentYWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentYWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentYWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeDriftCompensationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeDriftCompensationWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDriftCompensationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCompensationTextWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCompensationTextWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCompensationTextWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeColorTemperatureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeColorTemperatureWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorTemperatureWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeColorModeWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeColorModeWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeColorControlOptionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorControlOptionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeColorControlOptionsWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorControlOptionsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -915,140 +1303,140 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfPrimariesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNumberOfPrimariesWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNumberOfPrimariesWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary1XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary1XWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary1XWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary1YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary1YWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary1YWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary1IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary1IntensityWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary1IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary2XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary2XWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary2XWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary2YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary2YWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary2YWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary2IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary2IntensityWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary2IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary3XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary3XWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary3XWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary3YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary3YWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary3YWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary3IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary3IntensityWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary3IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary4XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary4XWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary4XWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary4YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary4YWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary4YWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary4IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary4IntensityWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary4IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary5XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary5XWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary5XWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary5YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary5YWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary5YWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary5IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary5IntensityWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary5IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary6XWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary6XWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary6XWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary6YWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary6YWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary6YWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePrimary6IntensityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePrimary6IntensityWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePrimary6IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1056,24 +1444,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeWhitePointXWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeWhitePointXWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeWhitePointXWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeWhitePointYWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeWhitePointYWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeWhitePointYWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeColorPointRXWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeColorPointRXWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorPointRXWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1081,8 +1469,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointRYWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeColorPointRYWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorPointRYWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1091,8 +1479,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeColorPointRIntensityWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorPointRIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -1101,8 +1489,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointGXWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeColorPointGXWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorPointGXWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1110,8 +1498,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointGYWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeColorPointGYWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorPointGYWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1120,8 +1508,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeColorPointGIntensityWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorPointGIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -1130,8 +1518,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointBXWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeColorPointBXWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorPointBXWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1139,8 +1527,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorPointBYWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeColorPointBYWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorPointBYWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1149,8 +1537,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeColorPointBIntensityWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorPointBIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -1158,48 +1546,48 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEnhancedCurrentHueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeEnhancedCurrentHueWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEnhancedCurrentHueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeEnhancedColorModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeEnhancedColorModeWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEnhancedColorModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeColorLoopActiveWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeColorLoopActiveWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorLoopActiveWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeColorLoopDirectionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeColorLoopDirectionWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorLoopDirectionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeColorLoopTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeColorLoopTimeWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorLoopTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeColorLoopStartEnhancedHueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeColorLoopStartEnhancedHueWithMinInterval:(uint16_t)minInterval
-                                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorLoopStartEnhancedHueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1207,8 +1595,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeColorLoopStoredEnhancedHueWithMinInterval:(uint16_t)minInterval
-                                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorLoopStoredEnhancedHueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1216,16 +1604,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorCapabilitiesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeColorCapabilitiesWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorCapabilitiesWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeColorTempPhysicalMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeColorTempPhysicalMinWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorTempPhysicalMinWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -1233,8 +1621,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeColorTempPhysicalMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeColorTempPhysicalMaxWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeColorTempPhysicalMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -1242,8 +1630,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCoupleColorTempToLevelMinMiredsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCoupleColorTempToLevelMinMiredsWithMinInterval:(uint16_t)minInterval
-                                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCoupleColorTempToLevelMinMiredsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  subscriptionEstablished:
                                                      (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1253,25 +1641,43 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSNumber * _Nonnull)value
                                            completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeStartUpColorTemperatureMiredsWithMinInterval:(uint16_t)minInterval
-                                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStartUpColorTemperatureMiredsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                            NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1284,44 +1690,61 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPContentLauncher : CHIPCluster
 
-- (void)launchContentRequestWithParams:(CHIPContentLauncherClusterLaunchContentRequestParams *)params
-                     completionHandler:(void (^)(CHIPContentLauncherClusterLaunchResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
-- (void)launchURLRequestWithParams:(CHIPContentLauncherClusterLaunchURLRequestParams *)params
-                 completionHandler:(void (^)(CHIPContentLauncherClusterLaunchResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler;
+- (void)launchContentWithParams:(CHIPContentLauncherClusterLaunchContentParams *)params
+              completionHandler:(void (^)(CHIPContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler;
+- (void)launchURLWithParams:(CHIPContentLauncherClusterLaunchURLParams *)params
+          completionHandler:(void (^)(CHIPContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeAcceptHeaderListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAcceptHeaderListWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
-                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                            reportHandler:
-                                                (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeAcceptHeaderWithCompletionHandler:(void (^)(
+                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeAcceptHeaderWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSupportedStreamingProtocolsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completionHandler;
 - (void)writeAttributeSupportedStreamingProtocolsWithValue:(NSNumber * _Nonnull)value
                                          completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeSupportedStreamingProtocolsWithMinInterval:(uint16_t)minInterval
-                                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSupportedStreamingProtocolsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              subscriptionEstablished:
                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1336,44 +1759,62 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDeviceListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeDeviceListWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDeviceListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeServerListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeServerListWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeServerListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClientListWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClientListWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClientListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePartsListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePartsListWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePartsListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1390,10 +1831,28 @@ NS_ASSUME_NONNULL_BEGIN
                     completionHandler:(void (^)(CHIPDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1409,54 +1868,70 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearCredentialWithParams:(CHIPDoorLockClusterClearCredentialParams *)params
                 completionHandler:(StatusCompletion)completionHandler;
 - (void)clearUserWithParams:(CHIPDoorLockClusterClearUserParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)clearWeekDayScheduleWithParams:(CHIPDoorLockClusterClearWeekDayScheduleParams *)params
+                     completionHandler:(StatusCompletion)completionHandler;
+- (void)clearYearDayScheduleWithParams:(CHIPDoorLockClusterClearYearDayScheduleParams *)params
+                     completionHandler:(StatusCompletion)completionHandler;
 - (void)getCredentialStatusWithParams:(CHIPDoorLockClusterGetCredentialStatusParams *)params
                     completionHandler:(void (^)(CHIPDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler;
 - (void)getUserWithParams:(CHIPDoorLockClusterGetUserParams *)params
         completionHandler:
             (void (^)(CHIPDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+- (void)getWeekDayScheduleWithParams:(CHIPDoorLockClusterGetWeekDayScheduleParams *)params
+                   completionHandler:(void (^)(CHIPDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler;
+- (void)getYearDayScheduleWithParams:(CHIPDoorLockClusterGetYearDayScheduleParams *)params
+                   completionHandler:(void (^)(CHIPDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler;
 - (void)lockDoorWithParams:(CHIPDoorLockClusterLockDoorParams * _Nullable)params
          completionHandler:(StatusCompletion)completionHandler;
 - (void)setCredentialWithParams:(CHIPDoorLockClusterSetCredentialParams *)params
               completionHandler:(void (^)(CHIPDoorLockClusterSetCredentialResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler;
 - (void)setUserWithParams:(CHIPDoorLockClusterSetUserParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)setWeekDayScheduleWithParams:(CHIPDoorLockClusterSetWeekDayScheduleParams *)params
+                   completionHandler:(StatusCompletion)completionHandler;
+- (void)setYearDayScheduleWithParams:(CHIPDoorLockClusterSetYearDayScheduleParams *)params
+                   completionHandler:(StatusCompletion)completionHandler;
 - (void)unlockDoorWithParams:(CHIPDoorLockClusterUnlockDoorParams * _Nullable)params
            completionHandler:(StatusCompletion)completionHandler;
+- (void)unlockWithTimeoutWithParams:(CHIPDoorLockClusterUnlockWithTimeoutParams *)params
+                  completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeLockStateWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLockStateWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLockStateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeLockTypeWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLockTypeWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLockTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeActuatorEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActuatorEnabledWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActuatorEnabledWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeDoorStateWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeDoorStateWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDoorStateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeNumberOfTotalUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNumberOfTotalUsersSupportedWithMinInterval:(uint16_t)minInterval
-                                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNumberOfTotalUsersSupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              subscriptionEstablished:
                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1464,8 +1939,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfPINUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNumberOfPINUsersSupportedWithMinInterval:(uint16_t)minInterval
-                                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNumberOfPINUsersSupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1473,41 +1948,59 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfRFIDUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNumberOfRFIDUsersSupportedWithMinInterval:(uint16_t)minInterval
-                                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNumberOfRFIDUsersSupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeNumberOfWeekDaySchedulesSupportedPerUserWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                                       NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeNumberOfWeekDaySchedulesSupportedPerUserWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)
+                                                                                      subscriptionEstablishedHandler
+                                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                                      NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeNumberOfYearDaySchedulesSupportedPerUserWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                                       NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeNumberOfYearDaySchedulesSupportedPerUserWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)
+                                                                                      subscriptionEstablishedHandler
+                                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                                      NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeMaxPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxPINCodeLengthWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxPINCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinPINCodeLengthWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinPINCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxRFIDCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxRFIDCodeLengthWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxRFIDCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinRFIDCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinRFIDCodeLengthWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinRFIDCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1515,16 +2008,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLanguageWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLanguageWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeLanguageWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLanguageWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAutoRelockTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeAutoRelockTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeAutoRelockTimeWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAutoRelockTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1532,24 +2025,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSoundVolumeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeSoundVolumeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeSoundVolumeWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSoundVolumeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOperatingModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOperatingModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOperatingModeWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOperatingModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSupportedOperatingModesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSupportedOperatingModesWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSupportedOperatingModesWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1559,8 +2052,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnableOneTouchLockingWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeEnableOneTouchLockingWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEnableOneTouchLockingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -1570,8 +2063,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnablePrivacyModeButtonWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeEnablePrivacyModeButtonWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEnablePrivacyModeButtonWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1580,25 +2073,43 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeWrongCodeEntryLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeWrongCodeEntryLimitWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeWrongCodeEntryLimitWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeWrongCodeEntryLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
                                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1613,101 +2124,119 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasurementTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMeasurementTypeWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMeasurementTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTotalActivePowerWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTotalActivePowerWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTotalActivePowerWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRmsVoltageWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRmsVoltageWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRmsVoltageWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRmsVoltageMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRmsVoltageMinWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRmsVoltageMinWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRmsVoltageMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRmsVoltageMaxWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRmsVoltageMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRmsCurrentWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRmsCurrentWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRmsCurrentWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRmsCurrentMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRmsCurrentMinWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRmsCurrentMinWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRmsCurrentMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRmsCurrentMaxWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRmsCurrentMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeActivePowerWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActivePowerWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActivePowerWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeActivePowerMinWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActivePowerMinWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActivePowerMinWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeActivePowerMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActivePowerMaxWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActivePowerMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1724,92 +2253,110 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePHYRateWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePHYRateWithMinInterval:(uint16_t)minInterval
-                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePHYRateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFullDuplexWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFullDuplexWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFullDuplexWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePacketRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePacketRxCountWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePacketRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePacketTxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePacketTxCountWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePacketTxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxErrCountWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxErrCountWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxErrCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCollisionCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCollisionCountWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCollisionCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOverrunCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeOverrunCountWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOverrunCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCarrierDetectWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCarrierDetectWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCarrierDetectWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTimeSinceResetWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTimeSinceResetWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTimeSinceResetWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1824,23 +2371,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLabelListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLabelListWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLabelListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1855,47 +2420,65 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeToleranceWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1921,48 +2504,67 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBreadcrumbWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBreadcrumbWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeBreadcrumbWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBreadcrumbWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeBasicCommissioningInfoListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBasicCommissioningInfoListWithMinInterval:(uint16_t)minInterval
-                                                        maxInterval:(uint16_t)maxInterval
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler;
+- (void)readAttributeBasicCommissioningInfoWithCompletionHandler:
+    (void (^)(CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)
+    subscribeAttributeBasicCommissioningInfoWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                              reportHandler:
+                                                  (void (^)(CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nullable value,
+                                                      NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRegulatoryConfigWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRegulatoryConfigWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRegulatoryConfigWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeLocationCapabilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLocationCapabilityWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLocationCapabilityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1977,29 +2579,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNetworkInterfacesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNetworkInterfacesWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNetworkInterfacesWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRebootCountWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRebootCountWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRebootCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeUpTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeUpTimeWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeUpTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTotalOperationalHoursWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTotalOperationalHoursWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTotalOperationalHoursWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -2007,15 +2609,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBootReasonsWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBootReasonsWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBootReasonsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeActiveHardwareFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActiveHardwareFaultsWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActiveHardwareFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -2023,33 +2625,51 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveRadioFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActiveRadioFaultsWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActiveRadioFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeActiveNetworkFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActiveNetworkFaultsWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActiveNetworkFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2075,47 +2695,66 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGroupKeyMapWithCompletionHandler:(void (^)(
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeGroupKeyMapWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)writeAttributeGroupKeyMapWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeGroupKeyMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeGroupTableWithCompletionHandler:(void (^)(
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeGroupTableWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeGroupTableWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxGroupsPerFabricWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxGroupsPerFabricWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxGroupsPerFabricWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxGroupKeysPerFabricWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxGroupKeysPerFabricWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxGroupKeysPerFabricWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
                                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2146,23 +2785,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNameSupportWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNameSupportWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNameSupportWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2184,32 +2841,50 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeIdentifyTimeWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeIdentifyTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeIdentifyTimeWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeIdentifyTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeIdentifyTypeWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeIdentifyTypeWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeIdentifyTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2224,55 +2899,73 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeToleranceWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeLightSensorTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLightSensorTypeWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLightSensorTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2285,22 +2978,40 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPKeypadInput : CHIPCluster
 
-- (void)sendKeyRequestWithParams:(CHIPKeypadInputClusterSendKeyRequestParams *)params
-               completionHandler:(void (^)(CHIPKeypadInputClusterSendKeyResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
+- (void)sendKeyWithParams:(CHIPKeypadInputClusterSendKeyParams *)params
+        completionHandler:
+            (void (^)(CHIPKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2328,54 +3039,54 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentLevelWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentLevelWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRemainingTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRemainingTimeWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRemainingTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinLevelWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinLevelWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxLevelWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxLevelWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentFrequencyWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentFrequencyWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentFrequencyWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinFrequencyWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinFrequencyWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinFrequencyWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxFrequencyWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxFrequencyWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxFrequencyWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2383,16 +3094,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOptionsWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOptionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOptionsWithMinInterval:(uint16_t)minInterval
-                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOptionsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOnOffTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOnOffTransitionTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOnOffTransitionTimeWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOnOffTransitionTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -2401,16 +3112,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOnLevelWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOnLevelWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOnLevelWithMinInterval:(uint16_t)minInterval
-                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOnLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOnTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOnTransitionTimeWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOnTransitionTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2418,8 +3129,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOffTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOffTransitionTimeWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOffTransitionTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2427,8 +3138,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeDefaultMoveRateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeDefaultMoveRateWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDefaultMoveRateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2437,32 +3148,50 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeStartUpCurrentLevelWithValue:(NSNumber * _Nullable)value
                                  completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeStartUpCurrentLevelWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStartUpCurrentLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
                                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2478,24 +3207,42 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeActiveLocaleWithCompletionHandler:(void (^)(
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeActiveLocaleWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeActiveLocaleWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActiveLocaleWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSupportedLocalesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSupportedLocalesWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSupportedLocalesWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2510,18 +3257,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)sleepWithCompletionHandler:(StatusCompletion)completionHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2534,41 +3299,58 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPMediaInput : CHIPCluster
 
-- (void)hideInputStatusRequestWithCompletionHandler:(StatusCompletion)completionHandler;
-- (void)renameInputRequestWithParams:(CHIPMediaInputClusterRenameInputRequestParams *)params
-                   completionHandler:(StatusCompletion)completionHandler;
-- (void)selectInputRequestWithParams:(CHIPMediaInputClusterSelectInputRequestParams *)params
-                   completionHandler:(StatusCompletion)completionHandler;
-- (void)showInputStatusRequestWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)hideInputStatusWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)renameInputWithParams:(CHIPMediaInputClusterRenameInputParams *)params
+            completionHandler:(StatusCompletion)completionHandler;
+- (void)selectInputWithParams:(CHIPMediaInputClusterSelectInputParams *)params
+            completionHandler:(StatusCompletion)completionHandler;
+- (void)showInputStatusWithCompletionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeMediaInputListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMediaInputListWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
-                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                          reportHandler:
-                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeInputListWithCompletionHandler:(void (^)(
+                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeInputListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeCurrentMediaInputWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentMediaInputWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
-                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                             reportHandler:
-                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeCurrentInputWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentInputWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:
+                                            (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2581,90 +3363,116 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPMediaPlayback : CHIPCluster
 
-- (void)fastForwardRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                                    NSError * _Nullable error))completionHandler;
-- (void)nextRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+- (void)fastForwardWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                              NSError * _Nullable error))completionHandler;
-- (void)pauseRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completionHandler;
-- (void)playRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completionHandler;
-- (void)previousRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                                 NSError * _Nullable error))completionHandler;
-- (void)rewindRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completionHandler;
-- (void)seekRequestWithParams:(CHIPMediaPlaybackClusterSeekRequestParams *)params
+- (void)nextWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler;
+- (void)pauseWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler;
+- (void)playWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler;
+- (void)previousWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler;
+- (void)rewindWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler;
+- (void)seekWithParams:(CHIPMediaPlaybackClusterSeekParams *)params
+     completionHandler:
+         (void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+- (void)skipBackwardWithParams:(CHIPMediaPlaybackClusterSkipBackwardParams *)params
+             completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler;
+- (void)skipForwardWithParams:(CHIPMediaPlaybackClusterSkipForwardParams *)params
             completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler;
-- (void)skipBackwardRequestWithParams:(CHIPMediaPlaybackClusterSkipBackwardRequestParams *)params
-                    completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler;
-- (void)skipForwardRequestWithParams:(CHIPMediaPlaybackClusterSkipForwardRequestParams *)params
-                   completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
-- (void)startOverRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                                  NSError * _Nullable error))completionHandler;
-- (void)stopRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completionHandler;
+- (void)startOverWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler;
+- (void)stopPlaybackWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler;
 
-- (void)readAttributePlaybackStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                            NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePlaybackStateWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:
-                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeCurrentStateWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentStateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:
+                                            (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeStartTimeWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeStartTimeWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStartTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeDurationWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeDurationWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDurationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeSampledPositionWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeSampledPositionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                           reportHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
+                                                             NSError * _Nullable error))reportHandler;
+
 - (void)readAttributePlaybackSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePlaybackSpeedWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePlaybackSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSeekRangeEndWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSeekRangeEndWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSeekRangeEndWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSeekRangeStartWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSeekRangeStartWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSeekRangeStartWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2682,52 +3490,70 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentModeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentModeWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSupportedModesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSupportedModesWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSupportedModesWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOnModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOnModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOnModeWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOnModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeStartUpModeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeStartUpModeWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStartUpModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeDescriptionWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2761,30 +3587,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxNetworksWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxNetworksWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxNetworksWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeNetworksWithCompletionHandler:(void (^)(
                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNetworksWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNetworksWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeScanMaxTimeSecondsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeScanMaxTimeSecondsWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeScanMaxTimeSecondsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeConnectMaxTimeSecondsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeConnectMaxTimeSecondsWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeConnectMaxTimeSecondsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -2793,16 +3619,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeInterfaceEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInterfaceEnabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInterfaceEnabledWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInterfaceEnabledWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeLastNetworkingStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLastNetworkingStatusWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLastNetworkingStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -2810,31 +3636,49 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLastNetworkIDWithCompletionHandler:(void (^)(
                                                             NSData * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLastNetworkIDWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLastNetworkIDWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeLastConnectErrorValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLastConnectErrorValueWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLastConnectErrorValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
                                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2858,16 +3702,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2886,8 +3730,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeDefaultOtaProvidersWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeDefaultOtaProvidersWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeDefaultOtaProvidersWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDefaultOtaProvidersWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -2895,23 +3739,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUpdatePossibleWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeUpdatePossibleWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeUpdatePossibleWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeUpdateStateWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeUpdateStateWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeUpdateStateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeUpdateStateProgressWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeUpdateStateProgressWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeUpdateStateProgressWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -2919,16 +3763,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2943,15 +3787,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOccupancyWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeOccupancyWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOccupancyWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOccupancySensorTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeOccupancySensorTypeWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOccupancySensorTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -2959,25 +3803,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOccupancySensorTypeBitmapWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeOccupancySensorTypeBitmapWithMinInterval:(uint16_t)minInterval
-                                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOccupancySensorTypeBitmapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2999,62 +3861,80 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)toggleWithCompletionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeOnOffWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeOnOffWithMinInterval:(uint16_t)minInterval
-                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOnOffWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeGlobalSceneControlWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeGlobalSceneControlWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeGlobalSceneControlWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOnTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOnTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOnTimeWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOnTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOffWaitTimeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOffWaitTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOffWaitTimeWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOffWaitTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeStartUpOnOffWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeStartUpOnOffWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeStartUpOnOffWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStartUpOnOffWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3069,32 +3949,50 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSwitchTypeWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSwitchTypeWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSwitchTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSwitchActionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeSwitchActionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeSwitchActionsWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSwitchActionsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3115,13 +4013,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)attestationRequestWithParams:(CHIPOperationalCredentialsClusterAttestationRequestParams *)params
                    completionHandler:(void (^)(CHIPOperationalCredentialsClusterAttestationResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
+- (void)CSRRequestWithParams:(CHIPOperationalCredentialsClusterCSRRequestParams *)params
+           completionHandler:(void (^)(CHIPOperationalCredentialsClusterCSRResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler;
 - (void)certificateChainRequestWithParams:(CHIPOperationalCredentialsClusterCertificateChainRequestParams *)params
                         completionHandler:
                             (void (^)(CHIPOperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
-- (void)opCSRRequestWithParams:(CHIPOperationalCredentialsClusterOpCSRRequestParams *)params
-             completionHandler:(void (^)(CHIPOperationalCredentialsClusterOpCSRResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler;
 - (void)removeFabricWithParams:(CHIPOperationalCredentialsClusterRemoveFabricParams *)params
              completionHandler:(void (^)(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
@@ -3135,30 +4033,29 @@ NS_ASSUME_NONNULL_BEGIN
                                 NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeNOCsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNOCsWithMinInterval:(uint16_t)minInterval
-                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNOCsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeFabricsListWithCompletionHandler:(void (^)(
-                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFabricsListWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
-                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeFabricsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSupportedFabricsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSupportedFabricsWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSupportedFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCommissionedFabricsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCommissionedFabricsWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCommissionedFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -3166,8 +4063,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTrustedRootCertificatesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTrustedRootCertificatesWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTrustedRootCertificatesWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3175,24 +4072,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentFabricIndexWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentFabricIndexWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentFabricIndexWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3206,36 +4121,36 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPowerSource : CHIPCluster
 
 - (void)readAttributeStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeStatusWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOrderWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeOrderWithMinInterval:(uint16_t)minInterval
-                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOrderWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeDescriptionWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeBatteryVoltageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBatteryVoltageWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBatteryVoltageWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeBatteryPercentRemainingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBatteryPercentRemainingWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBatteryPercentRemainingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3243,8 +4158,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatteryTimeRemainingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBatteryTimeRemainingWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBatteryTimeRemainingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -3252,16 +4167,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatteryChargeLevelWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBatteryChargeLevelWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBatteryChargeLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeActiveBatteryFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActiveBatteryFaultsWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActiveBatteryFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -3269,31 +4184,49 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatteryChargeStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBatteryChargeStateWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBatteryChargeStateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3307,23 +4240,41 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPowerSourceConfiguration : CHIPCluster
 
 - (void)readAttributeSourcesWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSourcesWithMinInterval:(uint16_t)minInterval
-                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSourcesWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3338,40 +4289,40 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3386,116 +4337,116 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxPressureWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxPressureWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxSpeedWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxSpeedWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxFlowWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxFlowWithMinInterval:(uint16_t)minInterval
-                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxFlowWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinConstPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinConstPressureWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinConstPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxConstPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxConstPressureWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxConstPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinCompPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinCompPressureWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinCompPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxCompPressureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxCompPressureWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxCompPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinConstSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinConstSpeedWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinConstSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxConstSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxConstSpeedWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxConstSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinConstFlowWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinConstFlowWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinConstFlowWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxConstFlowWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxConstFlowWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxConstFlowWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinConstTempWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinConstTempWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinConstTempWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxConstTempWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxConstTempWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxConstTempWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePumpStatusWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePumpStatusWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePumpStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeEffectiveOperationModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeEffectiveOperationModeWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEffectiveOperationModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3503,8 +4454,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEffectiveControlModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeEffectiveControlModeWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEffectiveControlModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -3512,14 +4463,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCapacityWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCapacityWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCapacityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSpeedWithMinInterval:(uint16_t)minInterval
-                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3527,16 +4478,16 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeLifetimeRunningHoursWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLifetimeRunningHoursWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
                                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePowerWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePowerWithMinInterval:(uint16_t)minInterval
-                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePowerWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3544,8 +4495,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLifetimeEnergyConsumedWithValue:(NSNumber * _Nullable)value
                                     completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeLifetimeEnergyConsumedWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLifetimeEnergyConsumedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3554,8 +4505,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOperationModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOperationModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOperationModeWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOperationModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3563,37 +4514,55 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeControlModeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeControlModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeControlModeWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeControlModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAlarmMaskWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAlarmMaskWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAlarmMaskWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3608,47 +4577,65 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeToleranceWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3683,53 +4670,71 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSceneCountWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSceneCountWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSceneCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentSceneWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentSceneWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentSceneWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentGroupWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentGroupWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentGroupWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSceneValidWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSceneValidWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSceneValidWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeNameSupportWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNameSupportWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNameSupportWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3746,56 +4751,74 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeThreadMetricsWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeThreadMetricsWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeThreadMetricsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentHeapFreeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentHeapFreeWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentHeapFreeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentHeapUsedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentHeapUsedWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentHeapUsedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentHeapHighWatermarkWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentHeapHighWatermarkWithMinInterval:(uint16_t)minInterval
-                                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentHeapHighWatermarkWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           subscriptionEstablished:
                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3810,47 +4833,65 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfPositionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNumberOfPositionsWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNumberOfPositionsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentPositionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentPositionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentPositionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMultiPressMaxWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMultiPressMaxWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMultiPressMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3863,40 +4904,55 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTargetNavigator : CHIPCluster
 
-- (void)navigateTargetRequestWithParams:(CHIPTargetNavigatorClusterNavigateTargetRequestParams *)params
-                      completionHandler:(void (^)(CHIPTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
-                                            NSError * _Nullable error))completionHandler;
+- (void)navigateTargetWithParams:(CHIPTargetNavigatorClusterNavigateTargetParams *)params
+               completionHandler:(void (^)(CHIPTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeTargetNavigatorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTargetNavigatorListWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
-                                     subscriptionEstablished:
-                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                               reportHandler:
-                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeTargetListWithCompletionHandler:(void (^)(
+                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeTargetListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeCurrentNavigatorTargetWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                     NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentNavigatorTargetWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
-                                        subscriptionEstablished:
-                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
-                                                                    NSError * _Nullable error))reportHandler;
+- (void)readAttributeCurrentTargetWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentTargetWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                         reportHandler:
+                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3911,47 +4967,47 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeToleranceWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeToleranceWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4014,206 +5070,206 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBooleanWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeBooleanWithMinInterval:(uint16_t)minInterval
-                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeBitmap8WithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBitmap8WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeBitmap8WithMinInterval:(uint16_t)minInterval
-                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBitmap8WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeBitmap16WithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBitmap16WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeBitmap16WithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBitmap16WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeBitmap32WithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBitmap32WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeBitmap32WithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBitmap32WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeBitmap64WithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeBitmap64WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeBitmap64WithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBitmap64WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt8uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt8uWithMinInterval:(uint16_t)minInterval
-                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt16uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt16uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt16uWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt24uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt24uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt24uWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt24uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt32uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt32uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt32uWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt32uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt40uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt40uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt40uWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt40uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt48uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt48uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt48uWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt48uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt56uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt56uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt56uWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt56uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt64uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt64uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt64uWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt64uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt8sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt8sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt8sWithMinInterval:(uint16_t)minInterval
-                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt16sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt16sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt16sWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt24sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt24sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt24sWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt24sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt32sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt32sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt32sWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt32sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt40sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt40sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt40sWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt40sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt48sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt48sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt48sWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt48sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt56sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt56sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt56sWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt56sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeInt64sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt64sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeInt64sWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInt64sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeEnum8WithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnum8WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeEnum8WithMinInterval:(uint16_t)minInterval
-                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEnum8WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeEnum16WithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnum16WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeEnum16WithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEnum16WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFloatSingleWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeFloatSingleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeFloatSingleWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFloatSingleWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFloatDoubleWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeFloatDoubleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeFloatDoubleWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFloatDoubleWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOctetStringWithCompletionHandler:(void (^)(
                                                           NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOctetStringWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOctetStringWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeListInt8uWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListInt8uWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeListInt8uWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeListInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeListOctetStringWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeListOctetStringWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeListOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4222,8 +5278,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListStructOctetStringWithValue:(NSArray * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeListStructOctetStringWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeListStructOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -4232,8 +5288,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLongOctetStringWithCompletionHandler:(void (^)(NSData * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLongOctetStringWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeLongOctetStringWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLongOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4241,16 +5297,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeCharStringWithCompletionHandler:(void (^)(
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeCharStringWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeCharStringWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCharStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeLongCharStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLongCharStringWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeLongCharStringWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLongCharStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4258,23 +5314,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeEpochUsWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEpochUsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeEpochUsWithMinInterval:(uint16_t)minInterval
-                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEpochUsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeEpochSWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEpochSWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeEpochSWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEpochSWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeVendorIdWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeVendorIdWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeVendorIdWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeVendorIdWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4282,8 +5338,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeListNullablesAndOptionalsStructWithValue:(NSArray * _Nonnull)value
                                              completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeListNullablesAndOptionalsStructWithMinInterval:(uint16_t)minInterval
-                                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeListNullablesAndOptionalsStructWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  subscriptionEstablished:
                                                      (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4292,17 +5348,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeEnumAttrWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnumAttrWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeEnumAttrWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEnumAttrWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeStructAttrWithCompletionHandler:(void (^)(CHIPTestClusterClusterSimpleStruct * _Nullable value,
+                                                         NSError * _Nullable error))completionHandler;
+- (void)writeAttributeStructAttrWithValue:(CHIPTestClusterClusterSimpleStruct * _Nonnull)value
+                        completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeStructAttrWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(CHIPTestClusterClusterSimpleStruct * _Nullable value,
+                                                        NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRangeRestrictedInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeRangeRestrictedInt8uWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeRangeRestrictedInt8uWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRangeRestrictedInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -4312,8 +5378,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeRangeRestrictedInt8sWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeRangeRestrictedInt8sWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRangeRestrictedInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -4323,8 +5389,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)writeAttributeRangeRestrictedInt16uWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeRangeRestrictedInt16uWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRangeRestrictedInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -4334,8 +5400,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)writeAttributeRangeRestrictedInt16sWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeRangeRestrictedInt16sWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRangeRestrictedInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -4343,8 +5409,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeListLongOctetStringWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeListLongOctetStringWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)writeAttributeListLongOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeListLongOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -4353,8 +5420,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeTimedWriteBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
 - (void)writeAttributeTimedWriteBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeTimedWriteBooleanWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTimedWriteBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4362,8 +5429,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeGeneralErrorBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeGeneralErrorBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeGeneralErrorBooleanWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeGeneralErrorBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -4372,8 +5439,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeClusterErrorBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeClusterErrorBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeClusterErrorBooleanWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterErrorBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -4382,16 +5449,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeUnsupportedWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeUnsupportedWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeUnsupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeNullableBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableBooleanWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableBooleanWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4399,8 +5466,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableBitmap8WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableBitmap8WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableBitmap8WithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableBitmap8WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4408,8 +5475,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableBitmap16WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableBitmap16WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableBitmap16WithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableBitmap16WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4417,8 +5484,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableBitmap32WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableBitmap32WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableBitmap32WithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableBitmap32WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4426,8 +5493,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableBitmap64WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableBitmap64WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableBitmap64WithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableBitmap64WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4435,8 +5502,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt8uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt8uWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4444,8 +5511,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt16uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt16uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt16uWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4453,8 +5520,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt24uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt24uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt24uWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt24uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4462,8 +5529,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt32uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt32uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt32uWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt32uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4471,8 +5538,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt40uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt40uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt40uWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt40uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4480,8 +5547,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt48uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt48uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt48uWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt48uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4489,8 +5556,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt56uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt56uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt56uWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt56uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4498,8 +5565,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt64uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt64uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt64uWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt64uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4507,8 +5574,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt8sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt8sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt8sWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4516,8 +5583,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt16sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt16sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt16sWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4525,8 +5592,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt24sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt24sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt24sWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt24sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4534,8 +5601,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt32sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt32sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt32sWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt32sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4543,8 +5610,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt40sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt40sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt40sWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt40sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4552,8 +5619,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt48sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt48sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt48sWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt48sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4561,8 +5628,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt56sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt56sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt56sWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt56sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4570,8 +5637,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableInt64sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt64sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableInt64sWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableInt64sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4579,8 +5646,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableEnum8WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableEnum8WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableEnum8WithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableEnum8WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4588,8 +5655,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableEnum16WithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableEnum16WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableEnum16WithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableEnum16WithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4598,8 +5665,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableFloatSingleWithValue:(NSNumber * _Nullable)value
                                  completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableFloatSingleWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableFloatSingleWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -4609,8 +5676,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableFloatDoubleWithValue:(NSNumber * _Nullable)value
                                  completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableFloatDoubleWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableFloatDoubleWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -4619,8 +5686,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableOctetStringWithCompletionHandler:(void (^)(NSData * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableOctetStringWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableOctetStringWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -4629,8 +5696,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableCharStringWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableCharStringWithValue:(NSString * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableCharStringWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableCharStringWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4638,18 +5705,28 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNullableEnumAttrWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableEnumAttrWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableEnumAttrWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableEnumAttrWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeNullableStructWithCompletionHandler:(void (^)(CHIPTestClusterClusterSimpleStruct * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableStructWithValue:(CHIPTestClusterClusterSimpleStruct * _Nullable)value
+                            completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableStructWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:(void (^)(CHIPTestClusterClusterSimpleStruct * _Nullable value,
+                                                            NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeNullableRangeRestrictedInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                            NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableRangeRestrictedInt8uWithValue:(NSNumber * _Nullable)value
                                           completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableRangeRestrictedInt8uWithMinInterval:(uint16_t)minInterval
-                                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableRangeRestrictedInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               subscriptionEstablished:
                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                         reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4659,8 +5736,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                            NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableRangeRestrictedInt8sWithValue:(NSNumber * _Nullable)value
                                           completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableRangeRestrictedInt8sWithMinInterval:(uint16_t)minInterval
-                                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableRangeRestrictedInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               subscriptionEstablished:
                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                         reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4670,8 +5747,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableRangeRestrictedInt16uWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableRangeRestrictedInt16uWithMinInterval:(uint16_t)minInterval
-                                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableRangeRestrictedInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4681,25 +5758,43 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableRangeRestrictedInt16sWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeNullableRangeRestrictedInt16sWithMinInterval:(uint16_t)minInterval
-                                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNullableRangeRestrictedInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                            NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4725,16 +5820,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLocalTemperatureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLocalTemperatureWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLocalTemperatureWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAbsMinHeatSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAbsMinHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAbsMinHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4742,8 +5837,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAbsMaxHeatSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAbsMaxHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAbsMaxHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4751,8 +5846,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAbsMinCoolSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAbsMinCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAbsMinCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4760,8 +5855,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAbsMaxCoolSetpointLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAbsMaxCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAbsMaxCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4771,8 +5866,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOccupiedCoolingSetpointWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOccupiedCoolingSetpointWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOccupiedCoolingSetpointWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4782,8 +5877,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOccupiedHeatingSetpointWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOccupiedHeatingSetpointWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOccupiedHeatingSetpointWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4793,8 +5888,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeMinHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeMinHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -4804,8 +5899,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeMaxHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeMaxHeatSetpointLimitWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -4815,8 +5910,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeMinCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeMinCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -4826,8 +5921,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)writeAttributeMaxCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeMaxCoolSetpointLimitWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMaxCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -4836,8 +5931,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeMinSetpointDeadBandWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)writeAttributeMinSetpointDeadBandWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeMinSetpointDeadBandWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMinSetpointDeadBandWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -4847,8 +5942,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)writeAttributeControlSequenceOfOperationWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeControlSequenceOfOperationWithMinInterval:(uint16_t)minInterval
-                                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeControlSequenceOfOperationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4857,22 +5952,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSystemModeWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeSystemModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeSystemModeWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSystemModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeStartOfWeekWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeStartOfWeekWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStartOfWeekWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeNumberOfWeeklyTransitionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNumberOfWeeklyTransitionsWithMinInterval:(uint16_t)minInterval
-                                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNumberOfWeeklyTransitionsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4880,8 +5975,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNumberOfDailyTransitionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNumberOfDailyTransitionsWithMinInterval:(uint16_t)minInterval
-                                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNumberOfDailyTransitionsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           subscriptionEstablished:
                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4889,23 +5984,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4922,8 +6017,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)writeAttributeTemperatureDisplayModeWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeTemperatureDisplayModeWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTemperatureDisplayModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4932,8 +6027,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeKeypadLockoutWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeKeypadLockoutWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeKeypadLockoutWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeKeypadLockoutWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4942,25 +6037,43 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeScheduleProgrammingVisibilityWithValue:(NSNumber * _Nonnull)value
                                            completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:(uint16_t)minInterval
-                                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                            NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4977,152 +6090,152 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeChannelWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeChannelWithMinInterval:(uint16_t)minInterval
-                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeChannelWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRoutingRoleWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRoutingRoleWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRoutingRoleWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeNetworkNameWithCompletionHandler:(void (^)(
-                                                          NSData * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNetworkNameWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeNetworkNameWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
+                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePanIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePanIdWithMinInterval:(uint16_t)minInterval
-                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePanIdWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeExtendedPanIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeExtendedPanIdWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeExtendedPanIdWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeMeshLocalPrefixWithCompletionHandler:(void (^)(NSData * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeMeshLocalPrefixWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMeshLocalPrefixWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOverrunCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeOverrunCountWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOverrunCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeNeighborTableListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeNeighborTableListWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeNeighborTableListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRouteTableListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRouteTableListWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRouteTableListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePartitionIdWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePartitionIdWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePartitionIdWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeWeightingWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeWeightingWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeWeightingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeDataVersionWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeDataVersionWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDataVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeStableDataVersionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeStableDataVersionWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStableDataVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeLeaderRouterIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLeaderRouterIdWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLeaderRouterIdWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeDetachedRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeDetachedRoleCountWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDetachedRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeChildRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeChildRoleCountWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeChildRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRouterRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRouterRoleCountWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRouterRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeLeaderRoleCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLeaderRoleCountWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLeaderRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAttachAttemptCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttachAttemptCountWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttachAttemptCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePartitionIdChangeCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePartitionIdChangeCountWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePartitionIdChangeCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5130,8 +6243,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBetterPartitionAttachAttemptCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:(uint16_t)minInterval
-                                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                    subscriptionEstablished:
                                                        (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5139,40 +6252,40 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeParentChangeCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeParentChangeCountWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeParentChangeCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxTotalCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxTotalCountWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxTotalCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxUnicastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxUnicastCountWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxUnicastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxBroadcastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxBroadcastCountWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxBroadcastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxAckRequestedCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxAckRequestedCountWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxAckRequestedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -5180,16 +6293,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxAckedCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxAckedCountWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxAckedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxNoAckRequestedCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxNoAckRequestedCountWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxNoAckRequestedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -5197,31 +6310,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxDataCountWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxDataCountWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxDataCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxDataPollCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxDataPollCountWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxDataPollCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxBeaconCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxBeaconCountWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxBeaconCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxBeaconRequestCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxBeaconRequestCountWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxBeaconRequestCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -5229,24 +6342,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxOtherCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxOtherCountWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxOtherCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxRetryCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxRetryCountWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxRetryCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxDirectMaxRetryExpiryCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxDirectMaxRetryExpiryCountWithMinInterval:(uint16_t)minInterval
-                                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxDirectMaxRetryExpiryCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              subscriptionEstablished:
                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5254,8 +6367,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxIndirectMaxRetryExpiryCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:(uint16_t)minInterval
-                                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5263,24 +6376,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxErrCcaCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxErrCcaCountWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxErrCcaCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxErrAbortCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxErrAbortCountWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxErrAbortCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTxErrBusyChannelCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTxErrBusyChannelCountWithMinInterval:(uint16_t)minInterval
-                                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTxErrBusyChannelCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -5288,55 +6401,55 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxTotalCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxTotalCountWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxTotalCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxUnicastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxUnicastCountWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxUnicastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxBroadcastCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxBroadcastCountWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxBroadcastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxDataCountWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxDataCountWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxDataCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxDataPollCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxDataPollCountWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxDataPollCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxBeaconCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxBeaconCountWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxBeaconCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxBeaconRequestCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxBeaconRequestCountWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxBeaconRequestCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -5344,16 +6457,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxOtherCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxOtherCountWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxOtherCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxAddressFilteredCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxAddressFilteredCountWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxAddressFilteredCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5361,8 +6474,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxDestAddrFilteredCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxDestAddrFilteredCountWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxDestAddrFilteredCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5370,24 +6483,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxDuplicatedCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxDuplicatedCountWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxDuplicatedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxErrNoFrameCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxErrNoFrameCountWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxErrNoFrameCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxErrUnknownNeighborCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxErrUnknownNeighborCountWithMinInterval:(uint16_t)minInterval
-                                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxErrUnknownNeighborCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5395,8 +6508,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrInvalidSrcAddrCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxErrInvalidSrcAddrCountWithMinInterval:(uint16_t)minInterval
-                                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxErrInvalidSrcAddrCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           subscriptionEstablished:
                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5404,69 +6517,69 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrSecCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxErrSecCountWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxErrSecCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxErrFcsCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxErrFcsCountWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxErrFcsCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRxErrOtherCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRxErrOtherCountWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRxErrOtherCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeActiveTimestampWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActiveTimestampWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActiveTimestampWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePendingTimestampWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePendingTimestampWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePendingTimestampWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeDelayWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeDelayWithMinInterval:(uint16_t)minInterval
-                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeDelayWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSecurityPolicyWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSecurityPolicyWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSecurityPolicyWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeChannelMaskWithCompletionHandler:(void (^)(
                                                           NSData * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeChannelMaskWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeChannelMaskWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOperationalDatasetComponentsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                            NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeOperationalDatasetComponentsWithMinInterval:(uint16_t)minInterval
-                                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOperationalDatasetComponentsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               subscriptionEstablished:
                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                         reportHandler:(void (^)(NSArray * _Nullable value,
@@ -5474,32 +6587,50 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveNetworkFaultsListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeActiveNetworkFaultsListWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActiveNetworkFaultsListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSArray * _Nullable value,
                                                                      NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5515,33 +6646,51 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeHourFormatWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeHourFormatWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeHourFormatWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeHourFormatWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeActiveCalendarTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
 - (void)writeAttributeActiveCalendarTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeActiveCalendarTypeWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeActiveCalendarTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSupportedCalendarTypesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSupportedCalendarTypesWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSupportedCalendarTypesWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:
                                                       (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5557,23 +6706,31 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeTemperatureUnitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)writeAttributeTemperatureUnitWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeTemperatureUnitWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTemperatureUnitWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                         reportHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5589,15 +6746,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLabelListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeLabelListWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLabelListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5610,27 +6785,43 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPWakeOnLan : CHIPCluster
 
-- (void)readAttributeWakeOnLanMacAddressWithCompletionHandler:(void (^)(NSString * _Nullable value,
-                                                                  NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeWakeOnLanMacAddressWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
-                                     subscriptionEstablished:
-                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                               reportHandler:
-                                                   (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeMACAddressWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeMACAddressWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5646,60 +6837,60 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetCountsWithCompletionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeBssidWithCompletionHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBssidWithMinInterval:(uint16_t)minInterval
-                                   maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBssidWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSecurityTypeWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSecurityTypeWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSecurityTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeWiFiVersionWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeWiFiVersionWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeWiFiVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeChannelNumberWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeChannelNumberWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeChannelNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeRssiWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeRssiWithMinInterval:(uint16_t)minInterval
-                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeRssiWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeBeaconLostCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBeaconLostCountWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBeaconLostCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeBeaconRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeBeaconRxCountWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeBeaconRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePacketMulticastRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePacketMulticastRxCountWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePacketMulticastRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5707,8 +6898,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketMulticastTxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePacketMulticastTxCountWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePacketMulticastTxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5716,8 +6907,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketUnicastRxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePacketUnicastRxCountWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePacketUnicastRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -5725,8 +6916,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketUnicastTxCountWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributePacketUnicastTxCountWithMinInterval:(uint16_t)minInterval
-                                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributePacketUnicastTxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -5734,39 +6925,57 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentMaxRateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentMaxRateWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentMaxRateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOverrunCountWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeOverrunCountWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOverrunCountWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5792,15 +7001,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)upOrOpenWithCompletionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTypeWithMinInterval:(uint16_t)minInterval
-                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentPositionLiftWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentPositionLiftWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentPositionLiftWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -5808,8 +7017,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentPositionTiltWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentPositionTiltWithMinInterval:(uint16_t)minInterval
-                                                 maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentPositionTiltWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -5817,16 +7026,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeConfigStatusWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeConfigStatusWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeConfigStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentPositionLiftPercentageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentPositionLiftPercentageWithMinInterval:(uint16_t)minInterval
-                                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentPositionLiftPercentageWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5834,8 +7043,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentPositionTiltPercentageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentPositionTiltPercentageWithMinInterval:(uint16_t)minInterval
-                                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentPositionTiltPercentageWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5843,16 +7052,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOperationalStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeOperationalStatusWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOperationalStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTargetPositionLiftPercent100thsWithMinInterval:(uint16_t)minInterval
-                                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTargetPositionLiftPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  subscriptionEstablished:
                                                      (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5860,8 +7069,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeTargetPositionTiltPercent100thsWithMinInterval:(uint16_t)minInterval
-                                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTargetPositionTiltPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  subscriptionEstablished:
                                                      (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5869,16 +7078,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEndProductTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeEndProductTypeWithMinInterval:(uint16_t)minInterval
-                                            maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeEndProductTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentPositionLiftPercent100thsWithMinInterval:(uint16_t)minInterval
-                                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentPositionLiftPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   subscriptionEstablished:
                                                       (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5886,8 +7095,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                                NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentPositionTiltPercent100thsWithMinInterval:(uint16_t)minInterval
-                                                              maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentPositionTiltPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   subscriptionEstablished:
                                                       (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5895,8 +7104,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInstalledOpenLimitLiftWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeInstalledOpenLimitLiftWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInstalledOpenLimitLiftWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5904,8 +7113,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInstalledClosedLimitLiftWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeInstalledClosedLimitLiftWithMinInterval:(uint16_t)minInterval
-                                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInstalledClosedLimitLiftWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           subscriptionEstablished:
                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5913,8 +7122,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInstalledOpenLimitTiltWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeInstalledOpenLimitTiltWithMinInterval:(uint16_t)minInterval
-                                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInstalledOpenLimitTiltWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5922,8 +7131,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeInstalledClosedLimitTiltWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeInstalledClosedLimitTiltWithMinInterval:(uint16_t)minInterval
-                                                      maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInstalledClosedLimitTiltWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
                                           subscriptionEstablished:
                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5931,38 +7140,56 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeModeWithMinInterval:(uint16_t)minInterval
-                                  maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSafetyStatusWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSafetyStatusWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSafetyStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeAttributeListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;

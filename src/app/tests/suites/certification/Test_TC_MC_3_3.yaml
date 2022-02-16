@@ -15,6 +15,7 @@
 name: 21.3.3. [TC-MC-3.3] Number Keys Verification
 
 config:
+    nodeId: 0x12344321
     cluster: "Keypad Input"
     endpoint: 1
 
@@ -22,10 +23,14 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Send Numbers1"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
@@ -33,7 +38,7 @@ tests:
 
     - label: "Send Numbers2"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
@@ -41,7 +46,7 @@ tests:
 
     - label: "Send Numbers3"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
@@ -49,7 +54,7 @@ tests:
 
     - label: "Send Numbers4"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
@@ -57,7 +62,7 @@ tests:
 
     - label: "Send Numbers5"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
@@ -65,7 +70,7 @@ tests:
 
     - label: "Send Numbers6"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
@@ -73,7 +78,7 @@ tests:
 
     - label: "Send Numbers7"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
@@ -81,7 +86,7 @@ tests:
 
     - label: "Send Numbers8"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
@@ -89,7 +94,7 @@ tests:
 
     - label: "Send Numbers9"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"

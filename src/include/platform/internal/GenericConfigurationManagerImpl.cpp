@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -35,6 +35,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <protocols/secure_channel/PASESession.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -311,6 +312,78 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSetupDiscriminator(uint16_t setupDiscriminator)
 {
     return WriteConfigValue(ConfigClass::kConfigKey_SetupDiscriminator, static_cast<uint32_t>(setupDiscriminator));
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pIterationCount(uint32_t & iterationCount)
+{
+    CHIP_ERROR err = ReadConfigValue(ConfigClass::kConfigKey_Spake2pIterationCount, iterationCount);
+
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        iterationCount = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT;
+        err            = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)
+{
+    CHIP_ERROR err                                                   = CHIP_NO_ERROR;
+    char saltB64[BASE64_ENCODED_LEN(chip::kPBKDFMaximumSaltLen) + 1] = { 0 };
+    size_t saltB64Len                                                = 0;
+
+    err = ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pSalt, saltB64, sizeof(saltB64), saltB64Len);
+    err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        saltB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT);
+        ReturnErrorCodeIf(saltB64Len > sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(saltB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT, saltB64Len);
+        err = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
+
+    ReturnErrorOnFailure(err);
+    saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
+    ReturnErrorCodeIf(saltLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, saltB64, saltLen);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)
+{
+    CHIP_ERROR err                                                                 = CHIP_NO_ERROR;
+    char verifierB64[BASE64_ENCODED_LEN(chip::kSpake2pSerializedVerifierSize) + 1] = { 0 };
+    size_t verifierB64Len                                                          = 0;
+
+    err = ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64), verifierB64Len);
+    err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        verifierB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER);
+        ReturnErrorCodeIf(verifierB64Len > sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(verifierB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER, verifierB64Len);
+        err = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
+
+    ReturnErrorOnFailure(err);
+    verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
+    ReturnErrorCodeIf(verifierLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, verifierB64, verifierLen);
+
+    return err;
 }
 
 template <class ConfigClass>
@@ -629,7 +702,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         err = GetManufacturingDate(year, month, dayOfMonth);
         if (err == CHIP_NO_ERROR)
         {
-            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02" PRIu8 "/%02" PRIu8, year, month, dayOfMonth);
+            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02u/%02u", year, month, dayOfMonth);
         }
         else
         {

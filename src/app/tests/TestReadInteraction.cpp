@@ -49,13 +49,16 @@ uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::ClusterId kTestClusterId        = 6;
-chip::ClusterId kInvalidTestClusterId = 7;
-chip::EndpointId kTestEndpointId      = 1;
-chip::EventId kTestEventIdDebug       = 1;
-chip::EventId kTestEventIdCritical    = 2;
-uint8_t kTestFieldValue1              = 1;
-chip::TLV::Tag kTestEventTag          = chip::TLV::ContextTag(1);
+chip::ClusterId kTestClusterId          = 6;
+chip::ClusterId kInvalidTestClusterId   = 7;
+chip::EndpointId kTestEndpointId        = 1;
+chip::EventId kTestEventIdDebug         = 1;
+chip::EventId kTestEventIdCritical      = 2;
+uint8_t kTestFieldValue1                = 1;
+chip::TLV::Tag kTestEventTag            = chip::TLV::ContextTag(1);
+chip::EndpointId kInvalidTestEndpointId = 3;
+chip::DataVersion kTestDataVersion1     = 3;
+chip::DataVersion kTestDataVersion2     = 5;
 
 class TestContext : public chip::Test::AppContext
 {
@@ -157,6 +160,24 @@ public:
 
     void OnDone() override {}
 
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpAttributePathParamsList;
+        }
+
+        if (aReadPrepareParams.mpEventPathParamsList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpEventPathParamsList;
+        }
+
+        if (aReadPrepareParams.mpDataVersionFilterList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpDataVersionFilterList;
+        }
+    }
+
     int mNumDataElementIndex               = 0;
     bool mGotEventResponse                 = false;
     int mNumAttributeResponse              = 0;
@@ -217,6 +238,18 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1);
 }
 
+bool IsClusterDataVersionEqual(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aRequiredVersion)
+{
+    if (kTestDataVersion1 == aRequiredVersion)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 class TestReadInteraction
 {
 public:
@@ -230,6 +263,10 @@ public:
     static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
     static void TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtrip(nlTestSuite * apSuite, void * apContext);
+    static void TestReadRoundtripWithDataVersionFilter(nlTestSuite * apSuite, void * apContext);
+    static void TestReadRoundtripWithNoMatchPathDataVersionFilter(nlTestSuite * apSuite, void * apContext);
+    static void TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter(nlTestSuite * apSuite, void * apContext);
+    static void TestReadRoundtripWithSameDifferentPathsDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadWildcard(nlTestSuite * apSuite, void * apContext);
     static void TestReadChunking(nlTestSuite * apSuite, void * apContext);
     static void TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext);
@@ -240,6 +277,7 @@ public:
     static void TestReadInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeInvalidIterval(nlTestSuite * apSuite, void * apContext);
     static void TestReadShutdown(nlTestSuite * apSuite, void * apContext);
+    static void TestResubscribeRoundtrip(nlTestSuite * apSuite, void * apContext);
 
 private:
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
@@ -707,6 +745,244 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
         // By now we should have closed all exchanges and sent all pending acks, so
         // there should be no queued-up things in the retransmit table.
         NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadRoundtripWithDataVersionFilter(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    GenerateEvents(apSuite, apContext);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+
+    chip::app::AttributePathParams attributePathParams[2];
+    attributePathParams[0].mEndpointId  = kTestEndpointId;
+    attributePathParams[0].mClusterId   = kTestClusterId;
+    attributePathParams[0].mAttributeId = 1;
+
+    attributePathParams[1].mEndpointId  = kTestEndpointId;
+    attributePathParams[1].mClusterId   = kTestClusterId;
+    attributePathParams[1].mAttributeId = 2;
+    attributePathParams[1].mListIndex   = 1;
+
+    chip::app::DataVersionFilter dataVersionFilters[1];
+    dataVersionFilters[0].mEndpointId = kTestEndpointId;
+    dataVersionFilters[0].mClusterId  = kTestClusterId;
+    dataVersionFilters[0].mDataVersion.SetValue(kTestDataVersion1);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 2;
+    readPrepareParams.mpDataVersionFilterList      = dataVersionFilters;
+    readPrepareParams.mDataVersionFilterListSize   = 1;
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Read);
+
+        err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
+
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadRoundtripWithNoMatchPathDataVersionFilter(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    GenerateEvents(apSuite, apContext);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    chip::app::AttributePathParams attributePathParams[2];
+    attributePathParams[0].mEndpointId  = kTestEndpointId;
+    attributePathParams[0].mClusterId   = kTestClusterId;
+    attributePathParams[0].mAttributeId = 1;
+
+    attributePathParams[1].mEndpointId  = kTestEndpointId;
+    attributePathParams[1].mClusterId   = kTestClusterId;
+    attributePathParams[1].mAttributeId = 2;
+    attributePathParams[1].mListIndex   = 1;
+
+    chip::app::DataVersionFilter dataVersionFilters[2];
+    dataVersionFilters[0].mEndpointId = kTestEndpointId;
+    dataVersionFilters[0].mClusterId  = kInvalidTestClusterId;
+    dataVersionFilters[0].mDataVersion.SetValue(kTestDataVersion1);
+
+    dataVersionFilters[1].mEndpointId = kInvalidTestEndpointId;
+    dataVersionFilters[1].mClusterId  = kTestClusterId;
+    dataVersionFilters[1].mDataVersion.SetValue(kTestDataVersion2);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 2;
+    readPrepareParams.mpDataVersionFilterList      = dataVersionFilters;
+    readPrepareParams.mDataVersionFilterListSize   = 2;
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Read);
+
+        err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    GenerateEvents(apSuite, apContext);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+
+    chip::app::AttributePathParams attributePathParams[2];
+    attributePathParams[0].mEndpointId  = kTestEndpointId;
+    attributePathParams[0].mClusterId   = kTestClusterId;
+    attributePathParams[0].mAttributeId = 1;
+
+    attributePathParams[1].mEndpointId  = kTestEndpointId;
+    attributePathParams[1].mClusterId   = kTestClusterId;
+    attributePathParams[1].mAttributeId = 2;
+    attributePathParams[1].mListIndex   = 1;
+
+    chip::app::DataVersionFilter dataVersionFilters[2];
+    dataVersionFilters[0].mEndpointId = kTestEndpointId;
+    dataVersionFilters[0].mClusterId  = kTestClusterId;
+    dataVersionFilters[0].mDataVersion.SetValue(kTestDataVersion1);
+
+    dataVersionFilters[1].mEndpointId = kTestEndpointId;
+    dataVersionFilters[1].mClusterId  = kTestClusterId;
+    dataVersionFilters[1].mDataVersion.SetValue(kTestDataVersion2);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 2;
+    readPrepareParams.mpDataVersionFilterList      = dataVersionFilters;
+    readPrepareParams.mDataVersionFilterListSize   = 2;
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Read);
+
+        err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilter(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    GenerateEvents(apSuite, apContext);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+
+    chip::app::AttributePathParams attributePathParams[2];
+    attributePathParams[0].mEndpointId  = kTestEndpointId;
+    attributePathParams[0].mClusterId   = kTestClusterId;
+    attributePathParams[0].mAttributeId = 1;
+
+    attributePathParams[1].mEndpointId  = kTestEndpointId;
+    attributePathParams[1].mClusterId   = kTestClusterId;
+    attributePathParams[1].mAttributeId = 2;
+    attributePathParams[1].mListIndex   = 1;
+
+    chip::app::DataVersionFilter dataVersionFilters[2];
+    dataVersionFilters[0].mEndpointId = kTestEndpointId;
+    dataVersionFilters[0].mClusterId  = kTestClusterId;
+    dataVersionFilters[0].mDataVersion.SetValue(kTestDataVersion1);
+
+    dataVersionFilters[1].mEndpointId = kInvalidTestEndpointId;
+    dataVersionFilters[1].mClusterId  = kTestClusterId;
+    dataVersionFilters[1].mDataVersion.SetValue(kTestDataVersion2);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 2;
+    readPrepareParams.mpDataVersionFilterList      = dataVersionFilters;
+    readPrepareParams.mDataVersionFilterListSize   = 2;
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Read);
+
+        err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+
+        delegate.mNumAttributeResponse = 0;
     }
 
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
@@ -1195,7 +1471,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     readPrepareParams.mEventPathParamsListSize = 0;
 
-    chip::app::AttributePathParams attributePathParams[2];
+    chip::app::AttributePathParams * attributePathParams = new chip::app::AttributePathParams[2];
     // Subscribe to full wildcard paths, repeat twice to ensure chunking.
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 2;
@@ -1210,7 +1486,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         delegate.mGotReport = false;
 
-        err = readClient.SendRequest(readPrepareParams);
+        err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         for (int i = 0; i < 20 && delegate.mNumAttributeResponse < 70; i++)
@@ -1483,6 +1759,10 @@ namespace {
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestReadRoundtrip", chip::app::TestReadInteraction::TestReadRoundtrip),
+    NL_TEST_DEF("TestReadRoundtripWithDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithDataVersionFilter),
+    NL_TEST_DEF("TestReadRoundtripWithNoMatchPathDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithNoMatchPathDataVersionFilter),
+    NL_TEST_DEF("TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter),
+    NL_TEST_DEF("TestReadRoundtripWithSameDifferentPathsDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilter),
     NL_TEST_DEF("TestReadWildcard", chip::app::TestReadInteraction::TestReadWildcard),
     NL_TEST_DEF("TestReadChunking", chip::app::TestReadInteraction::TestReadChunking),
     NL_TEST_DEF("TestSetDirtyBetweenChunks", chip::app::TestReadInteraction::TestSetDirtyBetweenChunks),

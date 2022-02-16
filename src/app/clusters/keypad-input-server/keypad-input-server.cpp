@@ -26,11 +26,21 @@
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/data-model/Encode.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::KeypadInput;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+static constexpr size_t kKeypadInputDelegateTableSize =
+    EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -39,12 +49,22 @@ using chip::app::Clusters::KeypadInput::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[kKeypadInputDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::KeypadInput::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
+    {
+        ChipLogError(Zcl, "KeypadInput returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        return app->GetKeypadInputDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogError(Zcl, "KeypadInput NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, KeypadInput::Id);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -65,8 +85,9 @@ namespace KeypadInput {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::KeypadInput::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, KeypadInput::Id);
+    // if endpoint is found and is not a dynamic endpoint
+    if (ep != 0xFFFF && ep < EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -83,25 +104,24 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfKeypadInputClusterSendKeyRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::SendKeyRequest::DecodableType & commandData)
+bool emberAfKeypadInputClusterSendKeyCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::SendKey::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
     auto & keyCode      = commandData.keyCode;
+    app::CommandResponseHelper<Commands::SendKeyResponse::Type> responder(command, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        Commands::SendKeyResponse::Type response = delegate->HandleSendKey(keyCode);
-        err                                      = command->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleSendKey(responder, keyCode);
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfKeypadInputClusterSendKeyRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfKeypadInputClusterSendKeyCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
     return true;

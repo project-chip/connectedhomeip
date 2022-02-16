@@ -47,8 +47,11 @@ class LogPipe(threading.Thread):
 
         self.start()
 
-    def CapturedLogContains(self, txt: str):
-        return any(txt in l for l in self.captured_logs)
+    def CapturedLogContains(self, txt: str, index=0):
+        for i, line in enumerate(self.captured_logs[index:]):
+            if txt in line:
+                return True, i
+        return False, len(self.captured_logs)
 
     def FindLastMatchingLine(self, matcher):
         for l in reversed(self.captured_logs):
@@ -101,8 +104,8 @@ class Runner:
             for dependency in dependencies:
                 if dependency.poll() is not None:
                     s.kill()
-                    raise Exception("Unexpected return %d for %r",
-                                    dependency.poll(), dependency)
+                    raise Exception("Unexpected return %d for %r" %
+                                    (dependency.poll(), dependency))
 
         code = s.wait()
         if code != 0:

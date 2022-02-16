@@ -18,9 +18,12 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <ota-provider-common/BdxOtaSender.h>
+#include <ota-provider-common/UserConsentDelegate.h>
+#include <vector>
 
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
@@ -46,17 +49,55 @@ public:
 
     enum QueryImageBehaviorType
     {
+        kRespondWithUnknown,
         kRespondWithUpdateAvailable,
         kRespondWithBusy,
         kRespondWithNotAvailable
     };
+    static constexpr uint16_t SW_VER_STR_MAX_LEN = 32;
+    static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
+    typedef struct DeviceSoftwareVersionModel
+    {
+        chip::VendorId vendorId;
+        uint16_t productId;
+        uint32_t softwareVersion;
+        char softwareVersionString[SW_VER_STR_MAX_LEN];
+        uint16_t cDVersionNumber;
+        bool softwareVersionValid;
+        uint32_t minApplicableSoftwareVersion;
+        uint32_t maxApplicableSoftwareVersion;
+        char otaURL[OTA_URL_MAX_LEN];
+    } DeviceSoftwareVersionModel;
+    void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
+    void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
+    {
+        mUpdateAction = action;
+    }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
+    void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
+    void SetSoftwareVersion(uint32_t softwareVersion) { mSoftwareVersion.SetValue(softwareVersion); }
+    void SetSoftwareVersionString(const char * versionString) { mSoftwareVersionString = versionString; }
+    void SetUserConsentNeeded(bool needed) { mUserConsentNeeded = needed; }
 
 private:
     BdxOtaSender mBdxOtaSender;
+    std::vector<DeviceSoftwareVersionModel> mCandidates;
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     QueryImageBehaviorType mQueryImageBehavior;
+    chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction mUpdateAction;
     uint32_t mDelayedActionTimeSec;
+    bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
+                            const uint32_t requestorSoftwareVersion,
+                            OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);
+    chip::ota::UserConsentDelegate * mUserConsentDelegate = nullptr;
+
+    chip::ota::UserConsentSubject
+    GetUserConsentSubject(const chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                          const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
+                          uint32_t targetVersion);
+    chip::Optional<uint32_t> mSoftwareVersion;
+    const char * mSoftwareVersionString = nullptr;
+    bool mUserConsentNeeded             = false;
 };

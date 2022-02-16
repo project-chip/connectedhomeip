@@ -89,9 +89,6 @@ DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 static BDXDownloader gDownloader;
 static OTAImageProcessorImpl gImageProcessor;
 
-static NodeId providerNodeId           = 2;
-static FabricIndex providerFabricIndex = 1;
-
 CHIP_ERROR AppTask::StartAppTask()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -182,7 +179,7 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Print the current software version
-    char currentSoftwareVer[ConfigurationManager::kMaxSoftwareVersionLength + 1] = { 0 };
+    char currentSoftwareVer[ConfigurationManager::kMaxSoftwareVersionStringLength + 1] = { 0 };
     err = ConfigurationMgr().GetSoftwareVersionString(currentSoftwareVer, sizeof(currentSoftwareVer));
     if (err != CHIP_NO_ERROR)
     {
@@ -493,9 +490,6 @@ void AppTask::OTAHandler(AppEvent * aEvent)
         return;
     }
 
-    // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
-    gRequestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex, chip::kRootEndpointId);
-
     static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
 
@@ -676,6 +670,6 @@ void AppTask::UpdateClusterState(void)
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
     }
 }

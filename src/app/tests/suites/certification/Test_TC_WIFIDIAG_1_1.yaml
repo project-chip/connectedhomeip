@@ -15,17 +15,20 @@
 name: 54.1.1. [TC-WIFIDIAG-1.1] Attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "WiFi Network Diagnostics"
-    endpoint: 1
+    endpoint: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    #Below steps disabled due to issue #13645 and 11670
     - label: "Reads NetworkInterface structure attribute from DUT"
-      disabled: true
       cluster: "General Diagnostics"
       command: "readAttribute"
       attribute: "NetworkInterfaces"
@@ -33,6 +36,9 @@ tests:
           constraints:
               type: list
 
+    # Various tests disabled for now until
+    # https://github.com/project-chip/connectedhomeip/pull/14755 is
+    # fixed and the SDK has the right types.
     - label: "Reads SecurityType attribute from DUT"
       disabled: true
       command: "readAttribute"
@@ -185,14 +191,18 @@ tests:
           constraints:
               type: uint32
 
+    # Disabled because this fails on Linux because we have no Wi-Fi interface.
     - label: "Reads CurrentMaxRate attribute from DUT"
+      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "CurrentMaxRate"
       response:
           value: 0
 
+    # Disabled because this fails on Linux because we have no Wi-Fi interface.
     - label: "Reads CurrentMaxRate attribute constraints"
+      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "CurrentMaxRate"

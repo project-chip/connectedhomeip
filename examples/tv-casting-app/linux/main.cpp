@@ -138,7 +138,7 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 
         // Send User Directed commissioning request
         ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
-            selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId[0])));
+            selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 }
@@ -230,7 +230,6 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
             .idAllocator    = &(server->GetSessionIDAllocator()),
             .fabricTable    = &(server->GetFabricTable()),
             .clientPool     = &gCASEClientPool,
-            .imDelegate     = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
         };
 
         PeerId peerID = fabric->GetPeerIdForNode(tvNodeId);
@@ -252,10 +251,11 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
             ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
-        LaunchURLRequest::Type request;
+        LaunchURL::Type request;
         request.contentURL          = chip::CharSpan::fromCharString(kContentUrl);
-        request.displayString       = chip::CharSpan::fromCharString(kContentDisplayStr);
-        request.brandingInformation = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type();
+        request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(kContentDisplayStr));
+        request.brandingInformation = Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>(
+            chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
         cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
     }
 }

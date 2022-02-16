@@ -47,10 +47,8 @@ namespace chip {
 
 extern const char * kSpake2pI2RSessionInfo;
 extern const char * kSpake2pR2ISessionInfo;
-extern const char * kSpake2pKeyExchangeSalt;
 
 constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
-constexpr uint32_t kSpake2p_Iteration_Count    = 100;
 
 // Specifications section 3.9. Password-Based Key Derivation Function
 constexpr uint32_t kPBKDFMinimumIterations = 1000;
@@ -59,7 +57,8 @@ constexpr uint32_t kPBKDFMinimumSaltLen    = 16;
 constexpr uint32_t kPBKDFMaximumSaltLen    = 32;
 
 // Specifications section 5.1.1.6
-constexpr uint32_t kSetupPINCodeMaximumValue = 99999998;
+constexpr uint32_t kSetupPINCodeMaximumValue   = 99999998;
+constexpr uint32_t kSetupPINCodeUndefinedValue = 0;
 
 using namespace Crypto;
 
@@ -76,10 +75,24 @@ struct PASESessionSerializable
     uint16_t mPeerSessionId;
 };
 
+/** @brief Serialized format of the PASE Verifier components.
+ *
+ *  This is used when the Verifier should be presented in a serialized form.
+ *  For example, when it is generated using PBKDF function, when stored in the
+ *  memory or when sent over the wire.
+ *  The serialized format is concatentation of 'W0' and 'L' verifier components:
+ *      { PASEVerifier.mW0[kP256_FE_Length], PASEVerifier.mL[kP256_Point_Length] }
+ **/
+constexpr size_t kSpake2pSerializedVerifierSize = kP256_FE_Length + kP256_Point_Length;
+typedef uint8_t PASEVerifierSerialized[kSpake2pSerializedVerifierSize];
+
 struct PASEVerifier
 {
-    uint8_t mW0[kSpake2p_WS_Length];
-    uint8_t mL[kSpake2p_WS_Length];
+    uint8_t mW0[kP256_FE_Length];
+    uint8_t mL[kP256_Point_Length];
+
+    CHIP_ERROR Serialize(MutableByteSpan & outSerialized);
+    CHIP_ERROR Deserialize(ByteSpan inSerialized);
 };
 
 class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
@@ -97,21 +110,6 @@ public:
 
     /**
      * @brief
-     *   Initialize using setup PIN code and wait for pairing requests.
-     *
-     * @param mySetUpPINCode  Setup PIN code of the local device
-     * @param pbkdf2IterCount Iteration count for PBKDF2 function
-     * @param salt            Salt to be used for SPAKE2P operation
-     * @param mySessionId     Session ID to be assigned to the secure session on the peer node
-     * @param delegate        Callback object
-     *
-     * @return CHIP_ERROR     The result of initialization
-     */
-    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t mySessionId,
-                              Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate);
-
-    /**
-     * @brief
      *   Initialize using PASE verifier and wait for pairing requests.
      *
      * @param verifier        PASE verifier to be used for SPAKE2P pairing
@@ -123,7 +121,7 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t passcodeID,
+    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, PasscodeId passcodeID,
                               uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
                               SessionEstablishmentDelegate * delegate);
 
@@ -242,10 +240,10 @@ private:
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
                                        System::PacketBufferHandle && msg);
 
-    static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                          PASEVerifier & verifier);
+    static CHIP_ERROR ComputeWS(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t wsSize,
+                                uint8_t * ws);
 
-    CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const ByteSpan & salt);
+    CHIP_ERROR SetupSpake2p();
 
     CHIP_ERROR SendPBKDFParamRequest();
     CHIP_ERROR HandlePBKDFParamRequest(System::PacketBufferHandle && msg);
@@ -279,16 +277,12 @@ private:
 #else
     Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
 #endif
-    uint8_t mPoint[kMAX_Point_Length];
 
-    /* w0s and w1s */
     PASEVerifier mPASEVerifier;
 
-    uint16_t mPasscodeID = 0;
+    PasscodeId mPasscodeID = kDefaultCommissioningPasscodeId;
 
     uint32_t mSetupPINCode;
-
-    bool mComputeVerifier = true;
 
     bool mHavePBKDFParameters = false;
 

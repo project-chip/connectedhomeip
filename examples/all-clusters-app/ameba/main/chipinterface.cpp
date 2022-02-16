@@ -97,12 +97,9 @@ AmebaOTAImageProcessor gImageProcessor;
 #endif
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-extern "C" void amebaQueryImageCmdHandler(uint32_t nodeId, uint32_t fabricId)
+extern "C" void amebaQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd
-    gRequestorCore.TestModeSetProviderParameters(nodeId, fabricId, chip::kRootEndpointId);
-
     static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
 

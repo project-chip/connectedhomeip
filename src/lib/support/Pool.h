@@ -294,7 +294,23 @@ class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<
 {
 public:
     HeapObjectPool() {}
-    ~HeapObjectPool() { VerifyOrDie(Allocated() == 0); }
+    ~HeapObjectPool()
+    {
+#ifndef __SANITIZE_ADDRESS__
+#ifdef __clang__
+#if __has_feature(address_sanitizer)
+#define __SANITIZE_ADDRESS__ 1
+#endif
+#endif
+#endif
+#if __SANITIZE_ADDRESS__
+        // Free all remaining objects so that ASAN can catch specific use-after-free cases.
+        ReleaseAll();
+#else  // __SANITIZE_ADDRESS__
+       // Verify that no live objects remain, to prevent potential use-after-free.
+        VerifyOrDie(Allocated() == 0);
+#endif // __SANITIZE_ADDRESS__
+    }
 
     template <typename... Args>
     T * CreateObject(Args &&... args)

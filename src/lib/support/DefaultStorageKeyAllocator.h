@@ -40,7 +40,15 @@ public:
     // Access Control List
 
     const char * AccessControlList() { return Format("acl"); }
-    const char * AccessControlEntry(size_t index) { return Format("acl/%zx", index); }
+    const char * AccessControlEntry(size_t index)
+    {
+        // This cast will never overflow because the number of ACL entries will be low.
+        return Format("acl/%x", static_cast<unsigned int>(index));
+    }
+
+    // Group Message Counters
+    const char * GroupDataCounter() { return Format("gdc"); }
+    const char * GroupControlCounter() { return Format("gcc"); }
 
     // Group Data Provider
 

@@ -42,15 +42,15 @@ using namespace chip::app::Clusters::WindowCovering;
 #define CHECK_BOUNDS_INVALID(MIN, VAL, MAX) ((VAL < MIN) || (VAL > MAX))
 #define CHECK_BOUNDS_VALID(MIN, VAL, MAX) (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
 
+#define FAKE_MOTION_DELAY_MS 5000
+
 /*
  * ConvertValue: Converts values from one range to another
  * Range In  -> from  inputLowValue to   inputHighValue
  * Range Out -> from outputLowValue to outputtHighValue
- * offset true  -> allows to take into account the minimum of each range in the conversion
- * offset false -> applies only the basic "rule of three" for the conversion
  */
 static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue,
-                             uint16_t value, bool offset)
+                             uint16_t value)
 {
     uint16_t inputMin = inputLowValue, inputMax = inputHighValue, inputRange = UINT16_MAX;
     uint16_t outputMin = outputLowValue, outputMax = outputHighValue, outputRange = UINT16_MAX;
@@ -70,29 +70,19 @@ static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, ui
     inputRange  = static_cast<uint16_t>(inputMax - inputMin);
     outputRange = static_cast<uint16_t>(outputMax - outputMin);
 
-    if (offset)
+    if (value < inputMin)
     {
-        if (value < inputMin)
-        {
-            return outputMin;
-        }
-
-        if (value > inputMax)
-        {
-            return outputMax;
-        }
-
-        if (inputRange > 0)
-        {
-            return static_cast<uint16_t>(outputMin + ((outputRange * (value - inputMin) / inputRange)));
-        }
+        return outputMin;
     }
-    else
+
+    if (value > inputMax)
     {
-        if (inputRange > 0)
-        {
-            return static_cast<uint16_t>((outputRange * (value) / inputRange));
-        }
+        return outputMax;
+    }
+
+    if (inputRange > 0)
+    {
+        return static_cast<uint16_t>(outputMin + ((outputRange * (value - inputMin) / inputRange)));
     }
 
     return outputMax;
@@ -100,12 +90,12 @@ static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, ui
 
 static Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
 {
-    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute, true);
+    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
 }
 
 static uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
 {
-    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative, true);
+    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
 }
 
 static OperationalState ValueToOperationalState(uint8_t value)
@@ -158,12 +148,12 @@ bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
     return hasFeature;
 }
 
-static bool HasFeaturePaLift(chip::EndpointId endpoint)
+bool HasFeaturePaLift(chip::EndpointId endpoint)
 {
     return (HasFeature(endpoint, WcFeature::kLift) && HasFeature(endpoint, WcFeature::kPositionAwareLift));
 }
 
-static bool HasFeaturePaTilt(chip::EndpointId endpoint)
+bool HasFeaturePaTilt(chip::EndpointId endpoint)
 {
     return (HasFeature(endpoint, WcFeature::kTilt) && HasFeature(endpoint, WcFeature::kPositionAwareTilt));
 }
@@ -443,6 +433,132 @@ OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths c
     return OperationalState::Stall;
 }
 
+void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoint)
+{
+    NPercent100ths position;
+    OperationalStatus opStatus = OperationalStatusGet(endpoint);
+    emberAfWindowCoveringClusterPrint("WC DELAYED CALLBACK 100ms w/ OpStatus=0x%02X", (unsigned char) opStatus.global);
+
+    /* Update position to simulate movement to pass the CI */
+    if (OperationalState::Stall != opStatus.lift)
+    {
+        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, position);
+        if (!position.IsNull())
+        {
+            LiftPositionSet(endpoint, position.Value());
+        }
+    }
+
+    /* Update position to simulate movement to pass the CI */
+    if (OperationalState::Stall != opStatus.tilt)
+    {
+        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, position);
+        if (!position.IsNull())
+        {
+            TiltPositionSet(endpoint, position.Value());
+        }
+    }
+}
+
+/**
+ * @brief Get event control object for an endpoint
+ *
+ * @param[in] endpoint
+ * @return EmberEventControl*
+ */
+EmberEventControl * GetEventControl(EndpointId endpoint)
+{
+    static EmberEventControl eventControls[EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT];
+    uint16_t index            = emberAfFindClusterServerEndpointIndex(endpoint, WindowCovering::Id);
+    EmberEventControl * event = nullptr;
+
+    if (index < ArraySize(eventControls))
+    {
+        event = &eventControls[index];
+    }
+    return event;
+}
+
+/**
+ * @brief Configure Fake Motion event control object for an endpoint
+ *
+ * @param[in] endpoint
+ * @return EmberEventControl*
+ */
+EmberEventControl * ConfigureFakeMotionEventControl(EndpointId endpoint)
+{
+    EmberEventControl * controller = GetEventControl(endpoint);
+
+    controller->endpoint = endpoint;
+    controller->callback = &emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler;
+
+    return controller;
+}
+
+/**
+ * @brief PostAttributeChange is called when an Attribute is modified
+ *
+ * @param[in] endpoint
+ * @param[in] attributeId
+ */
+void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
+{
+    // all-cluster-app: simulation for the CI testing
+    // otherwise it is defined for manufacturer specific implementation */
+    NPercent100ths current, target;
+    OperationalStatus prevOpStatus = OperationalStatusGet(endpoint);
+    OperationalStatus opStatus     = prevOpStatus;
+
+    emberAfWindowCoveringClusterPrint("WC POST ATTRIBUTE=%u OpStatus global=0x%02X lift=0x%02X tilt=0x%02X",
+                                      (unsigned int) attributeId, (unsigned int) opStatus.global, (unsigned int) opStatus.lift,
+                                      (unsigned int) opStatus.tilt);
+
+    switch (attributeId)
+    {
+    /* RO OperationalStatus */
+    case Attributes::OperationalStatus::Id:
+        if (OperationalState::Stall != opStatus.global)
+        {
+            // Finish the fake motion attribute update:
+            emberEventControlSetDelayMS(ConfigureFakeMotionEventControl(endpoint), FAKE_MOTION_DELAY_MS);
+        }
+        break;
+    /* ============= Positions for Position Aware ============= */
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+        if (OperationalState::Stall != opStatus.lift)
+        {
+            opStatus.lift = OperationalState::Stall;
+            emberAfWindowCoveringClusterPrint("Lift stop");
+        }
+        break;
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
+        if (OperationalState::Stall != opStatus.tilt)
+        {
+            opStatus.tilt = OperationalState::Stall;
+            emberAfWindowCoveringClusterPrint("Tilt stop");
+        }
+        break;
+    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
+    case Attributes::TargetPositionLiftPercent100ths::Id:
+        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, target);
+        Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
+        opStatus.lift = ComputeOperationalState(target, current);
+        break;
+    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
+    case Attributes::TargetPositionTiltPercent100ths::Id:
+        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, target);
+        Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
+        opStatus.tilt = ComputeOperationalState(target, current);
+        break;
+    default:
+        break;
+    }
+
+    /* This decides and triggers fake motion for the selected endpoint */
+    if ((opStatus.lift != prevOpStatus.lift) || (opStatus.tilt != prevOpStatus.tilt))
+        OperationalStatusSetWithGlobalUpdated(endpoint, opStatus);
+}
+
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
@@ -508,9 +624,8 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
 /**
  * @brief  Cluster StopMotion Command callback (from client)
  */
-bool __attribute__((weak))
-emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                               const Commands::StopMotion::DecodableType & fields)
+bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                    const Commands::StopMotion::DecodableType & fields)
 {
     emberAfWindowCoveringClusterPrint("StopMotion command received");
     app::DataModel::Nullable<Percent100ths> current;
@@ -551,7 +666,7 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
     else
     {
         emberAfWindowCoveringClusterPrint("Err Device is not PA LF");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_ACTION_DENIED);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
     return true;
 }
@@ -585,7 +700,7 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
     else
     {
         emberAfWindowCoveringClusterPrint("Err Device is not PA LF");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_ACTION_DENIED);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
     return true;
 }
@@ -610,7 +725,7 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
     else
     {
         emberAfWindowCoveringClusterPrint("Err Device is not PA TL");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_ACTION_DENIED);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
     return true;
 }
@@ -644,9 +759,21 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
     else
     {
         emberAfWindowCoveringClusterPrint("Err Device is not PA TL");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_ACTION_DENIED);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
     return true;
 }
 
+/**
+ * @brief Cluster Attribute Changed Callback
+ */
+void __attribute__((weak))
+MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+{
+    PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
+}
+
+/**
+ * @brief Cluster Plugin Init Callback
+ */
 void MatterWindowCoveringPluginServerInitCallback() {}

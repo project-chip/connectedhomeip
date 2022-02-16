@@ -61,6 +61,11 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
+            - name: Build Standalone cert tool
+              timeout-minutes: 5
+              run: |
+                 ./scripts/run_in_build_env.sh \
+                 "./scripts/build/build_examples.py --no-log-timestamps --target-glob '*-chip-cert' build"
             - name: Build example Standalone Echo Client
               timeout-minutes: 5
               run: |

@@ -22,5 +22,4 @@ chip_data_model("all-clusters-common") {
   zap_pregenerated_dir =
       "${chip_root}/zzz_generated/all-clusters-app/zap-generated"
   is_server = true
-  use_default_client_callbacks = true
 }
