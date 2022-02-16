@@ -56,7 +56,7 @@ CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
     return CHIP_NO_ERROR;
 }
 
-EmberBindingTableEntry & BindingTable::GetAt(uint8_t index)
+const EmberBindingTableEntry & BindingTable::GetAt(uint8_t index)
 {
     return mBindingTable[index];
 }
@@ -116,7 +116,7 @@ uint8_t BindingTable::GetNextAvaiableIndex()
     return EMBER_BINDING_TABLE_SIZE;
 }
 
-BindingTable::Iterator BindingTable::Iterator::operator++() const
+BindingTable::Iterator BindingTable::Iterator::operator++()
 {
     if (mIndex != EMBER_BINDING_TABLE_SIZE)
     {

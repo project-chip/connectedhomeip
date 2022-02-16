@@ -67,8 +67,7 @@ CHIP_ERROR CheckValidBindingList(const DecodableBindingListType & bindingList, F
     auto iter       = bindingList.begin();
     while (iter.Next())
     {
-        VerifyOrReturnError(iter.GetValue().fabricIndex == accessingFabricIndex && IsValidBinding(iter.GetValue()),
-                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(IsValidBinding(iter.GetValue()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         listSize++;
     }
     ReturnErrorOnFailure(iter.GetStatus());
@@ -83,7 +82,7 @@ CHIP_ERROR CheckValidBindingList(const DecodableBindingListType & bindingList, F
         }
     }
     ReturnErrorCodeIf(BindingTable::GetInstance().Size() - oldListSize + listSize > EMBER_BINDING_TABLE_SIZE,
-                      CHIP_IM_GLOBAL_STATUS(ConstraintError));
+                      CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
     return CHIP_NO_ERROR;
 }
 
@@ -204,10 +203,9 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
     }
     else if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        DecodableBindingListType newBindingList;
         TargetStructType target;
         ReturnErrorOnFailure(decoder.Decode(target));
-        if (target.fabricIndex != accessingFabricIndex || !IsValidBinding(target))
+        if (!IsValidBinding(target))
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }

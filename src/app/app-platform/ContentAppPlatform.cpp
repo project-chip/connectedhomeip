@@ -418,10 +418,17 @@ CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy 
             .cluster     = MakeOptional(bindingClusterId),
         };
     }
-    Binding::Attributes::Binding::TypeInfo::Type bindingList(entries);
-    CHIP_ERROR error = cluster.WriteAttribute(bindingList, nullptr, Binding::Id, Binding::Attributes::Binding::Id, successCb,
-                                              failureCb, NullOptional);
-    ChipLogDetail(Controller, "CreateBindingWithCallback: Sent write request, waiting for response");
+    using BindingListTypeInfo = Binding::Attributes::Binding::TypeInfo;
+    BindingListTypeInfo::Type bindingList(entries);
+    CHIP_ERROR error = cluster.WriteAttribute<BindingListTypeInfo>(bindingList, nullptr, successCb, failureCb);
+    if (error == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Controller, "CreateBindingWithCallback: Sent write request, waiting for response");
+    }
+    else
+    {
+        ChipLogError(Controller, "CreateBindingWithCallback: Failed to send write request: %" CHIP_ERROR_FORMAT, error.Format());
+    }
 
     return error;
 }

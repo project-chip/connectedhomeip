@@ -81100,7 +81100,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -81134,9 +81134,9 @@ private:
             auto * listHolder_0 = new ListHolder<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(2);
             listFreer.add(listHolder_0);
 
-            listHolder_0->mList[0].fabricIndex = 1;
+            listHolder_0->mList[0].fabricIndex = 0;
 
-            listHolder_0->mList[1].fabricIndex = 1;
+            listHolder_0->mList[1].fabricIndex = 0;
             listHolder_0->mList[1].node.Emplace();
             listHolder_0->mList[1].node.Value() = 1ULL;
             listHolder_0->mList[1].group.Emplace();
@@ -81177,11 +81177,11 @@ private:
             auto * listHolder_0 = new ListHolder<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(3);
             listFreer.add(listHolder_0);
 
-            listHolder_0->mList[0].fabricIndex = 1;
+            listHolder_0->mList[0].fabricIndex = 0;
             listHolder_0->mList[0].group.Emplace();
             listHolder_0->mList[0].group.Value() = 1U;
 
-            listHolder_0->mList[1].fabricIndex = 1;
+            listHolder_0->mList[1].fabricIndex = 0;
             listHolder_0->mList[1].node.Emplace();
             listHolder_0->mList[1].node.Value() = 1ULL;
             listHolder_0->mList[1].endpoint.Emplace();
@@ -81189,7 +81189,7 @@ private:
             listHolder_0->mList[1].cluster.Emplace();
             listHolder_0->mList[1].cluster.Value() = 6UL;
 
-            listHolder_0->mList[2].fabricIndex = 1;
+            listHolder_0->mList[2].fabricIndex = 0;
             listHolder_0->mList[2].node.Emplace();
             listHolder_0->mList[2].node.Value() = 2ULL;
             listHolder_0->mList[2].endpoint.Emplace();
@@ -81221,7 +81221,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 

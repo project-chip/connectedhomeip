@@ -46,9 +46,9 @@ tests:
       arguments:
           value:
               [
-                  { FabricIndex: 1 },
+                  { FabricIndex: 0 },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Node: 1,
                       Group: 1,
                       Endpoint: 1,
@@ -64,9 +64,9 @@ tests:
       arguments:
           value:
               [
-                  { FabricIndex: 1, Group: 1 },
-                  { FabricIndex: 1, Node: 1, Endpoint: 1, Cluster: 6 },
-                  { FabricIndex: 1, Node: 2, Endpoint: 1 },
+                  { FabricIndex: 0, Group: 1 },
+                  { FabricIndex: 0, Node: 1, Endpoint: 1, Cluster: 6 },
+                  { FabricIndex: 0, Node: 2, Endpoint: 1 },
               ]
 
     - label: "Read binding table"
