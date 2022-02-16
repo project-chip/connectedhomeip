@@ -48,9 +48,9 @@ using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
-constexpr uint8_t kUpdateTokenLen            = 32;                      // must be between 8 and 32
-constexpr uint8_t kUpdateTokenStrLen         = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
-constexpr size_t kUriMaxLen                  = 256;
+constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
+constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
+constexpr size_t kUriMaxLen          = 256;
 
 // Arbitrary BDX Transfer Params
 constexpr uint32_t kMaxBdxBlockSize                 = 1024;
@@ -208,12 +208,12 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
                 break;
 
             case UserConsentState::kObtaining:
-                queryStatus          = OTAQueryStatus::kBusy;
+                queryStatus = OTAQueryStatus::kBusy;
                 break;
 
             case UserConsentState::kDenied:
             case UserConsentState::kUnknown:
-                queryStatus          = OTAQueryStatus::kNotAvailable;
+                queryStatus = OTAQueryStatus::kNotAvailable;
                 break;
             }
         }
@@ -224,15 +224,15 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         break;
 
     case kRespondWithBusy:
-        queryStatus          = OTAQueryStatus::kBusy;
+        queryStatus = OTAQueryStatus::kBusy;
         break;
 
     case kRespondWithNotAvailable:
-        queryStatus          = OTAQueryStatus::kNotAvailable;
+        queryStatus = OTAQueryStatus::kNotAvailable;
         break;
 
     default:
-        queryStatus          = OTAQueryStatus::kNotAvailable;
+        queryStatus = OTAQueryStatus::kNotAvailable;
         break;
     }
 

@@ -44,7 +44,7 @@ using bdx::TransferSession;
 // Global instance of the OTARequestorInterface.
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
 
-constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this value when starting OTA "immediately"
+constexpr uint32_t kImmediateStartDelayMs    = 1;   // Start the timer with this value when starting OTA "immediately"
 constexpr uint32_t kMinimumDelayedActionTime = 120; // Spec mentions delayed action time should be at least 120 seconds
 
 static void LogQueryImageResponse(const QueryImageResponse::DecodableType & response)
@@ -150,20 +150,23 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             ChipLogDetail(SoftwareUpdate, "Version %" PRIu32 " is older or same than current version %" PRIu32 ", not updating",
                           update.softwareVersion, requestorCore->mCurrentVersion);
 
-            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
-                                                               System::Clock::Seconds32(std::max(kMinimumDelayedActionTime, response.delayedActionTime.ValueOr(0))));
+            requestorCore->mOtaRequestorDriver->UpdateNotFound(
+                UpdateNotFoundReason::UpToDate,
+                System::Clock::Seconds32(std::max(kMinimumDelayedActionTime, response.delayedActionTime.ValueOr(0))));
         }
 
         break;
     }
     case OTAQueryStatus::kBusy:
-        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::Busy,
-                                                           System::Clock::Seconds32(std::max(kMinimumDelayedActionTime, response.delayedActionTime.ValueOr(0))));
+        requestorCore->mOtaRequestorDriver->UpdateNotFound(
+            UpdateNotFoundReason::Busy,
+            System::Clock::Seconds32(std::max(kMinimumDelayedActionTime, response.delayedActionTime.ValueOr(0))));
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnQuery, OTAChangeReasonEnum::kDelayByProvider);
         break;
     case OTAQueryStatus::kNotAvailable:
-        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::NotAvailable,
-                                                           System::Clock::Seconds32(std::max(kMinimumDelayedActionTime, response.delayedActionTime.ValueOr(0))));
+        requestorCore->mOtaRequestorDriver->UpdateNotFound(
+            UpdateNotFoundReason::NotAvailable,
+            System::Clock::Seconds32(std::max(kMinimumDelayedActionTime, response.delayedActionTime.ValueOr(0))));
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         break;
     default:
@@ -194,7 +197,8 @@ void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateRespon
         requestorCore->mOtaRequestorDriver->UpdateConfirmed(System::Clock::Seconds32(response.delayedActionTime));
         break;
     case OTAApplyUpdateAction::kAwaitNextAction:
-        requestorCore->mOtaRequestorDriver->UpdateSuspended(System::Clock::Seconds32(std::max(kMinimumDelayedActionTime, response.delayedActionTime)));
+        requestorCore->mOtaRequestorDriver->UpdateSuspended(
+            System::Clock::Seconds32(std::max(kMinimumDelayedActionTime, response.delayedActionTime)));
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnApply, OTAChangeReasonEnum::kDelayByProvider);
         break;
     case OTAApplyUpdateAction::kDiscontinue:
