@@ -8,6 +8,8 @@ pkill chip-ota-provider-app
 pkill chip-ota-requestor-app
 
 scripts/examples/gn_build_example.sh examples/chip-tool out/
+scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug chip_config_network_layer_ble=false
+scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug chip_config_network_layer_ble=false
 
 touch my-firmware.bin
 
