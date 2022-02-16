@@ -62,7 +62,22 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_struct_items}}
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    {{! #if ordering here is to minimize code duplication.
+        struct_is_fabric_scoped should be true if and only if
+        struct_fabric_idx_field is defined, but guard against mismatches just
+        in case. }}
+    {{#if (isStrEqual label ../struct_fabric_idx_field)}}
+    {{#if ../struct_is_fabric_scoped}}
+      if ({{asLowerCamelCase label}} != kUndefinedFabricIndex)
+      {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+      }
+    {{else}}
+      #error {{asUpperCamelCase ../name}} claims to have a fabric index field but is not fabric-scoped.
+    {{/if}}
+    {{else}}
+      ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    {{/if}}
     {{/zcl_struct_items}}
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
