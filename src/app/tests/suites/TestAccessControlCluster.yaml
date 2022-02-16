@@ -28,13 +28,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Write"
+    - label: "Write three entries"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
                       Subjects: [nodeId, 1234, 5678, 9090],
@@ -46,7 +46,7 @@ tests:
                           ],
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 1, # view
                       AuthMode: 2, # case
                       Subjects: [1234, 5678, 0x8080, 0xFFFF],
@@ -58,7 +58,7 @@ tests:
                           ],
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 3, # operate
                       AuthMode: 3, # group
                       Subjects: [0x0101, 0x0102, 0xAAAA, 0xBBBB],
@@ -71,7 +71,7 @@ tests:
                   },
               ]
 
-    - label: "Read"
+    - label: "Read three entries"
       command: "readAttribute"
       attribute: "ACL"
       response:
@@ -114,13 +114,13 @@ tests:
                   },
               ]
 
-    - label: "Write"
+    - label: "Write two entries"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
                       Subjects: [nodeId],
@@ -132,7 +132,7 @@ tests:
                           ],
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 1, # view
                       AuthMode: 2, # case
                       Subjects: [0xCCCC, 0xDDDD],
@@ -140,7 +140,7 @@ tests:
                   },
               ]
 
-    - label: "Read"
+    - label: "Read two entries"
       command: "readAttribute"
       attribute: "ACL"
       response:

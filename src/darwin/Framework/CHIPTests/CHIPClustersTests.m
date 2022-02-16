@@ -228,12 +228,12 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for commissionee"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestAccessControlCluster_000001_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write three entries"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -244,12 +244,12 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
-            temp_3[0] = [NSNumber numberWithUnsignedLongLong:nodeId];
+            temp_3[0] = [NSNumber numberWithUnsignedLongLong:305414945ULL];
             temp_3[1] = [NSNumber numberWithUnsignedLongLong:1234ULL];
             temp_3[2] = [NSNumber numberWithUnsignedLongLong:5678ULL];
             temp_3[3] = [NSNumber numberWithUnsignedLongLong:9090ULL];
@@ -276,7 +276,7 @@ CHIPDevice * GetConnectedDevice(void)
         }
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
@@ -308,7 +308,7 @@ CHIPDevice * GetConnectedDevice(void)
         }
 
         temp_0[2] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).privilege = [NSNumber numberWithUnsignedChar:3];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).authMode = [NSNumber numberWithUnsignedChar:3];
         {
@@ -343,7 +343,7 @@ CHIPDevice * GetConnectedDevice(void)
     }
     [cluster writeAttributeAclWithValue:aclArgument
                       completionHandler:^(NSError * _Nullable err) {
-                          NSLog(@"Write Error: %@", err);
+                          NSLog(@"Write three entries Error: %@", err);
 
                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -354,7 +354,7 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTestAccessControlCluster_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read three entries"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -362,7 +362,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeAclWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read Error: %@", err);
+        NSLog(@"Read three entries Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -567,7 +567,7 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTestAccessControlCluster_000003_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write two entries"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -578,12 +578,11 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
-            temp_3[0] = [NSNumber numberWithUnsignedLongLong:nodeId];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = temp_3;
         }
         {
@@ -607,7 +606,7 @@ CHIPDevice * GetConnectedDevice(void)
         }
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
@@ -630,7 +629,7 @@ CHIPDevice * GetConnectedDevice(void)
     }
     [cluster writeAttributeAclWithValue:aclArgument
                       completionHandler:^(NSError * _Nullable err) {
-                          NSLog(@"Write Error: %@", err);
+                          NSLog(@"Write two entries Error: %@", err);
 
                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -641,7 +640,7 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTestAccessControlCluster_000004_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read two entries"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -649,7 +648,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeAclWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read Error: %@", err);
+        NSLog(@"Read two entries Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 

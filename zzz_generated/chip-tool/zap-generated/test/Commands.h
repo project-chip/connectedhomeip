@@ -254,20 +254,20 @@ public:
             err = TestWaitForCommissionee_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Write\n");
-            err = TestWrite_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Write three entries\n");
+            err = TestWriteThreeEntries_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read\n");
-            err = TestRead_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read three entries\n");
+            err = TestReadThreeEntries_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Write\n");
-            err = TestWrite_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Write two entries\n");
+            err = TestWriteTwoEntries_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read\n");
-            err = TestRead_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read two entries\n");
+            err = TestReadTwoEntries_4();
             break;
         }
 
@@ -344,7 +344,7 @@ private:
         return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
-    CHIP_ERROR TestWrite_1()
+    CHIP_ERROR TestWriteThreeEntries_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
@@ -357,7 +357,7 @@ private:
             auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(3);
             listFreer.add(listHolder_0);
 
-            listHolder_0->mList[0].fabricIndex = 1;
+            listHolder_0->mList[0].fabricIndex = 0;
             listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
             listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
             listHolder_0->mList[0].subjects.SetNonNull();
@@ -397,7 +397,7 @@ private:
                     chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 3);
             }
 
-            listHolder_0->mList[1].fabricIndex = 1;
+            listHolder_0->mList[1].fabricIndex = 0;
             listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
             listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
             listHolder_0->mList[1].subjects.SetNonNull();
@@ -437,7 +437,7 @@ private:
                     chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 3);
             }
 
-            listHolder_0->mList[2].fabricIndex = 1;
+            listHolder_0->mList[2].fabricIndex = 0;
             listHolder_0->mList[2].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
             listHolder_0->mList[2].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
             listHolder_0->mList[2].subjects.SetNonNull();
@@ -494,7 +494,7 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestRead_2()
+    CHIP_ERROR TestReadThreeEntries_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
@@ -503,7 +503,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -667,7 +667,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWrite_3()
+    CHIP_ERROR TestWriteTwoEntries_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
@@ -680,7 +680,7 @@ private:
             auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
             listFreer.add(listHolder_0);
 
-            listHolder_0->mList[0].fabricIndex = 1;
+            listHolder_0->mList[0].fabricIndex = 0;
             listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
             listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
             listHolder_0->mList[0].subjects.SetNonNull();
@@ -717,7 +717,7 @@ private:
                     chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 3);
             }
 
-            listHolder_0->mList[1].fabricIndex = 1;
+            listHolder_0->mList[1].fabricIndex = 0;
             listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
             listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
             listHolder_0->mList[1].subjects.SetNonNull();
@@ -762,7 +762,7 @@ private:
 
     void OnSuccessResponse_3() { NextTest(); }
 
-    CHIP_ERROR TestRead_4()
+    CHIP_ERROR TestReadTwoEntries_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
@@ -771,7 +771,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
