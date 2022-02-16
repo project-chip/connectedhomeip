@@ -203,8 +203,9 @@ def HostTargets():
     # Without extra build variants
     yield targets[0].Extend('chip-cert', app=HostApp.CERT_TOOL)
     yield targets[0].Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
-    yield targets[0].Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True)
-    yield targets[0].Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True, enable_ipv4=False)
+    yield targets[0].Extend('address-resolve-tool-clang', app=HostApp.ADDRESS_RESOLVE, use_clang=True).GlobBlacklist("Reduce default build variants")
+    yield targets[0].Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
+    yield targets[0].Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
 
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     for board in [HostBoard.NATIVE, HostBoard.FAKE]:

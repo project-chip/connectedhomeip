@@ -125,12 +125,12 @@ public:
     }
 
 private:
-    static constexpr System::Clock::Milliseconds32 kMinLookupTimeMsDefault{ 200 };
-    static constexpr System::Clock::Milliseconds32 kMaxLookupTimeMsDefault{ 3000 };
+    static constexpr uint32_t kMinLookupTimeMsDefault = 200;
+    static constexpr uint32_t kMaxLookupTimeMsDefault = 3000;
 
     PeerId mPeerId;
-    System::Clock::Milliseconds32 mMinLookupTimeMs = kMinLookupTimeMsDefault;
-    System::Clock::Milliseconds32 mMaxLookupTimeMs = kMaxLookupTimeMsDefault;
+    System::Clock::Milliseconds32 mMinLookupTimeMs{ kMinLookupTimeMsDefault };
+    System::Clock::Milliseconds32 mMaxLookupTimeMs{ kMaxLookupTimeMsDefault };
 };
 
 /// These things are expected to be defined by the implementation header.
