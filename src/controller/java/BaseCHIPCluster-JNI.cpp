@@ -9,7 +9,8 @@ JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlo
 {
     chip::DeviceLayer::StackLock lock;
     chip::Controller::ClusterBase * cluster = reinterpret_cast<chip::Controller::ClusterBase *>(clusterPtr);
-    if (cluster != nullptr) {
+    if (cluster != nullptr)
+    {
         delete cluster;
     }
 }
