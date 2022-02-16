@@ -37,10 +37,10 @@ To test the DFU over Matter, you need to complete the following steps:
 
         $ scripts/examples/gn_build_example.sh examples/chip-tool out/chiptool 'chip_mdns="platform"'
 
-4.  Run OTA Provider application with _matter.ota_ replaced with the path to
-    the Matter OTA image which you wish to provide to the Matter device. Note
-    that the Matter OTA image is, by default, generated at _zephyr/matter.ota_
-    in the example's build directory:
+4.  Run OTA Provider application with _matter.ota_ replaced with the path to the
+    Matter OTA image which you wish to provide to the Matter device. Note that
+    the Matter OTA image is, by default, generated at _zephyr/matter.ota_ in the
+    example's build directory:
 
          $ out/provider/chip-ota-provider-app -f matter.ota
 
@@ -59,13 +59,20 @@ To test the DFU over Matter, you need to complete the following steps:
     changed the default network settings when forming the network.
 
         $ ./out/chiptool/chip-tool pairing ble-thread 2 hex:000300000f02081111111122222222051000112233445566778899aabbccddeeff01021234 20202021 3840
+
 8.  Configure the Matter device with the default OTA Provider by running the
     following command. The last two arguments are Requestor Node Id and
     Requestor Endpoint Id, respectively:
 
-        $ ./out/avahi/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 1, "endpoint": 0}]' 2 0
+        $ ./out/chiptool/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 1, "endpoint": 0}]' 2 0
 
-8.  Initiate the DFU procedure in one of the following ways:
+9.  Configure the OTA Provider with the access control list (ACL) that grants
+    _Operate_ privileges to all nodes in the fabric. This is necessary to allow
+    the nodes to send cluster commands to the OTA Provider:
+
+        $ ./out/chiptool/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
+
+10.  Initiate the DFU procedure in one of the following ways:
 
     -   If you have built the device firmware with `-DCONFIG_CHIP_LIB_SHELL=y`
         option, which enables Matter shell commands, run the following command
@@ -83,7 +90,7 @@ To test the DFU over Matter, you need to complete the following steps:
         Once the device is made aware of the OTA Provider node, it automatically
         queries the OTA Provider for a new firmware image.
 
-9.  When the firmware image download is complete, the device is automatically
+11. When the firmware image download is complete, the device is automatically
     rebooted to apply the update.
 
 ## Device Firmware Upgrade over Bluetooth LE using smartphone
