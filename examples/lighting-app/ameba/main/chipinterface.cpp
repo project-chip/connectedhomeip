@@ -155,7 +155,6 @@ static Identify gIdentify1 = {
     chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
 };
 
-
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
