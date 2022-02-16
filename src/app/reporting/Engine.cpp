@@ -56,7 +56,8 @@ bool Engine::IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, con
         if (aPath.mEndpointId == filter->mEndpointId && aPath.mClusterId == filter->mClusterId)
         {
             existPathMatch = true;
-            if (!IsClusterDataVersionEqual(filter->mEndpointId, filter->mClusterId, filter->mDataVersion.Value()))
+            if (!IsClusterDataVersionEqual(ConcreteClusterPath(filter->mEndpointId, filter->mClusterId),
+                                           filter->mDataVersion.Value()))
             {
                 existVersionMismatch = true;
             }

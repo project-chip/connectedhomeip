@@ -1401,7 +1401,7 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
  * 2) There is no such server cluster on the given endpoint.
  * 3) No storage for a data version was provided for the endpoint.
  */
-chip::DataVersion * emberAfDataVersionStorage(chip::EndpointId endpointId, chip::ClusterId clusterId);
+chip::DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath);
 
 namespace chip {
 namespace app {
