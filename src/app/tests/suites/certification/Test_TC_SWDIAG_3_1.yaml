@@ -47,7 +47,8 @@ tests:
       attribute: "CurrentHeapUsed"
       PICS: A_CURRENTHEAPUSED
       response:
-          value: 0
+          constraints:
+              type: uint64
 
     - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
       optional: true
@@ -55,4 +56,5 @@ tests:
       attribute: "CurrentHeapHighWatermark"
       PICS: A_CURRENTHEAPHIGHWATERMARK
       response:
-          value: 0
+          constraints:
+              type: uint64
