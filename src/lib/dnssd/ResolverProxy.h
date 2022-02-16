@@ -24,7 +24,6 @@ namespace chip {
 namespace Dnssd {
 
 class ResolverDelegateProxy : public ReferenceCounted<ResolverDelegateProxy>,
-
                               public OperationalResolveDelegate,
                               public CommissioningResolveDelegate
 
