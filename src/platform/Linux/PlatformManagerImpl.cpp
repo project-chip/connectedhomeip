@@ -173,9 +173,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     CHIP_ERROR err;
     struct sigaction action;
-#if CHIP_WITH_GIO
-    GError * error = nullptr;
-#endif
 
     memset(&action, 0, sizeof(action));
     action.sa_handler = SignalHandler;
@@ -184,6 +181,22 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     sigaction(SIGUSR1, &action, NULL);
     sigaction(SIGUSR2, &action, NULL);
     sigaction(SIGTSTP, &action, NULL);
+
+#if CHIP_WITH_GIO
+    GError * error = nullptr;
+
+    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
+
+    std::thread gdbusThread(GDBus_Thread);
+    mGdbusThreadHandle = gdbusThread.native_handle();
+    gdbusThread.detach();
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    std::thread wifiIPThread(WiFIIPChangeListener);
+    mWifiIPThreadHandle = wifiIPThread.native_handle();
+    wifiIPThread.detach();
+#endif
 
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
@@ -197,15 +210,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SuccessOrExit(err);
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
-
-#if CHIP_WITH_GIO
-    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
-    mGdbusThread            = std::thread(GDBus_Thread);
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    mWifiIPThread = std::thread(WiFIIPChangeListener);
-#endif
 
 exit:
     return err;
@@ -234,18 +238,16 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     }
 
 #if CHIP_WITH_GIO
-    if (mGdbusThread.joinable())
+    if (pthread_cancel(mGdbusThreadHandle) != 0)
     {
-        pthread_cancel(mGdbusThread.native_handle());
-        mGdbusThread.join();
+        ChipLogError(DeviceLayer, "Failed to cancel gDBus thread");
     }
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    if (mWifiIPThread.joinable())
+    if (pthread_cancel(mWifiIPThreadHandle) != 0)
     {
-        pthread_cancel(mWifiIPThread.native_handle());
-        mWifiIPThread.join();
+        ChipLogError(DeviceLayer, "Failed to cancel WiFI IP Change Listener thread");
     }
 #endif
 
