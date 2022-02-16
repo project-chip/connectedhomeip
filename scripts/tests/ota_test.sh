@@ -37,9 +37,14 @@ else
     echo Provider not commissioned properly
 fi
 
+<<<<<<< HEAD
 ./out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
 
 stdbuf -o0 ./out/ota_requestor_debug/"$OTA_REQUESTOR_APP" --discriminator "$DISCRIMINATOR" --secured-device-port "$UDP_PORT" --KVS /tmp/chip_kvs_requestor --otaDownloadPath "$OTA_DOWNLOAD_PATH" | tee /tmp/ota/requestor-log.txt &
+=======
+stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app --discriminator "$DISCRIMINATOR" --secured-device-port "$UDP_PORT" --KVS /tmp/chip_kvs_requestor | tee /tmp/ota/requestor-log.txt &
+requestor_pid=$!
+>>>>>>> dd78b30b9 (add ota test)
 
 echo "Commissioning Requestor"
 
@@ -55,6 +60,7 @@ echo "Sending announce-ota-provider"
 
 ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0 | tee /tmp/ota/chip-tool-announce-ota.txt
 
+<<<<<<< HEAD
 timeout 30 grep -q "OTA image downloaded to" <(tail -n0 -f /tmp/ota/requestor-log.txt)
 
 echo "Exiting, logs are in tmp/ota/"
@@ -62,6 +68,16 @@ echo "Exiting, logs are in tmp/ota/"
 killall -e "$OTA_PROVIDER_APP" "$OTA_REQUESTOR_APP"
 
 if cmp "$OTA_DOWNLOAD_PATH" "$FIRMWARE_BIN"; then
+=======
+# timeout 30 grep -q "OTA image downloaded to" <(tail -n0 -f /tmp/ota/requestor-log.txt)
+sleep 20
+echo "Exiting, logs are in tmp/ota/"
+
+kill "$provider_pid"
+kill "$requestor_pid"
+
+if grep "OTA image downloaded to" /tmp/ota/requestor-log.txt; then
+>>>>>>> dd78b30b9 (add ota test)
     echo Test passed && exit 0
 else
     echo Test failed && exit 1
