@@ -19,9 +19,6 @@
 
 #pragma once
 
-// Software Version
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
-
 // EFR Logging
 #ifdef __cplusplus
 extern "C" {

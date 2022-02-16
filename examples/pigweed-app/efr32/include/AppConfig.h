@@ -20,9 +20,6 @@
 
 // ---- PW Example App Config ----
 
-// Software Verison
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
-
 // EFR32 WSTK Buttons
 #define PB0 0
 #define PB1 1

@@ -21,9 +21,6 @@
 
 // ---- Lock Example App Config ----
 
-// Software Version
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
-
 #define APP_TASK_NAME "Lck"
 
 // Time it takes in ms for the simulated actuator to move from one

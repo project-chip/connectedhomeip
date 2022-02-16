@@ -31,10 +31,6 @@
 
 #include "BDXDownloader.h"
 
-#ifdef OTA_PERIODIC_TIMEOUT
-#define TIMEOUT OTA_PERIODIC_TIMEOUT
-#endif
-
 namespace chip {
 
 // This class implements all of the core logic of the OTA Requestor
