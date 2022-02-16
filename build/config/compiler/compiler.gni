@@ -44,4 +44,7 @@ declare_args() {
 
   # enable libfuzzer
   is_libfuzzer = false
+
+  # cosmetic enabled
+  cosmetic_enabled = true
 }
