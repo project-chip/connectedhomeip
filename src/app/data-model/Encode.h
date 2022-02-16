@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/data-model/FabricScoped.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
@@ -88,6 +89,23 @@ template <typename X,
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
 {
     return x.Encode(writer, tag);
+}
+
+/*
+ * @brief
+ *
+ * A way to encode fabric-scoped structs for a write.
+ */
+template <typename X,
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().Encode(std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>())),
+                               CHIP_ERROR>::value &&
+                  DataModel::IsFabricScoped<X>::value,
+              X> * = nullptr>
+CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
+{
+    return x.EncodeForWrite(writer, tag);
 }
 
 /*

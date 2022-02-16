@@ -26,6 +26,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/MessageDef/WriteRequestMessage.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -260,7 +261,7 @@ private:
     /**
      *  Encode an attribute value that can be directly encoded using DataModel::Encode.
      */
-    template <class T>
+    template <class T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, int> = 0>
     CHIP_ERROR TryEncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
     {
         chip::TLV::TLVWriter * writer = nullptr;
@@ -269,6 +270,20 @@ private:
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(
             DataModel::Encode(*writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(FinishAttributeIB());
+
+        return CHIP_NO_ERROR;
+    }
+
+    template <class T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, int> = 0>
+    CHIP_ERROR TryEncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
+    {
+        chip::TLV::TLVWriter * writer = nullptr;
+
+        ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
+        VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(DataModel::EncodeForWrite(
+            *writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
         ReturnErrorOnFailure(FinishAttributeIB());
 
         return CHIP_NO_ERROR;

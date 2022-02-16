@@ -6906,6 +6906,10 @@ public:
     auto GetFabricIndex() const { return fabricIndex; }
 
     void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, bool isForWrite) const;
 };
 
 struct DecodableType
@@ -6948,6 +6952,10 @@ public:
     auto GetFabricIndex() const { return fabricIndex; }
 
     void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, bool isForWrite) const;
 };
 
 using DecodableType = Type;
@@ -9262,6 +9270,10 @@ public:
     auto GetFabricIndex() const { return fabricIndex; }
 
     void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, bool isForWrite) const;
 };
 
 using DecodableType = Type;
@@ -15806,6 +15818,10 @@ public:
     auto GetFabricIndex() const { return fabricIndex; }
 
     void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, bool isForWrite) const;
 };
 
 using DecodableType = Type;
@@ -15834,6 +15850,10 @@ public:
     auto GetFabricIndex() const { return fabricIndex; }
 
     void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, bool isForWrite) const;
 };
 
 using DecodableType = Type;
@@ -16552,6 +16572,10 @@ public:
     auto GetFabricIndex() const { return fabricIndex; }
 
     void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, bool isForWrite) const;
 };
 
 struct DecodableType
@@ -16595,6 +16619,10 @@ public:
     auto GetFabricIndex() const { return fabricIndex; }
 
     void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, bool isForWrite) const;
 };
 
 using DecodableType = Type;
@@ -37033,6 +37061,10 @@ public:
     auto GetFabricIndex() const { return fabricIndex; }
 
     void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, bool isForWrite) const;
 };
 
 using DecodableType = Type;
