@@ -262,7 +262,7 @@ config("std_default") {
 
 config("cosmetic_default") {
   if (cosmetic_enabled) {
-      configs = [ "$dir_pw_build:colorize_output" ]
+    configs = [ "$dir_pw_build:colorize_output" ]
   }
 }
 
