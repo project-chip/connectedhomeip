@@ -19,7 +19,7 @@
 import chip.clusters as Clusters
 import chip.exceptions
 import logging
-from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure, TypedAttributePath, SubscriptionTransaction
+from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure, TypedAttributePath, SubscriptionTransaction, DataVersion
 import chip.interaction_model
 import asyncio
 import time
@@ -45,31 +45,26 @@ def _IgnoreAttributeDecodeFailure(path):
 
 def VerifyDecodeSuccess(values):
     print(f"{values}")
-    for endpoint in values[0]:
-        for cluster in values[0][endpoint]:
-            for attribute in values[0][endpoint][cluster]:
-                v = values[0][endpoint][cluster][attribute]
-                print(f"EP{endpoint}/{attribute} = {v}")
+    for endpoint in values:
+        for cluster in values[endpoint]:
+            for attribute in values[endpoint][cluster]:
+                v = values[endpoint][cluster][attribute]
+                print(f"EP{endpoint}/{cluster}/{attribute} = {v}")
                 if (isinstance(v, ValueDecodeFailure)):
                     if _IgnoreAttributeDecodeFailure((endpoint, cluster, attribute)):
                         print(
-                            f"Ignoring attribute decode failure for path {endpoint}/{attribute}")
+                            f"Ignoring attribute decode failure for path {endpoint}/{cluster}/{attribute}")
                     else:
                         raise AssertionError(
-                            f"Cannot decode value for path {endpoint}/{attribute}, got error: '{str(v.Reason)}', raw TLV data: '{v.TLVValue}'")
+                            f"Cannot decode value for path {endpoint}/{cluster}/{attribute}, got error: '{str(v.Reason)}', raw TLV data: '{v.TLVValue}'")
 
-    for endpoint in values[1]:
-        for cluster in values[1][endpoint]:
-            for attribute in values[1][endpoint][cluster]:
-                v = values[1][endpoint][cluster][attribute]
-                print(f"EP{endpoint}/{attribute} version = {v}")
-                if (isinstance(v, ValueDecodeFailure)):
-                    if _IgnoreAttributeDecodeFailure((endpoint, cluster, attribute)):
-                        print(
-                            f"Ignoring attribute version decode failure for path {endpoint}/{attribute}")
-                    else:
-                        raise AssertionError(
-                            f"Cannot decode value for path {endpoint}/{attribute}, got error: '{str(v.Reason)}', raw TLV data: '{v.TLVValue}'")
+    for endpoint in values:
+        for cluster in values[endpoint]:
+            v = values[endpoint][cluster].get(DataVersion, None)
+            print(f"EP{endpoint}/{cluster} version = {v}")
+            if v is None:
+                raise AssertionError(
+                    f"Cannot get data version for path {endpoint}/{cluster}")
 
 
 def _AssumeEventsDecodeSuccess(values):
@@ -200,9 +195,9 @@ class ClusterObjectTests:
             (0, Clusters.Basic.Attributes.HardwareVersion),
         ]
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
-        if ((0 not in res[0]) or (Clusters.Basic not in res[0][0]) or (len(res[0][0][Clusters.Basic]) != 3)):
+        if ((0 not in res) or (Clusters.Basic not in res[0]) or (len(res[0][Clusters.Basic]) != 3)):
             raise AssertionError(
-                f"Got back {len(res[0])} data items instead of 3")
+                f"Got back {len(res)} data items instead of 3")
         VerifyDecodeSuccess(res)
 
         logger.info("2: Reading Ex Cx A*")
@@ -237,32 +232,32 @@ class ClusterObjectTests:
 
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, returnClusterObject=True)
         logger.info(
-            f"Basic Cluster - Label: {res[0][0][Clusters.Basic].productLabel}")
+            f"Basic Cluster - Label: {res[0][Clusters.Basic].productLabel}")
         # TestCluster will be ValueDecodeError here, so we comment out the log below.
         # Values are not expected to be ValueDecodeError for real clusters.
         # logger.info(
-        #    f"Test Cluster - Struct: {res[0][1][Clusters.TestCluster].structAttr}")
-        logger.info(f"Test Cluster: {res[0][1][Clusters.TestCluster]}")
+        #    f"Test Cluster - Struct: {res[1][Clusters.TestCluster].structAttr}")
+        logger.info(f"Test Cluster: {res[1][Clusters.TestCluster]}")
 
         logger.info("7: Reading Chunked List")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
-        if res[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListLongOctetString] != [b'0123456789abcdef' * 32] * 4:
+        if res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListLongOctetString] != [b'0123456789abcdef' * 32] * 4:
             raise AssertionError("Unexpected read result")
 
         logger.info("*: Getting current fabric index")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
-        fabricIndex = res[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        fabricIndex = res[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
 
         logger.info("8: Read without fabric filter")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        if len(res[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
+        if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
             raise AssertionError("Expect more elements in the response")
 
         logger.info("9: Read with fabric filter")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=True)
-        if len(res[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
+        if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
             raise AssertionError("Expect exact one element in the response")
-        if res[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped][0].fabricIndex != fabricIndex:
+        if res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped][0].fabricIndex != fabricIndex:
             raise AssertionError(
                 "Expect the fabric index matches the one current reading")
 
@@ -381,7 +376,7 @@ class ClusterObjectTests:
         ]
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
         VerifyDecodeSuccess(res)
-        data_version = res[1][0][40][1]
+        data_version = res[0][Clusters.Basic][DataVersion]
 
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
@@ -405,7 +400,7 @@ class ClusterObjectTests:
         ]
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, data_version)])
         VerifyDecodeSuccess(res)
-        new_data_version = res[1][0][40][1]
+        new_data_version = res[0][Clusters.Basic][DataVersion]
         if (data_version + 1) != new_data_version:
             raise AssertionError("Version mistmatch happens.")
 
