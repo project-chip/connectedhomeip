@@ -71,7 +71,7 @@ constexpr bool IsValidGroupNodeId(NodeId aNodeId)
     return chip::IsGroupId(aNodeId) && chip::IsValidGroupId(chip::GroupIdFromNodeId(aNodeId));
 }
 
-#if CHIP_DETAIL_LOGGING
+#if CHIP_PROGRESS_LOGGING
 
 char GetAuthModeStringForLogging(AuthMode authMode)
 {
@@ -152,7 +152,7 @@ char GetPrivilegeStringForLogging(Privilege privilege)
     return 'u';
 }
 
-#endif // CHIP_DETAIL_LOGGING
+#endif // CHIP_PROGRESS_LOGGING
 
 } // namespace
 
@@ -178,7 +178,7 @@ CHIP_ERROR AccessControl::Finish()
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
-#if CHIP_DETAIL_LOGGING
+#if CHIP_PROGRESS_LOGGING
     {
         char buf[6 * kCharsPerCatForLogging];
         ChipLogProgress(DataManagement,
