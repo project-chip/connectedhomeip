@@ -66,7 +66,7 @@ enum class OTARequestorIncomingEvent
     DefaultProvidersTimerExpiry,
 };
 
-enum class OTARequestorAction 
+enum class OTARequestorAction
 {
     DoNotProceed,
     CancelCurrentUpdateAndProceed,

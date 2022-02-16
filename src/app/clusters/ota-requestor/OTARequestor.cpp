@@ -164,7 +164,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::NotAvailable,
                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
 
-        // SL TODO: Here look for another provider from the default list. If found, query it -- otherwise enter idle 
+        // SL TODO: Here look for another provider from the default list. If found, query it -- otherwise enter idle
         // state. Take into the account when was the last time we queried it.
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
 

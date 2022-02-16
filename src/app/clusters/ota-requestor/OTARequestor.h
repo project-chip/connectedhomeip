@@ -296,7 +296,7 @@ private:
     static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
     /**
-     * Commissioning callback 
+     * Commissioning callback
      */
     static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 

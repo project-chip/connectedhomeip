@@ -48,7 +48,7 @@ uint16_t GenericOTARequestorDriver::GetMaxDownloadBlockSize()
 
 void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error)
 {
-   
+
 }
 
 void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
@@ -103,7 +103,7 @@ void GenericOTARequestorDriver::UpdateDiscontinued()
     mImageProcessor->Abort();
 }
 
-// Cancel all OTA update timers 
+// Cancel all OTA update timers
 void GenericOTARequestorDriver::UpdateCancelled()
 {
     // Cancel all OTA Update timers started by  OTARequestorDriver regardless of whether thery are running or not
