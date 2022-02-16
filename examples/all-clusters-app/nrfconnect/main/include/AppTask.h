@@ -19,57 +19,50 @@
 
 #pragma once
 
-#include "AppEvent.h"
-#include "LEDWidget.h"
-
 #include <platform/CHIPDeviceLayer.h>
 
 struct k_timer;
+class AppEvent;
+class LEDWidget;
 
 class AppTask
 {
 public:
+    static AppTask & Instance(void)
+    {
+        static AppTask sAppTask;
+        return sAppTask;
+    };
     int StartApp();
 
-    void PostEvent(AppEvent * event);
-    void UpdateClusterState();
-
 private:
-    friend AppTask & GetAppTask(void);
-
-    int Init();
-
-    void CancelTimer(void);
-
-    void DispatchEvent(AppEvent * event);
-
-    static void UpdateStatusLED();
-    static void LEDStateUpdateHandler(LEDWidget & ledWidget);
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
-    static void FunctionHandler(AppEvent * aEvent);
-    static void StartBLEAdvertisementHandler(AppEvent * aEvent);
-
-    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
-    static void ButtonEventHandler(uint32_t buttons_state, uint32_t has_changed);
-    static void TimerEventHandler(k_timer * timer);
-
-    void StartTimer(uint32_t aTimeoutInMs);
-
-    enum Function_t
+    enum class OperatingMode : uint8_t
     {
-        kFunction_NoneSelected   = 0,
-        kFunction_FactoryReset,
-        kFunction_Invalid
+        Normal,
+        FactoryReset,
+        Invalid
     };
 
-    Function_t mFunction      = kFunction_NoneSelected;
-    bool mFunctionTimerActive = false;
-    static AppTask sAppTask;
-};
+    int Init();
+    void DispatchEvent(AppEvent * aEvent);
 
-inline AppTask & GetAppTask(void)
-{
-    return AppTask::sAppTask;
-}
+    // statics needed to interact with zephyr C API
+    static void CancelTimer(void);
+    static void StartTimer(uint32_t aTimeoutInMs);
+    static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void FunctionHandler(AppEvent * aEvent);
+    static void ButtonEventHandler(uint32_t aButtonsState, uint32_t aHasChanged);
+    static void TimerEventHandler(k_timer * aTimer);
+    static void PostEvent(AppEvent * aEvent);
+    static void UpdateStatusLED();
+    static void LEDStateUpdateHandler(LEDWidget & aLedWidget);
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
+    static void StartBLEAdvertisementHandler(AppEvent * aEvent);
+    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * aEvent, intptr_t aArg);
+
+    OperatingMode mMode{ OperatingMode::Normal };
+    bool mFunctionTimerActive{ false };
+    bool mIsThreadProvisioned{ false };
+    bool mIsThreadEnabled{ false };
+    bool mHaveBLEConnections{ false };
+};

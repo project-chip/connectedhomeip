@@ -77,7 +77,7 @@ int main()
         goto exit;
     }
 
-    ret = GetAppTask().StartApp();
+    ret = AppTask::Instance().StartApp();
     if (ret != 0)
     {
         err = chip::System::MapErrorZephyr(ret);

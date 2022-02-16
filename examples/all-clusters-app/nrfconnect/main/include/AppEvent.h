@@ -20,21 +20,21 @@
 
 #include <cstdint>
 
-#include "LEDWidget.h"
-
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+class LEDWidget;
 
 struct AppEvent
 {
-    enum AppEventTypes
+    using EventHandler = void (*)(AppEvent *);
+
+    enum class Type : uint8_t
     {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_UpdateLedState,
+        None,
+        Button,
+        Timer,
+        UpdateLedState,
     };
 
-    uint16_t Type;
+    Type Type{ Type::None };
 
     union
     {
