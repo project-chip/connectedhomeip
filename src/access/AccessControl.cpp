@@ -386,6 +386,7 @@ AccessControl & GetAccessControl()
 
 void SetAccessControl(AccessControl & accessControl)
 {
+    ChipLogProgress(DataManagement, "AccessControl: setting");
     globalAccessControl = &accessControl;
 }
 
