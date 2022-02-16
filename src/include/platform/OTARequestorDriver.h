@@ -43,6 +43,7 @@ struct UpdateDescription
 
 enum class UpdateFailureState
 {
+    kIdle,
     kQuerying,
     kDownloading,
     kApplying,
@@ -55,6 +56,21 @@ enum class UpdateNotFoundReason
     Busy,
     NotAvailable,
     UpToDate
+};
+
+enum class OTARequestorIncomingEvent
+{
+    AnnouncedOTAProviderReceived,
+    TriggerImmediateQueryInvoked,
+    DefaultProvidersAttrSet,
+    DefaultProvidersTimerExpiry,
+};
+
+enum class OTARequestorAction 
+{
+    DoNotProceed,
+    CancelCurrentUpdateAndProceed,
+    Proceed,
 };
 
 // Interface class to abstract the OTA-related business logic. Each application
@@ -93,6 +109,15 @@ public:
 
     /// Called when the current software update has been cancelled by the local application
     virtual void UpdateCancelled() = 0;
+
+    /// Called at various stages of OTA update process to determine whether to proceed
+    virtual OTARequestorAction GetRequestorAction(OTARequestorIncomingEvent input) = 0;
+
+    /// Platform-specific timer setting method
+    virtual void ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState) = 0;
+
+    /// Platform-specific timer cancelling method
+    virtual void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) = 0;
 };
 
 } // namespace chip

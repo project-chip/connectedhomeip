@@ -113,6 +113,8 @@ public:
         app::DataModel::Nullable<uint8_t> percent;
         percent.SetNull();
         OtaRequestorServerSetUpdateStateProgress(percent);
+
+        chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor, reinterpret_cast<intptr_t>(this));
     }
 
     /**
@@ -122,6 +124,9 @@ public:
      * @param onConnectedAction  The action to take once session to provider has been established
      */
     void ConnectToProvider(OnConnectedAction onConnectedAction);
+
+    // Getter for the value of the UpdateState cached by the object
+    app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum GetCurrentUpdateState() { return mCurrentUpdateState; }
 
     /**
      * Called to set optional requestorCanConsent value provided by Requestor.
@@ -251,6 +256,20 @@ private:
     CHIP_ERROR SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy);
 
     /**
+     * Start the periodic timer for querying the default OTA Provider
+     */
+    void StartDefaultProvidersTimer();
+
+    /**
+     * Stop the periodic timer for querying the default OTA Provider
+     */
+    void StopDefaultProvidersTimer();
+    /**
+     * Timer handler for querying the default OTA Provider
+     */
+    void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
+
+    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
@@ -275,6 +294,12 @@ private:
      */
     static void OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response);
     static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
+
+    /**
+     * Commissioning callback 
+     */
+    static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
     uint32_t mOtaStartDelayMs                 = 0;
