@@ -178,7 +178,7 @@ public:
     DeviceController();
     virtual ~DeviceController() {}
 
-    enum class CommissioningWindowOption
+    enum class CommissioningWindowOption : uint8_t
     {
         kOriginalSetupCode = 0,
         kTokenWithRandomPIN,
@@ -271,7 +271,7 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
-                                       uint8_t option, SetupPayload & payload)
+                                       CommissioningWindowOption option, SetupPayload & payload)
     {
         mSuggestedSetUpPINCode = payload.setUpPINCode;
         ReturnErrorOnFailure(OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr));
@@ -302,7 +302,8 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
-                                                   uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                                   CommissioningWindowOption option,
+                                                   Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                    bool readVIDPIDAttributes = false);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -353,8 +354,6 @@ protected:
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    Transport::PeerAddress ToPeerAddress(const chip::Dnssd::ResolvedNodeData & nodeData) const;
-
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
@@ -533,6 +532,16 @@ public:
 
     /**
      * @brief
+     *   This function returns the attestation challenge for the secure session of the device being commissioned.
+     *
+     * @param[out] attestationChallenge The output for the attestationChallenge
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or CHIP_ERROR_INVALID_ARGUMENT if no secure session is active
+     */
+    CHIP_ERROR GetAttestationChallenge(ByteSpan & attestationChallenge);
+
+    /**
+     * @brief
      *   This function stops a pairing process that's in progress. It does not delete the pairing of a previously
      *   paired device.
      *
@@ -570,11 +579,13 @@ public:
      * @param[in] attestationNonce    Attestation nonce
      * @param[in] pai                 PAI certificate
      * @param[in] dac                 DAC certificates
+     * @param[in] remoteVendorId      vendor ID read from the device Basic Information cluster
+     * @param[in] remoteProductId     product ID read from the device Basic Information cluster
      * @param[in] proxy               device proxy that is being attested.
      */
     CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                        const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       DeviceProxy * proxy);
+                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
 
     /**
      * @brief

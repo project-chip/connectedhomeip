@@ -45,6 +45,7 @@ var Button1     = Button.addInstance();
 var Button2     = Button.addInstance();
 var ECJPAKE     = ECJPAKE.addInstance();
 var NVS1        = NVS.addInstance();
+var NVS2        = NVS.addInstance();
 var SHA21       = SHA2.addInstance();
 var LED1        = LED.addInstance();
 var LED2        = LED.addInstance();
@@ -84,22 +85,23 @@ Button2.gpioPin.interruptTrigger    = "Falling Edge";
 
 /* ======== CCFG ======== */
 var CCFG  = scripting.addModule("/ti/devices/CCFG");
-const deviceName = system.getScript("/ti/ti154stack/ti154stack_common.js").getLaunchPadFromDevice();
 const ccfgSettings = system.getScript("/ti/common/lprf_ccfg_settings.js").ccfgSettings;
 for(var setting in ccfgSettings)
 {
     CCFG[setting] = ccfgSettings[setting];
 }
 
-// Update LF Clock Source for CC2652RB devices
-if(deviceName.includes("RB"))
-{
-    CCFG.srcClkLF = "Derived from HF XOSC";
-}
+// Disable CCFG generation, this is added by the BIM project
+CCFG.enableCodeGeneration = false;
+
 /* NVS */
 NVS1.$name                      = "CONFIG_NVSINTERNAL";
 NVS1.internalFlash.regionBase = 0xAA000;
 NVS1.internalFlash.regionSize = 0x4000;
+
+NVS2.$name                                 = "CONFIG_NVSEXTERNAL";
+NVS2.nvsType                               = "External"; // NVS Region Type
+NVS2.$hardware                             = system.deviceData.board.components.MX25R8035F;
 
 /* RF */
 /* if an antenna component exists, assign it to the rf instance */
@@ -136,12 +138,6 @@ TRNG1.$name     = "CONFIG_TRNG_0";
 TRNG2.$name     = "CONFIG_TRNG_1";
 TRNG3.$name     = "CONFIG_TRNG_APP";
 
-/* Thread */
-Thread.deviceType         = "ftd";
-Thread.deviceTypeReadOnly = true;
-/* Thread SysConfig generated sources are not used until the upstream modules
- * can be updated to enable CHIP.
- */
 RTOS.name = "FreeRTOS";
 
 /* BLE */

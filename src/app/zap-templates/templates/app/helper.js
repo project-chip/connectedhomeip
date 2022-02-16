@@ -121,8 +121,14 @@ var endpointClusterWithInit = [
   'Time Format Localization',
   'Thermostat',
 ];
-var endpointClusterWithAttributeChanged = [ 'Bridged Device Basic', 'Door Lock', 'Identify', 'Pump Configuration and Control' ];
-var endpointClusterWithPreAttribute     = [
+var endpointClusterWithAttributeChanged = [
+  'Bridged Device Basic',
+  'Door Lock',
+  'Identify',
+  'Pump Configuration and Control',
+  'Window Covering',
+];
+var endpointClusterWithPreAttribute = [
   'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration', 'Time Format Localization', 'Localization Configuration'
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
@@ -327,9 +333,9 @@ function asPrintFormat(type)
       case 'bool':
         return '%d';
       case 'int8_t':
-        return '%" PRId8 "';
+        return '%d';
       case 'uint8_t':
-        return '%" PRIu8 "';
+        return '%u';
       case 'int16_t':
         return '%" PRId16 "';
       case 'uint16_t':
@@ -473,6 +479,11 @@ function nsValueToNamespace(ns)
  */
 async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
+  // Use the entryType as a type
+  if (type == 'array' && this.entryType) {
+    type = this.entryType;
+  }
+
   let passByReference = false;
   async function fn(pkgId)
   {

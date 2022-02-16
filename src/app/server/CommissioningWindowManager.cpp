@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -88,6 +88,7 @@ void CommissioningWindowManager::ResetState()
     mECMPasscodeID    = 0;
     mECMIterations    = 0;
     mECMSaltLength    = 0;
+    mWindowStatus     = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
 
     memset(&mECMPASEVerifier, 0, sizeof(mECMPASEVerifier));
     memset(mECMSalt, 0, sizeof(mECMSalt));
@@ -186,13 +187,23 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     }
     else
     {
-        uint32_t pinCode;
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
+        uint32_t iterationCount                   = 0;
+        uint8_t salt[kPBKDFMaximumSaltLen]        = { 0 };
+        size_t saltLen                            = 0;
+        PASEVerifierSerialized serializedVerifier = { 0 };
+        size_t serializedVerifierLen              = 0;
+        PASEVerifier verifier;
 
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
-            pinCode, kSpake2p_Iteration_Count,
-            ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), keyID,
-            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pIterationCount(iterationCount));
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pSalt(salt, sizeof(salt), saltLen));
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pVerifier(serializedVerifier, kSpake2pSerializedVerifierSize,
+                                                                                serializedVerifierLen));
+        VerifyOrReturnError(kSpake2pSerializedVerifierSize == serializedVerifierLen, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
+
+        ReturnErrorOnFailure(
+            mPairingSession.WaitForPairing(verifier, iterationCount, ByteSpan(salt, saltLen), kDefaultCommissioningPasscodeId,
+                                           keyID, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());
@@ -323,8 +334,6 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
         DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
     }
 #endif
-
-    mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
 
     // If aShuttingDown, don't try to change our DNS-SD advertisements.
     if (!aShuttingDown)

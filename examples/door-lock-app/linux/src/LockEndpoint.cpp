@@ -58,13 +58,13 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
     user.createdBy      = userInDb.createdBy;
     user.lastModifiedBy = userInDb.lastModifiedBy;
 
-    ChipLogDetail(
-        Zcl,
-        "Found occupied user "
-        "[endpoint=%d,adjustedIndex=%hu,name=\"%*.s\",credentialsCount=%zu,uniqueId=%x,type=%" PRIu8 ",credentialRule=%" PRIu8 ","
-        "createdBy=%d,lastModifiedBy=%d]",
-        mEndpointId, adjustedUserIndex, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(),
-        user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
+    ChipLogDetail(Zcl,
+                  "Found occupied user "
+                  "[endpoint=%d,adjustedIndex=%hu,name=\"%*.s\",credentialsCount=%zu,uniqueId=%x,type=%u,credentialRule=%u,"
+                  "createdBy=%d,lastModifiedBy=%d]",
+                  mEndpointId, adjustedUserIndex, static_cast<int>(user.userName.size()), user.userName.data(),
+                  user.credentials.size(), user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule),
+                  user.createdBy, user.lastModifiedBy);
 
     return true;
 }
@@ -76,8 +76,8 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
     ChipLogProgress(Zcl,
                     "Door Lock App: LockEndpoint::SetUser "
                     "[endpoint=%d,userIndex=%" PRIu16 ",creator=%d,modifier=%d,userName=\"%*.s\",uniqueId=%" PRIx32
-                    ",userStatus=%" PRIu8 ",userType=%" PRIu8 ","
-                    "credentialRule=%" PRIu8 ",credentials=%p,totalCredentials=%zu]",
+                    ",userStatus=%u,userType=%u,"
+                    "credentialRule=%u,credentials=%p,totalCredentials=%zu]",
                     mEndpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,
                     to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
                     totalCredentials);
@@ -132,9 +132,8 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
 bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,
                                  EmberAfPluginDoorLockCredentialInfo & credential) const
 {
-    ChipLogProgress(
-        Zcl, "Door Lock App: LockEndpoint::GetCredential [endpoint=%d,credentialIndex=%" PRIu16 ",credentialType=%" PRIu8 "]",
-        mEndpointId, credentialIndex, to_underlying(credentialType));
+    ChipLogProgress(Zcl, "Door Lock App: LockEndpoint::GetCredential [endpoint=%d,credentialIndex=%" PRIu16 ",credentialType=%u]",
+                    mEndpointId, credentialIndex, to_underlying(credentialType));
 
     if (credentialIndex >= mLockCredentials.size() || (0 == credentialIndex && DlCredentialType::kProgrammingPIN != credentialType))
     {
@@ -153,7 +152,7 @@ bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType cred
     credential.credentialType = credentialInStorage.credentialType;
     credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
 
-    ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,index=%" PRIu16 ",type=%" PRIu8 ",dataSize=%zu]", mEndpointId,
+    ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,index=%" PRIu16 ",type=%u,dataSize=%zu]", mEndpointId,
                   credentialIndex, to_underlying(credential.credentialType), credential.credentialData.size());
 
     return true;
@@ -162,11 +161,11 @@ bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType cred
 bool LockEndpoint::SetCredential(uint16_t credentialIndex, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
                                  const chip::ByteSpan & credentialData)
 {
-    ChipLogProgress(
-        Zcl,
-        "Door Lock App: LockEndpoint::SetCredential "
-        "[endpoint=%d,credentialIndex=%" PRIu16 ",credentialStatus=%" PRIu8 ",credentialType=%" PRIu8 ",credentialDataSize=%zu]",
-        mEndpointId, credentialIndex, to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size());
+    ChipLogProgress(Zcl,
+                    "Door Lock App: LockEndpoint::SetCredential "
+                    "[endpoint=%d,credentialIndex=%" PRIu16 ",credentialStatus=%u,credentialType=%u,credentialDataSize=%zu]",
+                    mEndpointId, credentialIndex, to_underlying(credentialStatus), to_underlying(credentialType),
+                    credentialData.size());
 
     if (credentialIndex >= mLockCredentials.size() || (0 == credentialIndex && DlCredentialType::kProgrammingPIN != credentialType))
     {
@@ -188,7 +187,7 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, DlCredentialStatus cr
     std::memcpy(credentialInStorage.credentialData, credentialData.data(), credentialData.size());
     credentialInStorage.credentialDataSize = credentialData.size();
 
-    ChipLogProgress(Zcl, "Successfully set the credential [mEndpointId=%d,index=%d,credentialType=%" PRIu8 "]", mEndpointId,
+    ChipLogProgress(Zcl, "Successfully set the credential [mEndpointId=%d,index=%d,credentialType=%u]", mEndpointId,
                     credentialIndex, to_underlying(credentialType));
 
     return true;

@@ -114,13 +114,12 @@ endif()
 
 if (CONFIG_CHIP_PW_RPC)
 
+# Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
+link_libraries($<BUILD_INTERFACE:zephyr_interface>)
+
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
-
-# TODO: Remove this temporary fix needed to get RPC builds working.
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m4 -mthumb" CACHE INTERNAL "")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=cortex-m4 -mthumb" CACHE INTERNAL "")
 
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert pw_assert_log)
@@ -180,6 +179,32 @@ pw_proto_library(lighting_service
     pw_protobuf.common_protos
 )
 
+pw_proto_library(ot_cli_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/ot_cli_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/ot_cli_service.options
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    ot_cli_service
+  DEPS
+    pw_protobuf.common_protos
+)
+
+pw_proto_library(thread_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/thread_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/thread_service.options
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    thread_service
+  DEPS
+    pw_protobuf.common_protos
+)
+
 target_sources(app PRIVATE
   ../../common/pigweed/RpcService.cpp
   ../../common/pigweed/nrfconnect/PigweedLoggerMutex.cpp
@@ -201,6 +226,7 @@ target_compile_options(app PRIVATE
                        "-DPW_RPC_BUTTON_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
+                       "-DPW_RPC_THREAD_SERVICE=1"
                        "-DPW_RPC_TRACING_SERVICE=1")
 
 target_link_libraries(app PRIVATE
@@ -208,6 +234,7 @@ target_link_libraries(app PRIVATE
   button_service.nanopb_rpc
   device_service.nanopb_rpc
   lighting_service.nanopb_rpc
+  thread_service.nanopb_rpc
   pw_checksum
   pw_hdlc
   pw_log
@@ -222,7 +249,5 @@ target_link_options(app
   PUBLIC
     "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
 )
-
-target_link_libraries(pw_build INTERFACE zephyr_interface)
 
 endif(CONFIG_CHIP_PW_RPC)

@@ -26,14 +26,24 @@ const uint16_t kListenPort = 5541;
 
 CHIP_ERROR CHIPCommandBridge::Run()
 {
-    NSLog(@"Running Command");
+    ChipLogProgress(chipTool, "Running Command");
 
     mController = [CHIPDeviceController sharedController];
-    [mController setListenPort:kListenPort];
-    [mController startup:nil vendorId:0 nocSigner:nil];
+    if (mController == nil) {
+        ChipLogError(chipTool, "Controller is nil");
+        return CHIP_ERROR_INTERNAL;
+    }
 
-    RunCommand();
+    [mController setListenPort:kListenPort];
+
+    if (![mController startup:nil vendorId:0 nocSigner:nil]) {
+        ChipLogError(chipTool, "Controller startup failure.");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    ReturnLogErrorOnFailure(RunCommand());
     ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
+
     return CHIP_NO_ERROR;
 }
 
@@ -41,12 +51,13 @@ CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mContro
 
 CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
 {
-    NSLog(@"Shutting down controller");
+    ChipLogProgress(chipTool, "Shutting down controller");
     BOOL result = [CurrentCommissioner() shutdown];
     if (!result) {
-        NSLog(@"Unable to shut down controller");
+        ChipLogError(chipTool, "Unable to shut down controller");
         return CHIP_ERROR_INTERNAL;
     }
+
     return CHIP_NO_ERROR;
 }
 

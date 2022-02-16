@@ -97,6 +97,8 @@ void initNetworkCommissioningThreadDriver(void)
 #endif
 }
 
+NetworkCommissioning::ThreadScanResponse * scanResult;
+otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter(scanResult);
 } // namespace
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
@@ -359,11 +361,55 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinishe
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(ThreadDriver::ScanCallback * callback)
 {
-    // TODO END scan feature + _OnNetworkScanFinished callback for response
-    // There is another ongoing scan request, reject the new one.
+    // If there is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mpScanCallback = callback;
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err = MapOpenThreadError(otLinkActiveScan(mOTInst, 0, /* all channels */
+                                                         0,          /* default value `kScanDurationDefault` = 300 ms. */
+                                                         _OnNetworkScanFinished, this));
+    return err;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished(otActiveScanResult * aResult, void * aContext)
+{
+    reinterpret_cast<GenericThreadStackManagerImpl_OpenThread *>(aContext)->_OnNetworkScanFinished(aResult);
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished(otActiveScanResult * aResult)
+{
+    if (aResult == nullptr) // scan completed
+    {
+        if (mpScanCallback != nullptr)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+                mpScanCallback = nullptr;
+            });
+        }
+    }
+    else
+    {
+        ChipLogProgress(
+            DeviceLayer,
+            "Thread Network: %s Panid 0x%" PRIx16 " Channel %" PRIu16 " RSSI %" PRId16 " LQI %" PRIu16 " Version %" PRIu16,
+            aResult->mNetworkName.m8, aResult->mPanId, aResult->mChannel, aResult->mRssi, aResult->mLqi, aResult->mVersion);
+
+        NetworkCommissioning::ThreadScanResponse scanResponse = { 0 };
+
+        scanResponse.panId           = aResult->mPanId;   // why is scanResponse.panID 64b
+        scanResponse.channel         = aResult->mChannel; // why is scanResponse.channel 16b
+        scanResponse.version         = aResult->mVersion;
+        scanResponse.rssi            = aResult->mRssi;
+        scanResponse.lqi             = aResult->mLqi;
+        scanResponse.extendedAddress = Encoding::BigEndian::Get64(aResult->mExtAddress.m8);
+        scanResponse.extendedPanId   = Encoding::BigEndian::Get64(aResult->mExtendedPanId.m8);
+        scanResponse.networkNameLen  = strnlen(aResult->mNetworkName.m8, OT_NETWORK_NAME_MAX_SIZE);
+        memcpy(scanResponse.networkName, aResult->mNetworkName.m8, scanResponse.networkNameLen);
+
+        mScanResponseIter.Add(&scanResponse);
+    }
 }
 
 template <class ImplClass>
@@ -792,7 +838,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
             otErr               = otThreadGetChildInfoById(mOTInst, neighbor->mRloc16, child);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
-            snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, ", Timeout: %10" PRIu32 " NetworkDataVersion: %3" PRIu8, child->mTimeout,
+            snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, ", Timeout: %10" PRIu32 " NetworkDataVersion: %3u", child->mTimeout,
                      child->mNetworkDataVersion);
         }
         else

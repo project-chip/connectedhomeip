@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -145,7 +146,8 @@ private:
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
     IOContext * mIOContext;
-    TransportMgrBase * mTransport; // Only needed for InitFromExisting.
+    TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
+    chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
 
     NodeId mBobNodeId       = 123654;
     NodeId mAliceNodeId     = 111222333;
@@ -232,6 +234,20 @@ public:
     {
         auto & impl = GetLoopback();
         impl.EnableAsyncDispatch(&mIOContext.GetSystemLayer());
+    }
+
+    /*
+     * Reset the dispatch back to a model that synchronously dispatches received messages up the stack.
+     *
+     * NOTE: This results in highly atypical/complex call stacks that are not representative of what happens on real
+     * devices and can cause subtle and complex bugs to either appear or get masked in the system. Where possible, please
+     * use this sparingly!
+     *
+     */
+    void DisableAsyncDispatch()
+    {
+        auto & impl = GetLoopback();
+        impl.DisableAsyncDispatch();
     }
 
     /*

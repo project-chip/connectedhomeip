@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <ota-provider-common/BdxOtaSender.h>
@@ -69,9 +70,14 @@ public:
     } DeviceSoftwareVersionModel;
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
+    void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
+    {
+        mUpdateAction = action;
+    }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
     void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
     void SetSoftwareVersion(uint32_t softwareVersion) { mSoftwareVersion.SetValue(softwareVersion); }
+    void SetSoftwareVersionString(const char * versionString) { mSoftwareVersionString = versionString; }
     void SetUserConsentNeeded(bool needed) { mUserConsentNeeded = needed; }
 
 private:
@@ -80,6 +86,7 @@ private:
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     QueryImageBehaviorType mQueryImageBehavior;
+    chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction mUpdateAction;
     uint32_t mDelayedActionTimeSec;
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
@@ -91,5 +98,6 @@ private:
                           const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
                           uint32_t targetVersion);
     chip::Optional<uint32_t> mSoftwareVersion;
-    bool mUserConsentNeeded = false;
+    const char * mSoftwareVersionString = nullptr;
+    bool mUserConsentNeeded             = false;
 };

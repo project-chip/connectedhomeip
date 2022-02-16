@@ -652,7 +652,7 @@ void ParseAttributeDataIB(nlTestSuite * apSuite, AttributeDataIB::Parser & aAttr
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathIB::Parser attributePathParser;
-    chip::DataVersion version = chip::kUndefinedDataVersion;
+    chip::DataVersion version = 0;
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aAttributeDataIBParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1163,9 +1163,6 @@ void BuildWriteRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWri
     writeRequestBuilder.MoreChunkedMessages(true);
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    writeRequestBuilder.IsFabricFiltered(true);
-    NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
-
     writeRequestBuilder.EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 }
@@ -1179,7 +1176,6 @@ void ParseWriteRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aRea
     bool timeRequest      = false;
     AttributeDataIBs::Parser writeRequests;
     bool moreChunkedMessages = false;
-    bool isFabricFiltered    = false;
 
     err = writeRequestParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1198,9 +1194,6 @@ void ParseWriteRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aRea
 
     err = writeRequestParser.GetMoreChunkedMessages(&moreChunkedMessages);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && moreChunkedMessages);
-
-    err = writeRequestParser.GetIsFabricFiltered(&isFabricFiltered);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && isFabricFiltered);
 }
 
 void BuildWriteResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)

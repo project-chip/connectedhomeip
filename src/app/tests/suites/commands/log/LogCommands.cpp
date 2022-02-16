@@ -21,13 +21,11 @@
 CHIP_ERROR LogCommands::Log(const char * message)
 {
     ChipLogDetail(chipTool, "%s", message);
-    ReturnErrorOnFailure(ContinueOnChipMainThread());
-    return CHIP_NO_ERROR;
+    return ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
 CHIP_ERROR LogCommands::UserPrompt(const char * message)
 {
     ChipLogDetail(chipTool, "USER_PROMPT: %s", message);
-    ReturnErrorOnFailure(ContinueOnChipMainThread());
-    return CHIP_NO_ERROR;
+    return ContinueOnChipMainThread(CHIP_NO_ERROR);
 }

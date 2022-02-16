@@ -53,7 +53,9 @@ ApplicationBasic
 ApplicationId
 ApplicationIdentifier
 ApplicationLauncher
+applyUpdateAction
 ApplyUpdateRequest
+ApplyUpdateResponse
 approver
 appspot
 aps
@@ -64,6 +66,7 @@ argv
 armeabi
 ARMmbed
 armv
+ASAN
 asdk
 AssertionError
 ASYNC
@@ -143,6 +146,7 @@ capacitive
 CatalogVendorId
 CBB
 cbd
+ccf
 CCMP
 CCS
 CCSTUDIO
@@ -278,6 +282,8 @@ debianutils
 DEDEDEDE
 deepnote
 DelayedActionTime
+delayedActionTimeSec
+delayQuery
 demangle
 deployable
 depottools
@@ -287,6 +293,7 @@ descheduled
 dev
 devcontainer
 devCtrl
+DeviceAttestationCredsExample
 DeviceCaCerts
 DeviceCert
 DeviceCommissioner
@@ -302,6 +309,7 @@ DevKitC
 DevKitM
 df
 dfu
+DgDxsfHx
 dhclient
 DHCP
 DHCPC
@@ -413,6 +421,7 @@ ffeebaefa
 FFF
 fffe
 fffff
+fHtcwcAAAAAAAAAwQAAAAAAXPMlAAAAAAA
 Fi
 filepath
 fini
@@ -429,6 +438,7 @@ fstab
 fsync
 ftd
 fullclean
+fuzzer
 gbl
 gcloud
 GDB
@@ -446,6 +456,9 @@ GetDeviceInfo
 GetDns
 GetIP
 getstarted
+GH
+gh
+ghp
 githubusercontent
 gitignore
 glibc
@@ -504,6 +517,7 @@ ImplClass
 implementers
 imx
 imxlinux
+incomingCommands
 indexhtml
 Inet
 InetLayer
@@ -550,6 +564,7 @@ jupyterlab
 KA
 Kconfig
 KeypadInput
+kInvalidCommandId
 KitProg
 kNodeIdNotSpecified
 knownissues
@@ -569,6 +584,7 @@ libdbus
 LIBDIR
 libegl
 libffi
+libfuzzer
 libgirepository
 libglib
 libical
@@ -716,6 +732,7 @@ nrfdks
 nrfutil
 nrfxlib
 NTAG
+nullptr
 NUM
 nwk
 NXP
@@ -763,6 +780,7 @@ otasoftwareupdaterequestor
 otaURL
 OTBR
 otcli
+outgoingCommands
 PAA
 PacketBuffer
 PAI
@@ -815,6 +833,7 @@ protobuf
 protos
 Prover
 providerNodeId
+providerFabricIndex
 PRs
 PSCAN
 PSK
@@ -833,6 +852,7 @@ PyEval
 PyFunction
 pylint
 PyObject
+pypi
 PyRun
 pytest
 QEMU
@@ -844,6 +864,7 @@ QRCodeUrl
 QSPI
 QueryImage
 QueryImageResponse
+queryImageStatus
 qvCHIP
 RADVD
 raspberryPi
@@ -875,6 +896,7 @@ req
 Requestor
 Requestor's
 Requestors
+RequestorCanConsent
 responder
 retargeting
 reusability
@@ -941,6 +963,7 @@ SiLabs
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+sizedb
 sl
 SLAAC
 SLTB
@@ -955,6 +978,7 @@ SoftDevice
 softmmu
 SoftwareDiagnostics
 SoftwareVersion
+softwareVersionStr
 SoftwareVersionString
 softwareVersionValid
 SPI
@@ -1023,6 +1047,7 @@ testws
 texinfo
 textboxes
 TFT
+ThIsIsNoTMyReAlGiThUbToKeNSoDoNoTtRy
 threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
@@ -1034,6 +1059,7 @@ TLV
 tmp
 tngvndl
 TODO
+toJson
 tokenized
 toolchain
 toolchains
@@ -1074,12 +1100,16 @@ UniFlash
 unpair
 unprovisioned
 untrusted
+updateAvailable
+updateNotAvailable
 UpdateTokens
 upstreamed
 URI
 usbmodem
 USBtoUART
 uscif
+UserConsentNeeded
+userConsentState
 userguide
 USERINTERFACE
 UserLabel
@@ -1130,7 +1160,9 @@ WSTK
 xa
 xab
 xaver
+xb
 xbef
+xc
 xcd
 Xcode
 xcodeproj
@@ -1139,8 +1171,11 @@ xd
 xdeadbeefcafe
 xds
 xdsdfu
+xed
 xef
 xF
+xFF
+xFFF
 xFFFF
 xfffff
 xffffffffe
@@ -1151,6 +1186,7 @@ XXXX
 XXXXXXXX
 xyz
 xz
+xzvf
 yaml
 yearday
 yml

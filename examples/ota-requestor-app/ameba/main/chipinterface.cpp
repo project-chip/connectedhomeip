@@ -21,11 +21,14 @@
 #include "DeviceCallbacks.h"
 #include "chip_porting.h"
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <lib/support/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
@@ -62,6 +65,16 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
+} // namespace
+
+void NetWorkCommissioningInstInit()
+{
+    sWiFiNetworkCommissioningInstance.Init();
+}
+
 static DeviceCallbacks EchoCallbacks;
 
 OTARequestor gRequestorCore;
@@ -69,12 +82,9 @@ GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 AmebaOTAImageProcessor gImageProcessor;
 
-extern "C" void amebaQueryImageCmdHandler(uint32_t nodeId, uint32_t fabricId)
+extern "C" void amebaQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd
-    gRequestorCore.TestModeSetProviderParameters(nodeId, fabricId, chip::kRootEndpointId);
-
     static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
 
@@ -130,6 +140,7 @@ extern "C" void ChipTest(void)
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    NetWorkCommissioningInstInit();
 
     InitOTARequestor();
 

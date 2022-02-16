@@ -43,8 +43,10 @@
 namespace chip {
 
 static constexpr FabricIndex kMinValidFabricIndex     = 1;
-static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UINT8_MAX - 1, CHIP_CONFIG_MAX_DEVICE_ADMINS);
+static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UINT8_MAX - 1, CHIP_CONFIG_MAX_FABRICS);
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
+
+static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fabric index should not be valid");
 
 // KVS store is sensitive to length of key strings, based on the underlying
 // platform. Keeping them short.
@@ -140,6 +142,8 @@ public:
         ReleaseOperationalCerts();
     }
 
+    NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
+    // TODO(#15049): Refactor/rename PeerId to OperationalId or OpId throughout source
     PeerId GetPeerId() const { return mOperationalId; }
     PeerId GetPeerIdForNode(const NodeId node) const
     {
@@ -441,16 +445,13 @@ public:
 
     uint8_t FabricCount() const { return mFabricCount; }
 
-    ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
-    ConstFabricIterator cend() const
-    {
-        return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_DEVICE_ADMINS, CHIP_CONFIG_MAX_DEVICE_ADMINS);
-    }
+    ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_FABRICS); }
+    ConstFabricIterator cend() const { return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_FABRICS, CHIP_CONFIG_MAX_FABRICS); }
     ConstFabricIterator begin() const { return cbegin(); }
     ConstFabricIterator end() const { return cend(); }
 
 private:
-    FabricInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
+    FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     FabricStorage * mStorage = nullptr;
 
     FabricTableDelegate * mDelegate = nullptr;

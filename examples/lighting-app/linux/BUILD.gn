@@ -50,11 +50,17 @@ executable("chip-lighting-app") {
   include_dirs = [ "include" ]
 
   if (chip_enable_pw_rpc) {
-    defines = [ "PW_RPC_ENABLED" ]
+    defines = [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+    ]
 
     sources += [
+      "${chip_root}/examples/platform/linux/Rpc.cpp",
       "${dir_pigweed}/targets/host/system_rpc_server.cc",
-      "Rpc.cpp",
     ]
 
     deps += [
@@ -76,6 +82,8 @@ executable("chip-lighting-app") {
     ]
 
     deps += pw_build_LINK_DEPS
+
+    include_dirs += [ "${chip_root}/examples/common" ]
   } else {
     # The system_rpc_server.cc file is in pigweed and doesn't compile with
     # -Wconversion, remove check for RPC build only.

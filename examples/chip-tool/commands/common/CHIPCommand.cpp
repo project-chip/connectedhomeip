@@ -41,15 +41,16 @@ CHIP_ERROR CHIPCommand::Run()
 
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
-    ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, true));
+    ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(mBleAdapterId.ValueOr(0), true));
 #endif
 
     ReturnLogErrorOnFailure(mDefaultStorage.Init());
     ReturnLogErrorOnFailure(mFabricStorage.Initialize(&mDefaultStorage));
 
     chip::Controller::FactoryInitParams factoryInitParams;
-    factoryInitParams.fabricStorage = &mFabricStorage;
-    factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerId());
+    factoryInitParams.fabricStorage            = &mFabricStorage;
+    factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
+    factoryInitParams.listenPort               = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerId());
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityNull, kIdentityNullFabricId));

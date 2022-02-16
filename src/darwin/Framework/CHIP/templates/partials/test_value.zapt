@@ -1,4 +1,7 @@
-{{#if isOptional}}
+{{#if (chip_tests_config_has definedValue)}}
+  {{! Just replace the value's name with the actual value in the rest of the processing~}}
+  {{>test_value target=target definedValue=(chip_tests_config_get_default_value definedValue) cluster=cluster depth=depth}}
+{{else if isOptional}}
   {{! Just go ahead and assign to the value, stripping the optionality bit off.  }}
   {{>test_value target=target definedValue=definedValue cluster=cluster isOptional=false depth=(incrementDepth depth)}}
 {{else if isNullable}}
@@ -11,7 +14,7 @@
   {
     NSMutableArray * temp_{{depth}} = [[NSMutableArray alloc] init];
     {{#each definedValue}}
-      {{>test_value target=(concat "temp_" ../depth "[" @index "]") definedValue=this cluster=../cluster depth=(incrementDepth ../depth) type=../type isArray=false}}
+      {{>test_value target=(concat "temp_" ../depth "[" @index "]") definedValue=this cluster=../cluster depth=(incrementDepth ../depth) type=../type isArray=false parent=../parent}}
     {{/each}}
     {{target}} = temp_{{depth}};
   }

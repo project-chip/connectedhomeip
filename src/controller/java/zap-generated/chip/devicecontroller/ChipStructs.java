@@ -173,10 +173,10 @@ public class ChipStructs {
 
   public static class ApplicationLauncherClusterApplicationEP {
     public ChipStructs.ApplicationLauncherClusterApplication application;
-    public String endpoint;
+    public Optional<Integer> endpoint;
 
     public ApplicationLauncherClusterApplicationEP(
-        ChipStructs.ApplicationLauncherClusterApplication application, String endpoint) {
+        ChipStructs.ApplicationLauncherClusterApplication application, Optional<Integer> endpoint) {
       this.application = application;
       this.endpoint = endpoint;
     }
@@ -313,16 +313,16 @@ public class ChipStructs {
   public static class ChannelClusterChannelInfo {
     public Integer majorNumber;
     public Integer minorNumber;
-    public String name;
-    public String callSign;
-    public String affiliateCallSign;
+    public Optional<String> name;
+    public Optional<String> callSign;
+    public Optional<String> affiliateCallSign;
 
     public ChannelClusterChannelInfo(
         Integer majorNumber,
         Integer minorNumber,
-        String name,
-        String callSign,
-        String affiliateCallSign) {
+        Optional<String> name,
+        Optional<String> callSign,
+        Optional<String> affiliateCallSign) {
       this.majorNumber = majorNumber;
       this.minorNumber = minorNumber;
       this.name = name;
@@ -356,12 +356,15 @@ public class ChipStructs {
 
   public static class ChannelClusterLineupInfo {
     public String operatorName;
-    public String lineupName;
-    public String postalCode;
+    public Optional<String> lineupName;
+    public Optional<String> postalCode;
     public Integer lineupInfoType;
 
     public ChannelClusterLineupInfo(
-        String operatorName, String lineupName, String postalCode, Integer lineupInfoType) {
+        String operatorName,
+        Optional<String> lineupName,
+        Optional<String> postalCode,
+        Integer lineupInfoType) {
       this.operatorName = operatorName;
       this.lineupName = lineupName;
       this.postalCode = postalCode;
@@ -445,12 +448,12 @@ public class ChipStructs {
   public static class ContentLauncherClusterParameter {
     public Integer type;
     public String value;
-    public ArrayList<ChipStructs.ContentLauncherClusterAdditionalInfo> externalIDList;
+    public Optional<ArrayList<ChipStructs.ContentLauncherClusterAdditionalInfo>> externalIDList;
 
     public ContentLauncherClusterParameter(
         Integer type,
         String value,
-        ArrayList<ChipStructs.ContentLauncherClusterAdditionalInfo> externalIDList) {
+        Optional<ArrayList<ChipStructs.ContentLauncherClusterAdditionalInfo>> externalIDList) {
       this.type = type;
       this.value = value;
       this.externalIDList = externalIDList;
@@ -495,12 +498,14 @@ public class ChipStructs {
   }
 
   public static class ContentLauncherClusterStyleInformation {
-    public String imageUrl;
-    public String color;
-    public ChipStructs.ContentLauncherClusterDimension size;
+    public Optional<String> imageUrl;
+    public Optional<String> color;
+    public Optional<ChipStructs.ContentLauncherClusterDimension> size;
 
     public ContentLauncherClusterStyleInformation(
-        String imageUrl, String color, ChipStructs.ContentLauncherClusterDimension size) {
+        Optional<String> imageUrl,
+        Optional<String> color,
+        Optional<ChipStructs.ContentLauncherClusterDimension> size) {
       this.imageUrl = imageUrl;
       this.color = color;
       this.size = size;
@@ -526,19 +531,19 @@ public class ChipStructs {
 
   public static class ContentLauncherClusterBrandingInformation {
     public String providerName;
-    public ChipStructs.ContentLauncherClusterStyleInformation background;
-    public ChipStructs.ContentLauncherClusterStyleInformation logo;
-    public ChipStructs.ContentLauncherClusterStyleInformation progressBar;
-    public ChipStructs.ContentLauncherClusterStyleInformation splash;
-    public ChipStructs.ContentLauncherClusterStyleInformation waterMark;
+    public Optional<ChipStructs.ContentLauncherClusterStyleInformation> background;
+    public Optional<ChipStructs.ContentLauncherClusterStyleInformation> logo;
+    public Optional<ChipStructs.ContentLauncherClusterStyleInformation> progressBar;
+    public Optional<ChipStructs.ContentLauncherClusterStyleInformation> splash;
+    public Optional<ChipStructs.ContentLauncherClusterStyleInformation> waterMark;
 
     public ContentLauncherClusterBrandingInformation(
         String providerName,
-        ChipStructs.ContentLauncherClusterStyleInformation background,
-        ChipStructs.ContentLauncherClusterStyleInformation logo,
-        ChipStructs.ContentLauncherClusterStyleInformation progressBar,
-        ChipStructs.ContentLauncherClusterStyleInformation splash,
-        ChipStructs.ContentLauncherClusterStyleInformation waterMark) {
+        Optional<ChipStructs.ContentLauncherClusterStyleInformation> background,
+        Optional<ChipStructs.ContentLauncherClusterStyleInformation> logo,
+        Optional<ChipStructs.ContentLauncherClusterStyleInformation> progressBar,
+        Optional<ChipStructs.ContentLauncherClusterStyleInformation> splash,
+        Optional<ChipStructs.ContentLauncherClusterStyleInformation> waterMark) {
       this.providerName = providerName;
       this.background = background;
       this.logo = logo;
@@ -667,24 +672,30 @@ public class ChipStructs {
 
   public static class GeneralDiagnosticsClusterNetworkInterfaceType {
     public String name;
-    public Boolean fabricConnected;
-    public Boolean offPremiseServicesReachableIPv4;
-    public Boolean offPremiseServicesReachableIPv6;
+    public Boolean isOperational;
+    public @Nullable Boolean offPremiseServicesReachableIPv4;
+    public @Nullable Boolean offPremiseServicesReachableIPv6;
     public byte[] hardwareAddress;
+    public ArrayList<byte[]> IPv4Addresses;
+    public ArrayList<byte[]> IPv6Addresses;
     public Integer type;
 
     public GeneralDiagnosticsClusterNetworkInterfaceType(
         String name,
-        Boolean fabricConnected,
-        Boolean offPremiseServicesReachableIPv4,
-        Boolean offPremiseServicesReachableIPv6,
+        Boolean isOperational,
+        @Nullable Boolean offPremiseServicesReachableIPv4,
+        @Nullable Boolean offPremiseServicesReachableIPv6,
         byte[] hardwareAddress,
+        ArrayList<byte[]> IPv4Addresses,
+        ArrayList<byte[]> IPv6Addresses,
         Integer type) {
       this.name = name;
-      this.fabricConnected = fabricConnected;
+      this.isOperational = isOperational;
       this.offPremiseServicesReachableIPv4 = offPremiseServicesReachableIPv4;
       this.offPremiseServicesReachableIPv6 = offPremiseServicesReachableIPv6;
       this.hardwareAddress = hardwareAddress;
+      this.IPv4Addresses = IPv4Addresses;
+      this.IPv6Addresses = IPv6Addresses;
       this.type = type;
     }
 
@@ -695,8 +706,8 @@ public class ChipStructs {
       output.append("\tname: ");
       output.append(name);
       output.append("\n");
-      output.append("\tfabricConnected: ");
-      output.append(fabricConnected);
+      output.append("\tisOperational: ");
+      output.append(isOperational);
       output.append("\n");
       output.append("\toffPremiseServicesReachableIPv4: ");
       output.append(offPremiseServicesReachableIPv4);
@@ -706,6 +717,12 @@ public class ChipStructs {
       output.append("\n");
       output.append("\thardwareAddress: ");
       output.append(Arrays.toString(hardwareAddress));
+      output.append("\n");
+      output.append("\tIPv4Addresses: ");
+      output.append(IPv4Addresses);
+      output.append("\n");
+      output.append("\tIPv6Addresses: ");
+      output.append(IPv6Addresses);
       output.append("\n");
       output.append("\ttype: ");
       output.append(type);
@@ -882,9 +899,9 @@ public class ChipStructs {
 
   public static class MediaPlaybackClusterPlaybackPosition {
     public Long updatedAt;
-    public Long position;
+    public @Nullable Long position;
 
-    public MediaPlaybackClusterPlaybackPosition(Long updatedAt, Long position) {
+    public MediaPlaybackClusterPlaybackPosition(Long updatedAt, @Nullable Long position) {
       this.updatedAt = updatedAt;
       this.position = position;
     }

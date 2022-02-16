@@ -15,6 +15,7 @@
 name: 18.2.2. [TC-BI-2.2] Primary functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Binary Input (Basic)"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Reads PresentValue attribute from DUT"
       command: "readAttribute"

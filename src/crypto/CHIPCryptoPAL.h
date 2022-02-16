@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -849,7 +849,7 @@ public:
      * @param my_identity_len   The verifier identity length.
      * @param peer_identity     The peer identity. May be NULL if identities are not established.
      * @param peer_identity_len The peer identity length.
-     * @param w0in              The input w0 (an output from the PBKDF).
+     * @param w0in              The input w0 (a parameter baked into the device or computed with ComputeW0).
      * @param w0in_len          The input w0 length.
      * @param Lin               The input L (a parameter baked into the device or computed with ComputeL).
      * @param Lin_len           The input L length.
@@ -1046,6 +1046,18 @@ public:
     virtual CHIP_ERROR PointIsValid(void * R) = 0;
 
     /*
+     *   @synopsis Compute w0sin mod p
+     *
+     *   @param w0out       Output field element (modulo p)
+     *   @param w0_len      Output field element length
+     *   @param w1sin       Input field element
+     *   @param w1sin_len   Input field element length
+     *
+     *   @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len) = 0;
+
+    /*
      *   @synopsis Compute w1in*G
      *
      *   @param Lout        Output point in 0x04 || X || Y format.
@@ -1208,6 +1220,8 @@ public:
     CHIP_ERROR PointInvert(void * R) override;
     CHIP_ERROR PointCofactorMul(void * R) override;
     CHIP_ERROR PointIsValid(void * R) override;
+
+    CHIP_ERROR ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len) override;
     CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
 
 protected:
@@ -1356,24 +1370,28 @@ public:
     virtual ~SymmetricKeyContext() = default;
     /**
      * @brief Perform the message encryption as described in 4.7.2. (Security Processing of Outgoing Messages)
-     * @param[in,out] plaintext     Outgoing message payload.
+     * @param[in] plaintext     Outgoing message payload.
      * @param[in] aad           Additional data (message header contents)
      * @param[in] nonce         Nonce (Security Flags | Message Counter | Source Node ID)
-     * @param[out] out_mic      Outgoing Message Integrity Check
+     * @param[out] mic          Outgoing Message Integrity Check
+     * @param[out] ciphertext   Outgoing encrypted payload. Must be at least as big as plaintext. The same buffer may be used both
+     * for ciphertext, and plaintext.
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR EncryptMessage(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
-                                      MutableByteSpan & out_mic) const = 0;
+    virtual CHIP_ERROR EncryptMessage(const ByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+                                      MutableByteSpan & mic, MutableByteSpan & ciphertext) const = 0;
     /**
      * @brief Perform the message decryption as described in 4.7.3.(Security Processing of Incoming Messages)
-     * @param[in,out] ciphertext Incoming encrypted payload
-     * @param[in] aad   Additional data (message header contents)
-     * @param[in] nonce Nonce (Security Flags | Message Counter | Source Node ID)
-     * @param[in] mic   Incoming Message Integrity Check
+     * @param[in] ciphertext    Incoming encrypted payload
+     * @param[in] aad           Additional data (message header contents)
+     * @param[in] nonce         Nonce (Security Flags | Message Counter | Source Node ID)
+     * @param[in] mic           Incoming Message Integrity Check
+     * @param[out] plaintext     Incoming message payload. Must be at least as big as ciphertext. The same buffer may be used both
+     * for plaintext, and ciphertext.
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR DecryptMessage(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
-                                      const ByteSpan & mic) const = 0;
+    virtual CHIP_ERROR DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+                                      const ByteSpan & mic, MutableByteSpan & plaintext) const = 0;
 
     /**
      * @brief Perform privacy encoding as described in 4.8.2. (Privacy Processing of Outgoing Messages)

@@ -47,6 +47,7 @@ const kResponseErrorName      = 'error';
 const kResponseWrongErrorName = 'errorWrongValue';
 const kPICSName               = 'PICS';
 const kSaveAsName             = 'saveAs';
+const kFabricFiltered         = 'fabricFiltered';
 
 class NullObject {
   toString()
@@ -139,6 +140,9 @@ function setDefaultTypeForCommand(test)
     test.commandName     = 'Read';
     test.isAttribute     = true;
     test.isReadAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
     break;
 
   case 'writeAttribute':
@@ -156,6 +160,9 @@ function setDefaultTypeForCommand(test)
     test.isAttribute          = true;
     test.isSubscribe          = true;
     test.isSubscribeAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
     break;
 
   case 'waitForReport':
@@ -390,7 +397,7 @@ function parse(filename)
 
 function printErrorAndExit(context, msg)
 {
-  console.log(context.testName, ': ', context.label);
+  console.log("\nERROR:\n", context.testName, ': ', context.label);
   console.log(msg);
   process.exit(1);
 }
@@ -574,22 +581,26 @@ function chip_tests_config_get_type(name, options)
 // test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
 // context is lost and it fails. Make sure to attach the global context as a property of the | value |
 // that is evaluated.
-function attachGlobal(global, value)
+//
+// errorContext should have "thisVal" and "name" properties that will be used
+// for error reporting via printErrorAndExit.
+function attachGlobal(global, value, errorContext)
 {
   if (Array.isArray(value)) {
-    value = value.map(v => attachGlobal(global, v));
+    value = value.map(v => attachGlobal(global, v, errorContext));
   } else if (value instanceof Object) {
     for (key in value) {
       if (key == "global") {
         continue;
       }
-      value[key] = attachGlobal(global, value[key]);
+      value[key] = attachGlobal(global, value[key], errorContext);
     }
   } else if (value === null) {
     value = new NullObject();
   } else {
     switch (typeof value) {
     case 'number':
+      checkNumberSanity(value, errorContext);
       value = new Number(value);
       break;
     case 'string':
@@ -605,6 +616,21 @@ function attachGlobal(global, value)
 
   value.global = global;
   return value;
+}
+
+/**
+ * Ensure the given value is not a possibly-corrupted-by-going-through-double
+ * integer.  If it is, tell the user (using that errorContext.name to describe
+ * it) and die.
+ */
+function checkNumberSanity(value, errorContext)
+{
+  // Number.isInteger is false for non-Numbers.
+  if (Number.isInteger(value) && !Number.isSafeInteger(value)) {
+    printErrorAndExit(errorContext.thisVal,
+        `${errorContext.name} value ${
+            value} is too large to represent exactly as an integer in YAML.  Put quotes around it to treat it as a string.\n\n`);
+  }
 }
 
 function chip_tests_item_parameters(options)
@@ -634,7 +660,8 @@ function chip_tests_item_parameters(options)
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
       }
-      commandArg.definedValue = attachGlobal(this.global, expected.value);
+
+      commandArg.definedValue = attachGlobal(this.global, expected.value, { thisVal : this, name : commandArg.name });
 
       return commandArg;
     });
@@ -663,12 +690,13 @@ function chip_tests_item_response_parameters(options)
         const expected = responseValues.splice(expectedIndex, 1)[0];
         if ('value' in expected) {
           responseArg.hasExpectedValue = true;
-          responseArg.expectedValue    = attachGlobal(this.global, expected.value);
+          responseArg.expectedValue    = attachGlobal(this.global, expected.value, { thisVal : this, name : responseArg.name });
         }
 
         if ('constraints' in expected) {
           responseArg.hasExpectedConstraints = true;
-          responseArg.expectedConstraints    = expected.constraints;
+          responseArg.expectedConstraints
+              = attachGlobal(this.global, expected.constraints, { thisVal : this, name : responseArg.name });
         }
 
         if ('saveAs' in expected) {

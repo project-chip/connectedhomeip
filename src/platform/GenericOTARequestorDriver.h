@@ -54,7 +54,7 @@ public:
     void UpdateDiscontinued() override;
     void UpdateCancelled() override;
 
-private:
+protected:
     void ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action);
 
     OTARequestorInterface * mRequestor           = nullptr;

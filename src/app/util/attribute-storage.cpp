@@ -47,6 +47,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/LockTracker.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
@@ -549,6 +550,8 @@ bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMe
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write)
 {
+    assertChipStackLockedByCurrentThread();
+
     uint16_t attributeOffsetIndex = 0;
 
     for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
@@ -662,6 +665,16 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
     return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
 }
 
+const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId)
+{
+    uint16_t ep = emberAfIndexFromEndpoint(endpointId);
+    if (ep == 0xFFFF)
+    {
+        return nullptr;
+    }
+    return emAfEndpoints[ep].endpointType;
+}
+
 const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, ClusterId clusterId,
                                                 EmberAfClusterMask mask, uint8_t * index)
 {
@@ -692,35 +705,17 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
     return NULL;
 }
 
-uint8_t emberAfClusterIndexInMatchingEndpoints(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
-{
-    uint8_t ep;
-    uint8_t index = 0xFF;
-    for (ep = 0; ep < emberAfEndpointCount(); ep++)
-    {
-        const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
-        if (emberAfFindClusterInType(endpointType, clusterId, mask) != NULL)
-        {
-            index++;
-            if (emAfEndpoints[ep].endpoint == endpoint)
-            {
-                return index;
-            }
-        }
-    }
-    return 0xFF;
-}
-
 uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
-    uint8_t ep;
-    uint8_t index = 0xFF;
-    for (ep = 0; ep < emberAfEndpointCount(); ep++)
+    for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
     {
-        const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
-        if (emberAfFindClusterInType(endpointType, clusterId, mask, &index) != NULL)
+        // Check the endpoint id first, because that way we avoid examining the
+        // endpoint type for endpoints that are not actually defined.
+        if (emAfEndpoints[ep].endpoint == endpoint)
         {
-            if (emAfEndpoints[ep].endpoint == endpoint)
+            const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
+            uint8_t index                            = 0xFF;
+            if (emberAfFindClusterInType(endpointType, clusterId, mask, &index) != NULL)
             {
                 return index;
             }
@@ -1432,9 +1427,9 @@ Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, Cl
     return Optional<AttributeId>(clusterObj->attributes[attributeIndex].attributeId);
 }
 
-DataVersion * emberAfDataVersionStorage(chip::EndpointId endpointId, chip::ClusterId clusterId)
+DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
 {
-    uint16_t index = emberAfIndexFromEndpoint(endpointId);
+    uint16_t index = emberAfIndexFromEndpoint(aConcreteClusterPath.mEndpointId);
     if (index == 0xFFFF)
     {
         // Unknown endpoint.
@@ -1449,7 +1444,7 @@ DataVersion * emberAfDataVersionStorage(chip::EndpointId endpointId, chip::Clust
 
     // This does a second walk over endpoints to find the right one, but
     // probably worth it to avoid duplicating code.
-    auto clusterIndex = emberAfClusterIndex(endpointId, clusterId, CLUSTER_MASK_SERVER);
+    auto clusterIndex = emberAfClusterIndex(aConcreteClusterPath.mEndpointId, aConcreteClusterPath.mClusterId, CLUSTER_MASK_SERVER);
     if (clusterIndex == 0xFF)
     {
         // No such cluster on this endpoint.

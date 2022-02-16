@@ -296,7 +296,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             {
                 ChipLogProgress(DataManagement,
                                 "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                                " Command=" ChipLogFormatMEI " Status=0x%" PRIx8,
+                                " Command=" ChipLogFormatMEI " Status=0x%x",
                                 endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId),
                                 to_underlying(statusIB.mStatus));
             }

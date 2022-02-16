@@ -143,6 +143,10 @@ namespace DeviceLayer {
 
         CHIP_ERROR KeyValueStoreManagerImpl::Init(const char * fileName)
         {
+            if (mInitialized) {
+                return CHIP_NO_ERROR;
+            }
+
             ReturnErrorCodeIf(gContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
             ReturnErrorCodeIf(fileName == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorCodeIf(fileName[0] == '\0', CHIP_ERROR_INVALID_ARGUMENT);
@@ -165,7 +169,7 @@ namespace DeviceLayer {
 
                 url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName] relativeToURL:documentsDirectory];
             } else {
-                url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName]];
+                url = [NSURL fileURLWithPath:[NSString stringWithUTF8String:fileName]];
             }
             ReturnErrorCodeIf(url == nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -197,8 +201,10 @@ namespace DeviceLayer {
 
             // create Managed Object context
             gContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+            [gContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
             [gContext setPersistentStoreCoordinator:coordinator];
 
+            mInitialized = true;
             return CHIP_NO_ERROR;
         }
 

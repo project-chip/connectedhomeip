@@ -29,12 +29,13 @@
 #include <utility>
 
 using namespace chip::Credentials;
-using GroupInfo     = GroupDataProvider::GroupInfo;
-using GroupKey      = GroupDataProvider::GroupKey;
-using GroupEndpoint = GroupDataProvider::GroupEndpoint;
-using EpochKey      = GroupDataProvider::EpochKey;
-using KeySet        = GroupDataProvider::KeySet;
-using GroupSession  = GroupDataProvider::GroupSession;
+using GroupInfo      = GroupDataProvider::GroupInfo;
+using GroupKey       = GroupDataProvider::GroupKey;
+using GroupEndpoint  = GroupDataProvider::GroupEndpoint;
+using EpochKey       = GroupDataProvider::EpochKey;
+using KeySet         = GroupDataProvider::KeySet;
+using GroupSession   = GroupDataProvider::GroupSession;
+using SecurityPolicy = GroupDataProvider::SecurityPolicy;
 
 namespace chip {
 namespace app {
@@ -94,10 +95,10 @@ static const GroupKey kGroup3Keyset1(kGroup3, kKeysetId1);
 static const GroupKey kGroup3Keyset2(kGroup3, kKeysetId2);
 static const GroupKey kGroup3Keyset3(kGroup3, kKeysetId3);
 
-static KeySet kKeySet0(kKeysetId0, KeySet::SecurityPolicy::kStandard, 3);
-static KeySet kKeySet1(kKeysetId1, KeySet::SecurityPolicy::kLowLatency, 1);
-static KeySet kKeySet2(kKeysetId2, KeySet::SecurityPolicy::kLowLatency, 2);
-static KeySet kKeySet3(kKeysetId3, KeySet::SecurityPolicy::kStandard, 3);
+static KeySet kKeySet0(kKeysetId0, SecurityPolicy::kStandard, 3);
+static KeySet kKeySet1(kKeysetId1, SecurityPolicy::kLowLatency, 1);
+static KeySet kKeySet2(kKeysetId2, SecurityPolicy::kLowLatency, 2);
+static KeySet kKeySet3(kKeysetId3, SecurityPolicy::kStandard, 3);
 
 uint8_t kZeroKey[EpochKey::kLengthBytes] = { 0 };
 
@@ -1050,7 +1051,7 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     //
 
     // Load the plaintext to encrypt
-    memcpy(ciphertext_buffer, kMessage, sizeof(kMessage));
+    memcpy(plaintext_buffer, kMessage, sizeof(kMessage));
 
     // Get the key context
     Crypto::SymmetricKeyContext * key_context = provider->GetKeyContext(kFabric2, kGroup2);
@@ -1058,9 +1059,10 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     uint16_t session_id = key_context->GetKeyHash();
 
     // Encrypt the message
-    NL_TEST_ASSERT(apSuite,
-                   CHIP_NO_ERROR ==
-                       key_context->EncryptMessage(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+    NL_TEST_ASSERT(
+        apSuite,
+        CHIP_NO_ERROR ==
+            key_context->EncryptMessage(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag, ciphertext));
 
     // The ciphertext must be different to the original message
     NL_TEST_ASSERT(apSuite, memcmp(ciphertext.data(), kMessage, sizeof(kMessage)));
@@ -1088,14 +1090,11 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
             NL_TEST_ASSERT(apSuite, expected.count(found) > 0);
             NL_TEST_ASSERT(apSuite, session.key != nullptr);
 
-            // Load ciphertext to decrypt
-            memcpy(plaintext_buffer, ciphertext_buffer, sizeof(plaintext_buffer));
-
             // Decrypt de ciphertext
-            NL_TEST_ASSERT(
-                apSuite,
-                CHIP_NO_ERROR ==
-                    session.key->DecryptMessage(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR ==
+                               session.key->DecryptMessage(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)),
+                                                           tag, plaintext));
 
             // The new plaintext must match the original message
             NL_TEST_ASSERT(apSuite, 0 == memcmp(plaintext.data(), kMessage, sizeof(kMessage)));

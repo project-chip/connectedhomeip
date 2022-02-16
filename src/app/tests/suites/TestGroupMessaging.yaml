@@ -21,6 +21,7 @@
 name: Basic Group Messaging Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
@@ -28,6 +29,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Add Group 1 (endpoint 1)"
       cluster: "Groups"
@@ -69,10 +74,11 @@ tests:
       arguments:
           values:
               - name: "GroupKeySet"
-                value:
-                    {
+                value: {
                         GroupKeySetID: 0x01a1,
-                        GroupKeySecurityPolicy: 0,
+                        #  TODO Revert this once MCSP is implemented
+                        # GroupKeySecurityPolicy: 0,
+                        GroupKeySecurityPolicy: 1, # 1 => LowLatency => TrustFirst
                         EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
                         EpochStartTime0: 1110000,
                         EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
@@ -108,6 +114,30 @@ tests:
               [
                   { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+              ]
+
+    - label: "Install ACLs for test"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  # Any CASE can admin
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  # These groups can operate
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [0x0101, 0x0102],
+                      Targets: null,
+                  },
               ]
 
     # Test Pair 1 : Sends a Group Write Attribute

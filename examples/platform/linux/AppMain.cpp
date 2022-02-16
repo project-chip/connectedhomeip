@@ -35,6 +35,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <platform/DiagnosticDataProvider.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
 #include <controller/CHIPDeviceControllerFactory.h>
@@ -53,10 +55,12 @@
 #include <CommonRpc.h>
 #endif
 
+#include <signal.h>
+
 #include "AppMain.h"
-#include "Options.h"
 
 using namespace chip;
+using namespace chip::ArgParser;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 using namespace chip::Inet;
@@ -87,6 +91,57 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
     }
 }
+
+void OnSignalHandler(int signum)
+{
+    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+
+    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
+    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
+    // running process to terminate with different reasons.
+    DiagnosticDataProvider::BootReasonType bootReason = DiagnosticDataProvider::BootReasonType::Unspecified;
+    switch (signum)
+    {
+    case SIGVTALRM:
+        bootReason = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
+        break;
+    case SIGALRM:
+        bootReason = DiagnosticDataProvider::BootReasonType::BrownOutReset;
+        break;
+    case SIGILL:
+        bootReason = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
+        break;
+    case SIGTRAP:
+        bootReason = DiagnosticDataProvider::BootReasonType::HardwareWatchdogReset;
+        break;
+    case SIGIO:
+        bootReason = DiagnosticDataProvider::BootReasonType::SoftwareUpdateCompleted;
+        break;
+    case SIGINT:
+        bootReason = DiagnosticDataProvider::BootReasonType::SoftwareReset;
+        break;
+    default:
+        IgnoreUnusedVariable(bootReason);
+        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
+        chipDie();
+        break;
+    }
+
+    Server::GetInstance().DispatchShutDownAndStopEventLoop();
+}
+
+void SetupSignalHandlers()
+{
+    // sigaction is not used here because Tsan interceptors seems to
+    // never dispatch the signals on darwin.
+    signal(SIGALRM, OnSignalHandler);
+    signal(SIGVTALRM, OnSignalHandler);
+    signal(SIGILL, OnSignalHandler);
+    signal(SIGTRAP, OnSignalHandler);
+    signal(SIGTERM, OnSignalHandler);
+    signal(SIGIO, OnSignalHandler);
+    signal(SIGINT, OnSignalHandler);
+}
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -106,7 +161,7 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
-int ChipLinuxAppInit(int argc, char ** argv)
+int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -122,13 +177,32 @@ int ChipLinuxAppInit(int argc, char ** argv)
     err = Platform::MemoryInit();
     SuccessOrExit(err);
 
+    err = ParseArguments(argc, argv, customOptions);
+    SuccessOrExit(err);
+
+#ifdef CHIP_CONFIG_KVS_PATH
+    if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
+    {
+        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+    }
+    else
+    {
+        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
+    }
+    SuccessOrExit(err);
+#endif
+
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
-    SuccessOrExit(err);
+    if (0 != LinuxDeviceOptions::GetInstance().payload.discriminator)
+    {
+        uint16_t discriminator = LinuxDeviceOptions::GetInstance().payload.discriminator;
+        err                    = DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator);
+        SuccessOrExit(err);
+    }
 
-    err = ParseArguments(argc, argv);
+    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
@@ -170,7 +244,7 @@ int ChipLinuxAppInit(int argc, char ** argv)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Failed to run Linux Lighting App: %s ", ErrorStr(err));
+        ChipLogProgress(NotSpecified, "Failed to init Linux App: %s ", ErrorStr(err));
         // End the program with non zero error code to indicate a error.
         return 1;
     }
@@ -516,6 +590,8 @@ void ChipLinuxAppMainLoop()
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+    SetupSignalHandlers();
+
     ApplicationInit();
 
     DeviceLayer::PlatformMgr().RunEventLoop();
@@ -527,4 +603,8 @@ void ChipLinuxAppMainLoop()
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif
+
+    Server::GetInstance().Shutdown();
+
+    DeviceLayer::PlatformMgr().Shutdown();
 }

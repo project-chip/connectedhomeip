@@ -46,6 +46,10 @@ public:
         return Format("acl/%x", static_cast<unsigned int>(index));
     }
 
+    // Group Message Counters
+    const char * GroupDataCounter() { return Format("gdc"); }
+    const char * GroupControlCounter() { return Format("gcc"); }
+
     // Group Data Provider
 
     const char * FabricTable() { return Format("f/t"); }

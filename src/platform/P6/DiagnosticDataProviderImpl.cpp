@@ -143,10 +143,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
 void DiagnosticDataProviderImpl::UpdateoffPremiseService(bool ipv4service, bool ipv6service)
 {
     /* Enable/Disable IPv4 Off Premise Services */
-    mipv4_offpremise = ipv4service;
+    mipv4_offpremise.SetNonNull(ipv4service);
 
     /* Enable/Disable IPv6 Off Premise Services */
-    mipv6_offpremise = ipv6service;
+    mipv6_offpremise.SetNonNull(ipv6service);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
@@ -159,7 +159,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     {
         /* Update Network Interface list */
         ifp->name                            = CharSpan::fromCharString(net_interface->name);
-        ifp->fabricConnected                 = net_interface->flags & NETIF_FLAG_LINK_UP;
+        ifp->isOperational                   = net_interface->flags & NETIF_FLAG_LINK_UP;
         ifp->type                            = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
         ifp->offPremiseServicesReachableIPv4 = mipv4_offpremise;
         ifp->offPremiseServicesReachableIPv6 = mipv6_offpremise;

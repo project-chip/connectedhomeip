@@ -35,6 +35,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <protocols/secure_channel/PASESession.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -135,18 +136,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(Mu
         ChipLogDetail(DeviceLayer, "Using Thread extended MAC for hostname.");
         return CHIP_NO_ERROR;
     }
-#else
-    if (DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(buf.data()) == CHIP_NO_ERROR)
+#endif
+
+    if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(buf.data()) == CHIP_NO_ERROR)
     {
         ChipLogDetail(DeviceLayer, "Using wifi MAC for hostname");
         return CHIP_NO_ERROR;
     }
-#endif
 
-    ChipLogError(DeviceLayer, "MAC is not known, using a default.");
-    uint8_t temp[ConfigurationManager::kMaxMACAddressLength] = { 0xEE, 0xAA, 0xBA, 0xDA, 0xBA, 0xD0, 0xDD, 0xCA };
-    memcpy(buf.data(), temp, buf.size());
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 template <class ConfigClass>
@@ -334,43 +332,53 @@ exit:
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)
 {
-    CHIP_ERROR err = ReadConfigValueBin(ConfigClass::kConfigKey_Spake2pSalt, buf, bufSize, saltLen);
+    CHIP_ERROR err                                                   = CHIP_NO_ERROR;
+    char saltB64[BASE64_ENCODED_LEN(chip::kPBKDFMaximumSaltLen) + 1] = { 0 };
+    size_t saltB64Len                                                = 0;
 
+    err = ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pSalt, saltB64, sizeof(saltB64), saltB64Len);
+    err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        uint8_t salt[] = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT;
-        ReturnErrorCodeIf(sizeof(salt) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, salt, sizeof(salt));
-        saltLen = sizeof(salt);
-        err     = CHIP_NO_ERROR;
+        saltB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT);
+        ReturnErrorCodeIf(saltB64Len > sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(saltB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT, saltB64Len);
+        err = CHIP_NO_ERROR;
     }
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
 
     ReturnErrorOnFailure(err);
+    saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
     ReturnErrorCodeIf(saltLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, saltB64, saltLen);
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)
 {
-    CHIP_ERROR err = ReadConfigValueBin(ConfigClass::kConfigKey_Spake2pVerifier, buf, bufSize, verifierLen);
+    CHIP_ERROR err                                                                 = CHIP_NO_ERROR;
+    char verifierB64[BASE64_ENCODED_LEN(chip::kSpake2pSerializedVerifierSize) + 1] = { 0 };
+    size_t verifierB64Len                                                          = 0;
 
+    err = ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64), verifierB64Len);
+    err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        uint8_t verifier[] = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER;
-        ReturnErrorCodeIf(sizeof(verifier) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, verifier, sizeof(verifier));
-        verifierLen = sizeof(verifier);
-        err         = CHIP_NO_ERROR;
+        verifierB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER);
+        ReturnErrorCodeIf(verifierB64Len > sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(verifierB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER, verifierB64Len);
+        err = CHIP_NO_ERROR;
     }
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
 
     ReturnErrorOnFailure(err);
+    verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
     ReturnErrorCodeIf(verifierLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, verifierB64, verifierLen);
 
     return err;
 }
@@ -691,7 +699,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         err = GetManufacturingDate(year, month, dayOfMonth);
         if (err == CHIP_NO_ERROR)
         {
-            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02" PRIu8 "/%02" PRIu8, year, month, dayOfMonth);
+            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02u/%02u", year, month, dayOfMonth);
         }
         else
         {

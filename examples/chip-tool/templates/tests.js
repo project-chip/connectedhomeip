@@ -18,11 +18,13 @@
 function getManualTests()
 {
   const DeviceDiscovery = [
+    'TestDiscovery',
     'Test_TC_DD_1_5',
     'Test_TC_DD_1_6',
     'Test_TC_DD_1_7',
     'Test_TC_DD_1_8',
     'Test_TC_DD_1_9',
+    'Test_TC_DD_1_10',
   ];
 
   const Groups = [
@@ -30,9 +32,17 @@ function getManualTests()
     'TestGroupDemoConfig',
   ];
 
+  const BulkDataExchangeProtocol = [
+    'Test_TC_BDX_1_1',
+    'Test_TC_BDX_1_2',
+    'Test_TC_BDX_2_1',
+    'Test_TC_BDX_2_2',
+  ];
+
   const tests = [
     DeviceDiscovery, //
     Groups, //
+    BulkDataExchangeProtocol, //
 
   ];
   return tests.flat(1);
@@ -202,7 +212,7 @@ function getTests()
   ];
 
   const ThreadNetworkDiagnostics = [
-    'Test_TC_DIAGTH_1_1',
+    'Test_TC_DIAG_TH_NW_1_1',
   ];
 
   const WiFiNetworkDiagnostics = [
