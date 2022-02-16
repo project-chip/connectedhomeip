@@ -230,7 +230,7 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         imageProcessor->signature = &(imageProcessor->pOtaTgtHdr->Sign[0][0]);
 
         // Store the signature temporarily
-        uint8_t * tempbufptr = const_cast <uint8_t*> (block.data() + imageProcessor->pOtaTgtHdr->FileImgHdr[0].Offset);
+        uint8_t * tempbufptr = const_cast<uint8_t *>(block.data() + imageProcessor->pOtaTgtHdr->FileImgHdr[0].Offset);
         memcpy(imageProcessor->signature, tempbufptr, 8);
         tempbufptr += 8;
 
@@ -254,8 +254,7 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
     else // received subsequent blocks
     {
         device_mutex_lock(RT_DEV_LOCK_FLASH);
-        if (ota_writestream_user(imageProcessor->flash_addr + imageProcessor->size, block.size(),
-                                 block.data()) < 0)
+        if (ota_writestream_user(imageProcessor->flash_addr + imageProcessor->size, block.size(), block.data()) < 0)
         {
             ChipLogError(SoftwareUpdate, "Write to flash failed");
             device_mutex_unlock(RT_DEV_LOCK_FLASH);
@@ -288,8 +287,7 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         if (imageProcessor->block_len > 0)
         {
             device_mutex_lock(RT_DEV_LOCK_FLASH);
-            if (flash_burst_write(&flash_ota, imageProcessor->flash_addr + 32, imageProcessor->block_len,
-                                  block.data() + 32) < 0)
+            if (flash_burst_write(&flash_ota, imageProcessor->flash_addr + 32, imageProcessor->block_len, block.data() + 32) < 0)
             {
                 device_mutex_unlock(RT_DEV_LOCK_FLASH);
                 ChipLogError(SoftwareUpdate, "Write to flash failed");
