@@ -238,8 +238,10 @@ class ClusterObjectTests:
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, returnClusterObject=True)
         logger.info(
             f"Basic Cluster - Label: {res[0][0][Clusters.Basic].productLabel}")
-        logger.info(
-            f"Test Cluster - Struct: {res[0][1][Clusters.TestCluster].structAttr}")
+        # TestCluster will be ValueDecodeError here, so we comment out the log below.
+        # Values are not expected to be ValueDecodeError for real clusters.
+        # logger.info(
+        #    f"Test Cluster - Struct: {res[0][1][Clusters.TestCluster].structAttr}")
         logger.info(f"Test Cluster: {res[0][1][Clusters.TestCluster]}")
 
         logger.info("7: Reading Chunked List")
