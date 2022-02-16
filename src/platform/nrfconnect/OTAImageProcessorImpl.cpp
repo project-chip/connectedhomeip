@@ -113,7 +113,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
     if (mContentHeaderParser.IsInitialized() && !block.empty())
     {
         OTAImageContentHeader header = {};
-        CHIP_ERROR error = mContentHeaderParser.AccumulateAndDecode(block, header);
+        CHIP_ERROR error             = mContentHeaderParser.AccumulateAndDecode(block, header);
 
         // Needs more data to decode the header
         ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
