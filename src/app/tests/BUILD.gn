@@ -39,8 +39,8 @@ static_library("helpers") {
 
 source_set("binding-test-srcs") {
   sources = [
-    "${chip_root}/src/app/util/binding-table.cpp",
     "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.cpp",
+    "${chip_root}/src/app/util/binding-table.cpp",
   ]
 
   public_deps = [
