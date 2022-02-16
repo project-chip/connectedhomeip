@@ -95,6 +95,33 @@ jobs:
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}-test-group/chip-all-clusters-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
+           - name: Build example OTA Provider
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug chip_config_network_layer_ble=false
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug ota-provider-app \
+                    out/ota_provider_debug/chip-ota-provider-app \
+                    /tmp/bloat_reports/
+            - name: Build example OTA Requestor
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug chip_config_network_layer_ble=false
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug ota-requestor-app \
+                    out/ota_requestor_debug/chip-ota-requestor-app \
+                    /tmp/bloat_reports/
+            - name: Build and run OTA example
+              timeout-minutes: 20
+              run: |
+                  scripts/tests/ota_test.sh
+            - name: Uploading OTA logs
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: OTA,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  path: |
+                      /tmp/ota/
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
@@ -185,6 +212,27 @@ jobs:
                      --iterations 1 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
+            - name: Build example OTA Provider
+              timeout-minutes: 5
+              run: |
+                scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug chip_config_network_layer_ble=false
+            - name: Build example OTA Requestor
+              timeout-minutes: 5
+              run: |
+                scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug chip_config_network_layer_ble=false
+            - name: Build and run OTA example
+              timeout-minutes: 20
+              run: |
+                  brew install openssl pkg-config coreutils
+                  mkdir /tmp/ota/
+                  scripts/tests/ota_test.sh
+            - name: Uploading OTA logs
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: OTA,Darwin-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  path: |
+                      /tmp/ota/
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
