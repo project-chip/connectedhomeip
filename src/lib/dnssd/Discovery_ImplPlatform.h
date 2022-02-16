@@ -49,7 +49,11 @@ public:
     CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
 
     // Members that implement Resolver interface.
-    void SetResolverDelegate(ResolverDelegate * delegate) override { mResolverProxy.SetResolverDelegate(delegate); }
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mResolverProxy.SetOperationalDelegate(delegate); }
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
+    {
+        mResolverProxy.SetCommissioningDelegate(delegate);
+    }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
