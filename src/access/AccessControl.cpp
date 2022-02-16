@@ -190,10 +190,10 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 #endif
 
-    // Don't check if using default delegate (e.g. test code that isn't testing access control)
-    if (&mDelegate == &mDefaultDelegate)
+    // TODO(#13867): this will go away
+    if (mDelegate.TemporaryCheckOverride())
     {
-        ChipLogProgress(DataManagement, "AccessControl: disabled (this will go away)");
+        ChipLogProgress(DataManagement, "AccessControl: temporary check override (this will go away)");
         return CHIP_NO_ERROR;
     }
 
