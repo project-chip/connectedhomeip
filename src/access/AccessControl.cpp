@@ -305,6 +305,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 
     // No entry was found which passed all checks: access is denied.
+    ChipLogDetail(DataManagement, "AccessControl: denied");
     return CHIP_ERROR_ACCESS_DENIED;
 }
 
