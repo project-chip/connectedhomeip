@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/mw320_sdk.gni")
 import("//build_overrides/lwip.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/mw320_sdk.gni")
 
-import("${mw320_sdk_build_root}/mw320_sdk.gni")
 import("${lwip_root}/lwip.gni")
 import("${mbedtls_root}/mbedtls.gni")
+import("${mw320_sdk_build_root}/mw320_sdk.gni")
 
 declare_args() {
   # Build target to use for mw320 SDK. Use this to set global SDK defines.
@@ -33,7 +33,6 @@ group("mw320_sdk") {
 
 config("mbedtls_mw320_config") {
   defines = [
-    
     "MBEDTLS_CONFIG_FILE=<src/platform/MW320/mw320-chip-mbedtls-config.h>",
 
     # These options should really be in the config.h...
@@ -67,12 +66,7 @@ config("mbedtls_mw320_config") {
 }
 
 mbedtls_target("mbedtls") {
-
   public_configs = [ ":mbedtls_mw320_config" ]
 
-  public_deps = [
-    ":mw320_sdk",
-  ]
+  public_deps = [ ":mw320_sdk" ]
 }
-
-
