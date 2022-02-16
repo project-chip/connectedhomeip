@@ -70,6 +70,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
         if (addressesFound == ArraySize(nodeData.ipAddress))
         {
             // Out of space.
+            ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
             break;
         }
         nodeData.ipAddress[addressesFound] = ip;
@@ -144,6 +145,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
         if (addressesFound == ArraySize(nodeData.mAddress))
         {
             // Out of space.
+            ChipLogProgress(Discovery, "Can't add more IPs to ResolvedNodeData");
             break;
         }
         nodeData.mAddress[addressesFound] = ip;
