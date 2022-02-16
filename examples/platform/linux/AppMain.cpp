@@ -35,6 +35,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <platform/DiagnosticDataProvider.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
 #include <controller/CHIPDeviceControllerFactory.h>
@@ -52,6 +54,8 @@
 #if defined(PW_RPC_ENABLED)
 #include <CommonRpc.h>
 #endif
+
+#include <signal.h>
 
 #include "AppMain.h"
 
@@ -86,6 +90,57 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     {
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
     }
+}
+
+void OnSignalHandler(int signum)
+{
+    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+
+    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
+    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
+    // running process to terminate with different reasons.
+    DiagnosticDataProvider::BootReasonType bootReason = DiagnosticDataProvider::BootReasonType::Unspecified;
+    switch (signum)
+    {
+    case SIGVTALRM:
+        bootReason = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
+        break;
+    case SIGALRM:
+        bootReason = DiagnosticDataProvider::BootReasonType::BrownOutReset;
+        break;
+    case SIGILL:
+        bootReason = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
+        break;
+    case SIGTRAP:
+        bootReason = DiagnosticDataProvider::BootReasonType::HardwareWatchdogReset;
+        break;
+    case SIGIO:
+        bootReason = DiagnosticDataProvider::BootReasonType::SoftwareUpdateCompleted;
+        break;
+    case SIGINT:
+        bootReason = DiagnosticDataProvider::BootReasonType::SoftwareReset;
+        break;
+    default:
+        IgnoreUnusedVariable(bootReason);
+        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
+        chipDie();
+        break;
+    }
+
+    Server::GetInstance().DispatchShutDownAndStopEventLoop();
+}
+
+void SetupSignalHandlers()
+{
+    // sigaction is not used here because Tsan interceptors seems to
+    // never dispatch the signals on darwin.
+    signal(SIGALRM, OnSignalHandler);
+    signal(SIGVTALRM, OnSignalHandler);
+    signal(SIGILL, OnSignalHandler);
+    signal(SIGTRAP, OnSignalHandler);
+    signal(SIGTERM, OnSignalHandler);
+    signal(SIGIO, OnSignalHandler);
+    signal(SIGINT, OnSignalHandler);
 }
 } // namespace
 
@@ -535,6 +590,8 @@ void ChipLinuxAppMainLoop()
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+    SetupSignalHandlers();
+
     ApplicationInit();
 
     DeviceLayer::PlatformMgr().RunEventLoop();
@@ -546,4 +603,8 @@ void ChipLinuxAppMainLoop()
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif
+
+    Server::GetInstance().Shutdown();
+
+    DeviceLayer::PlatformMgr().Shutdown();
 }

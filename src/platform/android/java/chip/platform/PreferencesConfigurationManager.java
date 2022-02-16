@@ -59,7 +59,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
          * src/include/platform/CHIPDeviceConfig.h for debug
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_ProductId:
-        return 65278;
+        return 0x8003;
 
         /**
          * The default hardware version number assigned to the device or product by the device
@@ -91,9 +91,6 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
 
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_SetupDiscriminator:
         return 0xF00;
-
-      case kConfigNamespace_ChipFactory + ":" + kConfigKey_Spake2pIterationCount:
-        return 100;
     }
 
     if (preferences.contains(key)) {

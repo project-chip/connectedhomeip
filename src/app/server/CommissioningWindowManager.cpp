@@ -88,6 +88,7 @@ void CommissioningWindowManager::ResetState()
     mECMPasscodeID    = 0;
     mECMIterations    = 0;
     mECMSaltLength    = 0;
+    mWindowStatus     = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
 
     memset(&mECMPASEVerifier, 0, sizeof(mECMPASEVerifier));
     memset(mECMSalt, 0, sizeof(mECMSalt));
@@ -333,8 +334,6 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
         DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
     }
 #endif
-
-    mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
 
     // If aShuttingDown, don't try to change our DNS-SD advertisements.
     if (!aShuttingDown)

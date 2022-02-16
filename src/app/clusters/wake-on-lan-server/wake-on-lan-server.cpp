@@ -36,8 +36,8 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WakeOnLan;
 
-#define WAKE_ON_LAN_DELEGATE_TABLE_SIZE                                                                                            \
-    (EMBER_AF_WAKE_ON_LAN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+static constexpr size_t kWakeOnLanDelegateTableSize =
+    EMBER_AF_WAKE_ON_LAN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -46,7 +46,7 @@ using chip::app::Clusters::WakeOnLan::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[WAKE_ON_LAN_DELEGATE_TABLE_SIZE] = { nullptr };
+Delegate * gDelegateTable[kWakeOnLanDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {

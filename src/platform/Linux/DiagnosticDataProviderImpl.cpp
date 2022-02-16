@@ -485,7 +485,7 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
     }
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetEthPHYRate(uint8_t & pHYRate)
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate)
 {
     if (ConnectivityMgrImpl().GetEthernetIfName() == nullptr)
     {

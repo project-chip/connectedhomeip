@@ -192,16 +192,18 @@ public:
      */
     template <typename AttributeInfo>
     CHIP_ERROR ReadAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> successCb,
-                             ReadResponseFailureCallback failureCb, const Optional<DataVersion> & aDataVersion = NullOptional)
+                             ReadResponseFailureCallback failureCb, bool aIsFabricFiltered = true,
+                             const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         return ReadAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
-            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb, failureCb, aDataVersion);
+            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb, failureCb, aIsFabricFiltered,
+            aDataVersion);
     }
 
     template <typename DecodableType, typename DecodableArgType>
     CHIP_ERROR ReadAttribute(void * context, ClusterId clusterId, AttributeId attributeId,
                              ReadResponseSuccessCallback<DecodableArgType> successCb, ReadResponseFailureCallback failureCb,
-                             const Optional<DataVersion> & aDataVersion = NullOptional)
+                             bool aIsFabricFiltered = true, const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -220,8 +222,8 @@ public:
         };
 
         return Controller::ReadAttribute<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
-                                                        mEndpoint, clusterId, attributeId, onSuccessCb, onFailureCb, true,
-                                                        aDataVersion);
+                                                        mEndpoint, clusterId, attributeId, onSuccessCb, onFailureCb,
+                                                        aIsFabricFiltered, aDataVersion);
     }
 
     /**
@@ -233,11 +235,11 @@ public:
                                   ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
                                   uint16_t maxIntervalCeilingSeconds,
                                   SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
-                                  const Optional<DataVersion> & aDataVersion                = NullOptional)
+                                  bool aIsFabricFiltered = true, const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
             context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
-            maxIntervalCeilingSeconds, subscriptionEstablishedCb, aDataVersion);
+            maxIntervalCeilingSeconds, subscriptionEstablishedCb, aIsFabricFiltered, aDataVersion);
     }
 
     template <typename DecodableType, typename DecodableArgType>
@@ -245,7 +247,7 @@ public:
                                   ReadResponseSuccessCallback<DecodableArgType> reportCb, ReadResponseFailureCallback failureCb,
                                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                                   SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
-                                  const Optional<DataVersion> & aDataVersion                = NullOptional)
+                                  bool aIsFabricFiltered = true, const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -273,7 +275,7 @@ public:
         return Controller::SubscribeAttribute<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
                                                              mEndpoint, clusterId, attributeId, onReportCb, onFailureCb,
                                                              minIntervalFloorSeconds, maxIntervalCeilingSeconds,
-                                                             onSubscriptionEstablishedCb, true, false, aDataVersion);
+                                                             onSubscriptionEstablishedCb, aIsFabricFiltered, false, aDataVersion);
     }
 
     /**

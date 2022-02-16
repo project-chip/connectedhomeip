@@ -42,15 +42,15 @@ using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using chip::app::Clusters::AccountLogin::Delegate;
 
-#define ACCOUNT_LOGIN_DELEGATE_TABLE_SIZE                                                                                          \
-    (EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+static constexpr size_t kAccountLoginDeletageTableSize =
+    EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 
 namespace {
 
-Delegate * gDelegateTable[ACCOUNT_LOGIN_DELEGATE_TABLE_SIZE] = { nullptr };
+Delegate * gDelegateTable[kAccountLoginDeletageTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {

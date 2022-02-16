@@ -35,8 +35,8 @@
 using namespace chip;
 using namespace chip::app::Clusters::AudioOutput;
 
-#define AUDIO_OUTPUT_DELEGATE_TABLE_SIZE                                                                                           \
-    (EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+static constexpr size_t kAudioOutputDelegateTableSize =
+    EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -45,7 +45,7 @@ using chip::app::Clusters::AudioOutput::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[AUDIO_OUTPUT_DELEGATE_TABLE_SIZE] = { nullptr };
+Delegate * gDelegateTable[kAudioOutputDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {

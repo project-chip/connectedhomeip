@@ -47,6 +47,7 @@ const kResponseErrorName      = 'error';
 const kResponseWrongErrorName = 'errorWrongValue';
 const kPICSName               = 'PICS';
 const kSaveAsName             = 'saveAs';
+const kFabricFiltered         = 'fabricFiltered';
 
 class NullObject {
   toString()
@@ -139,6 +140,9 @@ function setDefaultTypeForCommand(test)
     test.commandName     = 'Read';
     test.isAttribute     = true;
     test.isReadAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
     break;
 
   case 'writeAttribute':
@@ -156,6 +160,9 @@ function setDefaultTypeForCommand(test)
     test.isAttribute          = true;
     test.isSubscribe          = true;
     test.isSubscribeAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
     break;
 
   case 'waitForReport':
@@ -688,7 +695,8 @@ function chip_tests_item_response_parameters(options)
 
         if ('constraints' in expected) {
           responseArg.hasExpectedConstraints = true;
-          responseArg.expectedConstraints    = expected.constraints;
+          responseArg.expectedConstraints
+              = attachGlobal(this.global, expected.constraints, { thisVal : this, name : responseArg.name });
         }
 
         if ('saveAs' in expected) {

@@ -359,7 +359,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -385,7 +385,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -434,7 +434,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -460,7 +460,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -710,7 +710,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -736,7 +736,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -784,7 +784,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -810,7 +810,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -858,7 +858,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -884,7 +884,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -910,7 +910,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -961,7 +961,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1216,7 +1216,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1242,7 +1242,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1268,7 +1268,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1294,7 +1294,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1320,7 +1320,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1346,7 +1346,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1372,7 +1372,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1398,7 +1398,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1570,7 +1570,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1596,7 +1596,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1645,7 +1645,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1671,7 +1671,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1828,7 +1828,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1854,7 +1854,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -1903,7 +1903,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -2035,7 +2035,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BridgedActions::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -2061,7 +2061,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::BridgedActions::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -2203,7 +2203,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -2252,7 +2252,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4376,7 +4376,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4402,7 +4402,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4453,7 +4453,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4479,7 +4479,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4505,7 +4505,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4556,7 +4556,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4582,7 +4582,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4608,7 +4608,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4659,7 +4659,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4685,7 +4685,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4711,7 +4711,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4762,7 +4762,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16));
+            this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4788,7 +4788,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo>(
-            this, OnSuccessCallback_17, OnFailureCallback_17));
+            this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4815,7 +4815,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorMode::TypeInfo>(
-            this, OnSuccessCallback_18, OnFailureCallback_18));
+            this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4842,7 +4842,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
-            this, OnSuccessCallback_19, OnFailureCallback_19));
+            this, OnSuccessCallback_19, OnFailureCallback_19, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4868,7 +4868,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
-            this, OnSuccessCallback_20, OnFailureCallback_20));
+            this, OnSuccessCallback_20, OnFailureCallback_20, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4916,7 +4916,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
-            this, OnSuccessCallback_22, OnFailureCallback_22));
+            this, OnSuccessCallback_22, OnFailureCallback_22, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4942,7 +4942,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_23, OnFailureCallback_23));
+            this, OnSuccessCallback_23, OnFailureCallback_23, true));
         return CHIP_NO_ERROR;
     }
 
@@ -4968,7 +4968,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_24, OnFailureCallback_24));
+            this, OnSuccessCallback_24, OnFailureCallback_24, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5017,7 +5017,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_26, OnFailureCallback_26));
+            this, OnSuccessCallback_26, OnFailureCallback_26, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5043,7 +5043,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedColorMode::TypeInfo>(
-            this, OnSuccessCallback_27, OnFailureCallback_27));
+            this, OnSuccessCallback_27, OnFailureCallback_27, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5068,7 +5068,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_28, OnFailureCallback_28));
+            this, OnSuccessCallback_28, OnFailureCallback_28, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5094,7 +5094,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_29, OnFailureCallback_29));
+            this, OnSuccessCallback_29, OnFailureCallback_29, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5143,7 +5143,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_31, OnFailureCallback_31));
+            this, OnSuccessCallback_31, OnFailureCallback_31, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5169,7 +5169,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_32, OnFailureCallback_32));
+            this, OnSuccessCallback_32, OnFailureCallback_32, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5195,7 +5195,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_33, OnFailureCallback_33));
+            this, OnSuccessCallback_33, OnFailureCallback_33, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5244,7 +5244,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_35, OnFailureCallback_35));
+            this, OnSuccessCallback_35, OnFailureCallback_35, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5270,7 +5270,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            this, OnSuccessCallback_36, OnFailureCallback_36));
+            this, OnSuccessCallback_36, OnFailureCallback_36, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5296,7 +5296,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            this, OnSuccessCallback_37, OnFailureCallback_37));
+            this, OnSuccessCallback_37, OnFailureCallback_37, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5345,7 +5345,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            this, OnSuccessCallback_39, OnFailureCallback_39));
+            this, OnSuccessCallback_39, OnFailureCallback_39, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5372,7 +5372,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_40, OnFailureCallback_40));
+                this, OnSuccessCallback_40, OnFailureCallback_40, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5399,7 +5399,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_41, OnFailureCallback_41));
+                this, OnSuccessCallback_41, OnFailureCallback_41, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5450,7 +5450,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_43, OnFailureCallback_43));
+                this, OnSuccessCallback_43, OnFailureCallback_43, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5477,7 +5477,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_44, OnFailureCallback_44));
+                this, OnSuccessCallback_44, OnFailureCallback_44, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5504,7 +5504,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_45, OnFailureCallback_45));
+                this, OnSuccessCallback_45, OnFailureCallback_45, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5555,7 +5555,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_47, OnFailureCallback_47));
+                this, OnSuccessCallback_47, OnFailureCallback_47, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5581,7 +5581,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
-            this, OnSuccessCallback_48, OnFailureCallback_48));
+            this, OnSuccessCallback_48, OnFailureCallback_48, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5607,7 +5607,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
-            this, OnSuccessCallback_49, OnFailureCallback_49));
+            this, OnSuccessCallback_49, OnFailureCallback_49, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5658,7 +5658,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
-            this, OnSuccessCallback_51, OnFailureCallback_51));
+            this, OnSuccessCallback_51, OnFailureCallback_51, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5684,7 +5684,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo>(
-            this, OnSuccessCallback_52, OnFailureCallback_52));
+            this, OnSuccessCallback_52, OnFailureCallback_52, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5710,7 +5710,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo>(
-            this, OnSuccessCallback_53, OnFailureCallback_53));
+            this, OnSuccessCallback_53, OnFailureCallback_53, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5761,7 +5761,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo>(
-            this, OnSuccessCallback_55, OnFailureCallback_55));
+            this, OnSuccessCallback_55, OnFailureCallback_55, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5787,7 +5787,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo>(
-            this, OnSuccessCallback_56, OnFailureCallback_56));
+            this, OnSuccessCallback_56, OnFailureCallback_56, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5813,7 +5813,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo>(
-            this, OnSuccessCallback_57, OnFailureCallback_57));
+            this, OnSuccessCallback_57, OnFailureCallback_57, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5864,7 +5864,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo>(
-            this, OnSuccessCallback_59, OnFailureCallback_59));
+            this, OnSuccessCallback_59, OnFailureCallback_59, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5891,7 +5891,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo>(
-                this, OnSuccessCallback_60, OnFailureCallback_60));
+                this, OnSuccessCallback_60, OnFailureCallback_60, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5942,7 +5942,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo>(
-                this, OnSuccessCallback_62, OnFailureCallback_62));
+                this, OnSuccessCallback_62, OnFailureCallback_62, true));
         return CHIP_NO_ERROR;
     }
 
@@ -5969,7 +5969,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
-                this, OnSuccessCallback_63, OnFailureCallback_63));
+                this, OnSuccessCallback_63, OnFailureCallback_63, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6021,7 +6021,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
-                this, OnSuccessCallback_65, OnFailureCallback_65));
+                this, OnSuccessCallback_65, OnFailureCallback_65, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6047,7 +6047,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
-            this, OnSuccessCallback_66, OnFailureCallback_66));
+            this, OnSuccessCallback_66, OnFailureCallback_66, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6073,7 +6073,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
-            this, OnSuccessCallback_67, OnFailureCallback_67));
+            this, OnSuccessCallback_67, OnFailureCallback_67, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6124,7 +6124,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
-            this, OnSuccessCallback_69, OnFailureCallback_69));
+            this, OnSuccessCallback_69, OnFailureCallback_69, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6150,7 +6150,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
-            this, OnSuccessCallback_70, OnFailureCallback_70));
+            this, OnSuccessCallback_70, OnFailureCallback_70, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6201,7 +6201,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
-            this, OnSuccessCallback_72, OnFailureCallback_72));
+            this, OnSuccessCallback_72, OnFailureCallback_72, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6227,7 +6227,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(
-            this, OnSuccessCallback_73, OnFailureCallback_73));
+            this, OnSuccessCallback_73, OnFailureCallback_73, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6277,7 +6277,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(
-            this, OnSuccessCallback_75, OnFailureCallback_75));
+            this, OnSuccessCallback_75, OnFailureCallback_75, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6303,7 +6303,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo>(
-            this, OnSuccessCallback_76, OnFailureCallback_76));
+            this, OnSuccessCallback_76, OnFailureCallback_76, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6354,7 +6354,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo>(
-            this, OnSuccessCallback_78, OnFailureCallback_78));
+            this, OnSuccessCallback_78, OnFailureCallback_78, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6380,7 +6380,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1X::TypeInfo>(
-            this, OnSuccessCallback_79, OnFailureCallback_79));
+            this, OnSuccessCallback_79, OnFailureCallback_79, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6431,7 +6431,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1X::TypeInfo>(
-            this, OnSuccessCallback_81, OnFailureCallback_81));
+            this, OnSuccessCallback_81, OnFailureCallback_81, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6457,7 +6457,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Y::TypeInfo>(
-            this, OnSuccessCallback_82, OnFailureCallback_82));
+            this, OnSuccessCallback_82, OnFailureCallback_82, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6508,7 +6508,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Y::TypeInfo>(
-            this, OnSuccessCallback_84, OnFailureCallback_84));
+            this, OnSuccessCallback_84, OnFailureCallback_84, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6534,7 +6534,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Intensity::TypeInfo>(
-            this, OnSuccessCallback_85, OnFailureCallback_85));
+            this, OnSuccessCallback_85, OnFailureCallback_85, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6559,7 +6559,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2X::TypeInfo>(
-            this, OnSuccessCallback_86, OnFailureCallback_86));
+            this, OnSuccessCallback_86, OnFailureCallback_86, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6610,7 +6610,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2X::TypeInfo>(
-            this, OnSuccessCallback_88, OnFailureCallback_88));
+            this, OnSuccessCallback_88, OnFailureCallback_88, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6636,7 +6636,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Y::TypeInfo>(
-            this, OnSuccessCallback_89, OnFailureCallback_89));
+            this, OnSuccessCallback_89, OnFailureCallback_89, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6687,7 +6687,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Y::TypeInfo>(
-            this, OnSuccessCallback_91, OnFailureCallback_91));
+            this, OnSuccessCallback_91, OnFailureCallback_91, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6713,7 +6713,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Intensity::TypeInfo>(
-            this, OnSuccessCallback_92, OnFailureCallback_92));
+            this, OnSuccessCallback_92, OnFailureCallback_92, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6738,7 +6738,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3X::TypeInfo>(
-            this, OnSuccessCallback_93, OnFailureCallback_93));
+            this, OnSuccessCallback_93, OnFailureCallback_93, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6789,7 +6789,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3X::TypeInfo>(
-            this, OnSuccessCallback_95, OnFailureCallback_95));
+            this, OnSuccessCallback_95, OnFailureCallback_95, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6815,7 +6815,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Y::TypeInfo>(
-            this, OnSuccessCallback_96, OnFailureCallback_96));
+            this, OnSuccessCallback_96, OnFailureCallback_96, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6866,7 +6866,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Y::TypeInfo>(
-            this, OnSuccessCallback_98, OnFailureCallback_98));
+            this, OnSuccessCallback_98, OnFailureCallback_98, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6892,7 +6892,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Intensity::TypeInfo>(
-            this, OnSuccessCallback_99, OnFailureCallback_99));
+            this, OnSuccessCallback_99, OnFailureCallback_99, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6917,7 +6917,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4X::TypeInfo>(
-            this, OnSuccessCallback_100, OnFailureCallback_100));
+            this, OnSuccessCallback_100, OnFailureCallback_100, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6968,7 +6968,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4X::TypeInfo>(
-            this, OnSuccessCallback_102, OnFailureCallback_102));
+            this, OnSuccessCallback_102, OnFailureCallback_102, true));
         return CHIP_NO_ERROR;
     }
 
@@ -6994,7 +6994,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Y::TypeInfo>(
-            this, OnSuccessCallback_103, OnFailureCallback_103));
+            this, OnSuccessCallback_103, OnFailureCallback_103, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7045,7 +7045,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Y::TypeInfo>(
-            this, OnSuccessCallback_105, OnFailureCallback_105));
+            this, OnSuccessCallback_105, OnFailureCallback_105, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7071,7 +7071,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Intensity::TypeInfo>(
-            this, OnSuccessCallback_106, OnFailureCallback_106));
+            this, OnSuccessCallback_106, OnFailureCallback_106, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7096,7 +7096,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5X::TypeInfo>(
-            this, OnSuccessCallback_107, OnFailureCallback_107));
+            this, OnSuccessCallback_107, OnFailureCallback_107, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7147,7 +7147,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5X::TypeInfo>(
-            this, OnSuccessCallback_109, OnFailureCallback_109));
+            this, OnSuccessCallback_109, OnFailureCallback_109, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7173,7 +7173,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Y::TypeInfo>(
-            this, OnSuccessCallback_110, OnFailureCallback_110));
+            this, OnSuccessCallback_110, OnFailureCallback_110, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7224,7 +7224,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Y::TypeInfo>(
-            this, OnSuccessCallback_112, OnFailureCallback_112));
+            this, OnSuccessCallback_112, OnFailureCallback_112, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7250,7 +7250,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Intensity::TypeInfo>(
-            this, OnSuccessCallback_113, OnFailureCallback_113));
+            this, OnSuccessCallback_113, OnFailureCallback_113, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7275,7 +7275,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6X::TypeInfo>(
-            this, OnSuccessCallback_114, OnFailureCallback_114));
+            this, OnSuccessCallback_114, OnFailureCallback_114, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7326,7 +7326,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6X::TypeInfo>(
-            this, OnSuccessCallback_116, OnFailureCallback_116));
+            this, OnSuccessCallback_116, OnFailureCallback_116, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7352,7 +7352,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Y::TypeInfo>(
-            this, OnSuccessCallback_117, OnFailureCallback_117));
+            this, OnSuccessCallback_117, OnFailureCallback_117, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7403,7 +7403,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Y::TypeInfo>(
-            this, OnSuccessCallback_119, OnFailureCallback_119));
+            this, OnSuccessCallback_119, OnFailureCallback_119, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7429,7 +7429,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Intensity::TypeInfo>(
-            this, OnSuccessCallback_120, OnFailureCallback_120));
+            this, OnSuccessCallback_120, OnFailureCallback_120, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7454,7 +7454,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
-            this, OnSuccessCallback_121, OnFailureCallback_121));
+            this, OnSuccessCallback_121, OnFailureCallback_121, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7504,7 +7504,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
-            this, OnSuccessCallback_123, OnFailureCallback_123));
+            this, OnSuccessCallback_123, OnFailureCallback_123, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7530,7 +7530,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
-            this, OnSuccessCallback_124, OnFailureCallback_124));
+            this, OnSuccessCallback_124, OnFailureCallback_124, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7580,7 +7580,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
-            this, OnSuccessCallback_126, OnFailureCallback_126));
+            this, OnSuccessCallback_126, OnFailureCallback_126, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7606,7 +7606,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
-            this, OnSuccessCallback_127, OnFailureCallback_127));
+            this, OnSuccessCallback_127, OnFailureCallback_127, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7656,7 +7656,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
-            this, OnSuccessCallback_129, OnFailureCallback_129));
+            this, OnSuccessCallback_129, OnFailureCallback_129, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7682,7 +7682,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
-            this, OnSuccessCallback_130, OnFailureCallback_130));
+            this, OnSuccessCallback_130, OnFailureCallback_130, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7732,7 +7732,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
-            this, OnSuccessCallback_132, OnFailureCallback_132));
+            this, OnSuccessCallback_132, OnFailureCallback_132, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7758,7 +7758,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(
-            this, OnSuccessCallback_133, OnFailureCallback_133));
+            this, OnSuccessCallback_133, OnFailureCallback_133, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7806,7 +7806,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(
-            this, OnSuccessCallback_135, OnFailureCallback_135));
+            this, OnSuccessCallback_135, OnFailureCallback_135, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7832,7 +7832,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
-            this, OnSuccessCallback_136, OnFailureCallback_136));
+            this, OnSuccessCallback_136, OnFailureCallback_136, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7882,7 +7882,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
-            this, OnSuccessCallback_138, OnFailureCallback_138));
+            this, OnSuccessCallback_138, OnFailureCallback_138, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7908,7 +7908,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
-            this, OnSuccessCallback_139, OnFailureCallback_139));
+            this, OnSuccessCallback_139, OnFailureCallback_139, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7958,7 +7958,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
-            this, OnSuccessCallback_141, OnFailureCallback_141));
+            this, OnSuccessCallback_141, OnFailureCallback_141, true));
         return CHIP_NO_ERROR;
     }
 
@@ -7984,7 +7984,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(
-            this, OnSuccessCallback_142, OnFailureCallback_142));
+            this, OnSuccessCallback_142, OnFailureCallback_142, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8032,7 +8032,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(
-            this, OnSuccessCallback_144, OnFailureCallback_144));
+            this, OnSuccessCallback_144, OnFailureCallback_144, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8058,7 +8058,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
-            this, OnSuccessCallback_145, OnFailureCallback_145));
+            this, OnSuccessCallback_145, OnFailureCallback_145, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8108,7 +8108,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
-            this, OnSuccessCallback_147, OnFailureCallback_147));
+            this, OnSuccessCallback_147, OnFailureCallback_147, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8134,7 +8134,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
-            this, OnSuccessCallback_148, OnFailureCallback_148));
+            this, OnSuccessCallback_148, OnFailureCallback_148, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8184,7 +8184,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
-            this, OnSuccessCallback_150, OnFailureCallback_150));
+            this, OnSuccessCallback_150, OnFailureCallback_150, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8210,7 +8210,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(
-            this, OnSuccessCallback_151, OnFailureCallback_151));
+            this, OnSuccessCallback_151, OnFailureCallback_151, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8258,7 +8258,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(
-            this, OnSuccessCallback_153, OnFailureCallback_153));
+            this, OnSuccessCallback_153, OnFailureCallback_153, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8455,7 +8455,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8481,7 +8481,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8668,7 +8668,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -8851,7 +8851,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -9033,7 +9033,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -9208,7 +9208,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -9328,7 +9328,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -9499,7 +9499,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -9585,7 +9585,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -9776,7 +9776,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -10022,7 +10022,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -10197,7 +10197,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -10317,7 +10317,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -10488,7 +10488,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -10575,7 +10575,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -10746,7 +10746,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -10833,7 +10833,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -11008,7 +11008,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -11124,7 +11124,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -11295,7 +11295,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -11382,7 +11382,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -11553,7 +11553,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -11639,7 +11639,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -11844,7 +11844,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -11870,7 +11870,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -12129,7 +12129,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -12304,7 +12304,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -12428,7 +12428,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -12615,7 +12615,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -12834,7 +12834,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -13031,7 +13031,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -13057,7 +13057,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -13240,7 +13240,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -13415,7 +13415,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -13535,7 +13535,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -13706,7 +13706,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -13793,7 +13793,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -14088,7 +14088,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -14149,7 +14149,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -14175,7 +14175,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -14202,7 +14202,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_6, OnFailureCallback_6));
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -14228,7 +14228,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -14289,7 +14289,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -14350,7 +14350,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -14376,7 +14376,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -14437,7 +14437,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -14491,7 +14491,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16));
+            this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15423,7 +15423,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15484,7 +15484,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15545,7 +15545,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15606,7 +15606,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15668,7 +15668,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_10, OnFailureCallback_10));
+                this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15729,7 +15729,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15755,7 +15755,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15782,7 +15782,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_14, OnFailureCallback_14));
+                this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15843,7 +15843,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16));
+            this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15870,7 +15870,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_17, OnFailureCallback_17));
+                this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15896,7 +15896,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_18, OnFailureCallback_18));
+            this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -15957,7 +15957,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_20, OnFailureCallback_20));
+            this, OnSuccessCallback_20, OnFailureCallback_20, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16018,7 +16018,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_22, OnFailureCallback_22));
+            this, OnSuccessCallback_22, OnFailureCallback_22, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16044,7 +16044,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_23, OnFailureCallback_23));
+            this, OnSuccessCallback_23, OnFailureCallback_23, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16071,7 +16071,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_24, OnFailureCallback_24));
+                this, OnSuccessCallback_24, OnFailureCallback_24, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16132,7 +16132,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_26, OnFailureCallback_26));
+            this, OnSuccessCallback_26, OnFailureCallback_26, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16159,7 +16159,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_27, OnFailureCallback_27));
+                this, OnSuccessCallback_27, OnFailureCallback_27, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16185,7 +16185,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_28, OnFailureCallback_28));
+            this, OnSuccessCallback_28, OnFailureCallback_28, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16250,7 +16250,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_31, OnFailureCallback_31));
+            this, OnSuccessCallback_31, OnFailureCallback_31, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16311,7 +16311,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_33, OnFailureCallback_33));
+            this, OnSuccessCallback_33, OnFailureCallback_33, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16372,7 +16372,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_35, OnFailureCallback_35));
+            this, OnSuccessCallback_35, OnFailureCallback_35, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16398,7 +16398,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_36, OnFailureCallback_36));
+            this, OnSuccessCallback_36, OnFailureCallback_36, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16425,7 +16425,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_37, OnFailureCallback_37));
+                this, OnSuccessCallback_37, OnFailureCallback_37, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16486,7 +16486,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_39, OnFailureCallback_39));
+            this, OnSuccessCallback_39, OnFailureCallback_39, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16513,7 +16513,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_40, OnFailureCallback_40));
+                this, OnSuccessCallback_40, OnFailureCallback_40, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16539,7 +16539,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_41, OnFailureCallback_41));
+            this, OnSuccessCallback_41, OnFailureCallback_41, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16600,7 +16600,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_43, OnFailureCallback_43));
+            this, OnSuccessCallback_43, OnFailureCallback_43, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16661,7 +16661,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_45, OnFailureCallback_45));
+            this, OnSuccessCallback_45, OnFailureCallback_45, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16687,7 +16687,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_46, OnFailureCallback_46));
+            this, OnSuccessCallback_46, OnFailureCallback_46, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16714,7 +16714,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_47, OnFailureCallback_47));
+                this, OnSuccessCallback_47, OnFailureCallback_47, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16775,7 +16775,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_49, OnFailureCallback_49));
+            this, OnSuccessCallback_49, OnFailureCallback_49, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16802,7 +16802,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_50, OnFailureCallback_50));
+                this, OnSuccessCallback_50, OnFailureCallback_50, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16828,7 +16828,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_51, OnFailureCallback_51));
+            this, OnSuccessCallback_51, OnFailureCallback_51, true));
         return CHIP_NO_ERROR;
     }
 
@@ -16882,7 +16882,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_53, OnFailureCallback_53));
+            this, OnSuccessCallback_53, OnFailureCallback_53, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17297,7 +17297,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17358,7 +17358,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17384,7 +17384,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17410,7 +17410,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17437,7 +17437,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_7, OnFailureCallback_7));
+                this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17498,7 +17498,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17524,7 +17524,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17551,7 +17551,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_11, OnFailureCallback_11));
+                this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17612,7 +17612,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17673,7 +17673,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_15, OnFailureCallback_15));
+            this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17700,7 +17700,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_16, OnFailureCallback_16));
+                this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17726,7 +17726,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_17, OnFailureCallback_17));
+            this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -17780,7 +17780,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_19, OnFailureCallback_19));
+            this, OnSuccessCallback_19, OnFailureCallback_19, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18195,7 +18195,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18256,7 +18256,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18282,7 +18282,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18308,7 +18308,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18335,7 +18335,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_7, OnFailureCallback_7));
+                this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18396,7 +18396,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18422,7 +18422,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18449,7 +18449,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_11, OnFailureCallback_11));
+                this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18510,7 +18510,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18571,7 +18571,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_15, OnFailureCallback_15));
+            this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18598,7 +18598,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_16, OnFailureCallback_16));
+                this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18624,7 +18624,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_17, OnFailureCallback_17));
+            this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -18678,7 +18678,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_19, OnFailureCallback_19));
+            this, OnSuccessCallback_19, OnFailureCallback_19, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19057,7 +19057,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::DataModelRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19082,7 +19082,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorName::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19108,7 +19108,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19133,7 +19133,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductName::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19159,7 +19159,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19184,7 +19184,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19210,7 +19210,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19237,7 +19237,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::HardwareVersion::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19262,7 +19262,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::HardwareVersionString::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19289,7 +19289,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19314,7 +19314,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersionString::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19342,7 +19342,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ManufacturingDate::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19370,7 +19370,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::PartNumber::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19396,7 +19396,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductURL::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19423,7 +19423,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductLabel::TypeInfo>(
-            this, OnSuccessCallback_15, OnFailureCallback_15));
+            this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19449,7 +19449,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::SerialNumber::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16));
+            this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19475,7 +19475,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo>(
-            this, OnSuccessCallback_17, OnFailureCallback_17));
+            this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19500,7 +19500,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Reachable::TypeInfo>(
-            this, OnSuccessCallback_18, OnFailureCallback_18));
+            this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19525,7 +19525,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::UniqueID::TypeInfo>(
-            this, OnSuccessCallback_19, OnFailureCallback_19));
+            this, OnSuccessCallback_19, OnFailureCallback_19, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19659,7 +19659,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::MaxNetworks::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19684,7 +19684,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::Networks::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19848,7 +19848,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19881,7 +19881,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19908,7 +19908,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -19935,7 +19935,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -20106,7 +20106,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -20133,7 +20133,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -20184,7 +20184,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -20210,7 +20210,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -20508,7 +20508,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -20557,7 +20557,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -20829,7 +20829,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -20854,7 +20854,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -20879,7 +20879,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -20976,7 +20976,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21001,7 +21001,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21026,7 +21026,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21051,7 +21051,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21077,7 +21077,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21128,7 +21128,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21259,7 +21259,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21284,7 +21284,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21455,7 +21455,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21482,7 +21482,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21533,7 +21533,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21560,7 +21560,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::AttributeList::TypeInfo>(
-                this, OnSuccessCallback_5, OnFailureCallback_5));
+                this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21755,7 +21755,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21781,7 +21781,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21830,7 +21830,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21856,7 +21856,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -21881,7 +21881,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22235,7 +22235,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22261,7 +22261,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::RemainingTime::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22287,7 +22287,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22313,7 +22313,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22338,7 +22338,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentFrequency::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22364,7 +22364,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MinFrequency::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22390,7 +22390,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MaxFrequency::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22416,7 +22416,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22442,7 +22442,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22467,7 +22467,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22492,7 +22492,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22517,7 +22517,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22542,7 +22542,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo>(
-            this, OnSuccessCallback_15, OnFailureCallback_15));
+            this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22834,7 +22834,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22883,7 +22883,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -22956,7 +22956,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23007,7 +23007,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23058,7 +23058,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23085,7 +23085,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23136,7 +23136,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23187,7 +23187,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_15, OnFailureCallback_15));
+            this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23421,7 +23421,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23447,7 +23447,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23473,7 +23473,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23537,7 +23537,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23601,7 +23601,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23627,7 +23627,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23691,7 +23691,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23973,7 +23973,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -23999,7 +23999,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -24063,7 +24063,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -24089,7 +24089,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -24153,7 +24153,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -24203,7 +24203,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -24268,7 +24268,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -24558,7 +24558,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -24623,7 +24623,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -24688,7 +24688,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -24987,7 +24987,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -25081,7 +25081,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -25318,7 +25318,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -25344,7 +25344,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -25393,7 +25393,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -25419,7 +25419,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -26493,7 +26493,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::ChannelList::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -26812,7 +26812,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -26981,7 +26981,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -27293,7 +27293,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -27325,7 +27325,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -27363,7 +27363,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -27663,7 +27663,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -27688,7 +27688,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -27886,7 +27886,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -27911,7 +27911,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -27937,7 +27937,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -27963,7 +27963,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -27988,7 +27988,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28014,7 +28014,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28157,7 +28157,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28206,7 +28206,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28429,7 +28429,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28480,7 +28480,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28507,7 +28507,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorType::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28560,7 +28560,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorType::TypeInfo>(
-                this, OnSuccessCallback_6, OnFailureCallback_6));
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28587,7 +28587,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorTypeBitmap::TypeInfo>(
-                this, OnSuccessCallback_7, OnFailureCallback_7));
+                this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28640,7 +28640,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorTypeBitmap::TypeInfo>(
-                this, OnSuccessCallback_9, OnFailureCallback_9));
+                this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28781,7 +28781,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -28806,7 +28806,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29029,7 +29029,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29055,7 +29055,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29104,7 +29104,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29130,7 +29130,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29155,7 +29155,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29181,7 +29181,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29230,7 +29230,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29528,7 +29528,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29578,7 +29578,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29604,7 +29604,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29630,7 +29630,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29656,7 +29656,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29682,7 +29682,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29801,7 +29801,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29827,7 +29827,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29853,7 +29853,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -29879,7 +29879,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
-            this, OnSuccessCallback_15, OnFailureCallback_15));
+            this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -30136,7 +30136,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -30190,7 +30190,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -30244,7 +30244,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -30298,7 +30298,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -30352,7 +30352,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -30406,7 +30406,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -30460,7 +30460,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31326,7 +31326,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31352,7 +31352,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31412,7 +31412,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31438,7 +31438,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31498,7 +31498,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31524,7 +31524,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31550,7 +31550,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31576,7 +31576,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31630,7 +31630,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16));
+            this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31656,7 +31656,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_17, OnFailureCallback_17));
+            this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31682,7 +31682,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_18, OnFailureCallback_18));
+            this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31736,7 +31736,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_20, OnFailureCallback_20));
+            this, OnSuccessCallback_20, OnFailureCallback_20, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31762,7 +31762,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_21, OnFailureCallback_21));
+            this, OnSuccessCallback_21, OnFailureCallback_21, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31788,7 +31788,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_22, OnFailureCallback_22));
+            this, OnSuccessCallback_22, OnFailureCallback_22, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31814,7 +31814,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_23, OnFailureCallback_23));
+            this, OnSuccessCallback_23, OnFailureCallback_23, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31840,7 +31840,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_24, OnFailureCallback_24));
+            this, OnSuccessCallback_24, OnFailureCallback_24, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31894,7 +31894,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_26, OnFailureCallback_26));
+            this, OnSuccessCallback_26, OnFailureCallback_26, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31920,7 +31920,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_27, OnFailureCallback_27));
+            this, OnSuccessCallback_27, OnFailureCallback_27, true));
         return CHIP_NO_ERROR;
     }
 
@@ -31974,7 +31974,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_29, OnFailureCallback_29));
+            this, OnSuccessCallback_29, OnFailureCallback_29, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32000,7 +32000,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_30, OnFailureCallback_30));
+            this, OnSuccessCallback_30, OnFailureCallback_30, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32026,7 +32026,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_31, OnFailureCallback_31));
+            this, OnSuccessCallback_31, OnFailureCallback_31, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32052,7 +32052,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_32, OnFailureCallback_32));
+            this, OnSuccessCallback_32, OnFailureCallback_32, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32106,7 +32106,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_34, OnFailureCallback_34));
+            this, OnSuccessCallback_34, OnFailureCallback_34, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32132,7 +32132,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_35, OnFailureCallback_35));
+            this, OnSuccessCallback_35, OnFailureCallback_35, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32158,7 +32158,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_36, OnFailureCallback_36));
+            this, OnSuccessCallback_36, OnFailureCallback_36, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32212,7 +32212,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_38, OnFailureCallback_38));
+            this, OnSuccessCallback_38, OnFailureCallback_38, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32238,7 +32238,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_39, OnFailureCallback_39));
+            this, OnSuccessCallback_39, OnFailureCallback_39, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32264,7 +32264,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_40, OnFailureCallback_40));
+            this, OnSuccessCallback_40, OnFailureCallback_40, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32290,7 +32290,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_41, OnFailureCallback_41));
+            this, OnSuccessCallback_41, OnFailureCallback_41, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32316,7 +32316,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_42, OnFailureCallback_42));
+            this, OnSuccessCallback_42, OnFailureCallback_42, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32342,7 +32342,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_43, OnFailureCallback_43));
+            this, OnSuccessCallback_43, OnFailureCallback_43, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32368,7 +32368,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_44, OnFailureCallback_44));
+            this, OnSuccessCallback_44, OnFailureCallback_44, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32394,7 +32394,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_45, OnFailureCallback_45));
+            this, OnSuccessCallback_45, OnFailureCallback_45, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32593,7 +32593,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32619,7 +32619,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32668,7 +32668,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32694,7 +32694,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32836,7 +32836,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -32886,7 +32886,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -33105,7 +33105,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -33154,7 +33154,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -33181,7 +33181,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -33232,7 +33232,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_6, OnFailureCallback_6));
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -33259,7 +33259,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_7, OnFailureCallback_7));
+                this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -33310,7 +33310,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_9, OnFailureCallback_9));
+                this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -33468,7 +33468,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ClusterRevision::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -33519,7 +33519,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::AttributeList::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -33545,7 +33545,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::FeatureMap::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34331,7 +34331,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34357,7 +34357,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxSpeed::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34382,7 +34382,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxFlow::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34408,7 +34408,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34434,7 +34434,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
-                this, OnSuccessCallback_5, OnFailureCallback_5));
+                this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34460,7 +34460,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
-                this, OnSuccessCallback_6, OnFailureCallback_6));
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34486,7 +34486,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo>(
-                this, OnSuccessCallback_7, OnFailureCallback_7));
+                this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34512,7 +34512,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxSpeed::TypeInfo>(
-                this, OnSuccessCallback_8, OnFailureCallback_8));
+                this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34537,7 +34537,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxFlow::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34563,7 +34563,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
-                this, OnSuccessCallback_10, OnFailureCallback_10));
+                this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34589,7 +34589,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
-                this, OnSuccessCallback_11, OnFailureCallback_11));
+                this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34615,7 +34615,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
-                this, OnSuccessCallback_12, OnFailureCallback_12));
+                this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34641,7 +34641,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstPressure::TypeInfo>(
-                this, OnSuccessCallback_13, OnFailureCallback_13));
+                this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34667,7 +34667,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo>(
-                this, OnSuccessCallback_14, OnFailureCallback_14));
+                this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34693,7 +34693,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinCompPressure::TypeInfo>(
-                this, OnSuccessCallback_15, OnFailureCallback_15));
+                this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34719,7 +34719,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxCompPressure::TypeInfo>(
-                this, OnSuccessCallback_16, OnFailureCallback_16));
+                this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34745,7 +34745,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstSpeed::TypeInfo>(
-                this, OnSuccessCallback_17, OnFailureCallback_17));
+                this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34771,7 +34771,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstSpeed::TypeInfo>(
-                this, OnSuccessCallback_18, OnFailureCallback_18));
+                this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34797,7 +34797,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstFlow::TypeInfo>(
-                this, OnSuccessCallback_19, OnFailureCallback_19));
+                this, OnSuccessCallback_19, OnFailureCallback_19, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34823,7 +34823,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstFlow::TypeInfo>(
-                this, OnSuccessCallback_20, OnFailureCallback_20));
+                this, OnSuccessCallback_20, OnFailureCallback_20, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34849,7 +34849,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstTemp::TypeInfo>(
-                this, OnSuccessCallback_21, OnFailureCallback_21));
+                this, OnSuccessCallback_21, OnFailureCallback_21, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34876,7 +34876,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstTemp::TypeInfo>(
-                this, OnSuccessCallback_22, OnFailureCallback_22));
+                this, OnSuccessCallback_22, OnFailureCallback_22, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34903,7 +34903,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
-                this, OnSuccessCallback_23, OnFailureCallback_23));
+                this, OnSuccessCallback_23, OnFailureCallback_23, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34930,7 +34930,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
-                this, OnSuccessCallback_24, OnFailureCallback_24));
+                this, OnSuccessCallback_24, OnFailureCallback_24, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34955,7 +34955,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Speed::TypeInfo>(
-            this, OnSuccessCallback_25, OnFailureCallback_25));
+            this, OnSuccessCallback_25, OnFailureCallback_25, true));
         return CHIP_NO_ERROR;
     }
 
@@ -34981,7 +34981,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
-                this, OnSuccessCallback_26, OnFailureCallback_26));
+                this, OnSuccessCallback_26, OnFailureCallback_26, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35009,7 +35009,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
-                this, OnSuccessCallback_27, OnFailureCallback_27));
+                this, OnSuccessCallback_27, OnFailureCallback_27, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35034,7 +35034,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Power::TypeInfo>(
-            this, OnSuccessCallback_28, OnFailureCallback_28));
+            this, OnSuccessCallback_28, OnFailureCallback_28, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35060,7 +35060,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
-                this, OnSuccessCallback_29, OnFailureCallback_29));
+                this, OnSuccessCallback_29, OnFailureCallback_29, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35088,7 +35088,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
-                this, OnSuccessCallback_30, OnFailureCallback_30));
+                this, OnSuccessCallback_30, OnFailureCallback_30, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35139,7 +35139,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstPressure::TypeInfo>(
-                this, OnSuccessCallback_32, OnFailureCallback_32));
+                this, OnSuccessCallback_32, OnFailureCallback_32, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35165,7 +35165,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo>(
-                this, OnSuccessCallback_33, OnFailureCallback_33));
+                this, OnSuccessCallback_33, OnFailureCallback_33, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35191,7 +35191,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinCompPressure::TypeInfo>(
-                this, OnSuccessCallback_34, OnFailureCallback_34));
+                this, OnSuccessCallback_34, OnFailureCallback_34, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35217,7 +35217,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxCompPressure::TypeInfo>(
-                this, OnSuccessCallback_35, OnFailureCallback_35));
+                this, OnSuccessCallback_35, OnFailureCallback_35, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35243,7 +35243,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstSpeed::TypeInfo>(
-                this, OnSuccessCallback_36, OnFailureCallback_36));
+                this, OnSuccessCallback_36, OnFailureCallback_36, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35269,7 +35269,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstSpeed::TypeInfo>(
-                this, OnSuccessCallback_37, OnFailureCallback_37));
+                this, OnSuccessCallback_37, OnFailureCallback_37, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35295,7 +35295,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstFlow::TypeInfo>(
-                this, OnSuccessCallback_38, OnFailureCallback_38));
+                this, OnSuccessCallback_38, OnFailureCallback_38, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35321,7 +35321,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstFlow::TypeInfo>(
-                this, OnSuccessCallback_39, OnFailureCallback_39));
+                this, OnSuccessCallback_39, OnFailureCallback_39, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35347,7 +35347,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstTemp::TypeInfo>(
-                this, OnSuccessCallback_40, OnFailureCallback_40));
+                this, OnSuccessCallback_40, OnFailureCallback_40, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35374,7 +35374,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstTemp::TypeInfo>(
-                this, OnSuccessCallback_41, OnFailureCallback_41));
+                this, OnSuccessCallback_41, OnFailureCallback_41, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35401,7 +35401,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
-                this, OnSuccessCallback_42, OnFailureCallback_42));
+                this, OnSuccessCallback_42, OnFailureCallback_42, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35428,7 +35428,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
-                this, OnSuccessCallback_43, OnFailureCallback_43));
+                this, OnSuccessCallback_43, OnFailureCallback_43, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35453,7 +35453,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Speed::TypeInfo>(
-            this, OnSuccessCallback_44, OnFailureCallback_44));
+            this, OnSuccessCallback_44, OnFailureCallback_44, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35479,7 +35479,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
-                this, OnSuccessCallback_45, OnFailureCallback_45));
+                this, OnSuccessCallback_45, OnFailureCallback_45, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35507,7 +35507,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
-                this, OnSuccessCallback_46, OnFailureCallback_46));
+                this, OnSuccessCallback_46, OnFailureCallback_46, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35532,7 +35532,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Power::TypeInfo>(
-            this, OnSuccessCallback_47, OnFailureCallback_47));
+            this, OnSuccessCallback_47, OnFailureCallback_47, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35558,7 +35558,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
-                this, OnSuccessCallback_48, OnFailureCallback_48));
+                this, OnSuccessCallback_48, OnFailureCallback_48, true));
         return CHIP_NO_ERROR;
     }
 
@@ -35586,7 +35586,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
-                this, OnSuccessCallback_49, OnFailureCallback_49));
+                this, OnSuccessCallback_49, OnFailureCallback_49, true));
         return CHIP_NO_ERROR;
     }
 
@@ -36060,7 +36060,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -36111,7 +36111,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -36375,7 +36375,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -36426,7 +36426,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AttributeList::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -36585,7 +36585,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -36611,7 +36611,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -36639,7 +36639,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::Tolerance::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -36666,7 +36666,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::Tolerance::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -36809,7 +36809,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -36835,7 +36835,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37022,7 +37022,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::NumberOfPositions::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37048,7 +37048,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::NumberOfPositions::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37074,7 +37074,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37100,7 +37100,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37126,7 +37126,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::MultiPressMax::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37152,7 +37152,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::MultiPressMax::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37436,7 +37436,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37480,7 +37480,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37804,7 +37804,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37855,7 +37855,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::AttributeList::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -37986,7 +37986,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -38011,7 +38011,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::Tolerance::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -38154,7 +38154,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -38180,7 +38180,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -38337,7 +38337,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -38386,7 +38386,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -38411,7 +38411,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::FeatureMap::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39352,7 +39352,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39377,7 +39377,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39403,7 +39403,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39454,7 +39454,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39480,7 +39480,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39506,7 +39506,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39557,7 +39557,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39583,7 +39583,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39609,7 +39609,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39660,7 +39660,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39686,7 +39686,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39712,7 +39712,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_15, OnFailureCallback_15));
+            this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39763,7 +39763,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_17, OnFailureCallback_17));
+            this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39789,7 +39789,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            this, OnSuccessCallback_18, OnFailureCallback_18));
+            this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39815,7 +39815,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            this, OnSuccessCallback_19, OnFailureCallback_19));
+            this, OnSuccessCallback_19, OnFailureCallback_19, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39865,7 +39865,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            this, OnSuccessCallback_21, OnFailureCallback_21));
+            this, OnSuccessCallback_21, OnFailureCallback_21, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39891,7 +39891,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            this, OnSuccessCallback_22, OnFailureCallback_22));
+            this, OnSuccessCallback_22, OnFailureCallback_22, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39917,7 +39917,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            this, OnSuccessCallback_23, OnFailureCallback_23));
+            this, OnSuccessCallback_23, OnFailureCallback_23, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39967,7 +39967,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            this, OnSuccessCallback_25, OnFailureCallback_25));
+            this, OnSuccessCallback_25, OnFailureCallback_25, true));
         return CHIP_NO_ERROR;
     }
 
@@ -39993,7 +39993,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_26, OnFailureCallback_26));
+            this, OnSuccessCallback_26, OnFailureCallback_26, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40019,7 +40019,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_27, OnFailureCallback_27));
+            this, OnSuccessCallback_27, OnFailureCallback_27, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40069,7 +40069,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_29, OnFailureCallback_29));
+            this, OnSuccessCallback_29, OnFailureCallback_29, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40095,7 +40095,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_30, OnFailureCallback_30));
+            this, OnSuccessCallback_30, OnFailureCallback_30, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40121,7 +40121,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_31, OnFailureCallback_31));
+            this, OnSuccessCallback_31, OnFailureCallback_31, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40171,7 +40171,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_33, OnFailureCallback_33));
+            this, OnSuccessCallback_33, OnFailureCallback_33, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40197,7 +40197,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_34, OnFailureCallback_34));
+            this, OnSuccessCallback_34, OnFailureCallback_34, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40223,7 +40223,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_35, OnFailureCallback_35));
+            this, OnSuccessCallback_35, OnFailureCallback_35, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40273,7 +40273,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_37, OnFailureCallback_37));
+            this, OnSuccessCallback_37, OnFailureCallback_37, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40299,7 +40299,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_38, OnFailureCallback_38));
+            this, OnSuccessCallback_38, OnFailureCallback_38, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40325,7 +40325,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_39, OnFailureCallback_39));
+            this, OnSuccessCallback_39, OnFailureCallback_39, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40375,7 +40375,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_41, OnFailureCallback_41));
+            this, OnSuccessCallback_41, OnFailureCallback_41, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40402,7 +40402,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
-                this, OnSuccessCallback_42, OnFailureCallback_42));
+                this, OnSuccessCallback_42, OnFailureCallback_42, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40429,7 +40429,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
-                this, OnSuccessCallback_43, OnFailureCallback_43));
+                this, OnSuccessCallback_43, OnFailureCallback_43, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40481,7 +40481,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
-                this, OnSuccessCallback_45, OnFailureCallback_45));
+                this, OnSuccessCallback_45, OnFailureCallback_45, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40507,7 +40507,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(
-            this, OnSuccessCallback_46, OnFailureCallback_46));
+            this, OnSuccessCallback_46, OnFailureCallback_46, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40533,7 +40533,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(
-            this, OnSuccessCallback_47, OnFailureCallback_47));
+            this, OnSuccessCallback_47, OnFailureCallback_47, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40583,7 +40583,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(
-            this, OnSuccessCallback_49, OnFailureCallback_49));
+            this, OnSuccessCallback_49, OnFailureCallback_49, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40609,7 +40609,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
-            this, OnSuccessCallback_50, OnFailureCallback_50));
+            this, OnSuccessCallback_50, OnFailureCallback_50, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40635,7 +40635,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
-            this, OnSuccessCallback_51, OnFailureCallback_51));
+            this, OnSuccessCallback_51, OnFailureCallback_51, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40685,7 +40685,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
-            this, OnSuccessCallback_53, OnFailureCallback_53));
+            this, OnSuccessCallback_53, OnFailureCallback_53, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40711,7 +40711,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(
-            this, OnSuccessCallback_54, OnFailureCallback_54));
+            this, OnSuccessCallback_54, OnFailureCallback_54, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40762,7 +40762,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(
-            this, OnSuccessCallback_56, OnFailureCallback_56));
+            this, OnSuccessCallback_56, OnFailureCallback_56, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40789,7 +40789,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo>(
-                this, OnSuccessCallback_57, OnFailureCallback_57));
+                this, OnSuccessCallback_57, OnFailureCallback_57, true));
         return CHIP_NO_ERROR;
     }
 
@@ -40839,7 +40839,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo>(
-            this, OnSuccessCallback_59, OnFailureCallback_59));
+            this, OnSuccessCallback_59, OnFailureCallback_59, true));
         return CHIP_NO_ERROR;
     }
 
@@ -41860,7 +41860,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -41911,7 +41911,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -41983,7 +41983,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42034,7 +42034,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42106,7 +42106,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42157,7 +42157,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42229,7 +42229,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16));
+            this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42280,7 +42280,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_18, OnFailureCallback_18));
+            this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42352,7 +42352,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_21, OnFailureCallback_21));
+            this, OnSuccessCallback_21, OnFailureCallback_21, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42403,7 +42403,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_23, OnFailureCallback_23));
+            this, OnSuccessCallback_23, OnFailureCallback_23, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42475,7 +42475,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_26, OnFailureCallback_26));
+            this, OnSuccessCallback_26, OnFailureCallback_26, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42526,7 +42526,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            this, OnSuccessCallback_28, OnFailureCallback_28));
+            this, OnSuccessCallback_28, OnFailureCallback_28, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42783,7 +42783,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
-                this, OnSuccessCallback_39, OnFailureCallback_39));
+                this, OnSuccessCallback_39, OnFailureCallback_39, true));
         return CHIP_NO_ERROR;
     }
 
@@ -42836,7 +42836,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
-                this, OnSuccessCallback_41, OnFailureCallback_41));
+                this, OnSuccessCallback_41, OnFailureCallback_41, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43165,7 +43165,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43217,7 +43217,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AttributeList::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43523,7 +43523,7 @@ private:
         ReturnErrorOnFailure(
             cluster.ReadAttribute<
                 chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43551,7 +43551,7 @@ private:
         ReturnErrorOnFailure(
             cluster.ReadAttribute<
                 chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43603,7 +43603,7 @@ private:
         ReturnErrorOnFailure(
             cluster.ReadAttribute<
                 chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43631,7 +43631,7 @@ private:
         ReturnErrorOnFailure(
             cluster.ReadAttribute<
                 chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
-                this, OnSuccessCallback_5, OnFailureCallback_5));
+                this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43657,7 +43657,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                this, OnSuccessCallback_6, OnFailureCallback_6));
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43684,7 +43684,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                this, OnSuccessCallback_7, OnFailureCallback_7));
+                this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43734,7 +43734,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                this, OnSuccessCallback_9, OnFailureCallback_9));
+                this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43761,7 +43761,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                this, OnSuccessCallback_10, OnFailureCallback_10));
+                this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43788,7 +43788,7 @@ private:
         ReturnErrorOnFailure(
             cluster.ReadAttribute<
                 chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
-                this, OnSuccessCallback_11, OnFailureCallback_11));
+                this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43816,7 +43816,7 @@ private:
         ReturnErrorOnFailure(
             cluster.ReadAttribute<
                 chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
-                this, OnSuccessCallback_12, OnFailureCallback_12));
+                this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43868,7 +43868,7 @@ private:
         ReturnErrorOnFailure(
             cluster.ReadAttribute<
                 chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
-                this, OnSuccessCallback_14, OnFailureCallback_14));
+                this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -43896,7 +43896,7 @@ private:
         ReturnErrorOnFailure(
             cluster.ReadAttribute<
                 chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
-                this, OnSuccessCallback_15, OnFailureCallback_15));
+                this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -44530,7 +44530,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OverrunCount::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -44652,7 +44652,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::NetworkInterfaces::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -44929,7 +44929,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -44980,7 +44980,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -45007,7 +45007,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -45032,7 +45032,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::FeatureMap::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -45083,7 +45083,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::FeatureMap::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -45935,7 +45935,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -45986,7 +45986,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46013,7 +46013,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46064,7 +46064,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46091,7 +46091,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46142,7 +46142,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46169,7 +46169,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46220,7 +46220,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46247,7 +46247,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46297,7 +46297,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(
-            this, OnSuccessCallback_15, OnFailureCallback_15));
+            this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46324,7 +46324,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_16, OnFailureCallback_16));
+                this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46380,7 +46380,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_18, OnFailureCallback_18));
+                this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46408,7 +46408,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_19, OnFailureCallback_19));
+                this, OnSuccessCallback_19, OnFailureCallback_19, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46464,7 +46464,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_21, OnFailureCallback_21));
+                this, OnSuccessCallback_21, OnFailureCallback_21, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46492,7 +46492,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_22, OnFailureCallback_22));
+                this, OnSuccessCallback_22, OnFailureCallback_22, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46548,7 +46548,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_24, OnFailureCallback_24));
+                this, OnSuccessCallback_24, OnFailureCallback_24, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46576,7 +46576,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_25, OnFailureCallback_25));
+                this, OnSuccessCallback_25, OnFailureCallback_25, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46632,7 +46632,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_27, OnFailureCallback_27));
+                this, OnSuccessCallback_27, OnFailureCallback_27, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46660,7 +46660,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
-                this, OnSuccessCallback_28, OnFailureCallback_28));
+                this, OnSuccessCallback_28, OnFailureCallback_28, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46713,7 +46713,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
-                this, OnSuccessCallback_30, OnFailureCallback_30));
+                this, OnSuccessCallback_30, OnFailureCallback_30, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46741,7 +46741,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
-                this, OnSuccessCallback_31, OnFailureCallback_31));
+                this, OnSuccessCallback_31, OnFailureCallback_31, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46794,7 +46794,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
-                this, OnSuccessCallback_33, OnFailureCallback_33));
+                this, OnSuccessCallback_33, OnFailureCallback_33, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46822,7 +46822,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
-                this, OnSuccessCallback_34, OnFailureCallback_34));
+                this, OnSuccessCallback_34, OnFailureCallback_34, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46875,7 +46875,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
-                this, OnSuccessCallback_36, OnFailureCallback_36));
+                this, OnSuccessCallback_36, OnFailureCallback_36, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46903,7 +46903,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
-                this, OnSuccessCallback_37, OnFailureCallback_37));
+                this, OnSuccessCallback_37, OnFailureCallback_37, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46956,7 +46956,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
-                this, OnSuccessCallback_39, OnFailureCallback_39));
+                this, OnSuccessCallback_39, OnFailureCallback_39, true));
         return CHIP_NO_ERROR;
     }
 
@@ -46983,7 +46983,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
-            this, OnSuccessCallback_40, OnFailureCallback_40));
+            this, OnSuccessCallback_40, OnFailureCallback_40, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47034,7 +47034,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
-            this, OnSuccessCallback_42, OnFailureCallback_42));
+            this, OnSuccessCallback_42, OnFailureCallback_42, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47061,7 +47061,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
-            this, OnSuccessCallback_43, OnFailureCallback_43));
+            this, OnSuccessCallback_43, OnFailureCallback_43, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47113,7 +47113,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
-            this, OnSuccessCallback_45, OnFailureCallback_45));
+            this, OnSuccessCallback_45, OnFailureCallback_45, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47140,7 +47140,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
-            this, OnSuccessCallback_46, OnFailureCallback_46));
+            this, OnSuccessCallback_46, OnFailureCallback_46, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47192,7 +47192,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
-            this, OnSuccessCallback_48, OnFailureCallback_48));
+            this, OnSuccessCallback_48, OnFailureCallback_48, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47220,7 +47220,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_49, OnFailureCallback_49));
+                this, OnSuccessCallback_49, OnFailureCallback_49, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47274,7 +47274,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_51, OnFailureCallback_51));
+                this, OnSuccessCallback_51, OnFailureCallback_51, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47302,7 +47302,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_52, OnFailureCallback_52));
+                this, OnSuccessCallback_52, OnFailureCallback_52, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47356,7 +47356,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_54, OnFailureCallback_54));
+                this, OnSuccessCallback_54, OnFailureCallback_54, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47577,7 +47577,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47603,7 +47603,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47746,7 +47746,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -47772,7 +47772,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48256,7 +48256,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48286,7 +48286,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48314,7 +48314,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_5, OnFailureCallback_5));
+                this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48344,7 +48344,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_6, OnFailureCallback_6));
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48402,7 +48402,7 @@ private:
         ReturnErrorOnFailure(
             cluster.SubscribeAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
                 this, OnSuccessCallback_8, OnFailureCallback_8, minIntervalArgument, maxIntervalArgument,
-                OnSubscriptionEstablished_8));
+                OnSubscriptionEstablished_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48472,7 +48472,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_11, OnFailureCallback_11));
+                this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48540,7 +48540,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_15, OnFailureCallback_15));
+                this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48570,7 +48570,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_16, OnFailureCallback_16));
+                this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48598,7 +48598,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_17, OnFailureCallback_17));
+                this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48628,7 +48628,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_18, OnFailureCallback_18));
+                this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48689,7 +48689,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_21, OnFailureCallback_21));
+            this, OnSuccessCallback_21, OnFailureCallback_21, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48722,7 +48722,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_23, OnFailureCallback_23));
+                this, OnSuccessCallback_23, OnFailureCallback_23, true));
         return CHIP_NO_ERROR;
     }
 
@@ -48752,7 +48752,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_24, OnFailureCallback_24));
+                this, OnSuccessCallback_24, OnFailureCallback_24, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49237,7 +49237,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49267,7 +49267,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49295,7 +49295,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_5, OnFailureCallback_5));
+                this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49325,7 +49325,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_6, OnFailureCallback_6));
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49383,7 +49383,7 @@ private:
         ReturnErrorOnFailure(
             cluster.SubscribeAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
                 this, OnSuccessCallback_8, OnFailureCallback_8, minIntervalArgument, maxIntervalArgument,
-                OnSubscriptionEstablished_8));
+                OnSubscriptionEstablished_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49453,7 +49453,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_11, OnFailureCallback_11));
+                this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49521,7 +49521,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_15, OnFailureCallback_15));
+                this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49551,7 +49551,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-                this, OnSuccessCallback_16, OnFailureCallback_16));
+                this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49579,7 +49579,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_17, OnFailureCallback_17));
+                this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49609,7 +49609,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-                this, OnSuccessCallback_18, OnFailureCallback_18));
+                this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49670,7 +49670,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_21, OnFailureCallback_21));
+            this, OnSuccessCallback_21, OnFailureCallback_21, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49703,7 +49703,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_23, OnFailureCallback_23));
+                this, OnSuccessCallback_23, OnFailureCallback_23, true));
         return CHIP_NO_ERROR;
     }
 
@@ -49733,7 +49733,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_24, OnFailureCallback_24));
+                this, OnSuccessCallback_24, OnFailureCallback_24, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50131,7 +50131,7 @@ private:
         ReturnErrorOnFailure(
             cluster.SubscribeAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
                 this, OnSuccessCallback_6, OnFailureCallback_6, minIntervalArgument, maxIntervalArgument,
-                OnSubscriptionEstablished_6));
+                OnSubscriptionEstablished_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50233,7 +50233,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50260,7 +50260,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_12, OnFailureCallback_12));
+                this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50291,7 +50291,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_13, OnFailureCallback_13));
+                this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50327,7 +50327,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_14, OnFailureCallback_14));
+                this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50358,7 +50358,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
-                this, OnSuccessCallback_15, OnFailureCallback_15));
+                this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50506,7 +50506,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50543,7 +50543,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50725,7 +50725,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::OutputList::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50768,7 +50768,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::CurrentOutput::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -50957,7 +50957,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogList::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51500,7 +51500,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WakeOnLan::Attributes::MACAddress::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51688,7 +51688,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51714,7 +51714,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51740,7 +51740,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51766,7 +51766,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51792,7 +51792,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -51818,7 +51818,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52050,7 +52050,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52076,7 +52076,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52103,7 +52103,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52130,7 +52130,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52156,7 +52156,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52183,7 +52183,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52682,7 +52682,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::ChannelList::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -53065,7 +53065,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -53099,7 +53099,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -53430,7 +53430,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::InputList::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -53472,7 +53472,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::CurrentInput::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -59833,7 +59833,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -59882,7 +59882,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -59931,7 +59931,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -59957,7 +59957,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60006,7 +60006,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60055,7 +60055,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-            this, OnSuccessCallback_15, OnFailureCallback_15));
+            this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60081,7 +60081,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16));
+            this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60130,7 +60130,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-            this, OnSuccessCallback_18, OnFailureCallback_18));
+            this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60179,7 +60179,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-            this, OnSuccessCallback_20, OnFailureCallback_20));
+            this, OnSuccessCallback_20, OnFailureCallback_20, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60205,7 +60205,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-            this, OnSuccessCallback_21, OnFailureCallback_21));
+            this, OnSuccessCallback_21, OnFailureCallback_21, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60254,7 +60254,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-            this, OnSuccessCallback_23, OnFailureCallback_23));
+            this, OnSuccessCallback_23, OnFailureCallback_23, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60303,7 +60303,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-            this, OnSuccessCallback_25, OnFailureCallback_25));
+            this, OnSuccessCallback_25, OnFailureCallback_25, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60329,7 +60329,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-            this, OnSuccessCallback_26, OnFailureCallback_26));
+            this, OnSuccessCallback_26, OnFailureCallback_26, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60378,7 +60378,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-            this, OnSuccessCallback_28, OnFailureCallback_28));
+            this, OnSuccessCallback_28, OnFailureCallback_28, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60427,7 +60427,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-            this, OnSuccessCallback_30, OnFailureCallback_30));
+            this, OnSuccessCallback_30, OnFailureCallback_30, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60453,7 +60453,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-            this, OnSuccessCallback_31, OnFailureCallback_31));
+            this, OnSuccessCallback_31, OnFailureCallback_31, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60502,7 +60502,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-            this, OnSuccessCallback_33, OnFailureCallback_33));
+            this, OnSuccessCallback_33, OnFailureCallback_33, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60551,7 +60551,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-            this, OnSuccessCallback_35, OnFailureCallback_35));
+            this, OnSuccessCallback_35, OnFailureCallback_35, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60577,7 +60577,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-            this, OnSuccessCallback_36, OnFailureCallback_36));
+            this, OnSuccessCallback_36, OnFailureCallback_36, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60626,7 +60626,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-            this, OnSuccessCallback_38, OnFailureCallback_38));
+            this, OnSuccessCallback_38, OnFailureCallback_38, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60675,7 +60675,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-            this, OnSuccessCallback_40, OnFailureCallback_40));
+            this, OnSuccessCallback_40, OnFailureCallback_40, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60701,7 +60701,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            this, OnSuccessCallback_41, OnFailureCallback_41));
+            this, OnSuccessCallback_41, OnFailureCallback_41, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60750,7 +60750,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            this, OnSuccessCallback_43, OnFailureCallback_43));
+            this, OnSuccessCallback_43, OnFailureCallback_43, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60799,7 +60799,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            this, OnSuccessCallback_45, OnFailureCallback_45));
+            this, OnSuccessCallback_45, OnFailureCallback_45, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60825,7 +60825,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-            this, OnSuccessCallback_46, OnFailureCallback_46));
+            this, OnSuccessCallback_46, OnFailureCallback_46, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60874,7 +60874,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-            this, OnSuccessCallback_48, OnFailureCallback_48));
+            this, OnSuccessCallback_48, OnFailureCallback_48, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60923,7 +60923,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-            this, OnSuccessCallback_50, OnFailureCallback_50));
+            this, OnSuccessCallback_50, OnFailureCallback_50, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60949,7 +60949,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            this, OnSuccessCallback_51, OnFailureCallback_51));
+            this, OnSuccessCallback_51, OnFailureCallback_51, true));
         return CHIP_NO_ERROR;
     }
 
@@ -60998,7 +60998,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            this, OnSuccessCallback_53, OnFailureCallback_53));
+            this, OnSuccessCallback_53, OnFailureCallback_53, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61047,7 +61047,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            this, OnSuccessCallback_55, OnFailureCallback_55));
+            this, OnSuccessCallback_55, OnFailureCallback_55, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61096,7 +61096,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            this, OnSuccessCallback_57, OnFailureCallback_57));
+            this, OnSuccessCallback_57, OnFailureCallback_57, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61122,7 +61122,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            this, OnSuccessCallback_58, OnFailureCallback_58));
+            this, OnSuccessCallback_58, OnFailureCallback_58, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61171,7 +61171,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            this, OnSuccessCallback_60, OnFailureCallback_60));
+            this, OnSuccessCallback_60, OnFailureCallback_60, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61220,7 +61220,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            this, OnSuccessCallback_62, OnFailureCallback_62));
+            this, OnSuccessCallback_62, OnFailureCallback_62, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61269,7 +61269,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            this, OnSuccessCallback_64, OnFailureCallback_64));
+            this, OnSuccessCallback_64, OnFailureCallback_64, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61295,7 +61295,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            this, OnSuccessCallback_65, OnFailureCallback_65));
+            this, OnSuccessCallback_65, OnFailureCallback_65, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61344,7 +61344,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            this, OnSuccessCallback_67, OnFailureCallback_67));
+            this, OnSuccessCallback_67, OnFailureCallback_67, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61393,7 +61393,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            this, OnSuccessCallback_69, OnFailureCallback_69));
+            this, OnSuccessCallback_69, OnFailureCallback_69, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61442,7 +61442,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            this, OnSuccessCallback_71, OnFailureCallback_71));
+            this, OnSuccessCallback_71, OnFailureCallback_71, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61468,7 +61468,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            this, OnSuccessCallback_72, OnFailureCallback_72));
+            this, OnSuccessCallback_72, OnFailureCallback_72, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61517,7 +61517,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            this, OnSuccessCallback_74, OnFailureCallback_74));
+            this, OnSuccessCallback_74, OnFailureCallback_74, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61566,7 +61566,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            this, OnSuccessCallback_76, OnFailureCallback_76));
+            this, OnSuccessCallback_76, OnFailureCallback_76, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61615,7 +61615,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            this, OnSuccessCallback_78, OnFailureCallback_78));
+            this, OnSuccessCallback_78, OnFailureCallback_78, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61641,7 +61641,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
-            this, OnSuccessCallback_79, OnFailureCallback_79));
+            this, OnSuccessCallback_79, OnFailureCallback_79, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61690,7 +61690,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
-            this, OnSuccessCallback_81, OnFailureCallback_81));
+            this, OnSuccessCallback_81, OnFailureCallback_81, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61739,7 +61739,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
-            this, OnSuccessCallback_83, OnFailureCallback_83));
+            this, OnSuccessCallback_83, OnFailureCallback_83, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61788,7 +61788,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
-            this, OnSuccessCallback_85, OnFailureCallback_85));
+            this, OnSuccessCallback_85, OnFailureCallback_85, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61837,7 +61837,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
-            this, OnSuccessCallback_87, OnFailureCallback_87));
+            this, OnSuccessCallback_87, OnFailureCallback_87, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61863,7 +61863,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
-            this, OnSuccessCallback_88, OnFailureCallback_88));
+            this, OnSuccessCallback_88, OnFailureCallback_88, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61912,7 +61912,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
-            this, OnSuccessCallback_90, OnFailureCallback_90));
+            this, OnSuccessCallback_90, OnFailureCallback_90, true));
         return CHIP_NO_ERROR;
     }
 
@@ -61961,7 +61961,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
-            this, OnSuccessCallback_92, OnFailureCallback_92));
+            this, OnSuccessCallback_92, OnFailureCallback_92, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62010,7 +62010,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
-            this, OnSuccessCallback_94, OnFailureCallback_94));
+            this, OnSuccessCallback_94, OnFailureCallback_94, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62059,7 +62059,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
-            this, OnSuccessCallback_96, OnFailureCallback_96));
+            this, OnSuccessCallback_96, OnFailureCallback_96, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62085,7 +62085,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            this, OnSuccessCallback_97, OnFailureCallback_97));
+            this, OnSuccessCallback_97, OnFailureCallback_97, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62134,7 +62134,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            this, OnSuccessCallback_99, OnFailureCallback_99));
+            this, OnSuccessCallback_99, OnFailureCallback_99, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62183,7 +62183,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            this, OnSuccessCallback_101, OnFailureCallback_101));
+            this, OnSuccessCallback_101, OnFailureCallback_101, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62209,7 +62209,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            this, OnSuccessCallback_102, OnFailureCallback_102));
+            this, OnSuccessCallback_102, OnFailureCallback_102, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62258,7 +62258,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            this, OnSuccessCallback_104, OnFailureCallback_104));
+            this, OnSuccessCallback_104, OnFailureCallback_104, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62307,7 +62307,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            this, OnSuccessCallback_106, OnFailureCallback_106));
+            this, OnSuccessCallback_106, OnFailureCallback_106, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62333,7 +62333,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_107, OnFailureCallback_107));
+            this, OnSuccessCallback_107, OnFailureCallback_107, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62382,7 +62382,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_109, OnFailureCallback_109));
+            this, OnSuccessCallback_109, OnFailureCallback_109, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62433,7 +62433,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_111, OnFailureCallback_111));
+            this, OnSuccessCallback_111, OnFailureCallback_111, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62483,7 +62483,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_113, OnFailureCallback_113));
+            this, OnSuccessCallback_113, OnFailureCallback_113, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62535,7 +62535,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_115, OnFailureCallback_115));
+            this, OnSuccessCallback_115, OnFailureCallback_115, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62585,7 +62585,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-            this, OnSuccessCallback_117, OnFailureCallback_117));
+            this, OnSuccessCallback_117, OnFailureCallback_117, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62639,7 +62639,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-            this, OnSuccessCallback_119, OnFailureCallback_119));
+            this, OnSuccessCallback_119, OnFailureCallback_119, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62695,7 +62695,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_121, OnFailureCallback_121));
+            this, OnSuccessCallback_121, OnFailureCallback_121, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62744,7 +62744,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_123, OnFailureCallback_123));
+            this, OnSuccessCallback_123, OnFailureCallback_123, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62794,7 +62794,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_125, OnFailureCallback_125));
+            this, OnSuccessCallback_125, OnFailureCallback_125, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62843,7 +62843,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            this, OnSuccessCallback_127, OnFailureCallback_127));
+            this, OnSuccessCallback_127, OnFailureCallback_127, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62896,7 +62896,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            this, OnSuccessCallback_129, OnFailureCallback_129));
+            this, OnSuccessCallback_129, OnFailureCallback_129, true));
         return CHIP_NO_ERROR;
     }
 
@@ -62950,7 +62950,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListLongOctetString::TypeInfo>(
-            this, OnSuccessCallback_131, OnFailureCallback_131));
+            this, OnSuccessCallback_131, OnFailureCallback_131, true));
         return CHIP_NO_ERROR;
     }
 
@@ -63091,7 +63091,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListLongOctetString::TypeInfo>(
-            this, OnSuccessCallback_133, OnFailureCallback_133));
+            this, OnSuccessCallback_133, OnFailureCallback_133, true));
         return CHIP_NO_ERROR;
     }
 
@@ -63175,7 +63175,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            this, OnSuccessCallback_134, OnFailureCallback_134));
+            this, OnSuccessCallback_134, OnFailureCallback_134, true));
         return CHIP_NO_ERROR;
     }
 
@@ -63224,7 +63224,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            this, OnSuccessCallback_136, OnFailureCallback_136));
+            this, OnSuccessCallback_136, OnFailureCallback_136, true));
         return CHIP_NO_ERROR;
     }
 
@@ -63273,7 +63273,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            this, OnSuccessCallback_138, OnFailureCallback_138));
+            this, OnSuccessCallback_138, OnFailureCallback_138, true));
         return CHIP_NO_ERROR;
     }
 
@@ -63299,7 +63299,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            this, OnSuccessCallback_139, OnFailureCallback_139));
+            this, OnSuccessCallback_139, OnFailureCallback_139, true));
         return CHIP_NO_ERROR;
     }
 
@@ -63348,7 +63348,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            this, OnSuccessCallback_141, OnFailureCallback_141));
+            this, OnSuccessCallback_141, OnFailureCallback_141, true));
         return CHIP_NO_ERROR;
     }
 
@@ -63397,7 +63397,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            this, OnSuccessCallback_143, OnFailureCallback_143));
+            this, OnSuccessCallback_143, OnFailureCallback_143, true));
         return CHIP_NO_ERROR;
     }
 
@@ -63423,7 +63423,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
-            this, OnSuccessCallback_144, OnFailureCallback_144));
+            this, OnSuccessCallback_144, OnFailureCallback_144, true));
         return CHIP_NO_ERROR;
     }
 
@@ -63530,7 +63530,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            this, OnSuccessCallback_148, OnFailureCallback_148));
+            this, OnSuccessCallback_148, OnFailureCallback_148, true));
         return CHIP_NO_ERROR;
     }
 
@@ -63579,7 +63579,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            this, OnSuccessCallback_150, OnFailureCallback_150));
+            this, OnSuccessCallback_150, OnFailureCallback_150, true));
         return CHIP_NO_ERROR;
     }
 
@@ -64674,7 +64674,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
-            this, OnSuccessCallback_169, OnFailureCallback_169));
+            this, OnSuccessCallback_169, OnFailureCallback_169, true));
         return CHIP_NO_ERROR;
     }
 
@@ -64743,7 +64743,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
-            this, OnSuccessCallback_171, OnFailureCallback_171));
+            this, OnSuccessCallback_171, OnFailureCallback_171, true));
         return CHIP_NO_ERROR;
     }
 
@@ -64832,7 +64832,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-            this, OnSuccessCallback_173, OnFailureCallback_173));
+            this, OnSuccessCallback_173, OnFailureCallback_173, true));
         return CHIP_NO_ERROR;
     }
 
@@ -64963,7 +64963,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo>(
-                this, OnSuccessCallback_176, OnFailureCallback_176));
+                this, OnSuccessCallback_176, OnFailureCallback_176, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65049,7 +65049,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo>(
-                this, OnSuccessCallback_178, OnFailureCallback_178));
+                this, OnSuccessCallback_178, OnFailureCallback_178, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65121,7 +65121,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
-            this, OnSuccessCallback_180, OnFailureCallback_180));
+            this, OnSuccessCallback_180, OnFailureCallback_180, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65171,7 +65171,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
-            this, OnSuccessCallback_182, OnFailureCallback_182));
+            this, OnSuccessCallback_182, OnFailureCallback_182, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65222,7 +65222,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            this, OnSuccessCallback_184, OnFailureCallback_184));
+            this, OnSuccessCallback_184, OnFailureCallback_184, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65274,7 +65274,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            this, OnSuccessCallback_186, OnFailureCallback_186));
+            this, OnSuccessCallback_186, OnFailureCallback_186, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65324,7 +65324,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            this, OnSuccessCallback_188, OnFailureCallback_188));
+            this, OnSuccessCallback_188, OnFailureCallback_188, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65374,7 +65374,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            this, OnSuccessCallback_190, OnFailureCallback_190));
+            this, OnSuccessCallback_190, OnFailureCallback_190, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65426,7 +65426,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            this, OnSuccessCallback_192, OnFailureCallback_192));
+            this, OnSuccessCallback_192, OnFailureCallback_192, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65476,7 +65476,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            this, OnSuccessCallback_194, OnFailureCallback_194));
+            this, OnSuccessCallback_194, OnFailureCallback_194, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65526,7 +65526,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            this, OnSuccessCallback_196, OnFailureCallback_196));
+            this, OnSuccessCallback_196, OnFailureCallback_196, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65578,7 +65578,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            this, OnSuccessCallback_198, OnFailureCallback_198));
+            this, OnSuccessCallback_198, OnFailureCallback_198, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65628,7 +65628,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            this, OnSuccessCallback_200, OnFailureCallback_200));
+            this, OnSuccessCallback_200, OnFailureCallback_200, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65678,7 +65678,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
-            this, OnSuccessCallback_202, OnFailureCallback_202));
+            this, OnSuccessCallback_202, OnFailureCallback_202, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65730,7 +65730,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
-            this, OnSuccessCallback_204, OnFailureCallback_204));
+            this, OnSuccessCallback_204, OnFailureCallback_204, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65780,7 +65780,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
-            this, OnSuccessCallback_206, OnFailureCallback_206));
+            this, OnSuccessCallback_206, OnFailureCallback_206, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65830,7 +65830,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            this, OnSuccessCallback_208, OnFailureCallback_208));
+            this, OnSuccessCallback_208, OnFailureCallback_208, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65881,7 +65881,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            this, OnSuccessCallback_210, OnFailureCallback_210));
+            this, OnSuccessCallback_210, OnFailureCallback_210, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65933,7 +65933,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            this, OnSuccessCallback_212, OnFailureCallback_212));
+            this, OnSuccessCallback_212, OnFailureCallback_212, true));
         return CHIP_NO_ERROR;
     }
 
@@ -65960,7 +65960,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            this, OnSuccessCallback_213, OnFailureCallback_213));
+            this, OnSuccessCallback_213, OnFailureCallback_213, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66009,7 +66009,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            this, OnSuccessCallback_215, OnFailureCallback_215));
+            this, OnSuccessCallback_215, OnFailureCallback_215, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66035,7 +66035,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            this, OnSuccessCallback_216, OnFailureCallback_216));
+            this, OnSuccessCallback_216, OnFailureCallback_216, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66061,7 +66061,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            this, OnSuccessCallback_217, OnFailureCallback_217));
+            this, OnSuccessCallback_217, OnFailureCallback_217, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66111,7 +66111,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            this, OnSuccessCallback_219, OnFailureCallback_219));
+            this, OnSuccessCallback_219, OnFailureCallback_219, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66137,7 +66137,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            this, OnSuccessCallback_220, OnFailureCallback_220));
+            this, OnSuccessCallback_220, OnFailureCallback_220, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66187,7 +66187,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            this, OnSuccessCallback_222, OnFailureCallback_222));
+            this, OnSuccessCallback_222, OnFailureCallback_222, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66238,7 +66238,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            this, OnSuccessCallback_224, OnFailureCallback_224));
+            this, OnSuccessCallback_224, OnFailureCallback_224, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66290,7 +66290,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            this, OnSuccessCallback_226, OnFailureCallback_226));
+            this, OnSuccessCallback_226, OnFailureCallback_226, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66340,7 +66340,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            this, OnSuccessCallback_228, OnFailureCallback_228));
+            this, OnSuccessCallback_228, OnFailureCallback_228, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66366,7 +66366,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            this, OnSuccessCallback_229, OnFailureCallback_229));
+            this, OnSuccessCallback_229, OnFailureCallback_229, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66392,7 +66392,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            this, OnSuccessCallback_230, OnFailureCallback_230));
+            this, OnSuccessCallback_230, OnFailureCallback_230, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66442,7 +66442,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            this, OnSuccessCallback_232, OnFailureCallback_232));
+            this, OnSuccessCallback_232, OnFailureCallback_232, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66468,7 +66468,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            this, OnSuccessCallback_233, OnFailureCallback_233));
+            this, OnSuccessCallback_233, OnFailureCallback_233, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66518,7 +66518,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            this, OnSuccessCallback_235, OnFailureCallback_235));
+            this, OnSuccessCallback_235, OnFailureCallback_235, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66569,7 +66569,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            this, OnSuccessCallback_237, OnFailureCallback_237));
+            this, OnSuccessCallback_237, OnFailureCallback_237, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66621,7 +66621,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            this, OnSuccessCallback_239, OnFailureCallback_239));
+            this, OnSuccessCallback_239, OnFailureCallback_239, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66671,7 +66671,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            this, OnSuccessCallback_241, OnFailureCallback_241));
+            this, OnSuccessCallback_241, OnFailureCallback_241, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66697,7 +66697,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            this, OnSuccessCallback_242, OnFailureCallback_242));
+            this, OnSuccessCallback_242, OnFailureCallback_242, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66723,7 +66723,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            this, OnSuccessCallback_243, OnFailureCallback_243));
+            this, OnSuccessCallback_243, OnFailureCallback_243, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66773,7 +66773,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            this, OnSuccessCallback_245, OnFailureCallback_245));
+            this, OnSuccessCallback_245, OnFailureCallback_245, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66799,7 +66799,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            this, OnSuccessCallback_246, OnFailureCallback_246));
+            this, OnSuccessCallback_246, OnFailureCallback_246, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66849,7 +66849,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            this, OnSuccessCallback_248, OnFailureCallback_248));
+            this, OnSuccessCallback_248, OnFailureCallback_248, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66900,7 +66900,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            this, OnSuccessCallback_250, OnFailureCallback_250));
+            this, OnSuccessCallback_250, OnFailureCallback_250, true));
         return CHIP_NO_ERROR;
     }
 
@@ -66952,7 +66952,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            this, OnSuccessCallback_252, OnFailureCallback_252));
+            this, OnSuccessCallback_252, OnFailureCallback_252, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67002,7 +67002,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            this, OnSuccessCallback_254, OnFailureCallback_254));
+            this, OnSuccessCallback_254, OnFailureCallback_254, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67028,7 +67028,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            this, OnSuccessCallback_255, OnFailureCallback_255));
+            this, OnSuccessCallback_255, OnFailureCallback_255, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67054,7 +67054,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            this, OnSuccessCallback_256, OnFailureCallback_256));
+            this, OnSuccessCallback_256, OnFailureCallback_256, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67104,7 +67104,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            this, OnSuccessCallback_258, OnFailureCallback_258));
+            this, OnSuccessCallback_258, OnFailureCallback_258, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67130,7 +67130,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            this, OnSuccessCallback_259, OnFailureCallback_259));
+            this, OnSuccessCallback_259, OnFailureCallback_259, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67180,7 +67180,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            this, OnSuccessCallback_261, OnFailureCallback_261));
+            this, OnSuccessCallback_261, OnFailureCallback_261, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67232,7 +67232,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            this, OnSuccessCallback_263, OnFailureCallback_263));
+            this, OnSuccessCallback_263, OnFailureCallback_263, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67282,7 +67282,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            this, OnSuccessCallback_265, OnFailureCallback_265));
+            this, OnSuccessCallback_265, OnFailureCallback_265, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67308,7 +67308,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            this, OnSuccessCallback_266, OnFailureCallback_266));
+            this, OnSuccessCallback_266, OnFailureCallback_266, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67334,7 +67334,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            this, OnSuccessCallback_267, OnFailureCallback_267));
+            this, OnSuccessCallback_267, OnFailureCallback_267, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67384,7 +67384,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            this, OnSuccessCallback_269, OnFailureCallback_269));
+            this, OnSuccessCallback_269, OnFailureCallback_269, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67410,7 +67410,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            this, OnSuccessCallback_270, OnFailureCallback_270));
+            this, OnSuccessCallback_270, OnFailureCallback_270, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67460,7 +67460,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            this, OnSuccessCallback_272, OnFailureCallback_272));
+            this, OnSuccessCallback_272, OnFailureCallback_272, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67512,7 +67512,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            this, OnSuccessCallback_274, OnFailureCallback_274));
+            this, OnSuccessCallback_274, OnFailureCallback_274, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67562,7 +67562,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            this, OnSuccessCallback_276, OnFailureCallback_276));
+            this, OnSuccessCallback_276, OnFailureCallback_276, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67588,7 +67588,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            this, OnSuccessCallback_277, OnFailureCallback_277));
+            this, OnSuccessCallback_277, OnFailureCallback_277, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67614,7 +67614,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            this, OnSuccessCallback_278, OnFailureCallback_278));
+            this, OnSuccessCallback_278, OnFailureCallback_278, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67664,7 +67664,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            this, OnSuccessCallback_280, OnFailureCallback_280));
+            this, OnSuccessCallback_280, OnFailureCallback_280, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67690,7 +67690,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            this, OnSuccessCallback_281, OnFailureCallback_281));
+            this, OnSuccessCallback_281, OnFailureCallback_281, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67740,7 +67740,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            this, OnSuccessCallback_283, OnFailureCallback_283));
+            this, OnSuccessCallback_283, OnFailureCallback_283, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67792,7 +67792,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            this, OnSuccessCallback_285, OnFailureCallback_285));
+            this, OnSuccessCallback_285, OnFailureCallback_285, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67842,7 +67842,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            this, OnSuccessCallback_287, OnFailureCallback_287));
+            this, OnSuccessCallback_287, OnFailureCallback_287, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67868,7 +67868,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            this, OnSuccessCallback_288, OnFailureCallback_288));
+            this, OnSuccessCallback_288, OnFailureCallback_288, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67894,7 +67894,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            this, OnSuccessCallback_289, OnFailureCallback_289));
+            this, OnSuccessCallback_289, OnFailureCallback_289, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67944,7 +67944,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            this, OnSuccessCallback_291, OnFailureCallback_291));
+            this, OnSuccessCallback_291, OnFailureCallback_291, true));
         return CHIP_NO_ERROR;
     }
 
@@ -67970,7 +67970,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            this, OnSuccessCallback_292, OnFailureCallback_292));
+            this, OnSuccessCallback_292, OnFailureCallback_292, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68020,7 +68020,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            this, OnSuccessCallback_294, OnFailureCallback_294));
+            this, OnSuccessCallback_294, OnFailureCallback_294, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68072,7 +68072,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            this, OnSuccessCallback_296, OnFailureCallback_296));
+            this, OnSuccessCallback_296, OnFailureCallback_296, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68122,7 +68122,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            this, OnSuccessCallback_298, OnFailureCallback_298));
+            this, OnSuccessCallback_298, OnFailureCallback_298, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68148,7 +68148,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            this, OnSuccessCallback_299, OnFailureCallback_299));
+            this, OnSuccessCallback_299, OnFailureCallback_299, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68174,7 +68174,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            this, OnSuccessCallback_300, OnFailureCallback_300));
+            this, OnSuccessCallback_300, OnFailureCallback_300, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68224,7 +68224,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            this, OnSuccessCallback_302, OnFailureCallback_302));
+            this, OnSuccessCallback_302, OnFailureCallback_302, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68250,7 +68250,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            this, OnSuccessCallback_303, OnFailureCallback_303));
+            this, OnSuccessCallback_303, OnFailureCallback_303, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68300,7 +68300,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
-            this, OnSuccessCallback_305, OnFailureCallback_305));
+            this, OnSuccessCallback_305, OnFailureCallback_305, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68351,7 +68351,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
-            this, OnSuccessCallback_307, OnFailureCallback_307));
+            this, OnSuccessCallback_307, OnFailureCallback_307, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68402,7 +68402,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
-            this, OnSuccessCallback_309, OnFailureCallback_309));
+            this, OnSuccessCallback_309, OnFailureCallback_309, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68452,7 +68452,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
-            this, OnSuccessCallback_311, OnFailureCallback_311));
+            this, OnSuccessCallback_311, OnFailureCallback_311, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68502,7 +68502,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
-            this, OnSuccessCallback_313, OnFailureCallback_313));
+            this, OnSuccessCallback_313, OnFailureCallback_313, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68553,7 +68553,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
-            this, OnSuccessCallback_315, OnFailureCallback_315));
+            this, OnSuccessCallback_315, OnFailureCallback_315, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68604,7 +68604,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
-            this, OnSuccessCallback_317, OnFailureCallback_317));
+            this, OnSuccessCallback_317, OnFailureCallback_317, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68655,7 +68655,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
-            this, OnSuccessCallback_319, OnFailureCallback_319));
+            this, OnSuccessCallback_319, OnFailureCallback_319, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68705,7 +68705,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
-            this, OnSuccessCallback_321, OnFailureCallback_321));
+            this, OnSuccessCallback_321, OnFailureCallback_321, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68755,7 +68755,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
-            this, OnSuccessCallback_323, OnFailureCallback_323));
+            this, OnSuccessCallback_323, OnFailureCallback_323, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68806,7 +68806,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
-            this, OnSuccessCallback_325, OnFailureCallback_325));
+            this, OnSuccessCallback_325, OnFailureCallback_325, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68857,7 +68857,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
-            this, OnSuccessCallback_327, OnFailureCallback_327));
+            this, OnSuccessCallback_327, OnFailureCallback_327, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68909,7 +68909,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
-            this, OnSuccessCallback_329, OnFailureCallback_329));
+            this, OnSuccessCallback_329, OnFailureCallback_329, true));
         return CHIP_NO_ERROR;
     }
 
@@ -68959,7 +68959,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
-            this, OnSuccessCallback_331, OnFailureCallback_331));
+            this, OnSuccessCallback_331, OnFailureCallback_331, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69009,7 +69009,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            this, OnSuccessCallback_333, OnFailureCallback_333));
+            this, OnSuccessCallback_333, OnFailureCallback_333, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69060,7 +69060,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            this, OnSuccessCallback_335, OnFailureCallback_335));
+            this, OnSuccessCallback_335, OnFailureCallback_335, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69112,7 +69112,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            this, OnSuccessCallback_337, OnFailureCallback_337));
+            this, OnSuccessCallback_337, OnFailureCallback_337, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69162,7 +69162,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            this, OnSuccessCallback_339, OnFailureCallback_339));
+            this, OnSuccessCallback_339, OnFailureCallback_339, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69212,7 +69212,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo>(
-            this, OnSuccessCallback_341, OnFailureCallback_341));
+            this, OnSuccessCallback_341, OnFailureCallback_341, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69264,7 +69264,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo>(
-            this, OnSuccessCallback_343, OnFailureCallback_343));
+            this, OnSuccessCallback_343, OnFailureCallback_343, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69317,7 +69317,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo>(
-            this, OnSuccessCallback_345, OnFailureCallback_345));
+            this, OnSuccessCallback_345, OnFailureCallback_345, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69368,7 +69368,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo>(
-            this, OnSuccessCallback_347, OnFailureCallback_347));
+            this, OnSuccessCallback_347, OnFailureCallback_347, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69395,7 +69395,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            this, OnSuccessCallback_348, OnFailureCallback_348));
+            this, OnSuccessCallback_348, OnFailureCallback_348, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69448,7 +69448,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            this, OnSuccessCallback_350, OnFailureCallback_350));
+            this, OnSuccessCallback_350, OnFailureCallback_350, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69499,7 +69499,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            this, OnSuccessCallback_352, OnFailureCallback_352));
+            this, OnSuccessCallback_352, OnFailureCallback_352, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69549,7 +69549,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            this, OnSuccessCallback_354, OnFailureCallback_354));
+            this, OnSuccessCallback_354, OnFailureCallback_354, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69577,7 +69577,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            this, OnSuccessCallback_355, OnFailureCallback_355));
+            this, OnSuccessCallback_355, OnFailureCallback_355, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69628,7 +69628,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            this, OnSuccessCallback_357, OnFailureCallback_357));
+            this, OnSuccessCallback_357, OnFailureCallback_357, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69678,7 +69678,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            this, OnSuccessCallback_359, OnFailureCallback_359));
+            this, OnSuccessCallback_359, OnFailureCallback_359, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69728,7 +69728,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            this, OnSuccessCallback_361, OnFailureCallback_361));
+            this, OnSuccessCallback_361, OnFailureCallback_361, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69755,7 +69755,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
-            this, OnSuccessCallback_362, OnFailureCallback_362));
+            this, OnSuccessCallback_362, OnFailureCallback_362, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69777,7 +69777,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
-            this, OnSuccessCallback_363, OnFailureCallback_363));
+            this, OnSuccessCallback_363, OnFailureCallback_363, true));
         return CHIP_NO_ERROR;
     }
 
@@ -69899,7 +69899,7 @@ private:
 
         ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
             this, OnSuccessCallback_367, OnFailureCallback_367, minIntervalArgument, maxIntervalArgument,
-            OnSubscriptionEstablished_367));
+            OnSubscriptionEstablished_367, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70004,7 +70004,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo>(
-            this, OnSuccessCallback_370, OnFailureCallback_370));
+            this, OnSuccessCallback_370, OnFailureCallback_370, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70126,7 +70126,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo>(
-            this, OnSuccessCallback_375, OnFailureCallback_375));
+            this, OnSuccessCallback_375, OnFailureCallback_375, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70175,7 +70175,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo>(
-            this, OnSuccessCallback_377, OnFailureCallback_377));
+            this, OnSuccessCallback_377, OnFailureCallback_377, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70224,7 +70224,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo>(
-            this, OnSuccessCallback_379, OnFailureCallback_379));
+            this, OnSuccessCallback_379, OnFailureCallback_379, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70273,7 +70273,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo>(
-            this, OnSuccessCallback_381, OnFailureCallback_381));
+            this, OnSuccessCallback_381, OnFailureCallback_381, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70299,7 +70299,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo>(
-            this, OnSuccessCallback_382, OnFailureCallback_382));
+            this, OnSuccessCallback_382, OnFailureCallback_382, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70421,7 +70421,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo>(
-            this, OnSuccessCallback_387, OnFailureCallback_387));
+            this, OnSuccessCallback_387, OnFailureCallback_387, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70470,7 +70470,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo>(
-            this, OnSuccessCallback_389, OnFailureCallback_389));
+            this, OnSuccessCallback_389, OnFailureCallback_389, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70519,7 +70519,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo>(
-            this, OnSuccessCallback_391, OnFailureCallback_391));
+            this, OnSuccessCallback_391, OnFailureCallback_391, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70568,7 +70568,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo>(
-            this, OnSuccessCallback_393, OnFailureCallback_393));
+            this, OnSuccessCallback_393, OnFailureCallback_393, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70594,7 +70594,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo>(
-            this, OnSuccessCallback_394, OnFailureCallback_394));
+            this, OnSuccessCallback_394, OnFailureCallback_394, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70716,7 +70716,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo>(
-            this, OnSuccessCallback_399, OnFailureCallback_399));
+            this, OnSuccessCallback_399, OnFailureCallback_399, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70765,7 +70765,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo>(
-            this, OnSuccessCallback_401, OnFailureCallback_401));
+            this, OnSuccessCallback_401, OnFailureCallback_401, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70814,7 +70814,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo>(
-            this, OnSuccessCallback_403, OnFailureCallback_403));
+            this, OnSuccessCallback_403, OnFailureCallback_403, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70863,7 +70863,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo>(
-            this, OnSuccessCallback_405, OnFailureCallback_405));
+            this, OnSuccessCallback_405, OnFailureCallback_405, true));
         return CHIP_NO_ERROR;
     }
 
@@ -70889,7 +70889,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo>(
-            this, OnSuccessCallback_406, OnFailureCallback_406));
+            this, OnSuccessCallback_406, OnFailureCallback_406, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71011,7 +71011,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo>(
-            this, OnSuccessCallback_411, OnFailureCallback_411));
+            this, OnSuccessCallback_411, OnFailureCallback_411, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71060,7 +71060,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo>(
-            this, OnSuccessCallback_413, OnFailureCallback_413));
+            this, OnSuccessCallback_413, OnFailureCallback_413, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71109,7 +71109,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo>(
-            this, OnSuccessCallback_415, OnFailureCallback_415));
+            this, OnSuccessCallback_415, OnFailureCallback_415, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71158,7 +71158,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo>(
-            this, OnSuccessCallback_417, OnFailureCallback_417));
+            this, OnSuccessCallback_417, OnFailureCallback_417, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71185,7 +71185,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo>(
-                this, OnSuccessCallback_418, OnFailureCallback_418));
+                this, OnSuccessCallback_418, OnFailureCallback_418, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71317,7 +71317,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo>(
-                this, OnSuccessCallback_423, OnFailureCallback_423));
+                this, OnSuccessCallback_423, OnFailureCallback_423, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71370,7 +71370,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo>(
-                this, OnSuccessCallback_425, OnFailureCallback_425));
+                this, OnSuccessCallback_425, OnFailureCallback_425, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71423,7 +71423,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo>(
-                this, OnSuccessCallback_427, OnFailureCallback_427));
+                this, OnSuccessCallback_427, OnFailureCallback_427, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71476,7 +71476,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo>(
-                this, OnSuccessCallback_429, OnFailureCallback_429));
+                this, OnSuccessCallback_429, OnFailureCallback_429, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71528,7 +71528,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo>(
-                this, OnSuccessCallback_431, OnFailureCallback_431));
+                this, OnSuccessCallback_431, OnFailureCallback_431, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71555,7 +71555,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo>(
-                this, OnSuccessCallback_432, OnFailureCallback_432));
+                this, OnSuccessCallback_432, OnFailureCallback_432, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71687,7 +71687,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo>(
-                this, OnSuccessCallback_437, OnFailureCallback_437));
+                this, OnSuccessCallback_437, OnFailureCallback_437, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71740,7 +71740,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo>(
-                this, OnSuccessCallback_439, OnFailureCallback_439));
+                this, OnSuccessCallback_439, OnFailureCallback_439, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71793,7 +71793,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo>(
-                this, OnSuccessCallback_441, OnFailureCallback_441));
+                this, OnSuccessCallback_441, OnFailureCallback_441, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71846,7 +71846,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo>(
-                this, OnSuccessCallback_443, OnFailureCallback_443));
+                this, OnSuccessCallback_443, OnFailureCallback_443, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71898,7 +71898,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo>(
-                this, OnSuccessCallback_445, OnFailureCallback_445));
+                this, OnSuccessCallback_445, OnFailureCallback_445, true));
         return CHIP_NO_ERROR;
     }
 
@@ -71925,7 +71925,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo>(
-                this, OnSuccessCallback_446, OnFailureCallback_446));
+                this, OnSuccessCallback_446, OnFailureCallback_446, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72057,7 +72057,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo>(
-                this, OnSuccessCallback_451, OnFailureCallback_451));
+                this, OnSuccessCallback_451, OnFailureCallback_451, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72110,7 +72110,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo>(
-                this, OnSuccessCallback_453, OnFailureCallback_453));
+                this, OnSuccessCallback_453, OnFailureCallback_453, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72163,7 +72163,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo>(
-                this, OnSuccessCallback_455, OnFailureCallback_455));
+                this, OnSuccessCallback_455, OnFailureCallback_455, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72216,7 +72216,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo>(
-                this, OnSuccessCallback_457, OnFailureCallback_457));
+                this, OnSuccessCallback_457, OnFailureCallback_457, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72268,7 +72268,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo>(
-                this, OnSuccessCallback_459, OnFailureCallback_459));
+                this, OnSuccessCallback_459, OnFailureCallback_459, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72295,7 +72295,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo>(
-                this, OnSuccessCallback_460, OnFailureCallback_460));
+                this, OnSuccessCallback_460, OnFailureCallback_460, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72427,7 +72427,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo>(
-                this, OnSuccessCallback_465, OnFailureCallback_465));
+                this, OnSuccessCallback_465, OnFailureCallback_465, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72480,7 +72480,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo>(
-                this, OnSuccessCallback_467, OnFailureCallback_467));
+                this, OnSuccessCallback_467, OnFailureCallback_467, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72533,7 +72533,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo>(
-                this, OnSuccessCallback_469, OnFailureCallback_469));
+                this, OnSuccessCallback_469, OnFailureCallback_469, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72586,7 +72586,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo>(
-                this, OnSuccessCallback_471, OnFailureCallback_471));
+                this, OnSuccessCallback_471, OnFailureCallback_471, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72638,7 +72638,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo>(
-                this, OnSuccessCallback_473, OnFailureCallback_473));
+                this, OnSuccessCallback_473, OnFailureCallback_473, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72712,7 +72712,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::GeneralErrorBoolean::TypeInfo>(
-            this, OnSuccessCallback_476, OnFailureCallback_476));
+            this, OnSuccessCallback_476, OnFailureCallback_476, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72734,7 +72734,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ClusterErrorBoolean::TypeInfo>(
-            this, OnSuccessCallback_477, OnFailureCallback_477));
+            this, OnSuccessCallback_477, OnFailureCallback_477, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72757,7 +72757,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ClientGeneratedCommandList::TypeInfo>(
-                this, OnSuccessCallback_478, OnFailureCallback_478));
+                this, OnSuccessCallback_478, OnFailureCallback_478, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72831,7 +72831,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ServerGeneratedCommandList::TypeInfo>(
-                this, OnSuccessCallback_479, OnFailureCallback_479));
+                this, OnSuccessCallback_479, OnFailureCallback_479, true));
         return CHIP_NO_ERROR;
     }
 
@@ -72907,7 +72907,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::StructAttr::TypeInfo>(
-            this, OnSuccessCallback_481, OnFailureCallback_481));
+            this, OnSuccessCallback_481, OnFailureCallback_481, true));
         return CHIP_NO_ERROR;
     }
 
@@ -73429,7 +73429,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -73479,7 +73479,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -73537,7 +73537,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -73586,7 +73586,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -73635,7 +73635,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            this, OnSuccessCallback_15, OnFailureCallback_15));
+            this, OnSuccessCallback_15, OnFailureCallback_15, true));
         return CHIP_NO_ERROR;
     }
 
@@ -73693,7 +73693,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            this, OnSuccessCallback_17, OnFailureCallback_17));
+            this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -73742,7 +73742,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            this, OnSuccessCallback_19, OnFailureCallback_19));
+            this, OnSuccessCallback_19, OnFailureCallback_19, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74161,7 +74161,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74186,7 +74186,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74211,7 +74211,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74283,7 +74283,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74308,7 +74308,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74333,7 +74333,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74358,7 +74358,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74406,7 +74406,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74455,7 +74455,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74504,7 +74504,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16));
+            this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74553,7 +74553,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_18, OnFailureCallback_18));
+            this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -74601,7 +74601,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_20, OnFailureCallback_20));
+            this, OnSuccessCallback_20, OnFailureCallback_20, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76437,7 +76437,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76487,7 +76487,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76536,7 +76536,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76562,7 +76562,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76612,7 +76612,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            this, OnSuccessCallback_11, OnFailureCallback_11, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76661,7 +76661,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-            this, OnSuccessCallback_13, OnFailureCallback_13));
+            this, OnSuccessCallback_13, OnFailureCallback_13, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76687,7 +76687,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-            this, OnSuccessCallback_14, OnFailureCallback_14));
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76737,7 +76737,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16));
+            this, OnSuccessCallback_16, OnFailureCallback_16, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76786,7 +76786,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-            this, OnSuccessCallback_18, OnFailureCallback_18));
+            this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76812,7 +76812,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-            this, OnSuccessCallback_19, OnFailureCallback_19));
+            this, OnSuccessCallback_19, OnFailureCallback_19, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76862,7 +76862,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-            this, OnSuccessCallback_21, OnFailureCallback_21));
+            this, OnSuccessCallback_21, OnFailureCallback_21, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76911,7 +76911,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-            this, OnSuccessCallback_23, OnFailureCallback_23));
+            this, OnSuccessCallback_23, OnFailureCallback_23, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76937,7 +76937,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-            this, OnSuccessCallback_24, OnFailureCallback_24));
+            this, OnSuccessCallback_24, OnFailureCallback_24, true));
         return CHIP_NO_ERROR;
     }
 
@@ -76987,7 +76987,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-            this, OnSuccessCallback_26, OnFailureCallback_26));
+            this, OnSuccessCallback_26, OnFailureCallback_26, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77036,7 +77036,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-            this, OnSuccessCallback_28, OnFailureCallback_28));
+            this, OnSuccessCallback_28, OnFailureCallback_28, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77062,7 +77062,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-            this, OnSuccessCallback_29, OnFailureCallback_29));
+            this, OnSuccessCallback_29, OnFailureCallback_29, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77112,7 +77112,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-            this, OnSuccessCallback_31, OnFailureCallback_31));
+            this, OnSuccessCallback_31, OnFailureCallback_31, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77161,7 +77161,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-            this, OnSuccessCallback_33, OnFailureCallback_33));
+            this, OnSuccessCallback_33, OnFailureCallback_33, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77187,7 +77187,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-            this, OnSuccessCallback_34, OnFailureCallback_34));
+            this, OnSuccessCallback_34, OnFailureCallback_34, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77237,7 +77237,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-            this, OnSuccessCallback_36, OnFailureCallback_36));
+            this, OnSuccessCallback_36, OnFailureCallback_36, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77286,7 +77286,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-            this, OnSuccessCallback_38, OnFailureCallback_38));
+            this, OnSuccessCallback_38, OnFailureCallback_38, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77312,7 +77312,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            this, OnSuccessCallback_39, OnFailureCallback_39));
+            this, OnSuccessCallback_39, OnFailureCallback_39, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77362,7 +77362,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            this, OnSuccessCallback_41, OnFailureCallback_41));
+            this, OnSuccessCallback_41, OnFailureCallback_41, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77411,7 +77411,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            this, OnSuccessCallback_43, OnFailureCallback_43));
+            this, OnSuccessCallback_43, OnFailureCallback_43, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77437,7 +77437,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-            this, OnSuccessCallback_44, OnFailureCallback_44));
+            this, OnSuccessCallback_44, OnFailureCallback_44, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77487,7 +77487,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-            this, OnSuccessCallback_46, OnFailureCallback_46));
+            this, OnSuccessCallback_46, OnFailureCallback_46, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77536,7 +77536,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-            this, OnSuccessCallback_48, OnFailureCallback_48));
+            this, OnSuccessCallback_48, OnFailureCallback_48, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77562,7 +77562,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            this, OnSuccessCallback_49, OnFailureCallback_49));
+            this, OnSuccessCallback_49, OnFailureCallback_49, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77612,7 +77612,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            this, OnSuccessCallback_51, OnFailureCallback_51));
+            this, OnSuccessCallback_51, OnFailureCallback_51, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77661,7 +77661,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            this, OnSuccessCallback_53, OnFailureCallback_53));
+            this, OnSuccessCallback_53, OnFailureCallback_53, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77687,7 +77687,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            this, OnSuccessCallback_54, OnFailureCallback_54));
+            this, OnSuccessCallback_54, OnFailureCallback_54, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77737,7 +77737,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            this, OnSuccessCallback_56, OnFailureCallback_56));
+            this, OnSuccessCallback_56, OnFailureCallback_56, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77786,7 +77786,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            this, OnSuccessCallback_58, OnFailureCallback_58));
+            this, OnSuccessCallback_58, OnFailureCallback_58, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77812,7 +77812,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            this, OnSuccessCallback_59, OnFailureCallback_59));
+            this, OnSuccessCallback_59, OnFailureCallback_59, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77862,7 +77862,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            this, OnSuccessCallback_61, OnFailureCallback_61));
+            this, OnSuccessCallback_61, OnFailureCallback_61, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77911,7 +77911,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            this, OnSuccessCallback_63, OnFailureCallback_63));
+            this, OnSuccessCallback_63, OnFailureCallback_63, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77937,7 +77937,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            this, OnSuccessCallback_64, OnFailureCallback_64));
+            this, OnSuccessCallback_64, OnFailureCallback_64, true));
         return CHIP_NO_ERROR;
     }
 
@@ -77987,7 +77987,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            this, OnSuccessCallback_66, OnFailureCallback_66));
+            this, OnSuccessCallback_66, OnFailureCallback_66, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78036,7 +78036,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            this, OnSuccessCallback_68, OnFailureCallback_68));
+            this, OnSuccessCallback_68, OnFailureCallback_68, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78062,7 +78062,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            this, OnSuccessCallback_69, OnFailureCallback_69));
+            this, OnSuccessCallback_69, OnFailureCallback_69, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78112,7 +78112,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            this, OnSuccessCallback_71, OnFailureCallback_71));
+            this, OnSuccessCallback_71, OnFailureCallback_71, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78161,7 +78161,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            this, OnSuccessCallback_73, OnFailureCallback_73));
+            this, OnSuccessCallback_73, OnFailureCallback_73, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78187,7 +78187,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            this, OnSuccessCallback_74, OnFailureCallback_74));
+            this, OnSuccessCallback_74, OnFailureCallback_74, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78237,7 +78237,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            this, OnSuccessCallback_76, OnFailureCallback_76));
+            this, OnSuccessCallback_76, OnFailureCallback_76, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78286,7 +78286,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            this, OnSuccessCallback_78, OnFailureCallback_78));
+            this, OnSuccessCallback_78, OnFailureCallback_78, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78312,7 +78312,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            this, OnSuccessCallback_79, OnFailureCallback_79));
+            this, OnSuccessCallback_79, OnFailureCallback_79, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78362,7 +78362,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            this, OnSuccessCallback_81, OnFailureCallback_81));
+            this, OnSuccessCallback_81, OnFailureCallback_81, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78411,7 +78411,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            this, OnSuccessCallback_83, OnFailureCallback_83));
+            this, OnSuccessCallback_83, OnFailureCallback_83, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78437,7 +78437,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            this, OnSuccessCallback_84, OnFailureCallback_84));
+            this, OnSuccessCallback_84, OnFailureCallback_84, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78487,7 +78487,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            this, OnSuccessCallback_86, OnFailureCallback_86));
+            this, OnSuccessCallback_86, OnFailureCallback_86, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78536,7 +78536,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            this, OnSuccessCallback_88, OnFailureCallback_88));
+            this, OnSuccessCallback_88, OnFailureCallback_88, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78562,7 +78562,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            this, OnSuccessCallback_89, OnFailureCallback_89));
+            this, OnSuccessCallback_89, OnFailureCallback_89, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78612,7 +78612,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            this, OnSuccessCallback_91, OnFailureCallback_91));
+            this, OnSuccessCallback_91, OnFailureCallback_91, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78661,7 +78661,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            this, OnSuccessCallback_93, OnFailureCallback_93));
+            this, OnSuccessCallback_93, OnFailureCallback_93, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78687,7 +78687,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_94, OnFailureCallback_94));
+            this, OnSuccessCallback_94, OnFailureCallback_94, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78720,7 +78720,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_95, OnFailureCallback_95));
+            this, OnSuccessCallback_95, OnFailureCallback_95, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78769,7 +78769,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_97, OnFailureCallback_97));
+            this, OnSuccessCallback_97, OnFailureCallback_97, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78803,7 +78803,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_98, OnFailureCallback_98));
+            this, OnSuccessCallback_98, OnFailureCallback_98, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78853,7 +78853,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_100, OnFailureCallback_100));
+            this, OnSuccessCallback_100, OnFailureCallback_100, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78902,7 +78902,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_102, OnFailureCallback_102));
+            this, OnSuccessCallback_102, OnFailureCallback_102, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78935,7 +78935,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_103, OnFailureCallback_103));
+            this, OnSuccessCallback_103, OnFailureCallback_103, true));
         return CHIP_NO_ERROR;
     }
 
@@ -78984,7 +78984,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_105, OnFailureCallback_105));
+            this, OnSuccessCallback_105, OnFailureCallback_105, true));
         return CHIP_NO_ERROR;
     }
 
@@ -79019,7 +79019,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_106, OnFailureCallback_106));
+            this, OnSuccessCallback_106, OnFailureCallback_106, true));
         return CHIP_NO_ERROR;
     }
 
@@ -79069,7 +79069,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_108, OnFailureCallback_108));
+            this, OnSuccessCallback_108, OnFailureCallback_108, true));
         return CHIP_NO_ERROR;
     }
 
@@ -79418,7 +79418,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::DeviceList::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -79451,7 +79451,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -79530,7 +79530,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ClientList::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -79561,7 +79561,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::PartsList::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -79736,7 +79736,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -79785,7 +79785,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -79834,7 +79834,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80185,7 +80185,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80212,7 +80212,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80239,7 +80239,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80303,7 +80303,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80376,7 +80376,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80582,7 +80582,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80608,7 +80608,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80634,7 +80634,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::StartUpMode::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80660,7 +80660,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::Description::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80686,7 +80686,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::SupportedModes::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -80759,7 +80759,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -81085,7 +81085,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::ThreadMetrics::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+            this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -81112,7 +81112,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapFree::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -81137,7 +81137,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -81163,7 +81163,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -81409,7 +81409,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -81421,8 +81421,7 @@ private:
 
     void OnSuccessResponse_2(uint64_t currentHeapUsed)
     {
-        VerifyOrReturn(CheckValue("currentHeapUsed", currentHeapUsed, 0ULL));
-
+        VerifyOrReturn(CheckConstraintType("currentHeapUsed", "", "uint64"));
         NextTest();
     }
 
@@ -81436,7 +81435,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -81448,8 +81447,7 @@ private:
 
     void OnSuccessResponse_3(uint64_t currentHeapHighWatermark)
     {
-        VerifyOrReturn(CheckValue("currentHeapHighWatermark", currentHeapHighWatermark, 0ULL));
-
+        VerifyOrReturn(CheckConstraintType("currentHeapHighWatermark", "", "uint64"));
         NextTest();
     }
 };
@@ -81679,7 +81677,8 @@ private:
         maxIntervalArgument = 5U;
 
         ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3, minIntervalArgument, maxIntervalArgument, OnSubscriptionEstablished_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, minIntervalArgument, maxIntervalArgument, OnSubscriptionEstablished_3,
+            true));
         return CHIP_NO_ERROR;
     }
 
@@ -82415,7 +82414,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -84065,7 +84064,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfPINUsersSupported::TypeInfo>(
-            this, OnSuccessCallback_35, OnFailureCallback_35));
+            this, OnSuccessCallback_35, OnFailureCallback_35, true));
         return CHIP_NO_ERROR;
     }
 
@@ -84485,7 +84484,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo>(
-            this, OnSuccessCallback_44, OnFailureCallback_44));
+            this, OnSuccessCallback_44, OnFailureCallback_44, true));
         return CHIP_NO_ERROR;
     }
 
@@ -87562,7 +87561,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -87620,7 +87619,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
 
@@ -87679,7 +87678,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -87737,7 +87736,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -88295,7 +88294,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -88323,7 +88322,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -88351,7 +88350,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
 
@@ -91698,7 +91697,7 @@ private:
 
         request.groupKeySet.groupKeySetID = 417U;
         request.groupKeySet.groupKeySecurityPolicy =
-            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(1);
         request.groupKeySet.epochKey0.SetNonNull();
         request.groupKeySet.epochKey0.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
@@ -91918,7 +91917,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
         return CHIP_NO_ERROR;
     }
 
@@ -91969,7 +91968,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 
@@ -92028,7 +92027,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_12, OnFailureCallback_12));
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
         return CHIP_NO_ERROR;
     }
 
@@ -93083,7 +93082,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupsPerFabric::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
         return CHIP_NO_ERROR;
     }
 
@@ -93109,7 +93108,7 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -93399,7 +93398,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
+            this, OnSuccessCallback_9, OnFailureCallback_9, true));
         return CHIP_NO_ERROR;
     }
 
@@ -93437,7 +93436,7 @@ private:
         ListFreer listFreer;
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupTable::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
         return CHIP_NO_ERROR;
     }
 

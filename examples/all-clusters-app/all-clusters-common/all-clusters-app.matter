@@ -3576,7 +3576,6 @@ endpoint 1 {
   server  cluster MediaInput;
   server  cluster MediaPlayback;
   server  cluster ModeSelect;
-  server  cluster NetworkCommissioning;
   server  cluster OccupancySensing;
   server  cluster OnOff;
   server  cluster OnOffSwitchConfiguration;
@@ -3601,5 +3600,9 @@ endpoint 2 {
   server  cluster Groups;
   server  cluster OccupancySensing;
   server  cluster OnOff;
+}
+
+endpoint 65534 {
+  server  cluster NetworkCommissioning;
 }
 
