@@ -28,6 +28,8 @@ namespace app {
 class MessageParser : public StructParser
 {
 public:
+    CHIP_ERROR Init(TLV::TLVReader & aReader);
+    CHIP_ERROR ExitContainer();
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     CHIP_ERROR CheckInteractionModelRevision(TLV::TLVReader & aReader) const;
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
