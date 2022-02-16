@@ -45,7 +45,7 @@ public:
 
         const EmberBindingTableEntry * operator->() const { return &(mTable->mBindingTable[mIndex]); }
 
-        Iterator operator++() const;
+        Iterator operator++();
 
         bool operator==(const Iterator & rhs) { return mIndex == rhs.mIndex; }
 
@@ -55,16 +55,20 @@ public:
 
     private:
         BindingTable * mTable;
-        mutable uint8_t mPrevIndex;
-        mutable uint8_t mIndex;
+        uint8_t mPrevIndex;
+        uint8_t mIndex;
     };
 
     CHIP_ERROR Add(const EmberBindingTableEntry & entry);
 
-    EmberBindingTableEntry & GetAt(uint8_t index);
+    const EmberBindingTableEntry & GetAt(uint8_t index);
 
+    // The RemoveAt function shares the same semnatics as the std::list::remove.
+    // It returns the next iterator after removal and the old iterator is no loger valid.
     Iterator RemoveAt(Iterator iter);
 
+    // Returns the number of active entries in the binding table.
+    // *NOTE* The function does not return the capacity of the biding table.
     uint8_t Size() { return mSize; }
 
     Iterator begin();

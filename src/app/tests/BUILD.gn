@@ -37,8 +37,11 @@ static_library("helpers") {
   ]
 }
 
-source_set("binding-table") {
-  sources = [ "${chip_root}/src/app/util/binding-table.cpp" ]
+source_set("binding-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/util/binding-table.cpp",
+    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.cpp",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/util/mock:mock_ember",
@@ -64,6 +67,7 @@ chip_test_suite("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
+    "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
     "TestStatusIB.cpp",
@@ -84,7 +88,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    ":binding-table",
+    ":binding-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",

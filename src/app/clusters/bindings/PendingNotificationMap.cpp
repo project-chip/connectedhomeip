@@ -38,10 +38,10 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(FabricIndex * fabric, Node
             continue;
         }
         bool foundSamePeer = false;
-        for (auto checkIter = BindingTable::GetInstance().begin(); iter != BindingTable::GetInstance().end(); ++iter)
+        for (auto checkIter = BindingTable::GetInstance().begin(); checkIter != BindingTable::GetInstance().end(); ++checkIter)
         {
-            if (checkIter->type == EMBER_UNICAST_BINDING && checkIter->fabricIndex == checkIter->fabricIndex &&
-                checkIter->nodeId == checkIter->nodeId)
+            if (checkIter->type == EMBER_UNICAST_BINDING && checkIter->fabricIndex == iter->fabricIndex &&
+                checkIter->nodeId == iter->nodeId)
             {
                 foundSamePeer                        = true;
                 bindingWithSamePeer[iter.GetIndex()] = checkIter.GetIndex();
