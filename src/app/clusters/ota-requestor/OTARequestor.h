@@ -300,7 +300,6 @@ private:
      */
     static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
-
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
     uint32_t mOtaStartDelayMs                 = 0;
     CASESessionManager * mCASESessionManager  = nullptr;

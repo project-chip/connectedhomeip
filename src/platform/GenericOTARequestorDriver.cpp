@@ -46,16 +46,14 @@ uint16_t GenericOTARequestorDriver::GetMaxDownloadBlockSize()
     return 1024;
 }
 
-void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error)
-{
-
-}
+void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) {}
 
 void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mRequestor != nullptr);
-    ScheduleDelayedAction(UpdateFailureState::kDownloading, delay,
-                          [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
+    ScheduleDelayedAction(
+        UpdateFailureState::kDownloading, delay,
+        [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
 }
 
 void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
@@ -67,8 +65,9 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
         delay = kDefaultDelayedActionTime;
     }
 
-    ScheduleDelayedAction(UpdateFailureState::kQuerying, delay,
-                          [](System::Layer *, void * context) { ToDriver(context)->mRequestor->TriggerImmediateQuery(); }, this);
+    ScheduleDelayedAction(
+        UpdateFailureState::kQuerying, delay,
+        [](System::Layer *, void * context) { ToDriver(context)->mRequestor->TriggerImmediateQuery(); }, this);
 }
 
 void GenericOTARequestorDriver::UpdateDownloaded()
@@ -80,8 +79,9 @@ void GenericOTARequestorDriver::UpdateDownloaded()
 void GenericOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mImageProcessor != nullptr);
-    ScheduleDelayedAction(UpdateFailureState::kApplying, delay,
-                          [](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); }, this);
+    ScheduleDelayedAction(
+        UpdateFailureState::kApplying, delay, [](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); },
+        this);
 }
 
 void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
@@ -93,8 +93,9 @@ void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
         delay = kDefaultDelayedActionTime;
     }
 
-    ScheduleDelayedAction(UpdateFailureState::kAwaitingNextAction, delay,
-                          [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
+    ScheduleDelayedAction(
+        UpdateFailureState::kAwaitingNextAction, delay,
+        [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
 }
 
 void GenericOTARequestorDriver::UpdateDiscontinued()
@@ -129,58 +130,59 @@ void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallbac
     SystemLayer().CancelTimer(action, aAppState);
 }
 
-
 OTARequestorAction GenericOTARequestorDriver::GetRequestorAction(OTARequestorIncomingEvent input)
 {
 
     OTAUpdateStateEnum state  = mRequestor->GetCurrentUpdateState();
     OTARequestorAction action = OTARequestorAction::DoNotProceed;
 
-    switch(input)
+    switch (input)
+    {
+    case OTARequestorIncomingEvent::AnnouncedOTAProviderReceived: {
+        if (state != OTAUpdateStateEnum::kIdle)
         {
-            case OTARequestorIncomingEvent::AnnouncedOTAProviderReceived:
-                {
-                    if(state != OTAUpdateStateEnum::kIdle) {
-                        action = OTARequestorAction::DoNotProceed;
-                    } else {
-                        action = OTARequestorAction::Proceed;
-                    }
-
-                    break;
-                }
-            case OTARequestorIncomingEvent::TriggerImmediateQueryInvoked:
-                {
-                    if(state != OTAUpdateStateEnum::kIdle) {
-                        action = OTARequestorAction::DoNotProceed;
-                    } else {
-                        action = OTARequestorAction::Proceed;
-                    }
-                    break;
-                }
-            case OTARequestorIncomingEvent::DefaultProvidersAttrSet:
-                {
-                    if(state != OTAUpdateStateEnum::kIdle) {
-                        action = OTARequestorAction::CancelCurrentUpdateAndProceed;
-                    } else {
-                        action = OTARequestorAction::Proceed;
-                    }
-                    break;
-                }
-            case OTARequestorIncomingEvent::DefaultProvidersTimerExpiry:
-                {
-                    action = OTARequestorAction:: Proceed;
-                    break;
-                }
-            default:
-                {
-                    action = OTARequestorAction::Proceed;
-                }
+            action = OTARequestorAction::DoNotProceed;
         }
+        else
+        {
+            action = OTARequestorAction::Proceed;
+        }
+
+        break;
+    }
+    case OTARequestorIncomingEvent::TriggerImmediateQueryInvoked: {
+        if (state != OTAUpdateStateEnum::kIdle)
+        {
+            action = OTARequestorAction::DoNotProceed;
+        }
+        else
+        {
+            action = OTARequestorAction::Proceed;
+        }
+        break;
+    }
+    case OTARequestorIncomingEvent::DefaultProvidersAttrSet: {
+        if (state != OTAUpdateStateEnum::kIdle)
+        {
+            action = OTARequestorAction::CancelCurrentUpdateAndProceed;
+        }
+        else
+        {
+            action = OTARequestorAction::Proceed;
+        }
+        break;
+    }
+    case OTARequestorIncomingEvent::DefaultProvidersTimerExpiry: {
+        action = OTARequestorAction::Proceed;
+        break;
+    }
+    default: {
+        action = OTARequestorAction::Proceed;
+    }
+    }
 
     return action;
 }
-
-
 
 } // namespace DeviceLayer
 } // namespace chip
