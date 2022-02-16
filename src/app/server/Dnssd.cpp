@@ -259,10 +259,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
             if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
-                for (unsigned i = 0; i < sizeof(macBuffer); i++)
-                {
-                    macBuffer[i] = chip::Crypto::GetRandU8();
-                }
+                Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
             }
 
             const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
@@ -303,10 +300,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
-        for (unsigned i = 0; i < sizeof(macBuffer); i++)
-        {
-            macBuffer[i] = chip::Crypto::GetRandU8();
-        }
+        Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
     }
     advertiseParameters.SetMac(mac);
 
