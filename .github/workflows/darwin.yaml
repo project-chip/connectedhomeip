@@ -98,27 +98,6 @@ jobs:
               timeout-minutes: 10
               run: |
                 scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
-            - name: Build example OTA Provider
-              timeout-minutes: 5
-              run: |
-                scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug chip_config_network_layer_ble=false
-            - name: Build example OTA Requestor
-              timeout-minutes: 5
-              run: |
-                scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug chip_config_network_layer_ble=false
-            - name: Build and run OTA example
-              timeout-minutes: 20
-              run: |
-                  brew install openssl pkg-config coreutils
-                  mkdir /tmp/ota/
-                  scripts/tests/ota_test.sh
-            - name: Uploading OTA logs
-              if: always()
-              uses: actions/upload-artifact@v2
-              with:
-                  name: OTA,Darwin-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/ota/        
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
