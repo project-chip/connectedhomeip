@@ -197,6 +197,26 @@ exit:
     return err;
 }
 
+CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
+{
+    VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
+    if (IsPriming() || IsChunkedReport())
+    {
+        mSessionHandle.Grab(mpExchangeCtx->GetSessionHandle());
+    }
+    else
+    {
+        VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
+        mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Get(), this);
+    }
+    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
+
+    return StatusResponse::Send(aStatus, mpExchangeCtx,
+                                /* aExpectResponse = */ false);
+}
+
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
 {
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
