@@ -47,6 +47,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceControlServer.h>
 #include <string.h>
 
 using namespace chip;
@@ -527,9 +528,19 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
 
-    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
-                     AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen,
-                 nocResponse = OperationalCertStatus::kInvalidNOC);
+    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+
+    if (!server->IsFailSafeArmed())
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::UnsupportedAccess));
+        return true;
+    }
+
+    if (server->IsNocCommandInvoked())
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError));
+        return true;
+    }
 
     err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
@@ -555,6 +566,13 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();
+
+    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
+    // Index just allocated.
+    server->SetFabricIndex(fabricIndex);
+
+    // AddNOC command was successfully executed within the current fail-safe timer period.
+    server->SetNocCommandInvoked(true);
 
 exit:
 
@@ -587,6 +605,20 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: an administrator requested an update to the NOC");
 
+    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+
+    if (!server->IsFailSafeArmed())
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::UnsupportedAccess));
+        return true;
+    }
+
+    if (server->IsNocCommandInvoked())
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError));
+        return true;
+    }
+
     // Fetch current fabric
     FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
@@ -604,6 +636,13 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     // might be on the operational network already, in which case we are
     // expected to be live with our new identity at this point.
     app::DnssdServer::Instance().AdvertiseOperational();
+
+    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
+    // Index associated with the UpdateNOC command being invoked.
+    server->SetFabricIndex(fabricIndex);
+
+    // UpdateNOC command was successfully executed within the current fail-safe timer period.
+    server->SetNocCommandInvoked(true);
 
 exit:
 
@@ -739,6 +778,14 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
     MutableByteSpan nocsrElementsSpan;
 
+    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+
+    if (!server->IsFailSafeArmed())
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::UnsupportedAccess));
+        return true;
+    }
+
     auto & CSRNonce = commandData.CSRNonce;
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -750,10 +797,6 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
         size_t csrLength           = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
-
-        VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
-                         AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen,
-                     err = CHIP_ERROR_INCORRECT_STATE);
 
         // Always generate a new operational keypair for any new CSRRequest
         if (gFabricBeingCommissioned.GetOperationalKey() != nullptr)
@@ -823,9 +866,13 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
 
-    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() !=
-                     AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen,
-                 status = EMBER_ZCL_STATUS_FAILURE);
+    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+
+    if (!server->IsFailSafeArmed())
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::UnsupportedAccess));
+        return true;
+    }
 
     // TODO: Ensure we do not duplicate roots in storage, and detect "same key, different cert" errors
     // TODO: Validate cert signature prior to setting.

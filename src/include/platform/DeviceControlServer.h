@@ -28,6 +28,12 @@
 namespace chip {
 namespace DeviceLayer {
 
+struct FailSafeContext
+{
+    bool nocCommandInvoked = false;
+    FabricIndex mFabric    = kUndefinedFabricIndex;
+};
+
 /**
  * Defines the Swtich Device Control Delegate class to notify platform events.
  */
@@ -91,13 +97,25 @@ public:
     CHIP_ERROR DisarmFailSafe();
     CHIP_ERROR CommissioningComplete();
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb);
-
     CHIP_ERROR ConnectNetworkForOperational(ByteSpan networkID);
 
-    inline FabricIndex GetFabricIndex() { return mFabric; }
-    inline void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
+    /**
+     * @brief
+     *   Matches the fail-safe context’s Fabric Index (including null Fabric Index for a just established PASE session).
+     */
+    bool MatchFabricIndex(FabricIndex accessingFabric)
+    {
+        return (accessingFabric == mFailSafeContextl.mFabric) || (mFailSafeContextl.mFabric == kUndefinedFabricIndex);
+    }
+
+    inline bool IsFailSafeArmed() { return mFailSafeArmed; }
+    inline FabricIndex GetFabricIndex() { return mFailSafeContextl.mFabric; }
+    inline void SetFabricIndex(FabricIndex fabricId) { mFailSafeContextl.mFabric = fabricId; }
     inline NodeId GetPeerNodeId() { return mPeerNodeId; }
     inline void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
+    inline bool IsNocCommandInvoked() { return mFailSafeContextl.nocCommandInvoked; }
+    inline void SetNocCommandInvoked(bool status) { mFailSafeContextl.nocCommandInvoked = status; }
+
     void SetSwitchDelegate(SwitchDeviceControlDelegate * delegate) { mSwitchDelegate = delegate; }
     SwitchDeviceControlDelegate * GetSwitchDelegate() const { return mSwitchDelegate; }
 
@@ -106,7 +124,9 @@ public:
 private:
     // ===== Members for internal use by the following friends.
     static DeviceControlServer sInstance;
+    FailSafeContext mFailSafeContextl;
     SwitchDeviceControlDelegate * mSwitchDelegate = nullptr;
+    bool mFailSafeArmed                           = false;
 
     friend void HandleArmFailSafe(System::Layer * layer, void * aAppState);
     void CommissioningFailedTimerComplete();
@@ -121,8 +141,7 @@ private:
     DeviceControlServer(const DeviceControlServer &&) = delete;
     DeviceControlServer & operator=(const DeviceControlServer &) = delete;
 
-    NodeId mPeerNodeId  = 0;
-    FabricIndex mFabric = 0;
+    NodeId mPeerNodeId = kUndefinedNodeId;
 };
 
 } // namespace DeviceLayer

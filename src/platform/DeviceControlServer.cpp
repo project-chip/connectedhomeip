@@ -46,6 +46,9 @@ void DeviceControlServer::CommissioningFailedTimerComplete()
     event.Type                         = DeviceEventType::kCommissioningComplete;
     event.CommissioningComplete.status = CHIP_ERROR_TIMEOUT;
     CHIP_ERROR status                  = PlatformMgr().PostEvent(&event);
+
+    mFailSafeArmed = false;
+
     if (status != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to post commissioning complete: %" CHIP_ERROR_FORMAT, status.Format());
@@ -54,12 +57,16 @@ void DeviceControlServer::CommissioningFailedTimerComplete()
 
 CHIP_ERROR DeviceControlServer::ArmFailSafe(System::Clock::Timeout expiryLength)
 {
+    mFailSafeArmed = true;
     DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControlServer::DisarmFailSafe()
 {
+    mFailSafeArmed = false;
+    SetFabricIndex(kUndefinedFabricIndex);
+    SetNocCommandInvoked(false);
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
