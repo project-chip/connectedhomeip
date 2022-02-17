@@ -48,7 +48,7 @@ constexpr uint32_t sTestSpake2p01_PinCode        = 20202021;
 constexpr uint32_t sTestSpake2p01_IterationCount = 1000;
 constexpr uint8_t sTestSpake2p01_Salt[]          = { 0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20,
                                             0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
-constexpr PASEVerifier sTestSpake2p01_PASEVerifier = { .mW0 = {
+constexpr Spake2pVerifier sTestSpake2p01_PASEVerifier = { .mW0 = {
     0xB9, 0x61, 0x70, 0xAA, 0xE8, 0x03, 0x34, 0x68, 0x84, 0x72, 0x4F, 0xE9, 0xA3, 0xB2, 0x87, 0xC3,
     0x03, 0x30, 0xC2, 0xA6, 0x60, 0x37, 0x5D, 0x17, 0xBB, 0x20, 0x5A, 0x8C, 0xF1, 0xAE, 0xCB, 0x35,
 },
@@ -59,7 +59,7 @@ constexpr PASEVerifier sTestSpake2p01_PASEVerifier = { .mW0 = {
     0xB7, 0xC0, 0x7F, 0xCC, 0x06, 0x27, 0xA1, 0xB8, 0x57, 0x3A, 0x14, 0x9F, 0xCD, 0x1F, 0xA4, 0x66,
     0xCF
 } };
-constexpr PASEVerifierSerialized sTestSpake2p01_SerializedVerifier = {
+constexpr Spake2pVerifierSerialized sTestSpake2p01_SerializedVerifier = {
     0xB9, 0x61, 0x70, 0xAA, 0xE8, 0x03, 0x34, 0x68, 0x84, 0x72, 0x4F, 0xE9, 0xA3, 0xB2, 0x87, 0xC3, 0x03, 0x30, 0xC2, 0xA6,
     0x60, 0x37, 0x5D, 0x17, 0xBB, 0x20, 0x5A, 0x8C, 0xF1, 0xAE, 0xCB, 0x35, 0x04, 0x57, 0xF8, 0xAB, 0x79, 0xEE, 0x25, 0x3A,
     0xB6, 0xA8, 0xE4, 0x6B, 0xB0, 0x9E, 0x54, 0x3A, 0xE4, 0x22, 0x73, 0x6D, 0xE5, 0x01, 0xE3, 0xDB, 0x37, 0xD4, 0x41, 0xFE,
@@ -441,24 +441,22 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 
 void PASEVerifierSerializeTest(nlTestSuite * inSuite, void * inContext)
 {
-    PASEVerifier verifier;
+    Spake2pVerifier verifier;
     NL_TEST_ASSERT(inSuite, verifier.Deserialize(ByteSpan(sTestSpake2p01_SerializedVerifier)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, memcmp(&verifier, &sTestSpake2p01_PASEVerifier, sizeof(PASEVerifier)) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(&verifier, &sTestSpake2p01_PASEVerifier, sizeof(Spake2pVerifier)) == 0);
 
-    PASEVerifierSerialized serializedVerifier;
+    Spake2pVerifierSerialized serializedVerifier;
     MutableByteSpan serializedVerifierSpan(serializedVerifier);
     NL_TEST_ASSERT(inSuite, verifier.Serialize(serializedVerifierSpan) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, serializedVerifierSpan.size() == Crypto::kSpake2pSerializedVerifierSize);
-    NL_TEST_ASSERT(inSuite,
-                   memcmp(serializedVerifier, sTestSpake2p01_SerializedVerifier, Crypto::kSpake2pSerializedVerifierSize) == 0);
+    NL_TEST_ASSERT(inSuite, serializedVerifierSpan.size() == kSpake2p_VerifierSerialized_Length);
+    NL_TEST_ASSERT(inSuite, memcmp(serializedVerifier, sTestSpake2p01_SerializedVerifier, kSpake2p_VerifierSerialized_Length) == 0);
 
-    PASEVerifierSerialized serializedVerifier2;
+    Spake2pVerifierSerialized serializedVerifier2;
     MutableByteSpan serializedVerifier2Span(serializedVerifier2);
-    NL_TEST_ASSERT(inSuite,
-                   chip::Crypto::DRBG_get_bytes(serializedVerifier, Crypto::kSpake2pSerializedVerifierSize) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, chip::Crypto::DRBG_get_bytes(serializedVerifier, kSpake2p_VerifierSerialized_Length) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, verifier.Deserialize(ByteSpan(serializedVerifier)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, verifier.Serialize(serializedVerifier2Span) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, memcmp(serializedVerifier, serializedVerifier2, Crypto::kSpake2pSerializedVerifierSize) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(serializedVerifier, serializedVerifier2, kSpake2p_VerifierSerialized_Length) == 0);
 }
 
 // Test Suite
