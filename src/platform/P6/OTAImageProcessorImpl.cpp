@@ -23,7 +23,7 @@
 
 namespace chip {
 
-#ifdef CY_OTA
+#ifdef P6_OTA
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
@@ -86,6 +86,9 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
         return;
     }
+    // Note: This only erases up to the secondary slot size (which fa_size is
+    // set to). It will not erase the persistent storage as that only uses
+    // a small region towards the end of flash.
     if (flash_area_erase(imageProcessor->mFlashArea, 0, imageProcessor->mFlashArea->fa_size) != 0)
     {
         imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
@@ -217,6 +220,6 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;
 }
-#endif // CY_OTA
+#endif // P6_OTA
 
 } // namespace chip
