@@ -37,7 +37,7 @@ tests:
                       FabricIndex: 0,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [nodeId, 1234, 5678, 9090],
+                      Subjects: null,
                       Targets:
                           [
                               { Cluster: null, Endpoint: 0, DeviceType: null },
@@ -80,7 +80,7 @@ tests:
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [nodeId, 1234, 5678, 9090],
+                      Subjects: null,
                       Targets:
                           [
                               { Cluster: null, Endpoint: 0, DeviceType: null },
@@ -123,7 +123,7 @@ tests:
                       FabricIndex: 0,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [nodeId],
+                      Subjects: null,
                       Targets:
                           [
                               { Cluster: null, Endpoint: 0, DeviceType: null },
@@ -149,7 +149,7 @@ tests:
                       FabricIndex: 1,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [nodeId],
+                      Subjects: null,
                       Targets:
                           [
                               { Cluster: null, Endpoint: 0, DeviceType: null },

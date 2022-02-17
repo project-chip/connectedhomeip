@@ -360,17 +360,7 @@ private:
             listHolder_0->mList[0].fabricIndex = 0;
             listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
             listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
-            listHolder_0->mList[0].subjects.SetNonNull();
-
-            {
-                auto * listHolder_3 = new ListHolder<uint64_t>(4);
-                listFreer.add(listHolder_3);
-                listHolder_3->mList[0]                  = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-                listHolder_3->mList[1]                  = 1234ULL;
-                listHolder_3->mList[2]                  = 5678ULL;
-                listHolder_3->mList[3]                  = 9090ULL;
-                listHolder_0->mList[0].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 4);
-            }
+            listHolder_0->mList[0].subjects.SetNull();
             listHolder_0->mList[0].targets.SetNonNull();
 
             {
@@ -523,25 +513,7 @@ private:
             VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
             VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
             VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
-            VerifyOrReturn(CheckValueNonNull("acl[0].subjects", iter_0.GetValue().subjects));
-            {
-                auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[0].subjects.Value()", iter_NaN, 0));
-                VerifyOrReturn(CheckValue("acl[0].subjects.Value()[0]", iter_NaN.GetValue(),
-                                          mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL));
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[0].subjects.Value()", iter_NaN, 1));
-                VerifyOrReturn(CheckValue("acl[0].subjects.Value()[1]", iter_NaN.GetValue(), 1234ULL));
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[0].subjects.Value()", iter_NaN, 2));
-                VerifyOrReturn(CheckValue("acl[0].subjects.Value()[2]", iter_NaN.GetValue(), 5678ULL));
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[0].subjects.Value()", iter_NaN, 3));
-                VerifyOrReturn(CheckValue("acl[0].subjects.Value()[3]", iter_NaN.GetValue(), 9090ULL));
-                VerifyOrReturn(
-                    CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[0].subjects.Value()", iter_NaN, 4));
-            }
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
             VerifyOrReturn(CheckValueNonNull("acl[0].targets", iter_0.GetValue().targets));
             {
                 auto iter_NaN = iter_0.GetValue().targets.Value().begin();
@@ -683,14 +655,7 @@ private:
             listHolder_0->mList[0].fabricIndex = 0;
             listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
             listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
-            listHolder_0->mList[0].subjects.SetNonNull();
-
-            {
-                auto * listHolder_3 = new ListHolder<uint64_t>(1);
-                listFreer.add(listHolder_3);
-                listHolder_3->mList[0]                  = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-                listHolder_0->mList[0].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 1);
-            }
+            listHolder_0->mList[0].subjects.SetNull();
             listHolder_0->mList[0].targets.SetNonNull();
 
             {
@@ -791,16 +756,7 @@ private:
             VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
             VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
             VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
-            VerifyOrReturn(CheckValueNonNull("acl[0].subjects", iter_0.GetValue().subjects));
-            {
-                auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[0].subjects.Value()", iter_NaN, 0));
-                VerifyOrReturn(CheckValue("acl[0].subjects.Value()[0]", iter_NaN.GetValue(),
-                                          mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL));
-                VerifyOrReturn(
-                    CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[0].subjects.Value()", iter_NaN, 1));
-            }
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
             VerifyOrReturn(CheckValueNonNull("acl[0].targets", iter_0.GetValue().targets));
             {
                 auto iter_NaN = iter_0.GetValue().targets.Value().begin();

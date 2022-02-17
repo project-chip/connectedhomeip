@@ -247,14 +247,7 @@ CHIPDevice * GetConnectedDevice(void)
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
-        {
-            NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
-            temp_3[0] = [NSNumber numberWithUnsignedLongLong:305414945ULL];
-            temp_3[1] = [NSNumber numberWithUnsignedLongLong:1234ULL];
-            temp_3[2] = [NSNumber numberWithUnsignedLongLong:5678ULL];
-            temp_3[3] = [NSNumber numberWithUnsignedLongLong:9090ULL];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = temp_3;
-        }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
             temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
@@ -372,16 +365,7 @@ CHIPDevice * GetConnectedDevice(void)
             XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
             XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
             XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
-            XCTAssertFalse(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
-            XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects count], 4);
-            XCTAssertEqual(
-                [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects[0] unsignedLongLongValue], nodeId);
-            XCTAssertEqual(
-                [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects[1] unsignedLongLongValue], 1234ULL);
-            XCTAssertEqual(
-                [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects[2] unsignedLongLongValue], 5678ULL);
-            XCTAssertEqual(
-                [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects[3] unsignedLongLongValue], 9090ULL);
+            XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
             XCTAssertFalse(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
             XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets count], 3);
             XCTAssertTrue(
@@ -581,11 +565,7 @@ CHIPDevice * GetConnectedDevice(void)
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
-        {
-            NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
-            temp_3[0] = [NSNumber numberWithUnsignedLongLong:305414945ULL];
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = temp_3;
-        }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
             temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
@@ -659,10 +639,7 @@ CHIPDevice * GetConnectedDevice(void)
             XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
             XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
             XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
-            XCTAssertFalse(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
-            XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects count], 1);
-            XCTAssertEqual(
-                [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects[0] unsignedLongLongValue], nodeId);
+            XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
             XCTAssertFalse(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
             XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets count], 3);
             XCTAssertTrue(
