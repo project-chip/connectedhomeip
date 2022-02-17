@@ -75,6 +75,15 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aE
     eventOptions.mPath        = path;
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
     eventOptions.mFabricIndex = aEventData.GetFabricIndex();
+
+    //
+    // Unlike attributes which have a different 'EncodeForRead' for fabric-scoped structs,
+    // fabric-sensitive events don't require that since the actual omission of the event in its entirety
+    // happens within the event management framework itself at the time of access.
+    //
+    // The 'mFabricIndex' field in the event options above is encoded out-of-band alongside the event payload
+    // and used to match against the accessing fabric.
+    //
     return logMgmt.LogEvent(&eventData, eventOptions, aEventNumber);
 }
 
