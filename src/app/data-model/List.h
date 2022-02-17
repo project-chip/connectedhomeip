@@ -93,6 +93,21 @@ inline CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, List<X> 
     return CHIP_NO_ERROR;
 }
 
+template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, bool> = true>
+inline CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, List<X> list)
+{
+    TLV::TLVType type;
+
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
+    for (auto & item : list)
+    {
+        ReturnErrorOnFailure(EncodeForRead(writer, TLV::AnonymousTag(), accessingFabricIndex, item));
+    }
+    ReturnErrorOnFailure(writer.EndContainer(type));
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace DataModel
 } // namespace app
 } // namespace chip
