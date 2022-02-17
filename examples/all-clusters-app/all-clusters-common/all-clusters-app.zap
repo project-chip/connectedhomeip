@@ -11587,7 +11587,7 @@
               "code": 4,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             },
             {
@@ -11595,7 +11595,7 @@
               "code": 5,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             },
             {
@@ -11603,7 +11603,7 @@
               "code": 7,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             },
             {
@@ -11611,7 +11611,7 @@
               "code": 8,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             }
           ],

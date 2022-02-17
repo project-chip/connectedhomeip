@@ -1,0 +1,203 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    Window Covering [TC-WNCV-4.2] GoToTiltPercentage Long-Run Verification with
+    server as DUT
+
+# TODO: WindowCovering tests TC-WNCV-4.2 finalize featuremap conditional dependencies
+
+config:
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    ### Step 1x -> Initialize the Covering position before any testing
+    ### MANDATORY Init Commands
+    - label:
+          "1a: TH sends DownOrClose command to preposition the DUT in the
+          opposite direction"
+      command: "DownOrClose"
+
+    - label: "1b: TH Waits for 10 seconds movement(s) on the device"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    ### Depends on the FeatureMap -> Check CurrentPosition attributes
+    - label:
+          "1c: If (PA & LF) TH reads CurrentPositionTiltPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      response:
+          constraints:
+              notValue: 10000
+
+    ######## GoToTiltPercentage Long-Run 30 percent #######
+    ### Step 2x ->  Check GoToTiltPercentage 30% Long-Run effects
+    - label: "2a: TH sends GoToTiltPercentage command with 30.00 percent to DUT"
+      command: "GoToTiltPercentage"
+      arguments:
+          values:
+              - name: "tiltPercent100thsValue"
+                value: 3000
+              - name: "tiltPercentageValue"
+                value: 30
+
+    ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
+    - label: "2b: DUT updates its attributes"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "2c: If (PA & LF) TH reads TargetPositionTiltPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "TargetPositionTiltPercent100ths"
+      response:
+          value: 3000
+
+    ### Step 3x ->  Verify the DUT has reached its 30%
+    ### DUT moves toward its 30% position
+    ### WARNING -> TIMEOUT Cannot be set here yet we while rely on report
+    ### Timeout might need to be given from the CLI via an extra arguments
+    - label: "3a: TH set a timeout of 5-10 minutes for failure"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    ### Reports for END OF MOVEMENTs
+    ### This report check behave like a DO WHILE waiting for the end of the movements
+    - label:
+          "3b: Verify DUT reports OperationalStatus attribute to TH after a
+          GoToTiltPercentage"
+      command: "subscribeAttribute"
+      attribute: "OperationalStatus"
+      minInterval: 10
+      maxInterval: 60
+      response:
+          constraints:
+              type: map8
+              value: 0
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "3c: If (PA & LF) TH reads CurrentPositionTiltPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      response:
+          constraints:
+              type: uint16
+              value: 3000
+
+    ### Optional Depends on the FeatureMap
+    - label:
+          "3d: If (PA & LF) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercentage"
+      response:
+          constraints:
+              type: uint8
+              value: 30
+
+    ######## GoToTiltPercentage Long-Run for 60.2 percent #######
+    ### Step 4x ->  Check GoToTiltPercentage 60.20% Long-Run effects
+    - label: "4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT"
+      command: "GoToTiltPercentage"
+      arguments:
+          values:
+              - name: "tiltPercent100thsValue"
+                value: 6005
+              - name: "tiltPercentageValue"
+                value: 60
+
+    ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
+    - label: "4b: DUT updates its attributes"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "4c: If (PA & LF) TH reads TargetPositionTiltPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "TargetPositionTiltPercent100ths"
+      response:
+          value: 6005
+
+    ### Step 5x ->  Verify the DUT has reached its 60.2%
+    ### DUT moves toward its 60.2% position
+    ### WARNING -> TIMEOUT Cannot be set here yet we while rely on report
+    ### Timeout might need to be given from the CLI via an extra arguments
+    - label: "5a: TH set a timeout of 5-10 minutes for failure"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    ### Reports for END OF MOVEMENTs
+    ### This report check behave like a DO WHILE waiting for the end of the movements
+    - label:
+          "5b: Verify DUT reports OperationalStatus attribute to TH after a
+          GoToTiltPercentage"
+      command: "subscribeAttribute"
+      attribute: "OperationalStatus"
+      minInterval: 10
+      maxInterval: 60
+      response:
+          constraints:
+              type: map8
+              value: 0
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "5c: If (PA & LF) TH reads CurrentPositionTiltPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      response:
+          constraints:
+              type: uint16
+              value: 6005
+
+    ### Optional Depends on the FeatureMap
+    - label:
+          "5d: If (PA & LF) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercentage"
+      response:
+          constraints:
+              type: uint8
+              value: 60
