@@ -11692,7 +11692,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTAssertNotNil(cluster);
 
     id measuredValueArgument;
-    measuredValueArgument = [NSNumber numberWithShort:0];
+    measuredValueArgument = [NSNumber numberWithUnsignedShort:0U];
     [cluster
         writeAttributeMeasuredValueWithValue:measuredValueArgument
                            completionHandler:^(NSError * _Nullable err) {
@@ -11715,7 +11715,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTAssertNotNil(cluster);
 
     id minMeasuredValueArgument;
-    minMeasuredValueArgument = [NSNumber numberWithShort:0];
+    minMeasuredValueArgument = [NSNumber numberWithUnsignedShort:0U];
     [cluster
         writeAttributeMinMeasuredValueWithValue:minMeasuredValueArgument
                               completionHandler:^(NSError * _Nullable err) {
@@ -11738,7 +11738,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTAssertNotNil(cluster);
 
     id maxMeasuredValueArgument;
-    maxMeasuredValueArgument = [NSNumber numberWithShort:0];
+    maxMeasuredValueArgument = [NSNumber numberWithUnsignedShort:0U];
     [cluster
         writeAttributeMaxMeasuredValueWithValue:maxMeasuredValueArgument
                               completionHandler:^(NSError * _Nullable err) {
@@ -17447,6 +17447,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue shortValue], 0);
         }
 
@@ -17514,6 +17515,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue shortValue], 0);
         }
 
@@ -17581,6 +17583,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue shortValue], 0);
         }
 

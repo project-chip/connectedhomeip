@@ -20701,7 +20701,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_1(measuredValue);
     }
@@ -20711,7 +20711,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, int16_t minMeasuredValue)
+    static void OnSuccessCallback_2(void * context, const chip::app::DataModel::Nullable<uint16_t> & minMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_2(minMeasuredValue);
     }
@@ -20721,7 +20721,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, int16_t maxMeasuredValue)
+    static void OnSuccessCallback_3(void * context, const chip::app::DataModel::Nullable<uint16_t> & maxMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_3(maxMeasuredValue);
     }
@@ -20752,7 +20752,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_7(void * context, const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_7(measuredValue);
     }
@@ -20762,7 +20762,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context, int16_t minMeasuredValue)
+    static void OnSuccessCallback_8(void * context, const chip::app::DataModel::Nullable<uint16_t> & minMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_8(minMeasuredValue);
     }
@@ -20772,7 +20772,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context, int16_t maxMeasuredValue)
+    static void OnSuccessCallback_9(void * context, const chip::app::DataModel::Nullable<uint16_t> & maxMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_9(maxMeasuredValue);
     }
@@ -20843,7 +20843,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(int16_t measuredValue)
+    void OnSuccessResponse_1(const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -20868,7 +20868,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(int16_t minMeasuredValue)
+    void OnSuccessResponse_2(const chip::app::DataModel::Nullable<uint16_t> & minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
         NextTest();
@@ -20893,7 +20893,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(int16_t maxMeasuredValue)
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<uint16_t> & maxMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "uint16"));
         NextTest();
@@ -20906,8 +20906,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t measuredValueArgument;
-        measuredValueArgument = 0;
+        chip::app::DataModel::Nullable<uint16_t> measuredValueArgument;
+        measuredValueArgument.SetNonNull();
+        measuredValueArgument.Value() = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
             measuredValueArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
@@ -20930,8 +20931,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t minMeasuredValueArgument;
-        minMeasuredValueArgument = 0;
+        chip::app::DataModel::Nullable<uint16_t> minMeasuredValueArgument;
+        minMeasuredValueArgument.SetNonNull();
+        minMeasuredValueArgument.Value() = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             minMeasuredValueArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
@@ -20954,8 +20956,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t maxMeasuredValueArgument;
-        maxMeasuredValueArgument = 0;
+        chip::app::DataModel::Nullable<uint16_t> maxMeasuredValueArgument;
+        maxMeasuredValueArgument.SetNonNull();
+        maxMeasuredValueArgument.Value() = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
             maxMeasuredValueArgument, this, OnSuccessCallback_6, OnFailureCallback_6));
@@ -20990,7 +20993,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(int16_t measuredValue)
+    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -21015,7 +21018,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8(int16_t minMeasuredValue)
+    void OnSuccessResponse_8(const chip::app::DataModel::Nullable<uint16_t> & minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
         NextTest();
@@ -21040,7 +21043,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9(int16_t maxMeasuredValue)
+    void OnSuccessResponse_9(const chip::app::DataModel::Nullable<uint16_t> & maxMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "uint16"));
         NextTest();
@@ -21229,7 +21232,7 @@ private:
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnSuccessResponse_1(measuredValue);
     }
@@ -21239,7 +21242,7 @@ private:
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_2(void * context, const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnSuccessResponse_2(measuredValue);
     }
@@ -21273,7 +21276,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(int16_t measuredValue)
+    void OnSuccessResponse_1(const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -21298,7 +21301,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(int16_t measuredValue)
+    void OnSuccessResponse_2(const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -33014,7 +33017,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::Nullable<int16_t> & measuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_1(measuredValue);
     }
@@ -33031,7 +33034,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_3(void * context, const chip::app::DataModel::Nullable<int16_t> & measuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_3(measuredValue);
     }
@@ -33041,7 +33044,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context, int16_t minMeasuredValue)
+    static void OnSuccessCallback_4(void * context, const chip::app::DataModel::Nullable<int16_t> & minMeasuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_4(minMeasuredValue);
     }
@@ -33058,7 +33061,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, int16_t minMeasuredValue)
+    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::Nullable<int16_t> & minMeasuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_6(minMeasuredValue);
     }
@@ -33068,7 +33071,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context, int16_t maxMeasuredValue)
+    static void OnSuccessCallback_7(void * context, const chip::app::DataModel::Nullable<int16_t> & maxMeasuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_7(maxMeasuredValue);
     }
@@ -33085,7 +33088,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context, int16_t maxMeasuredValue)
+    static void OnSuccessCallback_9(void * context, const chip::app::DataModel::Nullable<int16_t> & maxMeasuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_9(maxMeasuredValue);
     }
@@ -33119,7 +33122,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(int16_t measuredValue)
+    void OnSuccessResponse_1(const chip::app::DataModel::Nullable<int16_t> & measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "int16"));
         NextTest();
@@ -33132,8 +33135,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t measuredValueArgument;
-        measuredValueArgument = 0;
+        chip::app::DataModel::Nullable<int16_t> measuredValueArgument;
+        measuredValueArgument.SetNonNull();
+        measuredValueArgument.Value() = 0;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo>(
             measuredValueArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
@@ -33168,9 +33172,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(int16_t measuredValue)
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<int16_t> & measuredValue)
     {
-        VerifyOrReturn(CheckValue("measuredValue", measuredValue, 0));
+        VerifyOrReturn(CheckValueNonNull("measuredValue", measuredValue));
+        VerifyOrReturn(CheckValue("measuredValue.Value()", measuredValue.Value(), 0));
 
         NextTest();
     }
@@ -33195,7 +33200,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(int16_t minMeasuredValue)
+    void OnSuccessResponse_4(const chip::app::DataModel::Nullable<int16_t> & minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "int16"));
         NextTest();
@@ -33208,8 +33213,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t minMeasuredValueArgument;
-        minMeasuredValueArgument = 0;
+        chip::app::DataModel::Nullable<int16_t> minMeasuredValueArgument;
+        minMeasuredValueArgument.SetNonNull();
+        minMeasuredValueArgument.Value() = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
@@ -33246,9 +33252,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(int16_t minMeasuredValue)
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<int16_t> & minMeasuredValue)
     {
-        VerifyOrReturn(CheckValue("minMeasuredValue", minMeasuredValue, 0));
+        VerifyOrReturn(CheckValueNonNull("minMeasuredValue", minMeasuredValue));
+        VerifyOrReturn(CheckValue("minMeasuredValue.Value()", minMeasuredValue.Value(), 0));
 
         NextTest();
     }
@@ -33273,7 +33280,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(int16_t maxMeasuredValue)
+    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<int16_t> & maxMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "int16"));
         NextTest();
@@ -33286,8 +33293,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t maxMeasuredValueArgument;
-        maxMeasuredValueArgument = 0;
+        chip::app::DataModel::Nullable<int16_t> maxMeasuredValueArgument;
+        maxMeasuredValueArgument.SetNonNull();
+        maxMeasuredValueArgument.Value() = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
@@ -33324,9 +33332,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9(int16_t maxMeasuredValue)
+    void OnSuccessResponse_9(const chip::app::DataModel::Nullable<int16_t> & maxMeasuredValue)
     {
-        VerifyOrReturn(CheckValue("maxMeasuredValue", maxMeasuredValue, 0));
+        VerifyOrReturn(CheckValueNonNull("maxMeasuredValue", maxMeasuredValue));
+        VerifyOrReturn(CheckValue("maxMeasuredValue.Value()", maxMeasuredValue.Value(), 0));
 
         NextTest();
     }
