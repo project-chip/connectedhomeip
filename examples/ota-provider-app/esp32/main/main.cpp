@@ -75,6 +75,66 @@ static void InitServer(intptr_t context)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     sWiFiNetworkCommissioningInstance.Init();
+
+    BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
+    VerifyOrReturn(bdxOtaSender != nullptr, ESP_LOGE(TAG, "bdxOtaSender is nullptr"));
+
+    // Register handler to handle bdx messages
+    CHIP_ERROR error = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(
+        chip::Protocols::BDX::Id, bdxOtaSender);
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(error));
+        return;
+    }
+
+    BdxOtaSenderCallbacks callbacks;
+    callbacks.onBlockQuery       = &onBlockQueryCallback;
+    callbacks.onTransferComplete = &onTransferCompleteCallback;
+    callbacks.onTransferFailed   = &onTransferFailedCallback;
+    bdxOtaSender->SetCallbacks(callbacks);
+
+    esp_vfs_spiffs_conf_t spiffs_conf = {
+        .base_path              = "/spiffs",
+        .partition_label        = NULL,
+        .max_files              = 3,
+        .format_if_mount_failed = false,
+    };
+
+    esp_err_t err = esp_vfs_spiffs_register(&spiffs_conf);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(err));
+        return;
+    }
+    size_t total = 0, used = 0;
+    err = esp_spiffs_info(NULL, &total, &used);
+    ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
+    char otaImagePath[kMaxImagePathlen];
+    sprintf(otaImagePath, "/spiffs/%s", otaFilename);
+    otaImageFile = fopen(otaImagePath, "r");
+    if (otaImageFile == NULL)
+    {
+        ESP_LOGE(TAG, "Failed to open %s", otaFilename);
+        return;
+    }
+    fseek(otaImageFile, 0, SEEK_END);
+    otaImageLen = ftell(otaImageFile);
+    rewind(otaImageFile);
+    ESP_LOGI(TAG, "The OTA image size: %d", otaImageLen);
+    if (otaImageLen > 0)
+    {
+        otaProvider.SetQueryImageBehavior(OTAProviderExample::kRespondWithUpdateAvailable);
+        otaProvider.SetOTAFilePath(otaFilename);
+    }
+
+    chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
+
+    // Launch a chip shell and register OTA Provider Commands
+    chip::LaunchShell();
+    OTAProviderCommands & otaProviderCommands = OTAProviderCommands::GetInstance();
+    otaProviderCommands.SetExampleOTAProvider(&otaProvider);
+    otaProviderCommands.Register();
 }
 
 } // namespace
@@ -153,64 +213,4 @@ extern "C" void app_main()
     }
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
-
-    BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
-    VerifyOrReturn(bdxOtaSender != nullptr, ESP_LOGE(TAG, "bdxOtaSender is nullptr"));
-
-    // Register handler to handle bdx messages
-    error = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
-                                                                                                          bdxOtaSender);
-    if (error != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(error));
-        return;
-    }
-
-    BdxOtaSenderCallbacks callbacks;
-    callbacks.onBlockQuery       = &onBlockQueryCallback;
-    callbacks.onTransferComplete = &onTransferCompleteCallback;
-    callbacks.onTransferFailed   = &onTransferFailedCallback;
-    bdxOtaSender->SetCallbacks(callbacks);
-
-    esp_vfs_spiffs_conf_t spiffs_conf = {
-        .base_path              = "/spiffs",
-        .partition_label        = NULL,
-        .max_files              = 3,
-        .format_if_mount_failed = false,
-    };
-
-    err = esp_vfs_spiffs_register(&spiffs_conf);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(err));
-        return;
-    }
-    size_t total = 0, used = 0;
-    err = esp_spiffs_info(NULL, &total, &used);
-    ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
-    char otaImagePath[kMaxImagePathlen];
-    sprintf(otaImagePath, "/spiffs/%s", otaFilename);
-    otaImageFile = fopen(otaImagePath, "r");
-    if (otaImageFile == NULL)
-    {
-        ESP_LOGE(TAG, "Failed to open %s", otaFilename);
-        return;
-    }
-    fseek(otaImageFile, 0, SEEK_END);
-    otaImageLen = ftell(otaImageFile);
-    rewind(otaImageFile);
-    ESP_LOGI(TAG, "The OTA image size: %d", otaImageLen);
-    if (otaImageLen > 0)
-    {
-        otaProvider.SetQueryImageBehavior(OTAProviderExample::kRespondWithUpdateAvailable);
-        otaProvider.SetOTAFilePath(otaFilename);
-    }
-
-    chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
-
-    // Launch a chip shell and register OTA Provider Commands
-    chip::LaunchShell();
-    OTAProviderCommands & otaProviderCommands = OTAProviderCommands::GetInstance();
-    otaProviderCommands.SetExampleOTAProvider(&otaProvider);
-    otaProviderCommands.Register();
 }

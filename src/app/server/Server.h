@@ -87,6 +87,12 @@ public:
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
+    /**
+     * This function send the ShutDown event before stopping
+     * the event loop.
+     */
+    void DispatchShutDownAndStopEventLoop();
+
     void Shutdown();
 
     static Server & GetInstance() { return sServer; }

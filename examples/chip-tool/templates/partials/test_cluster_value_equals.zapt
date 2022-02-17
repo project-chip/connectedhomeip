@@ -21,6 +21,7 @@
     {{/if}}
   {{/if}}
 {{else if isArray}}
+    {{ensureIsArray expected~}}
     {
       auto iter_{{depth}} = {{actual}}.begin();
       {{#each expected}}

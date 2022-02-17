@@ -132,17 +132,8 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
-    CHIP_ERROR err;
-    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
-
-    // The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence.
-    if (platformManagerDelegate != nullptr)
-    {
-        platformManagerDelegate->OnShutDown();
-    }
-
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
-    err = UDPEndPointManager()->Shutdown();
+    CHIP_ERROR err = UDPEndPointManager()->Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     ChipLogError(DeviceLayer, "BLE shutdown");

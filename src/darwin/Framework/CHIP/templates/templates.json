@@ -52,6 +52,10 @@
         {
             "name": "attribute_data_callback_name",
             "path": "partials/attribute_data_callback_name.zapt"
+        },
+        {
+            "name": "defined_value",
+            "path": "partials/defined_value.zapt"
         }
     ],
     "templates": [

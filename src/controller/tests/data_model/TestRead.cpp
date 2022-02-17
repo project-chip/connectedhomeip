@@ -126,7 +126,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-bool IsClusterDataVersionEqual(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aRequiredDataVersion)
+bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredDataVersion)
 {
     if (aRequiredDataVersion == kDataVersion)
     {

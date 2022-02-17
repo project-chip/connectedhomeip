@@ -148,10 +148,7 @@ class DefaultDACVerifier : public DeviceAttestationVerifier
 public:
     DefaultDACVerifier(const AttestationTrustStore * paaRootStore) : mAttestationTrustStore(paaRootStore) {}
 
-    void VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
-                                      const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
-                                      const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce, VendorId vendorId,
-                                      uint16_t productId,
+    void VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 
     AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
@@ -172,11 +169,7 @@ protected:
     const AttestationTrustStore * mAttestationTrustStore;
 };
 
-void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
-                                                      const ByteSpan & attestationChallengeBuffer,
-                                                      const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
-                                                      const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
-                                                      VendorId vendorId, uint16_t productId,
+void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
@@ -185,8 +178,9 @@ void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestati
     Platform::ScopedMemoryBuffer<uint8_t> paaCert;
     MutableByteSpan paaDerBuffer;
 
-    VerifyOrExit(!attestationInfoBuffer.empty() && !attestationChallengeBuffer.empty() && !attestationSignatureBuffer.empty() &&
-                     !paiDerBuffer.empty() && !dacDerBuffer.empty() && !attestationNonce.empty() && onCompletion != nullptr,
+    VerifyOrExit(!info.attestationElementsBuffer.empty() && !info.attestationChallengeBuffer.empty() &&
+                     !info.attestationSignatureBuffer.empty() && !info.paiDerBuffer.empty() && !info.dacDerBuffer.empty() &&
+                     !info.attestationNonceBuffer.empty() && onCompletion != nullptr,
                  attestationError = AttestationVerificationResult::kInvalidArgument);
 
     // match DAC and PAI VIDs
@@ -194,9 +188,9 @@ void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestati
         uint16_t paiVid = VendorId::NotSpecified;
         uint16_t dacVid = VendorId::NotSpecified;
 
-        VerifyOrExit(ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, paiDerBuffer, paiVid) == CHIP_NO_ERROR,
+        VerifyOrExit(ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, info.paiDerBuffer, paiVid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaiFormatInvalid);
-        VerifyOrExit(ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, dacDerBuffer, dacVid) == CHIP_NO_ERROR,
+        VerifyOrExit(ExtractDNAttributeFromX509Cert(MatterOid::kVendorId, info.dacDerBuffer, dacVid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kDacFormatInvalid);
 
         VerifyOrExit(paiVid == dacVid, attestationError = AttestationVerificationResult::kDacVendorIdMismatch);
@@ -207,16 +201,16 @@ void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestati
         P256PublicKey remoteManufacturerPubkey;
         P256ECDSASignature deviceSignature;
 
-        VerifyOrExit(ExtractPubkeyFromX509Cert(dacDerBuffer, remoteManufacturerPubkey) == CHIP_NO_ERROR,
+        VerifyOrExit(ExtractPubkeyFromX509Cert(info.dacDerBuffer, remoteManufacturerPubkey) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kDacFormatInvalid);
 
         // Validate overall attestation signature on attestation information
         // SetLength will fail if signature doesn't fit
-        VerifyOrExit(deviceSignature.SetLength(attestationSignatureBuffer.size()) == CHIP_NO_ERROR,
+        VerifyOrExit(deviceSignature.SetLength(info.attestationSignatureBuffer.size()) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kAttestationSignatureInvalidFormat);
-        memcpy(deviceSignature.Bytes(), attestationSignatureBuffer.data(), attestationSignatureBuffer.size());
-        VerifyOrExit(ValidateAttestationSignature(remoteManufacturerPubkey, attestationInfoBuffer, attestationChallengeBuffer,
-                                                  deviceSignature) == CHIP_NO_ERROR,
+        memcpy(deviceSignature.Bytes(), info.attestationSignatureBuffer.data(), info.attestationSignatureBuffer.size());
+        VerifyOrExit(ValidateAttestationSignature(remoteManufacturerPubkey, info.attestationElementsBuffer,
+                                                  info.attestationChallengeBuffer, deviceSignature) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kAttestationSignatureInvalid);
     }
 
@@ -225,7 +219,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestati
         MutableByteSpan akid(akidBuf);
         constexpr size_t paaCertAllocatedLen = kMaxDERCertLength;
 
-        VerifyOrExit(ExtractAKIDFromX509Cert(paiDerBuffer, akid) == CHIP_NO_ERROR,
+        VerifyOrExit(ExtractAKIDFromX509Cert(info.paiDerBuffer, akid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaiFormatInvalid);
 
         VerifyOrExit(paaCert.Alloc(paaCertAllocatedLen), attestationError = AttestationVerificationResult::kNoMemory);
@@ -236,19 +230,20 @@ void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestati
     }
 
 #if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
-    VerifyOrExit(IsCertificateValidAtCurrentTime(dacDerBuffer) == CHIP_NO_ERROR,
+    VerifyOrExit(IsCertificateValidAtCurrentTime(info.dacDerBuffer) == CHIP_NO_ERROR,
                  attestationError = AttestationVerificationResult::kDacExpired);
 #endif
 
-    VerifyOrExit(IsCertificateValidAtIssuance(dacDerBuffer, paiDerBuffer) == CHIP_NO_ERROR,
+    VerifyOrExit(IsCertificateValidAtIssuance(info.dacDerBuffer, info.paiDerBuffer) == CHIP_NO_ERROR,
                  attestationError = AttestationVerificationResult::kPaiExpired);
 
-    VerifyOrExit(IsCertificateValidAtIssuance(dacDerBuffer, paaDerBuffer) == CHIP_NO_ERROR,
+    VerifyOrExit(IsCertificateValidAtIssuance(info.dacDerBuffer, paaDerBuffer) == CHIP_NO_ERROR,
                  attestationError = AttestationVerificationResult::kPaaExpired);
 
     CertificateChainValidationResult chainValidationResult;
-    VerifyOrExit(ValidateCertificateChain(paaDerBuffer.data(), paaDerBuffer.size(), paiDerBuffer.data(), paiDerBuffer.size(),
-                                          dacDerBuffer.data(), dacDerBuffer.size(), chainValidationResult) == CHIP_NO_ERROR,
+    VerifyOrExit(ValidateCertificateChain(paaDerBuffer.data(), paaDerBuffer.size(), info.paiDerBuffer.data(),
+                                          info.paiDerBuffer.size(), info.dacDerBuffer.data(), info.dacDerBuffer.size(),
+                                          chainValidationResult) == CHIP_NO_ERROR,
                  attestationError = MapError(chainValidationResult));
 
     // if PAA contains VID, see if matches with DAC's VID.
@@ -273,28 +268,30 @@ void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestati
         ByteSpan certificationDeclarationPayload;
 
         DeviceInfoForAttestation deviceInfo{
-            .vendorId    = vendorId,
-            .productId   = productId,
+            .vendorId    = info.vendorId,
+            .productId   = info.productId,
             .dacVendorId = dacVendorId,
             .paiVendorId = dacVendorId,
         };
 
-        VerifyOrExit(DeconstructAttestationElements(attestationInfoBuffer, certificationDeclarationSpan, attestationNonceSpan,
-                                                    timestampDeconstructed, firmwareInfoSpan, vendorReserved) == CHIP_NO_ERROR,
+        VerifyOrExit(DeconstructAttestationElements(info.attestationElementsBuffer, certificationDeclarationSpan,
+                                                    attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan,
+                                                    vendorReserved) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kAttestationElementsMalformed);
 
         // Verify that Nonce matches with what we sent
-        VerifyOrExit(attestationNonceSpan.data_equal(attestationNonce),
+        VerifyOrExit(attestationNonceSpan.data_equal(info.attestationNonceBuffer),
                      attestationError = AttestationVerificationResult::kAttestationNonceMismatch);
 
         attestationError = ValidateCertificationDeclarationSignature(certificationDeclarationSpan, certificationDeclarationPayload);
         VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, attestationError = attestationError);
 
-        VerifyOrExit(ExtractDNAttributeFromX509Cert(MatterOid::kProductId, dacDerBuffer, deviceInfo.dacProductId) == CHIP_NO_ERROR,
+        VerifyOrExit(ExtractDNAttributeFromX509Cert(MatterOid::kProductId, info.dacDerBuffer, deviceInfo.dacProductId) ==
+                         CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kDacFormatInvalid);
         // If PID is missing from PAI, the next method call will return CHIP_ERROR_KEY_NOT_FOUND.
         // Valid return values are then CHIP_NO_ERROR or CHIP_ERROR_KEY_NOT_FOUND.
-        error = ExtractDNAttributeFromX509Cert(MatterOid::kProductId, paiDerBuffer, deviceInfo.paiProductId);
+        error = ExtractDNAttributeFromX509Cert(MatterOid::kProductId, info.paiDerBuffer, deviceInfo.paiProductId);
         VerifyOrExit(error == CHIP_NO_ERROR || error == CHIP_ERROR_KEY_NOT_FOUND,
                      attestationError = AttestationVerificationResult::kPaiFormatInvalid);
 

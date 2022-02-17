@@ -70,6 +70,22 @@ class NetworkCommissioningTests:
         logger.info(f"Got values: {values}")
         return values
 
+    async def test_negative(self, endpointId):
+        logger.info(
+            f"Running negative test cases for NetworkCommissioning cluster on endpoint {endpointId}")
+
+        try:
+            logger.info(
+                f"1. Send ConnectNetwork command with a illegal network id")
+            req = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
+                networkID=b'0' * 254, breadcrumb=0)
+            res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+            raise AssertionError(f"Failure expected but got response {res}")
+        except chip.interaction_model.InteractionModelError as ex:
+            logger.info(f"Received {ex} from server.")
+
+        logger.info(f"Finished negative test cases.")
+
     async def test_wifi(self, endpointId):
         logger.info(f"Get basic information of the endpoint")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[
@@ -290,10 +306,12 @@ class NetworkCommissioningTests:
                 if clus.featureMap == WIFI_NETWORK_FEATURE_MAP:
                     logger.info(
                         f"Endpoint {endpoint} is configured as WiFi network, run WiFi commissioning test.")
+                    await self.test_negative(endpoint)
                     await self.test_wifi(endpoint)
                 elif clus.featureMap == THREAD_NETWORK_FEATURE_MAP:
                     logger.info(
                         f"Endpoint {endpoint} is configured as Thread network, run Thread commissioning test.")
+                    await self.test_negative(endpoint)
                     await self.test_thread(endpoint)
                 else:
                     logger.info(

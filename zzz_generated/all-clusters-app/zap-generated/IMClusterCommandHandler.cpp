@@ -1766,6 +1766,42 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::GoToLiftPercentage::Id: {
+            Commands::GoToLiftPercentage::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfWindowCoveringClusterGoToLiftPercentageCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::GoToLiftValue::Id: {
+            Commands::GoToLiftValue::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfWindowCoveringClusterGoToLiftValueCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::GoToTiltPercentage::Id: {
+            Commands::GoToTiltPercentage::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfWindowCoveringClusterGoToTiltPercentageCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::GoToTiltValue::Id: {
+            Commands::GoToTiltValue::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfWindowCoveringClusterGoToTiltValueCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::StopMotion::Id: {
             Commands::StopMotion::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);

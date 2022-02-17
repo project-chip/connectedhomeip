@@ -157,12 +157,9 @@ void ApplicationInit()
     // Initialize all OTA download components
     InitOTARequestor();
 
-    // Test Mode operation: If a delay is provided, QueryImage after the timer expires
+    // If a delay is provided, after the timer expires, QueryImage from default OTA provider
     if (delayQueryTimeInSec > 0)
     {
-        // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
-        gRequestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex, chip::kRootEndpointId);
-
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
                                                     OnStartDelayTimerHandler, nullptr);
     }
