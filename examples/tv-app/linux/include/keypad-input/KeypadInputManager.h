@@ -28,6 +28,5 @@ using CecKeyCodeType      = chip::app::Clusters::KeypadInput::CecKeyCode;
 class KeypadInputManager : public KeypadInputDelegate
 {
 public:
-    void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper,
-                       const CecKeyCodeType & keyCode) override;
+    void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCodeType & keyCode) override;
 };

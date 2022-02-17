@@ -23,7 +23,7 @@
 
 using chip::app::AttributeValueEncoder;
 using AudioOutputDelegate = chip::app::Clusters::AudioOutput::Delegate;
-using OutputInfoType     = chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type;
+using OutputInfoType      = chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type;
 
 class AudioOutputManager : public AudioOutputDelegate
 {
@@ -34,6 +34,7 @@ public:
     CHIP_ERROR HandleGetOutputList(AttributeValueEncoder & aEncoder) override;
     bool HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) override;
     bool HandleSelectOutput(const uint8_t & index) override;
+
 protected:
     uint8_t mCurrentOutput;
     std::vector<OutputInfoType> mOutputs;
