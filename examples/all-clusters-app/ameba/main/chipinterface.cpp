@@ -177,7 +177,7 @@ extern "C" void ChipTest(void)
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
 }

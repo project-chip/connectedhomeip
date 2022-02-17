@@ -116,6 +116,8 @@ static void InitOTARequestor(void)
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // Initialize and interconnect the Requestor and Image Processor objects -- END
+
+    InitOTARequestor();
 }
 
 static void InitServer(intptr_t context)
@@ -146,7 +148,5 @@ extern "C" void ChipTest(void)
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
-
-    InitOTARequestor();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 }
