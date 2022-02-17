@@ -53,7 +53,7 @@ void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, chip::Dev
 }
 } // namespace
 
-void SwitchToggleOnOff()
+void SwitchToggleOnOff(intptr_t context)
 {
     chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
 }
