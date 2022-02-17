@@ -280,7 +280,8 @@ CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t p
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(salt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(salt.data() == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(salt.size() < kPBKDFMinimumSaltLen || salt.size() > kPBKDFMaximumSaltLen, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(salt.size() < Crypto::kSpake2pPBKDFMinimumSaltLen || salt.size() > Crypto::kSpake2pPBKDFMaximumSaltLen,
+                      CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err = Init(mySessionId, kSetupPINCodeUndefinedValue, delegate);
     // From here onwards, let's go to exit on error, as some state might have already
@@ -974,19 +975,19 @@ exit:
 
 CHIP_ERROR PASEVerifier::Serialize(MutableByteSpan & outSerialized)
 {
-    VerifyOrReturnError(outSerialized.size() >= kSpake2pSerializedVerifierSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(outSerialized.size() >= Crypto::kSpake2pSerializedVerifierSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     memcpy(&outSerialized.data()[0], mW0, sizeof(mW0));
     memcpy(&outSerialized.data()[sizeof(mW0)], mL, sizeof(mL));
 
-    outSerialized.reduce_size(kSpake2pSerializedVerifierSize);
+    outSerialized.reduce_size(Crypto::kSpake2pSerializedVerifierSize);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PASEVerifier::Deserialize(ByteSpan inSerialized)
 {
-    VerifyOrReturnError(inSerialized.size() >= kSpake2pSerializedVerifierSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inSerialized.size() >= Crypto::kSpake2pSerializedVerifierSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     memcpy(mW0, &inSerialized.data()[0], sizeof(mW0));
     memcpy(mL, &inSerialized.data()[sizeof(mW0)], sizeof(mL));
