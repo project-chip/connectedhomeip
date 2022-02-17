@@ -2,7 +2,7 @@
 
 This library defines methods for resolving addresses of CHIP Nodes/Peers.
 
-While dnssd is used for lookups, that method generally can yield several IP
+While dnssd is used for discovery, that method generally can yield several IP
 addresses due to:
 
 -   multiple IP addresses per interface (e.g. LL, GUA, ULA or even IPv4)
