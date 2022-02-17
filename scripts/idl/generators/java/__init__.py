@@ -148,7 +148,7 @@ class EncodableValue:
 
     Intended use is to be able to:
       - derive types (see clone and without_* methods) such that codegen
-        can implement things like 'if x != null { tread non-null x}'
+        can implement things like 'if x != null { treat non-null x}'
       - Java specific conversions: get boxed types and JNI string signautes
         for the underlying types.
     """

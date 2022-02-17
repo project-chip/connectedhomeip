@@ -245,14 +245,14 @@ class TypeLookupContext:
        "C" is undefined
 
     When considering a lookup context of cluster X
-       "A"  is defined as a struct (X::A)
-       "B"  is defined as a struct (X::B)
+       "A" is defined as a struct (X::A)
+       "B" is defined as a struct (X::B)
        "C" is undefined
 
     When considering a lookup context of cluster Y
-       "A"  is defined as an enum (::A)
+       "A" is defined as an enum (::A)
        "B" is undefined
-       "C"  is defined as an enum (Y::C)
+       "C" is defined as an enum (Y::C)
 
     """
 
