@@ -171,6 +171,7 @@ Status WiFiDriverImpl::ReorderNetwork(ByteSpan networkId, uint8_t index)
 
 void WiFiDriverImpl::ExecuteWiFiInterfaceChange(nsapi_connection_status_t status)
 {
+
     switch (status)
     {
     case NSAPI_STATUS_LOCAL_UP:
@@ -193,12 +194,6 @@ void WiFiDriverImpl::ExecuteWiFiInterfaceChange(nsapi_connection_status_t status
         ChipLogDetail(DeviceLayer, "Unknown connection status: 0x%08X", status);
         break;
     }
-
-    if (mConnectCallback)
-    {
-        mConnectCallback->OnResult(Status::kSuccess, CharSpan(), status);
-    }
-    mConnectCallback = nullptr;
 }
 
 void WiFiDriverImpl::OnWiFiInterfaceEvent(nsapi_event_t event, intptr_t data)
@@ -418,6 +413,12 @@ bool WiFiDriverImpl::WiFiNetworkIterator::Next(Network & item)
 void WiFiDriverImpl::OnNetworkConnected()
 {
     ChipLogDetail(DeviceLayer, "OnNetworkConnected");
+
+    if (mConnectCallback)
+    {
+        mConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
+        mConnectCallback = nullptr;
+    }
 
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
