@@ -306,7 +306,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         saltB64[saltB64Len] = '\0';
 
         char verifierB64[BASE64_ENCODED_LEN(chip::kSpake2p_VerifierSerialized_Length) + 1];
-        uint32_t verifierB64Len     = chip::Base64Encode32(serializedVerifier, chip::kSpake2p_VerifierSerialized_Length, verifierB64);
+        uint32_t verifierB64Len = chip::Base64Encode32(serializedVerifier, chip::kSpake2p_VerifierSerialized_Length, verifierB64);
         verifierB64[verifierB64Len] = '\0';
 
         if (fprintf(outFile, "%d,%08d,%d,%s,%s\n", i, gPinCode, gIterationCount, saltB64, verifierB64) < 0 || ferror(outFile))

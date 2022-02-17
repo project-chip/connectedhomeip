@@ -67,8 +67,8 @@ constexpr size_t kMAX_CSR_Length = 255;
 
 constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 
-constexpr size_t kMin_PBKDF_Salt_Length = 16;
-constexpr size_t kMax_PBKDF_Salt_Length = 32;
+constexpr size_t kMin_PBKDF_Salt_Length  = 16;
+constexpr size_t kMax_PBKDF_Salt_Length  = 32;
 constexpr uint32_t kMin_PBKDF_Iterations = 1000;
 constexpr uint32_t kMax_PBKDF_Iterations = 100000;
 
@@ -94,7 +94,7 @@ constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1
 
 constexpr size_t kMAX_Hash_SHA256_Context_Size = CHIP_CONFIG_SHA256_CONTEXT_SIZE;
 
-constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
+constexpr size_t kSpake2p_WS_Length                 = kP256_FE_Length + 8;
 constexpr size_t kSpake2p_VerifierSerialized_Length = kP256_FE_Length + kP256_Point_Length;
 
 /*
@@ -1277,8 +1277,8 @@ public:
      *
      * @return CHIP_ERROR     The result from running PBKDF2
      */
-    static CHIP_ERROR ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin,
-                                uint8_t * ws, uint32_t ws_len);
+    static CHIP_ERROR ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin, uint8_t * ws,
+                                uint32_t ws_len);
 };
 
 /**

@@ -569,8 +569,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin,
-                                      uint8_t * ws, uint32_t ws_len)
+CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin, uint8_t * ws,
+                                      uint32_t ws_len)
 {
 #ifdef ENABLE_HSM_PBKDF2
     PBKDF2_sha256HSM pbkdf2;
@@ -581,7 +581,8 @@ CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan &
     Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setupPin);
 
     ReturnErrorCodeIf(salt.size() < kMin_PBKDF_Salt_Length || salt.size() > kMax_PBKDF_Salt_Length, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(pbkdf2IterCount < kMin_PBKDF_Iterations || pbkdf2IterCount > kMax_PBKDF_Iterations, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(pbkdf2IterCount < kMin_PBKDF_Iterations || pbkdf2IterCount > kMax_PBKDF_Iterations,
+                      CHIP_ERROR_INVALID_ARGUMENT);
 
     return pbkdf2.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt.data(), salt.size(),
                                 pbkdf2IterCount, ws_len, ws);
