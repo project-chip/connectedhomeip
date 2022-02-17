@@ -1065,11 +1065,11 @@ class AccessControlDelegate : public AccessControl::Delegate
 public:
     CHIP_ERROR Init() override
     {
-        ChipLogDetail(DataManagement, "Examples::AccessControlDelegate::Init");
+        ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Init");
         CHIP_ERROR err = LoadFromFlash();
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogDetail(DataManagement, "AccessControl: unable to load stored ACL entries; using empty list instead");
+            ChipLogProgress(DataManagement, "AccessControl: unable to load stored ACL entries; using empty list instead");
             for (auto & storage : EntryStorage::acl)
             {
                 storage.Clear();
@@ -1080,7 +1080,7 @@ public:
 
     CHIP_ERROR Finish() override
     {
-        ChipLogDetail(DataManagement, "Examples::AccessControlDelegate::Finish");
+        ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Finish");
         return SaveToFlash();
     }
 
@@ -1140,7 +1140,7 @@ public:
                 CHIP_ERROR saveError = SaveToFlash();
                 if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
                 {
-                    ChipLogDetail(DataManagement, "CreateEntry failed to save to flash");
+                    ChipLogProgress(DataManagement, "CreateEntry failed to save to flash");
                 }
             }
             return err;
@@ -1172,7 +1172,7 @@ public:
                 CHIP_ERROR saveError = SaveToFlash();
                 if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
                 {
-                    ChipLogDetail(DataManagement, "UpdateEntry failed to save to flash");
+                    ChipLogProgress(DataManagement, "UpdateEntry failed to save to flash");
                 }
             }
             return err;
@@ -1215,7 +1215,7 @@ public:
             CHIP_ERROR saveError = SaveToFlash();
             if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
             {
-                ChipLogDetail(DataManagement, "DeleteEntry failed to save to flash");
+                ChipLogProgress(DataManagement, "DeleteEntry failed to save to flash");
             }
             return CHIP_NO_ERROR;
         }

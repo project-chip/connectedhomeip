@@ -344,6 +344,9 @@ public:
         virtual void SetListener(Listener & listener) { mListener = &listener; }
         virtual void ClearListener() { mListener = nullptr; }
 
+        // TODO(#13867): this will go away
+        virtual bool TemporaryCheckOverride() const { return false; }
+
     private:
         Listener * mListener = nullptr;
     };

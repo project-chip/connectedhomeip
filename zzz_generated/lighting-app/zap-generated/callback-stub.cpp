@@ -89,9 +89,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
         break;
-    case ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID:
-        emberAfOnOffSwitchConfigurationClusterInitCallback(endpoint);
-        break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
@@ -215,11 +212,6 @@ void __attribute__((weak)) emberAfOccupancySensingClusterInitCallback(EndpointId
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfOnOffSwitchConfigurationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
