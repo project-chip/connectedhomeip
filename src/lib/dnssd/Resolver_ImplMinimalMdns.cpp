@@ -193,8 +193,8 @@ void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress &
     {
         return;
     }
-    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs]   = addr;
-    mDiscoveredNodeData.interfaceId[mDiscoveredNodeData.numIPs] = mInterfaceId;
+    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs] = addr;
+    mDiscoveredNodeData.interfaceId                           = mInterfaceId;
     mDiscoveredNodeData.numIPs++;
 }
 

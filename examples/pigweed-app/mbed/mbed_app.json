@@ -11,7 +11,10 @@
             "nsapi.default-wifi-password": "\"YOUR_PASSWORD\"",
             "mbed-trace.max-level": "TRACE_LEVEL_DEBUG",
             "mbed-trace.enable": true,
-            "target.printf_lib": "std"
+            "target.printf_lib": "std",
+            "mcuboot.bootloader-build": false,
+            "mcuboot.log-enable": true,
+            "mcuboot.log-level": "MCUBOOT_LOG_LEVEL_ERROR"
         },
         "CY8CPROTO_062_4343W": {
             "target.network-default-interface-type": "WIFI",
@@ -20,7 +23,13 @@
                 "NL_ASSERT_LOG=NL_ASSERT_LOG_DEFAULT",
                 "NL_ASSERT_EXPECT_FLAGS=NL_ASSERT_FLAG_LOG",
                 "WHD_PRINT_DISABLE"
-            ]
+            ],
+            "mcuboot.primary-slot-address": "0x10022000",
+            "mcuboot.slot-size": "0x180000",
+            "mcuboot.scratch-address": "0x101A2000",
+            "mcuboot.scratch-size": "0x40000",
+            "mcuboot.max-img-sectors": "0xC00",
+            "mcuboot.header-size": "0x400"
         }
     },
     "config": {
@@ -31,6 +40,18 @@
         "system-state-led": {
             "help": "System status LED.",
             "value": "LED1"
+        },
+        "version-number": {
+            "value": "0"
+        },
+        "version-number-str": {
+            "value": "\"0.1.0\""
+        },
+        "vendor-id": {
+            "value": "0xFFF1"
+        },
+        "product-id": {
+            "value": "0x800B"
         }
     }
 }

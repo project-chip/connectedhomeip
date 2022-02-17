@@ -35,7 +35,7 @@ tests:
       command: "subscribeAttribute"
       attribute: "OnOff"
       minInterval: 2
-      maxInterval: 10
+      maxInterval: 5
       response:
           value: false
 

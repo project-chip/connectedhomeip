@@ -24,7 +24,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
 
 {{#if (isTestOnlyCluster cluster)}}
     dispatch_queue_t queue = dispatch_get_main_queue();
-    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{#if (isString type)}}@"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
+    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{#if (isString type)}}@"{{/if}}{{> defined_value}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
 {{else}}
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -127,14 +127,14 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {
           {{> actualValue}}
           BOOL isLowerCase = [actualValue isEqualToString:[actualValue lowercaseString]];
-          XCTAssert{{#if expectedConstraints.isLowerCase}}True{{else}}False{{/if}}(isLowerCase);
+          XCTAssert{{#if (isStrEqual "true" expectedConstraints.isLowerCase)}}True{{else}}False{{/if}}(isLowerCase);
         }
         {{/if}}
         {{#if (hasProperty expectedConstraints "isUpperCase")}}
         {
           {{> actualValue}}
           BOOL isUpperCase = [actualValue isEqualToString:[actualValue uppercaseString]];
-          XCTAssert{{#if expectedConstraints.isUpperCase}}True{{else}}False{{/if}}(isUpperCase);
+          XCTAssert{{#if (isStrEqual "true" expectedConstraints.isUpperCase)}}True{{else}}False{{/if}}(isUpperCase);
         }
         {{/if}}
         {{#if (hasProperty expectedConstraints "isHexString")}}
@@ -142,7 +142,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
           {{> actualValue}}
           NSCharacterSet *chars = [[NSCharacterSet characterSetWithCharactersInString:@"0123456789ABCDEF"] invertedSet];
           BOOL isHexString = (NSNotFound == [actualValue rangeOfCharacterFromSet:chars].location);
-          XCTAssert{{#if expectedConstraints.isHexString}}True{{else}}False{{/if}}(isHexString);
+          XCTAssert{{#if (isStrEqual "true" expectedConstraints.isHexString)}}True{{else}}False{{/if}}(isHexString);
         }
         {{/if}}
         {{#if (hasProperty expectedConstraints "maxLength")}}
@@ -217,7 +217,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
     {{#*inline "minCommandTimeout"~}}
       {{#if (isTestOnlyCluster cluster)~}}
         {{#if (isStrEqual command "WaitForMs")~}}
-          {{#chip_tests_item_parameters}}{{#if (isStrEqual name "ms")}}({{definedValue}} / 1000) + {{/if}}{{/chip_tests_item_parameters}}
+          {{#chip_tests_item_parameters}}{{#if (isStrEqual name "ms")}}({{> defined_value}} / 1000) + {{/if}}{{/chip_tests_item_parameters}}
         {{~/if}}
       {{~/if}}
     {{~/inline}}

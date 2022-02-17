@@ -445,15 +445,17 @@ void PASEVerifierSerializeTest(nlTestSuite * inSuite, void * inContext)
     PASEVerifierSerialized serializedVerifier;
     MutableByteSpan serializedVerifierSpan(serializedVerifier);
     NL_TEST_ASSERT(inSuite, verifier.Serialize(serializedVerifierSpan) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, serializedVerifierSpan.size() == kSpake2pSerializedVerifierSize);
-    NL_TEST_ASSERT(inSuite, memcmp(serializedVerifier, sTestSpake2p01_SerializedVerifier, kSpake2pSerializedVerifierSize) == 0);
+    NL_TEST_ASSERT(inSuite, serializedVerifierSpan.size() == Crypto::kSpake2pSerializedVerifierSize);
+    NL_TEST_ASSERT(inSuite,
+                   memcmp(serializedVerifier, sTestSpake2p01_SerializedVerifier, Crypto::kSpake2pSerializedVerifierSize) == 0);
 
     PASEVerifierSerialized serializedVerifier2;
     MutableByteSpan serializedVerifier2Span(serializedVerifier2);
-    NL_TEST_ASSERT(inSuite, chip::Crypto::DRBG_get_bytes(serializedVerifier, kSpake2pSerializedVerifierSize) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   chip::Crypto::DRBG_get_bytes(serializedVerifier, Crypto::kSpake2pSerializedVerifierSize) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, verifier.Deserialize(ByteSpan(serializedVerifier)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, verifier.Serialize(serializedVerifier2Span) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, memcmp(serializedVerifier, serializedVerifier2, kSpake2pSerializedVerifierSize) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(serializedVerifier, serializedVerifier2, Crypto::kSpake2pSerializedVerifierSize) == 0);
 }
 
 // Test Suite

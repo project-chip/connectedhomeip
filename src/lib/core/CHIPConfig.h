@@ -1273,6 +1273,27 @@
 #endif // CHIP_CONFIG_MAX_FABRICS
 
 /**
+ *  @def CHIP_CONFIG_MAX_GROUP_DATA_PEERS
+ *
+ *  @brief
+ *    Maximum number of Peer within a fabric that can send group data message to a device.
+ *
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_DATA_PEERS
+#define CHIP_CONFIG_MAX_GROUP_DATA_PEERS 15
+#endif // CHIP_CONFIG_MAX_GROUP_DATA_PEERS
+
+/**
+ *  @def CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS
+ *
+ *  @brief
+ *   Maximum number of Peer within a fabric that can send group control message to a device.
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS
+#define CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS 2
+#endif // CHIP_CONFIG_MAX_GROUP_CONTROL_PEER
+
+/**
  * @def CHIP_NON_PRODUCTION_MARKER
  *
  * @brief Defines the name of a mark symbol whose presence signals that the chip code

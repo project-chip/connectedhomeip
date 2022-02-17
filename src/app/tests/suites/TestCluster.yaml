@@ -2894,7 +2894,7 @@ tests:
       command: "subscribeAttribute"
       attribute: "list_int8u"
       minInterval: 2
-      maxInterval: 10
+      maxInterval: 5
       response:
           value: [1, 2, 3, 4]
 

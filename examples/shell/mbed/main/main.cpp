@@ -17,6 +17,7 @@
 
 #include "mbedtls/platform.h"
 #include <ChipShellCollection.h>
+#include <DFUManager.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPMem.h>
@@ -83,6 +84,14 @@ int main()
         goto exit;
     }
 
+    err = GetDFUManager().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "DFU manager initialization failed: %s", err.AsString());
+        ret = EXIT_FAILURE;
+        goto exit;
+    }
+
     // Initialize the default streamer that was linked.
     ret = Engine::Root().Init();
     if (ret)
@@ -95,6 +104,7 @@ int main()
     cmd_otcli_init();
     cmd_ping_init();
     cmd_send_init();
+    cmd_app_server_init();
 
     ChipLogProgress(NotSpecified, "Mbed shell example application run");
 

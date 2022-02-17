@@ -395,24 +395,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     return success;
 }
 
-- (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
-{
-    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-    __block BOOL success = NO;
-    if (![self isRunning]) {
-        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
-        return success;
-    }
-    dispatch_sync(_chipWorkQueue, ^{
-        if ([self isRunning]) {
-            errorCode = self.cppCommissioner->UnpairDevice(deviceID);
-        }
-        success = ![self checkForError:errorCode logMsg:kErrorUnpairDevice error:error];
-    });
-
-    return success;
-}
-
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
@@ -430,22 +412,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     });
 
     return success;
-}
-
-- (BOOL)isDevicePaired:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
-{
-    __block BOOL paired = NO;
-    if (![self isRunning]) {
-        [self checkForError:CHIP_ERROR_INCORRECT_STATE logMsg:kErrorNotRunning error:error];
-        return paired;
-    }
-    dispatch_sync(_chipWorkQueue, ^{
-        if ([self isRunning]) {
-            paired = self.cppCommissioner->DoesDevicePairingExist(chip::PeerId().SetNodeId(deviceID));
-        }
-    });
-
-    return paired;
 }
 
 - (CHIPDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error

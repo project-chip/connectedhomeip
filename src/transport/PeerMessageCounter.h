@@ -85,7 +85,50 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Verify(uint32_t counter) const
+    /**
+     * @brief Implementation of spec 4.5.4.2
+     *
+     * For encrypted messages of Group Session Type, any arriving message with a counter in the range
+     * [(max_message_counter + 1) to (max_message_counter + 2^31 - 1)] (modulo 2^32) SHALL be considered
+     * new, and cause the max_message_counter value to be updated. Messages with counters from
+     * [(max_message_counter - 2^31) to (max_message_counter - MSG_COUNTER_WINDOW_SIZE - 1)] (modulo 2^
+     * 32) SHALL be considered duplicate. Message counters within the range of the bitmap SHALL be
+     * considered duplicate if the corresponding bit offset is set to true.
+     *
+     */
+    CHIP_ERROR VerifyGroupCounter(uint32_t counter)
+    {
+        if (mStatus != Status::Synced)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        // 1. Check whether the new counter value falls in the spec's "valid future counter value" window.
+        uint32_t counterIncrease          = counter - mSynced.mMaxCounter;
+        uint32_t groupFutureCounterWindow = (static_cast<uint32_t>(1 << 31)) - 1;
+        if (counterIncrease >= 1 && counterIncrease <= (groupFutureCounterWindow))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        // 2. Counter Window check
+        uint32_t offset = mSynced.mMaxCounter - counter;
+        if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        {
+            if ((offset == 0) || mSynced.mWindow.test(offset))
+            {
+                return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
+            }
+        }
+        else
+        {
+            return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR VerifyUnicast(uint32_t counter) const
     {
         if (mStatus != Status::Synced)
         {
@@ -95,10 +138,12 @@ public:
         if (counter <= mSynced.mMaxCounter)
         {
             uint32_t offset = mSynced.mMaxCounter - counter;
+
             if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
                 return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW; // outside valid range
             }
+
             if (mSynced.mWindow.test(offset))
             {
                 return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
@@ -108,7 +153,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR VerifyOrTrustFirst(uint32_t counter)
+    CHIP_ERROR Verify(uint32_t counter, bool useGroupAlgorithm = false)
+    {
+        if (useGroupAlgorithm)
+        {
+            return VerifyGroupCounter(counter);
+        }
+        return VerifyUnicast(counter);
+    }
+
+    CHIP_ERROR VerifyOrTrustFirst(uint32_t counter, bool useGroupAlgorithm = false)
     {
         switch (mStatus)
         {
@@ -117,8 +171,8 @@ public:
             SetCounter(counter);
             return CHIP_NO_ERROR;
         case Status::Synced: {
-            CHIP_ERROR err = Verify(counter);
-            if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW)
+            CHIP_ERROR err = Verify(counter, useGroupAlgorithm);
+            if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW && !useGroupAlgorithm)
             {
                 // According to chip spec, when global unencrypted message
                 // counter is out of window, the peer may have reset and is
@@ -132,6 +186,37 @@ public:
         default:
             VerifyOrDie(false);
             return CHIP_ERROR_INTERNAL;
+        }
+    }
+
+    /**
+     * @brief
+     *    With the counter verified and the packet MIC also verified by the secure key, we can trust the packet and adjust
+     *    counter states including possible Rollover for Groups communications.
+     *
+     * @pre Verify(counter) == CHIP_NO_ERROR
+     */
+    void CommitWithRollOver(uint32_t counter)
+    {
+        uint32_t offset = mSynced.mMaxCounter - counter;
+        if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        {
+            mSynced.mWindow.set(offset);
+        }
+        else
+        {
+            // Not a bit inside the window.  Since we are committing, this is a new mMaxCounter value.
+            mSynced.mMaxCounter = counter;
+            uint32_t shift      = -offset;
+            if (shift > CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            {
+                mSynced.mWindow.reset();
+            }
+            else
+            {
+                mSynced.mWindow <<= shift;
+            }
+            mSynced.mWindow.set(0);
         }
     }
 
@@ -200,7 +285,7 @@ private:
          *  | <-- mWindow -->|
          *  |[n]|  ...   |[0]|
          */
-        uint32_t mMaxCounter; // The most recent counter we have seen
+        uint32_t mMaxCounter = 0; // The most recent counter we have seen
         std::bitset<CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE> mWindow;
     };
 

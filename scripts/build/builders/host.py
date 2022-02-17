@@ -30,6 +30,7 @@ class HostApp(Enum):
     LOCK = auto()
     TESTS = auto()
     SHELL = auto()
+    CERT_TOOL = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -50,6 +51,8 @@ class HostApp(Enum):
             return '../'
         elif self == HostApp.SHELL:
             return 'shell/standalone'
+        elif self == HostApp.CERT_TOOL:
+            return '..'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -83,6 +86,9 @@ class HostApp(Enum):
         elif self == HostApp.SHELL:
             yield 'chip-shell'
             yield 'chip-shell.map'
+        elif self == HostApp.CERT_TOOL:
+            yield 'chip-cert'
+            yield 'chip-cert.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -168,6 +174,15 @@ class HostBuilder(GnBuilder):
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
             self.build_command = 'check'
+
+        if app == HostApp.CERT_TOOL:
+            # Certification only built for openssl
+            if self.board == HostBoard.ARM64:
+                # OpenSSL and MBEDTLS conflict. We only cross compile with mbedtls
+                raise Exception(
+                    "Cannot cross compile CERT TOOL: ssl library conflict")
+            self.extra_gn_options.append('chip_crypto="openssl"')
+            self.build_command = 'src/tools/chip-cert'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

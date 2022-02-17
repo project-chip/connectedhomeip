@@ -58,6 +58,7 @@ static_library("app") {
     "DeviceProxy.h",
     "EventManagement.cpp",
     "EventPathParams.h",
+    "GlobalAttributes.h",
     "InteractionModelEngine.cpp",
     "InteractionModelRevision.h",
     "InteractionModelTimeout.h",
