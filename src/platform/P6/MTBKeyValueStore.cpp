@@ -48,7 +48,11 @@ cy_rslt_t mtb_key_value_store_init(mtb_kvstore_t * kvstore_obj)
     }
     sectorSize          = cy_serial_flash_qspi_get_erase_size(ext_mem_address);
     uint32_t length     = sectorSize * 2;
+#ifdef CY_OTA
+    uint32_t start_addr = 0x3000000U;
+#else
     uint32_t start_addr = 0;
+#endif
 
     block_device.read         = bd_read;
     block_device.program      = bd_program;
