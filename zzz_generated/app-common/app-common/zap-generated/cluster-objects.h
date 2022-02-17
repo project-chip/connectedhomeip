@@ -11017,9 +11017,9 @@ struct TypeInfo
 namespace RegulatoryConfig {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RegulatoryConfig::Id; }
@@ -11029,9 +11029,9 @@ struct TypeInfo
 namespace LocationCapability {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocationCapability::Id; }
@@ -11109,8 +11109,10 @@ struct TypeInfo
 
         Attributes::Breadcrumb::TypeInfo::DecodableType breadcrumb = static_cast<uint64_t>(0);
         Attributes::BasicCommissioningInfo::TypeInfo::DecodableType basicCommissioningInfo;
-        Attributes::RegulatoryConfig::TypeInfo::DecodableType regulatoryConfig     = static_cast<uint8_t>(0);
-        Attributes::LocationCapability::TypeInfo::DecodableType locationCapability = static_cast<uint8_t>(0);
+        Attributes::RegulatoryConfig::TypeInfo::DecodableType regulatoryConfig =
+            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType>(0);
+        Attributes::LocationCapability::TypeInfo::DecodableType locationCapability =
+            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType>(0);
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
