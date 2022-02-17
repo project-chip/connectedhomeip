@@ -57,16 +57,16 @@ ChannelManager::ChannelManager()
     mChannels.push_back(worldChannel);
 
     mCurrentChannelIndex = 0;
-    mCurrentChannel = mChannels[mCurrentChannelIndex];
+    mCurrentChannel      = mChannels[mCurrentChannelIndex];
 }
-
 
 CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder)
 {
     // TODO: Insert code here
     std::vector<ChannelInfoType> channels = mChannels;
     return aEncoder.EncodeList([channels](const auto & encoder) -> CHIP_ERROR {
-        for (auto const& channel : channels) {
+        for (auto const & channel : channels)
+        {
             ReturnErrorOnFailure(encoder.Encode(channel));
         }
         return CHIP_NO_ERROR;
@@ -89,13 +89,15 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
     return aEncoder.Encode(mCurrentChannel);
 }
 
-bool isChannelMatched(const ChannelInfoType & channel, const CharSpan & match) {
+bool isChannelMatched(const ChannelInfoType & channel, const CharSpan & match)
+{
     char number[32];
     sprintf(number, "%d.%d", channel.majorNumber, channel.minorNumber);
     bool nameMatch = channel.name.HasValue() ? channel.name.Value().data_equal(match) : false;
-    bool affiliateCallSignMatch = channel.affiliateCallSign.HasValue() ? channel.affiliateCallSign.Value().data_equal(match) : false;
+    bool affiliateCallSignMatch =
+        channel.affiliateCallSign.HasValue() ? channel.affiliateCallSign.Value().data_equal(match) : false;
     bool callSignMatch = channel.callSign.HasValue() ? channel.callSign.Value().data_equal(match) : false;
-    bool numberMatch = match.data_equal(chip::CharSpan::fromCharString(number));
+    bool numberMatch   = match.data_equal(chip::CharSpan::fromCharString(number));
 
     return affiliateCallSignMatch || callSignMatch || nameMatch || numberMatch;
 }
@@ -104,11 +106,13 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
 {
     std::vector<ChannelInfoType> matchedChannels;
     uint16_t index = 0;
-    for (auto const& channel : mChannels) {
+    for (auto const & channel : mChannels)
+    {
         index++;
         // verify if CharSpan matches channel name
         // or callSign or affiliateCallSign or majorNumber.minorNumber
-        if (isChannelMatched(channel, match)) {
+        if (isChannelMatched(channel, match))
+        {
             matchedChannels.push_back(channel);
         }
     }
@@ -116,17 +120,22 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     ChangeChannelResponseType response;
 
     // Error: Found multiple matches
-    if (matchedChannels.size() > 1) {
+    if (matchedChannels.size() > 1)
+    {
         response.errorType = chip::app::Clusters::Channel::ErrorTypeEnum::kMultipleMatches;
         helper.Success(response);
-    } else if (matchedChannels.size() == 0) {
+    }
+    else if (matchedChannels.size() == 0)
+    {
         // Error: Found no match
         response.errorType = chip::app::Clusters::Channel::ErrorTypeEnum::kNoMatches;
         helper.Success(response);
-    } else {
+    }
+    else
+    {
         response.channelMatch = matchedChannels[0];
-        mCurrentChannel = matchedChannels[0];
-        mCurrentChannelIndex = index;
+        mCurrentChannel       = matchedChannels[0];
+        mCurrentChannelIndex  = index;
         helper.Success(response);
     }
 }
@@ -135,16 +144,19 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
 {
     // TODO: Insert code here
     bool channelChanged = false;
-    uint16_t index = 0;
-    for (auto const& channel : mChannels) {
+    uint16_t index      = 0;
+    for (auto const & channel : mChannels)
+    {
         index++;
         // verify if major & minor matches one of the channel from the list
-        if (channel.minorNumber ==  minorNumber && channel.majorNumber == majorNumber) {
+        if (channel.minorNumber == minorNumber && channel.majorNumber == majorNumber)
+        {
             // verify if channel changed by comparing values of current channel with the requested channel
-            if (channel.minorNumber !=  mCurrentChannel.minorNumber || channel.majorNumber != mCurrentChannel.majorNumber) {
-                channelChanged = true;
+            if (channel.minorNumber != mCurrentChannel.minorNumber || channel.majorNumber != mCurrentChannel.majorNumber)
+            {
+                channelChanged       = true;
                 mCurrentChannelIndex = index;
-                mCurrentChannel = channel;
+                mCurrentChannel      = channel;
             }
         }
     }
@@ -155,7 +167,7 @@ bool ChannelManager::HandleSkipChannel(const uint16_t & count)
 {
     // TODO: Insert code here
     uint16_t newChannelIndex = (count + mCurrentChannelIndex) % mChannels.size();
-    mCurrentChannelIndex = newChannelIndex;
-    mCurrentChannel = mChannels[mCurrentChannelIndex];
+    mCurrentChannelIndex     = newChannelIndex;
+    mCurrentChannel          = mChannels[mCurrentChannelIndex];
     return true;
 }

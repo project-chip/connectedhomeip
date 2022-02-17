@@ -36,7 +36,6 @@ AudioOutputManager::AudioOutputManager()
     }
 }
 
-
 uint8_t AudioOutputManager::HandleGetCurrentOutput()
 {
     return mCurrentOutput;
@@ -47,30 +46,37 @@ CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEnco
     // TODO: Insert code here
     std::vector<OutputInfoType> outputs = mOutputs;
     return aEncoder.EncodeList([outputs](const auto & encoder) -> CHIP_ERROR {
-        for (auto const& outputInfo : outputs) {
+        for (auto const & outputInfo : outputs)
+        {
             ReturnErrorOnFailure(encoder.Encode(outputInfo));
         }
         return CHIP_NO_ERROR;
     });
 }
 
-bool isAudioOutputIndexInRange(const uint8_t index, std::vector<OutputInfoType> outputs) {
+bool isAudioOutputIndexInRange(const uint8_t index, std::vector<OutputInfoType> outputs)
+{
     return index > 0 && index <= outputs.size();
 }
 
 bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
-    if (isAudioOutputIndexInRange(index, mOutputs)) {
+    if (isAudioOutputIndexInRange(index, mOutputs))
+    {
         uint16_t counter = 0;
-        for (const OutputInfoType & output : mOutputs) {
-            if (output.index == index) {
+        for (const OutputInfoType & output : mOutputs)
+        {
+            if (output.index == index)
+            {
                 mOutputs[counter].name = name;
             }
-            counter ++;
+            counter++;
         }
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }
@@ -78,10 +84,13 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
 bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
 {
     // TODO: Insert code here
-    if (isAudioOutputIndexInRange(index, mOutputs)) {
+    if (isAudioOutputIndexInRange(index, mOutputs))
+    {
         mCurrentOutput = index;
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }

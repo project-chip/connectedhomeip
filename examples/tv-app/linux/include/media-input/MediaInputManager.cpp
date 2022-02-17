@@ -40,7 +40,8 @@ CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncode
     // TODO: Insert code here
     std::vector<InputInfoType> inputs = mInputs;
     return aEncoder.EncodeList([inputs](const auto & encoder) -> CHIP_ERROR {
-        for (auto const& inputInfo : inputs) {
+        for (auto const & inputInfo : inputs)
+        {
             ReturnErrorOnFailure(encoder.Encode(inputInfo));
         }
         return CHIP_NO_ERROR;
@@ -52,17 +53,21 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
     return mCurrentInput;
 }
 
-bool isMediaInputIndexInRange(const uint8_t index, std::vector<InputInfoType> inputs) {
+bool isMediaInputIndexInRange(const uint8_t index, std::vector<InputInfoType> inputs)
+{
     return index > 0 && index <= inputs.size();
 }
 
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
     // TODO: Insert code here
-    if (isMediaInputIndexInRange(index, mInputs)) {
+    if (isMediaInputIndexInRange(index, mInputs))
+    {
         mCurrentInput = index;
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }
@@ -82,16 +87,21 @@ bool MediaInputManager::HandleHideInputStatus()
 bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
-    if (isMediaInputIndexInRange(index, mInputs)) {
+    if (isMediaInputIndexInRange(index, mInputs))
+    {
         uint16_t counter = 0;
-        for (const InputInfoType & input : mInputs) {
-            if (input.index == index) {
+        for (const InputInfoType & input : mInputs)
+        {
+            if (input.index == index)
+            {
                 mInputs[counter].name = name;
             }
-            counter ++;
+            counter++;
         }
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }

@@ -49,6 +49,7 @@ public:
     void HandleSeek(CommandResponseHelper<PlaybackResponseType> & helper, const uint64_t & positionMilliseconds) override;
     void HandleNext(CommandResponseHelper<PlaybackResponseType> & helper) override;
     void HandleStartOver(CommandResponseHelper<PlaybackResponseType> & helper) override;
+
 protected:
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum mCurrentState;
 };
