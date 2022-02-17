@@ -638,7 +638,6 @@ KVS
 kWindowNotOpen
 LabelList
 LabelStruct
-laguage
 launchable
 LAUNCHXL
 ldflags
@@ -1039,7 +1038,6 @@ SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
-seach
 SED
 SEGGER
 semver
