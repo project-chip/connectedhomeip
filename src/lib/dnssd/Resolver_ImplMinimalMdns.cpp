@@ -591,7 +591,14 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
 
         ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
+        if (resolve.Value().firstSend)
+        {
+            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
+        }
+        else
+        {
+            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+        }
     }
 
     return ScheduleResolveRetries();
