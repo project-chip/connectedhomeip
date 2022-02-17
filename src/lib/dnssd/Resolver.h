@@ -309,7 +309,7 @@ public:
     /// Called within the CHIP event loop after a successful node resolution.
     ///
     /// May be called multiple times: implementations may call this once per
-    /// received packets and MDNS packets may arrive over different interfaces
+    /// received packet and MDNS packets may arrive over different interfaces
     /// which will make nodeData have different content.
     virtual void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) = 0;
 
@@ -322,7 +322,7 @@ public:
     virtual void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
 };
 
-/// Callback for discovering nodes advertising non-operational status:
+/// Callbacks for discovering nodes advertising non-operational status:
 ///   - Commissioners
 ///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
 ///     connected to thread/wifi or devices with a commissioning window open)
