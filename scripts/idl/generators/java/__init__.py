@@ -109,6 +109,13 @@ def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
         yield attr
 
 
+def NamedFilter(choices: List, name: str):
+    for choice in choices:
+        if choice.name == name:
+            return choice
+    raise Exception("No item named %s in %r" % (name, choices))
+
+
 def ToBoxedJavaType(field: Field):
     if field.is_optional:
         return 'jobject'
@@ -351,6 +358,7 @@ class JavaGenerator(CodeGenerator):
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName
         self.jinja_env.filters['commandCallbackName'] = CommandCallbackName
+        self.jinja_env.filters['named'] = NamedFilter
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
         self.jinja_env.filters['lowercaseFirst'] = LowercaseFirst
         self.jinja_env.filters['asEncodable'] = EncodableValueFrom
