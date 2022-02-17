@@ -306,7 +306,7 @@ CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t p
     mIterationCount  = pbkdf2IterCount;
     mNextExpectedMsg = MsgType::PBKDFParamRequest;
     mPairingComplete = false;
-    mPasscodeID      = kDefaultCommissioningPasscodeId;
+    mPasscodeID      = passcodeID;
     mLocalMRPConfig  = mrpConfig;
 
     SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
@@ -321,9 +321,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
-                             Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
-                             SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, PasscodeId passcodeID,
+                             uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                             Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
 {
     TRACE_EVENT_SCOPE("Pair", "PASESession");
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -334,9 +334,10 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
     mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
 
     SetPeerAddress(peerAddress);
-    SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
 
     mLocalMRPConfig = mrpConfig;
+    mPasscodeID     = passcodeID;
+    SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
@@ -431,6 +432,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     uint8_t initiatorRandom[kPBKDFParamRandomNumberSize];
 
     uint32_t decodeTagIdSeq = 0;
+    PasscodeId passcodeId   = kDefaultCommissioningPasscodeId;
     bool hasPBKDFParameters = false;
 
     ChipLogDetail(SecureChannel, "Received PBKDF param request");
@@ -454,7 +456,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    SuccessOrExit(err = tlvReader.Get(mPasscodeID));
+    SuccessOrExit(err = tlvReader.Get(passcodeId));
+    VerifyOrExit(passcodeId == mPasscodeID, err = CHIP_ERROR_INVALID_PASE_PARAMETER);
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);

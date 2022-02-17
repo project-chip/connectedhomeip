@@ -843,7 +843,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID,
+    // TODO: Need to determine how PasscodeId is provided for a non-default case. i.e. ECM
+    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), kDefaultCommissioningPasscodeId, keyID,
                                     Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), exchangeCtxt, this);
     SuccessOrExit(err);
 
