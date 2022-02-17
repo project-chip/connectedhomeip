@@ -116,8 +116,6 @@ static void InitOTARequestor(void)
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // Initialize and interconnect the Requestor and Image Processor objects -- END
-
-    InitOTARequestor();
 }
 
 static void InitServer(intptr_t context)
@@ -128,6 +126,8 @@ static void InitServer(intptr_t context)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
+
+    InitOTARequestor();
 }
 
 extern "C" void ChipTest(void)
