@@ -750,20 +750,17 @@ JNI_METHOD(void, readPath)
 CHIP_ERROR ParseAttributePathList(jobject attributePathList, std::vector<app::AttributePathParams> & outAttributePathParamsList)
 {
     jint listSize;
-    CHIP_ERROR err = JniReferences::GetInstance().GetListSize(attributePathList, listSize);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(JniReferences::GetInstance().GetListSize(attributePathList, listSize));
 
     for (uint8_t i = 0; i < listSize; i++)
     {
         jobject attributePathItem = nullptr;
-        err                       = JniReferences::GetInstance().GetListItem(attributePathList, i, attributePathItem);
-        ReturnErrorOnFailure(err);
+        ReturnErrorOnFailure(JniReferences::GetInstance().GetListItem(attributePathList, i, attributePathItem));
 
         EndpointId endpointId;
         ClusterId clusterId;
         AttributeId attributeId;
-        err = ParseAttributePath(attributePathItem, endpointId, clusterId, attributeId);
-        ReturnErrorOnFailure(err);
+        ReturnErrorOnFailure(ParseAttributePath(attributePathItem, endpointId, clusterId, attributeId));
         outAttributePathParamsList.push_back(app::AttributePathParams(endpointId, clusterId, attributeId));
     }
 
@@ -778,15 +775,12 @@ CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId,
     jmethodID getEndpointIdMethod  = nullptr;
     jmethodID getClusterIdMethod   = nullptr;
     jmethodID getAttributeIdMethod = nullptr;
-    CHIP_ERROR err                 = JniReferences::GetInstance().FindMethod(env, attributePath, "getEndpointId",
-                                                             "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod);
-    ReturnErrorOnFailure(err);
-    err = JniReferences::GetInstance().FindMethod(env, attributePath, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;",
-                                                  &getClusterIdMethod);
-    ReturnErrorOnFailure(err);
-    err = JniReferences::GetInstance().FindMethod(env, attributePath, "getAttributeId",
-                                                  "()Lchip/devicecontroller/model/ChipPathId;", &getAttributeIdMethod);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
+        env, attributePath, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
+        env, attributePath, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
+        env, attributePath, "getAttributeId", "()Lchip/devicecontroller/model/ChipPathId;", &getAttributeIdMethod));
 
     jobject endpointIdObj = env->CallObjectMethod(attributePath, getEndpointIdMethod);
     VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -796,14 +790,11 @@ CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId,
     VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     uint32_t endpointId = 0;
-    err                 = GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
     uint32_t clusterId = 0;
-    err                = GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
     uint32_t attributeId = 0;
-    err                  = GetChipPathIdValue(attributeIdObj, kInvalidAttributeId, attributeId);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(GetChipPathIdValue(attributeIdObj, kInvalidAttributeId, attributeId));
 
     outEndpointId  = static_cast<EndpointId>(endpointId);
     outClusterId   = static_cast<ClusterId>(clusterId);
@@ -814,42 +805,37 @@ CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId,
 
 CHIP_ERROR GetChipPathIdValue(jobject chipPathId, uint32_t wildcardValue, uint32_t & outValue)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     bool idIsWildcard = false;
-    err               = IsWildcardChipPathId(chipPathId, idIsWildcard);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(IsWildcardChipPathId(chipPathId, idIsWildcard));
 
     if (idIsWildcard)
     {
         outValue = wildcardValue;
-        return err;
+        return CHIP_NO_ERROR;
     }
 
     jmethodID getIdMethod = nullptr;
-    err                   = JniReferences::GetInstance().FindMethod(env, chipPathId, "getId", "()J", &getIdMethod);
-    outValue              = env->CallLongMethod(chipPathId, getIdMethod);
-    VerifyOrReturnError(err == CHIP_NO_ERROR && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, chipPathId, "getId", "()J", &getIdMethod));
+    outValue = env->CallLongMethod(chipPathId, getIdMethod);
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard)
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
     JNIEnv * env            = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID getTypeMethod = nullptr;
-    err = JniReferences::GetInstance().FindMethod(env, chipPathId, "getType", "()Lchip/devicecontroller/model/ChipPathId$IdType;",
-                                                  &getTypeMethod);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
+        env, chipPathId, "getType", "()Lchip/devicecontroller/model/ChipPathId$IdType;", &getTypeMethod));
 
     jobject idType = env->CallObjectMethod(chipPathId, getTypeMethod);
     VerifyOrReturnError(idType != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     jmethodID nameMethod = nullptr;
-    err                  = JniReferences::GetInstance().FindMethod(env, idType, "name", "()Ljava/lang/String;", &nameMethod);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, idType, "name", "()Ljava/lang/String;", &nameMethod));
 
     jstring typeNameString = static_cast<jstring>(env->CallObjectMethod(idType, nameMethod));
     VerifyOrReturnError(idType != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
@@ -857,7 +843,7 @@ CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard)
 
     isWildcard = strncmp(typeNameJniString.c_str(), "WILDCARD", 8) == 0;
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void * IOThreadMain(void * arg)
