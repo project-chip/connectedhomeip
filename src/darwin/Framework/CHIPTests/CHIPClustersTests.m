@@ -583,6 +583,7 @@ CHIPDevice * GetConnectedDevice(void)
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+            temp_3[0] = [NSNumber numberWithUnsignedLongLong:305414945ULL];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = temp_3;
         }
         {
