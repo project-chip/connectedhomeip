@@ -24,13 +24,12 @@ import("${qpg_sdk_build_root}/qpg_sdk.gni")
 
 assert(current_os == "freertos")
 
-qpg_project_dir = "${chip_root}/examples/shell/qpg"
 examples_plat_dir = "${chip_root}/examples/platform/qpg"
 
 qpg_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/qpg",
-    "${qpg_project_dir}/include",
+    "${examples_plat_dir}/project_include",
     "${examples_plat_dir}",
   ]
 
