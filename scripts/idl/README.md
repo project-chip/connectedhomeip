@@ -1,14 +1,15 @@
-# IDL based codegen 
+# IDL based codegen
 
 ## What is a matter IDL
 
-A matter IDL is a text-file that aims to be a concise representation of
-data structures, cluster definitions and bindings. It is intended
-for human readability (has to be clear and concise, supports comments)
-as well as machine parsing (well defined syntax, not free form).
+A matter IDL is a text-file that aims to be a concise representation of data
+structures, cluster definitions and bindings. It is intended for human
+readability (has to be clear and concise, supports comments) as well as machine
+parsing (well defined syntax, not free form).
 
-The actual grammar is defined as a [Lark](https://lark-parser.readthedocs.io/en/latest/index.html)
-parsing grammar, however it may be easier to understand with an example:
+The actual grammar is defined as a
+[Lark](https://lark-parser.readthedocs.io/en/latest/index.html) parsing grammar,
+however it may be easier to understand with an example:
 
 ```
 /* C++ comments are supported */
@@ -39,7 +40,7 @@ struct LabelStruct {
 server cluster AccessControl = 31 {
 
   // Enums and structs can be defined globally or be cluster specific.
-  // IDL generation rules will take into account scoping (i.e. pick local defined 
+  // IDL generation rules will take into account scoping (i.e. pick local defined
   // name first, things defined in one cluster are not visible in another).
   enum AuthMode : ENUM8 {
     kPase = 1;
@@ -75,11 +76,11 @@ server cluster AccessControl = 31 {
 
   // attributes may be read-only as well
   // "global" specifies that this attribute number is generally available and
-  // reused across all clusters. 
+  // reused across all clusters.
   //
   // TODO: it is unclear if this helps codegen or readability  so the "global"
   //       attribute may be removed in the future.
-  readonly global attribute int16u clusterRevision = 65533;   
+  readonly global attribute int16u clusterRevision = 65533;
 
   // Commands have spec-defined numbers which are used for over-the-wire
   // invocation.
@@ -103,14 +104,14 @@ server cluster AccessControl = 31 {
 //
 // A code generation may generate either combination of client and server
 // clusters for a given cluster name.
-// 
+//
 // Even if both client and server cluster are declared within an IDL, their
 // content may differ. For example
 //    - server cluster contains only attributes that the server exposes. As such
 //      some optional attributes may be missing.
 //
-//    - client cluster contains attributes that the app wants to access as a 
-//      client. So an optional attribute may be presented because the 
+//    - client cluster contains attributes that the app wants to access as a
+//      client. So an optional attribute may be presented because the
 //      underlying application can make use of that attribute.
 client cluster OtaSoftwareUpdateProvider = 41 {
     ///.... content removed: it is very similar to a server cluster
@@ -127,7 +128,7 @@ endpoint 0 {
   // a cluster can be bound to a OTA provider to use for updates.
   binding cluster OtaSoftwareUpdateProvider;
 
-  // A server cluster is a server that gets exposed to the world. 
+  // A server cluster is a server that gets exposed to the world.
   //
   // As an example, a light bulb may expose a OnOff cluster.
   server  cluster OtaSoftwareUpdateRequestor;
@@ -139,27 +140,26 @@ endpoint 0 {
 
 IDL parsing is done within the `idl` python package (this is the current
 directory of this README). Most of the heavy lifting is done by the lark using
-[matter_grammar.lark](./matter_grammar.lark), which is then turned
-into an AST:
+[matter_grammar.lark](./matter_grammar.lark), which is then turned into an AST:
 
- - [matter_grammar.lark](./matter_grammar.lark) parses and validates
-   textual content
- - [matter_idl_parser.py](./matter_idl_parser.py) has a transformer that
-   converts the text given by lark into a more type-safe (and type-rich)
-   AST as defined ing [matter_idl_types.py](./matter_idl_types.py)
+-   [matter_grammar.lark](./matter_grammar.lark) parses and validates textual
+    content
+-   [matter_idl_parser.py](./matter_idl_parser.py) has a transformer that
+    converts the text given by lark into a more type-safe (and type-rich) AST as
+    defined ing [matter_idl_types.py](./matter_idl_types.py)
 
 ## Code generation
 
-Code generators are defined in `generators` and their purpose is to convert
-the parsed AST into one or several output files. In most cases the output will
-be split per cluster so that large CPP files are not generated (faster and
-more parallel compilation).
+Code generators are defined in `generators` and their purpose is to convert the
+parsed AST into one or several output files. In most cases the output will be
+split per cluster so that large CPP files are not generated (faster and more
+parallel compilation).
 
 ### Code generator base functionality
 
-Generators use [Jinja2](https://jinja.palletsprojects.com/en/3.0.x/) as a 
-templating laguage. The general `CodeGenerator` class in 
-[generators/__init__.py](./generators/__init__.py) provides the ability to
+Generators use [Jinja2](https://jinja.palletsprojects.com/en/3.0.x/) as a
+templating laguage. The general `CodeGenerator` class in
+[generators/**init**.py](./generators/__init__.py) provides the ability to
 output files based on jinja templates.
 
 In order to build working jinja2 templates, some further processing of the AST
@@ -169,22 +169,22 @@ types into more concrete types is provided by `generators/types.py`.
 
 ### Implementing generators
 
-Beyond default AST processing, each generator is expected to add 
+Beyond default AST processing, each generator is expected to add
 language-specific filters to create templates that work. This includes:
-  - add any additional filters and transforms for data
-  - add any additional type processing that is language specific
+
+-   add any additional filters and transforms for data
+-   add any additional type processing that is language specific
 
 See the java code generator in `generators/java` as an example of codegen.
 
 ### Testing generators
 
-Tests of generation are based on checking that a given input matches an
-expected output. The [tests/available_tests](./test/available_tests.yaml)
-describe for each input and generator the expected output.
+Tests of generation are based on checking that a given input matches an expected
+output. The [tests/available_tests](./test/available_tests.yaml) describe for
+each input and generator the expected output.
 
-Intent for tests is to be focused and still easy to see deltas. 
-Input IDLs are expected to be small and focusing on a specific functionality.
-Keep in mind that the test outputs are expected to be human-reviwed when
-codegen logic changes.
+Intent for tests is to be focused and still easy to see deltas. Input IDLs are
+expected to be small and focusing on a specific functionality. Keep in mind that
+the test outputs are expected to be human-reviwed when codegen logic changes.
 
 These generator tests rare run by `test_generators.py`.
