@@ -37,14 +37,14 @@ tests:
                   {
                       index: 1,
                       inputType: 4,
-                      name: "exampleName",
-                      description: "exampleDescription",
+                      name: "HDMI",
+                      description: "High-Definition Multimedia Interface",
                   },
                   {
                       index: 2,
                       inputType: 4,
-                      name: "exampleName",
-                      description: "exampleDescription",
+                      name: "HDMI",
+                      description: "High-Definition Multimedia Interface",
                   },
               ]
 
@@ -52,7 +52,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentInput"
       response:
-          value: 0
+          value: 1
 
     - label: "Select Input Command"
       command: "selectInput"
@@ -74,4 +74,24 @@ tests:
               - name: "index"
                 value: 1
               - name: "name"
-                value: "newName"
+                value: "HDMI Test"
+
+    - label: "Read attribute media input list"
+      command: "readAttribute"
+      attribute: "InputList"
+      response:
+          value:
+              [
+                  {
+                      index: 1,
+                      inputType: 4,
+                      name: "HDMI Test",
+                      description: "High-Definition Multimedia Interface",
+                  },
+                  {
+                      index: 2,
+                      inputType: 4,
+                      name: "HDMI",
+                      description: "High-Definition Multimedia Interface",
+                  },
+              ]
