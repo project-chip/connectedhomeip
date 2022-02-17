@@ -278,32 +278,32 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
 
 namespace {
 
-CHIP_ERROR ReadClusterDataVersion(const EndpointId & aEndpointId, const ClusterId & aClusterId, DataVersion & aDataVersion)
+CHIP_ERROR ReadClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath, DataVersion & aDataVersion)
 {
-    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    DataVersion * version = emberAfDataVersionStorage(aConcreteClusterPath);
     if (version == nullptr)
     {
         ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in ReadClusterDataVersion!",
-                     aEndpointId, ChipLogValueMEI(aClusterId));
+                     aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
         return CHIP_ERROR_NOT_FOUND;
     }
     aDataVersion = *version;
     return CHIP_NO_ERROR;
 }
 
-void IncreaseClusterDataVersion(const EndpointId & aEndpointId, const ClusterId & aClusterId)
+void IncreaseClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath)
 {
-    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    DataVersion * version = emberAfDataVersionStorage(aConcreteClusterPath);
     if (version == nullptr)
     {
         ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!",
-                     aEndpointId, ChipLogValueMEI(aClusterId));
+                     aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
     }
     else
     {
         (*(version))++;
-        ChipLogDetail(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " update version to %" PRIx32, aEndpointId,
-                      ChipLogValueMEI(aClusterId), *(version));
+        ChipLogDetail(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " update version to %" PRIx32,
+                      aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId), *(version));
     }
     return;
 }
@@ -416,7 +416,7 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
     AttributeValueEncoder::AttributeEncodeState state =
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
     DataVersion version = 0;
-    ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
+    ReturnErrorOnFailure(ReadClusterDataVersion(aPath, version));
     AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
@@ -504,12 +504,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
         {
-            // Grace period until ACLs are in place
-            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
-            err = CHIP_NO_ERROR;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
             if (aPath.mExpanded)
             {
@@ -549,7 +543,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     DataVersion version = 0;
-    ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
+    ReturnErrorOnFailure(ReadClusterDataVersion(aPath, version));
     attributeDataIBBuilder.DataVersion(version);
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
@@ -942,12 +936,6 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         }
         if (err != CHIP_NO_ERROR)
         {
-            // Grace period until ACLs are in place
-            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
-            err = CHIP_NO_ERROR;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
             return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
@@ -960,8 +948,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
-    if (aPath.mDataVersion.HasValue() &&
-        !IsClusterDataVersionEqual(aPath.mEndpointId, aPath.mClusterId, aPath.mDataVersion.Value()))
+    if (aPath.mDataVersion.HasValue() && !IsClusterDataVersionEqual(aPath, aPath.mDataVersion.Value()))
     {
         ChipLogError(DataManagement, "Write Version mismatch for Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI,
                      aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId));
@@ -1000,13 +987,13 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     return apWriteHandler->AddStatus(aPath, status);
 }
 
-bool IsClusterDataVersionEqual(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aRequiredVersion)
+bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
 {
-    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    DataVersion * version = emberAfDataVersionStorage(aConcreteClusterPath);
     if (version == nullptr)
     {
         ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in IsClusterDataVersionEqual!",
-                     aEndpointId, ChipLogValueMEI(aClusterId));
+                     aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
         return false;
     }
     else
@@ -1039,7 +1026,7 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     info.mAttributeId = attributeId;
     info.mEndpointId  = endpoint;
 
-    IncreaseClusterDataVersion(endpoint, clusterId);
+    IncreaseClusterDataVersion(ConcreteClusterPath(endpoint, clusterId));
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled work won't execute until the current execution context

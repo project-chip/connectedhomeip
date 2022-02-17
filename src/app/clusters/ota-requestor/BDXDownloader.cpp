@@ -128,8 +128,18 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
 {
     if (mState == State::kInProgress)
     {
-        // There's no method for a BDX receiving driver to cleanly end a transfer
-        mBdxTransfer.AbortTransfer(chip::bdx::StatusCode::kUnknown);
+        bdx::StatusCode status = bdx::StatusCode::kUnknown;
+        if (reason == CHIP_ERROR_INVALID_FILE_IDENTIFIER)
+        {
+            status = bdx::StatusCode::kBadMessageContents;
+        }
+        else if (reason == CHIP_ERROR_WRITE_FAILED)
+        {
+            status = bdx::StatusCode::kTransferFailedUnknownError;
+        }
+
+        // There is no method for a BDX receiving driver to cleanly end a transfer
+        mBdxTransfer.AbortTransfer(status);
         if (mImageProcessor != nullptr)
         {
             mImageProcessor->Abort();

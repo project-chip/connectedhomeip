@@ -134,6 +134,26 @@ const uint8_t spake2p_N_p256[65] = {
     0xd3, 0x60, 0x34, 0x80, 0x8c, 0xd5, 0x64, 0x49, 0x0b, 0x1e, 0x65, 0x6e, 0xdb, 0xe7,
 };
 
+/** @brief Spake2p parameters.
+ *
+ * Specifications section 3.9. Password-Based Key Derivation Function
+ * Specifications section 5.1.1.6
+ **/
+constexpr uint32_t kSpake2pPBKDFMinimumIterations = 1000;
+constexpr uint32_t kSpake2pPBKDFMaximumIterations = 100000;
+constexpr uint32_t kSpake2pPBKDFMinimumSaltLen    = 16;
+constexpr uint32_t kSpake2pPBKDFMaximumSaltLen    = 32;
+
+/** @brief Serialized format of the PASE Verifier components.
+ *
+ *  This is used when the Verifier should be presented in a serialized form.
+ *  For example, when it is generated using PBKDF function, when stored in the
+ *  memory or when sent over the wire.
+ *  The serialized format is concatentation of { W0, L } verifier components
+ *  as per Specifications section 3.10. Password-Authenticated Key Exchange.
+ **/
+constexpr size_t kSpake2pSerializedVerifierSize = kP256_FE_Length + kP256_Point_Length;
+
 /**
  * Spake2+ state machine to ensure proper execution of the protocol.
  */

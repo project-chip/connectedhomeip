@@ -418,7 +418,7 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 0);
 
         // The server should shutted down, while the client is still alive (pending for the attribute data.)
-        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
     }
 
     // Sanity check

@@ -72,7 +72,7 @@ const ESP32Config::Key ESP32Config::kConfigKey_GroupKeyIndex      = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
-const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "reg-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const ESP32Config::Key ESP32Config::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
