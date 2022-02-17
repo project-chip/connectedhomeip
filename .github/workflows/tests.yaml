@@ -96,8 +96,9 @@ jobs:
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Build and run OTA example
-              timeout-minutes: 20
+              timeout-minutes: 30
               run: |
+                  rm -rf /tmp/ota/
                   mkdir -p /tmp/ota/
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug chip_config_network_layer_ble=false
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug chip_config_network_layer_ble=false
@@ -203,7 +204,8 @@ jobs:
               timeout-minutes: 30
               run: |
                   brew install openssl pkg-config coreutils
-                  mkdir /tmp/ota/
+                  rm -rf /tmp/ota/
+                  mkdir -p /tmp/ota/
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug chip_config_network_layer_ble=false
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug chip_config_network_layer_ble=false
                   scripts/tests/ota_test.sh
