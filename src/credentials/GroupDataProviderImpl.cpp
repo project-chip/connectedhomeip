@@ -891,6 +891,8 @@ void GroupDataProviderImpl::Finish()
     mGroupKeyIterators.ReleaseAll();
     mEndpointIterators.ReleaseAll();
     mKeySetIterators.ReleaseAll();
+    mGroupSessionsIterator.ReleaseAll();
+    mKeyContexPool.ReleaseAll();
 }
 
 //

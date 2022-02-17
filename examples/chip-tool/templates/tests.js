@@ -18,6 +18,7 @@
 function getManualTests()
 {
   const DeviceDiscovery = [
+    'TestDiscovery',
     'Test_TC_DD_1_5',
     'Test_TC_DD_1_6',
     'Test_TC_DD_1_7',
@@ -228,6 +229,10 @@ function getTests()
     'Test_TC_WNCV_3_1',
     'Test_TC_WNCV_3_2',
     'Test_TC_WNCV_3_3',
+    'Test_TC_WNCV_3_4',
+    'Test_TC_WNCV_3_5',
+    'Test_TC_WNCV_4_3',
+    'Test_TC_WNCV_4_4',
   ];
 
   const TV = [
@@ -250,7 +255,6 @@ function getTests()
     'TestClusterComplexTypes',
     'TestConstraints',
     'TestDelayCommands',
-    'TestDiscovery',
     'TestLogCommands',
     'TestSaveAs',
     'TestConfigVariables',

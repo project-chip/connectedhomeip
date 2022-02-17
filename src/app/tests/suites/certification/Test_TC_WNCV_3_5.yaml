@@ -1,0 +1,115 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    Window Covering [TC-WNCV-3.5] DownOrClose Long-Run Verification with server
+    as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 1
+    fastMotionDuration:
+        type: INT16U
+        defaultValue: 3000
+    fullMotionDuration:
+        type: INT16U
+        defaultValue: 6000
+
+tests:
+    - label: "0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ################ Position Init Phase #############
+    ### Step 1x -> Initialize the Covering position before any testing
+    ### MANDATORY Init Commands
+    - label:
+          "1a: TH sends UpOrOpen command to preposition the DUT in the opposite
+          direction"
+      command: "UpOrOpen"
+
+    ### DUT adjusts to a non-closed position
+    ### Testers should input the fastMotionDuration parameter that match their DUT behavior
+    - label:
+          "1b: TH Waits for fastMotionDuration seconds movement(s) on the device"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: fastMotionDuration
+
+    ######## DownOrClose Long-Run Command #######
+    ### Step 2x -> Check DownOrClose Long-Run effects
+    ### MANDATORY Command
+    - label: "2a: TH sends DownOrClose command to DUT"
+      command: "DownOrClose"
+
+    ### DUT move toward its fully-closed position
+    ### Testers should input the fullMotionDuration parameter that match their DUT behavior
+    - label:
+          "2b: TH Waits for fullMotionDuration seconds movement(s) on the device"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: fullMotionDuration
+
+    ######## DownOrClose Long-Run: Category only for Position Aware DUT #######
+    ### Step 3x -> Verify the DUT has reached its fully-open limits
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV_LF && WNCV_PA_LF
+      response:
+          value: 10000
+
+    ### Optional Depends on the FeatureMap
+    - label:
+          "3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercentage"
+      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
+      response:
+          value: 100
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      PICS: WNCV_TL && WNCV_PA_TL
+      response:
+          value: 10000
+
+    ### Optional Depends on the FeatureMap
+    - label:
+          "3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercentage"
+      PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONLIFTPERCENTAGE
+      response:
+          value: 100

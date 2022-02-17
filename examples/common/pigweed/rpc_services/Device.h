@@ -52,6 +52,26 @@ public:
         return pw::Status::Unimplemented();
     }
 
+    virtual pw::Status SetPairingState(const chip_rpc_PairingState & request, pw_protobuf_Empty & response)
+    {
+        if (request.pairing_enabled)
+        {
+            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingMode(DeviceLayer::ConnectivityMgr().kFastAdvertising);
+        }
+        else
+        {
+            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        }
+        return pw::OkStatus();
+    }
+
+    virtual pw::Status GetPairingState(const pw_protobuf_Empty & request, chip_rpc_PairingState & response)
+    {
+        response.pairing_enabled = DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled();
+        return pw::OkStatus();
+    }
+
     virtual pw::Status GetDeviceState(const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
     {
         uint64_t time_since_boot_sec;

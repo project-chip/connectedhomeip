@@ -15,6 +15,7 @@
 name: Content Launcher Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Content Launcher"
     endpoint: 1
 
@@ -22,21 +23,25 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Read attribute accept header list"
       command: "readAttribute"
-      attribute: "accept header list"
+      attribute: "AcceptHeader"
       response:
           value: ["example", "example"]
 
     - label: "Read attribute supported streaming protocols"
       command: "readAttribute"
-      attribute: "supported streaming protocols"
+      attribute: "SupportedStreamingProtocols"
       response:
           value: 0
 
     - label: "Launch Content Command"
-      command: "launchContentRequest"
+      command: "launchContent"
       arguments:
           values:
               - name: "autoPlay"
@@ -64,7 +69,7 @@ tests:
                 value: 0
 
     - label: "Launch URL Command"
-      command: "launchURLRequest"
+      command: "launchURL"
       arguments:
           values:
               - name: "contentURL"

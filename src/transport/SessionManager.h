@@ -30,11 +30,13 @@
 #include <crypto/RandUtils.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/CryptoContext.h>
+#include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/SecureSessionTable.h>
@@ -184,7 +186,8 @@ public:
      * @param messageCounterManager The message counter manager
      */
     CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                    Transport::MessageCounterManagerInterface * messageCounterManager);
+                    Transport::MessageCounterManagerInterface * messageCounterManager,
+                    chip::PersistentStorageDelegate * storageDelegate);
 
     /**
      * @brief
@@ -255,6 +258,7 @@ private:
     Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions;
     Transport::GroupSessionTable<CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE> mGroupSessions;
     State mState; // < Initialization state of the object
+    chip::Transport::GroupOutgoingCounters mGroupClientCounter;
 
     SessionMessageDelegate * mCB = nullptr;
 

@@ -47,8 +47,6 @@ void WriteHandler::Close()
 {
     VerifyOrReturn(mState != State::Uninitialized);
 
-    mMessageWriter.Reset();
-
     if (mpExchangeCtx != nullptr)
     {
         mpExchangeCtx->SetDelegate(nullptr);
@@ -83,8 +81,9 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), Status::Failure);
 
-    mMessageWriter.Init(std::move(packet));
-    VerifyOrReturnError(mWriteResponseBuilder.Init(&mMessageWriter) == CHIP_NO_ERROR, Status::Failure);
+    System::PacketBufferTLVWriter messageWriter;
+    messageWriter.Init(std::move(packet));
+    VerifyOrReturnError(mWriteResponseBuilder.Init(&messageWriter) == CHIP_NO_ERROR, Status::Failure);
 
     mWriteResponseBuilder.CreateWriteResponses();
     VerifyOrReturnError(mWriteResponseBuilder.GetError() == CHIP_NO_ERROR, Status::Failure);
@@ -94,7 +93,7 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
     // Do not send response on Group Write
     if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
-        CHIP_ERROR err = SendWriteResponse();
+        CHIP_ERROR err = SendWriteResponse(std::move(messageWriter));
         if (err != CHIP_NO_ERROR)
         {
             status = Status::Failure;
@@ -167,25 +166,25 @@ void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCont
     Close();
 }
 
-CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
+CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferTLVWriter && aMessageWriter, System::PacketBufferHandle & packet)
 {
     VerifyOrReturnError(mState == State::AddStatus, CHIP_ERROR_INCORRECT_STATE);
     AttributeStatusIBs::Builder & attributeStatusIBs = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
     ReturnErrorOnFailure(attributeStatusIBs.GetError());
     mWriteResponseBuilder.EndOfWriteResponseMessage();
     ReturnErrorOnFailure(mWriteResponseBuilder.GetError());
-    ReturnErrorOnFailure(mMessageWriter.Finalize(&packet));
+    ReturnErrorOnFailure(aMessageWriter.Finalize(&packet));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteHandler::SendWriteResponse()
+CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMessageWriter)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle packet;
 
     VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = FinalizeMessage(packet);
+    err = FinalizeMessage(std::move(aMessageWriter), packet);
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -247,7 +246,18 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         {
             MatterPreAttributeWriteCallback(dataAttributePath);
             TLV::TLVWriter backup;
+            DataVersion version = 0;
             mWriteResponseBuilder.Checkpoint(backup);
+            err = element.GetDataVersion(&version);
+            if (CHIP_NO_ERROR == err)
+            {
+                dataAttributePath.mDataVersion.SetValue(version);
+            }
+            else if (CHIP_END_OF_TLV == err)
+            {
+                err = CHIP_NO_ERROR;
+            }
+            SuccessOrExit(err);
             err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, dataReader, this);
             if (err != CHIP_NO_ERROR)
             {

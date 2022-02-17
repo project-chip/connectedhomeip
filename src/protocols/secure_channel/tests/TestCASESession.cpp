@@ -260,10 +260,10 @@ void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
     CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
-class TestPersistentStorageDelegate : public PersistentStorageDelegate, public FabricStorage
+class TestCASESessionPersistentStorageDelegate : public PersistentStorageDelegate, public FabricStorage
 {
 public:
-    TestPersistentStorageDelegate()
+    TestCASESessionPersistentStorageDelegate()
     {
         memset(keys, 0, sizeof(keys));
         memset(keysize, 0, sizeof(keysize));
@@ -271,7 +271,7 @@ public:
         memset(valuesize, 0, sizeof(valuesize));
     }
 
-    ~TestPersistentStorageDelegate() { Cleanup(); }
+    ~TestCASESessionPersistentStorageDelegate() { Cleanup(); }
 
     void Cleanup()
     {
@@ -347,8 +347,8 @@ private:
     uint16_t valuesize[16];
 };
 
-TestPersistentStorageDelegate gCommissionerStorageDelegate;
-TestPersistentStorageDelegate gDeviceStorageDelegate;
+TestCASESessionPersistentStorageDelegate gCommissionerStorageDelegate;
+TestCASESessionPersistentStorageDelegate gDeviceStorageDelegate;
 
 TestCASEServerIPK gPairingServer;
 

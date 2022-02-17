@@ -29,9 +29,10 @@ public:
         mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
-        AddArgument("option", 0, UINT8_MAX, &mCommissioningWindowOption);
+        AddArgument("option", 0, 2, &mCommissioningWindowOption);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-        AddArgument("iteration", chip::kPBKDFMinimumIterations, chip::kPBKDFMaximumIterations, &mIteration);
+        AddArgument("iteration", chip::Crypto::kSpake2pPBKDFMinimumIterations, chip::Crypto::kSpake2pPBKDFMaximumIterations,
+                    &mIteration);
         AddArgument("discriminator", 0, 4096, &mDiscriminator);
     }
 
@@ -41,7 +42,7 @@ public:
 
 private:
     NodeId mNodeId;
-    uint8_t mCommissioningWindowOption;
+    ChipDeviceController::CommissioningWindowOption mCommissioningWindowOption;
     uint16_t mTimeout;
     uint32_t mIteration;
     uint16_t mDiscriminator;

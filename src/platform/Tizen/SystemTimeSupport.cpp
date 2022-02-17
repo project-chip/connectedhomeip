@@ -114,10 +114,8 @@ CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
         const time_t timep = tv.tv_sec;
         struct tm calendar;
         localtime_r(&timep, &calendar);
-        ChipLogProgress(
-            DeviceLayer,
-            "Real time clock set to %ld (%04" PRId16 "/%02" PRId8 "/%02" PRId8 " %02" PRId8 ":%02" PRId8 ":%02" PRId8 " UTC)",
-            tv.tv_sec, calendar.tm_year, calendar.tm_mon, calendar.tm_mday, calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
+        ChipLogProgress(DeviceLayer, "Real time clock set to %ld (%04" PRId16 "/%02d/%02d %02d:%02d:%02d UTC)", tv.tv_sec,
+                        calendar.tm_year, calendar.tm_mon, calendar.tm_mday, calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
     }
 #endif // CHIP_PROGRESS_LOGGING
     return CHIP_NO_ERROR;

@@ -86,15 +86,15 @@ pw_proto_library(locking_service
 
 pw_proto_library(wifi_service
   SOURCES
-    ${chip_dir}/examples/ipv6only-app/common/wifi_service/wifi_service.proto
+    ${chip_dir}/examples/common/pigweed/protos/wifi_service.proto
   INPUTS
-    ${chip_dir}/examples/ipv6only-app/common/wifi_service/wifi_service.options
+    ${chip_dir}/examples/common/pigweed/protos/wifi_service.options
   PREFIX
     wifi_service
   DEPS
     pw_protobuf.common_protos
   STRIP_PREFIX
-    ${chip_dir}/examples/ipv6only-app/common/wifi_service
+    ${chip_dir}/examples/common/pigweed/protos
 )
 
 endif(matter_enable_rpc)
@@ -222,6 +222,8 @@ list(
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
+    -DCONFIG_ENABLE_ROTATING_DEVICE_ID=1
+    -DMATTER_ALL_CLUSTERS_APP=1
 )
 
 if (matter_enable_rpc)
@@ -234,7 +236,6 @@ list(
     -DPW_RPC_LIGHTING_SERVICE=1
     -DPW_RPC_LOCKING_SERVICE=1
     -DCONFIG_ENABLE_PW_RPC=1
-    -DCONFIG_ENABLE_ROTATING_DEVICE_ID=1
 )
 endif (matter_enable_rpc)
 

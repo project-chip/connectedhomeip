@@ -15,6 +15,7 @@
 name: Channel Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Channel"
     endpoint: 1
 
@@ -22,10 +23,14 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Read attribute Channel list"
       command: "readAttribute"
-      attribute: "Channel list"
+      attribute: "ChannelList"
       response:
           value:
               [
@@ -48,7 +53,7 @@ tests:
     - label: "Read attribute channel lineup"
       disabled: true
       command: "readAttribute"
-      attribute: "channel lineup"
+      attribute: "Lineup"
       response:
           value:
               {
@@ -62,7 +67,7 @@ tests:
     - label: "Read attribute current channel"
       disabled: true
       command: "readAttribute"
-      attribute: "current channel"
+      attribute: "CurrentChannel"
       response:
           value:
               {
@@ -74,7 +79,7 @@ tests:
               }
 
     - label: "Change Channel Command"
-      command: "changeChannelRequest"
+      command: "changeChannel"
       arguments:
           values:
               - name: "match"
@@ -94,7 +99,7 @@ tests:
                     }
 
     - label: "Change Channel By Number Command"
-      command: "changeChannelByNumberRequest"
+      command: "changeChannelByNumber"
       arguments:
           values:
               - name: "majorNumber"
@@ -103,7 +108,7 @@ tests:
                 value: 2
 
     - label: "Skip Channel Command"
-      command: "skipChannelRequest"
+      command: "skipChannel"
       arguments:
           values:
               - name: "count"

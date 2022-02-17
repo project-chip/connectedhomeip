@@ -1134,7 +1134,12 @@ CHIP_ERROR TCPEndPointImplSockets::CheckConnectionProgress(bool & isProgressing)
 
     // Fetch the bytes pending successful transmission in the TCP out queue.
 
+#ifdef __APPLE__
+    socklen_t len = sizeof(currPendingBytesRaw);
+    if (getsockopt(mSocket, SOL_SOCKET, SO_NWRITE, &currPendingBytesRaw, &len) < 0)
+#else
     if (ioctl(mSocket, TIOCOUTQ, &currPendingBytesRaw) < 0)
+#endif
     {
         return CHIP_ERROR_POSIX(errno);
     }

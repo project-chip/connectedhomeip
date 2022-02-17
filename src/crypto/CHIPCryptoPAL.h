@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -133,6 +133,26 @@ const uint8_t spake2p_N_p256[65] = {
     0xd6, 0x0a, 0xa6, 0xbf, 0xad, 0xe4, 0x50, 0x08, 0xa6, 0x36, 0x33, 0x7f, 0x51, 0x68, 0xc6, 0x4d, 0x9b,
     0xd3, 0x60, 0x34, 0x80, 0x8c, 0xd5, 0x64, 0x49, 0x0b, 0x1e, 0x65, 0x6e, 0xdb, 0xe7,
 };
+
+/** @brief Spake2p parameters.
+ *
+ * Specifications section 3.9. Password-Based Key Derivation Function
+ * Specifications section 5.1.1.6
+ **/
+constexpr uint32_t kSpake2pPBKDFMinimumIterations = 1000;
+constexpr uint32_t kSpake2pPBKDFMaximumIterations = 100000;
+constexpr uint32_t kSpake2pPBKDFMinimumSaltLen    = 16;
+constexpr uint32_t kSpake2pPBKDFMaximumSaltLen    = 32;
+
+/** @brief Serialized format of the PASE Verifier components.
+ *
+ *  This is used when the Verifier should be presented in a serialized form.
+ *  For example, when it is generated using PBKDF function, when stored in the
+ *  memory or when sent over the wire.
+ *  The serialized format is concatentation of { W0, L } verifier components
+ *  as per Specifications section 3.10. Password-Authenticated Key Exchange.
+ **/
+constexpr size_t kSpake2pSerializedVerifierSize = kP256_FE_Length + kP256_Point_Length;
 
 /**
  * Spake2+ state machine to ensure proper execution of the protocol.
@@ -849,7 +869,7 @@ public:
      * @param my_identity_len   The verifier identity length.
      * @param peer_identity     The peer identity. May be NULL if identities are not established.
      * @param peer_identity_len The peer identity length.
-     * @param w0in              The input w0 (an output from the PBKDF).
+     * @param w0in              The input w0 (a parameter baked into the device or computed with ComputeW0).
      * @param w0in_len          The input w0 length.
      * @param Lin               The input L (a parameter baked into the device or computed with ComputeL).
      * @param Lin_len           The input L length.
@@ -1046,6 +1066,18 @@ public:
     virtual CHIP_ERROR PointIsValid(void * R) = 0;
 
     /*
+     *   @synopsis Compute w0sin mod p
+     *
+     *   @param w0out       Output field element (modulo p)
+     *   @param w0_len      Output field element length
+     *   @param w1sin       Input field element
+     *   @param w1sin_len   Input field element length
+     *
+     *   @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len) = 0;
+
+    /*
      *   @synopsis Compute w1in*G
      *
      *   @param Lout        Output point in 0x04 || X || Y format.
@@ -1208,6 +1240,8 @@ public:
     CHIP_ERROR PointInvert(void * R) override;
     CHIP_ERROR PointCofactorMul(void * R) override;
     CHIP_ERROR PointIsValid(void * R) override;
+
+    CHIP_ERROR ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len) override;
     CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
 
 protected:

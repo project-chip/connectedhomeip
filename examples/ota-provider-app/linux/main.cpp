@@ -38,6 +38,7 @@ using chip::ArgParser::OptionSet;
 using chip::ArgParser::PrintArgError;
 using chip::bdx::TransferControlFlags;
 using chip::Messaging::ExchangeManager;
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 
 // TODO: this should probably be done dynamically
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
@@ -46,6 +47,7 @@ constexpr uint16_t kOptionFilepath             = 'f';
 constexpr uint16_t kOptionOtaImageList         = 'o';
 constexpr uint16_t kOptionQueryImageStatus     = 'q';
 constexpr uint16_t kOptionUserConsentState     = 'u';
+constexpr uint16_t kOptionUpdateAction         = 'a';
 constexpr uint16_t kOptionDelayedActionTimeSec = 't';
 constexpr uint16_t kOptionSoftwareVersion      = 's';
 constexpr uint16_t kOptionSoftwareVersionStr   = 'S';
@@ -56,6 +58,7 @@ chip::ota::DefaultUserConsentProvider gUserConsentProvider;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUnknown;
+static OTAApplyUpdateAction gOptionUpdateAction                       = OTAApplyUpdateAction::kProceed;
 static uint32_t gDelayedActionTimeSec                                 = 0;
 static const char * gOtaFilepath                                      = nullptr;
 static const char * gOtaImageListFilepath                             = nullptr;
@@ -183,6 +186,30 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             retval = false;
         }
         break;
+    case kOptionUpdateAction:
+        if (aValue == NULL)
+        {
+            PrintArgError("%s: ERROR: NULL applyUpdateAction parameter\n", aProgram);
+            retval = false;
+        }
+        else if (strcmp(aValue, "proceed") == 0)
+        {
+            gOptionUpdateAction = OTAApplyUpdateAction::kProceed;
+        }
+        else if (strcmp(aValue, "awaitNextAction") == 0)
+        {
+            gOptionUpdateAction = OTAApplyUpdateAction::kAwaitNextAction;
+        }
+        else if (strcmp(aValue, "discontinue") == 0)
+        {
+            gOptionUpdateAction = OTAApplyUpdateAction::kDiscontinue;
+        }
+        else
+        {
+            PrintArgError("%s: ERROR: Invalid applyUpdateAction parameter:  %s\n", aProgram, aValue);
+            retval = false;
+        }
+        break;
     case kOptionDelayedActionTimeSec:
         gDelayedActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
@@ -245,6 +272,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
     { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
     { "queryImageStatus", chip::ArgParser::kArgumentRequired, kOptionQueryImageStatus },
+    { "applyUpdateAction", chip::ArgParser::kArgumentRequired, kOptionUpdateAction },
     { "delayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
@@ -260,6 +288,8 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Path to a file containing a list of OTA images\n"
                              "  -q/--queryImageStatus <updateAvailable | busy | updateNotAvailable>\n"
                              "        Value for the Status field in the QueryImageResponse\n"
+                             "  -a/--applyUpdateAction <proceed | awaitNextAction | discontinue>\n"
+                             "        Value for the Action field in the ApplyUpdateResponse\n"
                              "  -t/--delayedActionTimeSec <time>\n"
                              "        Value in seconds for the DelayedActionTime field in the QueryImageResponse\n"
                              "        and ApplyUpdateResponse\n"
@@ -275,7 +305,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Value for the SoftwareVersionString field in the QueryImageResponse\n"
                              "        -o/--otaImageList overrides this option\n"
                              "  -c/--UserConsentNeeded\n"
-                             "        If provided, value of UserConsentNeeded in the Query Image Response is set to true\n" };
+                             "        If provided, and value of RequestorCanConsent field in QueryImage Command is true,\n"
+                             "        then value of UserConsentNeeded field in the QueryImageResponse is set to true.\n"
+                             "        Else, value of UserConsentNeeded is false.\n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
@@ -301,6 +333,7 @@ void ApplicationInit()
     }
 
     gOtaProvider.SetQueryImageBehavior(gQueryImageBehavior);
+    gOtaProvider.SetApplyUpdateAction(gOptionUpdateAction);
     gOtaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
     if (gSoftwareVersion.HasValue())
     {

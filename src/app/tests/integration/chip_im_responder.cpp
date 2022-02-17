@@ -130,7 +130,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     return err;
 }
 
-bool IsClusterDataVersionEqual(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aRequiredVersion)
+bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
 {
     return true;
 }
@@ -173,7 +173,7 @@ int main(int argc, char * argv[])
                                      .SetAddressType(chip::Inet::IPAddressType::kIPv6));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager);
+    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager, &gStorage);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);

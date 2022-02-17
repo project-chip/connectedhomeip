@@ -27,6 +27,7 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
 const { getCommands, getAttributes } = require('../simulated-clusters/SimulatedClusters.js');
 
 const knownVariables = {
+  'nodeId' : { type : 'NODE_ID', defaultValue : 0x12345 },
   'endpoint' : { type : 'ENDPOINT_NO', defaultValue : '' },
   'cluster' : { type : 'CHAR_STRING', defaultValue : '' },
   'timeout' : { type : 'INT16U', defaultValue : 30 },
@@ -80,12 +81,16 @@ async function extractVariablesFromConfig(context, suite)
     }
 
     if (!isKnownVariable && !('defaultValue' in target)) {
-      throw new Error(`${suite.filename}: No default value defined for config ${key}`);
+      throw new Error(`${suite.filename}: No default value defined for config '${key}'`);
     }
 
     value.defaultValue = isKnownVariable ? suite.config[key] : suite.config[key].defaultValue;
-    value.chipType     = await zclHelper.asUnderlyingZclType.call(context, value.type, { 'hash' : {} });
-    value.name         = key;
+    if (Number.isInteger(value.defaultValue) && !Number.isSafeInteger(value.defaultValue)) {
+      throw new Error(`${suite.filename}: Default value defined for config '${
+          key}' is too large to represent exactly as an integer in YAML.  Put quotes around it to treat it as a string.`);
+    }
+    value.chipType = await zclHelper.asUnderlyingZclType.call(context, value.type, { 'hash' : {} });
+    value.name     = key;
     variables.push(value);
   }
 

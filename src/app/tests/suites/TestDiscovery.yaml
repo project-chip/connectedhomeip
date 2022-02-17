@@ -15,6 +15,7 @@
 name: Test Discovery
 
 config:
+    nodeId: 0x12344321
     endpoint: 0
     discriminator:
         type: INT16U
@@ -41,6 +42,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Open Commissioning Window"
       cluster: "AdministratorCommissioning"
@@ -278,6 +283,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Open Commissioning Window"
       cluster: "AdministratorCommissioning"

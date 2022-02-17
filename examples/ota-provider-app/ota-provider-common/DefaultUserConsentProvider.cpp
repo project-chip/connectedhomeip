@@ -24,7 +24,7 @@ namespace ota {
 void DefaultUserConsentProvider::LogUserConsentSubject(const UserConsentSubject & subject)
 {
     ChipLogDetail(SoftwareUpdate, "User consent request for:");
-    ChipLogDetail(SoftwareUpdate, ":  FabricIndex: %" PRIu8, subject.fabricIndex);
+    ChipLogDetail(SoftwareUpdate, ":  FabricIndex: %u", subject.fabricIndex);
     ChipLogDetail(SoftwareUpdate, ":  RequestorNodeId: " ChipLogFormatX64, ChipLogValueX64(subject.requestorNodeId));
     ChipLogDetail(SoftwareUpdate, ":  ProviderEndpointId: %" PRIu16, subject.providerEndpointId);
     ChipLogDetail(SoftwareUpdate, ":  RequestorVendorId: %" PRIu16, subject.requestorVendorId);

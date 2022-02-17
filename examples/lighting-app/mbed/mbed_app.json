@@ -11,7 +11,10 @@
             "nsapi.default-wifi-password": "\"YOUR_PASSWORD\"",
             "mbed-trace.max-level": "TRACE_LEVEL_DEBUG",
             "mbed-trace.enable": true,
-            "target.printf_lib": "std"
+            "target.printf_lib": "std",
+            "mcuboot.bootloader-build": false,
+            "mcuboot.log-enable": true,
+            "mcuboot.log-level": "MCUBOOT_LOG_LEVEL_ERROR"
         },
         "CY8CPROTO_062_4343W": {
             "target.network-default-interface-type": "WIFI",
@@ -23,7 +26,13 @@
             ],
             "target.components_add": ["capsense"],
             "lighting-state-led": "P9_6",
-            "lighting-button": "USER_BUTTON"
+            "lighting-button": "USER_BUTTON",
+            "mcuboot.primary-slot-address": "0x10022000",
+            "mcuboot.slot-size": "0x180000",
+            "mcuboot.scratch-address": "0x101A2000",
+            "mcuboot.scratch-size": "0x40000",
+            "mcuboot.max-img-sectors": "0xC00",
+            "mcuboot.header-size": "0x400"
         }
     },
     "config": {
@@ -63,9 +72,17 @@
             "help": "Name used for BLE advertising.",
             "value": "\"MBED-lighting\""
         },
-        "use-gatt-indication-ack-hack": {
-            "help": "Fake a TX transfer confirmation. Send a 'kCHIPoBLEIndicateConfirm' event as soon as data is sent, without waiting for the actual ACK from the GATT client. This hack has to stay until we provide a fix in the Mbed OS repo.",
-            "value": 1
+        "version-number": {
+            "value": "0"
+        },
+        "version-number-str": {
+            "value": "\"0.1.0\""
+        },
+        "vendor-id": {
+            "value": "0xFFF1"
+        },
+        "product-id": {
+            "value": "0x8005"
         }
     }
 }

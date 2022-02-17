@@ -38,12 +38,16 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/Constants.h>
+#include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/PairingSession.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
 
 #include <inttypes.h>
+
+// Global object
+chip::Transport::GroupPeerTable mGroupPeerMsgCounter;
 
 namespace chip {
 
@@ -72,10 +76,12 @@ SessionManager::SessionManager() : mState(State::kNotReady) {}
 SessionManager::~SessionManager() {}
 
 CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                                Transport::MessageCounterManagerInterface * messageCounterManager)
+                                Transport::MessageCounterManagerInterface * messageCounterManager,
+                                chip::PersistentStorageDelegate * storageDelegate)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(storageDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mState                 = State::kInitialized;
     mSystemLayer           = systemLayer;
@@ -85,6 +91,8 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
     (void) mGlobalEncryptedMessageCounter.Init();
     mGlobalUnencryptedMessageCounter.Init();
+
+    mGroupClientCounter.Init(storageDelegate);
 
     ScheduleExpiryTimer();
 
@@ -111,7 +119,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
                                           System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {
     PacketHeader packetHeader;
-    if (IsControlMessage(payloadHeader))
+    bool isControlMsg = IsControlMessage(payloadHeader);
+    if (isControlMsg)
     {
         packetHeader.SetSecureSessionControlMsg(true);
     }
@@ -128,9 +137,9 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         auto * groups     = Credentials::GetGroupDataProvider();
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
-        // TODO : #11911
-        // For now, just set the packetHeader with the correct data.
         packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
+        packetHeader.SetMessageCounter(mGroupClientCounter.GetCounter(isControlMsg));
+        mGroupClientCounter.IncrementCounter(isControlMsg);
         packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
         packetHeader.SetSourceNodeId(groupSession->GetSourceNodeId());
@@ -154,7 +163,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
 #if CHIP_PROGRESS_LOGGING
         destination = kUndefinedNodeId;
-        fabricIndex = kUndefinedFabricIndex;
+        fabricIndex = groupSession->GetFabricIndex();
 #endif // CHIP_PROGRESS_LOGGING
     }
     break;
@@ -598,9 +607,9 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
                                                 System::PacketBufferHandle && msg)
 {
     PayloadHeader payloadHeader;
-    SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
-    Credentials::GroupDataProvider * groups              = Credentials::GetGroupDataProvider();
+    Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
     VerifyOrReturn(nullptr != groups);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (!packetHeader.GetDestinationGroupId().HasValue())
     {
@@ -673,25 +682,49 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return;
     }
 
-    // TODO: Handle Group message counter here spec 4.7.3
+    // Handle Group message counter here spec 4.7.3
     // spec 4.5.1.2 for msg counter
+    chip::Transport::PeerMessageCounter * counter = nullptr;
 
-    if (isDuplicate == SessionMessageDelegate::DuplicateMessage::Yes)
+    if (CHIP_NO_ERROR ==
+        mGroupPeerMsgCounter.FindOrAddPeer(groupContext.fabric_index, packetHeader.GetSourceNodeId().Value(),
+                                           packetHeader.IsSecureSessionControlMsg(), counter))
     {
-        ChipLogDetail(Inet,
-                      "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
-                      " on exchange " ChipLogFormatExchangeId,
-                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
 
-        // If it's a duplicate message, let's drop it right here to save CPU cycles
+        if (Credentials::GroupDataProvider::SecurityPolicy::kLowLatency == groupContext.security_policy)
+        {
+            err = counter->VerifyOrTrustFirst(packetHeader.GetMessageCounter(), true);
+        }
+        else
+        {
+
+            // TODO support cache and sync with MCSP. Issue  #11689
+            ChipLogError(Inet, "Received Group Msg with key policy Cache and Sync, but MCSP is not implemented");
+            return;
+
+            // cache and sync
+            // err = counter->Verify(packetHeader.GetMessageCounter(), true);
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            // Exit now, since Group Messages don't have acks or responses of any kind.
+            ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+    }
+    else
+    {
+        ChipLogError(Inet,
+                     "Group Counter Tables full or invalid NodeId/FabricIndex after decryption of message, dropping everything");
         return;
     }
 
-    // TODO: Commit Group Message Counter
+    counter->CommitWithRollOver(packetHeader.GetMessageCounter());
 
     if (mCB != nullptr)
     {
-        // TODO : When MCSP is done, clean up session creation logique
+        // TODO : When MCSP is done, clean up session creation logic
         Optional<SessionHandle> session =
             CreateGroupSession(groupContext.group_id, groupContext.fabric_index, packetHeader.GetSourceNodeId().Value());
 
@@ -699,7 +732,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         Transport::GroupSession * groupSession = session.Value()->AsGroupSession();
 
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, groupSession, peerAddress, msg->Start(), msg->TotalLength());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), peerAddress, isDuplicate, std::move(msg));
+        mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), peerAddress,
+                               SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
 
         RemoveGroupSession(groupSession);
     }

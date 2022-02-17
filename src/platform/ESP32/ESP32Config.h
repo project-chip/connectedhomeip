@@ -113,6 +113,17 @@ struct ESP32Config::Key
     const char * Name;
 
     bool operator==(const Key & other) const;
+
+    template <typename T, typename std::enable_if_t<std::is_convertible<T, const char *>::value, int> = 0>
+    Key(const char * aNamespace, T aName) : Namespace(aNamespace), Name(aName)
+    {}
+
+    template <size_t N>
+    Key(const char * aNamespace, const char (&aName)[N]) : Namespace(aNamespace), Name(aName)
+    {
+        // Note: N includes null-terminator.
+        static_assert(N <= ESP32Config::kMaxConfigKeyNameLength + 1, "Key too long");
+    }
 };
 
 inline bool ESP32Config::Key::operator==(const Key & other) const

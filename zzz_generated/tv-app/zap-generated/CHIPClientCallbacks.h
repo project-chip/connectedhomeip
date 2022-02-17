@@ -45,10 +45,10 @@ typedef void (*OperationalCredentialsNOCsListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
         data);
-void OperationalCredentialsClusterFabricsListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                 chip::Callback::Cancelable * onSuccessCallback,
-                                                                 chip::Callback::Cancelable * onFailureCallback);
-typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(
+void OperationalCredentialsClusterFabricsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                             chip::Callback::Cancelable * onSuccessCallback,
+                                                             chip::Callback::Cancelable * onFailureCallback);
+typedef void (*OperationalCredentialsFabricsListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & data);

@@ -31,7 +31,7 @@ using chip::Shell::streamer_get;
 
 namespace {
 
-void ReadLine(char * buffer, size_t max)
+ssize_t ReadLine(char * buffer, size_t max)
 {
     ssize_t read = 0;
     bool done    = false;
@@ -55,6 +55,15 @@ void ReadLine(char * buffer, size_t max)
                 streamer_printf(streamer_get(), "\r\n");
                 *inptr = 0; // null terminate
                 done   = true;
+                break;
+            case 0x04:
+                // Delete EOT character.
+                inptr -= 1;
+                // Stop the read loop if the input is still empty.
+                if (inptr == buffer - 1)
+                {
+                    done = true;
+                }
                 break;
             case 0x7F:
                 // delete backspace character + 1 more
@@ -84,6 +93,9 @@ void ReadLine(char * buffer, size_t max)
             read--;
         }
     }
+
+    // Return the length of the buffer including the terminating null byte.
+    return inptr - buffer;
 }
 
 bool IsSeparator(char ch)
@@ -186,7 +198,11 @@ void Engine::RunMainLoop()
     while (true)
     {
         char * line = static_cast<char *>(Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));
-        ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE);
+        if (ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE) == 0)
+        {
+            // Stop loop in case of empty read (Ctrl-D).
+            break;
+        }
 #if CONFIG_DEVICE_LAYER
         DeviceLayer::PlatformMgr().ScheduleWork(ProcessShellLine, reinterpret_cast<intptr_t>(line));
 #else

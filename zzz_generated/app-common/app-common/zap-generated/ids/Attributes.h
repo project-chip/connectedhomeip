@@ -2396,9 +2396,9 @@ namespace NOCs {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace NOCs
 
-namespace FabricsList {
+namespace Fabrics {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace FabricsList
+} // namespace Fabrics
 
 namespace SupportedFabrics {
 static constexpr AttributeId Id = 0x00000002;
@@ -5582,9 +5582,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace WakeOnLan {
 namespace Attributes {
 
-namespace WakeOnLanMacAddress {
+namespace MACAddress {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace WakeOnLanMacAddress
+} // namespace MACAddress
 
 namespace ServerGeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
@@ -5616,9 +5616,9 @@ namespace ChannelList {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace ChannelList
 
-namespace ChannelLineup {
+namespace Lineup {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace ChannelLineup
+} // namespace Lineup
 
 namespace CurrentChannel {
 static constexpr AttributeId Id = 0x00000002;
@@ -5650,13 +5650,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace TargetNavigator {
 namespace Attributes {
 
-namespace TargetNavigatorList {
+namespace TargetList {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace TargetNavigatorList
+} // namespace TargetList
 
-namespace CurrentNavigatorTarget {
+namespace CurrentTarget {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentNavigatorTarget
+} // namespace CurrentTarget
 
 namespace ServerGeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
@@ -5684,9 +5684,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace MediaPlayback {
 namespace Attributes {
 
-namespace PlaybackState {
+namespace CurrentState {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace PlaybackState
+} // namespace CurrentState
 
 namespace StartTime {
 static constexpr AttributeId Id = 0x00000001;
@@ -5696,9 +5696,9 @@ namespace Duration {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace Duration
 
-namespace Position {
+namespace SampledPosition {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace Position
+} // namespace SampledPosition
 
 namespace PlaybackSpeed {
 static constexpr AttributeId Id = 0x00000004;
@@ -5738,13 +5738,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace MediaInput {
 namespace Attributes {
 
-namespace MediaInputList {
+namespace InputList {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace MediaInputList
+} // namespace InputList
 
-namespace CurrentMediaInput {
+namespace CurrentInput {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentMediaInput
+} // namespace CurrentInput
 
 namespace ServerGeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
@@ -5824,9 +5824,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ContentLauncher {
 namespace Attributes {
 
-namespace AcceptHeaderList {
+namespace AcceptHeader {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace AcceptHeaderList
+} // namespace AcceptHeader
 
 namespace SupportedStreamingProtocols {
 static constexpr AttributeId Id = 0x00000001;
@@ -5858,13 +5858,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace AudioOutput {
 namespace Attributes {
 
-namespace AudioOutputList {
+namespace OutputList {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace AudioOutputList
+} // namespace OutputList
 
-namespace CurrentAudioOutput {
+namespace CurrentOutput {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentAudioOutput
+} // namespace CurrentOutput
 
 namespace ServerGeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
@@ -5892,13 +5892,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ApplicationLauncher {
 namespace Attributes {
 
-namespace ApplicationLauncherList {
+namespace CatalogList {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace ApplicationLauncherList
+} // namespace CatalogList
 
-namespace ApplicationLauncherApp {
+namespace CurrentApp {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace ApplicationLauncherApp
+} // namespace CurrentApp
 
 namespace ServerGeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
@@ -5930,25 +5930,25 @@ namespace VendorName {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace VendorName
 
-namespace VendorId {
+namespace VendorID {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace VendorId
+} // namespace VendorID
 
 namespace ApplicationName {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace ApplicationName
 
-namespace ProductId {
+namespace ProductID {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace ProductId
+} // namespace ProductID
 
-namespace ApplicationApp {
+namespace Application {
 static constexpr AttributeId Id = 0x00000004;
-} // namespace ApplicationApp
+} // namespace Application
 
-namespace ApplicationStatus {
+namespace Status {
 static constexpr AttributeId Id = 0x00000005;
-} // namespace ApplicationStatus
+} // namespace Status
 
 namespace ApplicationVersion {
 static constexpr AttributeId Id = 0x00000006;

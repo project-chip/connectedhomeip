@@ -31,7 +31,12 @@ NODE_ID = 1
 LIGHTING_ENDPOINT_ID = 1
 
 # Ignore failures decoding these attributes (e.g. not yet implemented)
-ignoreAttributeDecodeFailureList = []
+ignoreAttributeDecodeFailureList = [
+    (1, Clusters.Objects.TestCluster,
+     Clusters.Objects.TestCluster.Attributes.GeneralErrorBoolean),
+    (1, Clusters.Objects.TestCluster,
+     Clusters.Objects.TestCluster.Attributes.ClusterErrorBoolean),
+]
 
 
 def _IgnoreAttributeDecodeFailure(path):
@@ -121,9 +126,9 @@ class ClusterObjectTests:
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
                                                (0, Clusters.Basic.Attributes.NodeLabel(
-                                                   "Test"), 0),
+                                                   "Test")),
                                                (0, Clusters.Basic.Attributes.Location(
-                                                   "A loooong string"), 0)
+                                                   "A loooong string"))
                                            ])
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
@@ -224,19 +229,20 @@ class ClusterObjectTests:
         ]
         VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
-        # TODO: #13750 Reading OperationalCredentials::FabricLists attribute may crash the server, skip this test temporarily.
-        # logger.info("6: Reading E* C* A*")
-        # req = [
-        #     '*'
-        # ]
-        # VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        logger.info("6: Reading E* C* A*")
+        req = [
+            '*'
+        ]
+        VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
-        # res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, returnClusterObject=True)
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, returnClusterObject=True)
+        logger.info(
+            f"Basic Cluster - Label: {res[0][0][Clusters.Basic].productLabel}")
+        # TestCluster will be ValueDecodeError here, so we comment out the log below.
+        # Values are not expected to be ValueDecodeError for real clusters.
         # logger.info(
-        #     f"Basic Cluster - Label: {res[0][Clusters.Basic].productLabel}")
-        # logger.info(
-        #     f"Test Cluster - Struct: {res[1][Clusters.TestCluster].structAttr}")
-        # logger.info(f"Test Cluster: {res[1][Clusters.TestCluster]}")
+        #    f"Test Cluster - Struct: {res[0][1][Clusters.TestCluster].structAttr}")
+        logger.info(f"Test Cluster: {res[0][1][Clusters.TestCluster]}")
 
         logger.info("7: Reading Chunked List")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
@@ -321,7 +327,7 @@ class ClusterObjectTests:
         await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                      attributes=[
                                          (1, Clusters.TestCluster.Attributes.TimedWriteBoolean(
-                                             True), 0),
+                                             True)),
                                      ],
                                      timedRequestTimeoutMs=1000)
 
@@ -339,7 +345,7 @@ class ClusterObjectTests:
             await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                          attributes=[
                                              (1, Clusters.TestCluster.Attributes.TimedWriteBoolean(
-                                                 True), 0),
+                                                 True)),
                                          ],
                                          timedRequestTimeoutMs=10)
             raise AssertionError("Timeout expected!")
@@ -361,7 +367,7 @@ class ClusterObjectTests:
             await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                          attributes=[
                                              (1, Clusters.TestCluster.Attributes.TimedWriteBoolean(
-                                                 True), 0),
+                                                 True)),
                                          ])
             raise AssertionError("The write request should be rejected.")
         except ValueError:
@@ -380,7 +386,7 @@ class ClusterObjectTests:
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
                                                (0, Clusters.Basic.Attributes.NodeLabel(
-                                                   "Test"), 0)
+                                                   "Test"))
                                            ])
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
@@ -405,6 +411,42 @@ class ClusterObjectTests:
 
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, new_data_version)])
         VerifyDecodeSuccess(res)
+
+        res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                           attributes=[
+                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                                   "Test"), new_data_version)
+                                           ])
+
+        expectedRes = [
+            AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
+                                               AttributeId=5), Status=chip.interaction_model.Status.Success),
+        ]
+
+        if res != expectedRes:
+            for i in range(len(res)):
+                if res[i] != expectedRes[i]:
+                    logger.error(
+                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+            raise AssertionError("Write returned unexpected result.")
+
+        res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                           attributes=[
+                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                                   "Test"), new_data_version)
+                                           ])
+
+        expectedRes = [
+            AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
+                                               AttributeId=5), Status=chip.interaction_model.Status.DataVersionMismatch),
+        ]
+
+        if res != expectedRes:
+            for i in range(len(res)):
+                if res[i] != expectedRes[i]:
+                    logger.error(
+                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+            raise AssertionError("Write returned unexpected result.")
 
     @classmethod
     async def RunTest(cls, devCtrl):

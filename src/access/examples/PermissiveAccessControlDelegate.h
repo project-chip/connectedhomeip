@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,15 +14,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <CommonRpc.h>
+#include "access/AccessControl.h"
 
 namespace chip {
-namespace rpc {
+namespace Access {
+namespace Examples {
 
-class LightingService;
+AccessControl::Delegate & GetPermissiveAccessControlDelegate();
 
-} // namespace rpc
+} // namespace Examples
+} // namespace Access
 } // namespace chip

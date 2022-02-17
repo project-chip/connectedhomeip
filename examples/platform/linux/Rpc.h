@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <app/clusters/low-power-server/low-power-server.h>
+namespace chip {
+namespace rpc {
 
-class LowPowerManager : public chip::app::Clusters::LowPower::Delegate
-{
-public:
-    bool HandleSleep() override;
-};
+int Init();
+
+} // namespace rpc
+} // namespace chip

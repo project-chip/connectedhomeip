@@ -361,10 +361,12 @@ typedef struct _NetworkInfo
 typedef struct _NetworkInterfaceType
 {
     chip::CharSpan Name;
-    bool FabricConnected;
+    bool IsOperational;
     bool OffPremiseServicesReachableIPv4;
     bool OffPremiseServicesReachableIPv6;
     chip::ByteSpan HardwareAddress;
+    /* TYPE WARNING: array array defaults to */ uint8_t * IPv4Addresses;
+    /* TYPE WARNING: array array defaults to */ uint8_t * IPv6Addresses;
     uint8_t Type;
 } NetworkInterfaceType;
 

@@ -499,7 +499,16 @@ static void OnLwIPInitComplete(void * arg)
 
 void ShutdownNetwork()
 {
+    gTCP.ForEachEndPoint([](TCPEndPoint * lEndPoint) -> Loop {
+        gTCP.ReleaseEndPoint(lEndPoint);
+        return Loop::Continue;
+    });
     gTCP.Shutdown();
+
+    gUDP.ForEachEndPoint([](UDPEndPoint * lEndPoint) -> Loop {
+        gUDP.ReleaseEndPoint(lEndPoint);
+        return Loop::Continue;
+    });
     gUDP.Shutdown();
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     ReleaseLwIP();

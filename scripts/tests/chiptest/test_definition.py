@@ -232,7 +232,7 @@ class TestDefinition:
             runner.RunSubprocess(tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode],
                                  name='PAIR', dependencies=[apps_register])
 
-            runner.RunSubprocess(tool_cmd + ['tests', self.run_name, TEST_NODE_ID],
+            runner.RunSubprocess(tool_cmd + ['tests', self.run_name],
                                  name='TEST', dependencies=[apps_register])
         except:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")

@@ -15,6 +15,7 @@
 name: 28.2.2. [TC-BDX-2.2] Synchronous file receiving
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 

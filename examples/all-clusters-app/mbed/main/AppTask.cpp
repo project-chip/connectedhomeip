@@ -18,6 +18,7 @@
 
 #include "AppTask.h"
 #include "LEDWidget.h"
+#include <DFUManager.h>
 #include <app/server/OnboardingCodesUtil.h>
 
 #include <app/server/Dnssd.h>
@@ -37,6 +38,7 @@ static bool sHaveBLEConnections       = false;
 
 static events::EventQueue sAppEventQueue;
 
+using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
 
@@ -44,6 +46,7 @@ AppTask AppTask::sAppTask;
 
 int AppTask::Init()
 {
+    CHIP_ERROR error;
     // Register the callback to init the MDNS server when connectivity is available
     PlatformMgr().AddEventHandler(
         [](const ChipDeviceEvent * event, intptr_t arg) {
@@ -59,16 +62,28 @@ int AppTask::Init()
         },
         0);
 
-    chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+    ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
+    error = Server::GetInstance().Init();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Server initialization failed: %s", error.AsString());
+        return EXIT_FAILURE;
+    }
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+    error = GetDFUManager().Init();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "DFU manager initialization failed: %s", error.AsString());
+        return EXIT_FAILURE;
+    }
 
     return 0;
 }

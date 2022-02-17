@@ -81,14 +81,14 @@ class ChipClusters:
             "commands": {
             0x00000000: {
                     "commandId": 0x00000000,
-                    "commandName": "GetSetupPINRequest",
+                    "commandName": "GetSetupPIN",
                     "args": {
                         "tempAccountIdentifier": "str",
                     },
                 },
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "LoginRequest",
+                    "commandName": "Login",
                     "args": {
                         "tempAccountIdentifier": "str",
                         "setupPIN": "str",
@@ -96,7 +96,7 @@ class ChipClusters:
                 },
             0x00000003: {
                     "commandId": 0x00000003,
-                    "commandName": "LogoutRequest",
+                    "commandName": "Logout",
                     "args": {
                     },
                 },
@@ -216,7 +216,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "VendorId",
+                    "attributeName": "VendorID",
                     "attributeId": 0x00000001,
                     "type": "int",
                     "reportable": True,
@@ -228,19 +228,19 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000003: {
-                    "attributeName": "ProductId",
+                    "attributeName": "ProductID",
                     "attributeId": 0x00000003,
                     "type": "int",
                     "reportable": True,
                 },
                 0x00000004: {
-                    "attributeName": "ApplicationApp",
+                    "attributeName": "Application",
                     "attributeId": 0x00000004,
                     "type": "",
                     "reportable": True,
                 },
                 0x00000005: {
-                    "attributeName": "ApplicationStatus",
+                    "attributeName": "Status",
                     "attributeId": 0x00000005,
                     "type": "int",
                     "reportable": True,
@@ -289,7 +289,7 @@ class ChipClusters:
             "commands": {
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "HideAppRequest",
+                    "commandName": "HideApp",
                     "args": {
                         "catalogVendorId": "int",
                         "applicationId": "str",
@@ -297,7 +297,7 @@ class ChipClusters:
                 },
             0x00000000: {
                     "commandId": 0x00000000,
-                    "commandName": "LaunchAppRequest",
+                    "commandName": "LaunchApp",
                     "args": {
                         "catalogVendorId": "int",
                         "applicationId": "str",
@@ -306,7 +306,7 @@ class ChipClusters:
                 },
             0x00000001: {
                     "commandId": 0x00000001,
-                    "commandName": "StopAppRequest",
+                    "commandName": "StopApp",
                     "args": {
                         "catalogVendorId": "int",
                         "applicationId": "str",
@@ -315,13 +315,13 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "ApplicationLauncherList",
+                    "attributeName": "CatalogList",
                     "attributeId": 0x00000000,
                     "type": "int",
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "ApplicationLauncherApp",
+                    "attributeName": "CurrentApp",
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,
@@ -359,7 +359,7 @@ class ChipClusters:
             "commands": {
             0x00000001: {
                     "commandId": 0x00000001,
-                    "commandName": "RenameOutputRequest",
+                    "commandName": "RenameOutput",
                     "args": {
                         "index": "int",
                         "name": "str",
@@ -367,7 +367,7 @@ class ChipClusters:
                 },
             0x00000000: {
                     "commandId": 0x00000000,
-                    "commandName": "SelectOutputRequest",
+                    "commandName": "SelectOutput",
                     "args": {
                         "index": "int",
                     },
@@ -375,13 +375,13 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "AudioOutputList",
+                    "attributeName": "OutputList",
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "CurrentAudioOutput",
+                    "attributeName": "CurrentOutput",
                     "attributeId": 0x00000001,
                     "type": "int",
                     "reportable": True,
@@ -1044,24 +1044,24 @@ class ChipClusters:
             "clusterName": "Channel",
             "clusterId": 0x00000504,
             "commands": {
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "ChangeChannel",
+                    "args": {
+                        "match": "str",
+                    },
+                },
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "ChangeChannelByNumberRequest",
+                    "commandName": "ChangeChannelByNumber",
                     "args": {
                         "majorNumber": "int",
                         "minorNumber": "int",
                     },
                 },
-            0x00000000: {
-                    "commandId": 0x00000000,
-                    "commandName": "ChangeChannelRequest",
-                    "args": {
-                        "match": "str",
-                    },
-                },
             0x00000003: {
                     "commandId": 0x00000003,
-                    "commandName": "SkipChannelRequest",
+                    "commandName": "SkipChannel",
                     "args": {
                         "count": "int",
                     },
@@ -1075,7 +1075,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "ChannelLineup",
+                    "attributeName": "Lineup",
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,
@@ -1680,7 +1680,7 @@ class ChipClusters:
             "commands": {
             0x00000000: {
                     "commandId": 0x00000000,
-                    "commandName": "LaunchContentRequest",
+                    "commandName": "LaunchContent",
                     "args": {
                         "parameterList": "",
                         "autoPlay": "bool",
@@ -1689,7 +1689,7 @@ class ChipClusters:
                 },
             0x00000001: {
                     "commandId": 0x00000001,
-                    "commandName": "LaunchURLRequest",
+                    "commandName": "LaunchURL",
                     "args": {
                         "contentURL": "str",
                         "displayString": "str",
@@ -1704,7 +1704,7 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "AcceptHeaderList",
+                    "attributeName": "AcceptHeader",
                     "attributeId": 0x00000000,
                     "type": "str",
                     "reportable": True,
@@ -2890,7 +2890,7 @@ class ChipClusters:
             "commands": {
             0x00000000: {
                     "commandId": 0x00000000,
-                    "commandName": "SendKeyRequest",
+                    "commandName": "SendKey",
                     "args": {
                         "keyCode": "int",
                     },
@@ -3205,13 +3205,13 @@ class ChipClusters:
             "commands": {
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "HideInputStatusRequest",
+                    "commandName": "HideInputStatus",
                     "args": {
                     },
                 },
             0x00000003: {
                     "commandId": 0x00000003,
-                    "commandName": "RenameInputRequest",
+                    "commandName": "RenameInput",
                     "args": {
                         "index": "int",
                         "name": "str",
@@ -3219,27 +3219,27 @@ class ChipClusters:
                 },
             0x00000000: {
                     "commandId": 0x00000000,
-                    "commandName": "SelectInputRequest",
+                    "commandName": "SelectInput",
                     "args": {
                         "index": "int",
                     },
                 },
             0x00000001: {
                     "commandId": 0x00000001,
-                    "commandName": "ShowInputStatusRequest",
+                    "commandName": "ShowInputStatus",
                     "args": {
                     },
                 },
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "MediaInputList",
+                    "attributeName": "InputList",
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "CurrentMediaInput",
+                    "attributeName": "CurrentInput",
                     "attributeId": 0x00000001,
                     "type": "int",
                     "reportable": True,
@@ -3276,77 +3276,77 @@ class ChipClusters:
             "commands": {
             0x00000007: {
                     "commandId": 0x00000007,
-                    "commandName": "FastForwardRequest",
+                    "commandName": "FastForward",
                     "args": {
                     },
                 },
             0x00000005: {
                     "commandId": 0x00000005,
-                    "commandName": "NextRequest",
+                    "commandName": "Next",
                     "args": {
                     },
                 },
             0x00000001: {
                     "commandId": 0x00000001,
-                    "commandName": "PauseRequest",
+                    "commandName": "Pause",
                     "args": {
                     },
                 },
             0x00000000: {
                     "commandId": 0x00000000,
-                    "commandName": "PlayRequest",
+                    "commandName": "Play",
                     "args": {
                     },
                 },
             0x00000004: {
                     "commandId": 0x00000004,
-                    "commandName": "PreviousRequest",
+                    "commandName": "Previous",
                     "args": {
                     },
                 },
             0x00000006: {
                     "commandId": 0x00000006,
-                    "commandName": "RewindRequest",
+                    "commandName": "Rewind",
                     "args": {
                     },
                 },
             0x0000000B: {
                     "commandId": 0x0000000B,
-                    "commandName": "SeekRequest",
+                    "commandName": "Seek",
                     "args": {
                         "position": "int",
                     },
                 },
             0x00000009: {
                     "commandId": 0x00000009,
-                    "commandName": "SkipBackwardRequest",
+                    "commandName": "SkipBackward",
                     "args": {
                         "deltaPositionMilliseconds": "int",
                     },
                 },
             0x00000008: {
                     "commandId": 0x00000008,
-                    "commandName": "SkipForwardRequest",
+                    "commandName": "SkipForward",
                     "args": {
                         "deltaPositionMilliseconds": "int",
                     },
                 },
             0x00000003: {
                     "commandId": 0x00000003,
-                    "commandName": "StartOverRequest",
+                    "commandName": "StartOver",
                     "args": {
                     },
                 },
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "StopRequest",
+                    "commandName": "StopPlayback",
                     "args": {
                     },
                 },
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "PlaybackState",
+                    "attributeName": "CurrentState",
                     "attributeId": 0x00000000,
                     "type": "int",
                     "reportable": True,
@@ -3364,7 +3364,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000003: {
-                    "attributeName": "Position",
+                    "attributeName": "SampledPosition",
                     "attributeId": 0x00000003,
                     "type": "",
                     "reportable": True,
@@ -4008,7 +4008,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "FabricsList",
+                    "attributeName": "Fabrics",
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,
@@ -4725,7 +4725,7 @@ class ChipClusters:
             "commands": {
             0x00000000: {
                     "commandId": 0x00000000,
-                    "commandName": "NavigateTargetRequest",
+                    "commandName": "NavigateTarget",
                     "args": {
                         "target": "int",
                         "data": "str",
@@ -4734,13 +4734,13 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "TargetNavigatorList",
+                    "attributeName": "TargetList",
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "CurrentNavigatorTarget",
+                    "attributeName": "CurrentTarget",
                     "attributeId": 0x00000001,
                     "type": "int",
                     "reportable": True,
@@ -6336,7 +6336,7 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "WakeOnLanMacAddress",
+                    "attributeName": "MACAddress",
                     "attributeId": 0x00000000,
                     "type": "str",
                     "reportable": True,

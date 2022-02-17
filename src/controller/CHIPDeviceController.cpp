@@ -443,37 +443,33 @@ CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t s
 }
 
 CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration,
-                                                                 uint16_t discriminator, uint8_t option,
+                                                                 uint16_t discriminator, CommissioningWindowOption option,
                                                                  chip::Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                                  bool readVIDPIDAttributes)
 {
     mSetupPayload = SetupPayload();
 
+    switch (option)
+    {
+    case CommissioningWindowOption::kOriginalSetupCode:
+    case CommissioningWindowOption::kTokenWithRandomPIN:
+        break;
+    case CommissioningWindowOption::kTokenWithProvidedPIN:
+        mSetupPayload.setUpPINCode = mSuggestedSetUpPINCode;
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     mSetupPayload.version               = 0;
     mSetupPayload.discriminator         = discriminator;
     mSetupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
+    mCommissioningWindowOption         = option;
     mCommissioningWindowCallback       = callback;
     mDeviceWithCommissioningWindowOpen = deviceId;
     mCommissioningWindowTimeout        = timeout;
     mCommissioningWindowIteration      = iteration;
-
-    switch (option)
-    {
-    case 0:
-        mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
-        break;
-    case 1:
-        mCommissioningWindowOption = CommissioningWindowOption::kTokenWithRandomPIN;
-        break;
-    case 2:
-        mCommissioningWindowOption = CommissioningWindowOption::kTokenWithProvidedPIN;
-        mSetupPayload.setUpPINCode = mSuggestedSetUpPINCode;
-        break;
-    default:
-        ChipLogError(Controller, "Invalid Pairing Window option");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
 
     if (callback != nullptr && mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode && readVIDPIDAttributes)
     {
@@ -1118,22 +1114,13 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
-CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
-                                                       const ByteSpan & attestationNonce, const ByteSpan & pai,
-                                                       const ByteSpan & dac, VendorId remoteVendorId, uint16_t remoteProductId,
-                                                       DeviceProxy * proxy)
+CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const Credentials::DeviceAttestationVerifier::AttestationInfo & info)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
 
-    // Retrieve attestation challenge
-    ByteSpan attestationChallenge =
-        proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-
-    dac_verifier->VerifyAttestationInformation(attestationElements, attestationChallenge, signature, pai, dac, attestationNonce,
-                                               remoteVendorId, remoteProductId, &mDeviceAttestationInformationVerificationCallback);
+    dac_verifier->VerifyAttestationInformation(info, &mDeviceAttestationInformationVerificationCallback);
 
     // TODO: Validate Firmware Information
 
@@ -1794,7 +1781,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
 
         static constexpr size_t kMaxCountryCodeSize = 3;
-        char countryCodeStr[kMaxCountryCodeSize]    = "WW";
+        char countryCodeStr[kMaxCountryCodeSize]    = "XX";
         size_t actualCountryCodeSize                = 2;
 
 #if CONFIG_DEVICE_LAYER
@@ -1804,7 +1791,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 #endif
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to find country code, defaulting to WW");
+            ChipLogError(Controller, "Unable to find country code, defaulting to XX");
         }
         chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
@@ -1834,7 +1821,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         SendAttestationRequestCommand(proxy, params.GetAttestationNonce().Value());
         break;
-    case CommissioningStage::kAttestationVerification:
+    case CommissioningStage::kAttestationVerification: {
         ChipLogProgress(Controller, "Verifying attestation");
         if (!params.GetAttestationElements().HasValue() || !params.GetAttestationSignature().HasValue() ||
             !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue() ||
@@ -1844,16 +1831,21 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        if (ValidateAttestationInfo(params.GetAttestationElements().Value(), params.GetAttestationSignature().Value(),
-                                    params.GetAttestationNonce().Value(), params.GetPAI().Value(), params.GetDAC().Value(),
-                                    params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value(),
-                                    proxy) != CHIP_NO_ERROR)
+
+        DeviceAttestationVerifier::AttestationInfo info(
+            params.GetAttestationElements().Value(),
+            proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge(),
+            params.GetAttestationSignature().Value(), params.GetPAI().Value(), params.GetDAC().Value(),
+            params.GetAttestationNonce().Value(), params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value());
+
+        if (ValidateAttestationInfo(info) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error validating attestation information");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        break;
+    }
+    break;
     case CommissioningStage::kSendOpCertSigningRequest:
         if (!params.GetCSRNonce().HasValue())
         {

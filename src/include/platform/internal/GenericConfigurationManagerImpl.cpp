@@ -27,6 +27,7 @@
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
 #include <ble/CHIPBleServiceData.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <inttypes.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/Base64.h>
@@ -35,7 +36,6 @@
 #include <lib/support/ScopedBuffer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-#include <protocols/secure_channel/PASESession.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -136,18 +136,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(Mu
         ChipLogDetail(DeviceLayer, "Using Thread extended MAC for hostname.");
         return CHIP_NO_ERROR;
     }
-#else
-    if (DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(buf.data()) == CHIP_NO_ERROR)
+#endif
+
+    if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(buf.data()) == CHIP_NO_ERROR)
     {
         ChipLogDetail(DeviceLayer, "Using wifi MAC for hostname");
         return CHIP_NO_ERROR;
     }
-#endif
 
-    ChipLogError(DeviceLayer, "MAC is not known, using a default.");
-    uint8_t temp[ConfigurationManager::kMaxMACAddressLength] = { 0xEE, 0xAA, 0xBA, 0xDA, 0xBA, 0xD0, 0xDD, 0xCA };
-    memcpy(buf.data(), temp, buf.size());
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 template <class ConfigClass>
@@ -335,9 +332,11 @@ exit:
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)
 {
-    CHIP_ERROR err                                                   = CHIP_NO_ERROR;
-    char saltB64[BASE64_ENCODED_LEN(chip::kPBKDFMaximumSaltLen) + 1] = { 0 };
-    size_t saltB64Len                                                = 0;
+    static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2pPBKDFMaximumSaltLen) + 1;
+
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
+    size_t saltB64Len                       = 0;
 
     err = ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pSalt, saltB64, sizeof(saltB64), saltB64Len);
     err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -362,9 +361,12 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pSalt(uint8_t 
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)
 {
-    CHIP_ERROR err                                                                 = CHIP_NO_ERROR;
-    char verifierB64[BASE64_ENCODED_LEN(chip::kSpake2pSerializedVerifierSize) + 1] = { 0 };
-    size_t verifierB64Len                                                          = 0;
+    static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
+        BASE64_ENCODED_LEN(chip::Crypto::kSpake2pSerializedVerifierSize) + 1;
+
+    CHIP_ERROR err                                            = CHIP_NO_ERROR;
+    char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
+    size_t verifierB64Len                                     = 0;
 
     err = ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64), verifierB64Len);
     err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -702,7 +704,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         err = GetManufacturingDate(year, month, dayOfMonth);
         if (err == CHIP_NO_ERROR)
         {
-            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02" PRIu8 "/%02" PRIu8, year, month, dayOfMonth);
+            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02u/%02u", year, month, dayOfMonth);
         }
         else
         {

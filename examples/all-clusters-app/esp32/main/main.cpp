@@ -185,7 +185,35 @@ void AddDevice(std::string name)
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
-class EditAttributeListModel : public ListScreen::Model
+class TouchesMatterStackModel : public ListScreen::Model
+{
+    // We could override Action() and then hope focusIndex has not changed by
+    // the time our queued task runs, but it's cleaner to just capture its value
+    // now.
+    struct QueuedAction
+    {
+        QueuedAction(TouchesMatterStackModel * selfArg, int iArg) : self(selfArg), i(iArg) {}
+        TouchesMatterStackModel * self;
+        int i;
+    };
+
+    void ItemAction(int i) final
+    {
+        auto * action = chip::Platform::New<QueuedAction>(this, i);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(QueuedActionHandler, reinterpret_cast<intptr_t>(action));
+    }
+
+    static void QueuedActionHandler(intptr_t closure)
+    {
+        auto * queuedAction = reinterpret_cast<QueuedAction *>(closure);
+        queuedAction->self->DoAction(queuedAction->i);
+        chip::Platform::Delete(queuedAction);
+    }
+
+    virtual void DoAction(int i) = 0;
+};
+
+class EditAttributeListModel : public TouchesMatterStackModel
 {
     int deviceIndex;
     int endpointIndex;
@@ -224,7 +252,8 @@ public:
         }
         return i == 0 ? "+" : "-";
     }
-    virtual void ItemAction(int i)
+
+    void DoAction(int i) override
     {
         auto & attribute = this->attribute();
         auto & value     = std::get<1>(attribute);
@@ -398,7 +427,7 @@ private:
     }
 };
 
-class SetupListModel : public ListScreen::Model
+class SetupListModel : public TouchesMatterStackModel
 {
 public:
     SetupListModel()
@@ -413,7 +442,7 @@ public:
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
     virtual std::string GetItemText(int i) { return options.at(i); }
-    virtual void ItemAction(int i)
+    void DoAction(int i) override
     {
         ESP_LOGI(TAG, "Opening options %d: %s", i, GetItemText(i).c_str());
         if (i == 0)

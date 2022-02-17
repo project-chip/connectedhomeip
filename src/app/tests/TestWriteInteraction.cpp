@@ -159,7 +159,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
 
     attributeDataIBsBuilder.EndOfAttributeDataIBs();
     NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
-    writeRequestBuilder.IsFabricFiltered(false).EndOfWriteRequestMessage();
+    writeRequestBuilder.EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
