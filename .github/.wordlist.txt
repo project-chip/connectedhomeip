@@ -821,7 +821,6 @@ nwk
 NXP
 objcopy
 OccupancySensing
-octed
 OctetString
 OECORE
 ol

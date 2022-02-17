@@ -27,7 +27,7 @@ enum StatusCode : ENUM8 {
 
 // Structures just have a name
 struct LabelStruct {
-    CHAR_STRING<16> label = 0;  // structure fields have a type. Some types can be sized (strings, octed strings)
+    CHAR_STRING<16> label = 0;  // structure fields have a type. Some types can be sized (strings, octet strings)
     CHAR_STRING<16> value = 1;  // every structure field has an index. this is the tag when encoding over the wire
 }
 
