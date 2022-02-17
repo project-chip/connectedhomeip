@@ -1165,7 +1165,6 @@ ThreadNetworkDiagnostics
 threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
-throghout
 ths
 Thunderboard
 timedInteractionTimeoutMs

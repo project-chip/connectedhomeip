@@ -21,7 +21,7 @@ however it may be easier to understand with an example:
 // storage size and how it gets transmitted over the wire)
 enum StatusCode : ENUM8 {
   kBusy = 1;                  // every enum MUST have an integer value
-  kPAKEParameterError = 0x02; // throghout, either HEX or integer can be used
+  kPAKEParameterError = 0x02; // throughout, either HEX or integer can be used
   kWindowNotOpen = 3;
 }
 
