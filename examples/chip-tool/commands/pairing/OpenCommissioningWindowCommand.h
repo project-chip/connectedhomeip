@@ -31,7 +31,8 @@ public:
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("option", 0, 2, &mCommissioningWindowOption);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-        AddArgument("iteration", chip::kPBKDFMinimumIterations, chip::kPBKDFMaximumIterations, &mIteration);
+        AddArgument("iteration", chip::Crypto::kSpake2pPBKDFMinimumIterations, chip::Crypto::kSpake2pPBKDFMaximumIterations,
+                    &mIteration);
         AddArgument("discriminator", 0, 4096, &mDiscriminator);
     }
 

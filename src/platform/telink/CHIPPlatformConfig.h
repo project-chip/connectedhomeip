@@ -35,6 +35,18 @@
 
 #define CHIP_CONFIG_ERROR_CLASS 1
 
+/**
+ *  @def CHIP_CONFIG_MAX_FABRICS
+ *
+ *  @brief
+ *    Maximum number of fabrics the device can participate in.  Each fabric can
+ *    provision the device with its unique operational credentials and manage
+ *    its own access control lists.
+ */
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 5 // 4 fabrics + 1 for rotation slack
+#endif
+
 // ==================== Security Adaptations ====================
 
 // ==================== General Configuration Overrides ====================

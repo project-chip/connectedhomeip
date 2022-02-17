@@ -26,12 +26,12 @@
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
 
-{%-   for attr in cluster.attributes | attributesWithCallback(known_enums) %}
+{%-   for attr in cluster.attributes | attributesWithCallback(typeLookup) %}
 JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster, read{{attr.definition.name | capitalcase}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::{{cluster.name | capitalcase}}::Attributes::{{attr.definition.name | capitalcase}}::TypeInfo;
-    {%- set callbackName = attr | callbackName(cluster, known_enums) %}
+    {%- set callbackName = attr | callbackName(cluster, typeLookup) %}
     std::unique_ptr<{{callbackName}}, void (*)({{callbackName}} *)> onSuccess(chip::Platform::New<{{callbackName}}>(callback, false), chip::Platform::Delete<{{callbackName}}>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 

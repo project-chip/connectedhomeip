@@ -279,6 +279,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
+        return;
     }
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
@@ -462,6 +463,24 @@ void Instance::OnCommissioningComplete(CHIP_ERROR err)
         ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentails.");
         mpWirelessDriver->RevertConfiguration();
     }
+}
+
+bool NullNetworkDriver::GetEnabled()
+{
+    // Disable the interface and it cannot be enabled since there are no physical interfaces.
+    return false;
+}
+
+uint8_t NullNetworkDriver::GetMaxNetworks()
+{
+    // The minimal value of MaxNetworks should be 1 per spec.
+    return 1;
+}
+
+DeviceLayer::NetworkCommissioning::NetworkIterator * NullNetworkDriver::GetNetworks()
+{
+    // Instance::Read accepts nullptr as an empty NetworkIterator.
+    return nullptr;
 }
 
 } // namespace NetworkCommissioning

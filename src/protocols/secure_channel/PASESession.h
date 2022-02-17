@@ -50,13 +50,6 @@ extern const char * kSpake2pR2ISessionInfo;
 
 constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 
-// Specifications section 3.9. Password-Based Key Derivation Function
-constexpr uint32_t kPBKDFMinimumIterations = 1000;
-constexpr uint32_t kPBKDFMaximumIterations = 100000;
-constexpr uint32_t kPBKDFMinimumSaltLen    = 16;
-constexpr uint32_t kPBKDFMaximumSaltLen    = 32;
-
-// Specifications section 5.1.1.6
 constexpr uint32_t kSetupPINCodeMaximumValue   = 99999998;
 constexpr uint32_t kSetupPINCodeUndefinedValue = 0;
 
@@ -75,17 +68,6 @@ struct PASESessionSerializable
     uint16_t mPeerSessionId;
 };
 
-/** @brief Serialized format of the PASE Verifier components.
- *
- *  This is used when the Verifier should be presented in a serialized form.
- *  For example, when it is generated using PBKDF function, when stored in the
- *  memory or when sent over the wire.
- *  The serialized format is concatentation of 'W0' and 'L' verifier components:
- *      { PASEVerifier.mW0[kP256_FE_Length], PASEVerifier.mL[kP256_Point_Length] }
- **/
-constexpr size_t kSpake2pSerializedVerifierSize = kP256_FE_Length + kP256_Point_Length;
-typedef uint8_t PASEVerifierSerialized[kSpake2pSerializedVerifierSize];
-
 struct PASEVerifier
 {
     uint8_t mW0[kP256_FE_Length];
@@ -94,6 +76,8 @@ struct PASEVerifier
     CHIP_ERROR Serialize(MutableByteSpan & outSerialized);
     CHIP_ERROR Deserialize(ByteSpan inSerialized);
 };
+
+typedef uint8_t PASEVerifierSerialized[Crypto::kSpake2pSerializedVerifierSize];
 
 class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
 {

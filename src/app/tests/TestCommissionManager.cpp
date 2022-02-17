@@ -118,8 +118,8 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
     chip::PASEVerifier verifier;
-    constexpr uint32_t kIterations = chip::kPBKDFMinimumIterations;
-    uint8_t salt[chip::kPBKDFMinimumSaltLen];
+    constexpr uint32_t kIterations = chip::Crypto::kSpake2pPBKDFMinimumIterations;
+    uint8_t salt[chip::Crypto::kSpake2pPBKDFMinimumSaltLen];
     chip::ByteSpan saltData(salt);
     constexpr chip::PasscodeId kPasscodeID = 1;
     uint16_t currentDiscriminator;
