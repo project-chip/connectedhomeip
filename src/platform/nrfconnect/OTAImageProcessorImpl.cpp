@@ -25,6 +25,8 @@
 #include <dfu/dfu_target.h>
 #include <dfu/dfu_target_mcuboot.h>
 
+#include <sys/reboot.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -54,7 +56,15 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    return System::MapErrorZephyr(dfu_target_done(true));
+    ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_done(true)));
+
+#ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+    return DeviceLayer::SystemLayer().StartTimer(
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS),
+        [](System::Layer *, void * /* context */) { sys_reboot(SYS_REBOOT_WARM); }, nullptr /* context */);
+#else
+    return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
