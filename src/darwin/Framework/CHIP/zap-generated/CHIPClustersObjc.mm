@@ -10185,12 +10185,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = FlowMeasurement::Attributes::MeasuredValue::TypeInfo;
-        auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = FlowMeasurement::Attributes::MeasuredValue::TypeInfo;
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -10199,15 +10200,15 @@ using namespace chip::app::Clusters;
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt16sAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt16uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = FlowMeasurement::Attributes::MeasuredValue::TypeInfo;
-            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPNullableInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -10215,12 +10216,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo;
-        auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo;
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -10229,15 +10231,15 @@ using namespace chip::app::Clusters;
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt16sAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt16uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo;
-            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPNullableInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -10245,12 +10247,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
-        auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -10259,15 +10262,15 @@ using namespace chip::app::Clusters;
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt16sAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt16uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
-            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPNullableInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -17794,12 +17797,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeMeasuredValueWithCompletionHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = PressureMeasurement::Attributes::MeasuredValue::TypeInfo;
-        auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt16sAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = PressureMeasurement::Attributes::MeasuredValue::TypeInfo;
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -17808,15 +17812,15 @@ using namespace chip::app::Clusters;
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt16sAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt16sAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = PressureMeasurement::Attributes::MeasuredValue::TypeInfo;
-            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPNullableInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -17824,12 +17828,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeMinMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo;
-        auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt16sAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo;
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -17838,15 +17843,15 @@ using namespace chip::app::Clusters;
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt16sAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt16sAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo;
-            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPNullableInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -17854,12 +17859,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeMaxMeasuredValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16sAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
-        auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt16sAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -17868,15 +17874,15 @@ using namespace chip::app::Clusters;
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt16sAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt16sAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo;
-            auto successFn = Callback<Int16sAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPNullableInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }

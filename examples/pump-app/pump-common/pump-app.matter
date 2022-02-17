@@ -190,16 +190,16 @@ server cluster FixedLabel = 64 {
 }
 
 client cluster FlowMeasurement = 1028 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster FlowMeasurement = 1028 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -694,16 +694,16 @@ server cluster OperationalCredentials = 62 {
 }
 
 client cluster PressureMeasurement = 1027 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster PressureMeasurement = 1027 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
