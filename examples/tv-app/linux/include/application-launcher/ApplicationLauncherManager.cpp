@@ -39,7 +39,7 @@ CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncode
 void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
                                                  const ApplicationType & application)
 {
-    ChipLogError(Zcl, "ApplicationLauncherManager::HandleLaunchApp");
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleLaunchApp");
 
     // TODO: Insert code here
     LauncherResponseType response;
@@ -52,7 +52,7 @@ void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherR
 void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
                                                const ApplicationType & application)
 {
-    ChipLogError(Zcl, "ApplicationLauncherManager::HandleStopApp");
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleStopApp");
 
     // TODO: Insert code here
     LauncherResponseType response;
@@ -65,7 +65,7 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
 void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
                                                const ApplicationType & application)
 {
-    ChipLogError(Zcl, "ApplicationLauncherManager::HandleHideApp");
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleHideApp");
 
     // TODO: Insert code here
     LauncherResponseType response;
