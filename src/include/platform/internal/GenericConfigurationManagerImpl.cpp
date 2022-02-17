@@ -332,7 +332,7 @@ exit:
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)
 {
-    static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2pPBKDFMaximumSaltLen) + 1;
+    static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::kMax_PBKDF_Salt_Length) + 1;
 
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
@@ -362,7 +362,7 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)
 {
     static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
-        BASE64_ENCODED_LEN(chip::Crypto::kSpake2pSerializedVerifierSize) + 1;
+        BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
 
     CHIP_ERROR err                                            = CHIP_NO_ERROR;
     char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };

@@ -117,9 +117,9 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     CHIP_ERROR err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(originDiscriminator);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
-    chip::PASEVerifier verifier;
-    constexpr uint32_t kIterations = chip::Crypto::kSpake2pPBKDFMinimumIterations;
-    uint8_t salt[chip::Crypto::kSpake2pPBKDFMinimumSaltLen];
+    chip::Spake2pVerifier verifier;
+    constexpr uint32_t kIterations = chip::kMin_PBKDF_Iterations;
+    uint8_t salt[chip::kMin_PBKDF_Salt_Length];
     chip::ByteSpan saltData(salt);
     constexpr chip::PasscodeId kPasscodeID = 1;
     uint16_t currentDiscriminator;

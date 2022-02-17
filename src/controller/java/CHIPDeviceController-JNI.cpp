@@ -630,8 +630,8 @@ JNI_METHOD(jobject, computePaseVerifier)
     jobject params;
     jbyteArray verifierBytes;
     PasscodeId passcodeId;
-    PASEVerifier verifier;
-    PASEVerifierSerialized serializedVerifier;
+    Spake2pVerifier verifier;
+    Spake2pVerifierSerialized serializedVerifier;
     MutableByteSpan serializedVerifierSpan(serializedVerifier);
     JniByteArray jniSalt(env, salt);
 
@@ -644,8 +644,7 @@ JNI_METHOD(jobject, computePaseVerifier)
     err = verifier.Serialize(serializedVerifierSpan);
     SuccessOrExit(err);
 
-    err =
-        JniReferences::GetInstance().N2J_ByteArray(env, serializedVerifier, Crypto::kSpake2pSerializedVerifierSize, verifierBytes);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, serializedVerifier, kSpake2p_VerifierSerialized_Length, verifierBytes);
     SuccessOrExit(err);
 
     err = N2J_PaseVerifierParams(env, setupPincode, static_cast<jlong>(passcodeId), verifierBytes, params);
