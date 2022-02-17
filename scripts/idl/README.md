@@ -187,4 +187,4 @@ Intent for tests is to be focused and still easy to see deltas. Input IDLs are
 expected to be small and focusing on a specific functionality. Keep in mind that
 the test outputs are expected to be human-reviwed when codegen logic changes.
 
-These generator tests rare run by `test_generators.py`.
+These generator tests are run by `test_generators.py`.
