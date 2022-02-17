@@ -4620,7 +4620,7 @@ CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 
 CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
 {
-    return DoEncode(writer, tag, Optional<FabricIndex>(accessingFabricIndex));
+    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
 }
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
@@ -4686,7 +4686,7 @@ CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 
 CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
 {
-    return DoEncode(writer, tag, Optional<FabricIndex>(accessingFabricIndex));
+    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
 }
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
@@ -6363,7 +6363,7 @@ CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 
 CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
 {
-    return DoEncode(writer, tag, Optional<FabricIndex>(accessingFabricIndex));
+    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
 }
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
@@ -10203,7 +10203,7 @@ CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 
 CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
 {
-    return DoEncode(writer, tag, Optional<FabricIndex>(accessingFabricIndex));
+    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
 }
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
@@ -10273,7 +10273,7 @@ CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 
 CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
 {
-    return DoEncode(writer, tag, Optional<FabricIndex>(accessingFabricIndex));
+    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
 }
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
@@ -10869,7 +10869,7 @@ CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 
 CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
 {
-    return DoEncode(writer, tag, Optional<FabricIndex>(accessingFabricIndex));
+    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
 }
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
@@ -10931,7 +10931,7 @@ CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 
 CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
 {
-    return DoEncode(writer, tag, Optional<FabricIndex>(accessingFabricIndex));
+    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
 }
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
@@ -22936,7 +22936,7 @@ CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 
 CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
 {
-    return DoEncode(writer, tag, Optional<FabricIndex>(accessingFabricIndex));
+    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
 }
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const

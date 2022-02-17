@@ -193,16 +193,6 @@ CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, const Nullable<
         return writer.PutNull(tag);
     }
 
-    // Allow sending invalid values for nullables when
-    // CONFIG_IM_BUILD_FOR_UNIT_TEST is true, so we can test how the other side
-    // responds.
-#if !CONFIG_IM_BUILD_FOR_UNIT_TEST
-    if (!x.HasValidValue())
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-#endif // !CONFIG_IM_BUILD_FOR_UNIT_TEST
-
     // The -Wmaybe-uninitialized warning gets confused about the fact
     // that x.mValue is always initialized if x.IsNull() is not
     // true, so suppress it for our access to x.Value().
@@ -226,16 +216,6 @@ CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex acce
     {
         return writer.PutNull(tag);
     }
-
-    // Allow sending invalid values for nullables when
-    // CONFIG_IM_BUILD_FOR_UNIT_TEST is true, so we can test how the other side
-    // responds.
-#if !CONFIG_IM_BUILD_FOR_UNIT_TEST
-    if (!x.HasValidValue())
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-#endif // !CONFIG_IM_BUILD_FOR_UNIT_TEST
 
     // The -Wmaybe-uninitialized warning gets confused about the fact
     // that x.mValue is always initialized if x.IsNull() is not

@@ -1244,7 +1244,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -1478,7 +1478,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Groups::Commands::AddGroupResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -1546,7 +1546,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -1616,7 +1616,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -1683,7 +1683,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Groups::Commands::RemoveGroupResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -2053,7 +2053,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Scenes::Commands::AddSceneResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -2129,7 +2129,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Scenes::Commands::ViewSceneResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -2211,7 +2211,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -2282,7 +2282,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -2351,7 +2351,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Scenes::Commands::StoreSceneResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -2460,7 +2460,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -2544,7 +2544,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -2620,7 +2620,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -2708,7 +2708,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Scenes::Commands::CopySceneResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -4277,7 +4277,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Alarms::Commands::GetAlarmResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -5042,7 +5042,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::PowerProfile::Commands::PowerProfileResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -5112,7 +5112,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::PowerProfile::Commands::PowerProfileStateResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -5298,7 +5298,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::PowerProfile::Commands::GetPowerProfilePriceResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -5438,7 +5438,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::PowerProfile::Commands::GetOverallSchedulePriceResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -5469,7 +5469,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::PowerProfile::Commands::PowerProfileScheduleConstraintsResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -5501,7 +5501,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::PowerProfile::Commands::EnergyPhasesScheduleResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -5533,7 +5533,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::PowerProfile::Commands::EnergyPhasesScheduleStateResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -5762,7 +5762,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::PowerProfile::Commands::GetPowerProfilePriceExtendedResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -6110,7 +6110,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ApplianceControl::Commands::SignalStateResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -7224,7 +7224,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::PollControl::Commands::CheckInResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -8962,7 +8962,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -9056,7 +9056,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -10818,7 +10818,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -10893,7 +10893,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -10960,7 +10960,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -11341,7 +11341,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -11419,7 +11419,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -11455,7 +11455,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -11490,7 +11490,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -11560,7 +11560,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -11635,7 +11635,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -11903,7 +11903,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -15971,7 +15971,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -16038,7 +16038,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -16102,7 +16102,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -16177,7 +16177,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -16215,7 +16215,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -16286,7 +16286,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -16318,7 +16318,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -16773,7 +16773,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -16869,7 +16869,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -18797,7 +18797,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -18920,7 +18920,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -19088,7 +19088,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::GetUserStatusResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -19207,7 +19207,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -19371,7 +19371,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -19524,7 +19524,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -19667,7 +19667,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -19775,7 +19775,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -19958,7 +19958,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::GetUserResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -20191,7 +20191,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return true; }
 };
@@ -20266,7 +20266,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -21108,7 +21108,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
     DlOperationSource operationSource     = static_cast<DlOperationSource>(0);
@@ -21116,8 +21116,6 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
-
-    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21159,7 +21157,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockOperationError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
     DlOperationSource operationSource     = static_cast<DlOperationSource>(0);
@@ -21168,8 +21166,6 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
-
-    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21212,7 +21208,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockUserChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockDataType lockDataType           = static_cast<DlLockDataType>(0);
     DlDataOperationType dataOperationType = static_cast<DlDataOperationType>(0);
@@ -21221,8 +21217,6 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     DataModel::Nullable<uint16_t> dataIndex;
-
-    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -23396,7 +23390,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -23454,7 +23448,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -31833,7 +31827,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IasZone::Commands::InitiateNormalOperationModeResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -31866,7 +31860,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IasZone::Commands::ZoneEnrollResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -31901,7 +31895,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IasZone::Commands::InitiateTestModeResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -32399,7 +32393,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IasAce::Commands::ArmResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -32469,7 +32463,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IasAce::Commands::BypassResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -32784,7 +32778,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IasAce::Commands::GetZoneIdMapResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -32856,7 +32850,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IasAce::Commands::GetZoneInformationResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -32920,7 +32914,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IasAce::Commands::GetPanelStatusResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -33058,7 +33052,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::IasAce::Commands::GetZoneStatusResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -33571,7 +33565,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Channel::Commands::ChangeChannelResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -33882,7 +33876,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34169,7 +34163,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34197,7 +34191,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34225,7 +34219,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34253,7 +34247,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34281,7 +34275,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34309,7 +34303,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34337,7 +34331,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34365,7 +34359,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34396,7 +34390,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34428,7 +34422,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -34492,7 +34486,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -35258,7 +35252,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -35642,7 +35636,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -35680,7 +35674,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -36194,7 +36188,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -36227,7 +36221,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -36259,7 +36253,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -36688,7 +36682,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return true; }
 };
@@ -37455,7 +37449,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -37595,7 +37589,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -37660,7 +37654,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -37737,7 +37731,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -37815,7 +37809,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -37960,7 +37954,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38024,7 +38018,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38088,7 +38082,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38152,7 +38146,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38216,7 +38210,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38248,7 +38242,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38282,7 +38276,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38315,7 +38309,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38369,7 +38363,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38412,7 +38406,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38508,7 +38502,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -38542,7 +38536,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -40873,7 +40867,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ApplianceEventsAndAlert::Commands::GetAlertsResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -41170,7 +41164,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ApplianceStatistics::Commands::LogResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -41240,7 +41234,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ApplianceStatistics::Commands::LogQueueResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };

@@ -112,6 +112,8 @@ public:
         template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
         CHIP_ERROR Encode(T && aArg) const
         {
+            VerifyOrReturnError(aArg.GetFabricIndex() != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
+
             // If we are encoding for a fabric filtered attribute read and the fabric index does not match that present in the
             // request, skip encoding this list item.
             VerifyOrReturnError(!mAttributeValueEncoder.mIsFabricFiltered ||

@@ -78,7 +78,7 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, List<X> list)
     return CHIP_NO_ERROR;
 }
 
-template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, int> = 0>
+template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, bool> = true>
 inline CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, List<X> list)
 {
     TLV::TLVType type;

@@ -77,7 +77,7 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aE
     eventOptions.mFabricIndex = aEventData.GetFabricIndex();
 
     //
-    // Unlike attribute which have a different 'EncodeForRead' for fabric-scoped structs,
+    // Unlike attributes which have a different 'EncodeForRead' for fabric-scoped structs,
     // fabric-sensitive events don't require that since the actual omission of the event in its entirety
     // happens within the event management framework itself at the time of access.
     //
