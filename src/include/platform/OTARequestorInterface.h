@@ -43,6 +43,17 @@ public:
         kWrongState        = 2
     };
 
+    // Various actions to take when OnConnected callback is called
+    enum OnConnectedAction
+    {
+        kQueryImage = 0,
+        kStartBDX,
+        kApplyUpdate,
+        kNotifyUpdateApplied,
+    };
+
+    virtual void ConnectToProvider(OnConnectedAction onConnectedAction) = 0;
+
     // Handler for the AnnounceOTAProvider command
     virtual EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -87,6 +98,9 @@ public:
 
     // Clear all entries with the specified fabric index in the default OTA provider list
     virtual CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) = 0;
+
+    using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
 
     // Add a default OTA provider to the cached list
     virtual CHIP_ERROR

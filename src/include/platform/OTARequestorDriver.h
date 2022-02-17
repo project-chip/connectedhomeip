@@ -118,6 +118,10 @@ public:
 
     /// Platform-specific timer cancelling method
     virtual void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) = 0;
+
+ using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    virtual void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
+                                        app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) = 0;
 };
 
 } // namespace chip

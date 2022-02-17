@@ -44,8 +44,6 @@ using bdx::TransferSession;
 // Global instance of the OTARequestorInterface.
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
 
-constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this value when starting OTA "immediately"
-
 static void LogQueryImageResponse(const QueryImageResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "QueryImageResponse:");
@@ -88,12 +86,6 @@ static void LogApplyUpdateResponse(const ApplyUpdateResponse::DecodableType & re
     ChipLogDetail(SoftwareUpdate, "ApplyUpdateResponse:");
     ChipLogDetail(SoftwareUpdate, "  action: %u", to_underlying(response.action));
     ChipLogDetail(SoftwareUpdate, "  delayedActionTime: %" PRIu32 " seconds", response.delayedActionTime);
-}
-
-void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
-{
-    VerifyOrReturn(appState != nullptr);
-    static_cast<OTARequestor *>(appState)->ConnectToProvider(OTARequestor::kQueryImage);
 }
 
 void SetRequestorInstance(OTARequestorInterface * instance)
@@ -241,22 +233,10 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    // Determine whether our current state allows us to proceed
-    OTARequestorAction action = mOtaRequestorDriver->GetRequestorAction(OTARequestorIncomingEvent::AnnouncedOTAProviderReceived);
-    if(action == OTARequestorAction::DoNotProceed) {
-        ChipLogProgress(SoftwareUpdate, "Wrong UpdateState, ignoring command");
-        return EMBER_ZCL_STATUS_SUCCESS;
-    } else if(action == OTARequestorAction::CancelCurrentUpdateAndProceed) {
-        CancelImageUpdate();
-    } else if(action == OTARequestorAction::Proceed) {
-        // Fall through
-    }
 
     ProviderLocation::Type providerLocation = { .fabricIndex    = commandObj->GetAccessingFabricIndex(),
                                                 .providerNodeID = commandData.providerNodeId,
                                                 .endpoint       = commandData.endpoint };
-
-    mProviderLocation.SetValue(providerLocation);
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %u", providerLocation.fabricIndex);
@@ -271,30 +251,16 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, providerLocation.endpoint);
 
 
-    // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
-    // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
-    uint32_t msToStart = 0;
-    switch (announcementReason)
-    {
-    case OTAAnnouncementReason::kSimpleAnnouncement:
-    case OTAAnnouncementReason::kUpdateAvailable:
-        msToStart = mOtaStartDelayMs;
-        break;
-    case OTAAnnouncementReason::kUrgentUpdateAvailable:
-        msToStart = kImmediateStartDelayMs;
-        break;
-    default:
-        ChipLogError(SoftwareUpdate, "Unexpected announcementReason: %u", static_cast<uint8_t>(announcementReason));
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    mOtaRequestorDriver->ScheduleDelayedAction(UpdateFailureState::kQuerying, System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, this);
+    mOtaRequestorDriver->ProcessAnnounceOTAProviders(providerLocation, announcementReason);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
+    // SL TODO: With every error condition we must restart the default provider timer, enter kIdle state. 
+    // applies to all flavors of the solution
+
     VerifyOrReturn(mOtaRequestorDriver != nullptr, ChipLogError(SoftwareUpdate, "OTA requestor driver not set"));
     VerifyOrReturn(mServer != nullptr, ChipLogError(SoftwareUpdate, "Server not set"));
     VerifyOrReturn(mProviderLocation.HasValue(), ChipLogError(SoftwareUpdate, "Provider location not set"));

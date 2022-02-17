@@ -37,14 +37,14 @@ namespace chip {
 class OTARequestor : public OTARequestorInterface, public BDXDownloader::StateDelegate
 {
 public:
-    // Various actions to take when OnConnected callback is called
-    enum OnConnectedAction
-    {
-        kQueryImage = 0,
-        kStartBDX,
-        kApplyUpdate,
-        kNotifyUpdateApplied,
-    };
+    // // Various actions to take when OnConnected callback is called
+    // enum OnConnectedAction
+    // {
+    //     kQueryImage = 0,
+    //     kStartBDX,
+    //     kApplyUpdate,
+    //     kNotifyUpdateApplied,
+    // };
 
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
@@ -81,6 +81,9 @@ public:
 
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
+  
+    using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    void SetCurrentProviderLocation(ProviderLocationType providerLocation) { mProviderLocation.SetValue(providerLocation); }
 
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(
@@ -123,7 +126,7 @@ public:
      *
      * @param onConnectedAction  The action to take once session to provider has been established
      */
-    void ConnectToProvider(OnConnectedAction onConnectedAction);
+    void ConnectToProvider(OnConnectedAction onConnectedAction) override;
 
     // Getter for the value of the UpdateState cached by the object
     app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum GetCurrentUpdateState() { return mCurrentUpdateState; }
@@ -140,7 +143,7 @@ public:
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
-    using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+
     using OTAUpdateStateEnum               = app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
     using OTAChangeReasonEnum              = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
 
