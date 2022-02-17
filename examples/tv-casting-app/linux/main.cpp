@@ -121,6 +121,9 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
  */
 void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr)
 {
+    // DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_tv_casting_kvs");
+    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+
     // Enter commissioning mode, open commissioning window
     Server::GetInstance().Init();
     Server::GetInstance().GetFabricTable().DeleteAllFabrics();
