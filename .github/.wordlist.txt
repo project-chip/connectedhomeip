@@ -311,6 +311,7 @@ debianutils
 debugText
 DEDEDEDE
 deepnote
+DefaultOTAProviders
 DefaultSuccess
 definedValue
 DehumidificationControl
@@ -926,6 +927,7 @@ protobuf
 protos
 Prover
 providerFabricIndex
+ProviderLocation
 providerNodeId
 ProxyConfiguration
 ProxyDiscovery
@@ -1291,6 +1293,7 @@ Xcode
 xcodeproj
 xcworkspace
 xd
+xDEADBEEF
 xdeadbeefcafe
 xds
 xdsdfu

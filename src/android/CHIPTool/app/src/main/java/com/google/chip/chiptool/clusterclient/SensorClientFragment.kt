@@ -33,6 +33,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 private typealias ReadCallback = ChipClusters.IntegerAttributeCallback
+private typealias PressureReadCallback =
+  ChipClusters.PressureMeasurementCluster.MeasuredValueAttributeCallback
 
 class SensorClientFragment : Fragment() {
   private lateinit var scope: CoroutineScope
@@ -251,11 +253,11 @@ class SensorClientFragment : Fragment() {
             "unitSymbol" to "\u00B0C"
         ),
         "Pressure" to mapOf(
-            "read" to { device: Long, endpointId: Int, callback: ReadCallback ->
+            "read" to { device: Long, endpointId: Int, callback: PressureReadCallback ->
               val cluster = ChipClusters.PressureMeasurementCluster(device, endpointId)
               cluster.readMeasuredValueAttribute(callback)
             },
-            "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
+            "subscribe" to { device: Long, endpointId: Int, callback: PressureReadCallback ->
               val cluster = ChipClusters.PressureMeasurementCluster(device, endpointId)
               cluster.subscribeMeasuredValueAttribute(callback,
                                                       MIN_REFRESH_PERIOD_S,
