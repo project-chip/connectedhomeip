@@ -299,8 +299,50 @@ enum class DiscoveryType
     kCommissionableNode,
     kCommissionerNode
 };
+
+/// Callbacks for resolving operational node resolution
+class OperationalResolveDelegate
+{
+public:
+    virtual ~OperationalResolveDelegate() = default;
+
+    /// Called within the CHIP event loop after a successful node resolution.
+    ///
+    /// May be called multiple times: implementations may call this once per
+    /// received packet and MDNS packets may arrive over different interfaces
+    /// which will make nodeData have different content.
+    virtual void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) = 0;
+
+    /// Notify a final failure for a node operational resolution.
+    ///
+    /// Called within the chip event loop if node resolution could not be performed.
+    /// This may be due to internal errors or timeouts.
+    ///
+    /// This will be called only if 'OnOperationalNodeResolved' is never called.
+    virtual void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
+};
+
+/// Callbacks for discovering nodes advertising non-operational status:
+///   - Commissioners
+///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
+///     connected to thread/wifi or devices with a commissioning window open)
+class CommissioningResolveDelegate
+{
+public:
+    virtual ~CommissioningResolveDelegate() = default;
+
+    /// Called within the CHIP event loop once a node is discovered.
+    ///
+    /// May be called multiple times as more nodes send their answer to a
+    /// multicast discovery query
+    virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
+};
+
 /// Groups callbacks for CHIP service resolution requests
-class ResolverDelegate
+///
+/// TEMPORARY defined as a stop-gap to implementing
+/// OperationalRsolveDelegate or CommissioningResolveDelegate
+class ResolverDelegate : public OperationalResolveDelegate, public CommissioningResolveDelegate
 {
 public:
     virtual ~ResolverDelegate() = default;
@@ -313,6 +355,16 @@ public:
 
     // Called when a CHIP Node acting as Commissioner or in commissioning mode is found
     virtual void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) = 0;
+
+    // OperationalResolveDelegate
+    void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) override { OnNodeIdResolved(nodeData); }
+    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
+    {
+        OnNodeIdResolutionFailed(peerId, error);
+    }
+
+    // CommissioningNodeResolveDelegate
+    void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override { OnNodeDiscoveryComplete(nodeData); }
 };
 
 /**
@@ -337,10 +389,23 @@ public:
     virtual void Shutdown() = 0;
 
     /**
-     * Registers a resolver delegate. If nullptr is passed, the previously registered delegate
-     * is unregistered.
+     * If nullptr is passed, the previously registered delegate is unregistered.
      */
-    virtual void SetResolverDelegate(ResolverDelegate * delegate) = 0;
+    virtual void SetOperationalDelegate(OperationalResolveDelegate * delegate) = 0;
+
+    /**
+     * If nullptr is passed, the previously registered delegate is unregistered.
+     */
+    virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
+
+    /**
+     * TEMPORARY setter that sets both operational and commissioning delegates
+     */
+    void SetResolverDelegate(ResolverDelegate * delegate)
+    {
+        SetOperationalDelegate(delegate);
+        SetCommissioningDelegate(delegate);
+    }
 
     /**
      * Requests resolution of the given operational node service.

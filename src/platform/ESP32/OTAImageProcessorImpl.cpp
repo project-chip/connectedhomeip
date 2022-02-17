@@ -160,7 +160,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     ByteSpan block = ByteSpan(imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
 
-    CHIP_ERROR error = imageProcessor->ProcessBlock(block);
+    CHIP_ERROR error = imageProcessor->ProcessHeader(block);
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to process OTA image header");

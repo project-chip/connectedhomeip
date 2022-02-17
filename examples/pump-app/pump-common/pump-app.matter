@@ -190,16 +190,16 @@ server cluster FixedLabel = 64 {
 }
 
 client cluster FlowMeasurement = 1028 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster FlowMeasurement = 1028 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -492,9 +492,9 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u scanMaxTimeSeconds = 2;
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
-  readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string<32> lastNetworkID = 6;
-  readonly attribute int32u lastConnectErrorValue = 7;
+  readonly attribute nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute nullable octet_string<32> lastNetworkID = 6;
+  readonly attribute nullable int32s lastConnectErrorValue = 7;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -694,16 +694,16 @@ server cluster OperationalCredentials = 62 {
 }
 
 client cluster PressureMeasurement = 1027 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster PressureMeasurement = 1027 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 

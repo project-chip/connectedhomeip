@@ -36,6 +36,7 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/CryptoContext.h>
+#include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/SecureSessionTable.h>
@@ -257,6 +258,7 @@ private:
     Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions;
     Transport::GroupSessionTable<CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE> mGroupSessions;
     State mState; // < Initialization state of the object
+    chip::Transport::GroupOutgoingCounters mGroupClientCounter;
 
     SessionMessageDelegate * mCB = nullptr;
 
@@ -265,9 +267,6 @@ private:
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
-
-    // Will be use once PR 14996 is merged
-    chip::PersistentStorageDelegate * mStorage = nullptr;
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
     GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;

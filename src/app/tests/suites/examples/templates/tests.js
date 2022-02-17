@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,10 +15,35 @@
  *    limitations under the License.
  */
 
-#include "LowPowerManager.h"
-
-bool LowPowerManager::HandleSleep()
+function getManualTests()
 {
-    // TODO: Insert code here
-    return true;
+  const ExampleManualCataCategory = [
+    'examples/Test_Example',
+  ];
+
+  const tests = [
+    ExampleManualCataCategory, //
+
+  ];
+  return tests.flat(1);
 }
+
+function getTests()
+{
+  const TestExample = [
+    'examples/Test_Example_1',
+    'examples/Test_Example_2',
+    'examples/Test_Example_3',
+  ];
+
+  const tests = [
+    TestExample, //
+  ];
+  return tests.flat(1);
+}
+
+//
+// Module exports
+//
+exports.getTests       = getTests;
+exports.getManualTests = getManualTests;

@@ -36,7 +36,7 @@
 const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
-const uint16_t kTimeoutInSeconds = 5;
+const uint16_t kTimeoutInSeconds = 20;
 const uint64_t nodeId = 0x12344321;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
@@ -228,7 +228,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BI_1_1_000001_ReadAttribute
@@ -346,7 +346,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BI_2_1_000001_ReadAttribute
@@ -621,7 +621,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BI_2_2_000001_ReadAttribute
@@ -822,7 +822,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BOOL_1_1_000001_ReadAttribute
@@ -940,7 +940,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BOOL_2_1_000001_ReadAttribute
@@ -1040,7 +1040,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BRAC_1_1_000001_ReadAttribute
@@ -1092,7 +1092,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_1_1_000001_ReadAttribute
@@ -1162,7 +1162,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_2_1_000001_ReadAttribute
@@ -5230,7 +5230,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_3_1_000001_On
@@ -5461,7 +5461,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_3_2_000001_On
@@ -5656,7 +5656,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_3_3_000001_On
@@ -5803,7 +5803,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_1_000001_On
@@ -5923,7 +5923,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_2_000001_On
@@ -6168,7 +6168,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_3_000001_On
@@ -6315,7 +6315,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_4_000001_On
@@ -6436,7 +6436,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_5_1_000001_On
@@ -6557,7 +6557,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_5_2_000001_On
@@ -6700,7 +6700,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_5_3_000001_On
@@ -6821,7 +6821,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_6_1_000001_On
@@ -6941,7 +6941,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_6_2_000001_On
@@ -7230,7 +7230,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_6_3_000001_On
@@ -7381,7 +7381,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_1_000001_On
@@ -7606,7 +7606,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_2_000001_On
@@ -7833,7 +7833,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_3_000001_On
@@ -7980,7 +7980,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_4_000001_On
@@ -8101,7 +8101,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_8_1_000001_On
@@ -8501,7 +8501,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_1_000001_On
@@ -9826,7 +9826,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHue4;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_2_000001_On
@@ -10300,7 +10300,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_3_000001_On
@@ -10876,7 +10876,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DM_1_1_000001_ReadAttribute
@@ -11358,7 +11358,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DM_3_1_000001_ReadAttribute
@@ -11415,7 +11415,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_EMR_1_1_000001_ReadAttribute
@@ -11533,7 +11533,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -11542,7 +11542,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -11551,7 +11551,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_FLW_1_1_000001_ReadAttribute
@@ -11621,7 +11621,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_FLW_2_1_000001_ReadAttribute
@@ -11692,7 +11692,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTAssertNotNil(cluster);
 
     id measuredValueArgument;
-    measuredValueArgument = [NSNumber numberWithShort:0];
+    measuredValueArgument = [NSNumber numberWithUnsignedShort:0U];
     [cluster
         writeAttributeMeasuredValueWithValue:measuredValueArgument
                            completionHandler:^(NSError * _Nullable err) {
@@ -11715,7 +11715,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTAssertNotNil(cluster);
 
     id minMeasuredValueArgument;
-    minMeasuredValueArgument = [NSNumber numberWithShort:0];
+    minMeasuredValueArgument = [NSNumber numberWithUnsignedShort:0U];
     [cluster
         writeAttributeMinMeasuredValueWithValue:minMeasuredValueArgument
                               completionHandler:^(NSError * _Nullable err) {
@@ -11738,7 +11738,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTAssertNotNil(cluster);
 
     id maxMeasuredValueArgument;
-    maxMeasuredValueArgument = [NSNumber numberWithShort:0];
+    maxMeasuredValueArgument = [NSNumber numberWithUnsignedShort:0U];
     [cluster
         writeAttributeMaxMeasuredValueWithValue:maxMeasuredValueArgument
                               completionHandler:^(NSError * _Nullable err) {
@@ -11935,7 +11935,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_FLW_2_2_000001_ReadAttribute
@@ -11982,7 +11982,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_ILL_1_1_000001_ReadAttribute
@@ -12110,7 +12110,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_1_1_000001_ReadAttribute
@@ -12269,7 +12269,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000001_MoveToLevel
@@ -12598,7 +12598,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_2_000001_ReadAttribute
@@ -12959,7 +12959,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000001_ReadAttribute
@@ -13268,7 +13268,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000001_ReadAttribute
@@ -13610,7 +13610,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000001_On
@@ -13864,7 +13864,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_6_1_000001_On
@@ -14097,7 +14097,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_1_1_000001_ReadAttribute
@@ -14215,7 +14215,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_2_1_000001_Sleep
@@ -14243,7 +14243,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14252,7 +14252,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14261,7 +14261,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14270,7 +14270,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14279,7 +14279,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14288,7 +14288,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14297,7 +14297,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14306,7 +14306,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14315,7 +14315,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14324,7 +14324,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14333,7 +14333,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14342,7 +14342,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_5_1_000001_ReadAttribute
@@ -14370,7 +14370,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_5_2_000001_UserPrompt
@@ -14387,7 +14387,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_5_3_000001_UserPrompt
@@ -14404,7 +14404,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_1_000001_UserPrompt
@@ -14432,7 +14432,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the playback state attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14469,7 +14469,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_2_000001_UserPrompt
@@ -14497,7 +14497,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentState attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14558,7 +14558,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_3_000001_UserPrompt
@@ -14591,7 +14591,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_4_000001_UserPrompt
@@ -14643,7 +14643,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentState attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14683,7 +14683,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentState attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14720,7 +14720,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14729,7 +14729,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14738,10 +14738,9 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-NSNumber * _Nonnull currentTarget;
 - (void)testSendClusterTest_TC_MC_8_1_000001_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads the CurrentTarget attribute"];
@@ -14751,15 +14750,10 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestTargetNavigator * cluster = [[CHIPTestTargetNavigator alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeCurrentNavigatorTargetWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentTargetWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentTarget attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            currentTarget = actualValue;
-        }
 
         [expectation fulfill];
     }];
@@ -14775,7 +14769,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestTargetNavigator * cluster = [[CHIPTestTargetNavigator alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeTargetNavigatorListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeTargetListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the TargetList attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14791,7 +14785,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_9_1_000001_Log
@@ -14830,7 +14824,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeVendorIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeVendorIDWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the VendorID attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14878,7 +14872,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeProductIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeProductIDWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the ProductID attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14897,7 +14891,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeApplicationStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the Status attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14942,7 +14936,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OCC_1_1_000001_ReadAttribute
@@ -15012,7 +15006,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OCC_2_1_000001_ReadAttribute
@@ -15264,7 +15258,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OCC_2_2_000001_ReadAttribute
@@ -15311,7 +15305,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_1_1_000001_ReadAttribute
@@ -15518,7 +15512,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_1_000001_ReadAttribute
@@ -15877,7 +15871,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_2_000001_Off
@@ -16189,7 +16183,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_3_000001_On
@@ -17204,7 +17198,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PS_1_1_000001_ReadAttribute
@@ -17322,7 +17316,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PRS_1_1_000001_ReadAttribute
@@ -17392,7 +17386,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PRS_2_1_000001_ReadAttribute
@@ -17453,6 +17447,7 @@ NSNumber * _Nonnull currentTarget;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue shortValue], 0);
         }
 
@@ -17520,6 +17515,7 @@ NSNumber * _Nonnull currentTarget;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue shortValue], 0);
         }
 
@@ -17587,6 +17583,7 @@ NSNumber * _Nonnull currentTarget;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue shortValue], 0);
         }
 
@@ -17601,7 +17598,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_1_1_000001_ReadAttribute
@@ -17698,7 +17695,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_2_1_000001_ReadAttribute
@@ -18982,7 +18979,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_2_2_000001_WriteAttribute
@@ -19066,7 +19063,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_2_3_000001_WriteAttribute
@@ -19295,7 +19292,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_RH_1_1_000001_ReadAttribute
@@ -19371,7 +19368,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_RH_2_1_000001_ReadAttribute
@@ -19505,7 +19502,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_RH_2_2_000001_ReadAttribute
@@ -19556,7 +19553,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWTCH_2_1_000001_ReadAttribute
@@ -19715,7 +19712,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWTCH_2_2_000001_UserPrompt
@@ -20053,7 +20050,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TM_1_1_000001_ReadAttribute
@@ -20129,7 +20126,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TM_2_1_000001_ReadAttribute
@@ -20198,7 +20195,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TM_2_2_000001_ReadAttribute
@@ -20249,7 +20246,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSTAT_1_1_000001_ReadAttribute
@@ -20339,7 +20336,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSTAT_2_1_000001_ReadAttribute
@@ -21998,7 +21995,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSTAT_2_2_000001_ReadAttribute
@@ -23299,7 +23296,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSUIC_1_1_000001_ReadAttribute
@@ -23372,7 +23369,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSUIC_2_1_000001_ReadAttribute
@@ -23731,7 +23728,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSUIC_2_2_000001_WriteAttribute
@@ -23980,7 +23977,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DIAG_TH_NW_1_1_000001_ResetCounts
@@ -24036,7 +24033,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WIFIDIAG_1_1_000001_ReadAttribute
@@ -24064,7 +24061,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -24073,7 +24070,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_1_1_000001_ReadAttribute
@@ -24262,7 +24259,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_1_000001_ReadAttribute
@@ -25820,7 +25817,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -25829,7 +25826,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_4_000001_ReadAttribute
@@ -25894,7 +25891,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_5_000001_ReadAttribute
@@ -25954,15 +25951,15 @@ NSNumber * _Nonnull currentTarget;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_WNCV_3_1_000000_WaitForCommissionee
+- (void)testSendClusterTest_TC_WNCV_3_4_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000001_DownOrClose
+- (void)testSendClusterTest_TC_WNCV_3_4_000001_DownOrClose
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"1a: TH sends DownOrClose command to preposition the DUT in the opposite direction"];
@@ -25982,200 +25979,16 @@ NSNumber * _Nonnull currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000002_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"1b: TH Waits for 10 seconds movement(s) on the device"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 10000);
-    [self waitForExpectationsWithTimeout:(10000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_4_000002_WaitForMs
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
+        [self expectationWithDescription:@"1b: TH Waits for fastMotionDuration seconds movement(s) on the device"];
 
-    CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 3000);
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000004_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"1d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"1d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 1);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 100);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000005_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"1e: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"1e: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000006_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 1);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 100);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-bool testSendClusterTest_TC_WNCV_3_1_000007_WaitForReport_Fulfilled = false;
-ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
-- (void)testSendClusterTest_TC_WNCV_3_1_000007_WaitForReport
-{
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    test_Test_TC_WNCV_3_1_OperationalStatus_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Report: 2: Subscribe to DUT reports on OperationalStatus attribute Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        testSendClusterTest_TC_WNCV_3_1_000007_WaitForReport_Fulfilled = true;
-    };
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000008_SubscribeAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"2: Subscribe to DUT reports on OperationalStatus attribute"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    uint16_t minIntervalArgument = 4U;
-    uint16_t maxIntervalArgument = 5U;
-    [cluster subscribeAttributeOperationalStatusWithMinInterval:@(minIntervalArgument)
-        maxInterval:@(maxIntervalArgument)
-        subscriptionEstablished:^{
-            XCTAssertEqual(testSendClusterTest_TC_WNCV_3_1_000007_WaitForReport_Fulfilled, true);
-            [expectation fulfill];
-        }
-        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"2: Subscribe to DUT reports on OperationalStatus attribute Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-            if (test_Test_TC_WNCV_3_1_OperationalStatus_Reported != nil) {
-                ResponseHandler callback = test_Test_TC_WNCV_3_1_OperationalStatus_Reported;
-                test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
-                callback(value, err);
-            }
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000009_UpOrOpen
+- (void)testSendClusterTest_TC_WNCV_3_4_000003_UpOrOpen
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"2a: TH sends UpOrOpen command to DUT"];
 
@@ -26194,18 +26007,19 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000010_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"2b: DUT updates its attributes"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000011_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_4_000004_WaitForMs
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT"];
+        [self expectationWithDescription:@"2b: TH Waits for fullMotionDuration seconds movement(s) on the device"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_3_4_000005_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -26213,8 +26027,8 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
     XCTAssertNotNil(cluster);
 
     [cluster
-        readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT Error: %@", err);
+        readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT Error: %@", err);
 
             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -26229,93 +26043,10 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000012_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"2e: TH leave the device moving for 2 seconds"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000013_WaitForReport
+- (void)testSendClusterTest_TC_WNCV_3_4_000006_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3a1: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    test_Test_TC_WNCV_3_1_OperationalStatus_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"3a1: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 5);
-            }
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 21);
-            }
-        }
-
-        [expectation fulfill];
-    };
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000014_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"3a2: DUT updates its attributes"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000015_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 9999U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000016_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT"];
+        [self expectationWithDescription:@"3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -26324,21 +26055,14 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [cluster
         readAttributeCurrentPositionLiftPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT Error: %@", err);
+            NSLog(@"3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT Error: %@", err);
 
             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 99);
-                }
+                XCTAssertFalse(actualValue == nil);
+                XCTAssertEqual([actualValue unsignedCharValue], 0);
             }
 
             [expectation fulfill];
@@ -26346,10 +26070,10 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000017_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_4_000007_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
+        [self expectationWithDescription:@"3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -26358,21 +26082,14 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [cluster
         readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
+            NSLog(@"3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
 
             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 9999U);
-                }
+                XCTAssertFalse(actualValue == nil);
+                XCTAssertEqual([actualValue unsignedShortValue], 0U);
             }
 
             [expectation fulfill];
@@ -26380,10 +26097,10 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000018_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_4_000008_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional attribute from DUT"];
+        [self expectationWithDescription:@"3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -26392,151 +26109,14 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [cluster
         readAttributeCurrentPositionTiltPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional attribute from DUT Error: %@", err);
+            NSLog(@"3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT Error: %@", err);
 
             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 99);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000019_StopMotion
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"4a: TH sends a StopMotion command to DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster stopMotionWithCompletionHandler:^(NSError * _Nullable err) {
-        NSLog(@"4a: TH sends a StopMotion command to DUT Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000020_WaitForMs
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"4b: TH waits for 3 seconds the end of inertial movement(s) on the device"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000021_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000022_WaitForMs
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"5a: TH waits for x seconds attributes update on the device"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000023_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 9999U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000024_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 9999U);
-                }
+                XCTAssertFalse(actualValue == nil);
+                XCTAssertEqual([actualValue unsignedCharValue], 0);
             }
 
             [expectation fulfill];
@@ -26545,15 +26125,15 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_WNCV_3_2_000000_WaitForCommissionee
+- (void)testSendClusterTest_TC_WNCV_3_5_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000001_UpOrOpen
+- (void)testSendClusterTest_TC_WNCV_3_5_000001_UpOrOpen
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"1a: TH sends UpOrOpen command to preposition the DUT in the opposite direction"];
@@ -26573,200 +26153,16 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000002_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"1b: TH Waits for 10 seconds movement(s) on the device"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 10000);
-    [self waitForExpectationsWithTimeout:(10000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000003_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_5_000002_WaitForMs
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
+        [self expectationWithDescription:@"1b: TH Waits for fastMotionDuration seconds movement(s) on the device"];
 
-    CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 9999U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 3000);
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000004_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"1d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"1d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 99);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000005_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"1e: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"1e: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 9999U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000006_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 99);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-bool testSendClusterTest_TC_WNCV_3_2_000007_WaitForReport_Fulfilled = false;
-ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
-- (void)testSendClusterTest_TC_WNCV_3_2_000007_WaitForReport
-{
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    test_Test_TC_WNCV_3_2_OperationalStatus_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Report: 2: Subscribe to DUT reports on OperationalStatus attribute Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        testSendClusterTest_TC_WNCV_3_2_000007_WaitForReport_Fulfilled = true;
-    };
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000008_SubscribeAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"2: Subscribe to DUT reports on OperationalStatus attribute"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    uint16_t minIntervalArgument = 4U;
-    uint16_t maxIntervalArgument = 5U;
-    [cluster subscribeAttributeOperationalStatusWithMinInterval:@(minIntervalArgument)
-        maxInterval:@(maxIntervalArgument)
-        subscriptionEstablished:^{
-            XCTAssertEqual(testSendClusterTest_TC_WNCV_3_2_000007_WaitForReport_Fulfilled, true);
-            [expectation fulfill];
-        }
-        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"2: Subscribe to DUT reports on OperationalStatus attribute Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-            if (test_Test_TC_WNCV_3_2_OperationalStatus_Reported != nil) {
-                ResponseHandler callback = test_Test_TC_WNCV_3_2_OperationalStatus_Reported;
-                test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
-                callback(value, err);
-            }
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000009_DownOrClose
+- (void)testSendClusterTest_TC_WNCV_3_5_000003_DownOrClose
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"2a: TH sends DownOrClose command to DUT"];
 
@@ -26785,558 +26181,16 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000010_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"2b: DUT updates its attributes"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 100);
-    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000011_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_5_000004_WaitForMs
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                XCTAssertFalse(actualValue == nil);
-                XCTAssertEqual([actualValue unsignedShortValue], 10000U);
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000012_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"2e: TH leave the device moving for 2 seconds"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000013_WaitForReport
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3a: Verify DUT reports OperationalStatus attribute to TH after a DownOrClose"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    test_Test_TC_WNCV_3_2_OperationalStatus_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"3a: Verify DUT reports OperationalStatus attribute to TH after a DownOrClose Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 10);
-            }
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 42);
-            }
-        }
-
-        [expectation fulfill];
-    };
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000014_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"3a2: DUT updates its attributes"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000015_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000016_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 1);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 100);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000017_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000018_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 1);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 100);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000019_StopMotion
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"4a: TH sends a StopMotion command to DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster stopMotionWithCompletionHandler:^(NSError * _Nullable err) {
-        NSLog(@"4a: TH sends a StopMotion command to DUT Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000020_WaitForMs
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"4b: TH waits for 3 seconds the end of inertial movement(s) on the device"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000021_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000022_WaitForMs
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"5a: TH waits for x seconds attributes update on the device"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000023_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000024_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 1U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterTest_TC_WNCV_3_3_000000_WaitForCommissionee
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000001_DownOrClose
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"1a: TH sends DownOrClose command to preposition the DUT in the opposite direction"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
-        NSLog(@"1a: TH sends DownOrClose command to preposition the DUT in the opposite direction Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000002_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"1b: TH Waits for 6-8 seconds movement(s) on the device"];
+        [self expectationWithDescription:@"2b: TH Waits for fullMotionDuration seconds movement(s) on the device"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 6000);
     [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_3_000003_UpOrOpen
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"1c: TH sends UpOrOpen command to preposition the DUT in the opposite direction"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster upOrOpenWithCompletionHandler:^(NSError * _Nullable err) {
-        NSLog(@"1c: TH sends UpOrOpen command to preposition the DUT in the opposite direction Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000004_WaitForMs
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"1d: TH Waits for 2 seconds movement(s) on the device"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-bool testSendClusterTest_TC_WNCV_3_3_000005_WaitForReport_Fulfilled = false;
-ResponseHandler test_Test_TC_WNCV_3_3_OperationalStatus_Reported = nil;
-- (void)testSendClusterTest_TC_WNCV_3_3_000005_WaitForReport
-{
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    test_Test_TC_WNCV_3_3_OperationalStatus_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Report: 2: Subscribe to DUT reports on OperationalStatus attribute Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        testSendClusterTest_TC_WNCV_3_3_000005_WaitForReport_Fulfilled = true;
-    };
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000006_SubscribeAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"2: Subscribe to DUT reports on OperationalStatus attribute"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    uint16_t minIntervalArgument = 4U;
-    uint16_t maxIntervalArgument = 5U;
-    [cluster subscribeAttributeOperationalStatusWithMinInterval:@(minIntervalArgument)
-        maxInterval:@(maxIntervalArgument)
-        subscriptionEstablished:^{
-            XCTAssertEqual(testSendClusterTest_TC_WNCV_3_3_000005_WaitForReport_Fulfilled, true);
-            [expectation fulfill];
-        }
-        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"2: Subscribe to DUT reports on OperationalStatus attribute Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-            if (test_Test_TC_WNCV_3_3_OperationalStatus_Reported != nil) {
-                ResponseHandler callback = test_Test_TC_WNCV_3_3_OperationalStatus_Reported;
-                test_Test_TC_WNCV_3_3_OperationalStatus_Reported = nil;
-                callback(value, err);
-            }
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000007_StopMotion
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"2a: TH sends a StopMotion command to DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster stopMotionWithCompletionHandler:^(NSError * _Nullable err) {
-        NSLog(@"2a: TH sends a StopMotion command to DUT Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000008_WaitForMs
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"2b: TH waits for 3 seconds the end of inertial movement(s) on the device"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000009_WaitForReport
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"2c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    test_Test_TC_WNCV_3_3_OperationalStatus_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"2c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    };
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000010_WaitForMs
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"2d: TH waits for 100ms - 3s attributes update on the device"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000011_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"2e: TH reads OperationalStatus attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"2e: TH reads OperationalStatus attribute from DUT Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-NSNumber * _Nullable attrCurrentPositionLift;
-- (void)testSendClusterTest_TC_WNCV_3_3_000012_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_5_000005_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
@@ -27354,19 +26208,8 @@ NSNumber * _Nullable attrCurrentPositionLift;
 
             {
                 id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-            {
-                id actualValue = value;
-                attrCurrentPositionLift = actualValue;
+                XCTAssertFalse(actualValue == nil);
+                XCTAssertEqual([actualValue unsignedShortValue], 10000U);
             }
 
             [expectation fulfill];
@@ -27374,11 +26217,10 @@ NSNumber * _Nullable attrCurrentPositionLift;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_3_000013_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_5_000006_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute 3c: it Must be "
-                                         @"equal with CurrentPositionLiftPercent100ths from DUT"];
+        [self expectationWithDescription:@"3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -27386,21 +26228,15 @@ NSNumber * _Nullable attrCurrentPositionLift;
     XCTAssertNotNil(cluster);
 
     [cluster
-        readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute 3c: it Must be equal with "
-                  @"CurrentPositionLiftPercent100ths from DUT Error: %@",
-                err);
+        readAttributeCurrentPositionLiftPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT Error: %@", err);
 
             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
-                if (attrCurrentPositionLift == nil) {
-                    XCTAssertTrue(actualValue == nil);
-                } else {
-                    XCTAssertFalse(actualValue == nil);
-                    XCTAssertEqualObjects(actualValue, attrCurrentPositionLift);
-                }
+                XCTAssertFalse(actualValue == nil);
+                XCTAssertEqual([actualValue unsignedCharValue], 100);
             }
 
             [expectation fulfill];
@@ -27408,11 +26244,10 @@ NSNumber * _Nullable attrCurrentPositionLift;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-NSNumber * _Nullable attrCurrentPositionTilt;
-- (void)testSendClusterTest_TC_WNCV_3_3_000014_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_5_000007_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"4a: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
+        [self expectationWithDescription:@"3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -27421,7 +26256,71 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [cluster
         readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"4a: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
+            NSLog(@"3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                XCTAssertFalse(actualValue == nil);
+                XCTAssertEqual([actualValue unsignedShortValue], 10000U);
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_3_5_000008_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeCurrentPositionTiltPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                XCTAssertFalse(actualValue == nil);
+                XCTAssertEqual([actualValue unsignedCharValue], 100);
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_WNCV_4_3_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+NSNumber * _Nullable attrCurrentPositionLiftPercent100ths;
+- (void)testSendClusterTest_TC_WNCV_4_3_000001_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"1a: If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"1a: If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths from DUT Error: %@", err);
 
             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -27439,7 +26338,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
             }
             {
                 id actualValue = value;
-                attrCurrentPositionTilt = actualValue;
+                attrCurrentPositionLiftPercent100ths = actualValue;
             }
 
             [expectation fulfill];
@@ -27447,11 +26346,11 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_3_000015_ReadAttribute
+NSNumber * _Nullable attrCurrentPositionLiftPercentage;
+- (void)testSendClusterTest_TC_WNCV_4_3_000002_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"4b: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute 4c: it Must be "
-                                         @"equal with CurrentPositionTiltPercent100ths from DUT"];
+        [self expectationWithDescription:@"1b: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -27459,25 +26358,255 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     XCTAssertNotNil(cluster);
 
     [cluster
-        readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"4b: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute 4c: it Must be equal with "
-                  @"CurrentPositionTiltPercent100ths from DUT Error: %@",
-                err);
+        readAttributeCurrentPositionLiftPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"1b: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage from DUT Error: %@", err);
 
             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
             {
                 id actualValue = value;
-                if (attrCurrentPositionTilt == nil) {
-                    XCTAssertTrue(actualValue == nil);
-                } else {
-                    XCTAssertFalse(actualValue == nil);
-                    XCTAssertEqualObjects(actualValue, attrCurrentPositionTilt);
+                if (actualValue != nil) {
+                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
                 }
+            }
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 100);
+                }
+            }
+            {
+                id actualValue = value;
+                attrCurrentPositionLiftPercentage = actualValue;
             }
 
             [expectation fulfill];
         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_3_000003_GoToLiftPercentage
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2b: TH sends GoToLiftPercentage command with BadParam to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPWindowCoveringClusterGoToLiftPercentageParams alloc] init];
+    params.liftPercentageValue = [NSNumber numberWithUnsignedChar:63];
+    params.liftPercent100thsValue = [NSNumber numberWithUnsignedShort:12288U];
+    [cluster goToLiftPercentageWithParams:params
+                        completionHandler:^(NSError * _Nullable err) {
+                            NSLog(@"2b: TH sends GoToLiftPercentage command with BadParam to DUT Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_3_000004_GoToLiftPercentage
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: TH sends GoToLiftPercentage command with 10001 to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPWindowCoveringClusterGoToLiftPercentageParams alloc] init];
+    params.liftPercentageValue = [NSNumber numberWithUnsignedChar:100];
+    params.liftPercent100thsValue = [NSNumber numberWithUnsignedShort:10001U];
+    [cluster goToLiftPercentageWithParams:params
+                        completionHandler:^(NSError * _Nullable err) {
+                            NSLog(@"3a: TH sends GoToLiftPercentage command with 10001 to DUT Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_3_000005_GoToLiftPercentage
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPWindowCoveringClusterGoToLiftPercentageParams alloc] init];
+    params.liftPercentageValue = [NSNumber numberWithUnsignedChar:255];
+    params.liftPercent100thsValue = [NSNumber numberWithUnsignedShort:65535U];
+    [cluster goToLiftPercentageWithParams:params
+                        completionHandler:^(NSError * _Nullable err) {
+                            NSLog(@"4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_WNCV_4_4_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+NSNumber * _Nullable attrCurrentPositionTiltPercent100ths;
+- (void)testSendClusterTest_TC_WNCV_4_4_000001_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"1a: If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"1a: If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths from DUT Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
+                }
+            }
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
+                }
+            }
+            {
+                id actualValue = value;
+                attrCurrentPositionTiltPercent100ths = actualValue;
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+NSNumber * _Nullable attrCurrentPositionTiltPercentage;
+- (void)testSendClusterTest_TC_WNCV_4_4_000002_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"1b: If (PA_TL & TL) TH reads CurrentPositionTiltPercentage from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeCurrentPositionTiltPercentageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"1b: If (PA_TL & TL) TH reads CurrentPositionTiltPercentage from DUT Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
+                }
+            }
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 100);
+                }
+            }
+            {
+                id actualValue = value;
+                attrCurrentPositionTiltPercentage = actualValue;
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_4_000003_GoToTiltPercentage
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2b: TH sends GoToTiltPercentage command with BadParam to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPWindowCoveringClusterGoToTiltPercentageParams alloc] init];
+    params.tiltPercentageValue = [NSNumber numberWithUnsignedChar:63];
+    params.tiltPercent100thsValue = [NSNumber numberWithUnsignedShort:12288U];
+    [cluster goToTiltPercentageWithParams:params
+                        completionHandler:^(NSError * _Nullable err) {
+                            NSLog(@"2b: TH sends GoToTiltPercentage command with BadParam to DUT Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_4_000004_GoToTiltPercentage
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"3a: TH sends GoToTiltPercentage command with 10001 to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPWindowCoveringClusterGoToTiltPercentageParams alloc] init];
+    params.tiltPercentageValue = [NSNumber numberWithUnsignedChar:100];
+    params.tiltPercent100thsValue = [NSNumber numberWithUnsignedShort:10001U];
+    [cluster goToTiltPercentageWithParams:params
+                        completionHandler:^(NSError * _Nullable err) {
+                            NSLog(@"3a: TH sends GoToTiltPercentage command with 10001 to DUT Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_4_000005_GoToTiltPercentage
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPWindowCoveringClusterGoToTiltPercentageParams alloc] init];
+    params.tiltPercentageValue = [NSNumber numberWithUnsignedChar:255];
+    params.tiltPercent100thsValue = [NSNumber numberWithUnsignedShort:65535U];
+    [cluster goToTiltPercentageWithParams:params
+                        completionHandler:^(NSError * _Nullable err) {
+                            NSLog(@"4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                            [expectation fulfill];
+                        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -27487,7 +26616,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestCluster_000001_Test
@@ -36976,7 +36105,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
     XCTAssertNotNil(cluster);
 
     uint16_t minIntervalArgument = 2U;
-    uint16_t maxIntervalArgument = 10U;
+    uint16_t maxIntervalArgument = 5U;
     [cluster subscribeAttributeListInt8uWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
@@ -39880,7 +39009,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 NSNumber * _Nonnull TestAddArgumentDefaultValue;
@@ -42575,7 +41704,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestConstraints_000001_WriteAttribute
@@ -43101,7 +42230,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestDelayCommands_000001_WaitForMs
@@ -43118,7 +42247,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestDescriptorCluster_000001_ReadAttribute
@@ -43253,7 +42382,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestBasicInformation_000001_ReadAttribute
@@ -43364,7 +42493,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 21);
+            XCTAssertEqual([actualValue count], 23);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 0UL);
             XCTAssertEqual([actualValue[1] unsignedIntValue], 1UL);
             XCTAssertEqual([actualValue[2] unsignedIntValue], 2UL);
@@ -43384,8 +42513,10 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             XCTAssertEqual([actualValue[16] unsignedIntValue], 16UL);
             XCTAssertEqual([actualValue[17] unsignedIntValue], 17UL);
             XCTAssertEqual([actualValue[18] unsignedIntValue], 18UL);
-            XCTAssertEqual([actualValue[19] unsignedIntValue], 65531UL);
-            XCTAssertEqual([actualValue[20] unsignedIntValue], 65533UL);
+            XCTAssertEqual([actualValue[19] unsignedIntValue], 65528UL);
+            XCTAssertEqual([actualValue[20] unsignedIntValue], 65529UL);
+            XCTAssertEqual([actualValue[21] unsignedIntValue], 65531UL);
+            XCTAssertEqual([actualValue[22] unsignedIntValue], 65533UL);
         }
 
         [expectation fulfill];
@@ -43399,7 +42530,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestGroupsCluster_000001_ViewGroup
@@ -43990,7 +43121,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestGroupKeyManagementCluster_000001_ReadAttribute
@@ -44489,7 +43620,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestIdentifyCluster_000001_Identify
@@ -44520,7 +43651,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestLogCommands_000001_Log
@@ -44545,7 +43676,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestOperationalCredentialsCluster_000001_ReadAttribute
@@ -44766,7 +43897,7 @@ NSNumber * _Nonnull ourFabricIndex;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestModeSelectCluster_000001_ReadAttribute
@@ -44971,7 +44102,7 @@ NSNumber * _Nonnull ourFabricIndex;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWDIAG_1_1_000001_ReadAttribute
@@ -45075,7 +44206,7 @@ NSNumber * _Nonnull ourFabricIndex;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWDIAG_3_1_000001_ResetWatermarks
@@ -45116,11 +44247,6 @@ NSNumber * _Nonnull ourFabricIndex;
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
-        }
-
         [expectation fulfill];
     }];
 
@@ -45145,11 +44271,6 @@ NSNumber * _Nonnull ourFabricIndex;
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
-        }
-
         [expectation fulfill];
     }];
 
@@ -45161,7 +44282,7 @@ NSNumber * _Nonnull ourFabricIndex;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue, nodeId);
+    WaitForCommissionee(expectation, queue, 305414945);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestSubscribe_OnOff_000001_Off
@@ -45216,7 +44337,7 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     XCTAssertNotNil(cluster);
 
     uint16_t minIntervalArgument = 2U;
-    uint16_t maxIntervalArgument = 10U;
+    uint16_t maxIntervalArgument = 5U;
     [cluster subscribeAttributeOnOffWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{

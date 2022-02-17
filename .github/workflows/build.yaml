@@ -70,7 +70,7 @@ jobs:
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
-              timeout-minutes: 2
+              timeout-minutes: 5
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512

@@ -116,10 +116,10 @@ server cluster ApplicationBasic = 1293 {
   }
 
   readonly attribute char_string<32> vendorName = 0;
-  readonly attribute int16u vendorId = 1;
+  readonly attribute int16u vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
-  readonly attribute int16u productId = 3;
-  readonly attribute ApplicationStatusEnum applicationStatus = 5;
+  readonly attribute int16u productID = 3;
+  readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
   readonly global attribute int16u clusterRevision = 65533;
@@ -146,7 +146,7 @@ server cluster ApplicationLauncher = 1292 {
     CHAR_STRING applicationId = 1;
   }
 
-  readonly attribute INT16U applicationLauncherList[] = 0;
+  readonly attribute INT16U catalogList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -170,8 +170,8 @@ server cluster AudioOutput = 1291 {
     CHAR_STRING<32> name = 2;
   }
 
-  readonly attribute OutputInfo audioOutputList[] = 0;
-  readonly attribute int8u currentAudioOutput = 1;
+  readonly attribute OutputInfo outputList[] = 0;
+  readonly attribute int8u currentOutput = 1;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -757,7 +757,7 @@ server cluster ContentLauncher = 1290 {
     MetricTypeEnum metric = 2;
   }
 
-  readonly attribute CHAR_STRING acceptHeaderList[] = 0;
+  readonly attribute CHAR_STRING acceptHeader[] = 0;
   attribute bitmap32 supportedStreamingProtocols = 1;
   readonly global attribute int16u clusterRevision = 65533;
 }
@@ -1339,9 +1339,9 @@ server cluster FixedLabel = 64 {
 }
 
 server cluster FlowMeasurement = 1028 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
   readonly global attribute int16u clusterRevision = 65533;
 }
@@ -1973,8 +1973,8 @@ server cluster MediaInput = 1287 {
     CHAR_STRING<32> description = 3;
   }
 
-  readonly attribute InputInfo mediaInputList[] = 0;
-  readonly attribute int8u currentMediaInput = 1;
+  readonly attribute InputInfo inputList[] = 0;
+  readonly attribute int8u currentInput = 1;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -1995,7 +1995,7 @@ server cluster MediaPlayback = 1286 {
     kSeekOutOfRange = 5;
   }
 
-  readonly attribute PlaybackStateEnum playbackState = 0;
+  readonly attribute PlaybackStateEnum currentState = 0;
   readonly attribute nullable epoch_us startTime = 1;
   readonly attribute nullable int64u duration = 2;
   readonly attribute single playbackSpeed = 4;
@@ -2086,9 +2086,9 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u scanMaxTimeSeconds = 2;
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
-  readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string<32> lastNetworkID = 6;
-  readonly attribute int32u lastConnectErrorValue = 7;
+  readonly attribute nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute nullable octet_string<32> lastNetworkID = 6;
+  readonly attribute nullable int32s lastConnectErrorValue = 7;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -2527,9 +2527,9 @@ server cluster PowerSourceConfiguration = 46 {
 }
 
 server cluster PressureMeasurement = 1027 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -2826,8 +2826,8 @@ server cluster TargetNavigator = 1285 {
     CHAR_STRING<32> name = 1;
   }
 
-  readonly attribute TargetInfo targetNavigatorList[] = 0;
-  readonly attribute int8u currentNavigatorTarget = 1;
+  readonly attribute TargetInfo targetList[] = 0;
+  readonly attribute int8u currentTarget = 1;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -3377,7 +3377,7 @@ server cluster UserLabel = 65 {
 }
 
 server cluster WakeOnLan = 1283 {
-  readonly attribute char_string<32> wakeOnLanMacAddress = 0;
+  readonly attribute char_string<32> MACAddress = 0;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -3512,7 +3512,29 @@ server cluster WindowCovering = 258 {
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
+  request struct GoToLiftPercentageRequest {
+    Percent liftPercentageValue = 0;
+    Percent100ths liftPercent100thsValue = 1;
+  }
+
+  request struct GoToLiftValueRequest {
+    INT16U liftValue = 0;
+  }
+
+  request struct GoToTiltPercentageRequest {
+    Percent tiltPercentageValue = 0;
+    Percent100ths tiltPercent100thsValue = 1;
+  }
+
+  request struct GoToTiltValueRequest {
+    INT16U tiltValue = 0;
+  }
+
   command DownOrClose(): DefaultSuccess = 1;
+  command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
+  command GoToLiftValue(GoToLiftValueRequest): DefaultSuccess = 4;
+  command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
+  command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
   command StopMotion(): DefaultSuccess = 2;
   command UpOrOpen(): DefaultSuccess = 0;
 }
@@ -3576,7 +3598,6 @@ endpoint 1 {
   server  cluster MediaInput;
   server  cluster MediaPlayback;
   server  cluster ModeSelect;
-  server  cluster NetworkCommissioning;
   server  cluster OccupancySensing;
   server  cluster OnOff;
   server  cluster OnOffSwitchConfiguration;
@@ -3601,5 +3622,9 @@ endpoint 2 {
   server  cluster Groups;
   server  cluster OccupancySensing;
   server  cluster OnOff;
+}
+
+endpoint 65534 {
+  server  cluster NetworkCommissioning;
 }
 

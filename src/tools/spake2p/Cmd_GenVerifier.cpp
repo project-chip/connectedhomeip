@@ -168,7 +168,8 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
     case 'i':
         if (!ParseInt(arg, gIterationCount) ||
-            !(gIterationCount >= chip::kPBKDFMinimumIterations && gIterationCount <= chip::kPBKDFMaximumIterations))
+            !(gIterationCount >= chip::Crypto::kSpake2pPBKDFMinimumIterations &&
+              gIterationCount <= chip::Crypto::kSpake2pPBKDFMaximumIterations))
         {
             PrintArgError("%s: Invalid value specified for the iteration-count parameter: %s\n", progName, arg);
             return false;
@@ -176,7 +177,8 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'l':
-        if (!ParseInt(arg, gSaltLen) || !(gSaltLen >= chip::kPBKDFMinimumSaltLen && gSaltLen <= chip::kPBKDFMaximumSaltLen))
+        if (!ParseInt(arg, gSaltLen) ||
+            !(gSaltLen >= chip::Crypto::kSpake2pPBKDFMinimumSaltLen && gSaltLen <= chip::Crypto::kSpake2pPBKDFMaximumSaltLen))
         {
             PrintArgError("%s: Invalid value specified for salt length parameter: %s\n", progName, arg);
             return false;
@@ -185,7 +187,8 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
     case 's':
         gSalt = arg;
-        if (!(strlen(gSalt) >= chip::kPBKDFMinimumSaltLen && strlen(gSalt) <= chip::kPBKDFMaximumSaltLen))
+        if (!(strlen(gSalt) >= chip::Crypto::kSpake2pPBKDFMinimumSaltLen &&
+              strlen(gSalt) <= chip::Crypto::kSpake2pPBKDFMaximumSaltLen))
         {
             fprintf(stderr, "%s: Invalid legth of the specified salt parameter: %s\n", progName, arg);
             return false;
@@ -268,7 +271,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
 
     for (uint32_t i = 0; i < gCount; i++)
     {
-        uint8_t salt[chip::kPBKDFMaximumSaltLen];
+        uint8_t salt[chip::Crypto::kSpake2pPBKDFMaximumSaltLen];
         if (gSalt == nullptr)
         {
             CHIP_ERROR err = chip::Crypto::DRBG_get_bytes(salt, gSaltLen);
@@ -301,12 +304,13 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             return false;
         }
 
-        char saltB64[BASE64_ENCODED_LEN(chip::kPBKDFMaximumSaltLen) + 1];
+        char saltB64[BASE64_ENCODED_LEN(chip::Crypto::kSpake2pPBKDFMaximumSaltLen) + 1];
         uint32_t saltB64Len = chip::Base64Encode32(salt, gSaltLen, saltB64);
         saltB64[saltB64Len] = '\0';
 
-        char verifierB64[BASE64_ENCODED_LEN(chip::kSpake2pSerializedVerifierSize) + 1];
-        uint32_t verifierB64Len     = chip::Base64Encode32(serializedVerifier, chip::kSpake2pSerializedVerifierSize, verifierB64);
+        char verifierB64[BASE64_ENCODED_LEN(chip::Crypto::kSpake2pSerializedVerifierSize) + 1];
+        uint32_t verifierB64Len =
+            chip::Base64Encode32(serializedVerifier, chip::Crypto::kSpake2pSerializedVerifierSize, verifierB64);
         verifierB64[verifierB64Len] = '\0';
 
         if (fprintf(outFile, "%d,%08d,%d,%s,%s\n", i, gPinCode, gIterationCount, saltB64, verifierB64) < 0 || ferror(outFile))

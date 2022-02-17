@@ -582,18 +582,9 @@ public:
      * @brief
      *   This function validates the Attestation Information sent by the device.
      *
-     * @param[in] attestationElements Attestation Elements TLV.
-     * @param[in] signature           Attestation signature generated for all the above fields + Attestation Challenge.
-     * @param[in] attestationNonce    Attestation nonce
-     * @param[in] pai                 PAI certificate
-     * @param[in] dac                 DAC certificates
-     * @param[in] remoteVendorId      vendor ID read from the device Basic Information cluster
-     * @param[in] remoteProductId     product ID read from the device Basic Information cluster
-     * @param[in] proxy               device proxy that is being attested.
+     * @param[in] info Structure contatining all the required information for validating the device attestation.
      */
-    CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
-                                       const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
+    CHIP_ERROR ValidateAttestationInfo(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
 
     /**
      * @brief

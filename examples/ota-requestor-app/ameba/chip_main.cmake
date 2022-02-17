@@ -72,6 +72,7 @@ list(
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
+    -DMATTER_OTA_REQUESTOR_APP=1
 )
 
 list(

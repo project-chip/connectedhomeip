@@ -66,6 +66,21 @@ constexpr bool isRendezvousBypassed()
 #endif
 }
 
+void StopEventLoop(intptr_t arg)
+{
+    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
+}
+
+void DispatchShutDownEvent(intptr_t arg)
+{
+    // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
+    chip::DeviceLayer::PlatformManagerDelegate * platformManagerDelegate = chip::DeviceLayer::PlatformMgr().GetDelegate();
+    if (platformManagerDelegate != nullptr)
+    {
+        platformManagerDelegate->OnShutDown();
+    }
+}
+
 } // namespace
 
 namespace chip {
@@ -281,11 +296,17 @@ exit:
     return err;
 }
 
+void Server::DispatchShutDownAndStopEventLoop()
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(DispatchShutDownEvent);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+}
+
 void Server::Shutdown()
 {
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-    mExchangeMgr.Shutdown();
+    LogErrorOnFailure(mExchangeMgr.Shutdown());
     mSessions.Shutdown();
     mTransports.Close();
     mCommissioningWindowManager.Shutdown();

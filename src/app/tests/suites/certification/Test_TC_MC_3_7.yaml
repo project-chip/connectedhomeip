@@ -31,7 +31,7 @@ tests:
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
-      command: "LaunchAppRequest"
+      command: "LaunchApp"
       arguments:
           values:
               - name: "data"
@@ -44,7 +44,7 @@ tests:
     # TODO: Update the corresponding values when feature is supported
     - label: "Stop an app with the provided application ID"
       disabled: true
-      command: "StopAppRequest"
+      command: "StopApp"
       arguments:
           values:
               - name: "applicationId"
@@ -53,7 +53,7 @@ tests:
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
-      command: "LaunchAppRequest"
+      command: "LaunchApp"
       arguments:
           values:
               - name: "data"
@@ -68,7 +68,7 @@ tests:
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
-      command: "LaunchAppRequest"
+      command: "LaunchApp"
       arguments:
           values:
               - name: "data"
@@ -81,7 +81,7 @@ tests:
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
-      command: "LaunchAppRequest"
+      command: "LaunchApp"
       arguments:
           values:
               - name: "data"

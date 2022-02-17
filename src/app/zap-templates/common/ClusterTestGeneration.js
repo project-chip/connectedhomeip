@@ -47,6 +47,7 @@ const kResponseErrorName      = 'error';
 const kResponseWrongErrorName = 'errorWrongValue';
 const kPICSName               = 'PICS';
 const kSaveAsName             = 'saveAs';
+const kFabricFiltered         = 'fabricFiltered';
 
 class NullObject {
   toString()
@@ -139,6 +140,9 @@ function setDefaultTypeForCommand(test)
     test.commandName     = 'Read';
     test.isAttribute     = true;
     test.isReadAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
     break;
 
   case 'writeAttribute':
@@ -156,6 +160,9 @@ function setDefaultTypeForCommand(test)
     test.isAttribute          = true;
     test.isSubscribe          = true;
     test.isSubscribeAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
     break;
 
   case 'waitForReport':
@@ -511,6 +518,12 @@ function chip_tests_items(options)
 
 function getVariable(context, key, name)
 {
+  if (!(typeof name == "string" || (typeof name == "object" && (name instanceof String)))) {
+    // Non-string key; don't try to look it up.  Could end up looking like a
+    // variable name by accident when stringified.
+    return null;
+  }
+
   while (!('variables' in context) && context.parent) {
     context = context.parent;
   }
@@ -688,7 +701,8 @@ function chip_tests_item_response_parameters(options)
 
         if ('constraints' in expected) {
           responseArg.hasExpectedConstraints = true;
-          responseArg.expectedConstraints    = expected.constraints;
+          responseArg.expectedConstraints
+              = attachGlobal(this.global, expected.constraints, { thisVal : this, name : responseArg.name });
         }
 
         if ('saveAs' in expected) {
@@ -748,6 +762,15 @@ function if_include_struct_item_value(structValue, name, options)
   return options.inverse(this);
 }
 
+// To be used to verify that things are actually arrays before trying to use
+// #each with them, since that silently treats non-arrays as empty arrays.
+function ensureIsArray(value, options)
+{
+  if (!(value instanceof Array)) {
+    printErrorAndExit(this, `Expected array but instead got ${typeof value}: ${JSON.stringify(value)}\n`);
+  }
+}
+
 //
 // Module exports
 //
@@ -767,3 +790,4 @@ exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
 exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;
 exports.if_include_struct_item_value        = if_include_struct_item_value;
+exports.ensureIsArray                       = ensureIsArray;

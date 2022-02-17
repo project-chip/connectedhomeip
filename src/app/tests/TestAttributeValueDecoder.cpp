@@ -52,7 +52,7 @@ struct TestSetup
         TLVType ignored;
         writer.Init(buf);
         ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, ignored));
-        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(0), value));
+        ReturnErrorOnFailure(DataModel::EncodeForWrite(writer, TLV::ContextTag(0), value));
         ReturnErrorOnFailure(writer.EndContainer(ignored));
         ReturnErrorOnFailure(writer.Finalize());
         return CHIP_NO_ERROR;

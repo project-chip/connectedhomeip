@@ -54,34 +54,23 @@ OTAImageProcessorImpl gImageProcessor;
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
 
-constexpr uint16_t kOptionProviderNodeId      = 'n';
-constexpr uint16_t kOptionProviderFabricIndex = 'f';
 constexpr uint16_t kOptionDelayQuery          = 'q';
 constexpr uint16_t kOptionRequestorCanConsent = 'c';
 
-NodeId providerNodeId           = 0x0;
-FabricIndex providerFabricIndex = 1;
-uint16_t delayQueryTimeInSec    = 0;
+uint16_t delayQueryTimeInSec = 0;
 chip::Optional<bool> gRequestorCanConsent;
 
 OptionDef cmdLineOptionsDef[] = {
-    { "providerNodeId", chip::ArgParser::kArgumentRequired, kOptionProviderNodeId },
-    { "providerFabricIndex", chip::ArgParser::kArgumentRequired, kOptionProviderFabricIndex },
     { "delayQuery", chip::ArgParser::kArgumentRequired, kOptionDelayQuery },
     { "requestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
     {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -n/--providerNodeId <node ID>\n"
-                             "        Node ID of the OTA Provider to connect to (hex format)\n\n"
-                             "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
-                             "  -f/--providerFabricIndex <fabric index>\n"
-                             "        Fabric index of the OTA Provider to connect to. If none is specified, default value is 1.\n\n"
-                             "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
                              "  -q/--delayQuery <Time in seconds>\n"
                              "        From boot up, the amount of time to wait before triggering the QueryImage\n"
-                             "        command. If none or zero is supplied, QueryImage will not be triggered automatically.\n"
+                             "        command. If none or zero is supplied, QueryImage will not be triggered automatically. At "
+                             "least one provider location must be written to the DefaultOTAProviders attribute.\n"
                              "  -c/--requestorCanConsent\n"
                              "        If supplied, the RequestorCanConsent field of the QueryImage command is set to true.\n"
                              "        Otherwise, the value is determined by the driver.\n " };
@@ -115,21 +104,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
     switch (aIdentifier)
     {
-    case kOptionProviderNodeId:
-        if (1 != sscanf(aValue, "%" PRIX64, &providerNodeId))
-        {
-            PrintArgError("%s: unable to parse Node ID: %s\n", aProgram, aValue);
-        }
-        break;
-    case kOptionProviderFabricIndex:
-        providerFabricIndex = static_cast<uint8_t>(strtol(aValue, NULL, 0));
-
-        if (kOptionProviderFabricIndex == 0)
-        {
-            PrintArgError("%s: Input ERROR: Fabric Index may not be zero\n", aProgram);
-            retval = false;
-        }
-        break;
     case kOptionDelayQuery:
         delayQueryTimeInSec = static_cast<uint16_t>(strtol(aValue, NULL, 0));
         break;
@@ -157,12 +131,9 @@ void ApplicationInit()
     // Initialize all OTA download components
     InitOTARequestor();
 
-    // Test Mode operation: If a delay is provided, QueryImage after the timer expires
+    // If a delay is provided, after the timer expires, QueryImage from default OTA provider
     if (delayQueryTimeInSec > 0)
     {
-        // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
-        gRequestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex, chip::kRootEndpointId);
-
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
                                                     OnStartDelayTimerHandler, nullptr);
     }

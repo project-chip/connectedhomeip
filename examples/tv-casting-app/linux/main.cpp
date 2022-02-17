@@ -251,7 +251,7 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
             ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
-        LaunchURLRequest::Type request;
+        LaunchURL::Type request;
         request.contentURL          = chip::CharSpan::fromCharString(kContentUrl);
         request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(kContentDisplayStr));
         request.brandingInformation = Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>(

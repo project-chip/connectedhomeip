@@ -941,9 +941,9 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u scanMaxTimeSeconds = 2;
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
-  readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string<32> lastNetworkID = 6;
-  readonly attribute int32u lastConnectErrorValue = 7;
+  readonly attribute nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute nullable octet_string<32> lastNetworkID = 6;
+  readonly attribute nullable int32s lastConnectErrorValue = 7;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -1146,53 +1146,6 @@ server cluster OccupancySensing = 1030 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
-client cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : enum8 {
-    kFadeToOffIn0p8Seconds = 0;
-    kNoFade = 1;
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
-  }
-
-  enum OnOffDyingLightEffectVariant : enum8 {
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
-  }
-
-  enum OnOffEffectIdentifier : enum8 {
-    kDelayedAllOff = 0;
-    kDyingLight = 1;
-  }
-
-  bitmap OnOffControl : BITMAP8 {
-    kAcceptOnlyWhenOn = 0x1;
-  }
-
-  readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute enum8 startUpOnOff = 16387;
-  readonly global attribute bitmap32 featureMap = 65532;
-  readonly global attribute int16u clusterRevision = 65533;
-
-  request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectId = 0;
-    OnOffDelayedAllOffEffectVariant effectVariant = 1;
-  }
-
-  request struct OnWithTimedOffRequest {
-    OnOffControl onOffControl = 0;
-    int16u onTime = 1;
-    int16u offWaitTime = 2;
-  }
-
-  command Off(): DefaultSuccess = 0;
-  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  command On(): DefaultSuccess = 1;
-  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
-  command Toggle(): DefaultSuccess = 2;
-}
-
 server cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : enum8 {
     kFadeToOffIn0p8Seconds = 0;
@@ -1238,12 +1191,6 @@ server cluster OnOff = 6 {
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
   command Toggle(): DefaultSuccess = 2;
-}
-
-server cluster OnOffSwitchConfiguration = 7 {
-  readonly attribute enum8 switchType = 0;
-  attribute enum8 switchActions = 16;
-  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster OperationalCredentials = 62 {
@@ -1693,10 +1640,5 @@ endpoint 1 {
   server  cluster LevelControl;
   server  cluster OccupancySensing;
   server  cluster OnOff;
-}
-
-endpoint 2 {
-  binding cluster OnOff;
-  server  cluster OnOffSwitchConfiguration;
 }
 

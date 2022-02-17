@@ -37,12 +37,5 @@ public:
     ~OtaSoftwareUpdateProviderCluster() {}
 };
 
-class DLL_EXPORT OnOffCluster : public ClusterBase
-{
-public:
-    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
-    ~OnOffCluster() {}
-};
-
 } // namespace Controller
 } // namespace chip

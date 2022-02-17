@@ -31,6 +31,8 @@
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
+
 #include <list>
 
 using namespace chip;
@@ -40,6 +42,9 @@ using namespace chip::app::Clusters::ApplicationBasic;
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
+static constexpr size_t kApplicationBasicDelegateTableSize =
+    EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 
@@ -47,7 +52,7 @@ using chip::app::Clusters::ApplicationBasic::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[kApplicationBasicDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
@@ -163,19 +168,19 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
     case chip::app::Clusters::ApplicationBasic::Attributes::VendorName::Id: {
         return ReadVendorNameAttribute(aEncoder, delegate);
     }
-    case chip::app::Clusters::ApplicationBasic::Attributes::VendorId::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id: {
         return ReadVendorIdAttribute(aEncoder, delegate);
     }
     case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::Id: {
         return ReadApplicationNameAttribute(aEncoder, delegate);
     }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ProductId::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ProductID::Id: {
         return ReadProductIdAttribute(aEncoder, delegate);
     }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationApp::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::Application::Id: {
         return ReadApplicationAttribute(aEncoder, delegate);
     }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::Status::Id: {
         return ReadStatusAttribute(aEncoder, delegate);
     }
     case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::Id: {
