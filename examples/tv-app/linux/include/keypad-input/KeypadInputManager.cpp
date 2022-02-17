@@ -54,6 +54,6 @@ void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType
       default:
         response.status = chip::app::Clusters::KeypadInput::StatusEnum::kUnsupportedKey;
     }
-    
+
     helper.Success(response);
 }

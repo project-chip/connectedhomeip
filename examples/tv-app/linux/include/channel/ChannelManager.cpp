@@ -106,8 +106,8 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     uint16_t index = 0;
     for (auto const& channel : mChannels) {
         index++;
-        // verify if CharSpan matches channel name 
-        // or callSign or affiliateCallSign or majorNumber.minorNumber 
+        // verify if CharSpan matches channel name
+        // or callSign or affiliateCallSign or majorNumber.minorNumber
         if (isChannelMatched(channel, match)) {
             matchedChannels.push_back(channel);
         }
