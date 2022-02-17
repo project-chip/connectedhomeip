@@ -158,12 +158,12 @@ parallel compilation).
 ### Code generator base functionality
 
 Generators use [Jinja2](https://jinja.palletsprojects.com/en/3.0.x/) as a
-templating laguage. The general `CodeGenerator` class in
+templating language. The general `CodeGenerator` class in
 [generators/**init**.py](./generators/__init__.py) provides the ability to
 output files based on jinja templates.
 
 In order to build working jinja2 templates, some further processing of the AST
-data is required. Some facilities for lookup namespacing (e.g. seach for named
+data is required. Some facilities for lookup namespacing (e.g. search for named
 data types within cluster first then globally) as well interpretation of data
 types into more concrete types is provided by `generators/types.py`.
 
