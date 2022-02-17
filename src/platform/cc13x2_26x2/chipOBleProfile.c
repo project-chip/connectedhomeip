@@ -90,7 +90,7 @@ static uint8_t chipOBleProfileRxCharVal[CHIPOBLEPROFILE_CHAR_LEN] = { 0x00 };
 // CHIPoBLE Rx Characteristic User Description
 static uint8_t chipOBleProfileRxdDataUserDesp[CHIPOBLEPROFILE_MAX_DESCRIPTION_LEN] = "ChipOBLE Rx Char";
 
-#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 // CHIPoBLE C3 Characteristic Properties
 static uint8_t chipOBleProfileC3CharProps = GATT_PROP_READ;
 

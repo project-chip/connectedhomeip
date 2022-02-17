@@ -1826,7 +1826,7 @@ void BLEManagerImpl::CHIPoBLEProfile_charValueChangeCB(uint8_t paramId, uint16_t
  *
  * @return  None.
  */
-void BLEManagerImpl::CHIPoBLEProfile_c3ValueReadCB(uint16_t connHandle, uint8_t *destBuf, uint16_t maxLen)
+void BLEManagerImpl::CHIPoBLEProfile_c3ValueReadCB(uint8_t * destBuf, uint16_t maxLen, uint16_t connHandle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle packetBuf;

@@ -428,9 +428,6 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/util.c",
       "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/thread/source/activity/dmm_thread_activity.c",
       "${ti_simplelink_sdk_root}/source/ti/dmm/dmm_priority_ble_thread.c",
-
-      # Move this into the SDK
-      "${chip_root}/src/platform/cc13x2_26x2/ble_user_config.c",
     ]
 
     configs -= [ "${build_root}/config/compiler:std_default" ]

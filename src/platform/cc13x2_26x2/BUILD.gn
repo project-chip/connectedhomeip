@@ -60,6 +60,7 @@ static_library("cc13x2_26x2") {
     sources += [
       "BLEManagerImpl.cpp",
       "BLEManagerImpl.h",
+      "ble_user_config.c",
       "chipOBleProfile.c",
     ]
   }

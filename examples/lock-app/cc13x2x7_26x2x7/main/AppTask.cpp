@@ -105,10 +105,6 @@ int AppTask::Init()
 {
     LED_Params ledParams;
     Button_Params buttonParams;
-    uint8_t EUI64[8];
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING && CHIP_ENABLE_ROTATING_DEVICE_ID
-    char stringEUI64[sizeof(EUI64)*2 + 1]; // just big enough for string(EUI64)
-#endif
 
     cc13x2_26x2LogInit();
 
@@ -156,20 +152,22 @@ int AppTask::Init()
     }
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING && CHIP_ENABLE_ROTATING_DEVICE_ID
-    // set serial number to flash
-    // this is before ZCL is started, so Basic Cluster populates Serial Number with this EUI64 (in string)
-    ThreadStackMgrImpl().GetIeeeEui64(EUI64);
-    for (int i = 0; i < (int)sizeof(EUI64); i++)
     {
-        sprintf(&stringEUI64[i*2], "%02x", EUI64[i]);
-    }
-    ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64) + 1);
-    PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("ConfigurationMgr().StoreSerialNumber failed (%X)", ret.AsInteger());
-        while (1)
-            ;
+        uint64_t EUI64;
+        char stringEUI64[sizeof(EUI64) * 2 + 1]; // just big enough for string(EUI64)
+
+        // set serial number to flash
+        // this is before ZCL is started, so Basic Cluster populates Serial Number with this EUI64 (in string)
+        ThreadStackMgrImpl().GetIeeeEui64((uint8_t *) &EUI64);
+        sprintf(stringEUI64, "%" PRIx64, EUI64);
+        ret = ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64));
+        PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
+        if (ret != CHIP_NO_ERROR)
+        {
+            PLAT_LOG("ConfigurationMgr().StoreSerialNumber failed (%X)", ret.AsInteger());
+            while (1)
+                ;
+        }
     }
 #endif
 
