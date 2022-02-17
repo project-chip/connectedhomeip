@@ -407,45 +407,45 @@ server cluster Groups = 4 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct GetGroupMembershipRequest {
-    INT16U groupList[] = 0;
+    group_id groupList[] = 0;
   }
 
   request struct RemoveGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   request struct ViewGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   response struct AddGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct GetGroupMembershipResponse {
     INT8U capacity = 0;
-    INT16U groupList[] = 1;
+    group_id groupList[] = 1;
   }
 
   response struct RemoveGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct ViewGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     CHAR_STRING groupName = 2;
   }
 
