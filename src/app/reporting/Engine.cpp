@@ -146,7 +146,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             AttributeValueEncoder::AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
             err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), apReadHandler->IsFabricFiltered(), attributeReportIBs,
                                       pathForRetrieval, &encodeState);
-            if (err != CHIP_NO_ERROR)
+
+            // Note: If the read request failed on ACL checks, RetrieveClusterData will return with CHIP_NO_ERROR, so it is
+            // safe to encode an AttributeEncodeState below.
+            if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
             {
                 ChipLogError(DataManagement,
                              "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
@@ -156,22 +159,41 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 // Otherwise, if partial data allowed, save the encode state.
                 // Otherwise roll back. If we have already encoded some chunks, we are done; otherwise encode status.
 
-                if (encodeState.AllowPartialData() && ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY)))
+                if (encodeState.AllowPartialData())
                 {
-                    // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
-                    apReadHandler->SetAttributeEncodeState(encodeState);
+                    bool hasEncoded = (attributeReportIBs.GetWriter()->GetLengthWritten() != emptyReportDataLength);
+
+                    if (!hasEncoded)
+                    {
+                        // We did not encode anything on a clean buffer due to no memory, this means the attribute is too
+                        // large to encode.
+                        err = attributeReportIBs.EncodeAttributeStatus(
+                            readPath, StatusIB(Protocols::InteractionModel::Status::ResourceExhausted));
+                        apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+                    }
+                    else
+                    {
+                        // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next
+                        // chunk.
+                        apReadHandler->SetAttributeEncodeState(encodeState);
+                    }
                 }
                 else
                 {
                     // We met a error during writing reports, one common case is we are running out of buffer, rollback the
                     // attributeReportIB to avoid any partial data.
                     attributeReportIBs.Rollback(attributeBackup);
-                    apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+                    attributeReportIBs.ResetError();
 
-                    if (err != CHIP_ERROR_NO_MEMORY && err != CHIP_ERROR_BUFFER_TOO_SMALL)
+                    apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+                    bool hasEncoded = (attributeReportIBs.GetWriter()->GetLengthWritten() != emptyReportDataLength);
+
+                    if (!hasEncoded)
                     {
-                        // Try to encode our error as a status response.
-                        err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
+                        // We did not encode anything on a clean buffer due to no memory, this means the attribute data is too large
+                        // to encode.
+                        err = attributeReportIBs.EncodeAttributeStatus(
+                            readPath, StatusIB(Protocols::InteractionModel::Status::ResourceExhausted));
                         if (err != CHIP_NO_ERROR)
                         {
                             // OK, just roll back again and give up.
@@ -179,6 +201,24 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                         }
                     }
                 }
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                // We met a error during writing reports, one common case is we are running out of buffer, rollback the
+                // attributeReportIB to avoid any partial data.
+                attributeReportIBs.Rollback(attributeBackup);
+
+                // Try to encode our error as a status response.
+                err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
+                if (err != CHIP_NO_ERROR)
+                {
+                    // OK, just roll back again and give up.
+                    attributeReportIBs.Rollback(attributeBackup);
+                }
+
+                ChipLogError(DataManagement,
+                             "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
+                             ChipLogValueMEI(pathForRetrieval.mClusterId), err.Format());
             }
             SuccessOrExit(err);
             // Successfully encoded the attribute, clear the internal state.
@@ -249,6 +289,8 @@ exit:
     // hasMoreChunks + no data encoded is a flag that we have encountered some trouble when processing the attribute.
     // BuildAndSendSingleReportData will abort the read transaction if we encoded no attribute and no events but hasMoreChunks is
     // set.
+    // Note that if an attribute is too large to encode, we will put a StatusIB with ResourceExhausted status code, making
+    // attributeDataWritten becoming true.
     if (apHasMoreChunks != nullptr)
     {
         *apHasMoreChunks = hasMoreChunks;
@@ -420,13 +462,12 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
         if (!hasEncodedAttributes && !hasEncodedEvents && hasMoreChunks)
         {
+            // For attributes, we should at least encode a ResourceExhausted status code.
+            // For events, the data size are checked before putting into the buffer.
+            // So we assume we have encoded something on this read transaction.
             ChipLogError(DataManagement,
                          "No data actually encoded but hasMoreChunks flag is set, close read handler! (attribute too big?)");
-            err = apReadHandler->SendStatusReport(Protocols::InteractionModel::Status::ResourceExhausted);
-            if (err == CHIP_NO_ERROR)
-            {
-                needCloseReadHandler = true;
-            }
+            needCloseReadHandler = true;
             ExitNow();
         }
     }
