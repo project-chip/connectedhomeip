@@ -160,18 +160,6 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        return;
-    }
-
-    chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    if (requestor != nullptr)
-    {
-        requestor->NotifyUpdateApplied(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION + 1);
-    }
-
     ChipLogProgress(SoftwareUpdate, "Rebooting after 2 seconds...");
 
     cy_rtos_delay_milliseconds(2000);
