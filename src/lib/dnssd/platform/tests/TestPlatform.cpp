@@ -219,6 +219,12 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mdnsPlatform.FinalizeServiceUpdate() == CHIP_NO_ERROR);
 }
 
+int TestSetup(void * inContext)
+{
+    chip::Platform::MemoryInit();
+    return SUCCESS;
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestStub", TestStub),                             //
     NL_TEST_DEF("TestOperational", TestOperational),               //
@@ -230,7 +236,7 @@ const nlTest sTests[] = {
 
 int TestDnssdPlatform(void)
 {
-    nlTestSuite theSuite = { "DnssdPlatform", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "DnssdPlatform", &sTests[0], &TestSetup, nullptr };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
