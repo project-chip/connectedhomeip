@@ -666,7 +666,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
     // Check to see if pairing in progress before shutting down
     CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
-    if (device->IsSessionSetupInProgress())
+    if (device != nullptr && device->IsSessionSetupInProgress())
     {
         ChipLogDetail(Controller, "Setup in progress, stopping setup before shutting down");
         OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
