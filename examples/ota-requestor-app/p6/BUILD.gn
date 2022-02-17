@@ -47,7 +47,7 @@ config("p6_ota_config") {
   ldflags += [ "-Wl,--defsym,MCUBOOT_HEADER_SIZE=0x400,--defsym,MCUBOOT_BOOTLOADER_SIZE=0x18000,--defsym,CY_BOOT_PRIMARY_1_SIZE=0x1C0000" ]
 
   defines = [
-    "CY_OTA",
+    "P6_OTA",
     "OTA_SUPPORT ",
     "OTA_USE_EXTERNAL_FLASH",
     "CY_BOOT_USE_EXTERNAL_FLASH",

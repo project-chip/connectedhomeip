@@ -51,7 +51,7 @@ void ButtonHandler::GpioInit(void)
 {
     cy_rslt_t result = CY_RSLT_SUCCESS;
     // Set up button GPIOs to input with pullups.
-    result = cyhal_gpio_init(APP_LIGHT_BUTTON, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
+    result = cyhal_gpio_init(APP_UPDATE_BUTTON, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
     if (result != CY_RSLT_SUCCESS)
     {
         printf(" cyhal_gpio_init failed for APP_LOCK_BUTTON\r\n");
@@ -62,16 +62,16 @@ void ButtonHandler::GpioInit(void)
         printf(" cyhal_gpio_init failed for APP_FUNCTION_BUTTON\r\n");
     }
     /* Configure GPIO interrupt. */
-    cyhal_gpio_register_callback(APP_LIGHT_BUTTON, lockbuttonIsr, NULL);
+    cyhal_gpio_register_callback(APP_UPDATE_BUTTON, lockbuttonIsr, NULL);
     cyhal_gpio_register_callback(APP_FUNCTION_BUTTON, functionbuttonIsr, NULL);
-    cyhal_gpio_enable_event(APP_LIGHT_BUTTON, CYHAL_GPIO_IRQ_FALL, GPIO_INTERRUPT_PRIORITY, true);
+    cyhal_gpio_enable_event(APP_UPDATE_BUTTON, CYHAL_GPIO_IRQ_FALL, GPIO_INTERRUPT_PRIORITY, true);
     cyhal_gpio_enable_event(APP_FUNCTION_BUTTON, CYHAL_GPIO_IRQ_FALL, GPIO_INTERRUPT_PRIORITY, true);
 }
 
 void ButtonHandler::lockbuttonIsr(void * handler_arg, cyhal_gpio_event_t event)
 {
     portBASE_TYPE taskWoken = pdFALSE;
-    xTimerStartFromISR(buttonTimers[APP_LIGHT_BUTTON_IDX], &taskWoken);
+    xTimerStartFromISR(buttonTimers[APP_UPDATE_BUTTON_IDX], &taskWoken);
 }
 
 void ButtonHandler::functionbuttonIsr(void * handler_arg, cyhal_gpio_event_t event)
@@ -92,7 +92,7 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
     }
     else
     {
-        buttonevent = cyhal_gpio_read(APP_LIGHT_BUTTON);
+        buttonevent = cyhal_gpio_read(APP_UPDATE_BUTTON);
     }
     GetAppTask().ButtonEventHandler(timerId, (buttonevent) ? APP_BUTTON_PRESSED : APP_BUTTON_RELEASED);
 }

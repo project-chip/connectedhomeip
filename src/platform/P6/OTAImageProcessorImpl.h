@@ -24,7 +24,7 @@
 
 #include <fstream>
 
-#ifdef CY_OTA
+#ifdef P6_OTA
 extern "C" {
 #include "bootutil/bootutil.h"
 #include "cy_flash_psoc6.h"
