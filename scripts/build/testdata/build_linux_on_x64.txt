@@ -67,12 +67,6 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--
 # Generating linux-x64-address-resolve-tool
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} {out}/linux-x64-address-resolve-tool
 
-# Generating linux-x64-address-resolve-tool-platform-mdns
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_mdns="platform"' {out}/linux-x64-address-resolve-tool-platform-mdns
-
-# Generating linux-x64-address-resolve-tool-platform-mdns-ipv6only
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_inet_config_enable_ipv4=false chip_mdns="platform"' {out}/linux-x64-address-resolve-tool-platform-mdns-ipv6only
-
 # Generating linux-x64-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux {out}/linux-x64-all-clusters
 
@@ -165,12 +159,6 @@ ninja -C {out}/linux-fake-tests check
 
 # Building linux-x64-address-resolve-tool
 ninja -C {out}/linux-x64-address-resolve-tool src/lib/address_resolve:address-resolve-tool
-
-# Building linux-x64-address-resolve-tool-platform-mdns
-ninja -C {out}/linux-x64-address-resolve-tool-platform-mdns src/lib/address_resolve:address-resolve-tool
-
-# Building linux-x64-address-resolve-tool-platform-mdns-ipv6only
-ninja -C {out}/linux-x64-address-resolve-tool-platform-mdns-ipv6only src/lib/address_resolve:address-resolve-tool
 
 # Building linux-x64-all-clusters
 ninja -C {out}/linux-x64-all-clusters
