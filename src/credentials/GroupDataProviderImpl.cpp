@@ -717,14 +717,14 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     chip::KeysetId prev            = 0xffff;
     bool first                     = true;
 
-    uint16_t keyset_id            = 0;
-    KeySet::SecurityPolicy policy = KeySet::SecurityPolicy::kStandard;
-    uint8_t keys_count            = 0;
+    uint16_t keyset_id                       = 0;
+    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kStandard;
+    uint8_t keys_count                       = 0;
     OperationalKey operational_keys[KeySet::kEpochKeysMax];
 
     KeySetData() = default;
     KeySetData(chip::FabricIndex fabric, chip::KeysetId id) : fabric_index(fabric) { keyset_id = id; }
-    KeySetData(chip::FabricIndex fabric, chip::KeysetId id, KeySet::SecurityPolicy policy_id, uint8_t num_keys) :
+    KeySetData(chip::FabricIndex fabric, chip::KeysetId id, GroupDataProvider::SecurityPolicy policy_id, uint8_t num_keys) :
         fabric_index(fabric), keyset_id(id), policy(policy_id), keys_count(num_keys)
     {}
 
@@ -738,7 +738,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
 
     void Clear() override
     {
-        policy     = KeySet::SecurityPolicy::kStandard;
+        policy     = GroupDataProvider::SecurityPolicy::kStandard;
         keys_count = 0;
         memset(operational_keys, 0x00, sizeof(operational_keys));
         next = 0xffff;
@@ -891,6 +891,8 @@ void GroupDataProviderImpl::Finish()
     mGroupKeyIterators.ReleaseAll();
     mEndpointIterators.ReleaseAll();
     mKeySetIterators.ReleaseAll();
+    mGroupSessionsIterator.ReleaseAll();
+    mKeyContexPool.ReleaseAll();
 }
 
 //
@@ -1948,9 +1950,10 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
         if (key.hash == mSessionId)
         {
             mKeyContext.SetKey(ByteSpan(key.value, sizeof(key.value)), mSessionId);
-            output.fabric_index = fabric.fabric_index;
-            output.group_id     = mapping.group_id;
-            output.key          = &mKeyContext;
+            output.fabric_index    = fabric.fabric_index;
+            output.group_id        = mapping.group_id;
+            output.security_policy = keyset.policy;
+            output.key             = &mKeyContext;
             return true;
         }
     }

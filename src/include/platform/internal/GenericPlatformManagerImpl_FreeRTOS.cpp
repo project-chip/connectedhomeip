@@ -104,6 +104,27 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_UnlockChipStack(void)
     xSemaphoreGive(mChipStackLock);
 }
 
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+template <class ImplClass>
+bool GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_IsChipStackLockedByCurrentThread() const
+{
+    // We can't check for INCLUDE_xTaskGetCurrentTaskHandle because it's often
+    // _not_ set, but xTaskGetCurrentTaskHandle works anyway because
+    // configUSE_MUTEXES is set.  So in practice, xTaskGetCurrentTaskHandle can
+    // be assumed to be available here.
+#if INCLUDE_xSemaphoreGetMutexHolder != 1
+#error Must either set INCLUDE_xSemaphoreGetMutexHolder = 1 in FreeRTOSConfig.h or set chip_stack_lock_tracking = "none" in Matter gn configuration.
+#endif
+    // If we have not started our event loop yet, return true because in that
+    // case we can't be racing against the (not yet started) event loop.
+    //
+    // Similarly, if mChipStackLock has not been created yet, might as well
+    // return true.
+    return (mEventLoopTask == nullptr) || (mChipStackLock == nullptr) ||
+        (xSemaphoreGetMutexHolder(mChipStackLock) == xTaskGetCurrentTaskHandle());
+}
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {

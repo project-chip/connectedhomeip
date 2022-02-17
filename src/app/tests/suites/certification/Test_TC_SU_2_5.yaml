@@ -1,0 +1,55 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    31.6.1. [TC-SU-2.5] Tests the different scenarios on the DUT based on the
+    ApplyUpdateResponse response sent by the OTA-P
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
+          field is set to 'Proceed' DelayedActionTime is set to 0."
+      disabled: true
+
+    - label:
+          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
+          field is set to 'Proceed' DelayedActionTime is set to 5 minutes."
+      disabled: true
+
+    - label:
+          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
+          field is set to 'AwaitNextAction', DelayedActionTime is set to 1
+          minute."
+      disabled: true
+
+    - label:
+          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
+          field is set to 'AwaitNextAction', DelayedActionTime is set to 12
+          minutes."
+      disabled: true
+
+    - label:
+          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
+          field is set to 'Discontinue', DelayedActionTime is set to 0 minutes."
+      disabled: true
+
+    - label:
+          "IF (PICS_DT_Vendor_Specific) Apply the OTA Update on DUT using vendor
+          specific mechanism."
+      disabled: true

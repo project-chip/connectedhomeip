@@ -48,7 +48,7 @@ constexpr FabricIndex kUndefinedFabricIndex = 0;
 constexpr EndpointId kInvalidEndpointId     = 0xFFFF;
 constexpr EndpointId kRootEndpointId        = 0;
 constexpr ListIndex kInvalidListIndex       = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
-constexpr DataVersion kUndefinedDataVersion = 0;
+
 // These are MEIs, 0xFFFF is not a valid manufacturer code,
 // thus 0xFFFF'FFFF is not a valid MEI.
 static constexpr ClusterId kInvalidClusterId     = 0xFFFF'FFFF;
@@ -56,5 +56,29 @@ static constexpr AttributeId kInvalidAttributeId = 0xFFFF'FFFF;
 static constexpr CommandId kInvalidCommandId     = 0xFFFF'FFFF;
 static constexpr EventId kInvalidEventId         = 0xFFFF'FFFF;
 static constexpr FieldId kInvalidFieldId         = 0xFFFF'FFFF;
+
+constexpr bool IsValidClusterId(ClusterId aClusterId)
+{
+    const ClusterId kIdMask     = 0x0000'FFFF;
+    const ClusterId kVendorMask = 0xFFFF'0000;
+    const auto id               = aClusterId & kIdMask;
+    const auto vendor           = aClusterId & kVendorMask;
+    return (vendor == 0x0000'0000 && id <= 0x7FFF) ||
+        (vendor >= 0x0001'0000 && vendor <= 0xFFFE'0000 && id >= 0xFC00 && id <= 0xFFFE);
+}
+
+constexpr bool IsValidDeviceTypeId(DeviceTypeId aDeviceTypeId)
+{
+    const DeviceTypeId kIdMask     = 0x0000'FFFF;
+    const DeviceTypeId kVendorMask = 0xFFFF'0000;
+    const auto id                  = aDeviceTypeId & kIdMask;
+    const auto vendor              = aDeviceTypeId & kVendorMask;
+    return vendor <= 0xFFFE'0000 && id <= 0xBFFF;
+}
+
+constexpr bool IsValidEndpointId(EndpointId aEndpointId)
+{
+    return aEndpointId != kInvalidEndpointId;
+}
 
 } // namespace chip

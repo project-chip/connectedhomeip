@@ -185,11 +185,12 @@
  * The unique id assigned by the device vendor to identify the product or device type.  This
  * number is scoped to the device vendor id.
  *
- * Un-overridden default must match the default test DAC
+ * Un-overridden default must either match one of the given development certs
+ * or have a DeviceAttestationCredentialsProvider implemented.
  * (see src/credentials/examples/DeviceAttestationCredsExample.cpp)
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8000
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8001
 #endif
 
 /**
@@ -836,6 +837,92 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS
 #define CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS 90000
+#endif
+
+// -------------------- Test Setup (PASE) Configuration --------------------
+
+/**
+ * @def CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+ *
+ * @brief
+ *   Enable use of test setup parameters for testing purposes only.
+ *
+ *  @note
+ *    WARNING: This option makes it possible to circumvent basic chip security functionality.
+ *    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+ */
+// TODO: When the SDK code is production ready this should be set to 0 and each platform
+// will need to enable it indivually when needed.
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+
+/**
+ * @def CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+ *
+ * @brief
+ *   Test Spake2p passcode to use if actual passcode value is not provisioned in the device memory.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+ *
+ * @brief
+ *   Test setup discriminator to use if actual discriminator value is not provisioned in the device memory.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+ *
+ * @brief
+ *   Test Spake2p iteration count to use if actual iteration count value is not provisioned in the device memory.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT 1000
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
+ *
+ * @brief
+ *   Test Spake2p Salt to use if actual salt value is not provisioned in the device memory.
+ * @note
+ *   The value is base-64 encoded string.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT "U1BBS0UyUCBLZXkgU2FsdA=="
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER
+ *
+ * @brief
+ *   Test Spake2p Verifier to use if actual verifier value is not provisioned in the device memory.
+ * @note
+ *   The value is base-64 encoded string.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER                                                                               \
+    "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/"  \
+    "NH6Rmzw=="
+#endif
+
+#else
+
+#undef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+#undef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+#undef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+#undef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
+#undef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER
+
 #endif
 
 // -------------------- Event Logging Configuration --------------------

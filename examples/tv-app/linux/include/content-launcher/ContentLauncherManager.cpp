@@ -21,6 +21,7 @@
 using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
 
 ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
@@ -30,20 +31,21 @@ ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderLis
 }
 
 void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
-                                                 const list<Parameter> & parameterList, bool autoplay, const CharSpan & data)
+                                                 const DecodableList<ParameterType> & parameterList, bool autoplay,
+                                                 const CharSpan & data)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());
 
     LaunchResponseType response;
     // TODO: Insert code here
-    response.data   = CharSpan::fromCharString("exampleData");
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
     response.status = ContentLauncher::StatusEnum::kSuccess;
     helper.Success(response);
 }
 
 void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
-                                             const CharSpan & displayString, const list<BrandingInformation> & brandingInformation)
+                                             const CharSpan & displayString, const BrandingInformationType & brandingInformation)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
@@ -52,7 +54,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
 
     // TODO: Insert code here
     LaunchResponseType response;
-    response.data   = CharSpan::fromCharString("exampleData");
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
     response.status = ContentLauncher::StatusEnum::kSuccess;
     helper.Success(response);
 }

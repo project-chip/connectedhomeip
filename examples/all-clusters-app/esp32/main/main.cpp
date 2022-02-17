@@ -27,6 +27,7 @@
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
 #include "ShellCommands.h"
+#include "StatusScreen.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -184,7 +185,35 @@ void AddDevice(std::string name)
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
-class EditAttributeListModel : public ListScreen::Model
+class TouchesMatterStackModel : public ListScreen::Model
+{
+    // We could override Action() and then hope focusIndex has not changed by
+    // the time our queued task runs, but it's cleaner to just capture its value
+    // now.
+    struct QueuedAction
+    {
+        QueuedAction(TouchesMatterStackModel * selfArg, int iArg) : self(selfArg), i(iArg) {}
+        TouchesMatterStackModel * self;
+        int i;
+    };
+
+    void ItemAction(int i) final
+    {
+        auto * action = chip::Platform::New<QueuedAction>(this, i);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(QueuedActionHandler, reinterpret_cast<intptr_t>(action));
+    }
+
+    static void QueuedActionHandler(intptr_t closure)
+    {
+        auto * queuedAction = reinterpret_cast<QueuedAction *>(closure);
+        queuedAction->self->DoAction(queuedAction->i);
+        chip::Platform::Delete(queuedAction);
+    }
+
+    virtual void DoAction(int i) = 0;
+};
+
+class EditAttributeListModel : public TouchesMatterStackModel
 {
     int deviceIndex;
     int endpointIndex;
@@ -223,7 +252,8 @@ public:
         }
         return i == 0 ? "+" : "-";
     }
-    virtual void ItemAction(int i)
+
+    void DoAction(int i) override
     {
         auto & attribute = this->attribute();
         auto & value     = std::get<1>(attribute);
@@ -397,7 +427,7 @@ private:
     }
 };
 
-class SetupListModel : public ListScreen::Model
+class SetupListModel : public TouchesMatterStackModel
 {
 public:
     SetupListModel()
@@ -412,7 +442,7 @@ public:
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
     virtual std::string GetItemText(int i) { return options.at(i); }
-    virtual void ItemAction(int i)
+    void DoAction(int i) override
     {
         ESP_LOGI(TAG, "Opening options %d: %s", i, GetItemText(i).c_str());
         if (i == 0)
@@ -540,6 +570,12 @@ void SetupPretendDevices()
     AddCluster("Humidity Sensor");
     AddAttribute("MeasuredValue", "30");
     app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
+
+    AddDevice("Light Sensor");
+    AddEndpoint("External");
+    AddCluster("Illuminance Measurement");
+    AddAttribute("MeasuredValue", "1000");
+    app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
 }
 
 WiFiWidget pairingWindowLED;
@@ -692,23 +728,18 @@ extern "C" void app_main()
             ->Item("QR Code",
                    [=]() {
                        ESP_LOGI(TAG, "Opening QR code screen");
-                       ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
-                       uint16_t discriminator;
-                       if (ConfigurationMgr().GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR)
-                       {
-                           ESP_LOGI(TAG, "Setup discriminator: %u (0x%x)", discriminator, discriminator);
-                       }
-                       uint32_t setupPINCode;
-                       if (ConfigurationMgr().GetSetupPinCode(setupPINCode) == CHIP_NO_ERROR)
-                       {
-                           ESP_LOGI(TAG, "Setup PIN code: %u (0x%x)", setupPINCode, setupPINCode);
-                       }
+                       PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
                        ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText));
                    })
             ->Item("Setup",
                    [=]() {
                        ESP_LOGI(TAG, "Opening Setup list");
                        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<SetupListModel>()));
+                   })
+            ->Item("Status",
+                   [=]() {
+                       ESP_LOGI(TAG, "Opening Status screen");
+                       ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
                    })
             ->Item("Custom",
                    []() {

@@ -27,13 +27,14 @@
 #include <cstdint>
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <setup_payload/SetupPayload.h>
 
 struct LinuxDeviceOptions
 {
     chip::SetupPayload payload;
     uint32_t mBleDevice                = 0;
-    bool mWiFi                         = true;
+    bool mWiFi                         = false;
     bool mThread                       = false;
     uint32_t securedDevicePort         = CHIP_PORT;
     uint32_t securedCommissionerPort   = CHIP_PORT + 2;
@@ -45,4 +46,4 @@ struct LinuxDeviceOptions
     static LinuxDeviceOptions & GetInstance();
 };
 
-CHIP_ERROR ParseArguments(int argc, char * argv[]);
+CHIP_ERROR ParseArguments(int argc, char * argv[], chip::ArgParser::OptionSet * customOptions = nullptr);

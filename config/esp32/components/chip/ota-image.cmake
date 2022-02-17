@@ -43,7 +43,7 @@ function(chip_ota_image TARGET_NAME)
         "sha256"
     )
 
-    separate_arguments(OTA_EXTRA_ARGS NATIVE_COMMAND "${CHIP_OTA_IMAGE_EXTRA_ARGS}")
+    separate_arguments(OTA_EXTRA_ARGS NATIVE_COMMAND "${CONFIG_CHIP_OTA_IMAGE_EXTRA_ARGS}")
 
     list(APPEND OTA_ARGS ${OTA_EXTRA_ARGS})
     list(APPEND OTA_ARGS ${ARG_INPUT_FILES})
@@ -60,6 +60,5 @@ function(chip_ota_image TARGET_NAME)
 
     add_custom_target(${TARGET_NAME} ALL
         COMMAND ${Python3_EXECUTABLE} ${CHIP_ROOT}/src/app/ota_image_tool.py create @${BUILD_DIR}/args-ota-image.tmp
-        COMMAND ${CMAKE_COMMAND} -E remove ${BUILD_DIR}/args-ota-image.tmp
     )
 endfunction()

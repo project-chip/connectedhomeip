@@ -57,10 +57,12 @@ from pw_rpc.console_tools.console import ClientInfo, flattened_rpc_completions
 from attributes_service import attributes_service_pb2
 from button_service import button_service_pb2
 from device_service import device_service_pb2
+from echo_service import echo_pb2
 from lighting_service import lighting_service_pb2
 from locking_service import locking_service_pb2
+from ot_cli_service import ot_cli_service_pb2
+from thread_service import thread_service_pb2
 from wifi_service import wifi_service_pb2
-from echo_service import echo_pb2
 
 _LOG = logging.getLogger(__name__)
 _DEVICE_LOG = logging.getLogger('rpc_device')
@@ -69,13 +71,15 @@ PW_RPC_MAX_PACKET_SIZE = 256
 SOCKET_SERVER = 'localhost'
 SOCKET_PORT = 33000
 
-PROTOS = [button_service_pb2,
-          attributes_service_pb2,
+PROTOS = [attributes_service_pb2,
+          button_service_pb2,
+          device_service_pb2,
+          echo_pb2,
           lighting_service_pb2,
           locking_service_pb2,
-          wifi_service_pb2,
-          device_service_pb2,
-          echo_pb2]
+          ot_cli_service_pb2,
+          thread_service_pb2,
+          wifi_service_pb2]
 
 
 def _parse_args():

@@ -345,8 +345,6 @@ public:
      * @brief
      *   Fetch the most recently vended Number for a particular priority level
      *
-     * @param aPriority Priority level
-     *
      * @return EventNumber most recently vended event Number for that event priority
      */
     EventNumber GetLastEventNumber() { return mLastEventNumber; }

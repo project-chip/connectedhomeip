@@ -61,7 +61,7 @@ EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short en
             return EMBER_ZCL_STATUS_SUCCESS;
         }
     }
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %" PRIu8, mode);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", mode);
     return EMBER_ZCL_STATUS_INVALID_VALUE;
 }
 

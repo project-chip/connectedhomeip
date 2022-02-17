@@ -19,22 +19,18 @@
 #include "AppTask.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
-#include <app/server/OnboardingCodesUtil.h>
 
-#ifdef CAPSENSE_ENABLED
-#include "capsense.h"
-#endif
-
-// FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
-// from unistd.h to avoid a conflicting declaration with the `sleep()` provided
-// by Mbed-OS in mbed_power_mgmt.h.
-#define sleep unistd_sleep
 #include <app/server/Dnssd.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <platform/CHIPDeviceLayer.h>
-#undef sleep
-
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+
+// mbed-os headers
+#include "drivers/Timeout.h"
+#include "events/EventQueue.h"
 
 // ZAP -- ZCL Advanced Platform
 #include <app-common/zap-generated/attribute-id.h>
@@ -42,14 +38,12 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-
-// mbed-os headers
+#ifdef CAPSENSE_ENABLED
+#include "capsense.h"
+#else
 #include "drivers/InterruptIn.h"
-#include "drivers/Timeout.h"
-#include "events/EventQueue.h"
 #include "platform/Callback.h"
+#endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT (MBED_CONF_APP_FACTORY_RESET_TRIGGER_TIMEOUT)
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT (MBED_CONF_APP_FACTORY_RESET_CANCEL_WINDOW_TIMEOUT)
@@ -60,13 +54,15 @@
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
 
-static mbed::InterruptIn sLightingButton(LIGHTING_BUTTON);
-static mbed::InterruptIn sFunctionButton(FUNCTION_BUTTON);
 #ifdef CAPSENSE_ENABLED
 static mbed::CapsenseButton CapFunctionButton(Capsense::getInstance(), 0);
 static mbed::CapsenseButton CapLockButton(Capsense::getInstance(), 1);
 static mbed::CapsenseSlider CapSlider(Capsense::getInstance());
+#else
+static mbed::InterruptIn sLightingButton(LIGHTING_BUTTON);
+static mbed::InterruptIn sFunctionButton(FUNCTION_BUTTON);
 #endif
+
 static bool sIsWiFiStationProvisioned = false;
 static bool sIsWiFiStationEnabled     = false;
 static bool sIsWiFiStationConnected   = false;
@@ -77,6 +73,7 @@ static mbed::Timeout sFunctionTimer;
 
 static events::EventQueue sAppEventQueue;
 
+using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -84,6 +81,7 @@ AppTask AppTask::sAppTask;
 
 int AppTask::Init()
 {
+    CHIP_ERROR error;
     // Register the callback to init the MDNS server when connectivity is available
     PlatformMgr().AddEventHandler(
         [](const ChipDeviceEvent * event, intptr_t arg) {
@@ -116,16 +114,28 @@ int AppTask::Init()
     LightingMgr().Init(MBED_CONF_APP_LIGHTING_STATE_LED);
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+    ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
+    error = Server::GetInstance().Init();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Server initialization failed: %s", error.AsString());
+        return EXIT_FAILURE;
+    }
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+    error = GetDFUManager().Init();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "DFU manager initialization failed: %s", error.AsString());
+        return EXIT_FAILURE;
+    }
 
     return 0;
 }

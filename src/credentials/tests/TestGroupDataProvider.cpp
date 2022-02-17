@@ -29,12 +29,13 @@
 #include <utility>
 
 using namespace chip::Credentials;
-using GroupInfo     = GroupDataProvider::GroupInfo;
-using GroupKey      = GroupDataProvider::GroupKey;
-using GroupEndpoint = GroupDataProvider::GroupEndpoint;
-using EpochKey      = GroupDataProvider::EpochKey;
-using KeySet        = GroupDataProvider::KeySet;
-using GroupSession  = GroupDataProvider::GroupSession;
+using GroupInfo      = GroupDataProvider::GroupInfo;
+using GroupKey       = GroupDataProvider::GroupKey;
+using GroupEndpoint  = GroupDataProvider::GroupEndpoint;
+using EpochKey       = GroupDataProvider::EpochKey;
+using KeySet         = GroupDataProvider::KeySet;
+using GroupSession   = GroupDataProvider::GroupSession;
+using SecurityPolicy = GroupDataProvider::SecurityPolicy;
 
 namespace chip {
 namespace app {
@@ -94,10 +95,10 @@ static const GroupKey kGroup3Keyset1(kGroup3, kKeysetId1);
 static const GroupKey kGroup3Keyset2(kGroup3, kKeysetId2);
 static const GroupKey kGroup3Keyset3(kGroup3, kKeysetId3);
 
-static KeySet kKeySet0(kKeysetId0, KeySet::SecurityPolicy::kStandard, 3);
-static KeySet kKeySet1(kKeysetId1, KeySet::SecurityPolicy::kLowLatency, 1);
-static KeySet kKeySet2(kKeysetId2, KeySet::SecurityPolicy::kLowLatency, 2);
-static KeySet kKeySet3(kKeysetId3, KeySet::SecurityPolicy::kStandard, 3);
+static KeySet kKeySet0(kKeysetId0, SecurityPolicy::kStandard, 3);
+static KeySet kKeySet1(kKeysetId1, SecurityPolicy::kLowLatency, 1);
+static KeySet kKeySet2(kKeysetId2, SecurityPolicy::kLowLatency, 2);
+static KeySet kKeySet3(kKeysetId3, SecurityPolicy::kStandard, 3);
 
 uint8_t kZeroKey[EpochKey::kLengthBytes] = { 0 };
 

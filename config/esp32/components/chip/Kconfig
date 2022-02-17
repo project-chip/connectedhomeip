@@ -47,6 +47,16 @@ menu "CHIP Core"
                 A Binding object is used to configure how the local device communicates with
                 a remote entity, be it a cloud service, a mobile application, or another device.
 
+        config MAX_FABRICS
+            int "Max Fabrics"
+            range 5 255
+            default 5
+            help
+                The maxinum number of fabrics the device can participate in.
+
+                Each fabric can provision the device with its unique operational credentials and
+                manage its own access control lists.
+
         config MAX_PEER_NODES
             int "Max Peer Nodes"
             range 0 65535
@@ -257,15 +267,15 @@ menu "CHIP Device Layer"
         config DEVICE_VENDOR_ID
             hex "Device Vendor Id"
             range 1 0xFFFE
-            default 0x235A
+            default 0xFFF1
             help
                 The device vendor id (in hex). This a CHIP-assigned id for the organization responsible for producing the device.
-                Defaults to CHIP (0x235A).
+                Defaults to test VID 0xFFF1.
 
         config DEVICE_PRODUCT_ID
             hex "Device Product Id"
             range 1 0xFFFE
-            default 0xFEFF
+            default 0x8000
             help
                 The device product id (in hex).  This is a unique id assigned by the device vendor to identify the product or device type.
                 Defaults to a CHIP-assigned id designating a non-production or test "product".
@@ -610,63 +620,14 @@ menu "CHIP Device Layer"
 
                 This option is for testing only and should not be enabled in production releases.
 
-        config USE_TEST_SETUP_PIN_CODE
-            int "Use Test Setup Pin Code"
-            range 0 99999999
-            default 20202021
+        config ENABLE_TEST_SETUP_PARAMS
+            bool "Enable Test Setup Parameters"
+            default y
             help
-                Specifies a hard-coded device setup pin code to be used if none is found in CHIP NV storage.
-                Setting the value to 0 disables the feature.
+                Enable use of test setup parameters for testing purposes only.
 
-                Note that any decimal integer number between 00000000 and 99999999 can be used here.
-
-                This option is for testing only and should not be enabled in production releases.
-
-        config USE_TEST_SETUP_DISCRIMINATOR
-            hex "Use Test Setup discriminator"
-            range 0x000 0xFFF
-            default 0xF00
-            help
-                Specifies a hard-coded device discriminator to be used if none is found in CHIP NV storage.
-                Setting the value to 0x0 disables the feature.
-
-                Note that any integer number between 0x000 and 0xFFF can be used here.
-
-                This option is for testing only and should not be enabled in production releases.
-
-        config USE_TEST_SPAKE2P_ITERATION_COUNT
-            int "Use Test Spake2p Iteration Count"
-            range 0 100000
-            default 1000
-            help
-                Specifies a hard-coded spake2p iteration count to be used if none is found in CHIP NV storage.
-                Setting the value to 0 disables the feature.
-
-                Note that any decimal integer number between 1000 and 100000 can be used here.
-
-                This option is for testing only and should not be enabled in production releases.
-
-        config USE_TEST_SPAKE2P_SALT
-            string "Use Test Spake2p Salt"
-            default "{ 0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20, 0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 }"
-            help
-                Specifies a hard-coded spake2p salt to be used if none is found in CHIP NV storage.
-                Setting the value to 0 disables the feature.
-
-                Note that any string representing hexadecimal array from 16 up to 32 bytes can be used here.
-
-                This option is for testing only and should not be enabled in production releases.
-
-        config USE_TEST_SPAKE2P_VERIFIER
-            string "Use Test Spake2p Verifier"
-            default "{ 0xab, 0xa6, 0x0c, 0x30, 0x41, 0x6b, 0x8f, 0x41, 0x77, 0xf5, 0xe1, 0x6a, 0xd5, 0x14, 0xcf, 0xd9, 0x57, 0x75, 0x13, 0xf0, 0x2f, 0xd6, 0x05, 0x06, 0xb1, 0x04, 0x9d, 0x0f, 0x2c, 0x73, 0x10, 0x01, 0x0e, 0x5e, 0x40, 0xbf, 0xd8, 0x6b, 0x4e, 0xf6, 0x81, 0xa8, 0x8b, 0x71, 0xe9, 0xe2, 0xa8, 0x53, 0x98, 0x5a, 0x7d, 0xef, 0x91, 0x6e, 0xa3, 0x0e, 0x01, 0xb8, 0x72, 0x2f, 0xbf, 0x7d, 0x0e, 0x38, 0x85, 0x6c, 0x12, 0xcd, 0x64, 0xc2, 0x25, 0xbb, 0x24, 0xef, 0x21, 0x41, 0x7e, 0x0e, 0x44, 0xe5 }"
-            help
-                Specifies a hard-coded spake2p verifier to be used if none is found in CHIP NV storage.
-                Setting the value to 0 disables the feature.
-
-                Note that any string representing hexadecimal array of 80 bytes can be used here.
-
-                This option is for testing only and should not be enabled in production releases.
+                WARNING: This option makes it possible to circumvent basic chip security functionality.
+                Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
 
         config ENABLE_FIXED_TUNNEL_SERVER
             bool "Use Fixed Tunnel Server"
@@ -779,8 +740,11 @@ menu "CHIP Device Layer"
             string "OTA image creator extra arguments"
             depends on CHIP_OTA_IMAGE_BUILD
             help
-              This option allows one to pass optional arguments to the ota_image_tool.py script,
-              used for building OTA image with Matter OTA header.
+              ota_image_tool.py is used to create the OTA image.
+              Mandatory arguments(Version, VersionString, VID, PID) are picked up from the config options.
+              This option allows us to pass optional arguments(MinApplicableSoftwareVersion, MaxApplicableSoftwareVersion,
+              and ReleaseNotesURL) to the ota_image_tool.py script.
+              eg: "-mi 2 -ma 4 -rn https://github.com/espressif/esp-idf/releases/tag/v4.4"
 
     endmenu
 

@@ -19,8 +19,8 @@
 const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
-const uint16_t kTimeoutInSeconds = 5;
-const uint64_t kDeviceId = 1;
+const uint16_t kTimeoutInSeconds = 20;
+const uint64_t nodeId = 0x12344321;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
 const uint16_t kRemotePort = 5540;
@@ -49,12 +49,12 @@ void UserPrompt(XCTestExpectation * expectation, dispatch_queue_t queue, NSStrin
     [expectation fulfill];
 }
 
-void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue)
+void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue, uint64_t deviceId)
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     XCTAssertNotNil(controller);
 
-    [controller getConnectedDevice:kDeviceId
+    [controller getConnectedDevice:deviceId
                              queue:dispatch_get_main_queue()
                  completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
                      XCTAssertEqual(error.code, 0);
@@ -132,7 +132,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTAssertTrue(started);
 
     NSError * error;
-    [controller pairDevice:kDeviceId
+    [controller pairDevice:nodeId
                    address:kAddress
                       port:kRemotePort
              discriminator:kDiscriminator
@@ -143,7 +143,7 @@ CHIPDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getConnectedDevice:kDeviceId
+    [controller getConnectedDevice:nodeId
                              queue:dispatch_get_main_queue()
                  completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
                      XCTAssertEqual(error.code, 0);
@@ -158,10 +158,6 @@ CHIPDevice * GetConnectedDevice(void)
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     XCTAssertNotNil(controller);
 
-    NSError * error;
-    [controller unpairDevice:kDeviceId error:&error];
-    XCTAssertEqual(error.code, 0);
-
     BOOL stopped = [controller shutdown];
     XCTAssertTrue(stopped);
 }
@@ -173,7 +169,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     __block CHIPDevice * device;
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getConnectedDevice:kDeviceId
+    [controller getConnectedDevice:nodeId
                              queue:dispatch_get_main_queue()
                  completionHandler:^(CHIPDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
                      XCTAssertEqual(error.code, 0);

@@ -136,7 +136,7 @@ OptionSet *gCmdOptionSets[] =
 // clang-format on
 
 uint32_t gCount           = 1;
-uint32_t gPinCode         = 0;
+uint32_t gPinCode         = chip::kSetupPINCodeUndefinedValue;
 uint32_t gIterationCount  = 0;
 uint8_t gSaltLen          = 0;
 const char * gSalt        = nullptr;
@@ -155,10 +155,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
     case 'p':
         // Specifications sections 5.1.1.6 and 5.1.6.1
-        if (!ParseInt(arg, gPinCode) || (gPinCode > chip::kSetupPINCodeMaximumValue) || (gPinCode == 0) || (gPinCode == 11111111) ||
-            (gPinCode == 22222222) || (gPinCode == 33333333) || (gPinCode == 44444444) || (gPinCode == 55555555) ||
-            (gPinCode == 66666666) || (gPinCode == 77777777) || (gPinCode == 88888888) || (gPinCode == 99999999) ||
-            (gPinCode == 12345678) || (gPinCode == 87654321))
+        if (!ParseInt(arg, gPinCode) || (gPinCode > chip::kSetupPINCodeMaximumValue) ||
+            (gPinCode == chip::kSetupPINCodeUndefinedValue) || (gPinCode == 11111111) || (gPinCode == 22222222) ||
+            (gPinCode == 33333333) || (gPinCode == 44444444) || (gPinCode == 55555555) || (gPinCode == 66666666) ||
+            (gPinCode == 77777777) || (gPinCode == 88888888) || (gPinCode == 99999999) || (gPinCode == 12345678) ||
+            (gPinCode == 87654321))
         {
             PrintArgError("%s: Invalid value specified for pin-code parameter: %s\n", progName, arg);
             return false;
@@ -167,7 +168,8 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
     case 'i':
         if (!ParseInt(arg, gIterationCount) ||
-            !(gIterationCount >= chip::kPBKDFMinimumIterations && gIterationCount <= chip::kPBKDFMaximumIterations))
+            !(gIterationCount >= chip::Crypto::kSpake2pPBKDFMinimumIterations &&
+              gIterationCount <= chip::Crypto::kSpake2pPBKDFMaximumIterations))
         {
             PrintArgError("%s: Invalid value specified for the iteration-count parameter: %s\n", progName, arg);
             return false;
@@ -175,7 +177,8 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'l':
-        if (!ParseInt(arg, gSaltLen) || !(gSaltLen >= chip::kPBKDFMinimumSaltLen && gSaltLen <= chip::kPBKDFMaximumSaltLen))
+        if (!ParseInt(arg, gSaltLen) ||
+            !(gSaltLen >= chip::Crypto::kSpake2pPBKDFMinimumSaltLen && gSaltLen <= chip::Crypto::kSpake2pPBKDFMaximumSaltLen))
         {
             PrintArgError("%s: Invalid value specified for salt length parameter: %s\n", progName, arg);
             return false;
@@ -184,7 +187,8 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
     case 's':
         gSalt = arg;
-        if (!(strlen(gSalt) >= chip::kPBKDFMinimumSaltLen && strlen(gSalt) <= chip::kPBKDFMaximumSaltLen))
+        if (!(strlen(gSalt) >= chip::Crypto::kSpake2pPBKDFMinimumSaltLen &&
+              strlen(gSalt) <= chip::Crypto::kSpake2pPBKDFMaximumSaltLen))
         {
             fprintf(stderr, "%s: Invalid legth of the specified salt parameter: %s\n", progName, arg);
             return false;
@@ -267,7 +271,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
 
     for (uint32_t i = 0; i < gCount; i++)
     {
-        uint8_t salt[chip::kPBKDFMaximumSaltLen];
+        uint8_t salt[chip::Crypto::kSpake2pPBKDFMaximumSaltLen];
         if (gSalt == nullptr)
         {
             CHIP_ERROR err = chip::Crypto::DRBG_get_bytes(salt, gSaltLen);
@@ -284,7 +288,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
 
         chip::PASEVerifier verifier;
         CHIP_ERROR err = chip::PASESession::GeneratePASEVerifier(verifier, gIterationCount, chip::ByteSpan(salt, gSaltLen),
-                                                                 (gPinCode == 0), gPinCode);
+                                                                 (gPinCode == chip::kSetupPINCodeUndefinedValue), gPinCode);
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "GeneratePASEVerifier() failed.\n");
@@ -300,12 +304,13 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             return false;
         }
 
-        char saltB64[BASE64_ENCODED_LEN(chip::kPBKDFMaximumSaltLen) + 1];
+        char saltB64[BASE64_ENCODED_LEN(chip::Crypto::kSpake2pPBKDFMaximumSaltLen) + 1];
         uint32_t saltB64Len = chip::Base64Encode32(salt, gSaltLen, saltB64);
         saltB64[saltB64Len] = '\0';
 
-        char verifierB64[BASE64_ENCODED_LEN(chip::kSpake2pSerializedVerifierSize) + 1];
-        uint32_t verifierB64Len     = chip::Base64Encode32(serializedVerifier, chip::kSpake2pSerializedVerifierSize, verifierB64);
+        char verifierB64[BASE64_ENCODED_LEN(chip::Crypto::kSpake2pSerializedVerifierSize) + 1];
+        uint32_t verifierB64Len =
+            chip::Base64Encode32(serializedVerifier, chip::Crypto::kSpake2pSerializedVerifierSize, verifierB64);
         verifierB64[verifierB64Len] = '\0';
 
         if (fprintf(outFile, "%d,%08d,%d,%s,%s\n", i, gPinCode, gIterationCount, saltB64, verifierB64) < 0 || ferror(outFile))
@@ -315,7 +320,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
         }
 
         // On the next iteration the PIN Code and Salt will be randomly generated.
-        gPinCode = 0;
+        gPinCode = chip::kSetupPINCodeUndefinedValue;
         gSalt    = nullptr;
     }
 

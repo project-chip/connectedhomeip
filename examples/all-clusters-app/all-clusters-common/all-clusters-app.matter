@@ -116,10 +116,10 @@ server cluster ApplicationBasic = 1293 {
   }
 
   readonly attribute char_string<32> vendorName = 0;
-  readonly attribute int16u vendorId = 1;
+  readonly attribute int16u vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
-  readonly attribute int16u productId = 3;
-  readonly attribute ApplicationStatusEnum applicationStatus = 5;
+  readonly attribute int16u productID = 3;
+  readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
   readonly global attribute int16u clusterRevision = 65533;
@@ -146,7 +146,7 @@ server cluster ApplicationLauncher = 1292 {
     CHAR_STRING applicationId = 1;
   }
 
-  readonly attribute INT16U applicationLauncherList[] = 0;
+  readonly attribute INT16U catalogList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -170,8 +170,8 @@ server cluster AudioOutput = 1291 {
     CHAR_STRING<32> name = 2;
   }
 
-  readonly attribute OutputInfo audioOutputList[] = 0;
-  readonly attribute int8u currentAudioOutput = 1;
+  readonly attribute OutputInfo outputList[] = 0;
+  readonly attribute int8u currentOutput = 1;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -235,15 +235,24 @@ server cluster BinaryInputBasic = 15 {
 }
 
 server cluster Binding = 30 {
-  struct BindingEntry {
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct BindRequest {
     NODE_ID nodeId = 0;
     GROUP_ID groupId = 1;
     ENDPOINT_NO endpointId = 2;
     CLUSTER_ID clusterId = 3;
   }
 
-  attribute BindingEntry bindingList[] = 0;
-  readonly global attribute int16u clusterRevision = 65533;
+  request struct UnbindRequest {
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
+  }
+
+  command Bind(BindRequest): DefaultSuccess = 0;
+  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 server cluster BooleanState = 69 {
@@ -380,9 +389,9 @@ server cluster Channel = 1284 {
   struct ChannelInfo {
     INT16U majorNumber = 0;
     INT16U minorNumber = 1;
-    CHAR_STRING<32> name = 2;
-    CHAR_STRING<32> callSign = 3;
-    CHAR_STRING<32> affiliateCallSign = 4;
+    optional CHAR_STRING<32> name = 2;
+    optional CHAR_STRING<32> callSign = 3;
+    optional CHAR_STRING<32> affiliateCallSign = 4;
   }
 
   readonly attribute ChannelInfo channelList[] = 0;
@@ -719,7 +728,7 @@ server cluster ContentLauncher = 1290 {
   struct Parameter {
     ParameterEnum type = 0;
     CHAR_STRING value = 1;
-    AdditionalInfo externalIDList[] = 2;
+    optional AdditionalInfo externalIDList[] = 2;
   }
 
   struct AdditionalInfo {
@@ -729,17 +738,17 @@ server cluster ContentLauncher = 1290 {
 
   struct BrandingInformation {
     CHAR_STRING providerName = 0;
-    StyleInformation background = 1;
-    StyleInformation logo = 2;
-    StyleInformation progressBar = 3;
-    StyleInformation splash = 4;
-    StyleInformation waterMark = 5;
+    optional StyleInformation background = 1;
+    optional StyleInformation logo = 2;
+    optional StyleInformation progressBar = 3;
+    optional StyleInformation splash = 4;
+    optional StyleInformation waterMark = 5;
   }
 
   struct StyleInformation {
-    CHAR_STRING imageUrl = 0;
-    CHAR_STRING color = 1;
-    Dimension size = 2;
+    optional CHAR_STRING imageUrl = 0;
+    optional CHAR_STRING color = 1;
+    optional Dimension size = 2;
   }
 
   struct Dimension {
@@ -748,7 +757,7 @@ server cluster ContentLauncher = 1290 {
     MetricTypeEnum metric = 2;
   }
 
-  readonly attribute CHAR_STRING acceptHeaderList[] = 0;
+  readonly attribute CHAR_STRING acceptHeader[] = 0;
   attribute bitmap32 supportedStreamingProtocols = 1;
   readonly global attribute int16u clusterRevision = 65533;
 }
@@ -1330,9 +1339,9 @@ server cluster FixedLabel = 64 {
 }
 
 server cluster FlowMeasurement = 1028 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
   readonly global attribute int16u clusterRevision = 65533;
 }
@@ -1447,11 +1456,13 @@ server cluster GeneralDiagnostics = 51 {
 
   struct NetworkInterfaceType {
     CHAR_STRING<32> name = 0;
-    BOOLEAN fabricConnected = 1;
+    BOOLEAN isOperational = 1;
     nullable BOOLEAN offPremiseServicesReachableIPv4 = 2;
     nullable BOOLEAN offPremiseServicesReachableIPv6 = 3;
     OCTET_STRING<8> hardwareAddress = 4;
-    InterfaceType type = 5;
+    OCTET_STRING IPv4Addresses[] = 5;
+    OCTET_STRING IPv6Addresses[] = 6;
+    InterfaceType type = 7;
   }
 
   critical event HardwareFaultChange = 0 {
@@ -1962,8 +1973,8 @@ server cluster MediaInput = 1287 {
     CHAR_STRING<32> description = 3;
   }
 
-  readonly attribute InputInfo mediaInputList[] = 0;
-  readonly attribute int8u currentMediaInput = 1;
+  readonly attribute InputInfo inputList[] = 0;
+  readonly attribute int8u currentInput = 1;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -1984,12 +1995,12 @@ server cluster MediaPlayback = 1286 {
     kSeekOutOfRange = 5;
   }
 
-  readonly attribute PlaybackStateEnum playbackState = 0;
-  readonly attribute epoch_us startTime = 1;
-  readonly attribute int64u duration = 2;
+  readonly attribute PlaybackStateEnum currentState = 0;
+  readonly attribute nullable epoch_us startTime = 1;
+  readonly attribute nullable int64u duration = 2;
   readonly attribute single playbackSpeed = 4;
-  readonly attribute int64u seekRangeEnd = 5;
-  readonly attribute int64u seekRangeStart = 6;
+  readonly attribute nullable int64u seekRangeEnd = 5;
+  readonly attribute nullable int64u seekRangeStart = 6;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -2075,9 +2086,9 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute int8u scanMaxTimeSeconds = 2;
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
-  readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string<32> lastNetworkID = 6;
-  readonly attribute int32u lastConnectErrorValue = 7;
+  readonly attribute nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute nullable octet_string<32> lastNetworkID = 6;
+  readonly attribute nullable int32s lastConnectErrorValue = 7;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -2352,7 +2363,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
-  readonly attribute FabricDescriptor fabricsList[] = 1;
+  readonly attribute FabricDescriptor fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
@@ -2516,9 +2527,9 @@ server cluster PowerSourceConfiguration = 46 {
 }
 
 server cluster PressureMeasurement = 1027 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -2815,8 +2826,8 @@ server cluster TargetNavigator = 1285 {
     CHAR_STRING<32> name = 1;
   }
 
-  readonly attribute TargetInfo targetNavigatorList[] = 0;
-  readonly attribute int8u currentNavigatorTarget = 1;
+  readonly attribute TargetInfo targetList[] = 0;
+  readonly attribute int8u currentTarget = 1;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -2948,7 +2959,7 @@ server cluster TestCluster = 1295 {
   attribute int8s rangeRestrictedInt8s = 39;
   attribute int16u rangeRestrictedInt16u = 40;
   attribute int16s rangeRestrictedInt16s = 41;
-  readonly attribute LONG_OCTET_STRING listLongOctetString[] = 42;
+  attribute LONG_OCTET_STRING listLongOctetString[] = 42;
   readonly attribute TestFabricScoped listFabricScoped[] = 43;
   attribute boolean timedWriteBoolean = 48;
   attribute boolean generalErrorBoolean = 49;
@@ -3366,7 +3377,7 @@ server cluster UserLabel = 65 {
 }
 
 server cluster WakeOnLan = 1283 {
-  readonly attribute char_string<32> wakeOnLanMacAddress = 0;
+  readonly attribute char_string<32> MACAddress = 0;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -3414,11 +3425,11 @@ server cluster WiFiNetworkDiagnostics = 54 {
     WiFiConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute octet_string<6> bssid = 0;
-  readonly attribute enum8 securityType = 1;
-  readonly attribute enum8 wiFiVersion = 2;
-  readonly attribute int16u channelNumber = 3;
-  readonly attribute int8s rssi = 4;
+  readonly attribute nullable octet_string<6> bssid = 0;
+  readonly attribute nullable SecurityType securityType = 1;
+  readonly attribute nullable WiFiVersionType wiFiVersion = 2;
+  readonly attribute nullable int16u channelNumber = 3;
+  readonly attribute nullable int8s rssi = 4;
   readonly attribute int32u beaconLostCount = 5;
   readonly attribute int32u beaconRxCount = 6;
   readonly attribute int32u packetMulticastRxCount = 7;
@@ -3501,7 +3512,29 @@ server cluster WindowCovering = 258 {
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
+  request struct GoToLiftPercentageRequest {
+    Percent liftPercentageValue = 0;
+    Percent100ths liftPercent100thsValue = 1;
+  }
+
+  request struct GoToLiftValueRequest {
+    INT16U liftValue = 0;
+  }
+
+  request struct GoToTiltPercentageRequest {
+    Percent tiltPercentageValue = 0;
+    Percent100ths tiltPercent100thsValue = 1;
+  }
+
+  request struct GoToTiltValueRequest {
+    INT16U tiltValue = 0;
+  }
+
   command DownOrClose(): DefaultSuccess = 1;
+  command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
+  command GoToLiftValue(GoToLiftValueRequest): DefaultSuccess = 4;
+  command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
+  command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
   command StopMotion(): DefaultSuccess = 2;
   command UpOrOpen(): DefaultSuccess = 0;
 }
@@ -3565,7 +3598,6 @@ endpoint 1 {
   server  cluster MediaInput;
   server  cluster MediaPlayback;
   server  cluster ModeSelect;
-  server  cluster NetworkCommissioning;
   server  cluster OccupancySensing;
   server  cluster OnOff;
   server  cluster OnOffSwitchConfiguration;
@@ -3590,5 +3622,9 @@ endpoint 2 {
   server  cluster Groups;
   server  cluster OccupancySensing;
   server  cluster OnOff;
+}
+
+endpoint 65534 {
+  server  cluster NetworkCommissioning;
 }
 

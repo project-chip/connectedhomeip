@@ -47,6 +47,25 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
+bool Engine::IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath)
+{
+    bool existPathMatch       = false;
+    bool existVersionMismatch = false;
+    for (auto filter = aDataVersionFilterList; filter != nullptr; filter = filter->mpNext)
+    {
+        if (aPath.mEndpointId == filter->mEndpointId && aPath.mClusterId == filter->mClusterId)
+        {
+            existPathMatch = true;
+            if (!IsClusterDataVersionEqual(ConcreteClusterPath(filter->mEndpointId, filter->mClusterId),
+                                           filter->mDataVersion.Value()))
+            {
+                existVersionMismatch = true;
+            }
+        }
+    }
+    return existPathMatch && !existVersionMismatch;
+}
+
 CHIP_ERROR
 Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                             AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
@@ -108,6 +127,13 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 if (!concretePathDirty)
                 {
                     // This attribute is not dirty, we just skip this one.
+                    continue;
+                }
+            }
+            else
+            {
+                if (IsClusterDataVersionMatch(apReadHandler->GetDataVersionFilterlist(), readPath))
+                {
                     continue;
                 }
             }
@@ -332,6 +358,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     uint16_t reservedSize                      = 0;
     bool hasMoreChunks                         = false;
+    bool needCloseReadHandler                  = false;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -394,8 +421,13 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         if (!hasEncodedAttributes && !hasEncodedEvents && hasMoreChunks)
         {
             ChipLogError(DataManagement,
-                         "No data actually encoded but hasMoreChunks flag is set, abort report! (attribute too big?)");
-            ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
+                         "No data actually encoded but hasMoreChunks flag is set, close read handler! (attribute too big?)");
+            err = apReadHandler->SendStatusReport(Protocols::InteractionModel::Status::ResourceExhausted);
+            if (err == CHIP_NO_ERROR)
+            {
+                needCloseReadHandler = true;
+            }
+            ExitNow();
         }
     }
 
@@ -439,7 +471,7 @@ exit:
         //
         apReadHandler->Abort();
     }
-    else if (apReadHandler->IsType(ReadHandler::InteractionType::Read) && !hasMoreChunks)
+    else if ((apReadHandler->IsType(ReadHandler::InteractionType::Read) && !hasMoreChunks) || needCloseReadHandler)
     {
         //
         // In the case of successful report generation and we're on the last chunk of a read, we don't expect

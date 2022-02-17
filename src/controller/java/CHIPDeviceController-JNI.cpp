@@ -154,10 +154,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     long result                              = 0;
 
     ChipLogProgress(Controller, "newDeviceController() called");
-
-    wrapper =
-        AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, &DeviceLayer::SystemLayer(),
-                                                    DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), &err);
+    std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
+        new chip::Controller::AndroidOperationalCredentialsIssuer());
+    wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, &DeviceLayer::SystemLayer(),
+                                                          DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(),
+                                                          std::move(opCredsIssuer), &err);
     SuccessOrExit(err);
 
     // Create and start the IO thread. Must be called after Controller()->Init
@@ -531,8 +532,10 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
         return false;
     }
 
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, 0, 0, 0, setupPayload);
+    AndroidDeviceControllerWrapper * wrapper           = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    DeviceController::CommissioningWindowOption option = DeviceController::CommissioningWindowOption::kOriginalSetupCode;
+
+    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, 0, 0, option, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -559,8 +562,10 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
         return false;
     }
 
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, iteration, discriminator, 1,
+    AndroidDeviceControllerWrapper * wrapper           = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    DeviceController::CommissioningWindowOption option = DeviceController::CommissioningWindowOption::kTokenWithProvidedPIN;
+
+    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, iteration, discriminator, option,
                                                          setupPayload);
 
     if (err != CHIP_NO_ERROR)
@@ -570,6 +575,37 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     }
 
     return true;
+}
+
+JNI_METHOD(jbyteArray, getAttestationChallenge)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ByteSpan attestationChallenge;
+    jbyteArray attestationChallengeJbytes = nullptr;
+
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    err                                      = wrapper->Controller()->GetAttestationChallenge(attestationChallenge);
+    SuccessOrExit(err);
+
+    err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), sizeof(attestationChallenge.data()),
+                                                     attestationChallengeJbytes);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+    return attestationChallengeJbytes;
 }
 
 JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handle)
@@ -608,7 +644,8 @@ JNI_METHOD(jobject, computePaseVerifier)
     err = verifier.Serialize(serializedVerifierSpan);
     SuccessOrExit(err);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, serializedVerifier, kSpake2pSerializedVerifierSize, verifierBytes);
+    err =
+        JniReferences::GetInstance().N2J_ByteArray(env, serializedVerifier, Crypto::kSpake2pSerializedVerifierSize, verifierBytes);
     SuccessOrExit(err);
 
     err = N2J_PaseVerifierParams(env, setupPincode, static_cast<jlong>(passcodeId), verifierBytes, params);

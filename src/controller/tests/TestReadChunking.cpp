@@ -96,7 +96,7 @@ class TestReadCallback : public app::ReadClient::Callback
 {
 public:
     TestReadCallback() : mBufferedCallback(*this) {}
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
 
     void OnDone() override;
@@ -108,10 +108,42 @@ public:
     app::BufferedReadCallback mBufferedCallback;
 };
 
-void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                        const app::StatusIB & aStatus)
 {
-    if (aPath.mAttributeId != kTestListAttribute)
+    if (aPath.mAttributeId == Globals::Attributes::ServerGeneratedCommandList::Id)
+    {
+        app::DataModel::DecodableList<CommandId> v;
+        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
+        auto it          = v.begin();
+        size_t arraySize = 0;
+        while (it.Next())
+        {
+            NL_TEST_ASSERT(gSuite, false);
+        }
+        NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, arraySize == 0);
+    }
+    else if (aPath.mAttributeId == Globals::Attributes::ClientGeneratedCommandList::Id)
+    {
+        app::DataModel::DecodableList<CommandId> v;
+        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
+        auto it          = v.begin();
+        size_t arraySize = 0;
+        while (it.Next())
+        {
+            NL_TEST_ASSERT(gSuite, false);
+        }
+        NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, arraySize == 0);
+    }
+    else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
+    {
+        // Nothing to check for this one; depends on the endpoint.
+    }
+    else if (aPath.mAttributeId != kTestListAttribute)
     {
         uint8_t v;
         NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
@@ -129,7 +161,7 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         }
         NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(gSuite, arraySize = 5);
+        NL_TEST_ASSERT(gSuite, arraySize == 5);
     }
     mAttributeCount++;
 }
@@ -145,16 +177,13 @@ public:
         registerAttributeAccessOverride(this);
     }
 
-    CHIP_ERROR Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                    app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(FabricIndex fabricIndex, const app::ConcreteDataAttributePath & aPath,
-                     app::AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override;
 };
 
 TestAttrAccess gAttrAccess;
 
-CHIP_ERROR TestAttrAccess::Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                                app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -177,8 +206,7 @@ CHIP_ERROR TestAttrAccess::Read(FabricIndex fabricIndex, const app::ConcreteRead
     }
 }
 
-CHIP_ERROR TestAttrAccess::Write(FabricIndex fabricIndex, const app::ConcreteDataAttributePath & aPath,
-                                 app::AttributeValueDecoder & aDecoder)
+CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -244,7 +272,7 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
         // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
         // times this can run without seeing expected results.
         //
-        for (int j = 0; j < 10 && !readCallback.mOnReportEnd; j++)
+        for (int j = 0; j < 20 && !readCallback.mOnReportEnd; j++)
         {
             ctx.DrainAndServiceIO();
             chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
@@ -252,9 +280,11 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
         }
 
         //
-        // Always returns the same number of attributes read (5 + revision = 6).
+        // Always returns the same number of attributes read (5 + revision +
+        // AttributeList + ClientGeneratedCommandList +
+        // ServerGeneratedCommandList = 9).
         //
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 6);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 9);
         readCallback.mAttributeCount = 0;
 
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -388,7 +418,7 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 0);
 
         // The server should shutted down, while the client is still alive (pending for the attribute data.)
-        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
     }
 
     // Sanity check

@@ -170,8 +170,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         NetworkInterface * ifp = new NetworkInterface();
 
         interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
-        ifp->name            = CharSpan::fromCharString(ifp->Name);
-        ifp->fabricConnected = true;
+        ifp->name          = CharSpan::fromCharString(ifp->Name);
+        ifp->isOperational = true;
         Inet::InterfaceType interfaceType;
         if (interfaceIterator.GetInterfaceType(interfaceType) == CHIP_NO_ERROR)
         {
@@ -199,8 +199,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             ChipLogError(DeviceLayer, "Failed to get interface type");
         }
 
-        ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
-        ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
+        ifp->offPremiseServicesReachableIPv4.SetNull();
+        ifp->offPremiseServicesReachableIPv6.SetNull();
 
         uint8_t addressSize;
         if (interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress)) != CHIP_NO_ERROR)
@@ -212,7 +212,27 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             ifp->hardwareAddress = ByteSpan(ifp->MacAddress, addressSize);
         }
 
-        head = ifp;
+        // Assuming IPv6-only support
+        Inet::InterfaceAddressIterator interfaceAddressIterator;
+        uint8_t ipv6AddressesCount = 0;
+        while (interfaceAddressIterator.HasCurrent())
+        {
+            if (interfaceAddressIterator.GetInterfaceId() == interfaceIterator.GetInterfaceId())
+            {
+                chip::Inet::IPAddress ipv6Address;
+                if (interfaceAddressIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+                {
+                    memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
+                    ifp->Ipv6AddressSpans[ipv6AddressesCount] =
+                        ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], kMaxIPv6AddrSize);
+                    ipv6AddressesCount++;
+                }
+            }
+            interfaceAddressIterator.Next();
+        }
+
+        ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+        head               = ifp;
     }
 
     *netifpp = head;

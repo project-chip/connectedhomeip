@@ -18,11 +18,22 @@
 function getManualTests()
 {
   const DeviceDiscovery = [
+    'TestDiscovery',
     'Test_TC_DD_1_5',
     'Test_TC_DD_1_6',
     'Test_TC_DD_1_7',
     'Test_TC_DD_1_8',
     'Test_TC_DD_1_9',
+    'Test_TC_DD_1_10',
+    'Test_TC_DD_2_1',
+    'Test_TC_DD_2_2',
+    'Test_TC_DD_3_1',
+    'Test_TC_DD_3_2',
+    'Test_TC_DD_3_5',
+    'Test_TC_DD_3_6',
+    'Test_TC_DD_3_9',
+    'Test_TC_DD_3_10',
+    'Test_TC_DD_4_1',
   ];
 
   const Groups = [
@@ -30,9 +41,198 @@ function getManualTests()
     'TestGroupDemoConfig',
   ];
 
+  const BulkDataExchangeProtocol = [
+    'Test_TC_BDX_1_1',
+    'Test_TC_BDX_1_2',
+    'Test_TC_BDX_1_3',
+    'Test_TC_BDX_1_5',
+    'Test_TC_BDX_1_6',
+    'Test_TC_BDX_2_1',
+    'Test_TC_BDX_2_2',
+    'Test_TC_BDX_2_3',
+    'Test_TC_BDX_2_4',
+    'Test_TC_BDX_2_5',
+  ];
+
+  const bridge = [
+    'Test_TC_BR_1',
+    'Test_TC_BR_2',
+    'Test_TC_BR_3',
+  ];
+
+  const BridgedActions = [
+    'Test_TC_BRAC_2_1',
+    'Test_TC_BRAC_2_2',
+  ];
+
+  const DeviceManagement = [
+    'Test_TC_DM_1_2',
+    'Test_TC_DM_2_3',
+    'Test_TC_DM_3_2',
+  ];
+
+  const DiagnosticsLogs = [
+    'Test_TC_DIAG_LOG_1_1',
+    'Test_TC_DIAG_LOG_1_2',
+    'Test_TC_DIAG_LOG_1_3',
+  ];
+
+  const Descriptor = [
+    'Test_TC_DESC_1_1',
+  ];
+
+  const EthernetNetworkDiagnostics = [
+    'Test_TC_ETHDIAG_1_2',
+  ];
+
+  const GeneralCommissioning = [
+    'Test_TC_GC_1_1',
+    'Test_TC_GC_1_2',
+    'Test_TC_GC_1_3',
+  ];
+
+  const GeneralDiagnostics = [
+    'Test_TC_GENDIAG_1_1',
+    'Test_TC_GENDIAG_1_2',
+  ];
+
+  const Identify = [
+    'Test_TC_I_1_1',
+    'Test_TC_I_2_1',
+    'Test_TC_I_2_2',
+    'Test_TC_I_2_3',
+  ];
+
+  const IlluminanceMeasurement = [
+    'Test_TC_ILL_2_1',
+  ];
+
+  const InteractionDataModel = [
+    'Test_TC_IDM_1_1',
+    'Test_TC_IDM_1_2',
+    'Test_TC_IDM_2_1',
+    'Test_TC_IDM_2_2',
+    'Test_TC_IDM_3_1',
+    'Test_TC_IDM_3_2',
+    'Test_TC_IDM_4_1',
+    'Test_TC_IDM_4_2',
+    'Test_TC_IDM_5_1',
+    'Test_TC_IDM_5_2',
+    'Test_TC_IDM_6_1',
+    'Test_TC_IDM_6_2',
+  ];
+
+  const MediaControl = [
+    'Test_TC_MC_3_12',
+    'Test_TC_MC_4_1',
+    'Test_TC_MC_8_2',
+    'Test_TC_MC_9_2',
+    'Test_TC_MC_10_1',
+    'Test_TC_MC_10_2',
+    'Test_TC_MC_10_3',
+    'Test_TC_MC_10_4',
+    'Test_TC_MC_10_5',
+    'Test_TC_MC_10_6',
+  ];
+
+  const MultipleFabrics = [
+    'Test_TC_MF_1_1',
+    'Test_TC_MF_1_2',
+    'Test_TC_MF_1_3',
+    'Test_TC_MF_1_4',
+    'Test_TC_MF_1_5',
+    'Test_TC_MF_1_6',
+    'Test_TC_MF_1_7',
+    'Test_TC_MF_1_8',
+    'Test_TC_MF_1_9',
+    'Test_TC_MF_1_10',
+    'Test_TC_MF_1_11',
+    'Test_TC_MF_1_12',
+    'Test_TC_MF_1_13',
+    'Test_TC_MF_1_14',
+    'Test_TC_MF_1_15',
+    'Test_TC_MF_1_16',
+    'Test_TC_MF_1_17',
+    'Test_TC_MF_1_18',
+    'Test_TC_MF_1_19',
+    'Test_TC_MF_1_20',
+    'Test_TC_MF_1_21',
+    'Test_TC_MF_1_22',
+    'Test_TC_MF_1_23',
+    'Test_TC_MF_1_24',
+  ];
+
+  const ModeSelect = [
+    'Test_TC_MOD_1_1',
+    'Test_TC_MOD_1_2',
+    'Test_TC_MOD_2_1',
+  ];
+
+  const OTASoftwareUpdate = [
+    'Test_TC_SU_1_1',
+    'Test_TC_SU_2_1',
+    'Test_TC_SU_2_2',
+    'Test_TC_SU_2_3',
+    'Test_TC_SU_2_4',
+    'Test_TC_SU_2_5',
+    'Test_TC_SU_2_6',
+    'Test_TC_SU_2_7',
+    'Test_TC_SU_3_1',
+    'Test_TC_SU_3_2',
+    'Test_TC_SU_3_3',
+    'Test_TC_SU_3_4',
+  ];
+
+  const PowerSourceConfiguration = [
+    'Test_TC_PSCFG_1_1',
+    'Test_TC_PSCFG_2_1',
+  ];
+
+  const SecureChannel = [
+    'Test_TC_SC_4_5',
+    'Test_TC_SC_4_6',
+    'Test_TC_SC_4_7',
+    'Test_TC_SC_4_8',
+    'Test_TC_SC_4_9',
+  ];
+
+  const SoftwareDiagnostics = [
+    'Test_TC_SWDIAG_1_2',
+  ];
+
+  const WiFiNetworkDiagnostics = [
+    'Test_TC_WIFIDIAG_1_2',
+    'Test_TC_WIFIDIAG_2_1',
+  ];
+
+  const WindowCovering = [
+    'Test_TC_WNCV_2_3',
+  ];
+
   const tests = [
     DeviceDiscovery, //
     Groups, //
+    BulkDataExchangeProtocol, //
+    bridge, //
+    BridgedActions, //
+    DeviceManagement, //
+    DiagnosticsLogs, //
+    Descriptor, //
+    EthernetNetworkDiagnostics, //
+    GeneralCommissioning, //
+    GeneralDiagnostics, //
+    Identify, //
+    IlluminanceMeasurement, //
+    InteractionDataModel, //
+    MediaControl, //
+    MultipleFabrics, //
+    ModeSelect, //
+    OTASoftwareUpdate, //
+    PowerSourceConfiguration, //
+    SecureChannel, //
+    SoftwareDiagnostics, //
+    WiFiNetworkDiagnostics, //
+    WindowCovering, //
 
   ];
   return tests.flat(1);
@@ -219,6 +419,10 @@ function getTests()
     'Test_TC_WNCV_3_1',
     'Test_TC_WNCV_3_2',
     'Test_TC_WNCV_3_3',
+    'Test_TC_WNCV_3_4',
+    'Test_TC_WNCV_3_5',
+    'Test_TC_WNCV_4_3',
+    'Test_TC_WNCV_4_4',
   ];
 
   const TV = [

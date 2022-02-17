@@ -40,15 +40,15 @@ set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRIN
 
 pw_proto_library(wifi_service
   SOURCES
-    ${IPV6_EXAMPLE_ROOT}/common/wifi_service/wifi_service.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/wifi_service.proto
   INPUTS
-    ${IPV6_EXAMPLE_ROOT}/common/wifi_service/wifi_service.options
+    ${CHIP_ROOT}/examples/common/pigweed/protos/wifi_service.options
   PREFIX
     wifi_service
   DEPS
     pw_protobuf.common_protos
   STRIP_PREFIX
-    ${IPV6_EXAMPLE_ROOT}/common/wifi_service
+    ${CHIP_ROOT}/examples/common/pigweed/protos
 )
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <lib/core/CHIPCore.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionHolder.h>
@@ -36,6 +37,7 @@ extern chip::Messaging::ExchangeManager gExchangeManager;
 extern chip::SessionManager gSessionManager;
 extern chip::Inet::IPAddress gDestAddr;
 extern chip::SessionHolder gSession;
+extern chip::TestPersistentStorageDelegate gStorage;
 
 extern chip::FabricIndex gFabricIndex;
 

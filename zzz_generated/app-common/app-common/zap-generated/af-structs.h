@@ -143,7 +143,7 @@ typedef struct _Application
 typedef struct _ApplicationEP
 {
     Application application;
-    chip::CharSpan endpoint;
+    chip::EndpointId endpoint;
 } ApplicationEP;
 
 // Struct for Target
@@ -201,15 +201,6 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * current;
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
-
-// Struct for BindingEntry
-typedef struct _BindingEntry
-{
-    chip::NodeId nodeId;
-    chip::GroupId groupId;
-    chip::EndpointId endpointId;
-    chip::ClusterId clusterId;
-} BindingEntry;
 
 // Struct for ChannelInfo
 typedef struct _ChannelInfo
@@ -370,10 +361,12 @@ typedef struct _NetworkInfo
 typedef struct _NetworkInterfaceType
 {
     chip::CharSpan Name;
-    bool FabricConnected;
+    bool IsOperational;
     bool OffPremiseServicesReachableIPv4;
     bool OffPremiseServicesReachableIPv6;
     chip::ByteSpan HardwareAddress;
+    /* TYPE WARNING: array array defaults to */ uint8_t * IPv4Addresses;
+    /* TYPE WARNING: array array defaults to */ uint8_t * IPv6Addresses;
     uint8_t Type;
 } NetworkInterfaceType;
 

@@ -30,17 +30,10 @@ namespace {
 class UnimplementedDACVerifier : public DeviceAttestationVerifier
 {
 public:
-    void VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
-                                      const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
-                                      const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
+    void VerifyAttestationInformation(const AttestationInfo & info,
                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion) override
     {
-        (void) attestationInfoBuffer;
-        (void) attestationChallengeBuffer;
-        (void) attestationSignatureBuffer;
-        (void) paiDerBuffer;
-        (void) dacDerBuffer;
-        (void) attestationNonce;
+        (void) info;
         (void) onCompletion;
     }
 

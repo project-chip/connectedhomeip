@@ -128,8 +128,18 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
 {
     if (mState == State::kInProgress)
     {
-        // There's no method for a BDX receiving driver to cleanly end a transfer
-        mBdxTransfer.AbortTransfer(chip::bdx::StatusCode::kUnknown);
+        bdx::StatusCode status = bdx::StatusCode::kUnknown;
+        if (reason == CHIP_ERROR_INVALID_FILE_IDENTIFIER)
+        {
+            status = bdx::StatusCode::kBadMessageContents;
+        }
+        else if (reason == CHIP_ERROR_WRITE_FAILED)
+        {
+            status = bdx::StatusCode::kTransferFailedUnknownError;
+        }
+
+        // There is no method for a BDX receiving driver to cleanly end a transfer
+        mBdxTransfer.AbortTransfer(status);
         if (mImageProcessor != nullptr)
         {
             mImageProcessor->Abort();
@@ -184,9 +194,7 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     case TransferSession::OutputEventType::kBlockReceived: {
         chip::ByteSpan blockData(outEvent.blockdata.Data, outEvent.blockdata.Length);
         ReturnErrorOnFailure(mImageProcessor->ProcessBlock(blockData));
-        Nullable<uint8_t> percent;
-        mImageProcessor->GetPercentComplete(percent);
-        mStateDelegate->OnUpdateProgressChanged(percent);
+        mStateDelegate->OnUpdateProgressChanged(mImageProcessor->GetPercentComplete());
 
         // TODO: this will cause problems if Finalize() is not guaranteed to do its work after ProcessBlock().
         if (outEvent.blockdata.IsEof)

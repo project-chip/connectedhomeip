@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
 #include <app/MessageDef/WriteResponseMessage.h>
 #include <lib/core/CHIPCore.h>
@@ -79,8 +80,8 @@ public:
     CHIP_ERROR ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
 
-    CHIP_ERROR AddStatus(const ConcreteAttributePath & aPath, const Protocols::InteractionModel::Status aStatus);
-    CHIP_ERROR AddStatus(const ConcreteAttributePath & aPath, const StatusIB & aStatus);
+    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus);
+    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus);
 
     CHIP_ERROR AddClusterSpecificSuccess(const AttributePathParams & aAttributePathParams, uint8_t aClusterStatus)
     {
@@ -99,6 +100,18 @@ public:
      */
     bool IsTimedWrite() const { return mIsTimedRequest; }
 
+    bool MatchesExchangeContext(Messaging::ExchangeContext * apExchangeContext) const
+    {
+        return !IsFree() && mpExchangeCtx == apExchangeContext;
+    }
+
+    void CacheACLCheckResult(const AttributeAccessToken & aToken) { mACLCheckCache.SetValue(aToken); }
+
+    bool ACLCheckCacheHit(const AttributeAccessToken & aToken)
+    {
+        return mACLCheckCache.HasValue() && mACLCheckCache.Value() == aToken;
+    }
+
 private:
     enum class State
     {
@@ -108,8 +121,11 @@ private:
         Sending,           // The handler has sent out the write response
     };
     Protocols::InteractionModel::Status ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
-    CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & packet);
-    CHIP_ERROR SendWriteResponse();
+    Protocols::InteractionModel::Status HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
+                                                                  System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+
+    CHIP_ERROR FinalizeMessage(System::PacketBufferTLVWriter && aMessageWriter, System::PacketBufferHandle & packet);
+    CHIP_ERROR SendWriteResponse(System::PacketBufferTLVWriter && aMessageWriter);
 
     void MoveToState(const State aTargetState);
     void ClearState();
@@ -127,10 +143,10 @@ private: // ExchangeDelegate
 private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
-    System::PacketBufferTLVWriter mMessageWriter;
-    State mState           = State::Uninitialized;
-    bool mIsTimedRequest   = false;
-    bool mIsFabricFiltered = false;
+    State mState                                  = State::Uninitialized;
+    bool mIsTimedRequest                          = false;
+    bool mHasMoreChunks                           = false;
+    Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 };
 } // namespace app
 } // namespace chip

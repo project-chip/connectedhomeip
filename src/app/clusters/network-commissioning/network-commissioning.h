@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/data-model/Nullable.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/Variant.h>
 #include <platform/NetworkCommissioning.h>
@@ -50,8 +51,8 @@ public:
     void InvokeCommand(HandlerContext & ctx) override;
 
     // AttributeAccessInterface
-    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(FabricIndex fabricIndex, const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // WirelessDriver::ConnectCallback
     void OnResult(DeviceLayer::NetworkCommissioning::Status commissioningError, CharSpan errorText,
@@ -79,6 +80,16 @@ private:
     app::CommandHandler::Handle mAsyncCommandHandle;
 
     ConcreteCommandPath mPath = ConcreteCommandPath(0, 0, 0);
+
+    // Last* attributes
+    // Setting these values don't have to care about parallel requests, since we will reject other requests when there is another
+    // request ongoing.
+    DataModel::Nullable<NetworkCommissioningStatus> mLastNetworkingStatusValue;
+    DataModel::Nullable<Attributes::LastConnectErrorValue::TypeInfo::Type> mLastConnectErrorValue;
+    uint8_t mConnectingNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
+    uint8_t mConnectingNetworkIDLen = 0;
+    uint8_t mLastNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
+    uint8_t mLastNetworkIDLen = 0;
 
     // Actual handlers of the commands
     void HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req);
@@ -112,6 +123,19 @@ public:
     {}
 
     virtual ~Instance() = default;
+};
+
+// NetworkDriver for the devices that don't have / don't need a real network driver.
+class NullNetworkDriver : public DeviceLayer::NetworkCommissioning::EthernetDriver
+{
+public:
+    uint8_t GetMaxNetworks() override;
+
+    DeviceLayer::NetworkCommissioning::NetworkIterator * GetNetworks() override;
+
+    bool GetEnabled() override;
+
+    virtual ~NullNetworkDriver() = default;
 };
 
 } // namespace NetworkCommissioning

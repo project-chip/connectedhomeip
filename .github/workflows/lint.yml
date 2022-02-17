@@ -43,6 +43,14 @@ jobs:
         run: |
           git grep -n "VerifyOrExit(.*, [A-Za-z]*_ERROR" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
+      # git grep exits with 0 if it finds a match, but we want
+      # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+      # to avoid our grep regexp matching itself.
+      - name: Check for use of PRI*8, which are not supported on some libcs.
+        if: always()
+        run: |
+          git grep -n "PRI.8" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
+
       # Comments like '{{! ... }}' should be used in zap files
       - name: Do not allow TODO in generated files
         if: always()

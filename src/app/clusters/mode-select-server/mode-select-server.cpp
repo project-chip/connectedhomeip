@@ -42,13 +42,12 @@ class ModeSelectAttrAccess : public AttributeAccessInterface
 public:
     ModeSelectAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ModeSelect::Id) {}
 
-    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
 ModeSelectAttrAccess gModeSelectAttrAccess;
 
-CHIP_ERROR ModeSelectAttrAccess::Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath,
-                                      AttributeValueEncoder & aEncoder)
+CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == ModeSelect::Id);
 
@@ -92,7 +91,7 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
         ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %" PRIu8, newMode);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
         emberAfSendImmediateDefaultResponse(checkSupportedModeStatus);
         return false;
     }

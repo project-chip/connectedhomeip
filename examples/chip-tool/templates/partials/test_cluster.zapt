@@ -245,13 +245,14 @@ class {{filename}}: public TestCommand
     CHIP_ERROR {{>testCommand}}()
     {
         SetIdentity(kIdentity{{asUpperCamelCase identity}});
-        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{#if (isString type)}}"{{/if~}}
+        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}},{{/not_first}}
+          {{#*inline "defaultValue"}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/inline}}
           {{~#if (chip_tests_config_has definedValue)~}}
-          m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}
-          {{else}}
-          {{definedValue}}
+          m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{~#if (isString type)}}chip::CharSpan::fromCharString("{{>defaultValue}}"){{else}}{{>defaultValue}}{{/if~}}
+          {{~else if (isString type)}}"{{definedValue}}"
+          {{else}}{{definedValue}}
           {{~/if~}}
-        {{~#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
+          {{/chip_tests_item_parameters}});
     }
     {{else if isWait}}
     CHIP_ERROR {{>testCommand}}()
@@ -300,6 +301,7 @@ class {{filename}}: public TestCommand
         {{#if isCommand}}
         using RequestType = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
 
+        ListFreer listFreer;
         RequestType request;
         {{#chip_tests_item_parameters}}
         {{>commandValue ns=parent.cluster container=(concat "request." (asLowerCamelCase label)) definedValue=definedValue depth=0}}
@@ -333,6 +335,7 @@ class {{filename}}: public TestCommand
         cluster.Associate({{>device}}, endpoint);
         {{/if}}
 
+        ListFreer listFreer;
         {{#chip_tests_item_parameters}}
         {{zapTypeToEncodableClusterObjectType type ns=parent.cluster}} {{asLowerCamelCase name}}Argument;
         {{>commandValue ns=parent.cluster container=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue depth=0}}
@@ -349,9 +352,9 @@ class {{filename}}: public TestCommand
         {{else if isSubscribeEvent}}
           ReturnErrorOnFailure(cluster.SubscribeEvent<{{zapTypeToDecodableClusterObjectType event ns=cluster isArgument=true}}>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, minIntervalArgument, maxIntervalArgument, {{>staticSubscriptionEstablished}}));
         {{else if isReadAttribute}}
-          ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}));
+          ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, {{fabricFiltered}}));
         {{else if isSubscribeAttribute}}
-          ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, minIntervalArgument, maxIntervalArgument, {{>staticSubscriptionEstablished}}));
+          ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, minIntervalArgument, maxIntervalArgument, {{>staticSubscriptionEstablished}}, {{fabricFiltered}}));
         {{else if isWaitForReport}}
           {{> subscribeDataCallback}} = {{> staticSuccessResponse}};
         {{else}}

@@ -26,6 +26,7 @@ class Test_TC_DM_1_3_Simulated : public TestCommand
 public:
     Test_TC_DM_1_3_Simulated() : TestCommand("Test_TC_DM_1_3_Simulated"), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -154,6 +155,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 21;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -178,7 +180,7 @@ private:
     CHIP_ERROR TestLogOnOffTestStartup_1()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          *** Basic Cluster Tests Ready");
+        return Log("*** Basic Cluster Tests Ready");
     }
 
     CHIP_ERROR TestQueryDataModelRevision_2()
@@ -400,6 +402,7 @@ class Test_TC_DM_3_3_Simulated : public TestCommand
 public:
     Test_TC_DM_3_3_Simulated() : TestCommand("Test_TC_DM_3_3_Simulated"), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -483,6 +486,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -579,6 +583,7 @@ class Test_TC_DM_2_3_Simulated : public TestCommand
 public:
     Test_TC_DM_2_3_Simulated() : TestCommand("Test_TC_DM_2_3_Simulated"), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -663,6 +668,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 

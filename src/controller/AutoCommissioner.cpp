@@ -302,6 +302,16 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
+        if ((report.stageCompleted == CommissioningStage::kAttestationVerification) &&
+            ((report.Get<AdditionalErrorInfo>().attestationResult ==
+              Credentials::AttestationVerificationResult::kDacProductIdMismatch) ||
+             (report.Get<AdditionalErrorInfo>().attestationResult ==
+              Credentials::AttestationVerificationResult::kDacVendorIdMismatch)))
+        {
+            ChipLogError(Controller,
+                         "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
+                         "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
+        }
     }
     else
     {
@@ -313,6 +323,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             {
                 mParams.SetFailsafeTimerSeconds(mDeviceCommissioningInfo.general.recommendedFailsafe);
             }
+            mParams.SetRemoteVendorId(report.Get<ReadCommissioningInfo>().basic.vendorId);
+            mParams.SetRemoteProductId(report.Get<ReadCommissioningInfo>().basic.productId);
             break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);
@@ -381,7 +393,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     }
 
     mParams.SetCompletionStatus(err);
-    // TODO: Get real endpoint
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage), GetCommandTimeout(nextStage));
     return CHIP_NO_ERROR;
 }

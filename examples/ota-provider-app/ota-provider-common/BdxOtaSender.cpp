@@ -105,7 +105,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         chip::System::PacketBufferHandle blockBuf = chip::System::PacketBufferHandle::New(bytesToRead);
         if (blockBuf.IsNull())
         {
-            // TODO: AbortTransfer() needs to support GeneralStatusCode failures as well as BDX specific errors.
+            // TODO(#13981): AbortTransfer() needs to support GeneralStatusCode failures as well as BDX specific errors.
             mTransfer.AbortTransfer(StatusCode::kUnknown);
             return;
         }
