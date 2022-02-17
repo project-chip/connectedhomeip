@@ -31,6 +31,7 @@ static_library("helpers") {
   cflags = [ "-Wconversion" ]
 
   deps = [
+    "${chip_root}/src/access",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",

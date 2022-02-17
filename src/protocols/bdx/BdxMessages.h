@@ -48,8 +48,6 @@ enum class MessageType : uint8_t
 
 enum class StatusCode : uint16_t
 {
-    kNone                       = 0x0000,
-    kOverflow                   = 0x0011,
     kLengthTooLarge             = 0x0012,
     kLengthTooShort             = 0x0013,
     kLengthMismatch             = 0x0014,
@@ -57,8 +55,8 @@ enum class StatusCode : uint16_t
     kBadMessageContents         = 0x0016,
     kBadBlockCounter            = 0x0017,
     kUnexpectedMessage          = 0x0018,
+    kResponderBusy              = 0x0019,
     kTransferFailedUnknownError = 0x001F,
-    kFailureToSend              = 0x0021,
     kTransferMethodNotSupported = 0x0050,
     kFileDesignatorUnknown      = 0x0051,
     kStartOffsetNotSupported    = 0x0052,

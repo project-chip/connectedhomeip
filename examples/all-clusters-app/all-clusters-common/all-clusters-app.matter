@@ -3504,7 +3504,29 @@ server cluster WindowCovering = 258 {
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
+  request struct GoToLiftPercentageRequest {
+    Percent liftPercentageValue = 0;
+    Percent100ths liftPercent100thsValue = 1;
+  }
+
+  request struct GoToLiftValueRequest {
+    INT16U liftValue = 0;
+  }
+
+  request struct GoToTiltPercentageRequest {
+    Percent tiltPercentageValue = 0;
+    Percent100ths tiltPercent100thsValue = 1;
+  }
+
+  request struct GoToTiltValueRequest {
+    INT16U tiltValue = 0;
+  }
+
   command DownOrClose(): DefaultSuccess = 1;
+  command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
+  command GoToLiftValue(GoToLiftValueRequest): DefaultSuccess = 4;
+  command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
+  command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
   command StopMotion(): DefaultSuccess = 2;
   command UpOrOpen(): DefaultSuccess = 0;
 }
