@@ -360,7 +360,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     be used for generation.
 
     AST parsing is textual, so it does not understand what "foo" means. This method
-    looks up what "foo" actually means: includdes basic types (e.g. bool), 
+    looks up what "foo" actually means: includes basic types (e.g. bool),
     zcl types (like enums or bitmaps) and does lookups to find structs/enums/bitmaps/etc
     that are defined in the given lookup context.
     """
