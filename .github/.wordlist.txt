@@ -303,6 +303,7 @@ DCONFIG
 debianutils
 DEDEDEDE
 deepnote
+DefaultOTAProviders
 definedValue
 DehumidificationControl
 DelayedActionTime
@@ -437,6 +438,7 @@ extern
 extpanid
 FabricId
 fabricIdx
+fabricIndex
 factoryreset
 FanControl
 fb
@@ -903,6 +905,7 @@ protobuf
 protos
 Prover
 providerFabricIndex
+ProviderLocation
 providerNodeId
 ProxyConfiguration
 ProxyDiscovery
@@ -1075,6 +1078,7 @@ storagepath
 str
 strcpy
 struct
+structs
 su
 Subclassing
 subcommand
@@ -1265,6 +1269,7 @@ Xcode
 xcodeproj
 xcworkspace
 xd
+xDEADBEEF
 xdeadbeefcafe
 xds
 xdsdfu
