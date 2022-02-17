@@ -111,7 +111,7 @@ private:
     PasscodeId mECMPasscodeID  = kDefaultCommissioningPasscodeId;
     uint32_t mECMIterations    = 0;
     uint32_t mECMSaltLength    = 0;
-    uint8_t mECMSalt[kPBKDFMaximumSaltLen];
+    uint8_t mECMSalt[Crypto::kSpake2pPBKDFMaximumSaltLen];
 };
 
 } // namespace chip

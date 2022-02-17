@@ -94,6 +94,8 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
+    VerifyOrReturnError(mState == State::kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+
     mReliableMessageMgr.Shutdown();
 
     if (mSessionManager != nullptr)

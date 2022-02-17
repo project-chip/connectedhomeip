@@ -1,0 +1,122 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.6.1. [TC-IDM-4.2] ReportDataMessage from DUT test cases
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH sends a subscription message to the DUT. DUT sends a report data
+          action to the TH"
+      disabled: true
+
+    - label:
+          "TH sends a subscription message to the DUT. DUT sends a report data
+          action to the TH TH sends a status response"
+      disabled: true
+
+    - label:
+          "DUT and TH activate the subscription. Change the value of the
+          attribute which is being subscribed on the DUT by manually changing
+          some settings on the device. Example: Temperature sensor may update
+          the value of the room temperature. Turning on/off on a light bulb."
+      disabled: true
+
+    - label:
+          "DUT and TH activate the subscription. Change the value of the
+          attribute which is being subscribed on the DUT by sending an IMWrite
+          or Invoke message to the DUT from the TH."
+      disabled: true
+
+    - label:
+          "DUT and TH activate the subscription. Change the value of the
+          attribute which is being subscribed on the DUT. TH force sends a
+          status response with an 'inactive subscription'. Change the value of
+          the attribute which is being subscribed on the DUT."
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type bool. Modify that attribute on the DUT. DUT
+          should send the report data with the modified attribute value. Repeat
+          the above steps multiple times (3 times) before the max interval time
+          specified during the subscription activation."
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type string. Modify that attribute on the DUT.
+          DUT should send the report data with the modified attribute value
+          Repeat the above steps multiple times (3 times) before the max
+          interval time specified during the subscription activation."
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type 'unsigned integer'. Modify that attribute on
+          the DUT. DUT should send the report data with the modified attribute
+          value. Repeat the above steps multiple times (3 times) before the max
+          interval time specified during the subscription activation."
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type 'signed integer'. Modify that attribute on
+          the DUT. DUT should send the report data with the modified attribute
+          value. Repeat the above steps multiple times (3 times)before the max
+          interval time specified during the subscription activation."
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type 'floating point'. Modify that attribute on
+          the DUT. DUT should send the report data with the modified attribute
+          value. Repeat the above steps multiple times (3 times) before the max
+          interval time specified during the subscription activation."
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for any
+          attribute After the Maximum interval time is elapsed, TH should send
+          another subscription request message with different parameters than
+          before. Change the value of the attribute requested on the DUT."
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for any
+          attribute After the Maximum interval time is elapsed, change the value
+          of the attribute requested on the DUT."
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for an attribute
+          Reboot the DUT. Change the value of the attribute on the DUT."
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for an attribute
+          There are no attribute value changes before MAxInterval elapses."
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type list. Modify that attribute on the DUT. DUT
+          should send the report data with the modified attribute value. Repeat
+          the above steps multiple times (3 times) before the max interval time
+          specified during the subscription activation."
+      disabled: true

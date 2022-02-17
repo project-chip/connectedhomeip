@@ -99,18 +99,6 @@ CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case to_underlying(Tag::kIsFabricFiltered):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kIsFabricFiltered))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kIsFabricFiltered));
-#if CHIP_DETAIL_LOGGING
-            {
-                bool isFabricFiltered;
-                ReturnErrorOnFailure(reader.Get(isFabricFiltered));
-                PRETTY_PRINT("\tisFabricFiltered = %s, ", isFabricFiltered ? "true" : "false");
-            }
-#endif // CHIP_DETAIL_LOGGING
-            break;
         case kInteractionModelRevisionTag:
             ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
@@ -164,11 +152,6 @@ CHIP_ERROR WriteRequestMessage::Parser::GetMoreChunkedMessages(bool * const apMo
     return GetSimpleValue(to_underlying(Tag::kMoreChunkedMessages), TLV::kTLVType_Boolean, apMoreChunkedMessages);
 }
 
-CHIP_ERROR WriteRequestMessage::Parser::GetIsFabricFiltered(bool * const apIsFabricFiltered) const
-{
-    return GetSimpleValue(to_underlying(Tag::kIsFabricFiltered), TLV::kTLVType_Boolean, apIsFabricFiltered);
-}
-
 WriteRequestMessage::Builder & WriteRequestMessage::Builder::SuppressResponse(const bool aSuppressResponse)
 {
     // skip if error has already been set
@@ -205,16 +188,6 @@ WriteRequestMessage::Builder & WriteRequestMessage::Builder::MoreChunkedMessages
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kMoreChunkedMessages)), aMoreChunkedMessages);
-    }
-    return *this;
-}
-
-WriteRequestMessage::Builder & WriteRequestMessage::Builder::IsFabricFiltered(const bool aIsFabricFiltered)
-{
-    // skip if error has already been set
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsFabricFiltered)), aIsFabricFiltered);
     }
     return *this;
 }

@@ -16,9 +16,17 @@
 
 #include <app/tests/AppTestContext.h>
 
+#include <access/AccessControl.h>
+#include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+
+namespace {
+
+chip::Access::AccessControl permissiveAccessControl(chip::Access::Examples::GetPermissiveAccessControlDelegate());
+
+} // namespace
 
 namespace chip {
 namespace Test {
@@ -28,11 +36,16 @@ CHIP_ERROR AppContext::Init()
     ReturnErrorOnFailure(Super::Init());
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager()));
 
+    Access::SetAccessControl(permissiveAccessControl);
+    ReturnErrorOnFailure(Access::GetAccessControl().Init());
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AppContext::Shutdown()
 {
+    ReturnErrorOnFailure(Access::GetAccessControl().Finish());
+
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     ReturnErrorOnFailure(Super::Shutdown());
 
