@@ -19,7 +19,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "LEDWidget.h"
+#include "Utils.hpp"
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -31,8 +31,6 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
-#include <platform/CHIPDeviceLayer.h>
 
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
@@ -48,10 +46,7 @@ LOG_MODULE_DECLARE(app);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
 static LEDWidget sStatusLED;
-static LEDWidget sUnusedLED1;
-static LEDWidget sUnusedLED2;
-static LEDWidget sUnusedLED3;
-
+static UnusedLedsWrapper<3> sUnusedLeds{ { DK_LED2, DK_LED3, DK_LED4 } };
 static k_timer sFunctionTimer;
 
 namespace LedConsts {
@@ -79,14 +74,11 @@ int AppTask::Init()
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
 
     sStatusLED.Init(SYSTEM_STATE_LED);
-    sUnusedLED1.Init(DK_LED2);
-    sUnusedLED2.Init(DK_LED3);
-    sUnusedLED3.Init(DK_LED4);
 
     UpdateStatusLED();
 
     // Initialize buttons
-    int ret = dk_buttons_init(ButtonEventHandler);
+    auto ret = dk_buttons_init(ButtonEventHandler);
     if (ret)
     {
         LOG_ERR("dk_buttons_init() failed");
@@ -110,7 +102,7 @@ int AppTask::Init()
 
 int AppTask::StartApp()
 {
-    int ret = Init();
+    auto ret = Init();
 
     if (ret)
     {
@@ -180,14 +172,10 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 #ifdef CONFIG_STATE_LEDS
         // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
         sStatusLED.Set(false);
-        sUnusedLED1.Set(false);
-        sUnusedLED2.Set(false);
-        sUnusedLED3.Set(false);
+        sUnusedLeds.Set(false);
 
         sStatusLED.Blink(LedConsts::sBlinkRate_ms);
-        sUnusedLED1.Blink(LedConsts::sBlinkRate_ms);
-        sUnusedLED2.Blink(LedConsts::sBlinkRate_ms);
-        sUnusedLED3.Blink(LedConsts::sBlinkRate_ms);
+        sUnusedLeds.Blink(LedConsts::sBlinkRate_ms);
 #endif
     }
     else if (Instance().mFunctionTimerActive && Instance().mMode == OperatingMode::FactoryReset)
@@ -220,9 +208,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     {
         if (Instance().mFunctionTimerActive && Instance().mMode == OperatingMode::FactoryReset)
         {
-            sUnusedLED1.Set(false);
-            sUnusedLED2.Set(false);
-            sUnusedLED3.Set(false);
+            sUnusedLeds.Set(false);
 
             UpdateStatusLED();
             CancelTimer();
@@ -250,7 +236,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     // Don't allow on starting Matter service BLE advertising after Thread provisioning.
     if (ConnectivityMgr().IsThreadProvisioned())
     {
-        LOG_INF("NFC Tag emulation and Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        LOG_INF("Matter service BLE advertising not started - device is commissioned to a Thread network.");
         return;
     }
 
