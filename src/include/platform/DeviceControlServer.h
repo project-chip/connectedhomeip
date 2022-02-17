@@ -23,6 +23,7 @@
 #pragma once
 
 #include <lib/support/Span.h>
+#include <platform/FailSafeContext.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
@@ -95,16 +96,15 @@ public:
 
     void SetSwitchDelegate(SwitchDeviceControlDelegate * delegate) { mSwitchDelegate = delegate; }
     SwitchDeviceControlDelegate * GetSwitchDelegate() const { return mSwitchDelegate; }
+    FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
 
     static DeviceControlServer & DeviceControlSvr();
 
 private:
     // ===== Members for internal use by the following friends.
     static DeviceControlServer sInstance;
+    FailSafeContext mFailSafeContext;
     SwitchDeviceControlDelegate * mSwitchDelegate = nullptr;
-
-    friend void HandleArmFailSafe(System::Layer * layer, void * aAppState);
-    void CommissioningFailedTimerComplete();
 
     // ===== Private members reserved for use by this class only.
 

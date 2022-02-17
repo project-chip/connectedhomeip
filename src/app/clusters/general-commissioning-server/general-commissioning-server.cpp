@@ -127,13 +127,27 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    CheckSuccess(server->ArmFailSafe(System::Clock::Seconds16(commandData.expiryLengthSeconds)), Failure);
+    FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
-    Commands::ArmFailSafeResponse::Type response;
-    response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
-    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    /*
+     * If the fail-safe timer was not currently armed, the the fail-safe timer SHALL be armed.
+     * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
+     * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
+     */
+    if (!failSafeContext.IsFailSafeArmed())
+    {
+        Commands::ArmFailSafeResponse::Type response;
+
+        CheckSuccess(failSafeContext.ArmFailSafe(commandObj->GetAccessingFabricIndex(),
+                                                 System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                     Failure);
+        response.errorCode = CommissioningError::kOk;
+        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    }
+    else
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Busy));
+    }
 
     return true;
 }
@@ -155,7 +169,6 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
 
     Commands::CommissioningCompleteResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
     return true;
@@ -172,7 +185,6 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
     Commands::SetRegulatoryConfigResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
     return true;
