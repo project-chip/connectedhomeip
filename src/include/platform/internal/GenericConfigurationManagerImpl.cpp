@@ -52,7 +52,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 {
     CHIP_ERROR err;
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
 #endif
 
@@ -308,7 +308,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::InitiateFactoryReset()
 template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 {
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     // Increment life time counter to protect against long-term tracking of rotating device ID.
     IncrementLifetimeCounter();
     // Inheriting classes should call this method so the lifetime counter is updated if necessary.
@@ -588,7 +588,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GenerateUniqueId(char *
     return Encoding::BytesToUppercaseHexString(reinterpret_cast<uint8_t *>(&randomUniqueId), sizeof(uint64_t), buf, bufSize);
 }
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetLifetimeCounter(uint16_t & lifetimeCounter)
 {
@@ -605,7 +605,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::IncrementLifetimeCounte
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
-#ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
     static_assert(kRotatingDeviceIDUniqueIDLength >= kMinRotatingDeviceIDUniqueIDLength,
                   "Length of unique ID for rotating device ID is smaller than minimum.");
     constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
@@ -615,9 +614,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRotatingDeviceIdUniq
     memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
     uniqueIdSpan = uniqueIdSpan.SubSpan(0, sizeof(uniqueId));
     return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
 #endif // CHIP_ENABLE_ROTATING_DEVICE_ID
 

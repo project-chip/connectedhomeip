@@ -30,6 +30,7 @@
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/PersistedStorage.h>
+#include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 
 namespace chip {
 namespace Ble {
@@ -71,7 +72,7 @@ public:
         kMaxProductLabelLength          = 64,
         kMaxSerialNumberLength          = 32,
         kMaxUniqueIDLength              = 32,
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
         kMinRotatingDeviceIDUniqueIDLength = 16,
         kRotatingDeviceIDUniqueIDLength    = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH,
 #endif
@@ -102,7 +103,7 @@ public:
     virtual CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount)                          = 0;
     virtual CHIP_ERROR GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)              = 0;
     virtual CHIP_ERROR GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)      = 0;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     // Lifetime counter is monotonic counter that is incremented upon each commencement of advertising
     virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) = 0;
     virtual CHIP_ERROR IncrementLifetimeCounter()                     = 0;
