@@ -217,6 +217,7 @@ exit:
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
+    CHIP_ERROR err;
     uint64_t upTime = 0;
 
     if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
@@ -237,6 +238,8 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
+    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+
 #if CHIP_WITH_GIO
     if (pthread_cancel(mGdbusThreadHandle) != 0)
     {
@@ -251,7 +254,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     }
 #endif
 
-    return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+    return err;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(
