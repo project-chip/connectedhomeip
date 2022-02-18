@@ -83,6 +83,10 @@ void LEDWidget::Init(gpio_num_t gpioNum)
             .timer_sel  = LEDC_TIMER_1,
             .duty       = 0,
             .hpoint     = 0,
+            {
+                .output_invert = 1,
+            },
+
         };
         ledc_channel_config(&ledc_channel);
         mDefaultOnBrightness = UINT8_MAX;
