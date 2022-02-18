@@ -34,8 +34,11 @@ public:
     CHIP_ERROR HandleGetOutputList(AttributeValueEncoder & aEncoder) override;
     bool HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) override;
     bool HandleSelectOutput(const uint8_t & index) override;
+    char * Data(uint8_t index) { return mCharDataBuffer[index]; }
 
 protected:
     uint8_t mCurrentOutput;
     std::vector<OutputInfoType> mOutputs;
+    // Magic numbers are here on purpose, please allocate memory
+    char mCharDataBuffer[10][32];
 };

@@ -30,6 +30,7 @@ AudioOutputManager::AudioOutputManager()
     {
         OutputInfoType outputInfo;
         outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
+        // note: safe only because of use of string literal
         outputInfo.name       = chip::CharSpan::fromCharString("HDMI");
         outputInfo.index      = static_cast<uint8_t>(i);
         mOutputs.push_back(outputInfo);
@@ -44,9 +45,8 @@ uint8_t AudioOutputManager::HandleGetCurrentOutput()
 CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEncoder)
 {
     // TODO: Insert code here
-    std::vector<OutputInfoType> outputs = mOutputs;
-    return aEncoder.EncodeList([outputs](const auto & encoder) -> CHIP_ERROR {
-        for (auto const & outputInfo : outputs)
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & outputInfo : this->mOutputs)
         {
             ReturnErrorOnFailure(encoder.Encode(outputInfo));
         }
@@ -54,41 +54,36 @@ CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEnco
     });
 }
 
-bool isAudioOutputIndexInRange(const uint8_t index, std::vector<OutputInfoType> outputs)
-{
-    return index > 0 && index <= outputs.size();
-}
-
 bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
-    if (isAudioOutputIndexInRange(index, mOutputs))
+    bool audioOutputRenamed = false;
+    
+    for (OutputInfoType & output : mOutputs)
     {
-        for (OutputInfoType & output : mOutputs)
+        if (output.index == index)
         {
-            if (output.index == index)
-            {
-                output.name = name;
-            }
+            audioOutputRenamed = true;
+            memcpy(this->Data(index), name.data(), name.size());
+            output.name = chip::CharSpan(this->Data(index), name.size());
         }
-        return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return audioOutputRenamed;
 }
 
 bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
 {
     // TODO: Insert code here
-    if (isAudioOutputIndexInRange(index, mOutputs))
+    bool audioOutputSelected = false;
+    for (OutputInfoType & output : mOutputs)
     {
-        mCurrentOutput = index;
-        return true;
+        if (output.index == index)
+        {
+            audioOutputSelected = true;
+            mCurrentOutput = index;
+        }
     }
-    else
-    {
-        return false;
-    }
+
+    return audioOutputSelected;
 }
