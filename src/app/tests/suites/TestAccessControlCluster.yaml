@@ -165,3 +165,32 @@ tests:
                       Targets: [{ Cluster: 5, Endpoint: 6, DeviceType: null }],
                   },
               ]
+
+    # NOTE: this effectively restores the ACL contents from before this test ran
+    - label: "Write one entry"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Read one entry"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]

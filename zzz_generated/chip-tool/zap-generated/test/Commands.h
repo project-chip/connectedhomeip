@@ -379,6 +379,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read two entries\n");
             err = TestReadTwoEntries_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Write one entry\n");
+            err = TestWriteOneEntry_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read one entry\n");
+            err = TestReadOneEntry_6();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -390,7 +398,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -442,6 +450,26 @@ private:
             acl)
     {
         (static_cast<TestAccessControlCluster *>(context))->OnSuccessResponse_4(acl);
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context) { (static_cast<TestAccessControlCluster *>(context))->OnSuccessResponse_5(); }
+
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnFailureResponse_6(error);
+    }
+
+    static void OnSuccessCallback_6(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnSuccessResponse_6(acl);
     }
 
     //
@@ -922,6 +950,79 @@ private:
                     CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 1));
             }
             VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 2));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteOneEntry_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(1);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 1);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestReadOneEntry_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        {
+            auto iter_0 = acl.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 0));
+            VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
+            VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 1));
         }
 
         NextTest();
