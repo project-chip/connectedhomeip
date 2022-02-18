@@ -124,7 +124,7 @@ public:
 private:
     // ===== Members for internal use by the following friends.
     static DeviceControlServer sInstance;
-    FailSafeContext mFailSafeContextl;
+    FailSafeContext mFailSafeContext;
     SwitchDeviceControlDelegate * mSwitchDelegate = nullptr;
     bool mFailSafeArmed                           = false;
 
