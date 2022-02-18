@@ -95,7 +95,6 @@ ReadHandler::~ReadHandler()
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
     }
-
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpDataVersionFilterList);
@@ -150,7 +149,6 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
     case HandlerState::AwaitingReportResponse:
         if (IsChunkedReport())
         {
-            InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
             MoveToState(HandlerState::GeneratingReports);
             mpExchangeCtx->WillSendMessage();
 
@@ -159,7 +157,6 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
         }
         else if (IsType(InteractionType::Subscribe))
         {
-            InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
             if (IsPriming())
             {
                 err           = SendSubscribeResponse();
@@ -209,7 +206,6 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
         mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Get(), this);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
 
     return StatusResponse::Send(aStatus, mpExchangeCtx,
                                 /* aExpectResponse = */ false);
@@ -227,8 +223,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
         mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Get(), this);
-        mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     }
+
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mIsChunkedReport        = aMoreChunks;
     bool noResponseExpected = IsType(InteractionType::Read) && !mIsChunkedReport;
@@ -236,6 +232,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     {
         MoveToState(HandlerState::AwaitingReportResponse);
     }
+    mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     CHIP_ERROR err =
         mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                    Messaging::SendFlags(noResponseExpected ? Messaging::SendMessageFlags::kNone
@@ -571,6 +568,11 @@ const char * ReadHandler::GetStateStr() const
 
 void ReadHandler::MoveToState(const HandlerState aTargetState)
 {
+    if (IsAwaitingReportResponse() && aTargetState != HandlerState::AwaitingReportResponse)
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
+
     mState = aTargetState;
     ChipLogDetail(DataManagement, "IM RH moving to [%s]", GetStateStr());
 }
@@ -620,7 +622,6 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 
     mIsPrimingReports = false;
     MoveToState(HandlerState::GeneratingReports);
-
     return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
 }
 

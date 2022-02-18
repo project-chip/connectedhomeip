@@ -118,6 +118,8 @@ public:
         }
     }
 
+    uint32_t GetNumReportsInFlight() { return mNumReportsInFlight; }
+
 private:
     friend class TestReportingEngine;
     /**
