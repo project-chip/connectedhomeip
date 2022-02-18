@@ -80,7 +80,9 @@ private:
         VerifyOrDie(!aPath.IsListItemOperation());
 
         VerifyOrExit(aStatus.IsSuccess(), err = aStatus.ToChipError());
-        VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
+        VerifyOrExit((aPath.mClusterId == mClusterId || kInvalidClusterId == mClusterId) &&
+                         (aPath.mAttributeId == mAttributeId || kInvalidAttributeId == mAttributeId),
+                     err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
