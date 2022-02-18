@@ -10574,12 +10574,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeRegulatoryConfigWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = GeneralCommissioning::Attributes::RegulatoryConfig::TypeInfo;
-        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = GeneralCommissioning::Attributes::RegulatoryConfig::TypeInfo;
+            auto successFn = Callback<GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeRegulatoryConfigWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -10588,15 +10589,16 @@ using namespace chip::app::Clusters;
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+    new CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = GeneralCommissioning::Attributes::RegulatoryConfig::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::
+                    OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -10604,12 +10606,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeLocationCapabilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = GeneralCommissioning::Attributes::LocationCapability::TypeInfo;
-        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = GeneralCommissioning::Attributes::LocationCapability::TypeInfo;
+            auto successFn = Callback<GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeLocationCapabilityWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -10618,15 +10621,16 @@ using namespace chip::app::Clusters;
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+    new CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = GeneralCommissioning::Attributes::LocationCapability::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::
+                    OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
