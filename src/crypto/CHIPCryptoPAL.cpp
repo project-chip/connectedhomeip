@@ -515,6 +515,80 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeW0(uint8_t * w0out, size_t * w0
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Spake2pVerifier::Serialize(MutableByteSpan & outSerialized)
+{
+    VerifyOrReturnError(outSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(&outSerialized.data()[0], mW0, sizeof(mW0));
+    memcpy(&outSerialized.data()[sizeof(mW0)], mL, sizeof(mL));
+
+    outSerialized.reduce_size(kSpake2p_VerifierSerialized_Length);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2pVerifier::Deserialize(ByteSpan inSerialized)
+{
+    VerifyOrReturnError(inSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(mW0, &inSerialized.data()[0], sizeof(mW0));
+    memcpy(mL, &inSerialized.data()[sizeof(mW0)], sizeof(mL));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin)
+{
+    uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
+    ReturnErrorOnFailure(ComputeWS(pbkdf2IterCount, salt, setupPin, serializedWS, sizeof(serializedWS)));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t len;
+
+    // Create local Spake2+ object for w0 and L computations.
+#ifdef ENABLE_HSM_SPAKE
+    Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
+#else
+    Spake2p_P256_SHA256_HKDF_HMAC spake2p;
+#endif
+    uint8_t context[kSHA256_Hash_Length] = { 0 };
+    SuccessOrExit(err = spake2p.Init(context, sizeof(context)));
+
+    // Compute w0
+    len = sizeof(mW0);
+    SuccessOrExit(err = spake2p.ComputeW0(mW0, &len, &serializedWS[0], kSpake2p_WS_Length));
+    VerifyOrExit(len == sizeof(mW0), err = CHIP_ERROR_INTERNAL);
+
+    // Compute L
+    len = sizeof(mL);
+    SuccessOrExit(err = spake2p.ComputeL(mL, &len, &serializedWS[kSpake2p_WS_Length], kSpake2p_WS_Length));
+    VerifyOrExit(len == sizeof(mL), err = CHIP_ERROR_INTERNAL);
+
+exit:
+    spake2p.Clear();
+    return err;
+}
+
+CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin, uint8_t * ws,
+                                      uint32_t ws_len)
+{
+#ifdef ENABLE_HSM_PBKDF2
+    PBKDF2_sha256HSM pbkdf2;
+#else
+    PBKDF2_sha256 pbkdf2;
+#endif
+    uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
+    Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setupPin);
+
+    ReturnErrorCodeIf(salt.size() < kSpake2p_Min_PBKDF_Salt_Length || salt.size() > kSpake2p_Max_PBKDF_Salt_Length,
+                      CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(pbkdf2IterCount < kSpake2p_Min_PBKDF_Iterations || pbkdf2IterCount > kSpake2p_Max_PBKDF_Iterations,
+                      CHIP_ERROR_INVALID_ARGUMENT);
+
+    return pbkdf2.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt.data(), salt.size(),
+                                pbkdf2IterCount, ws_len, ws);
+}
+
 CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer)
 {
     return ConvertIntegerRawToDerInternal(raw_integer, out_der_integer, /* include_tag_and_length = */ false);

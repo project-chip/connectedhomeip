@@ -146,6 +146,7 @@ private:
     CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
     CHIP_ERROR ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten);
     void GetMinEventLogPosition(uint32_t & aMinLogPosition);
+    void ScheduleUrgentEventDeliverySync();
 
     /**
      * If the provided path is a superset of our of our existing paths, update that existing path to match the

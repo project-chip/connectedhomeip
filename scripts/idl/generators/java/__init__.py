@@ -71,6 +71,15 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
 
 
 def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) -> str:
+    """
+    Figure out what callback name to use when a variable requires a read callback.
+
+    These are split into native types, like Boolean/Float/Double/CharString, where
+    one callback type can support anything. 
+
+    For specific types (e.g. A struct) codegen will generate its own callback name
+    specific to that type.
+    """
     global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
@@ -100,12 +109,6 @@ def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
         yield attr
 
 
-def ClientClustersOnly(clusters: List[Cluster]):
-    for cluster in clusters:
-        if cluster.side == ClusterSide.CLIENT:
-            yield cluster
-
-
 def NamedFilter(choices: List, name: str):
     for choice in choices:
         if choice.name == name:
@@ -124,7 +127,14 @@ def ToBoxedJavaType(field: Field):
         return 'jobject'
 
 
-def LowercaseFirst(name: str):
+def LowercaseFirst(name: str) -> str:
+    """
+    Change the first letter of a string to lowercase as long as the 2nd
+    letter is not uppercase.
+
+    Can be used for variable naming, eg insider structures, codegen will
+    call things "Foo foo" (notice variable name is lowercase).
+    """
     if len(name) > 1 and name[1].lower() != name[1]:
         # Odd workaround: PAKEVerifier should not become pAKEVerifier
         return name
@@ -142,6 +152,12 @@ class EncodableValue:
     Contains helpers for encoding values, specifically lookups
     for optionality, lists and recursive data type lookups within
     the IDL and cluster
+
+    Intended use is to be able to:
+      - derive types (see clone and without_* methods) such that codegen
+        can implement things like 'if x != null { treat non-null x}'
+      - Java specific conversions: get boxed types and JNI string signautes
+        for the underlying types.
     """
 
     def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
@@ -280,6 +296,13 @@ class EncodableValue:
 
 
 def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableValue:
+    """
+    Filter to convert a standard field to an EncodableValue.
+
+    This converts the AST information (field name/info + lookup context) into
+    a java-generator specific wrapper that can be manipulated and 
+    queried for properties like java native name or JNI string signature.
+    """
     attrs = set()
 
     if field.is_optional:
@@ -294,11 +317,24 @@ def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableVal
     return EncodableValue(context, field.data_type, attrs)
 
 
-def CreateLookupContext(idl: Idl, cluster: Cluster):
+def CreateLookupContext(idl: Idl, cluster: Cluster) -> TypeLookupContext:
+    """
+    A filter to mark a lookup context to be within a specific cluster.
+
+    This is used to specify how structure/enum/other names are looked up.
+    Generally one looks up within the specific cluster then if cluster does
+    not contain a definition, we loop at global namespacing.
+    """
     return TypeLookupContext(idl, cluster)
 
 
-def CanGenerateSubscribe(attr: Attribute, lookup: TypeLookupContext):
+def CanGenerateSubscribe(attr: Attribute, lookup: TypeLookupContext) -> bool:
+    """
+    Filter that returns if an attribute can be subscribed to.
+
+    Uses the given attribute and the lookupContext to figure out the attribute
+    type.
+    """
     # For backwards compatibility, we do not subscribe to structs
     # (although list of structs is ok ...)
     if attr.definition.is_list:
@@ -313,12 +349,15 @@ class JavaGenerator(CodeGenerator):
     """
 
     def __init__(self, storage: GeneratorStorage, idl: Idl):
+        """
+        Inintialization is specific for java generation and will add
+        filters as required by the java .jinja templates to function.
+        """
         super().__init__(storage, idl)
 
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName
         self.jinja_env.filters['commandCallbackName'] = CommandCallbackName
-        self.jinja_env.filters['clientClustersOnly'] = ClientClustersOnly
         self.jinja_env.filters['named'] = NamedFilter
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
         self.jinja_env.filters['lowercaseFirst'] = LowercaseFirst
@@ -327,6 +366,9 @@ class JavaGenerator(CodeGenerator):
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
 
     def internal_render_all(self):
+        """
+        Renders .CPP files required for JNI support.
+        """
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:

@@ -606,8 +606,6 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     ReadRequestMessage::Parser readRequestParser;
 
     reader.Init(msgBuf.Retain());
-    reader.Next();
-
     err = readRequestParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -659,8 +657,6 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     ReadRequestMessage::Parser readRequestParser;
 
     reader.Init(msgBuf.Retain());
-    reader.Next();
-
     err = readRequestParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 

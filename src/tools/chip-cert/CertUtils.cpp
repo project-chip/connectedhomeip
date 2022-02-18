@@ -457,6 +457,27 @@ exit:
     return res;
 }
 
+bool ReadCertDERRaw(const char * fileName, MutableByteSpan & cert)
+{
+    bool res = true;
+    std::unique_ptr<X509, void (*)(X509 *)> certX509(X509_new(), &X509_free);
+
+    VerifyOrReturnError(ReadCertPEM(fileName, certX509.get()) == true, false);
+
+    uint8_t * certPtr = cert.data();
+    int certLen       = i2d_X509(certX509.get(), &certPtr);
+    if (certLen < 0)
+    {
+        ReportOpenSSLErrorAndExit("i2d_X509", res = false);
+    }
+
+    VerifyOrReturnError(chip::CanCastTo<size_t>(certLen), false);
+    cert.reduce_size(static_cast<size_t>(certLen));
+
+exit:
+    return res;
+}
+
 bool X509ToChipCert(X509 * cert, MutableByteSpan & chipCert)
 {
     bool res = true;

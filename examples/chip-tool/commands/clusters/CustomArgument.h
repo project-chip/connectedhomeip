@@ -255,6 +255,10 @@ public:
         return writer.CopyElement(tag, reader);
     }
 
+    // We trust our consumers to do the encoding of our data correctly, so don't
+    // need to know whether we are being encoded for a write.
+    static constexpr bool kIsFabricScoped = false;
+
 private:
     uint8_t * mData                       = nullptr;
     uint32_t mDataLen                     = 0;

@@ -42,6 +42,9 @@ CHIP_ERROR Engine::Init()
 
 void Engine::Shutdown()
 {
+    // Flush out the event buffer synchronously
+    ScheduleUrgentEventDeliverySync();
+
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
     mGlobalDirtySet.ReleaseAll();
@@ -744,6 +747,22 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions
         return ScheduleUrgentEventDelivery(aPath);
     }
     return CHIP_NO_ERROR;
+}
+
+void Engine::ScheduleUrgentEventDeliverySync()
+{
+    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([](ReadHandler * handler) {
+        if (handler->IsType(ReadHandler::InteractionType::Read))
+        {
+            return Loop::Continue;
+        }
+
+        handler->UnblockUrgentEventDelivery();
+
+        return Loop::Continue;
+    });
+
+    Run();
 }
 
 }; // namespace reporting
