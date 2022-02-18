@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include <platform/DiagnosticDataProvider.h>
 #include <jni.h>
+#include <platform/DiagnosticDataProvider.h>
 
 namespace {
-constexpr int offPremiseServicesReachableUnknown    = 0;
-constexpr int offPremiseServicesReachableYes        = 1;
-constexpr int offPremiseServicesReachableNo         = 2;
+constexpr int offPremiseServicesReachableUnknown = 0;
+constexpr int offPremiseServicesReachableYes     = 1;
+constexpr int offPremiseServicesReachableNo      = 2;
 } // namespace
 
 namespace chip {

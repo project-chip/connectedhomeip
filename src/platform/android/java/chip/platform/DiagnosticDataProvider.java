@@ -18,7 +18,7 @@
 package chip.platform;
 
 public interface DiagnosticDataProvider {
-    int getRebootCount();
+  int getRebootCount();
 
-    NetworkInterface[] getNetworkInterfaces();
+  NetworkInterface[] getNetworkInterfaces();
 }

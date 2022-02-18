@@ -23,7 +23,6 @@ import chip.appserver.ChipAppServer;
 import chip.platform.AndroidBleManager;
 import chip.platform.AndroidChipPlatform;
 import chip.platform.ChipMdnsCallbackImpl;
-import chip.platform.DiagnosticDataProvider;
 import chip.platform.DiagnosticDataProviderImpl;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
