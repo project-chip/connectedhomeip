@@ -42,9 +42,9 @@ public:
         mImageProcessor = processor;
     }
 
+    //// Virtual methods from OTARequestorDriver
     bool CanConsent() override;
     uint16_t GetMaxDownloadBlockSize() override;
-
     void HandleError(UpdateFailureState state, CHIP_ERROR error) override;
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
     void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;
@@ -58,17 +58,20 @@ public:
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) override;
     void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
                                         app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
+    void DriverTriggerQuery() override;
 
+    //// Regular methods
     void StartDefaultProvidersTimer();
     void StopDefaultProvidersTimer();
     void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
+ 
 private:
     OTARequestorInterface      * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
     uint32_t mOtaStartDelayMs                 = 0;
 
  using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-    Optional<ProviderLocationType> mDriverProviderLocation; // Provider location used for the current update in progress
+    Optional<ProviderLocationType> mLastProviderLocation; // Provider location used for the last query or update 
 };
 
 } // namespace DeviceLayer

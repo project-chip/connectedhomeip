@@ -406,25 +406,19 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
 
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
-    // Determine whether our current state allows us to proceed
-    OTARequestorAction action = mOtaRequestorDriver->GetRequestorAction(OTARequestorIncomingEvent::TriggerImmediateQueryInvoked);
-    if(action == OTARequestorAction::DoNotProceed) {
-        ChipLogProgress(SoftwareUpdate, "Wrong UpdateState, ignoring command");
-        return kWrongState;
-    } else if(action == OTARequestorAction::CancelCurrentUpdateAndProceed) {
-        CancelImageUpdate();
-    } else if(action == OTARequestorAction::Proceed) {
-        // Fall through
-    }
 
     if (mProviderLocation.HasValue())
     {
+        // SL TODO: Revisit this logic. Can all of it be moved to the driver?
+
         // We are now querying some provider. Stop the default provider timer and leave the kIdle state.
         // Spec doesn't define a specific state for this but we can't be in kIdle
         StopDefaultProvidersTimer();
         RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
-        ConnectToProvider(kQueryImage);
+        // Go through the driver as it may make its own choices here
+        mOtaRequestorDriver->DriverTriggerQuery();
+
         return kTriggerSuccessful;
     }
     else
@@ -509,6 +503,8 @@ CHIP_ERROR OTARequestor::AddDefaultOtaProvider(ProviderLocation::Type const & pr
 
     // Update the cached provider location if necessary
     UpdateDefaultProviderLocation();
+
+    // 
 
     return CHIP_NO_ERROR;
 }
@@ -814,6 +810,7 @@ void OTARequestor::StopDefaultProvidersTimer()
                                                this);
 }
 
+// Invoked when the device becomes commissioned
 void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     ChipLogProgress(SoftwareUpdate, "Device commissioned, query the default provider");
@@ -821,7 +818,7 @@ void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDevic
     // TODO: Should we also send UpdateApplied here?
 
     // Query the default provider
-    (reinterpret_cast<OTARequestor *>(arg))->DefaultProviderTimerHandler(nullptr, reinterpret_cast<OTARequestor *>(arg));
+    (reinterpret_cast<OTARequestor *>(arg))->mOtaRequestorDriver->DriverTriggerQuery();
 }
 
 } // namespace chip

@@ -244,16 +244,37 @@ OTARequestorAction GenericOTARequestorDriver::GetRequestorAction(OTARequestorInc
     return action;
 }
 
-void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState)
+void GenericOTARequestorDriver::DriverTriggerQuery()
 {
-    VerifyOrReturn(appState != nullptr);
-    //OTARequestorInterface *requestorCore =  static_cast<OTARequestor *>(appState);
 
-    //  SL TODO -- implement better API here
-    //    TestModeSetProviderParameters(mTestingProviderNodeId, 0 , 0);
+    // IMPLEMENTATION CHOICE
+    // In this implementation explicitly triggering a query cancels any in-progress update
+    UpdateCancelled();
+
+    // Select a provider to query and set it in the OTARequestor
+
+    // Put the right API call here when available
+
+    // app::AttributeValueEncoder encoder;
+    // mRequestor->GetDefaultOtaProviderList(encoder);
+    // encoder.ForEachActiveObject([&](ProviderLocation::Type * pl) {
+    //         // For now, just find the first available
+
+    //         mRequestor->SetCurrentProviderLocation(*pl);
+    //         return Loop::Break;
+    //                             });
+ 
+    // mRequestor->SetCurrentProviderLocation(*pl);
+
     mRequestor->ConnectToProvider(OTARequestorInterface::kQueryImage);
 }
 
+void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    // In this implementation the default provider timer runs only if there is no other update in progress.
+    // Nevertheless, even though no other timers should be running, call a cleanup method to be safe 
+    DriverTriggerQuery();
+}
 
 void GenericOTARequestorDriver::StartDefaultProvidersTimer()
 {
@@ -270,6 +291,7 @@ void GenericOTARequestorDriver::StopDefaultProvidersTimer()
     CancelDelayedAction([](System::Layer *, void * context){ (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context); },
                                                this);
 }
+
 
 } // namespace DeviceLayer
 } // namespace chip
