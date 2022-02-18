@@ -1034,21 +1034,23 @@ void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketBufferHandle bufferHandle;
+    BitFlags<AdditionalDataFields> additionalDataFields;
+    AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
     MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
-    uint16_t lifetimeCounter = 0;
-    BitFlags<AdditionalDataFields> additionalDataFields;
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     err = ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
     SuccessOrExit(err);
-    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
+    err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
     SuccessOrExit(err);
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
-#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID */
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, rotatingDeviceIdUniqueIdSpan,
-                                                                         bufferHandle, additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, bufferHandle,
+                                                                         additionalDataFields);
     SuccessOrExit(err);
     p_data->msg_data.write.p_value = bufferHandle->Start();
     p_data->msg_data.write.len     = bufferHandle->DataLength();
