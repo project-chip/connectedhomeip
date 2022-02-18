@@ -69,48 +69,64 @@ const kDefaultResponse = {
 const FindCommissionable = {
   name : 'FindCommissionable',
   arguments : [],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
 const FindCommissionableByShortDiscriminator = {
   name : 'FindCommissionableByShortDiscriminator',
   arguments : [ kNumberValueArgument ],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
 const FindCommissionableByLongDiscriminator = {
   name : 'FindCommissionableByLongDiscriminator',
   arguments : [ kNumberValueArgument ],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
 const FindCommissionableByCompressedFabricId = {
   name : 'FindOperationalByCompressedFabricId',
   arguments : [ kNumberValueArgument ],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
 const FindCommissionableByCommissioningMode = {
   name : 'FindCommissionableByCommissioningMode',
   arguments : [],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
 const FindCommissionableByVendorId = {
   name : 'FindCommissionableByVendorId',
   arguments : [ kNumberValueArgument ],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
 const FindCommissionableByDeviceType = {
   name : 'FindCommissionableByDeviceType',
   arguments : [ kNumberValueArgument ],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
 const FindCommissionableByName = {
   name : 'FindCommissionableByName',
   arguments : [ kStringValueArgument ],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
@@ -121,18 +137,24 @@ const FindCommissionableByName = {
 const FindCommissioner = {
   name : 'FindCommissioner',
   arguments : [],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
 const FindCommissionerByVendorId = {
   name : 'FindCommissionableByVendorId',
   arguments : [ kNumberValueArgument ],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
 const FindCommissionerByDeviceType = {
   name : 'FindCommissionerByDeviceType',
   arguments : [ kNumberValueArgument ],
+  hasSpecificResponse : true,
+  responseName : 'DiscoveryCommandResponse',
   response : kDefaultResponse
 };
 
