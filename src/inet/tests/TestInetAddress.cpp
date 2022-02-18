@@ -32,9 +32,7 @@
 #include <lwip/init.h>
 #include <lwip/ip_addr.h>
 
-#if defined(LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS) && !defined(htonl)
-#define htonl(x) lwip_htonl(x)
-#endif
+#include <inet/arpa-inet-compatibility.h>
 
 #else
 #include <netinet/in.h>
