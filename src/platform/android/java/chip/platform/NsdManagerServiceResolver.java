@@ -183,9 +183,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     registrationListeners.add(registrationListener);
 
     nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
-    Log.d(
-        TAG,
-        "publish " + registrationListener + " count = " + registrationListeners.size());
+    Log.d(TAG, "publish " + registrationListener + " count = " + registrationListeners.size());
   }
 
   @Override
