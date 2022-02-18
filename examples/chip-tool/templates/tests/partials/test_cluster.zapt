@@ -19,19 +19,7 @@ class {{filename}}: public TestCommand
 
     ~{{filename}}()
     {
-        {{#chip_tests_items}}
-        {{#chip_tests_item_response_parameters}}
-        {{#if saveAs}}
-        {{#if (isString type)}}
-        if ({{saveAs}}Buffer != nullptr)
-        {
-            chip::Platform::MemoryFree({{saveAs}}Buffer);
-            {{saveAs}}Buffer = nullptr;
-        }
-        {{/if}}
-        {{/if}}
-        {{/chip_tests_item_response_parameters}}
-        {{/chip_tests_items}}
+        {{>teardownSaveAs}}
     }
 
     /////////// TestCommand Interface /////////
@@ -93,16 +81,9 @@ class {{filename}}: public TestCommand
     chip::Optional<{{chipType}}> m{{asUpperCamelCase name}};
     {{/chip_tests_config}}
 
-    {{#chip_tests_items}}
-    {{#chip_tests_item_response_parameters}}
-    {{#if saveAs}}
-    {{~#if (isString type)}}{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} * {{saveAs}}Buffer = nullptr;{{/if~}}
-    {{zapTypeToDecodableClusterObjectType type ns=../cluster}} {{saveAs}};
-    {{/if}}
-    {{/chip_tests_item_response_parameters}}
-    {{/chip_tests_items}}
+    {{>setupSaveAs}}
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
     {
       bool isExpectedDnssdResult = false;
       {{#chip_tests_items}}
@@ -111,9 +92,9 @@ class {{filename}}: public TestCommand
       {
           isExpectedDnssdResult = true;
           {{#chip_tests_item_response_parameters}}
-          {{#*inline "itemValue"}}nodeData.{{name}}{{#if isOptional}}.Value(){{/if}}{{/inline}}
+          {{#*inline "itemValue"}}value.{{name}}{{#if isOptional}}.Value(){{/if}}{{/inline}}
           {{~#if hasExpectedValue}}
-            {{#if isOptional}}VerifyOrReturn(CheckValuePresent("{{name}}", nodeData.{{name}}));{{/if}}
+            {{#if isOptional}}VerifyOrReturn(CheckValuePresent("{{name}}", value.{{name}}));{{/if}}
             VerifyOrReturn(CheckValue("{{name}}", {{>itemValue}},
             {{#if (chip_tests_config_has expectedValue)}}
             m{{asUpperCamelCase expectedValue}}.HasValue() ? m{{asUpperCamelCase expectedValue}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value expectedValue) (chip_tests_config_get_type expectedValue)}}
@@ -123,7 +104,7 @@ class {{filename}}: public TestCommand
           ));
           {{/if}}
           {{#if hasExpectedConstraints}}
-            {{#if isOptional}}VerifyOrReturn(CheckValuePresent("{{name}}", nodeData.{{name}}));{{/if}}
+            {{#if isOptional}}VerifyOrReturn(CheckValuePresent("{{name}}", value.{{name}}));{{/if}}
             {{#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{name}}", {{>itemValue}}.size(), {{expectedConstraints.minLength}}));{{/if}}
             {{#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{name}}", {{>itemValue}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
             {{#if (hasProperty expectedConstraints "minValue")}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{name}}", {{>itemValue}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
@@ -131,19 +112,7 @@ class {{filename}}: public TestCommand
             {{#if (hasProperty expectedConstraints "notValue")}}VerifyOrReturn(CheckConstraintNotValue("{{name}}", {{>itemValue}}, {{asTypedLiteral expectedConstraints.notValue type}}));{{/if}}
           {{/if}}
 
-          {{#if saveAs}}
-          {{#if (isString type)}}
-          if ({{saveAs}}Buffer != nullptr)
-          {
-             chip::Platform::MemoryFree({{saveAs}}Buffer);
-          }
-          {{saveAs}}Buffer = static_cast<{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} *>(chip::Platform::MemoryAlloc({{>itemValue}}.size()));
-          memcpy({{saveAs}}Buffer, {{>itemValue}}.data(), {{>itemValue}}.size());
-          {{saveAs}} = {{chipType}}({{saveAs}}Buffer, {{>itemValue}}.size());
-          {{else}}
-          {{saveAs}} = {{>itemValue}};
-          {{/if}}
-          {{/if}}
+          {{>maybeSaveAs}}
           {{/chip_tests_item_response_parameters}}
       }
       {{/if}}
@@ -443,19 +412,7 @@ class {{filename}}: public TestCommand
               {{/if}}
             {{/if}}
 
-            {{#if saveAs}}
-            {{#if (isString type)}}
-            if ({{saveAs}}Buffer != nullptr)
-            {
-                chip::Platform::MemoryFree({{saveAs}}Buffer);
-            }
-            {{saveAs}}Buffer = static_cast<{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} *>(chip::Platform::MemoryAlloc({{>item}}.size()));
-            memcpy({{saveAs}}Buffer, {{>item}}.data(), {{>item}}.size());
-            {{saveAs}} = {{chipType}}({{saveAs}}Buffer, {{>item}}.size());
-            {{else}}
-            {{saveAs}} = {{>item}};
-            {{/if}}
-            {{/if}}
+            {{>maybeSaveAs}}
           {{/chip_tests_item_response_parameters}}
         {{#unless async}}NextTest();{{/unless}}
         {{/if}}

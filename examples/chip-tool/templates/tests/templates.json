@@ -22,6 +22,18 @@
             "path": "partials/test_cluster.zapt"
         },
         {
+            "name": "setupSaveAs",
+            "path": "partials/saveAs/setupSaveAs.zapt"
+        },
+        {
+            "name": "teardownSaveAs",
+            "path": "partials/saveAs/teardownSaveAs.zapt"
+        },
+        {
+            "name": "maybeSaveAs",
+            "path": "partials/saveAs/maybeSaveAs.zapt"
+        },
+        {
             "name": "commandValue",
             "path": "partials/command_value.zapt"
         },
