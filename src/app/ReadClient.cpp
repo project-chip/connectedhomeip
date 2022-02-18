@@ -396,6 +396,12 @@ CHIP_ERROR ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apEx
 {
     mpExchangeCtx = apExchangeContext;
 
+    //
+    // Let's take over further message processing on this exchange from the IM.
+    // This is only relevant for reports during post-subscription.
+    //
+    mpExchangeCtx->SetDelegate(this);
+
     CHIP_ERROR err = ProcessReportData(std::move(aPayload));
     if (err != CHIP_NO_ERROR)
     {
