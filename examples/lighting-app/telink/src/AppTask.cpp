@@ -238,7 +238,6 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     {
         StartDefaultThreadNetwork();
         LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
-        BLEMgrImpl().SwitchToIeee802154();
     }
     else
     {
