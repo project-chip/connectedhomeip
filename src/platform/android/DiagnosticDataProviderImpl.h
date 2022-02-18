@@ -23,6 +23,13 @@
 #pragma once
 
 #include <platform/DiagnosticDataProvider.h>
+#include <jni.h>
+
+namespace {
+constexpr int offPremiseServicesReachableUnknown    = 0;
+constexpr int offPremiseServicesReachableYes        = 1;
+constexpr int offPremiseServicesReachableNo         = 2;
+} // namespace
 
 namespace chip {
 namespace DeviceLayer {
@@ -33,7 +40,17 @@ namespace DeviceLayer {
 class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {
 public:
+    void InitializeWithObject(jobject managerObject);
+
+public:
     static DiagnosticDataProviderImpl & GetDefaultInstance();
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
+    void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
+
+    jobject mDiagnosticDataProviderManagerObject = nullptr;
+    jmethodID mGetRebootCountMethod              = nullptr;
+    jmethodID mGetNifMethod                      = nullptr;
 };
 
 } // namespace DeviceLayer
