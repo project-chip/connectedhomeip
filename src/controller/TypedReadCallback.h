@@ -149,6 +149,8 @@ private:
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableEventType value;
 
+        VerifyOrExit(apStatus != nullptr && !apStatus->IsSuccess(), err = apStatus->ToChipError());
+
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         VerifyOrExit((aEventHeader.mPath.mEventId == value.GetEventId()) && (aEventHeader.mPath.mClusterId == value.GetClusterId()),

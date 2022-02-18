@@ -16,8 +16,12 @@
  *    limitations under the License.
  */
 
+#include <access/AccessControl.h>
+#include <access/RequestPath.h>
+#include <access/SubjectDescriptor.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/RequiredPrivilege.h>
 #include <inttypes.h>
 #include <lib/core/CHIPEventLoggingConfig.h>
 #include <lib/core/CHIPTLVUtilities.hpp>
@@ -75,29 +79,6 @@ struct CopyAndAdjustDeltaTimeContext
 
     TLV::TLVWriter * mpWriter       = nullptr;
     EventLoadOutContext * mpContext = nullptr;
-};
-
-/**
- * @brief
- *  Internal structure for traversing events.
- */
-struct EventEnvelopeContext
-{
-    EventEnvelopeContext() {}
-
-    int mFieldsToRead = 0;
-    /* PriorityLevel and DeltaTime are there if that is not first event when putting events in report*/
-#if CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS & CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
-    Timestamp mCurrentTime = Timestamp::System(System::Clock::kZero);
-#else
-    Timestamp mCurrentTime = Timestamp::Epoch(System::Clock::kZero);
-#endif
-    PriorityLevel mPriority  = PriorityLevel::First;
-    ClusterId mClusterId     = 0;
-    EndpointId mEndpointId   = 0;
-    EventId mEventId         = 0;
-    EventNumber mEventNumber = 0;
-    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };
 
 void EventManagement::InitializeCounter(Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
@@ -590,46 +571,115 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
     return CHIP_NO_ERROR;
 }
 
-static bool IsInterestedEventPaths(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event)
+CHIP_ERROR EventManagement::WriteEventStatusIB(TLVWriter & aWriter, const ConcreteEventPath & aEvent, StatusIB aStatus)
+{
+    TLVType containerType;
+    ReturnErrorOnFailure(aWriter.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
+
+    EventStatusIB::Builder builder;
+    builder.Init(&aWriter, to_underlying(EventReportIB::Tag::kEventStatus));
+
+    ReturnErrorOnFailure(builder.CreatePath()
+                             .Endpoint(aEvent.mEndpointId)
+                             .Cluster(aEvent.mClusterId)
+                             .Event(aEvent.mEventId)
+                             .EndOfEventPathIB()
+                             .GetError());
+
+    ReturnErrorOnFailure(builder.CreateErrorStatus().EncodeStatusIB(aStatus).GetError());
+
+    ReturnErrorOnFailure(builder.EndOfEventStatusIB().GetError());
+
+    ReturnErrorOnFailure(aWriter.EndContainer(containerType));
+    ReturnErrorOnFailure(aWriter.Finalize());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EventManagement::IsInterestedEventPaths(EventLoadOutContext * eventLoadOutContext,
+                                                   const EventManagement::EventEnvelopeContext & event)
 {
     if (eventLoadOutContext->mCurrentEventNumber < eventLoadOutContext->mStartingEventNumber)
     {
-        return false;
+        return CHIP_NO_ERROR;
     }
 
-    if (event.mFabricIndex != kUndefinedFabricIndex && eventLoadOutContext->mFabricIndex != event.mFabricIndex)
+    if (event.mFabricIndex != kUndefinedFabricIndex && eventLoadOutContext->mSubjectDescriptor.fabricIndex != event.mFabricIndex)
     {
-        return false;
+        return CHIP_NO_ERROR;
     }
 
     ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
+    CHIP_ERROR ret = CHIP_NO_ERROR;
+
+    bool isPathInterestedByConcretePath = false;
+
     for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
          interestedPath        = interestedPath->mpNext)
     {
         if (interestedPath->IsEventPathSupersetOf(path))
         {
-            return true;
+            ret = CHIP_EVENT_ID_FOUND;
+            if (!interestedPath->HasEventWildcard())
+            {
+                isPathInterestedByConcretePath = true;
+                break;
+            }
         }
     }
-    return false;
+
+    if (ret == CHIP_EVENT_ID_FOUND)
+    {
+        Access::RequestPath requestPath{ .cluster = event.mClusterId, .endpoint = event.mEndpointId };
+        Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
+        CHIP_ERROR aclError                = CHIP_NO_ERROR;
+
+        switch (GetInstance().mBypassACL)
+        {
+        case BypassACL::kAlwaysPass:
+            aclError = CHIP_NO_ERROR;
+            break;
+        case BypassACL::kAlwaysFail:
+            aclError = CHIP_ERROR_ACCESS_DENIED;
+            break;
+        case BypassACL::kNoBypass:
+            aclError = Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
+            break;
+        }
+
+        if (aclError != CHIP_NO_ERROR)
+        {
+            ReturnErrorCodeIf(aclError != CHIP_ERROR_ACCESS_DENIED, aclError);
+            if (isPathInterestedByConcretePath)
+            {
+                ret = CHIP_ERROR_ACCESS_DENIED;
+            }
+            else
+            {
+                ret = CHIP_NO_ERROR;
+            }
+        }
+    }
+
+    return ret;
 }
 
-CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext)
+CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext,
+                                          EventEnvelopeContext * event)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVReader innerReader;
     TLVType tlvType;
     TLVType tlvType1;
-    EventEnvelopeContext event;
 
     innerReader.Init(aReader);
+    VerifyOrDie(event != nullptr);
     ReturnErrorOnFailure(innerReader.EnterContainer(tlvType));
     ReturnErrorOnFailure(innerReader.Next());
 
     ReturnErrorOnFailure(innerReader.EnterContainer(tlvType1));
-    err = TLV::Utilities::Iterate(innerReader, FetchEventParameters, &event, false /*recurse*/);
+    err = TLV::Utilities::Iterate(innerReader, FetchEventParameters, event, false /*recurse*/);
 
-    if (event.mFieldsToRead != kRequiredEventField)
+    if (event->mFieldsToRead != kRequiredEventField)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -640,20 +690,17 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     }
     ReturnErrorOnFailure(err);
 
-    apEventLoadOutContext->mCurrentTime        = event.mCurrentTime;
-    apEventLoadOutContext->mCurrentEventNumber = event.mEventNumber;
-    if (IsInterestedEventPaths(apEventLoadOutContext, event))
-    {
-        return CHIP_EVENT_ID_FOUND;
-    }
+    apEventLoadOutContext->mCurrentTime        = event->mCurrentTime;
+    apEventLoadOutContext->mCurrentEventNumber = event->mEventNumber;
 
-    return CHIP_NO_ERROR;
+    return IsInterestedEventPaths(apEventLoadOutContext, *event);
 }
 
 CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aDepth, void * apContext)
 {
     EventLoadOutContext * const loadOutContext = static_cast<EventLoadOutContext *>(apContext);
-    CHIP_ERROR err                             = EventIterator(aReader, aDepth, loadOutContext);
+    EventEnvelopeContext event;
+    CHIP_ERROR err = EventIterator(aReader, aDepth, loadOutContext, &event);
     if (err == CHIP_EVENT_ID_FOUND)
     {
         // checkpoint the writer
@@ -675,11 +722,29 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
         loadOutContext->mFirst               = false;
         loadOutContext->mEventCount++;
     }
+    else if (err == CHIP_ERROR_ACCESS_DENIED)
+    {
+        // checkpoint the writer
+        TLV::TLVWriter checkpoint = loadOutContext->mWriter;
+
+        err = WriteEventStatusIB(loadOutContext->mWriter, ConcreteEventPath(event.mEndpointId, event.mClusterId, event.mEventId),
+                                 StatusIB(Protocols::InteractionModel::Status::UnsupportedAccess));
+
+        if (err != CHIP_NO_ERROR)
+        {
+            loadOutContext->mWriter = checkpoint;
+            return err;
+        }
+
+        loadOutContext->mPreviousTime.mValue = loadOutContext->mCurrentTime.mValue;
+        loadOutContext->mFirst               = false;
+        loadOutContext->mEventCount++;
+    }
     return err;
 }
 
 CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
-                                             size_t & aEventCount, FabricIndex aFabricIndex)
+                                             size_t & aEventCount, const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     // TODO: Add particular set of event Paths in FetchEventsSince so that we can filter the interested paths
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -692,7 +757,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
     ScopedLock lock(sInstance);
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-    context.mFabricIndex           = aFabricIndex;
+    context.mSubjectDescriptor     = aSubjectDescriptor;
     context.mpInterestedEventPaths = apClusterInfolist;
     err                            = GetEventReader(reader, PriorityLevel::Critical, &bufWrapper);
     SuccessOrExit(err);
