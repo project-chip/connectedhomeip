@@ -31,8 +31,8 @@ AudioOutputManager::AudioOutputManager()
         OutputInfoType outputInfo;
         outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
         // note: safe only because of use of string literal
-        outputInfo.name       = chip::CharSpan::fromCharString("HDMI");
-        outputInfo.index      = static_cast<uint8_t>(i);
+        outputInfo.name  = chip::CharSpan::fromCharString("HDMI");
+        outputInfo.index = static_cast<uint8_t>(i);
         mOutputs.push_back(outputInfo);
     }
 }
@@ -81,7 +81,7 @@ bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
         if (output.index == index)
         {
             audioOutputSelected = true;
-            mCurrentOutput = index;
+            mCurrentOutput      = index;
         }
     }
 

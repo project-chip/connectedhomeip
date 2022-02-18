@@ -61,7 +61,7 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
         if (input.index == index)
         {
             mediaInputSelected = true;
-            mCurrentInput = index;
+            mCurrentInput      = index;
         }
     }
 
