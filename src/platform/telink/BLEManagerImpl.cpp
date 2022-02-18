@@ -769,6 +769,10 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             err = HandleGAPDisconnect(event);
             break;
 
+        case DeviceEventType::kPlatformTelinkBleDisconnectRequest:
+            err = HandleDisconnectRequest(event);
+            break;
+
         case DeviceEventType::kPlatformTelinkBleRXWrite:
             err = HandleRXCharWrite(event);
             break;
@@ -787,6 +791,10 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
         case DeviceEventType::kCHIPoBLEConnectionClosed:
             err = HandleBleConnectionClosed(event);
+            break;
+
+        case DeviceEventType::kOperationalNetworkEnabled:
+            err = HandleOperationalNetworkEnabled(event);
             break;
 
         default:
@@ -954,23 +962,60 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event)
+CHIP_ERROR BLEManagerImpl::HandleDisconnectRequest(const ChipDeviceEvent * event)
 {
     ble_sts_t status = BLE_SUCCESS;
+    uint16_t handle = event->Platform.BleConnEvent.connHandle;
+    uint8_t reason = event->Platform.BleConnEvent.HciResult;
 
-    if(ConnectivityMgr().IsThreadProvisioned())
+    ChipLogDetail(DeviceLayer, "HandleDisconnectRequest");
+
+    /* Trigger disconnect. DisconnectCallback call occures on completion */
+    status = blc_ll_disconnect(handle, reason);
+    if(status != BLE_SUCCESS && status != LL_ERR_CONNECTION_NOT_ESTABLISH)
     {
-        // If Thread is provisionet it is time to disconnect BLE 
-        status = blc_ll_disconnect(BLS_CONN_HANDLE, CHIP_BLE_DISCONNECT_REASON);
-        if(status != BLE_SUCCESS && status != LL_ERR_CONNECTION_NOT_ESTABLISH)
-        {
-            ChipLogError(DeviceLayer, "Fail to disconnect. Error %d", status);
+        ChipLogError(DeviceLayer, "Fail to disconnect. Error %d", status);
 
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::HandleOperationalNetworkEnabled(const ChipDeviceEvent * event)
+{
+    ChipDeviceEvent disconnectEvent;
+
+    ChipLogDetail(DeviceLayer, "HandleOperationalNetworkEnabled");
+
+    disconnectEvent.Type                   = DeviceEventType::kPlatformTelinkBleDisconnectRequest;
+    disconnectEvent.Platform.BleConnEvent.connHandle = BLS_CONN_HANDLE;
+    disconnectEvent.Platform.BleConnEvent.HciResult  = CHIP_BLE_DISCONNECT_REASON;
+    ReturnErrorOnFailure(PlatformMgr().PostEvent(&disconnectEvent));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    ChipLogDetail(DeviceLayer, "HandleThreadStateChange");
+
+    if (event->Type == DeviceEventType::kThreadStateChange && event->ThreadStateChange.RoleChanged)
+    {
+        ChipDeviceEvent attachEvent;
+        attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
+        attachEvent.ThreadConnectivityChange.Result = kConnectivity_Established;
+
+        error = PlatformMgr().PostEvent(&attachEvent);
+        VerifyOrExit(error == CHIP_NO_ERROR,
+                       ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, error.Format()));
+
+    }
+
+exit:
+    return error;
 }
 
 CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
