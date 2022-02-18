@@ -37,6 +37,7 @@ jobs:
             image: connectedhomeip/chip-build:0.5.52
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
+
         steps:
             - name: Checkout
               uses: actions/checkout@v2
