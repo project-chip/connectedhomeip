@@ -67,7 +67,7 @@ static chip::ota::UserConsentState gUserConsentState                  = chip::ot
 static bool gUserConsentNeeded                                        = false;
 static chip::Optional<uint32_t> gSoftwareVersion;
 static const char * gSoftwareVersionString = nullptr;
-static uint32_t gIgnoreQueryImageCount                                = 0;
+static uint32_t gIgnoreQueryImageCount     = 0;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -190,7 +190,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         break;
     case kOptionIgnoreQueryImage:
         gIgnoreQueryImageCount = 1;
-        //gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        // gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUpdateAction:
         if (aValue == NULL)
