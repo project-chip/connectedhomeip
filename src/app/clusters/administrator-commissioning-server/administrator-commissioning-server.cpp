@@ -109,10 +109,14 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() ==
                      CommissioningWindowStatus::kWindowNotOpen,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
-    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     VerifyOrExit(discriminator <= kMaxDiscriminatorValue, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));

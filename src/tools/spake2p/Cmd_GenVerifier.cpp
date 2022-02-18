@@ -176,7 +176,8 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'l':
-        if (!ParseInt(arg, gSaltLen) || !(gSaltLen >= chip::kSpake2p_Min_PBKDF_Salt_Length && gSaltLen <= chip::kSpake2p_Max_PBKDF_Salt_Length))
+        if (!ParseInt(arg, gSaltLen) ||
+            !(gSaltLen >= chip::kSpake2p_Min_PBKDF_Salt_Length && gSaltLen <= chip::kSpake2p_Max_PBKDF_Salt_Length))
         {
             PrintArgError("%s: Invalid value specified for salt length parameter: %s\n", progName, arg);
             return false;

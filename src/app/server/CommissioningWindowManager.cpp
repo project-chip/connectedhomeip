@@ -188,7 +188,7 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     else
     {
         uint32_t iterationCount                      = 0;
-        uint8_t salt[kSpake2p_Max_PBKDF_Salt_Length]         = { 0 };
+        uint8_t salt[kSpake2p_Max_PBKDF_Salt_Length] = { 0 };
         size_t saltLen                               = 0;
         Spake2pVerifierSerialized serializedVerifier = { 0 };
         size_t serializedVerifierLen                 = 0;
