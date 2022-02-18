@@ -63,9 +63,8 @@ ChannelManager::ChannelManager()
 CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder)
 {
     // TODO: Insert code here
-    std::vector<ChannelInfoType> channels = mChannels;
-    return aEncoder.EncodeList([channels](const auto & encoder) -> CHIP_ERROR {
-        for (auto const & channel : channels)
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & channel : ChannelManager().mChannels)
         {
             ReturnErrorOnFailure(encoder.Encode(channel));
         }

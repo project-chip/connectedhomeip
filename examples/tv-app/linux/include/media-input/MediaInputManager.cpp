@@ -38,9 +38,8 @@ MediaInputManager::MediaInputManager()
 CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
     // TODO: Insert code here
-    std::vector<InputInfoType> inputs = mInputs;
-    return aEncoder.EncodeList([inputs](const auto & encoder) -> CHIP_ERROR {
-        for (auto const & inputInfo : inputs)
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & inputInfo : this->mInputs)
         {
             ReturnErrorOnFailure(encoder.Encode(inputInfo));
         }
@@ -53,23 +52,20 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
     return mCurrentInput;
 }
 
-bool isMediaInputIndexInRange(const uint8_t index, std::vector<InputInfoType> inputs)
-{
-    return index > 0 && index <= inputs.size();
-}
-
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
     // TODO: Insert code here
-    if (isMediaInputIndexInRange(index, mInputs))
+    bool mediaInputSelected = false;
+    for (InputInfoType & input : mInputs)
     {
-        mCurrentInput = index;
-        return true;
+        if (input.index == index)
+        {
+            mediaInputSelected = true;
+            mCurrentInput      = index;
+        }
     }
-    else
-    {
-        return false;
-    }
+
+    return mediaInputSelected;
 }
 
 bool MediaInputManager::HandleShowInputStatus()
@@ -87,19 +83,17 @@ bool MediaInputManager::HandleHideInputStatus()
 bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
-    if (isMediaInputIndexInRange(index, mInputs))
+    bool mediaInputRenamed = false;
+
+    for (InputInfoType & input : mInputs)
     {
-        for (InputInfoType & input : mInputs)
+        if (input.index == index)
         {
-            if (input.index == index)
-            {
-                input.name = name;
-            }
+            mediaInputRenamed = true;
+            memcpy(this->Data(index), name.data(), name.size());
+            input.name = chip::CharSpan(this->Data(index), name.size());
         }
-        return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return mediaInputRenamed;
 }
