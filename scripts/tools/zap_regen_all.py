@@ -85,7 +85,8 @@ def getGlobalTemplatesTargets():
         # Place holder has apps within each build
         if example_name == "placeholder":
             example_name = filepath.as_posix()
-            example_name = example_name[example_name.index('apps/') + len('apps/'):]
+            example_name = example_name[example_name.index(
+                'apps/') + len('apps/'):]
             example_name = example_name[:example_name.index('/')]
             logging.info("Found example %s (via %s)" %
                          (example_name, str(filepath)))
@@ -134,7 +135,8 @@ def getTestsTemplatesTargets(test_target):
     # Place holder has apps within each build
     for filepath in Path('./examples/placeholder').rglob('*.zap'):
         example_name = filepath.as_posix()
-        example_name = example_name[example_name.index('apps/') + len('apps/'):]
+        example_name = example_name[example_name.index(
+            'apps/') + len('apps/'):]
         example_name = example_name[:example_name.index('/')]
 
         templates[example_name] = {
