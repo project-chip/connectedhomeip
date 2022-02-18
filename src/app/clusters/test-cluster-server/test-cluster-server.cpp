@@ -75,6 +75,8 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
+    CHIP_ERROR WriteListFabricScopedListEntry(const Structs::TestFabricScoped::DecodableType & entry, size_t index);
+
     CHIP_ERROR ReadListInt8uAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteListInt8uAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder);
@@ -91,6 +93,7 @@ private:
     CHIP_ERROR ReadNullableStruct(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteNullableStruct(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteListFabricScopedAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 };
 
 TestAttrAccess gAttrAccess;
@@ -105,6 +108,11 @@ Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLengt
 OctetStringData gStructAttributeByteSpanData;
 Structs::SimpleStruct::Type gStructAttributeValue;
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
+
+TestCluster::Structs::TestFabricScoped::Type gListFabricScopedAttributeValue[kAttributeListLength];
+uint8_t gListFabricScoped_fabricSensitiveInt8uList[kAttributeListLength][64];
+size_t gListFabricScopedAttributeLen = 0;
+char gListFabricScoped_fabricSensitiveCharBuf[kAttributeListLength][128];
 
 //                                                     /16             /32             /48             /64
 const char sLongOctetStringBuf[513] = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  // 64
@@ -176,6 +184,9 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     }
     case ListLongOctetString::Id: {
         return WriteListLongOctetStringAttribute(aPath, aDecoder);
+    }
+    case ListFabricScoped::Id: {
+        return WriteListFabricScopedAttribute(aPath, aDecoder);
     }
     case ListStructOctetString::Id: {
         return WriteListStructOctetStringAttribute(aPath, aDecoder);
@@ -538,16 +549,130 @@ CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder
 CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type val;
-
-        for (const auto & fb : Server::GetInstance().GetFabricTable())
+        for (size_t index = 0; index < gListFabricScopedAttributeLen; index++)
         {
-            val.fabricIndex = fb.GetFabricIndex();
-            ReturnErrorOnFailure(encoder.Encode(val));
+            ReturnErrorOnFailure(encoder.Encode(gListFabricScopedAttributeValue[index]));
         }
 
         return CHIP_NO_ERROR;
     });
+}
+
+CHIP_ERROR TestAttrAccess::WriteListFabricScopedListEntry(const Structs::TestFabricScoped::DecodableType & entry, size_t index)
+{
+    VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    //
+    // The fabric index in the entry has already been set to the right index
+    // by the decoder.
+    //
+    gListFabricScopedAttributeValue[index].fabricIndex = entry.fabricIndex;
+
+    gListFabricScopedAttributeValue[index].optionalFabricSensitiveInt8u         = entry.optionalFabricSensitiveInt8u;
+    gListFabricScopedAttributeValue[index].nullableFabricSensitiveInt8u         = entry.nullableFabricSensitiveInt8u;
+    gListFabricScopedAttributeValue[index].nullableOptionalFabricSensitiveInt8u = entry.nullableOptionalFabricSensitiveInt8u;
+
+    VerifyOrReturnError(entry.fabricSensitiveCharString.size() < 128, CHIP_ERROR_BUFFER_TOO_SMALL);
+    strncpy(gListFabricScoped_fabricSensitiveCharBuf[index], entry.fabricSensitiveCharString.begin(),
+            entry.fabricSensitiveCharString.size());
+    gListFabricScopedAttributeValue[index].fabricSensitiveCharString =
+        CharSpan(gListFabricScoped_fabricSensitiveCharBuf[index], entry.fabricSensitiveCharString.size());
+
+    //
+    // For now, we're not permitting the SimpleStruct's contents to have valid strings, since that just
+    // increases the complexity of this logic. We don't really need to validate that since there are other tests
+    // that validate that struct, so let's just do the bare minimum here.
+    //
+    VerifyOrReturnError(entry.fabricSensitiveStruct.d.size() == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(entry.fabricSensitiveStruct.e.size() == 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    gListFabricScopedAttributeValue[index].fabricSensitiveStruct = entry.fabricSensitiveStruct;
+    gListFabricScopedAttributeValue[index].fabricSensitiveInt8u  = entry.fabricSensitiveInt8u;
+
+    auto intIter = entry.fabricSensitiveInt8uList.begin();
+    size_t i     = 0;
+    while (intIter.Next())
+    {
+        VerifyOrReturnError(i < 64, CHIP_ERROR_BUFFER_TOO_SMALL);
+        gListFabricScoped_fabricSensitiveInt8uList[index][i++] = intIter.GetValue();
+    }
+    ReturnErrorOnFailure(intIter.GetStatus());
+
+    gListFabricScopedAttributeValue[index].fabricSensitiveInt8uList =
+        DataModel::List<uint8_t>(gListFabricScoped_fabricSensitiveInt8uList[index], i);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    if (!aPath.IsListItemOperation())
+    {
+        ListFabricScoped::TypeInfo::DecodableType list;
+
+        ReturnErrorOnFailure(aDecoder.Decode(list));
+
+        //
+        // Delete all existing entries matching the accessing fabric. This is achieved by 'shifting down'
+        // entries that don't match the accessing fabric into the slots occupied by the deleted entries.
+        //
+        size_t srcIndex = 0, dstIndex = 0;
+        while (srcIndex < gListFabricScopedAttributeLen)
+        {
+            if (gListFabricScopedAttributeValue[srcIndex].fabricIndex != aDecoder.AccessingFabricIndex())
+            {
+                auto & dstEntry = gListFabricScopedAttributeValue[dstIndex];
+                auto & srcEntry = gListFabricScopedAttributeValue[srcIndex];
+
+                dstEntry = srcEntry;
+
+                //
+                // We copy the data referenced by spans over to the right slot in the backing buffers.
+                //
+                strncpy(gListFabricScoped_fabricSensitiveCharBuf[dstIndex], srcEntry.fabricSensitiveCharString.begin(),
+                        srcEntry.fabricSensitiveCharString.size());
+                dstEntry.fabricSensitiveCharString =
+                    CharSpan(gListFabricScoped_fabricSensitiveCharBuf[dstIndex], srcEntry.fabricSensitiveCharString.size());
+
+                memcpy(gListFabricScoped_fabricSensitiveInt8uList[dstIndex], gListFabricScoped_fabricSensitiveInt8uList[srcIndex],
+                       srcEntry.fabricSensitiveInt8uList.size() * sizeof(uint8_t));
+                gListFabricScopedAttributeValue[dstIndex].fabricSensitiveInt8uList = DataModel::List<uint8_t>(
+                    gListFabricScoped_fabricSensitiveInt8uList[dstIndex], srcEntry.fabricSensitiveInt8uList.size());
+
+                dstIndex++;
+            }
+
+            srcIndex++;
+        }
+
+        size_t size;
+        ReturnErrorOnFailure(list.ComputeSize(&size));
+
+        auto iter = list.begin();
+        while (iter.Next())
+        {
+            auto & entry = iter.GetValue();
+            ReturnErrorOnFailure(WriteListFabricScopedListEntry(entry, dstIndex++));
+        }
+
+        gListFabricScopedAttributeLen = dstIndex;
+        return iter.GetStatus();
+    }
+    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    {
+        VerifyOrReturnError(gListFabricScopedAttributeLen < kAttributeListLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+        Structs::TestFabricScoped::DecodableType listEntry;
+        ReturnErrorOnFailure(aDecoder.Decode(listEntry));
+        ReturnErrorOnFailure(WriteListFabricScopedListEntry(listEntry, gListFabricScopedAttributeLen));
+
+        gListFabricScopedAttributeLen++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
 }
 
 } // namespace

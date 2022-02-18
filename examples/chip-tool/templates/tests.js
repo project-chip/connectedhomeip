@@ -443,6 +443,7 @@ function getTests()
   const Others = [
     'TestCluster',
     'TestClusterComplexTypes',
+    'TestClusterMultiFabric',
     'TestConstraints',
     'TestDelayCommands',
     'TestLogCommands',

@@ -123,6 +123,17 @@ class uint(int):
                 'expecting positive value, got negative value of %d instead' % val)
 
 
+class float32(float):
+    ''' A type for single precision floats distinct from the double precision 'float'
+        type offered by default in Python. This type distinction is present in the Matter
+        data model types so we need it here as well.
+
+        It is backed by an ordinary float, which means there will be precision loss at the time
+        the value is converted to TLV.
+    '''
+    pass
+
+
 class TLVWriter(object):
     def __init__(self, encoding=None, implicitProfile=None):
         self._encoding = encoding if encoding is not None else bytearray()
@@ -194,8 +205,10 @@ class TLVWriter(object):
             self.putUnsignedInt(tag, val)
         elif isinstance(val, int):
             self.putSignedInt(tag, val)
-        elif isinstance(val, float):
+        elif isinstance(val, float32):
             self.putFloat(tag, val)
+        elif isinstance(val, float):
+            self.putDouble(tag, val)
         elif isinstance(val, str):
             self.putString(tag, val)
         elif isinstance(val, bytes) or isinstance(val, bytearray):
@@ -248,6 +261,15 @@ class TLVWriter(object):
 
     def putFloat(self, tag, val):
         """Write a value as a TLV float with the specified TLV tag."""
+        val = struct.pack("f", val)
+        controlAndTag = self._encodeControlAndTag(
+            TLV_TYPE_FLOATING_POINT_NUMBER, tag, lenOfLenOrVal=len(val)
+        )
+        self._encoding.extend(controlAndTag)
+        self._encoding.extend(val)
+
+    def putDouble(self, tag, val):
+        """Write a value as a TLV double with the specified TLV tag."""
         val = struct.pack("d", val)
         controlAndTag = self._encodeControlAndTag(
             TLV_TYPE_FLOATING_POINT_NUMBER, tag, lenOfLenOrVal=len(val)
