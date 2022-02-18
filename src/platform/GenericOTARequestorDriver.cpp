@@ -22,6 +22,9 @@
 #include <platform/OTARequestorInterface.h>
 
 namespace chip {
+
+extern void StartDelayTimerHandler(System::Layer * systemLayer, void * appState);
+
 namespace DeviceLayer {
 namespace {
 
@@ -148,11 +151,17 @@ void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallbac
     SystemLayer().CancelTimer(action, aAppState);
 }
 
-void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
-{
-    VerifyOrReturn(appState != nullptr);
-    static_cast<OTARequestorInterface *>(appState)->ConnectToProvider(OTARequestorInterface::kQueryImage);
-}
+
+// void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
+// {
+//     ChipLogDetail(SoftwareUpdate, "LISS StartDelayTimerHandler appState %p", appState);
+
+//     VerifyOrReturn(appState != nullptr);
+
+//  ChipLogDetail(SoftwareUpdate, "LISS StartDelayTimerHandler appState %p", appState);
+
+//     static_cast<GenericOTARequestorDriver *>(appState)->mRequestor->ConnectToProvider(OTARequestorInterface::kQueryImage);
+// }
 
 
 void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
@@ -182,7 +191,7 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocati
     mRequestor->SetCurrentProviderLocation(providerLocation);
     StopDefaultProvidersTimer();
 
-    ScheduleDelayedAction(UpdateFailureState::kQuerying, System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, this);
+    ScheduleDelayedAction(UpdateFailureState::kQuerying, System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, mRequestor);
 }
 
 OTARequestorAction GenericOTARequestorDriver::GetRequestorAction(OTARequestorIncomingEvent input)

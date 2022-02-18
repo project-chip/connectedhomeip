@@ -88,6 +88,12 @@ static void LogApplyUpdateResponse(const ApplyUpdateResponse::DecodableType & re
     ChipLogDetail(SoftwareUpdate, "  delayedActionTime: %" PRIu32 " seconds", response.delayedActionTime);
 }
 
+void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    VerifyOrReturn(appState != nullptr);
+    static_cast<OTARequestor *>(appState)->ConnectToProvider(OTARequestor::kQueryImage);
+}
+
 void SetRequestorInstance(OTARequestorInterface * instance)
 {
     globalOTARequestorInstance = instance;
@@ -238,7 +244,6 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
                                                 .providerNodeID = commandData.providerNodeId,
                                                 .endpoint       = commandData.endpoint };
 
-    ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %u", providerLocation.fabricIndex);
     ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(providerLocation.providerNodeID));
 
