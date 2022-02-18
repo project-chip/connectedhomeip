@@ -664,6 +664,14 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
+    // Check to see if pairing in progress before shutting down
+    CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
+    if (device != nullptr && device->IsSessionSetupInProgress())
+    {
+        ChipLogDetail(Controller, "Setup in progress, stopping setup before shutting down");
+        OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
+    }
+
     mSystemState->SessionMgr()->UnregisterRecoveryDelegate(*this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
