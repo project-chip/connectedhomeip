@@ -240,6 +240,10 @@ function getManualTests()
 
 function getTests()
 {
+  const AccessControl = [
+    'TestAccessControlCluster',
+  ];
+
   const BinaryInput = [
     'Test_TC_BI_1_1',
     'Test_TC_BI_2_1',
@@ -479,6 +483,7 @@ function getTests()
   ];
 
   const tests = [
+    AccessControl, //
     BinaryInput, //
     BooleanState, //
     BridgedActions, //
