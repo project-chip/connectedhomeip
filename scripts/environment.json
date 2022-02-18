@@ -1,7 +1,8 @@
 {
     "cipd_package_files": [
         "third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json",
-        "scripts/python.json"
+        "scripts/python.json",
+	"scripts/compiler.json"
     ],
     "virtualenv": {
         "gn_root": ".",
