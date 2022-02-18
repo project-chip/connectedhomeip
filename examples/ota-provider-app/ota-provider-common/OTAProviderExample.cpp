@@ -162,6 +162,10 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     bool requestorCanConsent              = commandData.requestorCanConsent.ValueOr(false);
     QueryImageResponse::Type response;
 
+    ChipLogDetail(Zcl, "  //is: OTAProviderExample::HandleQueryImage mIgnoreQueryImageCount %" PRIu32, mIgnoreQueryImageCount);
+
+if (mIgnoreQueryImageCount == 0)
+{
     switch (mQueryImageBehavior)
     {
     case kRespondWithUnknown:
@@ -287,7 +291,14 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         response.metadataForRequestor.Emplace(chip::ByteSpan());
     }
 
-    VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+    
+        VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+    }
+    else
+    {
+        mIgnoreQueryImageCount--;
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }

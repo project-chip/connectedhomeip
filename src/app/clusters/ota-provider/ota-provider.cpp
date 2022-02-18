@@ -238,7 +238,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
         return true;
     }
 
-    ChipLogDetail(Zcl, "  //is: Before calling HandleQueryImage");
+    ChipLogDetail(Zcl, "  //is: emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback - Before calling HandleQueryImage");
 
     status = delegate->HandleQueryImage(commandObj, commandPath, commandData);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
