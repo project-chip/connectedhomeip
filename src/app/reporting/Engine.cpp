@@ -519,14 +519,19 @@ void Engine::Run()
 
     mRunScheduled = false;
 
-    while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < imEngine->mReadHandlers.Allocated()))
+    // We may be deallocating read handlers as we go.  Track how many we had
+    // initially, so we make sure to go through all of them.
+    size_t initialAllocated = imEngine->mReadHandlers.Allocated();
+    while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < initialAllocated))
     {
         ReadHandler * readHandler = imEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) imEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
         if (readHandler->IsReportable())
         {
-            CHIP_ERROR err = BuildAndSendSingleReportData(readHandler);
+            mRunningReadHandler = readHandler;
+            CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
+            mRunningReadHandler = nullptr;
             if (err != CHIP_NO_ERROR)
             {
                 return;
@@ -534,6 +539,9 @@ void Engine::Run()
         }
 
         numReadHandled++;
+        // If readHandler removed itself from our list, we also decremented
+        // mCurReadHandlerIdx to account for that removal, so it's safe to
+        // increment here.
         mCurReadHandlerIdx++;
     }
 
@@ -669,6 +677,12 @@ void Engine::OnReportConfirm()
 {
     VerifyOrDie(mNumReportsInFlight > 0);
 
+    if (mNumReportsInFlight == CHIP_IM_MAX_REPORTS_IN_FLIGHT)
+    {
+        // We could have other things waiting to go now that this report is no
+        // longer in flight.
+        ScheduleRun();
+    }
     mNumReportsInFlight--;
     ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %" PRIu32, mNumReportsInFlight);
 }
