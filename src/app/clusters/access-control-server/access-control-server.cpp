@@ -225,7 +225,7 @@ struct AccessControlEntryCodec
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex accessingFabricIndex) const
     {
         AccessControlCluster::Structs::AccessControlEntry::Type staging;
 
@@ -272,7 +272,7 @@ struct AccessControlEntryCodec
             staging.targets.SetNonNull(targetBuffer, targetCount);
         }
 
-        return staging.Encode(aWriter, aTag);
+        return staging.EncodeForRead(aWriter, aTag, accessingFabricIndex);
     }
 
     CHIP_ERROR Decode(TLV::TLVReader & aReader)

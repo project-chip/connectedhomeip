@@ -1014,6 +1014,12 @@ class ChipClusters:
                     "type": "bool",
                     "reportable": True,
                 },
+                0x00000012: {
+                    "attributeName": "UniqueID",
+                    "attributeId": 0x00000012,
+                    "type": "str",
+                    "reportable": True,
+                },
                 0x0000FFF8: {
                     "attributeName": "ServerGeneratedCommandList",
                     "attributeId": 0x0000FFF8,

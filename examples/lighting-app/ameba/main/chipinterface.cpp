@@ -155,6 +155,26 @@ static Identify gIdentify1 = {
     chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
 };
 
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model and CHIP App Server
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    NetWorkCommissioningInstInit();
+
+    if (RTW_SUCCESS != wifi_is_connected_to_ap())
+    {
+        // QR code will be used with CHIP Tool
+        PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    }
+
+#if CONFIG_ENABLE_OTA_REQUESTOR
+    InitOTARequestor();
+#endif
+}
+
 extern "C" void ChipTest(void)
 {
     ChipLogProgress(DeviceLayer, "Lighting App Demo!");
@@ -174,17 +194,7 @@ extern "C" void ChipTest(void)
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
     }
 
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    NetWorkCommissioningInstInit();
-
-    if (RTW_SUCCESS != wifi_is_connected_to_ap())
-    {
-        // QR code will be used with CHIP Tool
-        PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-    }
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
 

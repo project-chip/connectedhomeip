@@ -47,7 +47,6 @@ CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && a
     StatusResponseMessage::Parser response;
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
-    ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(response.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(response.CheckSchemaValidity());
@@ -55,6 +54,7 @@ CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && a
     StatusIB status;
     ReturnErrorOnFailure(response.GetStatus(status.mStatus));
     ChipLogProgress(InteractionModel, "Received status response, status is %u", to_underlying(status.mStatus));
+    ReturnErrorOnFailure(response.ExitContainer());
 
     if (status.mStatus == Protocols::InteractionModel::Status::Success)
     {
