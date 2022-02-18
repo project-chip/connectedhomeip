@@ -161,7 +161,7 @@ public:
 
     void OnError(CHIP_ERROR aError) override { mReadError = true; }
 
-    void OnDone() override  { mOnDone = true; }
+    void OnDone() override { mOnDone = true; }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
