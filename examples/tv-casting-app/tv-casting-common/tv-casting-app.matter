@@ -296,38 +296,6 @@ server cluster Binding = 30 {
   command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
-server cluster BridgedDeviceBasic = 57 {
-  critical event StartUp = 0 {
-    INT32U softwareVersion = 0;
-  }
-
-  critical event ShutDown = 1 {
-  }
-
-  info event Leave = 2 {
-  }
-
-  info event ReachableChanged = 3 {
-    boolean reachableNewValue = 0;
-  }
-
-  readonly attribute char_string<32> vendorName = 1;
-  readonly attribute int16u vendorID = 2;
-  readonly attribute char_string<32> productName = 3;
-  attribute char_string<32> nodeLabel = 5;
-  readonly attribute int16u hardwareVersion = 7;
-  readonly attribute char_string<64> hardwareVersionString = 8;
-  readonly attribute int32u softwareVersion = 9;
-  readonly attribute char_string<64> softwareVersionString = 10;
-  readonly attribute char_string<16> manufacturingDate = 11;
-  readonly attribute char_string<32> partNumber = 12;
-  readonly attribute long_char_string<256> productURL = 13;
-  readonly attribute char_string<64> productLabel = 14;
-  readonly attribute char_string<32> serialNumber = 15;
-  readonly attribute boolean reachable = 17;
-  readonly global attribute int16u clusterRevision = 65533;
-}
-
 client cluster Channel = 1284 {
   enum ErrorTypeEnum : ENUM8 {
     kMultipleMatches = 0;
@@ -2918,7 +2886,6 @@ endpoint 1 {
   server  cluster BarrierControl;
   server  cluster BinaryInputBasic;
   server  cluster Binding;
-  server  cluster BridgedDeviceBasic;
   binding cluster Channel;
   server  cluster ColorControl;
   binding cluster ContentLauncher;

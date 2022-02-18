@@ -2321,7 +2321,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+                                                                           static_cast<uint16_t>(cppValue), value);
             return value;
         }
         case Attributes::ProductName::Id: {
@@ -2475,6 +2475,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueCtorSignature = "(Z)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<bool>(valueClassName.c_str(), valueCtorSignature.c_str(), cppValue,
                                                                        value);
+            return value;
+        }
+        case Attributes::UniqueID::Id: {
+            using TypeInfo = Attributes::UniqueID::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            value = env->NewStringUTF(std::string(cppValue.data(), cppValue.size()).c_str());
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {

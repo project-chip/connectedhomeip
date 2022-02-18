@@ -4820,7 +4820,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("VendorName", 1, value);
         }
         case BridgedDeviceBasic::Attributes::VendorID::Id: {
-            uint16_t value;
+            chip::VendorId value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("VendorID", 1, value);
         }

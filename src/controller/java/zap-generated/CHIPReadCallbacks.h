@@ -1752,6 +1752,36 @@ private:
     bool keepAlive;
 };
 
+class CHIPBridgedDeviceBasicVendorIDAttributeCallback
+    : public chip::Callback::Callback<CHIPBridgedDeviceBasicClusterVendorIDAttributeCallbackType>
+{
+public:
+    CHIPBridgedDeviceBasicVendorIDAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBridgedDeviceBasicVendorIDAttributeCallback();
+
+    static void maybeDestroy(CHIPBridgedDeviceBasicVendorIDAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBridgedDeviceBasicVendorIDAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, chip::VendorId value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBridgedDeviceBasicVendorIDAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPBridgedDeviceBasicServerGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPBridgedDeviceBasicClusterServerGeneratedCommandListAttributeCallbackType>
 {

@@ -14771,9 +14771,9 @@ struct TypeInfo
 namespace VendorID {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::VendorId;
+    using DecodableType    = chip::VendorId;
+    using DecodableArgType = chip::VendorId;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
@@ -15016,7 +15016,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::VendorName::TypeInfo::DecodableType vendorName;
-        Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<uint16_t>(0);
+        Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<chip::VendorId>(0);
         Attributes::ProductName::TypeInfo::DecodableType productName;
         Attributes::NodeLabel::TypeInfo::DecodableType nodeLabel;
         Attributes::HardwareVersion::TypeInfo::DecodableType hardwareVersion = static_cast<uint16_t>(0);
