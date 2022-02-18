@@ -37,7 +37,6 @@ jobs:
             image: connectedhomeip/chip-build:0.5.52
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/ota:/tmp/ota"
         steps:
             - name: Checkout
               uses: actions/checkout@v2
@@ -132,6 +131,7 @@ jobs:
                     linux debug ota-requestor-app \
                     out/ota_requestor_debug/chip-ota-requestor-app \
                     /tmp/bloat_reports/
+
             - name: Build example Standalone Door Lock App
               timeout-minutes: 5
               run: |
