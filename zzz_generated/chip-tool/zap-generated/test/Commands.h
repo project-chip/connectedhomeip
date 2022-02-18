@@ -52825,6 +52825,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Rename Output Command\n");
             err = TestRenameOutputCommand_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read attribute Audio Output list\n");
+            err = TestReadAttributeAudioOutputList_5();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -52836,7 +52840,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 6;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -52871,6 +52875,19 @@ private:
     static void OnSuccessCallback_2(void * context, uint8_t currentOutput)
     {
         (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_2(currentOutput);
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &
+            outputList)
+    {
+        (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_5(outputList);
     }
 
     //
@@ -52911,15 +52928,15 @@ private:
             VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 0));
             VerifyOrReturn(CheckValue("outputList[0].index", iter_0.GetValue().index, 1));
             VerifyOrReturn(CheckValue("outputList[0].outputType", iter_0.GetValue().outputType, 0));
-            VerifyOrReturn(CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 1));
             VerifyOrReturn(CheckValue("outputList[1].index", iter_0.GetValue().index, 2));
             VerifyOrReturn(CheckValue("outputList[1].outputType", iter_0.GetValue().outputType, 0));
-            VerifyOrReturn(CheckValueAsString("outputList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("outputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 2));
             VerifyOrReturn(CheckValue("outputList[2].index", iter_0.GetValue().index, 3));
             VerifyOrReturn(CheckValue("outputList[2].outputType", iter_0.GetValue().outputType, 0));
-            VerifyOrReturn(CheckValueAsString("outputList[2].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("outputList[2].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
             VerifyOrReturn(CheckNoMoreListItems<decltype(outputList)>("outputList", iter_0, 3));
         }
 
@@ -52947,7 +52964,7 @@ private:
 
     void OnSuccessResponse_2(uint8_t currentOutput)
     {
-        VerifyOrReturn(CheckValue("currentOutput", currentOutput, 0));
+        VerifyOrReturn(CheckValue("currentOutput", currentOutput, 1));
 
         NextTest();
     }
@@ -52989,7 +53006,7 @@ private:
         ListFreer listFreer;
         RequestType request;
         request.index = 1;
-        request.name  = chip::Span<const char>("exampleNamegarbage: not in length on purpose", 11);
+        request.name  = chip::Span<const char>("HDMI Testgarbage: not in length on purpose", 9);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_4();
@@ -53010,6 +53027,49 @@ private:
     }
 
     void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeAudioOutputList_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 2;
+        chip::Controller::AudioOutputClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::OutputList::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &
+            outputList)
+    {
+        {
+            auto iter_0 = outputList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 0));
+            VerifyOrReturn(CheckValue("outputList[0].index", iter_0.GetValue().index, 1));
+            VerifyOrReturn(CheckValue("outputList[0].outputType", iter_0.GetValue().outputType, 0));
+            VerifyOrReturn(CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI Test", 9)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 1));
+            VerifyOrReturn(CheckValue("outputList[1].index", iter_0.GetValue().index, 2));
+            VerifyOrReturn(CheckValue("outputList[1].outputType", iter_0.GetValue().outputType, 0));
+            VerifyOrReturn(CheckValueAsString("outputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 2));
+            VerifyOrReturn(CheckValue("outputList[2].index", iter_0.GetValue().index, 3));
+            VerifyOrReturn(CheckValue("outputList[2].outputType", iter_0.GetValue().outputType, 0));
+            VerifyOrReturn(CheckValueAsString("outputList[2].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(outputList)>("outputList", iter_0, 3));
+        }
+
+        NextTest();
+    }
 };
 
 class TV_ApplicationLauncherCluster : public TestCommand
@@ -54782,16 +54842,24 @@ public:
             err = TestReadAttributeChannelList_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Change Channel Command\n");
-            err = TestChangeChannelCommand_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read attribute channel lineup\n");
+            err = TestReadAttributeChannelLineup_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Change Channel By Number Command\n");
-            err = TestChangeChannelByNumberCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read attribute current channel\n");
+            err = TestReadAttributeCurrentChannel_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Skip Channel Command\n");
-            err = TestSkipChannelCommand_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Change Channel Command\n");
+            err = TestChangeChannelCommand_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Change Channel By Number Command\n");
+            err = TestChangeChannelByNumberCommand_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Skip Channel Command\n");
+            err = TestSkipChannelCommand_6();
             break;
         }
 
@@ -54804,7 +54872,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -54828,6 +54896,30 @@ private:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & channelList)
     {
         (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_1(channelList);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & lineup)
+    {
+        (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_2(lineup);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & currentChannel)
+    {
+        (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_3(currentChannel);
     }
 
     //
@@ -54865,53 +54957,69 @@ private:
         {
             auto iter_0 = channelList.begin();
             VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 0));
-            VerifyOrReturn(CheckValue("channelList[0].majorNumber", iter_0.GetValue().majorNumber, 1U));
-            VerifyOrReturn(CheckValue("channelList[0].minorNumber", iter_0.GetValue().minorNumber, 2U));
+            VerifyOrReturn(CheckValue("channelList[0].majorNumber", iter_0.GetValue().majorNumber, 6U));
+            VerifyOrReturn(CheckValue("channelList[0].minorNumber", iter_0.GetValue().minorNumber, 0U));
             VerifyOrReturn(CheckValuePresent("channelList[0].name", iter_0.GetValue().name));
-            VerifyOrReturn(CheckValueAsString("channelList[0].name.Value()", iter_0.GetValue().name.Value(),
-                                              chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(
+                CheckValueAsString("channelList[0].name.Value()", iter_0.GetValue().name.Value(), chip::CharSpan("ABC", 3)));
             VerifyOrReturn(CheckValuePresent("channelList[0].callSign", iter_0.GetValue().callSign));
             VerifyOrReturn(CheckValueAsString("channelList[0].callSign.Value()", iter_0.GetValue().callSign.Value(),
-                                              chip::CharSpan("exampleCSign", 12)));
+                                              chip::CharSpan("KAAL-TV", 7)));
             VerifyOrReturn(CheckValuePresent("channelList[0].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
             VerifyOrReturn(CheckValueAsString("channelList[0].affiliateCallSign.Value()",
-                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("exampleASign", 12)));
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("KAAL", 4)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 1));
-            VerifyOrReturn(CheckValue("channelList[1].majorNumber", iter_0.GetValue().majorNumber, 2U));
-            VerifyOrReturn(CheckValue("channelList[1].minorNumber", iter_0.GetValue().minorNumber, 3U));
+            VerifyOrReturn(CheckValue("channelList[1].majorNumber", iter_0.GetValue().majorNumber, 9U));
+            VerifyOrReturn(CheckValue("channelList[1].minorNumber", iter_0.GetValue().minorNumber, 1U));
             VerifyOrReturn(CheckValuePresent("channelList[1].name", iter_0.GetValue().name));
-            VerifyOrReturn(CheckValueAsString("channelList[1].name.Value()", iter_0.GetValue().name.Value(),
-                                              chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(
+                CheckValueAsString("channelList[1].name.Value()", iter_0.GetValue().name.Value(), chip::CharSpan("PBS", 3)));
             VerifyOrReturn(CheckValuePresent("channelList[1].callSign", iter_0.GetValue().callSign));
             VerifyOrReturn(CheckValueAsString("channelList[1].callSign.Value()", iter_0.GetValue().callSign.Value(),
-                                              chip::CharSpan("exampleCSign", 12)));
+                                              chip::CharSpan("KCTS-TV", 7)));
             VerifyOrReturn(CheckValuePresent("channelList[1].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
             VerifyOrReturn(CheckValueAsString("channelList[1].affiliateCallSign.Value()",
-                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("exampleASign", 12)));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(channelList)>("channelList", iter_0, 2));
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("KCTS", 4)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 2));
+            VerifyOrReturn(CheckValue("channelList[2].majorNumber", iter_0.GetValue().majorNumber, 9U));
+            VerifyOrReturn(CheckValue("channelList[2].minorNumber", iter_0.GetValue().minorNumber, 2U));
+            VerifyOrReturn(CheckValuePresent("channelList[2].name", iter_0.GetValue().name));
+            VerifyOrReturn(
+                CheckValueAsString("channelList[2].name.Value()", iter_0.GetValue().name.Value(), chip::CharSpan("PBS Kids", 8)));
+            VerifyOrReturn(CheckValuePresent("channelList[2].callSign", iter_0.GetValue().callSign));
+            VerifyOrReturn(CheckValueAsString("channelList[2].callSign.Value()", iter_0.GetValue().callSign.Value(),
+                                              chip::CharSpan("KCTS-TV", 7)));
+            VerifyOrReturn(CheckValuePresent("channelList[2].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
+            VerifyOrReturn(CheckValueAsString("channelList[2].affiliateCallSign.Value()",
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("KCTS", 4)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 3));
+            VerifyOrReturn(CheckValue("channelList[3].majorNumber", iter_0.GetValue().majorNumber, 9U));
+            VerifyOrReturn(CheckValue("channelList[3].minorNumber", iter_0.GetValue().minorNumber, 3U));
+            VerifyOrReturn(CheckValuePresent("channelList[3].name", iter_0.GetValue().name));
+            VerifyOrReturn(CheckValueAsString("channelList[3].name.Value()", iter_0.GetValue().name.Value(),
+                                              chip::CharSpan("World Channel", 13)));
+            VerifyOrReturn(CheckValuePresent("channelList[3].callSign", iter_0.GetValue().callSign));
+            VerifyOrReturn(CheckValueAsString("channelList[3].callSign.Value()", iter_0.GetValue().callSign.Value(),
+                                              chip::CharSpan("KCTS-TV", 7)));
+            VerifyOrReturn(CheckValuePresent("channelList[3].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
+            VerifyOrReturn(CheckValueAsString("channelList[3].affiliateCallSign.Value()",
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("KCTS", 4)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(channelList)>("channelList", iter_0, 4));
         }
 
         NextTest();
     }
 
-    CHIP_ERROR TestChangeChannelCommand_2()
+    CHIP_ERROR TestReadAttributeChannelLineup_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannel::Type;
+        chip::Controller::ChannelClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        RequestType request;
-        request.match = chip::Span<const char>("CNNgarbage: not in length on purpose", 3);
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_2(data.channelMatch, data.errorType);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_2(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::Lineup::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -54921,44 +55029,33 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & channelMatch,
-                             chip::app::Clusters::Channel::ErrorTypeEnum errorType)
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & lineup)
     {
-        VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 1U));
-        VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 0U));
-        VerifyOrReturn(CheckValuePresent("channelMatch.name", channelMatch.name));
-        VerifyOrReturn(CheckValueAsString("channelMatch.name.Value()", channelMatch.name.Value(), chip::CharSpan("name", 4)));
-        VerifyOrReturn(CheckValuePresent("channelMatch.callSign", channelMatch.callSign));
+        VerifyOrReturn(CheckValueNonNull("lineup", lineup));
         VerifyOrReturn(
-            CheckValueAsString("channelMatch.callSign.Value()", channelMatch.callSign.Value(), chip::CharSpan("callSign", 8)));
-        VerifyOrReturn(CheckValuePresent("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign));
-        VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign.Value()", channelMatch.affiliateCallSign.Value(),
-                                          chip::CharSpan("affiliateCallSign", 17)));
-
-        VerifyOrReturn(CheckValue("errorType", errorType, 0));
+            CheckValueAsString("lineup.Value().operatorName", lineup.Value().operatorName, chip::CharSpan("Comcast", 7)));
+        VerifyOrReturn(CheckValuePresent("lineup.Value().lineupName", lineup.Value().lineupName));
+        VerifyOrReturn(CheckValueAsString("lineup.Value().lineupName.Value()", lineup.Value().lineupName.Value(),
+                                          chip::CharSpan("Comcast King County", 19)));
+        VerifyOrReturn(CheckValuePresent("lineup.Value().postalCode", lineup.Value().postalCode));
+        VerifyOrReturn(
+            CheckValueAsString("lineup.Value().postalCode.Value()", lineup.Value().postalCode.Value(), chip::CharSpan("98052", 5)));
+        VerifyOrReturn(CheckValue("lineup.Value().lineupInfoType", lineup.Value().lineupInfoType, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestChangeChannelByNumberCommand_3()
+    CHIP_ERROR TestReadAttributeCurrentChannel_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type;
+        chip::Controller::ChannelClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        RequestType request;
-        request.majorNumber = 1U;
-        request.minorNumber = 2U;
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_3();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_3(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::CurrentChannel::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -54968,19 +55065,36 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3() { NextTest(); }
+    void OnSuccessResponse_3(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & currentChannel)
+    {
+        VerifyOrReturn(CheckValueNonNull("currentChannel", currentChannel));
+        VerifyOrReturn(CheckValue("currentChannel.Value().majorNumber", currentChannel.Value().majorNumber, 6U));
+        VerifyOrReturn(CheckValue("currentChannel.Value().minorNumber", currentChannel.Value().minorNumber, 0U));
+        VerifyOrReturn(CheckValuePresent("currentChannel.Value().name", currentChannel.Value().name));
+        VerifyOrReturn(CheckValueAsString("currentChannel.Value().name.Value()", currentChannel.Value().name.Value(),
+                                          chip::CharSpan("ABC", 3)));
+        VerifyOrReturn(CheckValuePresent("currentChannel.Value().callSign", currentChannel.Value().callSign));
+        VerifyOrReturn(CheckValueAsString("currentChannel.Value().callSign.Value()", currentChannel.Value().callSign.Value(),
+                                          chip::CharSpan("KAAL-TV", 7)));
+        VerifyOrReturn(CheckValuePresent("currentChannel.Value().affiliateCallSign", currentChannel.Value().affiliateCallSign));
+        VerifyOrReturn(CheckValueAsString("currentChannel.Value().affiliateCallSign.Value()",
+                                          currentChannel.Value().affiliateCallSign.Value(), chip::CharSpan("KAAL", 4)));
 
-    CHIP_ERROR TestSkipChannelCommand_4()
+        NextTest();
+    }
+
+    CHIP_ERROR TestChangeChannelCommand_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::SkipChannel::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannel::Type;
 
         ListFreer listFreer;
         RequestType request;
-        request.count = 1U;
+        request.match = chip::Span<const char>("PBSgarbage: not in length on purpose", 3);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_4();
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_4(data.channelMatch, data.errorType);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -54997,7 +55111,83 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4() { NextTest(); }
+    void OnSuccessResponse_4(const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & channelMatch,
+                             chip::app::Clusters::Channel::ErrorTypeEnum errorType)
+    {
+        VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 9U));
+        VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 1U));
+        VerifyOrReturn(CheckValuePresent("channelMatch.name", channelMatch.name));
+        VerifyOrReturn(CheckValueAsString("channelMatch.name.Value()", channelMatch.name.Value(), chip::CharSpan("PBS", 3)));
+        VerifyOrReturn(CheckValuePresent("channelMatch.callSign", channelMatch.callSign));
+        VerifyOrReturn(
+            CheckValueAsString("channelMatch.callSign.Value()", channelMatch.callSign.Value(), chip::CharSpan("KCTS-TV", 7)));
+        VerifyOrReturn(CheckValuePresent("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign));
+        VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign.Value()", channelMatch.affiliateCallSign.Value(),
+                                          chip::CharSpan("KCTS", 4)));
+
+        VerifyOrReturn(CheckValue("errorType", errorType, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestChangeChannelByNumberCommand_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.majorNumber = 6U;
+        request.minorNumber = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_5(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestSkipChannelCommand_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Channel::Commands::SkipChannel::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.count = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_6();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_6(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6() { NextTest(); }
 };
 
 class TV_LowPowerCluster : public TestCommand
@@ -55531,6 +55721,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Rename Input Command\n");
             err = TestRenameInputCommand_6();
             break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read attribute media input list\n");
+            err = TestReadAttributeMediaInputList_7();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -55542,7 +55736,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 8;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -55576,6 +55770,18 @@ private:
     static void OnSuccessCallback_2(void * context, uint8_t currentInput)
     {
         (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_2(currentInput);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & inputList)
+    {
+        (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_7(inputList);
     }
 
     //
@@ -55615,15 +55821,15 @@ private:
             VerifyOrReturn(CheckNextListItemDecodes<decltype(inputList)>("inputList", iter_0, 0));
             VerifyOrReturn(CheckValue("inputList[0].index", iter_0.GetValue().index, 1));
             VerifyOrReturn(CheckValue("inputList[0].inputType", iter_0.GetValue().inputType, 4));
-            VerifyOrReturn(CheckValueAsString("inputList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("inputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
             VerifyOrReturn(CheckValueAsString("inputList[0].description", iter_0.GetValue().description,
-                                              chip::CharSpan("exampleDescription", 18)));
+                                              chip::CharSpan("High-Definition Multimedia Interface", 36)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(inputList)>("inputList", iter_0, 1));
             VerifyOrReturn(CheckValue("inputList[1].index", iter_0.GetValue().index, 2));
             VerifyOrReturn(CheckValue("inputList[1].inputType", iter_0.GetValue().inputType, 4));
-            VerifyOrReturn(CheckValueAsString("inputList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("inputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
             VerifyOrReturn(CheckValueAsString("inputList[1].description", iter_0.GetValue().description,
-                                              chip::CharSpan("exampleDescription", 18)));
+                                              chip::CharSpan("High-Definition Multimedia Interface", 36)));
             VerifyOrReturn(CheckNoMoreListItems<decltype(inputList)>("inputList", iter_0, 2));
         }
 
@@ -55651,7 +55857,7 @@ private:
 
     void OnSuccessResponse_2(uint8_t currentInput)
     {
-        VerifyOrReturn(CheckValue("currentInput", currentInput, 0));
+        VerifyOrReturn(CheckValue("currentInput", currentInput, 1));
 
         NextTest();
     }
@@ -55749,7 +55955,7 @@ private:
         ListFreer listFreer;
         RequestType request;
         request.index = 1;
-        request.name  = chip::Span<const char>("newNamegarbage: not in length on purpose", 7);
+        request.name  = chip::Span<const char>("HDMI Testgarbage: not in length on purpose", 9);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_6();
@@ -55770,6 +55976,48 @@ private:
     }
 
     void OnSuccessResponse_6() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeMediaInputList_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::MediaInputClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::InputList::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & inputList)
+    {
+        {
+            auto iter_0 = inputList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(inputList)>("inputList", iter_0, 0));
+            VerifyOrReturn(CheckValue("inputList[0].index", iter_0.GetValue().index, 1));
+            VerifyOrReturn(CheckValue("inputList[0].inputType", iter_0.GetValue().inputType, 4));
+            VerifyOrReturn(CheckValueAsString("inputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI Test", 9)));
+            VerifyOrReturn(CheckValueAsString("inputList[0].description", iter_0.GetValue().description,
+                                              chip::CharSpan("High-Definition Multimedia Interface", 36)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(inputList)>("inputList", iter_0, 1));
+            VerifyOrReturn(CheckValue("inputList[1].index", iter_0.GetValue().index, 2));
+            VerifyOrReturn(CheckValue("inputList[1].inputType", iter_0.GetValue().inputType, 4));
+            VerifyOrReturn(CheckValueAsString("inputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
+            VerifyOrReturn(CheckValueAsString("inputList[1].description", iter_0.GetValue().description,
+                                              chip::CharSpan("High-Definition Multimedia Interface", 36)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(inputList)>("inputList", iter_0, 2));
+        }
+
+        NextTest();
+    }
 };
 
 class TestCluster : public TestCommand
