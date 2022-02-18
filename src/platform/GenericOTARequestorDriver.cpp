@@ -73,8 +73,15 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
         delay = kDefaultDelayedActionTime;
     }
 
+    // IMPLEMENTATION CHOICE:
+    // This implementation chooses to schedule another query with the same provider
+
+    // TODO: Should keep count of retries and stop after 3. 
+    // SL TODO: Add logic to select a different provider. 
+
+
     ScheduleDelayedAction(UpdateFailureState::kQuerying, delay,
-                          [](System::Layer *, void * context) { ToDriver(context)->mRequestor->TriggerImmediateQuery(); }, this);
+                          [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ConnectToProvider(OTARequestorInterface::kQueryImage); }, this);
 }
 
 void GenericOTARequestorDriver::UpdateDownloaded()
@@ -107,6 +114,12 @@ void GenericOTARequestorDriver::UpdateDiscontinued()
 {
     VerifyOrDie(mImageProcessor != nullptr);
     mImageProcessor->Abort();
+
+    // Cancel all update timers
+    UpdateCancelled();
+
+    // Restart the periodic default providers timer
+    StartDefaultProvidersTimer();
 }
 
 // Cancel all OTA update timers 
@@ -159,9 +172,10 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocati
         break;
     default:
         ChipLogError(SoftwareUpdate, "Unexpected announcementReason: %u", static_cast<uint8_t>(announcementReason));
-        return; 
+        return;
     }
 
+    // IMPLEMENTATION CHOICE:
     // This implementation of the OTARequestor driver chooses to unconditionally start the query using the Provider specified in this command. 
 
     // Point  mProviderNodeId to the announced node and cancel the default providers timer
