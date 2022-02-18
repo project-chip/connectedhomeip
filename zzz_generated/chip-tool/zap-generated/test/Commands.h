@@ -52347,7 +52347,7 @@ private:
             VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 0));
             VerifyOrReturn(CheckValue("outputList[0].index", iter_0.GetValue().index, 1));
             VerifyOrReturn(CheckValue("outputList[0].outputType", iter_0.GetValue().outputType, 0));
-            VerifyOrReturn(CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
+            VerifyOrReturn(CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI Test", 9)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 1));
             VerifyOrReturn(CheckValue("outputList[1].index", iter_0.GetValue().index, 2));
             VerifyOrReturn(CheckValue("outputList[1].outputType", iter_0.GetValue().outputType, 0));
