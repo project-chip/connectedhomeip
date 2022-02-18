@@ -27,3 +27,4 @@ extern LEDWidget statusLED2;
 extern BluetoothWidget bluetoothLED;
 extern WiFiWidget wifiLED;
 extern const chip::NodeId kLocalNodeId;
+extern WiFiWidget pairingWindowLED;
