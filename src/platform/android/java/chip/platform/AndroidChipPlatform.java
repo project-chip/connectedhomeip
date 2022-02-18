@@ -91,5 +91,4 @@ public final class AndroidChipPlatform {
       ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
 
   private native void setDiagnosticDataProviderManager(DiagnosticDataProvider dataProviderCallback);
-
 }

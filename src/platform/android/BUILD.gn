@@ -77,14 +77,14 @@ android_library("java") {
     "java/chip/platform/ChipMdnsCallback.java",
     "java/chip/platform/ChipMdnsCallbackImpl.java",
     "java/chip/platform/ConfigurationManager.java",
+    "java/chip/platform/DiagnosticDataProvider.java",
+    "java/chip/platform/DiagnosticDataProviderImpl.java",
     "java/chip/platform/KeyValueStoreManager.java",
+    "java/chip/platform/NetworkInterface.java",
     "java/chip/platform/NsdManagerServiceResolver.java",
     "java/chip/platform/PreferencesConfigurationManager.java",
     "java/chip/platform/PreferencesKeyValueStoreManager.java",
     "java/chip/platform/ServiceResolver.java",
-    "java/chip/platform/NetworkInterface.java",
-    "java/chip/platform/DiagnosticDataProvider.java",
-    "java/chip/platform/DiagnosticDataProviderImpl.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
