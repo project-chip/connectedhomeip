@@ -47,7 +47,7 @@ void DeviceControlServer::CommissioningFailedTimerComplete()
     event.CommissioningComplete.status = CHIP_ERROR_TIMEOUT;
     CHIP_ERROR status                  = PlatformMgr().PostEvent(&event);
 
-    mFailSafeArmed = false;
+    mFailSafeContext.SetFailSafeArmed(false);
 
     if (status != CHIP_NO_ERROR)
     {
@@ -57,16 +57,14 @@ void DeviceControlServer::CommissioningFailedTimerComplete()
 
 CHIP_ERROR DeviceControlServer::ArmFailSafe(System::Clock::Timeout expiryLength)
 {
-    mFailSafeArmed = true;
+    mFailSafeContext.SetFailSafeArmed(true);
     DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControlServer::DisarmFailSafe()
 {
-    mFailSafeArmed = false;
-    SetFabricIndex(kUndefinedFabricIndex);
-    SetNocCommandInvoked(false);
+    mFailSafeContext.SetFailSafeArmed(false);
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }

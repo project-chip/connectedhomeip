@@ -56,6 +56,7 @@ using namespace ::chip::Transport;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
+using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
@@ -528,17 +529,17 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
 
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
-    if (!server->IsFailSafeArmed())
+    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
     {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::UnsupportedAccess));
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
         return true;
     }
 
-    if (server->IsNocCommandInvoked())
+    if (failSafeContext.IsNocCommandInvoked())
     {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError));
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::ConstraintError));
         return true;
     }
 
@@ -569,10 +570,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index just allocated.
-    server->SetFabricIndex(fabricIndex);
-
-    // AddNOC command was successfully executed within the current fail-safe timer period.
-    server->SetNocCommandInvoked(true);
+    failSafeContext.SetNocCommandInvoked(fabricIndex);
 
 exit:
 
@@ -605,17 +603,17 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: an administrator requested an update to the NOC");
 
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
-    if (!server->IsFailSafeArmed())
+    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
     {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::UnsupportedAccess));
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
         return true;
     }
 
-    if (server->IsNocCommandInvoked())
+    if (failSafeContext.IsNocCommandInvoked())
     {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError));
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::ConstraintError));
         return true;
     }
 
@@ -639,10 +637,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index associated with the UpdateNOC command being invoked.
-    server->SetFabricIndex(fabricIndex);
-
-    // UpdateNOC command was successfully executed within the current fail-safe timer period.
-    server->SetNocCommandInvoked(true);
+    failSafeContext.SetNocCommandInvoked(fabricIndex);
 
 exit:
 
@@ -778,11 +773,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
     MutableByteSpan nocsrElementsSpan;
 
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
-    if (!server->IsFailSafeArmed())
+    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
     {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::UnsupportedAccess));
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
         return true;
     }
 
@@ -866,11 +861,11 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
 
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
-    if (!server->IsFailSafeArmed())
+    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
     {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::UnsupportedAccess));
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
         return true;
     }
 

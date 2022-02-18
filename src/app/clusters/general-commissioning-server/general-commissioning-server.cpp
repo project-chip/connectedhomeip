@@ -127,17 +127,21 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    DeviceControlServer * server      = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    FailSafeContext & failSafeContext = server->GetFailSafeContext();
 
-    SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
-
-    if (!server->IsFailSafeArmed() || server->MatchFabricIndex(handle->GetFabricIndex()))
+    /*
+     * If the fail-safe timer was not currently armed, the the fail-safe timer SHALL be armed.
+     * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
+     * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
+     */
+    if (!failSafeContext.IsFailSafeArmed() ||
+        failSafeContext.MatchesFailSafeContextFabricIndex(commandObj->GetAccessingFabricIndex()))
     {
         Commands::ArmFailSafeResponse::Type response;
 
         CheckSuccess(server->ArmFailSafe(System::Clock::Seconds16(commandData.expiryLengthSeconds)), Failure);
         response.errorCode = CommissioningError::kOk;
-        response.debugText = CharSpan("", 0);
         CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
     }
     else
@@ -167,7 +171,6 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
 
     Commands::CommissioningCompleteResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
     return true;
@@ -184,7 +187,6 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
     Commands::SetRegulatoryConfigResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
     return true;

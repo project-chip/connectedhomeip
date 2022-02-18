@@ -23,16 +23,11 @@
 #pragma once
 
 #include <lib/support/Span.h>
+#include <platform/FailSafeContext.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {
-
-struct FailSafeContext
-{
-    bool nocCommandInvoked = false;
-    FabricIndex mFabric    = kUndefinedFabricIndex;
-};
 
 /**
  * Defines the Swtich Device Control Delegate class to notify platform events.
@@ -93,31 +88,24 @@ class DeviceControlServer final
 public:
     // ===== Members for internal use by other Device Layer components.
 
+    /**
+     * @brief
+     *  Only a single fail-safe timer is started on the device, if this function is called again
+     *  when the fail-safe timer is currently armed, the currently-running fail-safe timer will
+     *  first be cancelled, then the fail-safe timer will be re-armed.
+     */
     CHIP_ERROR ArmFailSafe(System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
     CHIP_ERROR CommissioningComplete();
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb);
     CHIP_ERROR ConnectNetworkForOperational(ByteSpan networkID);
 
-    /**
-     * @brief
-     *   Matches the fail-safe context’s Fabric Index (including null Fabric Index for a just established PASE session).
-     */
-    bool MatchFabricIndex(FabricIndex accessingFabric)
-    {
-        return (accessingFabric == mFailSafeContextl.mFabric) || (mFailSafeContextl.mFabric == kUndefinedFabricIndex);
-    }
-
-    inline bool IsFailSafeArmed() { return mFailSafeArmed; }
-    inline FabricIndex GetFabricIndex() { return mFailSafeContextl.mFabric; }
-    inline void SetFabricIndex(FabricIndex fabricId) { mFailSafeContextl.mFabric = fabricId; }
+    inline FabricIndex GetFabricIndex() { return mFailSafeContext.GetFabricIndex(); }
     inline NodeId GetPeerNodeId() { return mPeerNodeId; }
     inline void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
-    inline bool IsNocCommandInvoked() { return mFailSafeContextl.nocCommandInvoked; }
-    inline void SetNocCommandInvoked(bool status) { mFailSafeContextl.nocCommandInvoked = status; }
-
     void SetSwitchDelegate(SwitchDeviceControlDelegate * delegate) { mSwitchDelegate = delegate; }
     SwitchDeviceControlDelegate * GetSwitchDelegate() const { return mSwitchDelegate; }
+    FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
 
     static DeviceControlServer & DeviceControlSvr();
 
@@ -126,7 +114,6 @@ private:
     static DeviceControlServer sInstance;
     FailSafeContext mFailSafeContext;
     SwitchDeviceControlDelegate * mSwitchDelegate = nullptr;
-    bool mFailSafeArmed                           = false;
 
     friend void HandleArmFailSafe(System::Layer * layer, void * aAppState);
     void CommissioningFailedTimerComplete();
