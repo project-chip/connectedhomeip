@@ -22,6 +22,7 @@
 #include <app/tests/suites/commands/commissioner/CommissionerCommands.h>
 #include <app/tests/suites/commands/delay/DelayCommands.h>
 #include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
+#include <app/tests/suites/commands/interaction_model/InteractionModel.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
@@ -40,7 +41,8 @@ class TestCommand : public CHIPCommand,
                     public CommissionerCommands,
                     public DiscoveryCommands,
                     public SystemCommands,
-                    public DelayCommands
+                    public DelayCommands,
+                    public InteractionModel
 {
 public:
     TestCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
@@ -62,7 +64,9 @@ protected:
     CHIP_ERROR WaitForCommissionee(chip::NodeId nodeId) override;
     void OnWaitForMs() override { NextTest(); };
 
-    std::map<std::string, ChipDevice *> mDevices;
+    /////////// Interaction Model Interface /////////
+    chip::DeviceProxy * GetDevice(const char * identity) override { return mDevices[identity]; }
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override{};
 
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
@@ -102,4 +106,5 @@ protected:
     chip::Optional<uint64_t> mDelayInMs;
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<uint16_t> mTimeout;
+    std::map<std::string, ChipDevice *> mDevices;
 };
