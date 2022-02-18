@@ -84,7 +84,7 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
 {
     // TODO: Insert code here
     bool mediaInputRenamed = false;
-    
+
     for (InputInfoType & input : mInputs)
     {
         if (input.index == index)

@@ -58,7 +58,7 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
 {
     // TODO: Insert code here
     bool audioOutputRenamed = false;
-    
+
     for (OutputInfoType & output : mOutputs)
     {
         if (output.index == index)
