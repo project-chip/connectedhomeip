@@ -23,6 +23,7 @@
 #include <app/util/af.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip::Credentials;
@@ -455,7 +456,15 @@ void WindowApp::Cover::LiftDown()
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
     chip::Percent100ths percent100ths = 5000; // set at middle
 
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
 
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
         percent100ths = current.Value();
@@ -468,7 +477,14 @@ void WindowApp::Cover::LiftDown()
     {
         percent100ths = 10000;
     }
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
     LiftPositionSet(mEndpoint, percent100ths);
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
 }
 
 void WindowApp::Cover::LiftUp()
@@ -477,7 +493,15 @@ void WindowApp::Cover::LiftUp()
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
     chip::Percent100ths percent100ths = 5000; // set at middle
 
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
 
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
         percent100ths = current.Value();
@@ -490,17 +514,36 @@ void WindowApp::Cover::LiftUp()
     {
         percent100ths = 0;
     }
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
     LiftPositionSet(mEndpoint, percent100ths);
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
 }
 
 void WindowApp::Cover::LiftUpdate(bool newTarget)
 {
     NPercent100ths current, target;
+
+    CoverWorkData * data = (CoverWorkData *) chip::Platform::MemoryAlloc(sizeof(CoverWorkData));
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::LiftUpdate - Out of Memory for WorkData"));
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
     Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
 
     OperationalStatus opStatus = OperationalStatusGet(mEndpoint);
     OperationalState opState   = ComputeOperationalState(target, current);
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
 
     /* If Triggered by a TARGET update */
     if (newTarget)
@@ -527,12 +570,25 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     else /* CURRENT reached TARGET or crossed it */
     {
         /* Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end */
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
         Attributes::CurrentPositionLiftPercent100ths::Set(mEndpoint, target);
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
         mLiftOpState = OperationalState::Stall;
     }
-
     opStatus.lift = mLiftOpState;
-    OperationalStatusSetWithGlobalUpdated(mEndpoint, opStatus);
+
+    data->mEndpointId = mEndpoint;
+    data->opStatus    = opStatus;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleOperationalStatusSetWithGlobalUpdate, reinterpret_cast<intptr_t>(data));
 
     if ((OperationalState::Stall != mLiftOpState) && mLiftTimer)
     {
@@ -546,7 +602,18 @@ void WindowApp::Cover::TiltDown()
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
     chip::Percent100ths percent100ths = 5000; // set at middle
 
+    CoverWorkData * data = (CoverWorkData *) chip::Platform::MemoryAlloc(sizeof(CoverWorkData));
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::TiltDown - Out of Memory for WorkData"));
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
     status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
 
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
         percent100ths = current.Value();
@@ -559,7 +626,11 @@ void WindowApp::Cover::TiltDown()
     {
         percent100ths = 10000;
     }
-    TiltPositionSet(mEndpoint, percent100ths);
+
+    data->mEndpointId   = mEndpoint;
+    data->percent100ths = percent100ths;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleTiltPositionSet, reinterpret_cast<intptr_t>(data));
 }
 
 void WindowApp::Cover::TiltUp()
@@ -568,7 +639,18 @@ void WindowApp::Cover::TiltUp()
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
     chip::Percent100ths percent100ths = 5000; // set at middle
 
+    CoverWorkData * data = (CoverWorkData *) chip::Platform::MemoryAlloc(sizeof(CoverWorkData));
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::TiltUp - Out of Memory for WorkData"));
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
     status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
 
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
         percent100ths = current.Value();
@@ -581,17 +663,33 @@ void WindowApp::Cover::TiltUp()
     {
         percent100ths = 0;
     }
-    TiltPositionSet(mEndpoint, percent100ths);
+
+    data->mEndpointId   = mEndpoint;
+    data->percent100ths = percent100ths;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleTiltPositionSet, reinterpret_cast<intptr_t>(data));
 }
 
 void WindowApp::Cover::TiltUpdate(bool newTarget)
 {
     NPercent100ths current, target;
+
+    CoverWorkData * data = (CoverWorkData *) chip::Platform::MemoryAlloc(sizeof(CoverWorkData));
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::TiltUpdate - Out of Memory for WorkData"));
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
     Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
 
     OperationalStatus opStatus = OperationalStatusGet(mEndpoint);
     OperationalState opState   = ComputeOperationalState(target, current);
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
 
     /* If Triggered by a TARGET update */
     if (newTarget)
@@ -621,9 +719,12 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
         Attributes::CurrentPositionTiltPercent100ths::Set(mEndpoint, target);
         mTiltOpState = OperationalState::Stall;
     }
-
     opStatus.tilt = mTiltOpState;
-    OperationalStatusSetWithGlobalUpdated(mEndpoint, opStatus);
+
+    data->mEndpointId = mEndpoint;
+    data->opStatus    = opStatus;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleOperationalStatusSetWithGlobalUpdate, reinterpret_cast<intptr_t>(data));
 
     if ((OperationalState::Stall != mTiltOpState) && mTiltTimer)
     {
@@ -633,7 +734,15 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
 
 EmberAfWcType WindowApp::Cover::CycleType()
 {
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
     EmberAfWcType type = TypeGet(mEndpoint);
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLE
 
     switch (type)
     {
@@ -651,7 +760,16 @@ EmberAfWcType WindowApp::Cover::CycleType()
     default:
         type = EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT;
     }
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
     TypeSet(mEndpoint, type);
+
+#ifdef CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+
     return type;
 }
 
@@ -671,4 +789,20 @@ void WindowApp::Cover::OnTiltTimeout(WindowApp::Timer & timer)
     {
         cover->TiltContinueToTarget();
     }
+}
+
+void WindowApp::Cover::ScheduleTiltPositionSet(intptr_t arg)
+{
+    WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
+    TiltPositionSet(data->mEndpointId, data->percent100ths);
+
+    chip::Platform::MemoryFree(data);
+}
+
+void WindowApp::Cover::ScheduleOperationalStatusSetWithGlobalUpdate(intptr_t arg)
+{
+    WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
+    OperationalStatusSetWithGlobalUpdated(data->mEndpointId, data->opStatus);
+
+    chip::Platform::MemoryFree(data);
 }
