@@ -326,8 +326,11 @@ void ReorderPeerRemovalTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetNodeIdAt(1, 0, false) == 9);
 }
 
+// Disabled for Zephyr since CHIP_CONFIG_MAX_FABRICS < 12
 #if !__ZEPHYR__
-
+#if CHIP_CONFIG_MAX_FABRICS < 12
+#error "Unit Test expect support for at least 12 fabrics."
+#endif
 void ReorderFabricRemovalTest(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err                                = CHIP_NO_ERROR;
