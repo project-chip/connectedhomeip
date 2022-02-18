@@ -18,6 +18,7 @@
 
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/StatusResponse.h>
+#include <app/InteractionModelTimeout.h>
 
 namespace chip {
 namespace app {
@@ -36,6 +37,7 @@ CHIP_ERROR StatusResponse::Send(Protocols::InteractionModel::Status aStatus, Mes
     response.Status(aStatus);
     ReturnErrorOnFailure(response.GetError());
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
+    apExchangeContext->SetResponseTimeout(kImMessageTimeout);
     ReturnErrorOnFailure(apExchangeContext->SendMessage(Protocols::InteractionModel::MsgType::StatusResponse, std::move(msgBuf),
                                                         aExpectResponse ? Messaging::SendMessageFlags::kExpectResponse
                                                                         : Messaging::SendMessageFlags::kNone));
