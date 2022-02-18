@@ -23,6 +23,9 @@ pw_assert_BACKEND = "$dir_pw_assert_log"
 chip_enable_openthread = true
 chip_openthread_ftd = false
 
+# Disable stack lock tracking
+chip_stack_lock_tracking = "None"
+
 declare_args() {
   chip_enable_ota_requestor = true
 }
