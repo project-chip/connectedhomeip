@@ -15823,6 +15823,14 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
+    public interface ListFabricScopedAttributeCallback {
+      void onSuccess(List<ChipStructs.TestClusterClusterTestFabricScoped> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface NullableBooleanAttributeCallback {
       void onSuccess(@Nullable Boolean value);
 
@@ -16875,6 +16883,28 @@ public class ChipClusters {
     public void subscribeListLongOctetStringAttribute(
         ListLongOctetStringAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeListLongOctetStringAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readListFabricScopedAttribute(ListFabricScopedAttributeCallback callback) {
+      readListFabricScopedAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeListFabricScopedAttribute(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.TestClusterClusterTestFabricScoped> value) {
+      writeListFabricScopedAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeListFabricScopedAttribute(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.TestClusterClusterTestFabricScoped> value,
+        int timedWriteTimeoutMs) {
+      writeListFabricScopedAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeListFabricScopedAttribute(
+        ListFabricScopedAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeListFabricScopedAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readTimedWriteBooleanAttribute(BooleanAttributeCallback callback) {
@@ -18080,6 +18110,21 @@ public class ChipClusters {
     private native void subscribeListLongOctetStringAttribute(
         long chipClusterPtr,
         ListLongOctetStringAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readListFabricScopedAttribute(
+        long chipClusterPtr, ListFabricScopedAttributeCallback callback);
+
+    private native void writeListFabricScopedAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.TestClusterClusterTestFabricScoped> value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeListFabricScopedAttribute(
+        long chipClusterPtr,
+        ListFabricScopedAttributeCallback callback,
         int minInterval,
         int maxInterval);
 

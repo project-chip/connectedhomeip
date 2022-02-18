@@ -6852,6 +6852,37 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPTestClusterListFabricScopedListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TestClusterListFabricScopedListAttributeCallback>
+{
+public:
+    CHIPTestClusterListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterListFabricScopedListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> &
+            value);
+};
+
+class CHIPTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge
+    : public CHIPTestClusterListFabricScopedListAttributeCallbackBridge
+{
+public:
+    CHIPTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTestClusterListFabricScopedListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPTestClusterNullableStructStructAttributeCallbackBridge
     : public CHIPCallbackBridge<TestClusterNullableStructStructAttributeCallback>
 {

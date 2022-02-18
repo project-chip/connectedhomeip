@@ -2277,7 +2277,7 @@
               ZAP_MIN_MAX_DEFAULTS_INDEX(35) }, /* range_restricted_int16s */                                                      \
             { 0x0000002A, ZAP_TYPE(ARRAY), 1000, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                     \
               ZAP_LONG_DEFAULTS_INDEX(2665) }, /* list_long_octet_string */                                                        \
-            { 0x0000002B, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
+            { 0x0000002B, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
               ZAP_EMPTY_DEFAULT() }, /* list_fabric_scoped */                                                                      \
             { 0x00000030, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(MUST_USE_TIMED_WRITE),           \
               ZAP_EMPTY_DEFAULT() }, /* timed_write_boolean */                                                                     \

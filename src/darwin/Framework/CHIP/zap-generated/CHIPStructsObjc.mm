@@ -901,6 +901,31 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPTestClusterClusterTestFabricScoped
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+
+        _fabricSensitiveInt8u = @(0);
+
+        _optionalFabricSensitiveInt8u = nil;
+
+        _nullableFabricSensitiveInt8u = nil;
+
+        _nullableOptionalFabricSensitiveInt8u = nil;
+
+        _fabricSensitiveCharString = @"";
+
+        _fabricSensitiveStruct = [CHIPTestClusterClusterSimpleStruct new];
+
+        _fabricSensitiveInt8uList = [NSArray array];
+    }
+    return self;
+}
+@end
+
 @implementation CHIPTestClusterClusterNullablesAndOptionalsStruct
 - (instancetype)init
 {
@@ -978,17 +1003,6 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _a = [NSArray array];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPTestClusterClusterTestFabricScoped
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _fabricIndex = @(0);
     }
     return self;
 }

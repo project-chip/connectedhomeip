@@ -2886,6 +2886,13 @@ server cluster TestCluster = 1295 {
 
   struct TestFabricScoped {
     fabric_idx fabricIndex = 0;
+    INT8U fabricSensitiveInt8u = 1;
+    optional INT8U optionalFabricSensitiveInt8u = 2;
+    nullable INT8U nullableFabricSensitiveInt8u = 3;
+    optional nullable INT8U nullableOptionalFabricSensitiveInt8u = 4;
+    CHAR_STRING fabricSensitiveCharString = 5;
+    SimpleStruct fabricSensitiveStruct = 6;
+    INT8U fabricSensitiveInt8uList[] = 7;
   }
 
   struct NestedStructList {
@@ -2960,7 +2967,7 @@ server cluster TestCluster = 1295 {
   attribute int16u rangeRestrictedInt16u = 40;
   attribute int16s rangeRestrictedInt16s = 41;
   attribute LONG_OCTET_STRING listLongOctetString[] = 42;
-  readonly attribute TestFabricScoped listFabricScoped[] = 43;
+  attribute TestFabricScoped listFabricScoped[] = 43;
   attribute boolean timedWriteBoolean = 48;
   attribute boolean generalErrorBoolean = 49;
   attribute boolean clusterErrorBoolean = 50;

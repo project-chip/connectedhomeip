@@ -6144,6 +6144,32 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedTestClusterClusterListFabricScopedAttributeCallback
+      implements ChipClusters.TestClusterCluster.ListFabricScopedAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.TestClusterClusterTestFabricScoped> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo(
+              "valueList", "List<ChipStructs.TestClusterClusterTestFabricScoped>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedTestClusterClusterServerGeneratedCommandListAttributeCallback
       implements ChipClusters.TestClusterCluster.ServerGeneratedCommandListAttributeCallback,
           DelegatedClusterCallback {
