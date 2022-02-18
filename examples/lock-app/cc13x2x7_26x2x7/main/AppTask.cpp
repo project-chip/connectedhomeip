@@ -153,16 +153,17 @@ int AppTask::Init()
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING && CHIP_ENABLE_ROTATING_DEVICE_ID
     {
-        uint64_t EUI64;
+	uint8_t EUI64[8];
         char stringEUI64[sizeof(EUI64) * 2 + 1]; // just big enough for string(EUI64)
 
         // set serial number to flash
         // this is before ZCL is started, so Basic Cluster populates Serial Number with this EUI64 (in string)
-        ThreadStackMgrImpl().GetIeeeEui64((uint8_t *) &EUI64);
-        sprintf(stringEUI64, "%" PRIx64, EUI64);
-        ret = ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64));
+        ThreadStackMgrImpl().GetIeeeEui64(EUI64);
+        sprintf(stringEUI64, "%02X%02X%02X%02X%02X%02X%02X%02X",
+			EUI64[0], EUI64[1], EUI64[2], EUI64[3], EUI64[4], EUI64[5], EUI64[6], EUI64[7]);
+	ret = ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64));
         PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
-        if (ret != CHIP_NO_ERROR)
+	if (ret != CHIP_NO_ERROR)
         {
             PLAT_LOG("ConfigurationMgr().StoreSerialNumber failed (%X)", ret.AsInteger());
             while (1)
