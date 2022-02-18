@@ -89,14 +89,12 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
     // TODO: Insert code here
     if (isMediaInputIndexInRange(index, mInputs))
     {
-        uint16_t counter = 0;
-        for (const InputInfoType & input : mInputs)
+        for (InputInfoType & input : mInputs)
         {
             if (input.index == index)
             {
-                mInputs[counter].name = name;
+                input.name = name;
             }
-            counter++;
         }
         return true;
     }
