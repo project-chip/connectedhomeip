@@ -35,8 +35,8 @@
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
-#include "DnssdImpl.h"
 #include "DiagnosticDataProviderImpl.h"
+#include "DnssdImpl.h"
 
 using namespace chip;
 

@@ -26,13 +26,13 @@
 #include <jni.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include "DiagnosticDataProviderImpl.h"
+#include <lib/support/CHIPJNIError.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/JniTypeWrappers.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
-#include "DiagnosticDataProviderImpl.h"
 #include <unistd.h>
-#include <lib/support/JniTypeWrappers.h>
-#include <lib/support/CHIPJNIError.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
@@ -48,7 +48,8 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 void DiagnosticDataProviderImpl::InitializeWithObject(jobject manager)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "Failed to GetEnvForCurrentThread for DiagnosticDataProviderManagerImpl"));
+    VerifyOrReturn(env != nullptr,
+                   ChipLogError(DeviceLayer, "Failed to GetEnvForCurrentThread for DiagnosticDataProviderManagerImpl"));
 
     mDiagnosticDataProviderManagerObject = env->NewGlobalRef(manager);
     VerifyOrReturn(mDiagnosticDataProviderManagerObject != nullptr,
@@ -65,7 +66,8 @@ void DiagnosticDataProviderImpl::InitializeWithObject(jobject manager)
         env->ExceptionClear();
     }
 
-    mGetNifMethod = env->GetMethodID(DiagnosticDataProviderManagerClass, "getNetworkInterfaces", "()[Lchip/platform/NetworkInterface;");
+    mGetNifMethod =
+        env->GetMethodID(DiagnosticDataProviderManagerClass, "getNetworkInterfaces", "()[Lchip/platform/NetworkInterface;");
     if (mGetNifMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access DiagnosticDataProviderManager 'getNetworkInterfaces' method");
@@ -134,38 +136,40 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 JniUtfString name(env, jname);
                 strncpy(ifp->Name, name.c_str(), Inet::InterfaceId::kMaxIfNameLength);
                 ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-                ifp->name = CharSpan(ifp->Name, strlen(ifp->Name));
+                ifp->name                                          = CharSpan(ifp->Name, strlen(ifp->Name));
             }
 
             jfieldID isOperationalField = env->GetFieldID(nifClass, "isOperational", "Z");
-            ifp->isOperational       = static_cast<bool>(env->GetBooleanField(nifObject, isOperationalField));
+            ifp->isOperational          = static_cast<bool>(env->GetBooleanField(nifObject, isOperationalField));
 
-            jfieldID getOpsrIPV4Field            = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv4", "I");
-            jint jOpsrIPV4                   = env->GetIntField(nifObject, getOpsrIPV4Field);
-            switch(jOpsrIPV4) {
-                case offPremiseServicesReachableUnknown:
-                    ifp->offPremiseServicesReachableIPv4.SetNull();
-                    break;
-                case offPremiseServicesReachableYes:
-                    ifp->offPremiseServicesReachableIPv4.SetNonNull(true);
-                    break;
-                case offPremiseServicesReachableNo:
-                    ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
-                    break;
+            jfieldID getOpsrIPV4Field = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv4", "I");
+            jint jOpsrIPV4            = env->GetIntField(nifObject, getOpsrIPV4Field);
+            switch (jOpsrIPV4)
+            {
+            case offPremiseServicesReachableUnknown:
+                ifp->offPremiseServicesReachableIPv4.SetNull();
+                break;
+            case offPremiseServicesReachableYes:
+                ifp->offPremiseServicesReachableIPv4.SetNonNull(true);
+                break;
+            case offPremiseServicesReachableNo:
+                ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
+                break;
             }
 
-            jfieldID getOpsrIPV6Field            = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv6", "I");
-            jint jOpsrIPV6                   = env->GetIntField(nifObject, getOpsrIPV6Field);
-            switch(jOpsrIPV6) {
-                case offPremiseServicesReachableUnknown:
-                    ifp->offPremiseServicesReachableIPv6.SetNull();
-                    break;
-                case offPremiseServicesReachableYes:
-                    ifp->offPremiseServicesReachableIPv6.SetNonNull(true);
-                    break;
-                case offPremiseServicesReachableNo:
-                    ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
-                    break;
+            jfieldID getOpsrIPV6Field = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv6", "I");
+            jint jOpsrIPV6            = env->GetIntField(nifObject, getOpsrIPV6Field);
+            switch (jOpsrIPV6)
+            {
+            case offPremiseServicesReachableUnknown:
+                ifp->offPremiseServicesReachableIPv6.SetNull();
+                break;
+            case offPremiseServicesReachableYes:
+                ifp->offPremiseServicesReachableIPv6.SetNonNull(true);
+                break;
+            case offPremiseServicesReachableNo:
+                ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
+                break;
             }
 
             jfieldID gethardwareAddressField = env->GetFieldID(nifClass, "hardwareAddress", "[B");
@@ -173,14 +177,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             if (jHardwareAddressObj != NULL)
             {
                 jbyteArray arr = reinterpret_cast<jbyteArray>(jHardwareAddressObj);
-                size_t len             = env->GetArrayLength(arr);
-                len = (len > kMaxHardwareAddrSize) ? kMaxHardwareAddrSize : len;
+                size_t len     = env->GetArrayLength(arr);
+                len            = (len > kMaxHardwareAddrSize) ? kMaxHardwareAddrSize : len;
                 env->GetByteArrayRegion(arr, 0, len, reinterpret_cast<jbyte *>(ifp->MacAddress));
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
             }
 
             jfieldID getTypeField = env->GetFieldID(nifClass, "type", "I");
-            ifp->type            = static_cast<InterfaceType>(env->GetIntField(nifObject, getTypeField));
+            ifp->type             = static_cast<InterfaceType>(env->GetIntField(nifObject, getTypeField));
 
             ifp->Next = head;
             head      = ifp;
