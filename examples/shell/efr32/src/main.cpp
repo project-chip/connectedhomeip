@@ -136,14 +136,6 @@ int main(void)
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
-    EFR32_LOG("Starting Platform Manager Event Loop");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
-        appError(ret);
-    }
-
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Starting OpenThread task");
 
@@ -155,6 +147,14 @@ int main(void)
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
+
+    EFR32_LOG("Starting Platform Manager Event Loop");
+    ret = PlatformMgr().StartEventLoopTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
+        appError(ret);
+    }
 
     chip::startShellTask();
     sl_system_kernel_start();
