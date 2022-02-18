@@ -43405,26 +43405,39 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeGroupKeyMapWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read Group Keys Error: %@", err);
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster readAttributeGroupKeyMapWithParams:params
+                              completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                                  NSLog(@"Read Group Keys Error: %@", err);
 
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue count], 2);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupId unsignedShortValue], 257U);
-            XCTAssertEqual(
-                [((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupKeySetID unsignedShortValue], 417U);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupId unsignedShortValue], 258U);
-            XCTAssertEqual(
-                [((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupKeySetID unsignedShortValue], 418U);
-        }
+                                  {
+                                      id actualValue = value;
+                                      XCTAssertEqual([actualValue count], 2);
+                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
+                                                             actualValue[0]).fabricIndex unsignedCharValue],
+                                          1);
+                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
+                                                             actualValue[0]).groupId unsignedShortValue],
+                                          257U);
+                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
+                                                             actualValue[0]).groupKeySetID unsignedShortValue],
+                                          417U);
+                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
+                                                             actualValue[1]).fabricIndex unsignedCharValue],
+                                          1);
+                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
+                                                             actualValue[1]).groupId unsignedShortValue],
+                                          258U);
+                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
+                                                             actualValue[1]).groupKeySetID unsignedShortValue],
+                                          418U);
+                                  }
 
-        [expectation fulfill];
-    }];
+                                  [expectation fulfill];
+                              }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -43437,26 +43450,37 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeGroupTableWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read GroupTable Error: %@", err);
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster readAttributeGroupTableWithParams:params
+                             completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                                 NSLog(@"Read GroupTable Error: %@", err);
 
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue count], 2);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupId unsignedShortValue], 257U);
-            XCTAssertTrue(
-                [((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupName isEqualToString:@"Group #1"]);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupId unsignedShortValue], 258U);
-            XCTAssertTrue(
-                [((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupName isEqualToString:@"Group #2"]);
-        }
+                                 {
+                                     id actualValue = value;
+                                     XCTAssertEqual([actualValue count], 2);
+                                     XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *)
+                                                            actualValue[0]).fabricIndex unsignedCharValue],
+                                         1);
+                                     XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *)
+                                                            actualValue[0]).groupId unsignedShortValue],
+                                         257U);
+                                     XCTAssertTrue([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupName
+                                         isEqualToString:@"Group #1"]);
+                                     XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *)
+                                                            actualValue[1]).fabricIndex unsignedCharValue],
+                                         1);
+                                     XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *)
+                                                            actualValue[1]).groupId unsignedShortValue],
+                                         258U);
+                                     XCTAssertTrue([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupName
+                                         isEqualToString:@"Group #2"]);
+                                 }
 
-        [expectation fulfill];
-    }];
+                                 [expectation fulfill];
+                             }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -43809,21 +43833,26 @@ NSNumber * _Nonnull ourFabricIndex;
                                                                                                 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeFabricsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read fabric list before setting label Error: %@", err);
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster readAttributeFabricsWithParams:params
+                          completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                              NSLog(@"Read fabric list before setting label Error: %@", err);
 
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue count], 1);
-            XCTAssertEqualObjects(
-                ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex, ourFabricIndex);
-            XCTAssertTrue([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label isEqualToString:@""]);
-        }
+                              {
+                                  id actualValue = value;
+                                  XCTAssertEqual([actualValue count], 1);
+                                  XCTAssertEqualObjects(
+                                      ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex,
+                                      ourFabricIndex);
+                                  XCTAssertTrue([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label
+                                      isEqualToString:@""]);
+                              }
 
-        [expectation fulfill];
-    }];
+                              [expectation fulfill];
+                          }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -43872,22 +43901,26 @@ NSNumber * _Nonnull ourFabricIndex;
                                                                                                 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeFabricsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read fabric list after setting label Error: %@", err);
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster readAttributeFabricsWithParams:params
+                          completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                              NSLog(@"Read fabric list after setting label Error: %@", err);
 
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue count], 1);
-            XCTAssertEqualObjects(
-                ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex, ourFabricIndex);
-            XCTAssertTrue(
-                [((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label isEqualToString:@"Batcave"]);
-        }
+                              {
+                                  id actualValue = value;
+                                  XCTAssertEqual([actualValue count], 1);
+                                  XCTAssertEqualObjects(
+                                      ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex,
+                                      ourFabricIndex);
+                                  XCTAssertTrue([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label
+                                      isEqualToString:@"Batcave"]);
+                              }
 
-        [expectation fulfill];
-    }];
+                              [expectation fulfill];
+                          }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
