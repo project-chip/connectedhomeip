@@ -130,7 +130,7 @@ jobs:
                   retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 140
+        timeout-minutes: 150
 
         strategy:
             matrix:
