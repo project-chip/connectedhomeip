@@ -255,9 +255,9 @@ void TestEncodeFabricScoped(nlTestSuite * aSuite, void * aContext)
 {
     TestSetup test(aSuite, kTestFabricIndex);
     Clusters::AccessControl::Structs::ExtensionEntry::Type items[3];
-    items[0].fabricIndex = 0;
-    items[1].fabricIndex = 1;
-    items[2].fabricIndex = 2;
+    items[0].fabricIndex = 1;
+    items[1].fabricIndex = 2;
+    items[2].fabricIndex = 3;
 
     // We tried to encode three items, however, the encoder should only put the item with matching fabric index into the final list.
     CHIP_ERROR err = test.encoder.EncodeList([items](const auto & encoder) -> CHIP_ERROR {

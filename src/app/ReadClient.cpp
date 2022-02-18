@@ -396,6 +396,12 @@ CHIP_ERROR ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apEx
 {
     mpExchangeCtx = apExchangeContext;
 
+    //
+    // Let's take over further message processing on this exchange from the IM.
+    // This is only relevant for reports during post-subscription.
+    //
+    mpExchangeCtx->SetDelegate(this);
+
     CHIP_ERROR err = ProcessReportData(std::move(aPayload));
     if (err != CHIP_NO_ERROR)
     {
@@ -419,8 +425,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     System::PacketBufferTLVReader reader;
 
     reader.Init(std::move(aPayload));
-    reader.Next();
-
     err = report.Init(reader);
     SuccessOrExit(err);
 
@@ -514,6 +518,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
             mIsInitialReport = true;
         }
     }
+
+    SuccessOrExit(err = report.ExitContainer());
 
 exit:
     if (IsSubscriptionType())
@@ -717,21 +723,20 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 {
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
-    ReturnLogErrorOnFailure(reader.Next());
 
     SubscribeResponseMessage::Parser subscribeResponse;
-    ReturnLogErrorOnFailure(subscribeResponse.Init(reader));
+    ReturnErrorOnFailure(subscribeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnLogErrorOnFailure(subscribeResponse.CheckSchemaValidity());
+    ReturnErrorOnFailure(subscribeResponse.CheckSchemaValidity());
 #endif
 
     uint64_t subscriptionId = 0;
-    ReturnLogErrorOnFailure(subscribeResponse.GetSubscriptionId(&subscriptionId));
-    VerifyOrReturnLogError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnLogErrorOnFailure(subscribeResponse.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
-    ReturnLogErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
-
+    ReturnErrorOnFailure(subscribeResponse.GetSubscriptionId(&subscriptionId));
+    VerifyOrReturnError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(subscribeResponse.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
+    ReturnErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
+    ReturnErrorOnFailure(subscribeResponse.ExitContainer());
     mpCallback.OnSubscriptionEstablished(subscriptionId);
 
     MoveToState(ClientState::SubscriptionActive);

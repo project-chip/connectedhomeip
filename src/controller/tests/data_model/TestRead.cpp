@@ -46,6 +46,10 @@ enum ResponseDirective
 
 ResponseDirective responseDirective;
 
+// Number of reads of TestCluster::Attributes::Int16u that we have observed.
+// Every read will increment this count by 1 and return the new value.
+uint16_t totalReadCount = 0;
+
 } // namespace
 
 namespace chip {
@@ -72,6 +76,16 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                 ReturnErrorOnFailure(encoder.Encode(val));
                 return CHIP_NO_ERROR;
             });
+        }
+        else if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
+                 aPath.mAttributeId == app::Clusters::TestCluster::Attributes::Int16u::Id)
+        {
+            AttributeValueEncoder::AttributeEncodeState state =
+                (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath, 0 /* data version */,
+                                               aIsFabricFiltered, state);
+
+            return valueEncoder.Encode(++totalReadCount);
         }
         else
         {
@@ -155,11 +169,20 @@ public:
     static void TestReadFabricScopedWithoutFabricFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadFabricScopedWithFabricFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_MultipleReads(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_OneSubscribeMultipleReads(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_TwoSubscribesMultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_MultipleSubscriptionsWithDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
 
 private:
+    // Issue the given number of reads in parallel and wait for them all to
+    // succeed.
+    static void MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount);
+    // Establish the given number of subscriptions, then issue the given number
+    // of reads in parallel and wait for them all to succeed.
+    static void SubscribeThenReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aSubscribeCount, size_t aReadCount);
 };
 
 void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void * apContext)
@@ -197,8 +220,6 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
     Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
                                                                                         kTestEndpointId, onSuccessCb, onFailureCb);
 
-    ctx.DrainAndServiceIO();
-    app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
@@ -243,8 +264,6 @@ void TestReadInteraction::TestReadDataVersionFilter(nlTestSuite * apSuite, void 
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true, dataVersion);
 
     ctx.DrainAndServiceIO();
-    app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && !onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -275,8 +294,6 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
     Controller::ReadEvent<TestCluster::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
                                                                          onSuccessCb, onFailureCb);
 
-    ctx.DrainAndServiceIO();
-    app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onFailureCbInvoked);
@@ -310,8 +327,6 @@ void TestReadInteraction::TestReadAttributeError(nlTestSuite * apSuite, void * a
                                                                                         kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
-    app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -343,9 +358,11 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
     Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
                                                                                         kTestEndpointId, onSuccessCb, onFailureCb);
 
+    ctx.ExpireSessionAliceToBob();
+
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
 
     ctx.ExpireSessionBobToAlice();
 
@@ -353,13 +370,7 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
 
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
-
-    ctx.DrainAndServiceIO();
-    app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-    ctx.DrainAndServiceIO();
-
-    ctx.ExpireSessionAliceToBob();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
 
@@ -370,10 +381,7 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
     ctx.CreateSessionAliceToBob();
     ctx.CreateSessionBobToAlice();
 
-    //
-    // TODO: Figure out why I cannot enable this line below.
-    //
-    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext)
@@ -415,16 +423,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
                            onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
     }
 
-    //
-    // It may take a couple of service calls since we may hit the limit of CHIP_IM_MAX_REPORTS_IN_FLIGHT
-    // reports.
-    //
-    for (int i = 0; i < 10 && (numSubscriptionEstablishedCalls != (CHIP_IM_MAX_NUM_READ_HANDLER + 1)); i++)
-    {
-        ctx.DrainAndServiceIO();
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-        ctx.DrainAndServiceIO();
-    }
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
@@ -432,6 +431,135 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadHandler_MultipleReads(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= CHIP_IM_MAX_NUM_READ_HANDLER,
+                  "How can we have more reports in flight than read handlers?");
+
+    MultipleReadHelper(apSuite, ctx, CHIP_IM_MAX_REPORTS_IN_FLIGHT);
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+}
+
+void TestReadInteraction::TestReadHandler_OneSubscribeMultipleReads(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= CHIP_IM_MAX_NUM_READ_HANDLER,
+                  "How can we have more reports in flight than read handlers?");
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT > 1, "We won't do any reads");
+
+    SubscribeThenReadHelper(apSuite, ctx, 1, CHIP_IM_MAX_REPORTS_IN_FLIGHT - 1);
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+}
+
+void TestReadInteraction::TestReadHandler_TwoSubscribesMultipleReads(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= CHIP_IM_MAX_NUM_READ_HANDLER,
+                  "How can we have more reports in flight than read handlers?");
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT > 2, "We won't do any reads");
+
+    SubscribeThenReadHelper(apSuite, ctx, 2, CHIP_IM_MAX_REPORTS_IN_FLIGHT - 2);
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+}
+
+void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aSubscribeCount,
+                                                  size_t aReadCount)
+{
+    auto sessionHandle                       = aCtx.GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&apSuite](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        //
+        // We shouldn't be encountering any failures in this test.
+        //
+        NL_TEST_ASSERT(apSuite, false);
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite, &aCtx, aSubscribeCount, aReadCount]() {
+        numSubscriptionEstablishedCalls++;
+        if (numSubscriptionEstablishedCalls == aSubscribeCount)
+        {
+            MultipleReadHelper(apSuite, aCtx, aReadCount);
+        }
+    };
+
+    for (size_t i = 0; i < aSubscribeCount; ++i)
+    {
+        NL_TEST_ASSERT(apSuite,
+                       Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                           &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                           onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+    }
+
+    aCtx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, numSuccessCalls == aSubscribeCount);
+    NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == aSubscribeCount);
+}
+
+void TestReadInteraction::MultipleReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aReadCount)
+{
+    auto sessionHandle       = aCtx.GetSessionBobToAlice();
+    uint32_t numSuccessCalls = 0;
+    uint32_t numFailureCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    uint16_t firstExpectedResponse = totalReadCount + 1;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+
+        NL_TEST_ASSERT(apSuite, attributePath == nullptr);
+    };
+
+    for (size_t i = 0; i < aReadCount; ++i)
+    {
+        // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise,
+        // it's not safe to do so.
+        auto onSuccessCb = [&numSuccessCalls, &apSuite, firstExpectedResponse,
+                            i](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+            NL_TEST_ASSERT(apSuite, dataResponse == firstExpectedResponse + i);
+            numSuccessCalls++;
+        };
+
+        NL_TEST_ASSERT(apSuite,
+                       Controller::ReadAttribute<TestCluster::Attributes::Int16u::TypeInfo>(
+                           &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
+    }
+
+    aCtx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, numSuccessCalls == aReadCount);
+    NL_TEST_ASSERT(apSuite, numFailureCalls == 0);
 }
 
 void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFilter(nlTestSuite * apSuite, void * apContext)
@@ -476,16 +604,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
                            onSubscriptionEstablishedCb, false, true, dataVersion) == CHIP_NO_ERROR);
     }
 
-    //
-    // It may take a couple of service calls since we may hit the limit of CHIP_IM_MAX_REPORTS_IN_FLIGHT
-    // reports.
-    //
-    for (int i = 0; i < 10 && (numSubscriptionEstablishedCalls != (CHIP_IM_MAX_NUM_READ_HANDLER + 1)); i++)
-    {
-        ctx.DrainAndServiceIO();
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-        ctx.DrainAndServiceIO();
-    }
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
@@ -537,16 +656,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscription
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                        onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
 
-    //
-    // It may take a couple of service calls since we may hit the limit of CHIP_IM_MAX_REPORTS_IN_FLIGHT
-    // reports.
-    //
-    for (int i = 0; i < 10; i++)
-    {
-        ctx.DrainAndServiceIO();
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-        ctx.DrainAndServiceIO();
-    }
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == 1);
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == 1);
@@ -589,16 +699,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTest
                    Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
 
-    //
-    // It may take a couple of service calls since we may hit the limit of CHIP_IM_MAX_REPORTS_IN_FLIGHT
-    // reports.
-    //
-    for (int i = 0; i < 10; i++)
-    {
-        ctx.DrainAndServiceIO();
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-        ctx.DrainAndServiceIO();
-    }
+    ctx.DrainAndServiceIO();
 
     app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(-1);
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
@@ -648,8 +749,6 @@ void TestReadInteraction::TestReadFabricScopedWithoutFabricFilter(nlTestSuite * 
     Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
 
-    ctx.DrainAndServiceIO();
-    app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
@@ -707,8 +806,6 @@ void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apS
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */);
 
     ctx.DrainAndServiceIO();
-    app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -727,6 +824,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadFabricScopedWithFabricFilter", TestReadInteraction::TestReadFabricScopedWithFabricFilter),
     NL_TEST_DEF("TestReadHandler_MultipleSubscriptions", TestReadInteraction::TestReadHandler_MultipleSubscriptions),
     NL_TEST_DEF("TestReadHandler_MultipleSubscriptionsWithDataVersionFilter", TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFilter),
+    NL_TEST_DEF("TestReadHandler_MultipleReads", TestReadInteraction::TestReadHandler_MultipleReads),
+    NL_TEST_DEF("TestReadHandler_OneSubscribeMultipleReads", TestReadInteraction::TestReadHandler_OneSubscribeMultipleReads),
+    NL_TEST_DEF("TestReadHandler_TwoSubscribesMultipleReads", TestReadInteraction::TestReadHandler_TwoSubscribesMultipleReads),
     NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleSubscriptions", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscriptions),
     NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleReads", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads),
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),

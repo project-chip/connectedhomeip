@@ -1,0 +1,78 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 22.1.2. [TC-MF-1.2] Administrator Behavior using BCM [DUT - Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH_CR1 starts a commissioning process with TH_CE"
+      disabled: true
+
+    - label:
+          "If (PICS_MF_BCM) TH_CR1 opens a commissioning window on TH_CE using a
+          commissioning timeout of PIXIT_COMM_WIN seconds using BCM (Basic
+          Commissioning Method)"
+      disabled: true
+
+    - label: "TH_CR1 reads the list of Fabrics on TH_CE"
+      disabled: true
+
+    - label: "DUT_CR2 starts a commissioning process with TH_CE"
+      disabled: true
+
+    - label:
+          "DUT_CR2 writes and reads the Basic Information Clusters NodeLabel
+          mandatory attribute of TH_CE"
+      disabled: true
+
+    - label: "DUT_CR2 reads the list of Fabrics on TH_CE"
+      disabled: true
+
+    - label:
+          "TH_CR1 writes and reads the Basic Information Clusters NodeLabel
+          mandatory attribute of TH_CE using CASE"
+      disabled: true
+
+    - label:
+          "DUT_CR2 writes and reads the Basic Information Clusters NodeLabel
+          mandatory attribute of TH_CE"
+      disabled: true
+
+    - label: "Turn off TH_CR1"
+      disabled: true
+
+    - label:
+          "DUT_CR2 opens a commissioning window on TH_CE using a commissioning
+          timeout of PIXIT_COMM_WIN seconds using BCM (Basic Commissioning
+          Method)"
+      disabled: true
+
+    - label:
+          "DUT_CR2 revokes the commissioning window on TH_CE using the Revoke
+          Commissioning command"
+      disabled: true
+
+    - label:
+          "TH_CR3 attempts to execute a PASE to starts a commissioning process
+          with TH_CE"
+      disabled: true
+
+    - label:
+          "DUT_CR2 writes and reads the Basic Information Clusters NodeLabel
+          mandatory attribute of TH_CE"
+      disabled: true
