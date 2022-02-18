@@ -21,9 +21,9 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <cstring>
 #include <device_lock.h>
+#include <lib/core/OTAImageHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
-#include <lib/core/OTAImageHeader.h>
 
 #if defined(CONFIG_PLATFORM_8710C)
 #include "ota_8710c.h"
@@ -79,9 +79,9 @@ private:
 #endif
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
-    uint32_t size   = 0;
-    uint8_t RemainHeader = 32;
-    uint8_t AmebaHeader[32] = {0};
+    uint32_t size           = 0;
+    uint8_t RemainHeader    = 32;
+    uint8_t AmebaHeader[32] = { 0 };
     uint32_t flash_addr;
     OTAImageHeaderParser mHeaderParser;
     uint32_t mSoftwareVersion;
