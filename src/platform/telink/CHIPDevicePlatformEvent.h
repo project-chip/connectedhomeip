@@ -49,6 +49,7 @@ enum InternalPlatformSpecificEventTypes
     kPlatformTelinkEvent = kRange_InternalPlatformSpecific,
     kPlatformTelinkBleConnected,
     kPlatformTelinkBleDisconnected,
+    kPlatformTelinkBleDisconnectRequest,
     kPlatformTelinkBleCCCWrite,
     kPlatformTelinkBleRXWrite,
     kPlatformTelinkBleTXComplete,

@@ -126,11 +126,21 @@ private:
 
     CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
     CHIP_ERROR HandleGAPDisconnect(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleDisconnectRequest(const ChipDeviceEvent * event);
     CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent *event);
     CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent *event);
     CHIP_ERROR HandleTXCharComplete(const ChipDeviceEvent * event);
     CHIP_ERROR HandleBleConnectionClosed(const ChipDeviceEvent * event);
+
+    /*
+        @todo WORKAROUND: Due to abscense of non-cuncurrent mode in Matter
+        we are emulating connection to Thread with this events and manually
+        disconnect BLE ass soon as OperationalNetworkEnabled occures.
+        This functionality shall be removed as soon as non-cuncurrent mode
+        would be implemented
+     */
     CHIP_ERROR HandleThreadStateChange(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleOperationalNetworkEnabled(const ChipDeviceEvent * event);
 
     /* Callbacks from BLE stack*/
     static void DriveBLEState(intptr_t arg);
