@@ -449,15 +449,8 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void OnTriggerUpdateTimerHandler(Layer * systemLayer, void * appState)
 {
-    NodeId nodeId         = 1;
-    FabricIndex fabIndex  = 1;
-    EndpointId endpointId = 0;
-    P6_LOG("Triggering immediate OTA update query with hardcoded parameters:");
-    P6_LOG("Provider NodeId: %lu", nodeId);
-    P6_LOG("Provider FabricIndex: %lu", fabIndex);
-    P6_LOG("Provider EndpointId: %lu", endpointId);
+    P6_LOG("Triggering immediate OTA update query");
 
     OTARequestor * req = static_cast<OTARequestor *>(GetRequestorInstance());
-    req->TestModeSetProviderParameters(nodeId, fabIndex, endpointId);
     req->TriggerImmediateQuery();
 }
