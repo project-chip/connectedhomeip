@@ -288,13 +288,8 @@ class {{filename}}: public TestCommand
 
         {{~#*inline "maybeWait"}}
           {{#if busyWaitMs}}
-          {
-            using namespace chip::System::Clock::Literals;
-            // Busy-wait for {{busyWaitMs}} milliseconds.
-            auto & clock = chip::System::SystemClock();
-            auto start = clock.GetMonotonicTimestamp();
-            while (clock.GetMonotonicTimestamp() - start < {{busyWaitMs}}_ms);
-          }
+          using namespace chip::System::Clock::Literals;
+          BusyWaitFor({{busyWaitMs}}_ms);
           {{/if}}
         {{/inline~}}
 
