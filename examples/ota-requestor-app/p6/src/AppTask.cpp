@@ -190,7 +190,7 @@ CHIP_ERROR AppTask::Init()
     chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum update_state;
     OtaRequestorServerGetUpdateState(0, update_state);
     // Update state immediately after an update/reboot should be still applying.
-    if(update_state == chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying)
+    if (update_state == chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying)
     {
         chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
         if (requestor != nullptr)
