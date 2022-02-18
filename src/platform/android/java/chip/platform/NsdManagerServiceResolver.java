@@ -185,7 +185,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
     Log.d(
         TAG,
-        "publish " + registrationListener + " count = " + registrationListeners.stream().count());
+        "publish " + registrationListener + " count = " + registrationListeners.size());
   }
 
   @Override
@@ -193,11 +193,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     Log.d(TAG, "removeServices: ");
     for (NsdManager.RegistrationListener l : registrationListeners) {
       Log.i(TAG, "Remove " + l);
-      try {
-        nsdManager.unregisterService(l);
-      } catch (Exception exception) {
-        Log.e(TAG, "removeServices: error = " + exception.getMessage());
-      }
+      nsdManager.unregisterService(l);
     }
     registrationListeners.clear();
   }
