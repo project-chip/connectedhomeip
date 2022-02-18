@@ -1,11 +1,11 @@
 {{#chip_tests tests}}
-class {{filename}}: public TestCommand
+class {{filename}}Suite: public TestCommand
 {
   public:
     {{#if ../credsIssuerConfigArg}}
-    {{filename}}(CredentialIssuerCommands * credsIssuerConfig): TestCommand("{{filename}}", credsIssuerConfig), mTestIndex(0)
+    {{filename}}Suite(CredentialIssuerCommands * credsIssuerConfig): TestCommand("{{filename}}", credsIssuerConfig), mTestIndex(0)
     {{else}}
-    {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0)
+    {{filename}}Suite(): TestCommand("{{filename}}"), mTestIndex(0)
     {{/if}}
     {
         {{#chip_tests_config}}
@@ -17,7 +17,7 @@ class {{filename}}: public TestCommand
         {{/chip_tests_config}}
     }
 
-    ~{{filename}}()
+    ~{{filename}}Suite()
     {
         {{#chip_tests_items}}
         {{#chip_tests_item_response_parameters}}
@@ -204,25 +204,25 @@ class {{filename}}: public TestCommand
       {{#if isGroupCommand}}
       static void {{>staticDoneResponse}}({{>staticDoneArguments}})
       {
-          (static_cast<{{filename}} *>(context))->{{> doneResponse }}();
+          (static_cast<{{filename}}Suite *>(context))->{{> doneResponse }}();
       }
       {{/if}}
     {{/if}}
 
     static void {{>staticFailureResponse}}({{>staticFailureArguments}})
     {
-        (static_cast<{{filename}} *>(context))->{{>failureResponse}}(error);
+        (static_cast<{{filename}}Suite *>(context))->{{>failureResponse}}(error);
     }
 
     static void {{>staticSuccessResponse}}({{> staticSuccessArguments}})
     {
-        (static_cast<{{filename}} *>(context))->{{>successResponse}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
+        (static_cast<{{filename}}Suite *>(context))->{{>successResponse}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
     }
 
     {{#if isSubscribe}}
     static void {{> staticSubscriptionEstablished}}({{> staticSubscriptionEstablishedArguments}})
     {
-        (static_cast<{{filename}} *>(context))->{{> subscriptionEstablished}}();
+        (static_cast<{{filename}}Suite *>(context))->{{> subscriptionEstablished}}();
     }
     {{/if}}
 
@@ -308,16 +308,16 @@ class {{filename}}: public TestCommand
         {{/chip_tests_item_parameters}}
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<{{filename}} *>(context))->{{>successResponse}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
+            (static_cast<{{filename}}Suite *>(context))->{{>successResponse}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<{{filename}} *>(context))->{{>failureResponse}}(error);
+            (static_cast<{{filename}}Suite *>(context))->{{>failureResponse}}(error);
         };
 
         {{#if isGroupCommand}}
         auto done = [](void * context) {
-            (static_cast<{{filename}} *>(context))->OnDoneResponse_{{index}}();
+            (static_cast<{{filename}}Suite *>(context))->OnDoneResponse_{{index}}();
         };
         {{/if}}
 

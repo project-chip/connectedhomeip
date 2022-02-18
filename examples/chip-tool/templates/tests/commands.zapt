@@ -45,10 +45,10 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestList>(),
         make_unique<ManualTestList>(),
       {{#chip_tests (getTests)}}
-        make_unique<{{filename}}>(credsIssuerConfig),
+        make_unique<{{filename}}Suite>(credsIssuerConfig),
       {{/chip_tests}}
       {{#chip_tests (getManualTests)}}
-        make_unique<{{filename}}>(credsIssuerConfig),
+        make_unique<{{filename}}Suite>(credsIssuerConfig),
       {{/chip_tests}}
     };
 
