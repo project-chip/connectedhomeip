@@ -22,6 +22,14 @@
             "path": "partials/test_cluster.zapt"
         },
         {
+            "name": "maybeCheckExpectedValue",
+            "path": "partials/checks/maybeCheckExpectedValue.zapt"
+        },
+        {
+            "name": "maybeCheckExpectedConstraints",
+            "path": "partials/checks/maybeCheckExpectedConstraints.zapt"
+        },
+        {
             "name": "setupSaveAs",
             "path": "partials/saveAs/setupSaveAs.zapt"
         },

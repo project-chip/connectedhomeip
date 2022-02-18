@@ -92,26 +92,8 @@ class {{filename}}: public TestCommand
       {
           isExpectedDnssdResult = true;
           {{#chip_tests_item_response_parameters}}
-          {{#*inline "itemValue"}}value.{{name}}{{#if isOptional}}.Value(){{/if}}{{/inline}}
-          {{~#if hasExpectedValue}}
-            {{#if isOptional}}VerifyOrReturn(CheckValuePresent("{{name}}", value.{{name}}));{{/if}}
-            VerifyOrReturn(CheckValue("{{name}}", {{>itemValue}},
-            {{#if (chip_tests_config_has expectedValue)}}
-            m{{asUpperCamelCase expectedValue}}.HasValue() ? m{{asUpperCamelCase expectedValue}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value expectedValue) (chip_tests_config_get_type expectedValue)}}
-            {{else}}
-            {{expectedValue}}
-            {{/if}}
-          ));
-          {{/if}}
-          {{#if hasExpectedConstraints}}
-            {{#if isOptional}}VerifyOrReturn(CheckValuePresent("{{name}}", value.{{name}}));{{/if}}
-            {{#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{name}}", {{>itemValue}}.size(), {{expectedConstraints.minLength}}));{{/if}}
-            {{#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{name}}", {{>itemValue}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
-            {{#if (hasProperty expectedConstraints "minValue")}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{name}}", {{>itemValue}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
-            {{#if (hasProperty expectedConstraints "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{name}}", {{>itemValue}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
-            {{#if (hasProperty expectedConstraints "notValue")}}VerifyOrReturn(CheckConstraintNotValue("{{name}}", {{>itemValue}}, {{asTypedLiteral expectedConstraints.notValue type}}));{{/if}}
-          {{/if}}
-
+          {{>maybeCheckExpectedValue}}
+          {{>maybeCheckExpectedConstraints}}
           {{>maybeSaveAs}}
           {{/chip_tests_item_response_parameters}}
       }
@@ -383,35 +365,8 @@ class {{filename}}: public TestCommand
           mReceivedReport_{{index}} = true;
           {{/if}}
           {{#chip_tests_item_response_parameters}}
-            {{~#*inline "item"}}{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{/inline}}
-            {{#if hasExpectedValue}}
-              {{>valueEquals actual=(asLowerCamelCase name) label=(asLowerCamelCase name) expected=expectedValue depth=0}}
-            {{/if}}
-            {{#if hasExpectedConstraints}}
-              {{#if isOptional}}
-                {{~#*inline "item"}}{{asLowerCamelCase name}}{{/inline}}
-                VerifyOrReturn(CheckValuePresent("{{> item}}", {{> item}}));
-              {{/if}}
-              {{#if (hasProperty expectedConstraints "type")}}VerifyOrReturn(CheckConstraintType("{{>item}}", "", "{{expectedConstraints.type}}"));{{/if}}
-              {{~#if (hasProperty expectedConstraints "format")}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
-              {{~#if (hasProperty expectedConstraints "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{>item}}", {{>item}}, "{{expectedConstraints.startsWith}}"));{{/if}}
-              {{~#if (hasProperty expectedConstraints "endsWith")}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>item}}, "{{expectedConstraints.endsWith}}"));{{/if}}
-              {{~#if (hasProperty expectedConstraints "isUpperCase")}}VerifyOrReturn(CheckConstraintIsUpperCase("{{>item}}", {{>item}}, {{expectedConstraints.isUpperCase}}));{{/if}}
-              {{~#if (hasProperty expectedConstraints "isLowerCase")}}VerifyOrReturn(CheckConstraintIsLowerCase("{{>item}}", {{>item}}, {{expectedConstraints.isLowerCase}}));{{/if}}
-              {{~#if (hasProperty expectedConstraints "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{>item}}", {{>item}}, {{expectedConstraints.isHexString}}));{{/if}}
-              {{~#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.minLength}}));{{/if}}
-              {{~#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
-              {{~#if (hasProperty expectedConstraints "minValue")}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
-              {{~#if (hasProperty expectedConstraints "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
-              {{~#if (hasProperty expectedConstraints "notValue")}}
-                {{#if (isLiteralNull expectedConstraints.notValue)}}
-                VerifyOrReturn(CheckValueNonNull("{{>item}}", {{>item}}));
-                {{else}}
-                VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.notValue type}}));
-                {{/if}}
-              {{/if}}
-            {{/if}}
-
+            {{>maybeCheckExpectedValue}}
+            {{>maybeCheckExpectedConstraints}}
             {{>maybeSaveAs}}
           {{/chip_tests_item_response_parameters}}
         {{#unless async}}NextTest();{{/unless}}
