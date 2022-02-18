@@ -393,9 +393,6 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
     reader.Init(std::move(aPayload));
 
-    err = reader.Next();
-    SuccessOrExit(err);
-
     err = writeRequestParser.Init(reader);
     SuccessOrExit(err);
 
@@ -448,6 +445,8 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     {
         err = ProcessAttributeDataIBs(AttributeDataIBsReader);
     }
+    SuccessOrExit(err);
+    SuccessOrExit(err = writeRequestParser.ExitContainer());
 
     if (err == CHIP_NO_ERROR)
     {
