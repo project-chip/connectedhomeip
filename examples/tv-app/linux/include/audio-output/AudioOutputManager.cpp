@@ -64,14 +64,12 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
     // TODO: Insert code here
     if (isAudioOutputIndexInRange(index, mOutputs))
     {
-        uint16_t counter = 0;
-        for (const OutputInfoType & output : mOutputs)
+        for (OutputInfoType & output : mOutputs)
         {
             if (output.index == index)
             {
-                mOutputs[counter].name = name;
+                output.name = name;
             }
-            counter++;
         }
         return true;
     }
