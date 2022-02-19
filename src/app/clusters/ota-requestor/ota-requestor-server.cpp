@@ -31,6 +31,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
+using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 
 namespace {
 
@@ -87,7 +88,16 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::ReadDefaultOtaProviders(Attribu
         return aEncoder.EncodeEmptyList();
     }
 
-    return requestor->GetDefaultOtaProviderList(aEncoder);
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        auto iterator = requestor->GetDefaultOTAProviderListIterator();
+        while (iterator.Next())
+        {
+            ProviderLocation::Type pl = iterator.GetValue();
+            ReturnErrorOnFailure(encoder.Encode(pl));
+        }
+
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath,
