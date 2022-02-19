@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelTimeout.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/StatusResponse.h>
-#include <app/InteractionModelTimeout.h>
 
 namespace chip {
 namespace app {
