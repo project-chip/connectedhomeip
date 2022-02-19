@@ -79,7 +79,7 @@ void DiagnosticDataProviderImpl::InitializeWithObject(jobject manager)
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(mDiagnosticDataProviderManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(mGetRebootCountMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
@@ -164,11 +164,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             }
 
             jfieldID gethardwareAddressField = env->GetFieldID(nifClass, "hardwareAddress", "[B");
-            jbyteArray jHardwareAddressObj      = static_cast<jbyteArray>(env->GetObjectField(nifObject, gethardwareAddressField));
+            jbyteArray jHardwareAddressObj   = static_cast<jbyteArray>(env->GetObjectField(nifObject, gethardwareAddressField));
             if (jHardwareAddressObj != nullptr)
             {
-                size_t len     = env->GetArrayLength(jHardwareAddressObj);
-                len            = (len > kMaxHardwareAddrSize) ? kMaxHardwareAddrSize : len;
+                size_t len = env->GetArrayLength(jHardwareAddressObj);
+                len        = (len > kMaxHardwareAddrSize) ? kMaxHardwareAddrSize : len;
                 env->GetByteArrayRegion(jHardwareAddressObj, 0, len, reinterpret_cast<jbyte *>(ifp->MacAddress));
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
             }
