@@ -29,6 +29,7 @@
 #include "DiagnosticDataProviderImpl.h"
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -78,29 +79,17 @@ void DiagnosticDataProviderImpl::InitializeWithObject(jobject manager)
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrExit(mDiagnosticDataProviderManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mGetRebootCountMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+    VerifyOrReturnLogError(mDiagnosticDataProviderManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mGetRebootCountMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
     ChipLogProgress(DeviceLayer, "Received GetRebootCount");
 
-    {
-        jint count = env->CallIntMethod(mDiagnosticDataProviderManagerObject, mGetRebootCountMethod);
-        if (count > UINT16_MAX)
-        {
-            return CHIP_ERROR_INVALID_INTEGER_VALUE;
-        }
-        rebootCount = static_cast<uint16_t>(count);
-    }
+    jint count = env->CallIntMethod(mDiagnosticDataProviderManagerObject, mGetRebootCountMethod);
+    VerifyOrReturnLogError(count < UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+    rebootCount = static_cast<uint16_t>(count);
 
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "ChannelManager::getChannelList status error: %s", err.AsString());
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
@@ -110,7 +99,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrExit(mDiagnosticDataProviderManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetNifMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+    VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
     {
         ChipLogProgress(DeviceLayer, "Received GetNetworkInterfaces");
         jobjectArray nifList = (jobjectArray) env->CallObjectMethod(mDiagnosticDataProviderManagerObject, mGetNifMethod);
@@ -133,10 +122,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
             jfieldID getNameField = env->GetFieldID(nifClass, "name", "Ljava/lang/String;");
             jstring jname         = static_cast<jstring>(env->GetObjectField(nifObject, getNameField));
-            if (jname != NULL)
+            if (jname != nullptr)
             {
                 JniUtfString name(env, jname);
-                strncpy(ifp->Name, name.c_str(), Inet::InterfaceId::kMaxIfNameLength);
+                Platform::CopyString(ifp->Name, name.c_str());
                 ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
                 ifp->name                                          = CharSpan(ifp->Name, strlen(ifp->Name));
             }
@@ -176,7 +165,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
             jfieldID gethardwareAddressField = env->GetFieldID(nifClass, "hardwareAddress", "[B");
             jbyteArray jHardwareAddressObj      = static_cast<jbyteArray>(env->GetObjectField(nifObject, gethardwareAddressField));
-            if (jHardwareAddressObj != NULL)
+            if (jHardwareAddressObj != nullptr)
             {
                 size_t len     = env->GetArrayLength(jHardwareAddressObj);
                 len            = (len > kMaxHardwareAddrSize) ? kMaxHardwareAddrSize : len;
