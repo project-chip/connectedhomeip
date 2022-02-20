@@ -14800,7 +14800,7 @@ bool emberAfChannelClusterChangeChannelCallback(
  */
 bool emberAfChannelClusterChangeChannelResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorType);
+    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t status);
 /**
  * @brief Channel Cluster ChangeChannelByNumber Command callback (from client)
  */

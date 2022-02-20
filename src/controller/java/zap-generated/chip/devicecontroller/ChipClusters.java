@@ -3323,7 +3323,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ChangeChannelResponseCallback {
-      void onSuccess(ChipStructs.ChannelClusterChannelInfo channelMatch, Integer errorType);
+      void onSuccess(ChipStructs.ChannelClusterChannelInfo channelMatch, Integer status);
 
       void onError(Exception error);
     }

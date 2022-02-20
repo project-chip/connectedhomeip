@@ -1403,12 +1403,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(ChipStructs.ChannelClusterChannelInfo channelMatch, Integer errorType) {
+    public void onSuccess(ChipStructs.ChannelClusterChannelInfo channelMatch, Integer status) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       // channelMatch: Struct ChannelInfo
       // Conversion from this type to Java is not properly implemented yet
-      CommandResponseInfo errorTypeResponseValue = new CommandResponseInfo("errorType", "Integer");
-      responseValues.put(errorTypeResponseValue, errorType);
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
+      responseValues.put(statusResponseValue, status);
       callback.onSuccess(responseValues);
     }
 

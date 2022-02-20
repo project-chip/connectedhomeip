@@ -3277,7 +3277,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _channelMatch = [CHIPChannelClusterChannelInfo new];
 
-        _errorType = @(0);
+        _status = @(0);
     }
     return self;
 }

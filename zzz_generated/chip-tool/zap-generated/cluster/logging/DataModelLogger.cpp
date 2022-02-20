@@ -3463,7 +3463,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("channelMatch", indent + 1, value.channelMatch));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("errorType", indent + 1, value.errorType));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }

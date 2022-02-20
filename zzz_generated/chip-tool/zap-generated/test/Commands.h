@@ -55094,7 +55094,7 @@ private:
         request.match = chip::Span<const char>("PBSgarbage: not in length on purpose", 3);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_4(data.channelMatch, data.errorType);
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_4(data.channelMatch, data.status);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -55112,7 +55112,7 @@ private:
     }
 
     void OnSuccessResponse_4(const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & channelMatch,
-                             chip::app::Clusters::Channel::ErrorTypeEnum errorType)
+                             chip::app::Clusters::Channel::StatusEnum status)
     {
         VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 9U));
         VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 1U));
@@ -55125,7 +55125,7 @@ private:
         VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign.Value()", channelMatch.affiliateCallSign.Value(),
                                           chip::CharSpan("KCTS", 4)));
 
-        VerifyOrReturn(CheckValue("errorType", errorType, 0));
+        VerifyOrReturn(CheckValue("status", status, 0));
 
         NextTest();
     }

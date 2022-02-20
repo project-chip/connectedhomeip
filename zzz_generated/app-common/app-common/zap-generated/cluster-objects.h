@@ -33453,16 +33453,24 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace WakeOnLan
 namespace Channel {
-// Enum for ErrorTypeEnum
-enum class ErrorTypeEnum : uint8_t
-{
-    kMultipleMatches = 0x00,
-    kNoMatches       = 0x01,
-};
 // Enum for LineupInfoTypeEnum
 enum class LineupInfoTypeEnum : uint8_t
 {
     kMso = 0x00,
+};
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
+{
+    kSuccess         = 0x00,
+    kMultipleMatches = 0x01,
+    kNoMatches       = 0x02,
+};
+
+// Bitmap for ChannelFeature
+enum class ChannelFeature : uint32_t
+{
+    kChannelList = 0x1,
+    kLineupInfo  = 0x2,
 };
 
 namespace Structs {
@@ -33586,7 +33594,7 @@ namespace ChangeChannelResponse {
 enum class Fields
 {
     kChannelMatch = 0,
-    kErrorType    = 1,
+    kStatus       = 1,
 };
 
 struct Type
@@ -33597,7 +33605,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     Structs::ChannelInfo::Type channelMatch;
-    ErrorTypeEnum errorType = static_cast<ErrorTypeEnum>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33613,7 +33621,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     Structs::ChannelInfo::DecodableType channelMatch;
-    ErrorTypeEnum errorType = static_cast<ErrorTypeEnum>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannelResponse
@@ -36087,13 +36095,6 @@ enum class StatusEnum : uint8_t
 enum class ApplicationLauncherFeature : uint32_t
 {
     kApplicationPlatform = 0x1,
-};
-
-// Bitmap for ChannelFeature
-enum class ChannelFeature : uint32_t
-{
-    kChannelList = 0x1,
-    kLineupInfo  = 0x2,
 };
 
 namespace Structs {
