@@ -2336,8 +2336,58 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const AccessControl::Events::AccessControlEntryChanged::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AdminFabricIndex", indent + 1, value.adminFabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminFabricIndex'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AdminNodeID", indent + 1, value.adminNodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminNodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AdminPasscodeID", indent + 1, value.adminPasscodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminPasscodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ChangeType", indent + 1, value.changeType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ChangeType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("LatestValue", indent + 1, value.latestValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'LatestValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2385,55 +2435,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const AccessControl::Events::AccessControlExtensionChanged::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("AdminFabricIndex", indent + 1, value.adminFabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminFabricIndex'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("AdminNodeID", indent + 1, value.adminNodeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminNodeID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("AdminPasscodeID", indent + 1, value.adminPasscodeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AdminPasscodeID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("ChangeType", indent + 1, value.changeType);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ChangeType'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("LatestValue", indent + 1, value.latestValue);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'LatestValue'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BridgedActions::Events::StateChanged::DecodableType & value)
+                                     const chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2465,7 +2467,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BridgedActions::Events::ActionFailed::DecodableType & value)
+                                     const chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2504,7 +2506,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Basic::Events::StartUp::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Basic::Events::StartUp::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2519,14 +2522,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Ba
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Basic::Events::ShutDown::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Basic::Events::Leave::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Basic::Events::ShutDown::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     DataModelLogger::LogString(indent, "}");
@@ -2534,7 +2531,15 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Ba
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Basic::Events::ReachableChanged::DecodableType & value)
+                                     const chip::app::Clusters::Basic::Events::Leave::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2549,8 +2554,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2589,8 +2595,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2613,8 +2620,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2653,8 +2661,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const GeneralDiagnostics::Events::HardwareFaultChange::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2678,7 +2687,32 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const GeneralDiagnostics::Events::RadioFaultChange::DecodableType & value)
+                                     const chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Current", indent + 1, value.current);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Current'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Previous", indent + 1, value.previous);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Previous'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2702,31 +2736,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const GeneralDiagnostics::Events::NetworkFaultChange::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("Current", indent + 1, value.current);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Current'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("Previous", indent + 1, value.previous);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Previous'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const GeneralDiagnostics::Events::BootReason::DecodableType & value)
+                                     const chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2742,7 +2752,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const SoftwareDiagnostics::Events::SoftwareFault::DecodableType & value)
+                                     const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2757,8 +2767,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2773,8 +2784,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const WiFiNetworkDiagnostics::Events::Disconnection::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2789,8 +2801,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2813,8 +2826,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2830,7 +2844,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BridgedDeviceBasic::Events::StartUp::DecodableType & value)
+                                     const chip::app::Clusters::BridgedDeviceBasic::Events::StartUp::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2846,7 +2860,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BridgedDeviceBasic::Events::ShutDown::DecodableType & value)
+                                     const chip::app::Clusters::BridgedDeviceBasic::Events::ShutDown::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     DataModelLogger::LogString(indent, "}");
@@ -2854,7 +2868,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BridgedDeviceBasic::Events::Leave::DecodableType & value)
+                                     const chip::app::Clusters::BridgedDeviceBasic::Events::Leave::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     DataModelLogger::LogString(indent, "}");
@@ -2862,7 +2876,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BridgedDeviceBasic::Events::ReachableChanged::DecodableType & value)
+                                     const chip::app::Clusters::BridgedDeviceBasic::Events::ReachableChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2877,7 +2891,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::SwitchLatched::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2892,7 +2907,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Sw
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::InitialPress::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Switch::Events::InitialPress::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2907,7 +2923,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Sw
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::LongPress::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Switch::Events::LongPress::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2922,22 +2939,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Sw
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::ShortRelease::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("PreviousPosition", indent + 1, value.previousPosition);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousPosition'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Switch::Events::LongRelease::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Switch::Events::ShortRelease::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2953,7 +2956,23 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Sw
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Switch::Events::MultiPressOngoing::DecodableType & value)
+                                     const chip::app::Clusters::Switch::Events::LongRelease::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("PreviousPosition", indent + 1, value.previousPosition);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousPosition'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2978,7 +2997,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Switch::Events::MultiPressComplete::DecodableType & value)
+                                     const chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3002,7 +3021,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BooleanState::Events::StateChange::DecodableType & value)
+                                     const chip::app::Clusters::BooleanState::Events::StateChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3018,7 +3037,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Events::DoorLockAlarm::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3034,7 +3053,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Events::DoorStateChange::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3050,7 +3069,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Events::LockOperation::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3106,7 +3125,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Events::LockOperationError::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3170,7 +3189,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Events::LockUserChange::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3233,8 +3252,126 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     DataModelLogger::LogString(indent, "}");
@@ -3242,7 +3379,25 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType & value)
+                                     const chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     DataModelLogger::LogString(indent, "}");
@@ -3250,126 +3405,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::DryRunning::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::PumpBlocked::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::SensorFailure::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::GeneralFault::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::Leakage::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::AirDetection::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const PumpConfigurationAndControl::Events::TurbineOperation::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const TestCluster::Events::TestEvent::DecodableType & value)
+                                     const chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3425,7 +3461,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Te
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Events::TestFabricScopedEvent::DecodableType & value)
+                                     const chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3442,15 +3478,16 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const AccountLogin::Commands::GetSetupPINResponse::DecodableType & value)
+                                     const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("setupPIN", indent + 1, value.setupPIN));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ApplicationLauncher::Commands::LauncherResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3459,7 +3496,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Channel::Commands::ChangeChannelResponse::DecodableType & value)
+                                     const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("channelMatch", indent + 1, value.channelMatch));
@@ -3468,7 +3505,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ContentLauncher::Commands::LaunchResponse::DecodableType & value)
+                                     const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3476,8 +3513,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3488,7 +3526,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::GetLogRecordResponse::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("logEntryId", indent + 1, value.logEntryId));
@@ -3502,7 +3540,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::GetPINCodeResponse::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("userId", indent + 1, value.userId));
@@ -3513,7 +3551,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::GetUserStatusResponse::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Commands::GetUserStatusResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("userId", indent + 1, value.userId));
@@ -3521,8 +3559,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("weekDayIndex", indent + 1, value.weekDayIndex));
@@ -3536,8 +3575,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("yearDayIndex", indent + 1, value.yearDayIndex));
@@ -3548,8 +3588,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("holidayIndex", indent + 1, value.holidayIndex));
@@ -3561,7 +3602,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::GetUserTypeResponse::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("userId", indent + 1, value.userId));
@@ -3570,7 +3611,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::GetRFIDCodeResponse::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("userId", indent + 1, value.userId));
@@ -3581,7 +3622,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::GetUserResponse::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("userIndex", indent + 1, value.userIndex));
@@ -3597,8 +3638,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::OperatingEventNotification::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::DoorLock::Commands::OperatingEventNotification::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("operationEventSource", indent + 1, value.operationEventSource));
@@ -3610,8 +3652,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::ProgrammingEventNotification::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::DoorLock::Commands::ProgrammingEventNotification::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("programEventSource", indent + 1, value.programEventSource));
@@ -3626,7 +3669,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::SetCredentialResponse::DecodableType & value)
+                                     const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3635,8 +3678,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const DoorLock::Commands::GetCredentialStatusResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("credentialExists", indent + 1, value.credentialExists));
@@ -3645,8 +3689,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("profileCount", indent + 1, value.profileCount));
@@ -3656,9 +3701,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("startTime", indent + 1, value.startTime));
@@ -3670,8 +3715,9 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("errorCode", indent + 1, value.errorCode));
@@ -3679,8 +3725,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("errorCode", indent + 1, value.errorCode));
@@ -3688,8 +3735,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("errorCode", indent + 1, value.errorCode));
@@ -3697,16 +3745,18 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("groupKeySet", indent + 1, value.groupKeySet));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("groupKeySetIDs", indent + 1, value.groupKeySetIDs));
@@ -3714,7 +3764,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Groups::Commands::AddGroupResponse::DecodableType & value)
+                                     const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3723,7 +3773,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Groups::Commands::ViewGroupResponse::DecodableType & value)
+                                     const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3733,7 +3783,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Groups::Commands::GetGroupMembershipResponse::DecodableType & value)
+                                     const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("capacity", indent + 1, value.capacity));
@@ -3742,7 +3792,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Groups::Commands::RemoveGroupResponse::DecodableType & value)
+                                     const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3751,7 +3801,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Identify::Commands::IdentifyQueryResponse::DecodableType & value)
+                                     const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("timeout", indent + 1, value.timeout));
@@ -3759,7 +3809,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const KeypadInput::Commands::SendKeyResponse::DecodableType & value)
+                                     const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3767,15 +3817,16 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const MediaPlayback::Commands::PlaybackResponse::DecodableType & value)
+                                     const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("networkingStatus", indent + 1, value.networkingStatus));
@@ -3785,8 +3836,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("networkingStatus", indent + 1, value.networkingStatus));
@@ -3794,8 +3846,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("networkingStatus", indent + 1, value.networkingStatus));
@@ -3804,8 +3857,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3819,8 +3873,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("action", indent + 1, value.action));
@@ -3828,8 +3883,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OperationalCredentials::Commands::AttestationResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("attestationElements", indent + 1, value.attestationElements));
@@ -3837,16 +3893,18 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OperationalCredentials::Commands::CertificateChainResponse::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("certificate", indent + 1, value.certificate));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OperationalCredentials::Commands::CSRResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("NOCSRElements", indent + 1, value.NOCSRElements));
@@ -3854,8 +3912,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OperationalCredentials::Commands::NOCResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("statusCode", indent + 1, value.statusCode));
@@ -3865,7 +3924,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::AddSceneResponse::DecodableType & value)
+                                     const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3875,7 +3934,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::ViewSceneResponse::DecodableType & value)
+                                     const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3888,7 +3947,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::RemoveSceneResponse::DecodableType & value)
+                                     const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3898,7 +3957,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::RemoveAllScenesResponse::DecodableType & value)
+                                     const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3907,7 +3966,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::StoreSceneResponse::DecodableType & value)
+                                     const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3917,7 +3976,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::GetSceneMembershipResponse::DecodableType & value)
+                                     const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3929,7 +3988,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::EnhancedAddSceneResponse::DecodableType & value)
+                                     const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3939,7 +3998,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::EnhancedViewSceneResponse::DecodableType & value)
+                                     const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3952,7 +4011,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::CopySceneResponse::DecodableType & value)
+                                     const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3961,8 +4020,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TargetNavigator::Commands::NavigateTargetResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -3971,31 +4031,34 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::TestSpecificResponse::DecodableType & value)
+                                     const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("returnValue", indent + 1, value.returnValue));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::TestAddArgumentsResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("returnValue", indent + 1, value.returnValue));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::TestSimpleArgumentResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("returnValue", indent + 1, value.returnValue));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
@@ -4007,8 +4070,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
@@ -4016,7 +4080,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::TestEnumsResponse::DecodableType & value)
+                                     const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
@@ -4024,8 +4088,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::TestNullableOptionalResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("wasPresent", indent + 1, value.wasPresent));
@@ -4035,8 +4100,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("nullableIntWasNull", indent + 1, value.nullableIntWasNull));
@@ -4077,7 +4143,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::BooleanResponse::DecodableType & value)
+                                     const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
@@ -4085,31 +4151,34 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::SimpleStructResponse::DecodableType & value)
+                                     const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::TestEmitTestEventResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(
@@ -4120,8 +4189,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("timeOfDay", indent + 1, value.timeOfDay));
@@ -9796,7 +9866,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case AccountLogin::Commands::GetSetupPINResponse::Id: {
-            AccountLogin::Commands::GetSetupPINResponse::DecodableType value;
+            chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetSetupPINResponse", 1, value);
         }
@@ -9807,7 +9877,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case ApplicationLauncher::Commands::LauncherResponse::Id: {
-            ApplicationLauncher::Commands::LauncherResponse::DecodableType value;
+            chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LauncherResponse", 1, value);
         }
@@ -9818,7 +9888,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case Channel::Commands::ChangeChannelResponse::Id: {
-            Channel::Commands::ChangeChannelResponse::DecodableType value;
+            chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChangeChannelResponse", 1, value);
         }
@@ -9829,7 +9899,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case ContentLauncher::Commands::LaunchResponse::Id: {
-            ContentLauncher::Commands::LaunchResponse::DecodableType value;
+            chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LaunchResponse", 1, value);
         }
@@ -9840,7 +9910,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case DiagnosticLogs::Commands::RetrieveLogsResponse::Id: {
-            DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType value;
+            chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RetrieveLogsResponse", 1, value);
         }
@@ -9851,67 +9921,67 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case DoorLock::Commands::GetLogRecordResponse::Id: {
-            DoorLock::Commands::GetLogRecordResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetLogRecordResponse", 1, value);
         }
         case DoorLock::Commands::GetPINCodeResponse::Id: {
-            DoorLock::Commands::GetPINCodeResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetPINCodeResponse", 1, value);
         }
         case DoorLock::Commands::GetUserStatusResponse::Id: {
-            DoorLock::Commands::GetUserStatusResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::GetUserStatusResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetUserStatusResponse", 1, value);
         }
         case DoorLock::Commands::GetWeekDayScheduleResponse::Id: {
-            DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetWeekDayScheduleResponse", 1, value);
         }
         case DoorLock::Commands::GetYearDayScheduleResponse::Id: {
-            DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetYearDayScheduleResponse", 1, value);
         }
         case DoorLock::Commands::GetHolidayScheduleResponse::Id: {
-            DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetHolidayScheduleResponse", 1, value);
         }
         case DoorLock::Commands::GetUserTypeResponse::Id: {
-            DoorLock::Commands::GetUserTypeResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetUserTypeResponse", 1, value);
         }
         case DoorLock::Commands::GetRFIDCodeResponse::Id: {
-            DoorLock::Commands::GetRFIDCodeResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetRFIDCodeResponse", 1, value);
         }
         case DoorLock::Commands::GetUserResponse::Id: {
-            DoorLock::Commands::GetUserResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetUserResponse", 1, value);
         }
         case DoorLock::Commands::OperatingEventNotification::Id: {
-            DoorLock::Commands::OperatingEventNotification::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::OperatingEventNotification::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperatingEventNotification", 1, value);
         }
         case DoorLock::Commands::ProgrammingEventNotification::Id: {
-            DoorLock::Commands::ProgrammingEventNotification::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::ProgrammingEventNotification::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ProgrammingEventNotification", 1, value);
         }
         case DoorLock::Commands::SetCredentialResponse::Id: {
-            DoorLock::Commands::SetCredentialResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SetCredentialResponse", 1, value);
         }
         case DoorLock::Commands::GetCredentialStatusResponse::Id: {
-            DoorLock::Commands::GetCredentialStatusResponse::DecodableType value;
+            chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetCredentialStatusResponse", 1, value);
         }
@@ -9922,12 +9992,12 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::Id: {
-            ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType value;
+            chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetProfileInfoResponseCommand", 1, value);
         }
         case ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::Id: {
-            ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType value;
+            chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetMeasurementProfileResponseCommand", 1, value);
         }
@@ -9938,17 +10008,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case GeneralCommissioning::Commands::ArmFailSafeResponse::Id: {
-            GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
+            chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ArmFailSafeResponse", 1, value);
         }
         case GeneralCommissioning::Commands::SetRegulatoryConfigResponse::Id: {
-            GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType value;
+            chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SetRegulatoryConfigResponse", 1, value);
         }
         case GeneralCommissioning::Commands::CommissioningCompleteResponse::Id: {
-            GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
+            chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CommissioningCompleteResponse", 1, value);
         }
@@ -9959,12 +10029,12 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case GroupKeyManagement::Commands::KeySetReadResponse::Id: {
-            GroupKeyManagement::Commands::KeySetReadResponse::DecodableType value;
+            chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("KeySetReadResponse", 1, value);
         }
         case GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id: {
-            GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType value;
+            chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("KeySetReadAllIndicesResponse", 1, value);
         }
@@ -9975,22 +10045,22 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case Groups::Commands::AddGroupResponse::Id: {
-            Groups::Commands::AddGroupResponse::DecodableType value;
+            chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AddGroupResponse", 1, value);
         }
         case Groups::Commands::ViewGroupResponse::Id: {
-            Groups::Commands::ViewGroupResponse::DecodableType value;
+            chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ViewGroupResponse", 1, value);
         }
         case Groups::Commands::GetGroupMembershipResponse::Id: {
-            Groups::Commands::GetGroupMembershipResponse::DecodableType value;
+            chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetGroupMembershipResponse", 1, value);
         }
         case Groups::Commands::RemoveGroupResponse::Id: {
-            Groups::Commands::RemoveGroupResponse::DecodableType value;
+            chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RemoveGroupResponse", 1, value);
         }
@@ -10001,7 +10071,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case Identify::Commands::IdentifyQueryResponse::Id: {
-            Identify::Commands::IdentifyQueryResponse::DecodableType value;
+            chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("IdentifyQueryResponse", 1, value);
         }
@@ -10012,7 +10082,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case KeypadInput::Commands::SendKeyResponse::Id: {
-            KeypadInput::Commands::SendKeyResponse::DecodableType value;
+            chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SendKeyResponse", 1, value);
         }
@@ -10023,7 +10093,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case MediaPlayback::Commands::PlaybackResponse::Id: {
-            MediaPlayback::Commands::PlaybackResponse::DecodableType value;
+            chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PlaybackResponse", 1, value);
         }
@@ -10034,17 +10104,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case NetworkCommissioning::Commands::ScanNetworksResponse::Id: {
-            NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType value;
+            chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ScanNetworksResponse", 1, value);
         }
         case NetworkCommissioning::Commands::NetworkConfigResponse::Id: {
-            NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType value;
+            chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NetworkConfigResponse", 1, value);
         }
         case NetworkCommissioning::Commands::ConnectNetworkResponse::Id: {
-            NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType value;
+            chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ConnectNetworkResponse", 1, value);
         }
@@ -10055,12 +10125,12 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id: {
-            OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType value;
+            chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("QueryImageResponse", 1, value);
         }
         case OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id: {
-            OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType value;
+            chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ApplyUpdateResponse", 1, value);
         }
@@ -10071,22 +10141,22 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case OperationalCredentials::Commands::AttestationResponse::Id: {
-            OperationalCredentials::Commands::AttestationResponse::DecodableType value;
+            chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttestationResponse", 1, value);
         }
         case OperationalCredentials::Commands::CertificateChainResponse::Id: {
-            OperationalCredentials::Commands::CertificateChainResponse::DecodableType value;
+            chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CertificateChainResponse", 1, value);
         }
         case OperationalCredentials::Commands::CSRResponse::Id: {
-            OperationalCredentials::Commands::CSRResponse::DecodableType value;
+            chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CSRResponse", 1, value);
         }
         case OperationalCredentials::Commands::NOCResponse::Id: {
-            OperationalCredentials::Commands::NOCResponse::DecodableType value;
+            chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NOCResponse", 1, value);
         }
@@ -10097,47 +10167,47 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case Scenes::Commands::AddSceneResponse::Id: {
-            Scenes::Commands::AddSceneResponse::DecodableType value;
+            chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AddSceneResponse", 1, value);
         }
         case Scenes::Commands::ViewSceneResponse::Id: {
-            Scenes::Commands::ViewSceneResponse::DecodableType value;
+            chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ViewSceneResponse", 1, value);
         }
         case Scenes::Commands::RemoveSceneResponse::Id: {
-            Scenes::Commands::RemoveSceneResponse::DecodableType value;
+            chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RemoveSceneResponse", 1, value);
         }
         case Scenes::Commands::RemoveAllScenesResponse::Id: {
-            Scenes::Commands::RemoveAllScenesResponse::DecodableType value;
+            chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RemoveAllScenesResponse", 1, value);
         }
         case Scenes::Commands::StoreSceneResponse::Id: {
-            Scenes::Commands::StoreSceneResponse::DecodableType value;
+            chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StoreSceneResponse", 1, value);
         }
         case Scenes::Commands::GetSceneMembershipResponse::Id: {
-            Scenes::Commands::GetSceneMembershipResponse::DecodableType value;
+            chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetSceneMembershipResponse", 1, value);
         }
         case Scenes::Commands::EnhancedAddSceneResponse::Id: {
-            Scenes::Commands::EnhancedAddSceneResponse::DecodableType value;
+            chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EnhancedAddSceneResponse", 1, value);
         }
         case Scenes::Commands::EnhancedViewSceneResponse::Id: {
-            Scenes::Commands::EnhancedViewSceneResponse::DecodableType value;
+            chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EnhancedViewSceneResponse", 1, value);
         }
         case Scenes::Commands::CopySceneResponse::Id: {
-            Scenes::Commands::CopySceneResponse::DecodableType value;
+            chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CopySceneResponse", 1, value);
         }
@@ -10148,7 +10218,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case TargetNavigator::Commands::NavigateTargetResponse::Id: {
-            TargetNavigator::Commands::NavigateTargetResponse::DecodableType value;
+            chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NavigateTargetResponse", 1, value);
         }
@@ -10159,62 +10229,62 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case TestCluster::Commands::TestSpecificResponse::Id: {
-            TestCluster::Commands::TestSpecificResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestSpecificResponse", 1, value);
         }
         case TestCluster::Commands::TestAddArgumentsResponse::Id: {
-            TestCluster::Commands::TestAddArgumentsResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestAddArgumentsResponse", 1, value);
         }
         case TestCluster::Commands::TestSimpleArgumentResponse::Id: {
-            TestCluster::Commands::TestSimpleArgumentResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestSimpleArgumentResponse", 1, value);
         }
         case TestCluster::Commands::TestStructArrayArgumentResponse::Id: {
-            TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestStructArrayArgumentResponse", 1, value);
         }
         case TestCluster::Commands::TestListInt8UReverseResponse::Id: {
-            TestCluster::Commands::TestListInt8UReverseResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestListInt8UReverseResponse", 1, value);
         }
         case TestCluster::Commands::TestEnumsResponse::Id: {
-            TestCluster::Commands::TestEnumsResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEnumsResponse", 1, value);
         }
         case TestCluster::Commands::TestNullableOptionalResponse::Id: {
-            TestCluster::Commands::TestNullableOptionalResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestNullableOptionalResponse", 1, value);
         }
         case TestCluster::Commands::TestComplexNullableOptionalResponse::Id: {
-            TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestComplexNullableOptionalResponse", 1, value);
         }
         case TestCluster::Commands::BooleanResponse::Id: {
-            TestCluster::Commands::BooleanResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BooleanResponse", 1, value);
         }
         case TestCluster::Commands::SimpleStructResponse::Id: {
-            TestCluster::Commands::SimpleStructResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SimpleStructResponse", 1, value);
         }
         case TestCluster::Commands::TestEmitTestEventResponse::Id: {
-            TestCluster::Commands::TestEmitTestEventResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEmitTestEventResponse", 1, value);
         }
         case TestCluster::Commands::TestEmitTestFabricScopedEventResponse::Id: {
-            TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType value;
+            chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEmitTestFabricScopedEventResponse", 1, value);
         }
@@ -10225,12 +10295,12 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         switch (path.mCommandId)
         {
         case Thermostat::Commands::GetWeeklyScheduleResponse::Id: {
-            Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType value;
+            chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetWeeklyScheduleResponse", 1, value);
         }
         case Thermostat::Commands::GetRelayStatusLogResponse::Id: {
-            Thermostat::Commands::GetRelayStatusLogResponse::DecodableType value;
+            chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetRelayStatusLogResponse", 1, value);
         }

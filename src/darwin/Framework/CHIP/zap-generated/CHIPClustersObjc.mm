@@ -401,7 +401,7 @@ using namespace chip::app::Clusters;
                                   NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    AccountLogin::Commands::GetSetupPIN::Type request;
+    chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type request;
     request.tempAccountIdentifier = [self asCharSpan:params.tempAccountIdentifier];
 
     new CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge(
@@ -415,7 +415,7 @@ using namespace chip::app::Clusters;
 - (void)loginWithParams:(CHIPAccountLoginClusterLoginParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AccountLogin::Commands::Login::Type request;
+    chip::app::Clusters::AccountLogin::Commands::Login::Type request;
     request.tempAccountIdentifier = [self asCharSpan:params.tempAccountIdentifier];
     request.setupPIN = [self asCharSpan:params.setupPIN];
 
@@ -434,7 +434,7 @@ using namespace chip::app::Clusters;
 - (void)logoutWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AccountLogin::Commands::Logout::Type request;
+    chip::app::Clusters::AccountLogin::Commands::Logout::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -585,7 +585,7 @@ using namespace chip::app::Clusters;
                              completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
+    chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
     request.commissioningTimeout = params.commissioningTimeout.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -604,7 +604,7 @@ using namespace chip::app::Clusters;
                         completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
+    chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
     request.commissioningTimeout = params.commissioningTimeout.unsignedShortValue;
     request.PAKEVerifier = [self asByteSpan:params.pakeVerifier];
     request.discriminator = params.discriminator.unsignedShortValue;
@@ -627,7 +627,7 @@ using namespace chip::app::Clusters;
 - (void)revokeCommissioningWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AdministratorCommissioning::Commands::RevokeCommissioning::Type request;
+    chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -1246,7 +1246,7 @@ using namespace chip::app::Clusters;
                               NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    ApplicationLauncher::Commands::HideApp::Type request;
+    chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
@@ -1263,7 +1263,7 @@ using namespace chip::app::Clusters;
                                 NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    ApplicationLauncher::Commands::LaunchApp::Type request;
+    chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
     if (params.data != nil) {
@@ -1284,7 +1284,7 @@ using namespace chip::app::Clusters;
                               NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    ApplicationLauncher::Commands::StopApp::Type request;
+    chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
@@ -1525,7 +1525,7 @@ using namespace chip::app::Clusters;
              completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AudioOutput::Commands::RenameOutput::Type request;
+    chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type request;
     request.index = params.index.unsignedCharValue;
     request.name = [self asCharSpan:params.name];
 
@@ -1545,7 +1545,7 @@ using namespace chip::app::Clusters;
              completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AudioOutput::Commands::SelectOutput::Type request;
+    chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type request;
     request.index = params.index.unsignedCharValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -1757,7 +1757,7 @@ using namespace chip::app::Clusters;
                           completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BarrierControl::Commands::BarrierControlGoToPercent::Type request;
+    chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type request;
     request.percentOpen = params.percentOpen.unsignedCharValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -1775,7 +1775,7 @@ using namespace chip::app::Clusters;
 - (void)barrierControlStopWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BarrierControl::Commands::BarrierControlStop::Type request;
+    chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -3051,7 +3051,7 @@ using namespace chip::app::Clusters;
 - (void)bindWithParams:(CHIPBindingClusterBindParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Binding::Commands::Bind::Type request;
+    chip::app::Clusters::Binding::Commands::Bind::Type request;
     request.nodeId = params.nodeId.unsignedLongLongValue;
     request.groupId = params.groupId.unsignedShortValue;
     request.endpointId = params.endpointId.unsignedShortValue;
@@ -3072,7 +3072,7 @@ using namespace chip::app::Clusters;
 - (void)unbindWithParams:(CHIPBindingClusterUnbindParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Binding::Commands::Unbind::Type request;
+    chip::app::Clusters::Binding::Commands::Unbind::Type request;
     request.nodeId = params.nodeId.unsignedLongLongValue;
     request.groupId = params.groupId.unsignedShortValue;
     request.endpointId = params.endpointId.unsignedShortValue;
@@ -3389,7 +3389,7 @@ using namespace chip::app::Clusters;
               completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::DisableAction::Type request;
+    chip::app::Clusters::BridgedActions::Commands::DisableAction::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3412,7 +3412,7 @@ using namespace chip::app::Clusters;
                           completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::DisableActionWithDuration::Type request;
+    chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3436,7 +3436,7 @@ using namespace chip::app::Clusters;
              completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::EnableAction::Type request;
+    chip::app::Clusters::BridgedActions::Commands::EnableAction::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3459,7 +3459,7 @@ using namespace chip::app::Clusters;
                          completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::EnableActionWithDuration::Type request;
+    chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3483,7 +3483,7 @@ using namespace chip::app::Clusters;
               completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::InstantAction::Type request;
+    chip::app::Clusters::BridgedActions::Commands::InstantAction::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3506,7 +3506,7 @@ using namespace chip::app::Clusters;
                             completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::InstantActionWithTransition::Type request;
+    chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3530,7 +3530,7 @@ using namespace chip::app::Clusters;
             completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::PauseAction::Type request;
+    chip::app::Clusters::BridgedActions::Commands::PauseAction::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3553,7 +3553,7 @@ using namespace chip::app::Clusters;
                         completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::PauseActionWithDuration::Type request;
+    chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3577,7 +3577,7 @@ using namespace chip::app::Clusters;
              completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::ResumeAction::Type request;
+    chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3600,7 +3600,7 @@ using namespace chip::app::Clusters;
             completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::StartAction::Type request;
+    chip::app::Clusters::BridgedActions::Commands::StartAction::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3623,7 +3623,7 @@ using namespace chip::app::Clusters;
                         completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::StartActionWithDuration::Type request;
+    chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -3647,7 +3647,7 @@ using namespace chip::app::Clusters;
            completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    BridgedActions::Commands::StopAction::Type request;
+    chip::app::Clusters::BridgedActions::Commands::StopAction::Type request;
     request.actionID = params.actionID.unsignedShortValue;
     if (params.invokeID != nil) {
         auto & definedValue_0 = request.invokeID.Emplace();
@@ -4486,7 +4486,7 @@ using namespace chip::app::Clusters;
                                     NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Channel::Commands::ChangeChannel::Type request;
+    chip::app::Clusters::Channel::Commands::ChangeChannel::Type request;
     request.match = [self asCharSpan:params.match];
 
     new CHIPChannelClusterChangeChannelResponseCallbackBridge(
@@ -4501,7 +4501,7 @@ using namespace chip::app::Clusters;
                       completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Channel::Commands::ChangeChannelByNumber::Type request;
+    chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type request;
     request.majorNumber = params.majorNumber.unsignedShortValue;
     request.minorNumber = params.minorNumber.unsignedShortValue;
 
@@ -4520,7 +4520,7 @@ using namespace chip::app::Clusters;
 - (void)skipChannelWithParams:(CHIPChannelClusterSkipChannelParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Channel::Commands::SkipChannel::Type request;
+    chip::app::Clusters::Channel::Commands::SkipChannel::Type request;
     request.count = params.count.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -4764,7 +4764,7 @@ using namespace chip::app::Clusters;
              completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::ColorLoopSet::Type request;
+    chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
     request.updateFlags = static_cast<std::remove_reference_t<decltype(request.updateFlags)>>(params.updateFlags.unsignedCharValue);
     request.action = static_cast<std::remove_reference_t<decltype(request.action)>>(params.action.unsignedCharValue);
     request.direction = static_cast<std::remove_reference_t<decltype(request.direction)>>(params.direction.unsignedCharValue);
@@ -4789,7 +4789,7 @@ using namespace chip::app::Clusters;
                 completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::EnhancedMoveHue::Type request;
+    chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type request;
     request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
     request.rate = params.rate.unsignedShortValue;
     request.optionsMask = params.optionsMask.unsignedCharValue;
@@ -4811,7 +4811,7 @@ using namespace chip::app::Clusters;
                   completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::EnhancedMoveToHue::Type request;
+    chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type request;
     request.enhancedHue = params.enhancedHue.unsignedShortValue;
     request.direction = static_cast<std::remove_reference_t<decltype(request.direction)>>(params.direction.unsignedCharValue);
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -4834,7 +4834,7 @@ using namespace chip::app::Clusters;
                                completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type request;
+    chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type request;
     request.enhancedHue = params.enhancedHue.unsignedShortValue;
     request.saturation = params.saturation.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -4857,7 +4857,7 @@ using namespace chip::app::Clusters;
                 completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::EnhancedStepHue::Type request;
+    chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type request;
     request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
     request.stepSize = params.stepSize.unsignedShortValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -4879,7 +4879,7 @@ using namespace chip::app::Clusters;
 - (void)moveColorWithParams:(CHIPColorControlClusterMoveColorParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::MoveColor::Type request;
+    chip::app::Clusters::ColorControl::Commands::MoveColor::Type request;
     request.rateX = params.rateX.shortValue;
     request.rateY = params.rateY.shortValue;
     request.optionsMask = params.optionsMask.unsignedCharValue;
@@ -4901,7 +4901,7 @@ using namespace chip::app::Clusters;
                      completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::MoveColorTemperature::Type request;
+    chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type request;
     request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
     request.rate = params.rate.unsignedShortValue;
     request.colorTemperatureMinimum = params.colorTemperatureMinimum.unsignedShortValue;
@@ -4924,7 +4924,7 @@ using namespace chip::app::Clusters;
 - (void)moveHueWithParams:(CHIPColorControlClusterMoveHueParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::MoveHue::Type request;
+    chip::app::Clusters::ColorControl::Commands::MoveHue::Type request;
     request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
     request.rate = params.rate.unsignedCharValue;
     request.optionsMask = params.optionsMask.unsignedCharValue;
@@ -4946,7 +4946,7 @@ using namespace chip::app::Clusters;
                completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::MoveSaturation::Type request;
+    chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type request;
     request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
     request.rate = params.rate.unsignedCharValue;
     request.optionsMask = params.optionsMask.unsignedCharValue;
@@ -4968,7 +4968,7 @@ using namespace chip::app::Clusters;
             completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::MoveToColor::Type request;
+    chip::app::Clusters::ColorControl::Commands::MoveToColor::Type request;
     request.colorX = params.colorX.unsignedShortValue;
     request.colorY = params.colorY.unsignedShortValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -4991,7 +4991,7 @@ using namespace chip::app::Clusters;
                        completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::MoveToColorTemperature::Type request;
+    chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type request;
     request.colorTemperature = params.colorTemperature.unsignedShortValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
     request.optionsMask = params.optionsMask.unsignedCharValue;
@@ -5012,7 +5012,7 @@ using namespace chip::app::Clusters;
 - (void)moveToHueWithParams:(CHIPColorControlClusterMoveToHueParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::MoveToHue::Type request;
+    chip::app::Clusters::ColorControl::Commands::MoveToHue::Type request;
     request.hue = params.hue.unsignedCharValue;
     request.direction = static_cast<std::remove_reference_t<decltype(request.direction)>>(params.direction.unsignedCharValue);
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -5035,7 +5035,7 @@ using namespace chip::app::Clusters;
                        completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::MoveToHueAndSaturation::Type request;
+    chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type request;
     request.hue = params.hue.unsignedCharValue;
     request.saturation = params.saturation.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -5058,7 +5058,7 @@ using namespace chip::app::Clusters;
                  completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::MoveToSaturation::Type request;
+    chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type request;
     request.saturation = params.saturation.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
     request.optionsMask = params.optionsMask.unsignedCharValue;
@@ -5079,7 +5079,7 @@ using namespace chip::app::Clusters;
 - (void)stepColorWithParams:(CHIPColorControlClusterStepColorParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::StepColor::Type request;
+    chip::app::Clusters::ColorControl::Commands::StepColor::Type request;
     request.stepX = params.stepX.shortValue;
     request.stepY = params.stepY.shortValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -5102,7 +5102,7 @@ using namespace chip::app::Clusters;
                      completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::StepColorTemperature::Type request;
+    chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type request;
     request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
     request.stepSize = params.stepSize.unsignedShortValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -5126,7 +5126,7 @@ using namespace chip::app::Clusters;
 - (void)stepHueWithParams:(CHIPColorControlClusterStepHueParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::StepHue::Type request;
+    chip::app::Clusters::ColorControl::Commands::StepHue::Type request;
     request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
     request.stepSize = params.stepSize.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedCharValue;
@@ -5149,7 +5149,7 @@ using namespace chip::app::Clusters;
                completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::StepSaturation::Type request;
+    chip::app::Clusters::ColorControl::Commands::StepSaturation::Type request;
     request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
     request.stepSize = params.stepSize.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedCharValue;
@@ -5172,7 +5172,7 @@ using namespace chip::app::Clusters;
              completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ColorControl::Commands::StopMoveStep::Type request;
+    chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type request;
     request.optionsMask = params.optionsMask.unsignedCharValue;
     request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
@@ -7107,7 +7107,7 @@ using namespace chip::app::Clusters;
                                     NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    ContentLauncher::Commands::LaunchContent::Type request;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type request;
     {
         using ListType_1 = std::remove_reference_t<decltype(request.search.parameterList)>;
         using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
@@ -7178,7 +7178,7 @@ using namespace chip::app::Clusters;
                                 NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    ContentLauncher::Commands::LaunchURL::Type request;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type request;
     request.contentURL = [self asCharSpan:params.contentURL];
     if (params.displayString != nil) {
         auto & definedValue_0 = request.displayString.Emplace();
@@ -7758,7 +7758,7 @@ using namespace chip::app::Clusters;
                                           NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    DiagnosticLogs::Commands::RetrieveLogsRequest::Type request;
+    chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type request;
     request.intent = static_cast<std::remove_reference_t<decltype(request.intent)>>(params.intent.unsignedCharValue);
     request.requestedProtocol
         = static_cast<std::remove_reference_t<decltype(request.requestedProtocol)>>(params.requestedProtocol.unsignedCharValue);
@@ -7879,7 +7879,7 @@ using namespace chip::app::Clusters;
                 completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::ClearCredential::Type request;
+    chip::app::Clusters::DoorLock::Commands::ClearCredential::Type request;
     if (params.credential == nil) {
         request.credential.SetNull();
     } else {
@@ -7904,7 +7904,7 @@ using namespace chip::app::Clusters;
 - (void)clearUserWithParams:(CHIPDoorLockClusterClearUserParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::ClearUser::Type request;
+    chip::app::Clusters::DoorLock::Commands::ClearUser::Type request;
     request.userIndex = params.userIndex.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -7923,7 +7923,7 @@ using namespace chip::app::Clusters;
                      completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::ClearWeekDaySchedule::Type request;
+    chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type request;
     request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
     request.userIndex = params.userIndex.unsignedShortValue;
 
@@ -7943,7 +7943,7 @@ using namespace chip::app::Clusters;
                      completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::ClearYearDaySchedule::Type request;
+    chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type request;
     request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
     request.userIndex = params.userIndex.unsignedShortValue;
 
@@ -7964,7 +7964,7 @@ using namespace chip::app::Clusters;
                                           NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::GetCredentialStatus::Type request;
+    chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type request;
     request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
         params.credential.credentialType.unsignedCharValue);
     request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
@@ -7982,7 +7982,7 @@ using namespace chip::app::Clusters;
             (void (^)(CHIPDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::GetUser::Type request;
+    chip::app::Clusters::DoorLock::Commands::GetUser::Type request;
     request.userIndex = params.userIndex.unsignedShortValue;
 
     new CHIPDoorLockClusterGetUserResponseCallbackBridge(
@@ -7998,7 +7998,7 @@ using namespace chip::app::Clusters;
                                          NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::GetWeekDaySchedule::Type request;
+    chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type request;
     request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
     request.userIndex = params.userIndex.unsignedShortValue;
 
@@ -8015,7 +8015,7 @@ using namespace chip::app::Clusters;
                                          NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::GetYearDaySchedule::Type request;
+    chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type request;
     request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
     request.userIndex = params.userIndex.unsignedShortValue;
 
@@ -8031,7 +8031,7 @@ using namespace chip::app::Clusters;
          completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::LockDoor::Type request;
+    chip::app::Clusters::DoorLock::Commands::LockDoor::Type request;
     if (params != nil) {
         if (params.pinCode != nil) {
             auto & definedValue_0 = request.pinCode.Emplace();
@@ -8056,7 +8056,7 @@ using namespace chip::app::Clusters;
                                     NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::SetCredential::Type request;
+    chip::app::Clusters::DoorLock::Commands::SetCredential::Type request;
     request.operationType
         = static_cast<std::remove_reference_t<decltype(request.operationType)>>(params.operationType.unsignedCharValue);
     request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
@@ -8093,7 +8093,7 @@ using namespace chip::app::Clusters;
 - (void)setUserWithParams:(CHIPDoorLockClusterSetUserParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::SetUser::Type request;
+    chip::app::Clusters::DoorLock::Commands::SetUser::Type request;
     request.operationType
         = static_cast<std::remove_reference_t<decltype(request.operationType)>>(params.operationType.unsignedCharValue);
     request.userIndex = params.userIndex.unsignedShortValue;
@@ -8144,7 +8144,7 @@ using namespace chip::app::Clusters;
                    completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::SetWeekDaySchedule::Type request;
+    chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type request;
     request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
     request.userIndex = params.userIndex.unsignedShortValue;
     request.daysMask = static_cast<std::remove_reference_t<decltype(request.daysMask)>>(params.daysMask.unsignedCharValue);
@@ -8169,7 +8169,7 @@ using namespace chip::app::Clusters;
                    completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::SetYearDaySchedule::Type request;
+    chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type request;
     request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
     request.userIndex = params.userIndex.unsignedShortValue;
     request.localStartTime = params.localStartTime.unsignedIntValue;
@@ -8191,7 +8191,7 @@ using namespace chip::app::Clusters;
            completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::UnlockDoor::Type request;
+    chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type request;
     if (params != nil) {
         if (params.pinCode != nil) {
             auto & definedValue_0 = request.pinCode.Emplace();
@@ -8215,7 +8215,7 @@ using namespace chip::app::Clusters;
                   completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::UnlockWithTimeout::Type request;
+    chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type request;
     request.timeout = params.timeout.unsignedShortValue;
     if (params.pinCode != nil) {
         auto & definedValue_0 = request.pinCode.Emplace();
@@ -9602,7 +9602,7 @@ using namespace chip::app::Clusters;
 - (void)resetCountsWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    EthernetNetworkDiagnostics::Commands::ResetCounts::Type request;
+    chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -10478,7 +10478,7 @@ using namespace chip::app::Clusters;
                                   NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    GeneralCommissioning::Commands::ArmFailSafe::Type request;
+    chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type request;
     request.expiryLengthSeconds = params.expiryLengthSeconds.unsignedShortValue;
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
     request.timeoutMs = params.timeoutMs.unsignedIntValue;
@@ -10496,7 +10496,7 @@ using namespace chip::app::Clusters;
         NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    GeneralCommissioning::Commands::CommissioningComplete::Type request;
+    chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type request;
 
     new CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -10512,7 +10512,7 @@ using namespace chip::app::Clusters;
                                           NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
+    chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
     request.location = static_cast<std::remove_reference_t<decltype(request.location)>>(params.location.unsignedCharValue);
     request.countryCode = [self asCharSpan:params.countryCode];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
@@ -11187,7 +11187,7 @@ using namespace chip::app::Clusters;
                                  NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    GroupKeyManagement::Commands::KeySetRead::Type request;
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type request;
     request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
 
     new CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge(
@@ -11203,7 +11203,7 @@ using namespace chip::app::Clusters;
                                            NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
     {
         using ListType_0 = std::remove_reference_t<decltype(request.groupKeySetIDs)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
@@ -11240,7 +11240,7 @@ using namespace chip::app::Clusters;
              completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    GroupKeyManagement::Commands::KeySetRemove::Type request;
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type request;
     request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -11259,7 +11259,7 @@ using namespace chip::app::Clusters;
             completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    GroupKeyManagement::Commands::KeySetWrite::Type request;
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type request;
     request.groupKeySet.groupKeySetID = params.groupKeySet.groupKeySetID.unsignedShortValue;
     request.groupKeySet.groupKeySecurityPolicy
         = static_cast<std::remove_reference_t<decltype(request.groupKeySet.groupKeySecurityPolicy)>>(
@@ -11619,7 +11619,7 @@ using namespace chip::app::Clusters;
              (void (^)(CHIPGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Groups::Commands::AddGroup::Type request;
+    chip::app::Clusters::Groups::Commands::AddGroup::Type request;
     request.groupId = params.groupId.unsignedShortValue;
     request.groupName = [self asCharSpan:params.groupName];
 
@@ -11635,7 +11635,7 @@ using namespace chip::app::Clusters;
                       completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Groups::Commands::AddGroupIfIdentifying::Type request;
+    chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Type request;
     request.groupId = params.groupId.unsignedShortValue;
     request.groupName = [self asCharSpan:params.groupName];
 
@@ -11656,7 +11656,7 @@ using namespace chip::app::Clusters;
                                          NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Groups::Commands::GetGroupMembership::Type request;
+    chip::app::Clusters::Groups::Commands::GetGroupMembership::Type request;
     {
         using ListType_0 = std::remove_reference_t<decltype(request.groupList)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
@@ -11691,7 +11691,7 @@ using namespace chip::app::Clusters;
 - (void)removeAllGroupsWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Groups::Commands::RemoveAllGroups::Type request;
+    chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -11710,7 +11710,7 @@ using namespace chip::app::Clusters;
                 (void (^)(CHIPGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Groups::Commands::RemoveGroup::Type request;
+    chip::app::Clusters::Groups::Commands::RemoveGroup::Type request;
     request.groupId = params.groupId.unsignedShortValue;
 
     new CHIPGroupsClusterRemoveGroupResponseCallbackBridge(
@@ -11726,7 +11726,7 @@ using namespace chip::app::Clusters;
               (void (^)(CHIPGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Groups::Commands::ViewGroup::Type request;
+    chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
     request.groupId = params.groupId.unsignedShortValue;
 
     new CHIPGroupsClusterViewGroupResponseCallbackBridge(
@@ -11902,7 +11902,7 @@ using namespace chip::app::Clusters;
 - (void)identifyWithParams:(CHIPIdentifyClusterIdentifyParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Identify::Commands::Identify::Type request;
+    chip::app::Clusters::Identify::Commands::Identify::Type request;
     request.identifyTime = params.identifyTime.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -11921,7 +11921,7 @@ using namespace chip::app::Clusters;
                                                NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Identify::Commands::IdentifyQuery::Type request;
+    chip::app::Clusters::Identify::Commands::IdentifyQuery::Type request;
 
     new CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -11935,7 +11935,7 @@ using namespace chip::app::Clusters;
               completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Identify::Commands::TriggerEffect::Type request;
+    chip::app::Clusters::Identify::Commands::TriggerEffect::Type request;
     request.effectIdentifier
         = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(params.effectIdentifier.unsignedCharValue);
     request.effectVariant
@@ -12459,7 +12459,7 @@ using namespace chip::app::Clusters;
             (void (^)(CHIPKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    KeypadInput::Commands::SendKey::Type request;
+    chip::app::Clusters::KeypadInput::Commands::SendKey::Type request;
     request.keyCode = static_cast<std::remove_reference_t<decltype(request.keyCode)>>(params.keyCode.unsignedCharValue);
 
     new CHIPKeypadInputClusterSendKeyResponseCallbackBridge(
@@ -12606,7 +12606,7 @@ using namespace chip::app::Clusters;
 - (void)moveWithParams:(CHIPLevelControlClusterMoveParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    LevelControl::Commands::Move::Type request;
+    chip::app::Clusters::LevelControl::Commands::Move::Type request;
     request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
     request.rate = params.rate.unsignedCharValue;
     request.optionMask = params.optionMask.unsignedCharValue;
@@ -12628,7 +12628,7 @@ using namespace chip::app::Clusters;
             completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    LevelControl::Commands::MoveToLevel::Type request;
+    chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type request;
     request.level = params.level.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
     request.optionMask = params.optionMask.unsignedCharValue;
@@ -12650,7 +12650,7 @@ using namespace chip::app::Clusters;
                      completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    LevelControl::Commands::MoveToLevelWithOnOff::Type request;
+    chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type request;
     request.level = params.level.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
 
@@ -12670,7 +12670,7 @@ using namespace chip::app::Clusters;
               completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    LevelControl::Commands::MoveWithOnOff::Type request;
+    chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type request;
     request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
     request.rate = params.rate.unsignedCharValue;
 
@@ -12689,7 +12689,7 @@ using namespace chip::app::Clusters;
 - (void)stepWithParams:(CHIPLevelControlClusterStepParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    LevelControl::Commands::Step::Type request;
+    chip::app::Clusters::LevelControl::Commands::Step::Type request;
     request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
     request.stepSize = params.stepSize.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -12712,7 +12712,7 @@ using namespace chip::app::Clusters;
               completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    LevelControl::Commands::StepWithOnOff::Type request;
+    chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type request;
     request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
     request.stepSize = params.stepSize.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -12732,7 +12732,7 @@ using namespace chip::app::Clusters;
 - (void)stopWithParams:(CHIPLevelControlClusterStopParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    LevelControl::Commands::Stop::Type request;
+    chip::app::Clusters::LevelControl::Commands::Stop::Type request;
     request.optionMask = params.optionMask.unsignedCharValue;
     request.optionOverride = params.optionOverride.unsignedCharValue;
 
@@ -12751,7 +12751,7 @@ using namespace chip::app::Clusters;
 - (void)stopWithOnOffWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    LevelControl::Commands::StopWithOnOff::Type request;
+    chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -13686,7 +13686,7 @@ using namespace chip::app::Clusters;
 - (void)sleepWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    LowPower::Commands::Sleep::Type request;
+    chip::app::Clusters::LowPower::Commands::Sleep::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -13836,7 +13836,7 @@ using namespace chip::app::Clusters;
 - (void)hideInputStatusWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    MediaInput::Commands::HideInputStatus::Type request;
+    chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -13853,7 +13853,7 @@ using namespace chip::app::Clusters;
 - (void)renameInputWithParams:(CHIPMediaInputClusterRenameInputParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    MediaInput::Commands::RenameInput::Type request;
+    chip::app::Clusters::MediaInput::Commands::RenameInput::Type request;
     request.index = params.index.unsignedCharValue;
     request.name = [self asCharSpan:params.name];
 
@@ -13872,7 +13872,7 @@ using namespace chip::app::Clusters;
 - (void)selectInputWithParams:(CHIPMediaInputClusterSelectInputParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    MediaInput::Commands::SelectInput::Type request;
+    chip::app::Clusters::MediaInput::Commands::SelectInput::Type request;
     request.index = params.index.unsignedCharValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -13890,7 +13890,7 @@ using namespace chip::app::Clusters;
 - (void)showInputStatusWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    MediaInput::Commands::ShowInputStatus::Type request;
+    chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -14100,7 +14100,7 @@ using namespace chip::app::Clusters;
                                              NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::FastForward::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::FastForward::Type request;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14114,7 +14114,7 @@ using namespace chip::app::Clusters;
                                       NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::Next::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::Next::Type request;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14128,7 +14128,7 @@ using namespace chip::app::Clusters;
                                        NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::Pause::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::Pause::Type request;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14142,7 +14142,7 @@ using namespace chip::app::Clusters;
                                       NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::Play::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::Play::Type request;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14156,7 +14156,7 @@ using namespace chip::app::Clusters;
                                           NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::Previous::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::Previous::Type request;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14170,7 +14170,7 @@ using namespace chip::app::Clusters;
                                         NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::Rewind::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::Rewind::Type request;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14185,7 +14185,7 @@ using namespace chip::app::Clusters;
          (void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::Seek::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::Seek::Type request;
     request.position = params.position.unsignedLongLongValue;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
@@ -14201,7 +14201,7 @@ using namespace chip::app::Clusters;
                                    NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::SkipBackward::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type request;
     request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
@@ -14217,7 +14217,7 @@ using namespace chip::app::Clusters;
                                   NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::SkipForward::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type request;
     request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
@@ -14232,7 +14232,7 @@ using namespace chip::app::Clusters;
                                            NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::StartOver::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::StartOver::Type request;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14246,7 +14246,7 @@ using namespace chip::app::Clusters;
                                               NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::StopPlayback::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type request;
 
     new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14605,7 +14605,7 @@ using namespace chip::app::Clusters;
              completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ModeSelect::Commands::ChangeToMode::Type request;
+    chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type request;
     request.newMode = params.newMode.unsignedCharValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -14922,7 +14922,7 @@ using namespace chip::app::Clusters;
                                                NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
+    chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
     request.operationalDataset = [self asByteSpan:params.operationalDataset];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
 
@@ -14939,7 +14939,7 @@ using namespace chip::app::Clusters;
                                              NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
+    chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
     request.ssid = [self asByteSpan:params.ssid];
     request.credentials = [self asByteSpan:params.credentials];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
@@ -14957,7 +14957,7 @@ using namespace chip::app::Clusters;
                                      NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    NetworkCommissioning::Commands::ConnectNetwork::Type request;
+    chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetwork::Type request;
     request.networkID = [self asByteSpan:params.networkID];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
 
@@ -14974,7 +14974,7 @@ using namespace chip::app::Clusters;
                                     NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    NetworkCommissioning::Commands::RemoveNetwork::Type request;
+    chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type request;
     request.networkID = [self asByteSpan:params.networkID];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
 
@@ -14991,7 +14991,7 @@ using namespace chip::app::Clusters;
                                      NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    NetworkCommissioning::Commands::ReorderNetwork::Type request;
+    chip::app::Clusters::NetworkCommissioning::Commands::ReorderNetwork::Type request;
     request.networkID = [self asByteSpan:params.networkID];
     request.networkIndex = params.networkIndex.unsignedCharValue;
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
@@ -15009,7 +15009,7 @@ using namespace chip::app::Clusters;
                                    NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    NetworkCommissioning::Commands::ScanNetworks::Type request;
+    chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type request;
     request.ssid = [self asByteSpan:params.ssid];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
 
@@ -15424,7 +15424,7 @@ using namespace chip::app::Clusters;
                                          NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type request;
+    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type request;
     request.updateToken = [self asByteSpan:params.updateToken];
     request.newVersion = params.newVersion.unsignedIntValue;
 
@@ -15440,7 +15440,7 @@ using namespace chip::app::Clusters;
                     completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type request;
+    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type request;
     request.updateToken = [self asByteSpan:params.updateToken];
     request.softwareVersion = params.softwareVersion.unsignedIntValue;
 
@@ -15461,7 +15461,7 @@ using namespace chip::app::Clusters;
                                  NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    OtaSoftwareUpdateProvider::Commands::QueryImage::Type request;
+    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type request;
     request.vendorId = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(params.vendorId.unsignedShortValue);
     request.productId = params.productId.unsignedShortValue;
     request.softwareVersion = params.softwareVersion.unsignedIntValue;
@@ -15586,7 +15586,7 @@ using namespace chip::app::Clusters;
                     completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type request;
+    chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type request;
     request.providerNodeId = params.providerNodeId.unsignedLongLongValue;
     request.vendorId = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(params.vendorId.unsignedShortValue);
     request.announcementReason
@@ -16076,7 +16076,7 @@ using namespace chip::app::Clusters;
 - (void)offWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    OnOff::Commands::Off::Type request;
+    chip::app::Clusters::OnOff::Commands::Off::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -16093,7 +16093,7 @@ using namespace chip::app::Clusters;
 - (void)offWithEffectWithParams:(CHIPOnOffClusterOffWithEffectParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    OnOff::Commands::OffWithEffect::Type request;
+    chip::app::Clusters::OnOff::Commands::OffWithEffect::Type request;
     request.effectId = static_cast<std::remove_reference_t<decltype(request.effectId)>>(params.effectId.unsignedCharValue);
     request.effectVariant
         = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
@@ -16113,7 +16113,7 @@ using namespace chip::app::Clusters;
 - (void)onWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    OnOff::Commands::On::Type request;
+    chip::app::Clusters::OnOff::Commands::On::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -16130,7 +16130,7 @@ using namespace chip::app::Clusters;
 - (void)onWithRecallGlobalSceneWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    OnOff::Commands::OnWithRecallGlobalScene::Type request;
+    chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -16148,7 +16148,7 @@ using namespace chip::app::Clusters;
                completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    OnOff::Commands::OnWithTimedOff::Type request;
+    chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type request;
     request.onOffControl
         = static_cast<std::remove_reference_t<decltype(request.onOffControl)>>(params.onOffControl.unsignedCharValue);
     request.onTime = params.onTime.unsignedShortValue;
@@ -16169,7 +16169,7 @@ using namespace chip::app::Clusters;
 - (void)toggleWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    OnOff::Commands::Toggle::Type request;
+    chip::app::Clusters::OnOff::Commands::Toggle::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -16764,7 +16764,7 @@ using namespace chip::app::Clusters;
                              NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    OperationalCredentials::Commands::AddNOC::Type request;
+    chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type request;
     request.NOCValue = [self asByteSpan:params.nocValue];
     if (params.icacValue != nil) {
         auto & definedValue_0 = request.ICACValue.Emplace();
@@ -16786,7 +16786,7 @@ using namespace chip::app::Clusters;
                           completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
+    chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
     request.rootCertificate = [self asByteSpan:params.rootCertificate];
 
     new CHIPCommandSuccessCallbackBridge(
@@ -16806,7 +16806,7 @@ using namespace chip::app::Clusters;
                                          NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    OperationalCredentials::Commands::AttestationRequest::Type request;
+    chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type request;
     request.attestationNonce = [self asByteSpan:params.attestationNonce];
 
     new CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(
@@ -16822,7 +16822,7 @@ using namespace chip::app::Clusters;
                                  NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    OperationalCredentials::Commands::CSRRequest::Type request;
+    chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Type request;
     request.CSRNonce = [self asByteSpan:params.csrNonce];
 
     new CHIPOperationalCredentialsClusterCSRResponseCallbackBridge(
@@ -16839,7 +16839,7 @@ using namespace chip::app::Clusters;
                                 NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    OperationalCredentials::Commands::CertificateChainRequest::Type request;
+    chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type request;
     request.certificateType = params.certificateType.unsignedCharValue;
 
     new CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge(
@@ -16856,7 +16856,7 @@ using namespace chip::app::Clusters;
                                    NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    OperationalCredentials::Commands::RemoveFabric::Type request;
+    chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type request;
     request.fabricIndex = params.fabricIndex.unsignedCharValue;
 
     new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(
@@ -16871,7 +16871,7 @@ using namespace chip::app::Clusters;
                              completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type request;
+    chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type request;
     request.trustedRootIdentifier = [self asByteSpan:params.trustedRootIdentifier];
 
     new CHIPCommandSuccessCallbackBridge(
@@ -16891,7 +16891,7 @@ using namespace chip::app::Clusters;
                                         NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    OperationalCredentials::Commands::UpdateFabricLabel::Type request;
+    chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type request;
     request.label = [self asCharSpan:params.label];
 
     new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(
@@ -16907,7 +16907,7 @@ using namespace chip::app::Clusters;
                                 NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    OperationalCredentials::Commands::UpdateNOC::Type request;
+    chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type request;
     request.NOCValue = [self asByteSpan:params.nocValue];
     if (params.icacValue != nil) {
         auto & definedValue_0 = request.ICACValue.Emplace();
@@ -19237,7 +19237,7 @@ using namespace chip::app::Clusters;
              (void (^)(CHIPScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Scenes::Commands::AddScene::Type request;
+    chip::app::Clusters::Scenes::Commands::AddScene::Type request;
     request.groupId = params.groupId.unsignedShortValue;
     request.sceneId = params.sceneId.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -19280,7 +19280,7 @@ using namespace chip::app::Clusters;
                                          NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Scenes::Commands::GetSceneMembership::Type request;
+    chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type request;
     request.groupId = params.groupId.unsignedShortValue;
 
     new CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(
@@ -19294,7 +19294,7 @@ using namespace chip::app::Clusters;
 - (void)recallSceneWithParams:(CHIPScenesClusterRecallSceneParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Scenes::Commands::RecallScene::Type request;
+    chip::app::Clusters::Scenes::Commands::RecallScene::Type request;
     request.groupId = params.groupId.unsignedShortValue;
     request.sceneId = params.sceneId.unsignedCharValue;
     request.transitionTime = params.transitionTime.unsignedShortValue;
@@ -19316,7 +19316,7 @@ using namespace chip::app::Clusters;
                                       NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Scenes::Commands::RemoveAllScenes::Type request;
+    chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type request;
     request.groupId = params.groupId.unsignedShortValue;
 
     new CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(
@@ -19332,7 +19332,7 @@ using namespace chip::app::Clusters;
                 (void (^)(CHIPScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Scenes::Commands::RemoveScene::Type request;
+    chip::app::Clusters::Scenes::Commands::RemoveScene::Type request;
     request.groupId = params.groupId.unsignedShortValue;
     request.sceneId = params.sceneId.unsignedCharValue;
 
@@ -19349,7 +19349,7 @@ using namespace chip::app::Clusters;
                (void (^)(CHIPScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Scenes::Commands::StoreScene::Type request;
+    chip::app::Clusters::Scenes::Commands::StoreScene::Type request;
     request.groupId = params.groupId.unsignedShortValue;
     request.sceneId = params.sceneId.unsignedCharValue;
 
@@ -19366,7 +19366,7 @@ using namespace chip::app::Clusters;
               (void (^)(CHIPScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Scenes::Commands::ViewScene::Type request;
+    chip::app::Clusters::Scenes::Commands::ViewScene::Type request;
     request.groupId = params.groupId.unsignedShortValue;
     request.sceneId = params.sceneId.unsignedCharValue;
 
@@ -19659,7 +19659,7 @@ using namespace chip::app::Clusters;
 - (void)resetWatermarksWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    SoftwareDiagnostics::Commands::ResetWatermarks::Type request;
+    chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -20215,7 +20215,7 @@ using namespace chip::app::Clusters;
                                      NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TargetNavigator::Commands::NavigateTarget::Type request;
+    chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type request;
     request.target = params.target.unsignedCharValue;
     if (params.data != nil) {
         auto & definedValue_0 = request.data.Emplace();
@@ -20616,7 +20616,7 @@ using namespace chip::app::Clusters;
                                               NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::SimpleStructEchoRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type request;
     request.arg1.a = params.arg1.a.unsignedCharValue;
     request.arg1.b = params.arg1.b.boolValue;
     request.arg1.c = static_cast<std::remove_reference_t<decltype(request.arg1.c)>>(params.arg1.c.unsignedCharValue);
@@ -20637,7 +20637,7 @@ using namespace chip::app::Clusters;
 - (void)testWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::Test::Type request;
+    chip::app::Clusters::TestCluster::Commands::Test::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -20656,7 +20656,7 @@ using namespace chip::app::Clusters;
                                        NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestAddArguments::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type request;
     request.arg1 = params.arg1.unsignedCharValue;
     request.arg2 = params.arg2.unsignedCharValue;
 
@@ -20673,7 +20673,7 @@ using namespace chip::app::Clusters;
                                                NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestEmitTestEventRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type request;
     request.arg1 = params.arg1.unsignedCharValue;
     request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
     request.arg3 = params.arg3.boolValue;
@@ -20691,7 +20691,7 @@ using namespace chip::app::Clusters;
                                        NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestEnumsRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type request;
     request.arg1 = static_cast<std::remove_reference_t<decltype(request.arg1)>>(params.arg1.unsignedShortValue);
     request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
 
@@ -20708,7 +20708,7 @@ using namespace chip::app::Clusters;
                                                    NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
     {
         using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
@@ -20745,7 +20745,7 @@ using namespace chip::app::Clusters;
                                                   NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestListInt8UReverseRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type request;
     {
         using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
@@ -20783,7 +20783,7 @@ using namespace chip::app::Clusters;
                                                               NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestListNestedStructListArgumentRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type request;
     {
         using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
@@ -20928,7 +20928,7 @@ using namespace chip::app::Clusters;
                                                     NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestListStructArgumentRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type request;
     {
         using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
@@ -20974,7 +20974,7 @@ using namespace chip::app::Clusters;
                                                       NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestNestedStructArgumentRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type request;
     request.arg1.a = params.arg1.a.unsignedCharValue;
     request.arg1.b = params.arg1.b.boolValue;
     request.arg1.c.a = params.arg1.c.a.unsignedCharValue;
@@ -20999,7 +20999,7 @@ using namespace chip::app::Clusters;
                                                           NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestNestedStructListArgumentRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type request;
     request.arg1.a = params.arg1.a.unsignedCharValue;
     request.arg1.b = params.arg1.b.boolValue;
     request.arg1.c.a = params.arg1.c.a.unsignedCharValue;
@@ -21119,7 +21119,7 @@ using namespace chip::app::Clusters;
 - (void)testNotHandledWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestNotHandled::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -21138,7 +21138,7 @@ using namespace chip::app::Clusters;
                                                   NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestNullableOptionalRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
     if (params != nil) {
         if (params.arg1 != nil) {
             auto & definedValue_0 = request.arg1.Emplace();
@@ -21164,7 +21164,7 @@ using namespace chip::app::Clusters;
                                   completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type request;
     if (params != nil) {
         if (params.arg1 != nil) {
             auto & definedValue_0 = request.arg1.Emplace();
@@ -21188,7 +21188,7 @@ using namespace chip::app::Clusters;
                                               NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestSpecific::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestSpecific::Type request;
 
     new CHIPTestClusterClusterTestSpecificResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -21203,7 +21203,7 @@ using namespace chip::app::Clusters;
                                                 NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestStructArgumentRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type request;
     request.arg1.a = params.arg1.a.unsignedCharValue;
     request.arg1.b = params.arg1.b.boolValue;
     request.arg1.c = static_cast<std::remove_reference_t<decltype(request.arg1.c)>>(params.arg1.c.unsignedCharValue);
@@ -21224,7 +21224,7 @@ using namespace chip::app::Clusters;
 - (void)testUnknownCommandWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TestUnknownCommand::Type request;
+    chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -21241,7 +21241,7 @@ using namespace chip::app::Clusters;
 - (void)timedInvokeRequestWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    TestCluster::Commands::TimedInvokeRequest::Type request;
+    chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -25701,7 +25701,7 @@ using namespace chip::app::Clusters;
 - (void)clearWeeklyScheduleWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Thermostat::Commands::ClearWeeklySchedule::Type request;
+    chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -25719,7 +25719,7 @@ using namespace chip::app::Clusters;
                                                    NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Thermostat::Commands::GetRelayStatusLog::Type request;
+    chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type request;
 
     new CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -25734,7 +25734,7 @@ using namespace chip::app::Clusters;
                                         NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Thermostat::Commands::GetWeeklySchedule::Type request;
+    chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Type request;
     request.daysToReturn
         = static_cast<std::remove_reference_t<decltype(request.daysToReturn)>>(params.daysToReturn.unsignedCharValue);
     request.modeToReturn
@@ -25752,7 +25752,7 @@ using namespace chip::app::Clusters;
                   completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Thermostat::Commands::SetWeeklySchedule::Type request;
+    chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type request;
     request.numberOfTransitionsForSequence = params.numberOfTransitionsForSequence.unsignedCharValue;
     request.dayOfWeekForSequence = static_cast<std::remove_reference_t<decltype(request.dayOfWeekForSequence)>>(
         params.dayOfWeekForSequence.unsignedCharValue);
@@ -25797,7 +25797,7 @@ using namespace chip::app::Clusters;
                    completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Thermostat::Commands::SetpointRaiseLower::Type request;
+    chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type request;
     request.mode = static_cast<std::remove_reference_t<decltype(request.mode)>>(params.mode.unsignedCharValue);
     request.amount = params.amount.charValue;
 
@@ -26895,7 +26895,7 @@ using namespace chip::app::Clusters;
 - (void)resetCountsWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    ThreadNetworkDiagnostics::Commands::ResetCounts::Type request;
+    chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -29697,7 +29697,7 @@ using namespace chip::app::Clusters;
 - (void)resetCountsWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    WiFiNetworkDiagnostics::Commands::ResetCounts::Type request;
+    chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -30278,7 +30278,7 @@ using namespace chip::app::Clusters;
 - (void)downOrCloseWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    WindowCovering::Commands::DownOrClose::Type request;
+    chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -30296,7 +30296,7 @@ using namespace chip::app::Clusters;
                    completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    WindowCovering::Commands::GoToLiftPercentage::Type request;
+    chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type request;
     request.liftPercentageValue = params.liftPercentageValue.unsignedCharValue;
     request.liftPercent100thsValue = params.liftPercent100thsValue.unsignedShortValue;
 
@@ -30316,7 +30316,7 @@ using namespace chip::app::Clusters;
               completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    WindowCovering::Commands::GoToLiftValue::Type request;
+    chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type request;
     request.liftValue = params.liftValue.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -30335,7 +30335,7 @@ using namespace chip::app::Clusters;
                    completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    WindowCovering::Commands::GoToTiltPercentage::Type request;
+    chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type request;
     request.tiltPercentageValue = params.tiltPercentageValue.unsignedCharValue;
     request.tiltPercent100thsValue = params.tiltPercent100thsValue.unsignedShortValue;
 
@@ -30355,7 +30355,7 @@ using namespace chip::app::Clusters;
               completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    WindowCovering::Commands::GoToTiltValue::Type request;
+    chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type request;
     request.tiltValue = params.tiltValue.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -30373,7 +30373,7 @@ using namespace chip::app::Clusters;
 - (void)stopMotionWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    WindowCovering::Commands::StopMotion::Type request;
+    chip::app::Clusters::WindowCovering::Commands::StopMotion::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -30390,7 +30390,7 @@ using namespace chip::app::Clusters;
 - (void)upOrOpenWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    WindowCovering::Commands::UpOrOpen::Type request;
+    chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
