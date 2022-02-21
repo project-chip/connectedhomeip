@@ -29,50 +29,84 @@
 #include "esp_system.h"
 
 #include "Button.h"
+#include "ScreenManager.h"
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
-extern const char * TAG;
+static const char * TAG = "Button.cpp";
 
-esp_err_t Button::Init(gpio_num_t gpioNum, uint16_t debouncePeriod)
+static xQueueHandle button_evt_queue = NULL;
+
+static void IRAM_ATTR button_isr_handler(void * arg)
 {
-    mGPIONum         = gpioNum;
-    mDebouncePeriod  = debouncePeriod / portTICK_PERIOD_MS;
-    mState           = false;
-    mLastPolledState = false;
-
-    esp_err_t err = gpio_set_direction(gpioNum, GPIO_MODE_INPUT);
-    if (err == ESP_OK)
-    {
-        Poll();
-    }
-    return err;
+    uint32_t gpio_num = (uint32_t) arg;
+    xQueueSendFromISR(button_evt_queue, &gpio_num, NULL);
 }
 
-bool Button::Poll()
+static void button_task(void * arg)
 {
-    uint32_t now = xTaskGetTickCount();
+    uint32_t io_num;
 
-    bool newState = gpio_get_level(mGPIONum) == 0;
-
-    if (newState != mLastPolledState)
+    while (1)
     {
-        mLastPolledState = newState;
-        mLastReadTime    = now;
-    }
+        if (xQueueReceive(button_evt_queue, &io_num, portMAX_DELAY))
+        {
+            vTaskDelay(50 / portTICK_PERIOD_MS);
+#if CONFIG_DEVICE_TYPE_M5STACK
+            int level = gpio_get_level((gpio_num_t) io_num);
+            ESP_LOGI(TAG, "GPIO[%d] intr, val: %d, pressed\n", io_num, level);
+            if (level == 0)
+            {
+                bool woken = false;
+                if (!woken)
+                {
+                    woken = WakeDisplay();
+                }
+                if (woken)
+                {
+                    continue;
+                }
 
-    else if (newState != mState && (now - mLastReadTime) >= mDebouncePeriod)
-    {
-        mState          = newState;
-        mPrevStateDur   = now - mStateStartTime;
-        mStateStartTime = now;
-        return true;
+                ScreenManager::ButtonPressed(40 - io_num);
+            }
+#endif
+        }
     }
-
-    return false;
 }
 
-uint32_t Button::GetStateDuration()
+esp_err_t Button::Init(gpio_num_t gpioNum)
 {
-    return (xTaskGetTickCount() - mStateStartTime) * portTICK_PERIOD_MS;
+    esp_err_t ret = ESP_OK;
+
+    mGPIONum = gpioNum;
+    //  zero-initialize the config structure.
+    gpio_config_t io_conf = {};
+    // interrupt of falling edge
+    io_conf.intr_type = GPIO_INTR_NEGEDGE;
+    // bit mask of the pins, use GPIO4/5 here
+    io_conf.pin_bit_mask = 1ULL << gpioNum;
+    // set as input mode
+    io_conf.mode = GPIO_MODE_INPUT;
+    // enable pull-up mode
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+
+    gpio_config(&io_conf);
+
+    // hook isr handler for specific gpio pin
+    ret = gpio_isr_handler_add(gpioNum, button_isr_handler, (void *) gpioNum);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "gpio_isr_handler_add failed: %s", esp_err_to_name(ret));
+        return ret;
+    }
+
+    if (button_evt_queue == NULL)
+    {
+        // create a queue to handle gpio event from isr
+        button_evt_queue = xQueueCreate(10, sizeof(uint32_t));
+        // start gpio task
+        xTaskCreate(button_task, "button_task", 3500, NULL, 10, NULL);
+    }
+
+    return ESP_OK;
 }

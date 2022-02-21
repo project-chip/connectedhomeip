@@ -443,9 +443,15 @@ void InitM5Stack(std::string qrCodeText)
 {
     esp_err_t err;
     // Initialize the buttons.
+    err = gpio_install_isr_service(0);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Button preInit failed: %s", esp_err_to_name(err));
+        return;
+    }
     for (int i = 0; i < buttons.size(); ++i)
     {
-        err = buttons[i].Init(button_gpios[i], 50);
+        err = buttons[i].Init(button_gpios[i]);
         if (err != ESP_OK)
         {
             ESP_LOGE(TAG, "Button.Init() failed: %s", esp_err_to_name(err));
@@ -492,39 +498,6 @@ void InitM5Stack(std::string qrCodeText)
             ->Item("Items")
             ->Item("For")
             ->Item("Demo")));
-}
-
-void PollButtons()
-{
-    // Run the UI Loop
-    while (true)
-    {
-        // TODO consider refactoring this example to use FreeRTOS tasks
-
-        bool woken = false;
-
-        // Poll buttons, possibly wake screen.
-        for (int i = 0; i < buttons.size(); ++i)
-        {
-            if (buttons[i].Poll())
-            {
-                if (!woken)
-                {
-                    woken = WakeDisplay();
-                }
-                if (woken)
-                {
-                    continue;
-                }
-                if (buttons[i].IsPressed())
-                {
-                    ScreenManager::ButtonPressed(1 + i);
-                }
-            }
-        }
-
-        vTaskDelay(50 / portTICK_PERIOD_MS);
-    }
 }
 #endif
 
