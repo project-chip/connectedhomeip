@@ -56,6 +56,48 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorId(uint16_t & vendorId)
+{
+    vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uint16_t & productId)
+{
+    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersion(uint32_t & softwareVer)
+{
+    softwareVer = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceTypeId(uint16_t & deviceType)
+{
+    deviceType = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingHint(uint16_t & pairingHint)
+{
+    pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingHint(uint16_t & pairingHint)
+{
+    pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorName(char * buf, size_t bufSize)
 {
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
