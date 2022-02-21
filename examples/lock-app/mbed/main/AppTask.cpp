@@ -117,8 +117,6 @@ int AppTask::Init()
     BoltLockMgr().Init();
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    ConnectivityMgrImpl().StartWiFiManagement();
-
     // Init ZCL Data Model and start server
     error = Server::GetInstance().Init();
     if (error != CHIP_NO_ERROR)

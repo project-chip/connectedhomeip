@@ -103,8 +103,6 @@ int AppTask::Init()
     sFunctionButton2.rise(mbed::callback(this, &AppTask::FunctionButton2ReleaseEventHandler));
 #endif
 
-    ConnectivityMgrImpl().StartWiFiManagement();
-
     // Init ZCL Data Model and start server
     error = Server::GetInstance().Init();
     if (error != CHIP_NO_ERROR)
