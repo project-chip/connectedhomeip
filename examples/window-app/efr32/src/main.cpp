@@ -141,8 +141,20 @@ int main(void)
         appError(err);
     }
 
-    EFR32_LOG("Starting OpenThread task");
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // Init ZCL Data Model
+    chip::Server::GetInstance().Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
+    EFR32_LOG("Starting Platform Manager Event Loop");
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
+        appError(err);
+    }
+
+    EFR32_LOG("Starting OpenThread task");
     // Start OpenThread task
     err = ThreadStackMgrImpl().StartThreadTask();
     if (err != CHIP_NO_ERROR)
@@ -178,14 +190,6 @@ int main(void)
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("App Init failed");
-        appError(err);
-    }
-
-    EFR32_LOG("Starting Platform Manager Event Loop");
-    err = PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
         appError(err);
     }
 

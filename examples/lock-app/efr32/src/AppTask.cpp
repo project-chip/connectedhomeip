@@ -131,11 +131,6 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
