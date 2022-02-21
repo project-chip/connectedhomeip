@@ -97,9 +97,6 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {{#if response.error}}
           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], {{response.error}});
           [expectation fulfill];
-        {{else if response.errorWrongValue}}
-          XCTAssertNotEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-          [expectation fulfill];
         {{else}}
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
         {{#unless isSubscribeAttribute}}
