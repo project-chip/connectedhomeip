@@ -132,7 +132,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     }
     else
     {
-        response.status = chip::app::Clusters::Channel::StatusEnum::kSuccess;
+        response.status       = chip::app::Clusters::Channel::StatusEnum::kSuccess;
         response.channelMatch = matchedChannels[0];
         mCurrentChannel       = matchedChannels[0];
         mCurrentChannelIndex  = index;

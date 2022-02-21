@@ -34,7 +34,6 @@ tests:
       response:
           value: [123, 456]
 
-
     - label: "Read attribute application launcher app"
       command: "readAttribute"
       attribute: "CurrentApp"
