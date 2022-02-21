@@ -248,8 +248,10 @@ CHIP_ERROR AppTask::Init()
     chip::Server::GetInstance().Init();
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
