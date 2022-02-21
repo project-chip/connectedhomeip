@@ -53119,16 +53119,20 @@ public:
             err = TestReadAttributeApplicationLauncherList_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Launch App Command\n");
-            err = TestLaunchAppCommand_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read attribute application launcher app\n");
+            err = TestReadAttributeApplicationLauncherApp_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Stop App Command\n");
-            err = TestStopAppCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Launch App Command\n");
+            err = TestLaunchAppCommand_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Hide App Command\n");
-            err = TestHideAppCommand_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Stop App Command\n");
+            err = TestStopAppCommand_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Hide App Command\n");
+            err = TestHideAppCommand_5();
             break;
         }
 
@@ -53141,7 +53145,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 6;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -53163,6 +53167,19 @@ private:
     static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<uint16_t> & catalogList)
     {
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_1(catalogList);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &
+            currentApp)
+    {
+        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(currentApp);
     }
 
     //
@@ -53208,7 +53225,35 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestLaunchAppCommand_2()
+    CHIP_ERROR TestReadAttributeApplicationLauncherApp_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ApplicationLauncherClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &
+            currentApp)
+    {
+        VerifyOrReturn(CheckValueNull("currentApp", currentApp));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestLaunchAppCommand_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
@@ -53221,44 +53266,6 @@ private:
 
         request.data.Emplace();
         request.data.Value() = chip::ByteSpan(chip::Uint8::from_const_char("datagarbage: not in length on purpose"), 4);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(data.status, data.data);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_2(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestStopAppCommand_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type;
-
-        ListFreer listFreer;
-        RequestType request;
-
-        request.application.catalogVendorId = 123U;
-        request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_3(data.status, data.data);
@@ -53287,10 +53294,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestHideAppCommand_4()
+    CHIP_ERROR TestStopAppCommand_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type;
+        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -53317,6 +53324,44 @@ private:
     }
 
     void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestHideAppCommand_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+
+        request.application.catalogVendorId = 123U;
+        request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_5(data.status, data.data);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_5(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
@@ -53808,8 +53853,16 @@ public:
             err = TestReadAttributeApplicationStatus_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute application version\n");
-            err = TestReadAttributeApplicationVersion_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute application status\n");
+            err = TestReadAttributeApplicationStatus_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read attribute application version\n");
+            err = TestReadAttributeApplicationVersion_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read attribute application allowed vendor list\n");
+            err = TestReadAttributeApplicationAllowedVendorList_8();
             break;
         }
 
@@ -53822,7 +53875,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 9;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -53891,9 +53944,31 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, chip::CharSpan applicationVersion)
+    static void OnSuccessCallback_6(
+        void * context,
+        const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & application)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_6(applicationVersion);
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_6(application);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context, chip::CharSpan applicationVersion)
+    {
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_7(applicationVersion);
+    }
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & allowedVendorList)
+    {
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_8(allowedVendorList);
     }
 
     //
@@ -54036,7 +54111,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeApplicationVersion_6()
+    CHIP_ERROR TestReadAttributeApplicationStatus_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
@@ -54044,7 +54119,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
@@ -54055,9 +54130,71 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(chip::CharSpan applicationVersion)
+    void OnSuccessResponse_6(
+        const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & application)
+    {
+        VerifyOrReturn(CheckValue("application.catalogVendorId", application.catalogVendorId, 123U));
+        VerifyOrReturn(
+            CheckValueAsString("application.applicationId", application.applicationId, chip::CharSpan("applicationId", 13)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeApplicationVersion_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        chip::Controller::ApplicationBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(chip::CharSpan applicationVersion)
     {
         VerifyOrReturn(CheckValueAsString("applicationVersion", applicationVersion, chip::CharSpan("exampleVersion", 14)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeApplicationAllowedVendorList_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        chip::Controller::ApplicationBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(const chip::app::DataModel::DecodableList<chip::VendorId> & allowedVendorList)
+    {
+        {
+            auto iter_0 = allowedVendorList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(allowedVendorList)>("allowedVendorList", iter_0, 0));
+            VerifyOrReturn(CheckValue("allowedVendorList[0]", iter_0.GetValue(), 1U));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(allowedVendorList)>("allowedVendorList", iter_0, 1));
+            VerifyOrReturn(CheckValue("allowedVendorList[1]", iter_0.GetValue(), 456U));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(allowedVendorList)>("allowedVendorList", iter_0, 2));
+        }
 
         NextTest();
     }
@@ -54118,60 +54255,76 @@ public:
             err = TestReadAttributeDuration_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read attribute playback speed\n");
-            err = TestReadAttributePlaybackSpeed_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read attribute position\n");
+            err = TestReadAttributePosition_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read attribute seek range end\n");
-            err = TestReadAttributeSeekRangeEnd_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read attribute playback speed\n");
+            err = TestReadAttributePlaybackSpeed_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute seek range start\n");
-            err = TestReadAttributeSeekRangeStart_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute seek range end\n");
+            err = TestReadAttributeSeekRangeEnd_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Media Playback Play Command\n");
-            err = TestMediaPlaybackPlayCommand_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read attribute seek range start\n");
+            err = TestReadAttributeSeekRangeStart_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Media Playback Pause Command\n");
-            err = TestMediaPlaybackPauseCommand_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Media Playback Play Command\n");
+            err = TestMediaPlaybackPlayCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Media Playback Stop Command\n");
-            err = TestMediaPlaybackStopCommand_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Media Playback Pause Command\n");
+            err = TestMediaPlaybackPauseCommand_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Media Playback Start Over Command\n");
-            err = TestMediaPlaybackStartOverCommand_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Media Playback Stop Command\n");
+            err = TestMediaPlaybackStopCommand_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Media Playback Previous Command\n");
-            err = TestMediaPlaybackPreviousCommand_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Media Playback Start Over Command\n");
+            err = TestMediaPlaybackStartOverCommand_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Media Playback Next Command\n");
-            err = TestMediaPlaybackNextCommand_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Media Playback Previous Command\n");
+            err = TestMediaPlaybackPreviousCommand_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Media Playback Rewind Command\n");
-            err = TestMediaPlaybackRewindCommand_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Media Playback Next Command\n");
+            err = TestMediaPlaybackNextCommand_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Media Playback Fast Forward Command\n");
-            err = TestMediaPlaybackFastForwardCommand_14();
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Media Playback Rewind Command\n");
+            err = TestMediaPlaybackRewindCommand_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Media Playback Skip Forward Command\n");
-            err = TestMediaPlaybackSkipForwardCommand_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Media Playback Fast Forward Command\n");
+            err = TestMediaPlaybackFastForwardCommand_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : Media Playback Skip Backward Command\n");
-            err = TestMediaPlaybackSkipBackwardCommand_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Media Playback Skip Forward Command\n");
+            err = TestMediaPlaybackSkipForwardCommand_16();
             break;
         case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : Media Playback Seek Command\n");
-            err = TestMediaPlaybackSeekCommand_17();
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Read attribute position after skip forward\n");
+            err = TestReadAttributePositionAfterSkipForward_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Media Playback Skip Backward Command\n");
+            err = TestMediaPlaybackSkipBackwardCommand_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Read attribute position after skip backward\n");
+            err = TestReadAttributePositionAfterSkipBackward_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Media Playback Seek Command\n");
+            err = TestMediaPlaybackSeekCommand_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Read attribute position after seek\n");
+            err = TestReadAttributePositionAfterSeek_21();
             break;
         }
 
@@ -54184,7 +54337,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 18;
+    const uint16_t mTestCount = 22;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -54233,9 +54386,12 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context, float playbackSpeed)
+    static void OnSuccessCallback_4(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_4(playbackSpeed);
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_4(sampledPosition);
     }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
@@ -54243,9 +54399,9 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
+    static void OnSuccessCallback_5(void * context, float playbackSpeed)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_5(seekRangeEnd);
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_5(playbackSpeed);
     }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
@@ -54253,9 +54409,58 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
+    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_6(seekRangeStart);
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_6(seekRangeEnd);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_7(seekRangeStart);
+    }
+
+    static void OnFailureCallback_17(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_17(error);
+    }
+
+    static void OnSuccessCallback_17(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_17(sampledPosition);
+    }
+
+    static void OnFailureCallback_19(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_19(error);
+    }
+
+    static void OnSuccessCallback_19(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_19(sampledPosition);
+    }
+
+    static void OnFailureCallback_21(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_21(error);
+    }
+
+    static void OnSuccessCallback_21(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_21(sampledPosition);
     }
 
     //
@@ -54343,12 +54548,12 @@ private:
     void OnSuccessResponse_3(const chip::app::DataModel::Nullable<uint64_t> & duration)
     {
         VerifyOrReturn(CheckValueNonNull("duration", duration));
-        VerifyOrReturn(CheckValue("duration.Value()", duration.Value(), 0ULL));
+        VerifyOrReturn(CheckValue("duration.Value()", duration.Value(), 80000ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributePlaybackSpeed_4()
+    CHIP_ERROR TestReadAttributePosition_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
@@ -54356,7 +54561,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
@@ -54367,14 +54572,19 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(float playbackSpeed)
+    void OnSuccessResponse_4(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
     {
-        VerifyOrReturn(CheckValue("playbackSpeed", playbackSpeed, 0.0f));
+        VerifyOrReturn(CheckValueNonNull("sampledPosition", sampledPosition));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().updatedAt", sampledPosition.Value().updatedAt, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("sampledPosition.Value().position", sampledPosition.Value().position));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().position.Value()", sampledPosition.Value().position.Value(), 0ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeSeekRangeEnd_5()
+    CHIP_ERROR TestReadAttributePlaybackSpeed_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
@@ -54382,7 +54592,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
@@ -54393,15 +54603,14 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
+    void OnSuccessResponse_5(float playbackSpeed)
     {
-        VerifyOrReturn(CheckValueNonNull("seekRangeEnd", seekRangeEnd));
-        VerifyOrReturn(CheckValue("seekRangeEnd.Value()", seekRangeEnd.Value(), 0ULL));
+        VerifyOrReturn(CheckValue("playbackSpeed", playbackSpeed, 0.0f));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeSeekRangeStart_6()
+    CHIP_ERROR TestReadAttributeSeekRangeEnd_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
@@ -54409,7 +54618,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
@@ -54420,31 +54629,24 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
     {
-        VerifyOrReturn(CheckValueNonNull("seekRangeStart", seekRangeStart));
-        VerifyOrReturn(CheckValue("seekRangeStart.Value()", seekRangeStart.Value(), 0ULL));
+        VerifyOrReturn(CheckValueNonNull("seekRangeEnd", seekRangeEnd));
+        VerifyOrReturn(CheckValue("seekRangeEnd.Value()", seekRangeEnd.Value(), 80000ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackPlayCommand_7()
+    CHIP_ERROR TestReadAttributeSeekRangeStart_7()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Play::Type;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        RequestType request;
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_7(data.status);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_7(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -54454,17 +54656,18 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
+        VerifyOrReturn(CheckValueNonNull("seekRangeStart", seekRangeStart));
+        VerifyOrReturn(CheckValue("seekRangeStart.Value()", seekRangeStart.Value(), 0ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackPauseCommand_8()
+    CHIP_ERROR TestMediaPlaybackPlayCommand_8()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Pause::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Play::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -54494,10 +54697,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackStopCommand_9()
+    CHIP_ERROR TestMediaPlaybackPauseCommand_9()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Pause::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -54527,10 +54730,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackStartOverCommand_10()
+    CHIP_ERROR TestMediaPlaybackStopCommand_10()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StartOver::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -54560,10 +54763,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackPreviousCommand_11()
+    CHIP_ERROR TestMediaPlaybackStartOverCommand_11()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Previous::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StartOver::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -54593,10 +54796,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackNextCommand_12()
+    CHIP_ERROR TestMediaPlaybackPreviousCommand_12()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Next::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Previous::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -54626,10 +54829,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackRewindCommand_13()
+    CHIP_ERROR TestMediaPlaybackNextCommand_13()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Rewind::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Next::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -54659,10 +54862,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackFastForwardCommand_14()
+    CHIP_ERROR TestMediaPlaybackRewindCommand_14()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::FastForward::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Rewind::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -54692,14 +54895,13 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackSkipForwardCommand_15()
+    CHIP_ERROR TestMediaPlaybackFastForwardCommand_15()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::FastForward::Type;
 
         ListFreer listFreer;
         RequestType request;
-        request.deltaPositionMilliseconds = 100ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_15(data.status);
@@ -54726,14 +54928,14 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackSkipBackwardCommand_16()
+    CHIP_ERROR TestMediaPlaybackSkipForwardCommand_16()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type;
 
         ListFreer listFreer;
         RequestType request;
-        request.deltaPositionMilliseconds = 100ULL;
+        request.deltaPositionMilliseconds = 500ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_16(data.status);
@@ -54760,24 +54962,16 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackSeekCommand_17()
+    CHIP_ERROR TestReadAttributePositionAfterSkipForward_17()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Seek::Type;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        RequestType request;
-        request.position = 100ULL;
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_17(data.status);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_17(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo>(
+            this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -54787,9 +54981,144 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_17(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_17(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        VerifyOrReturn(CheckValueNonNull("sampledPosition", sampledPosition));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().updatedAt", sampledPosition.Value().updatedAt, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("sampledPosition.Value().position", sampledPosition.Value().position));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().position.Value()", sampledPosition.Value().position.Value(), 500ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMediaPlaybackSkipBackwardCommand_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.deltaPositionMilliseconds = 100ULL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_18(data.status);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_18(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_18(chip::app::Clusters::MediaPlayback::StatusEnum status)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributePositionAfterSkipBackward_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo>(
+            this, OnSuccessCallback_19, OnFailureCallback_19, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        VerifyOrReturn(CheckValueNonNull("sampledPosition", sampledPosition));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().updatedAt", sampledPosition.Value().updatedAt, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("sampledPosition.Value().position", sampledPosition.Value().position));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().position.Value()", sampledPosition.Value().position.Value(), 400ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMediaPlaybackSeekCommand_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Seek::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.position = 1000ULL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_20(data.status);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_20(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_20(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributePositionAfterSeek_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo>(
+            this, OnSuccessCallback_21, OnFailureCallback_21, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_21(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        VerifyOrReturn(CheckValueNonNull("sampledPosition", sampledPosition));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().updatedAt", sampledPosition.Value().updatedAt, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("sampledPosition.Value().position", sampledPosition.Value().position));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().position.Value()", sampledPosition.Value().position.Value(), 1000ULL));
 
         NextTest();
     }
@@ -55094,7 +55423,7 @@ private:
         request.match = chip::Span<const char>("PBSgarbage: not in length on purpose", 3);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_4(data.channelMatch, data.errorType);
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_4(data.channelMatch, data.status);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -55112,7 +55441,7 @@ private:
     }
 
     void OnSuccessResponse_4(const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & channelMatch,
-                             chip::app::Clusters::Channel::ErrorTypeEnum errorType)
+                             chip::app::Clusters::Channel::StatusEnum status)
     {
         VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 9U));
         VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 1U));
@@ -55125,7 +55454,7 @@ private:
         VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign.Value()", channelMatch.affiliateCallSign.Value(),
                                           chip::CharSpan("KCTS", 4)));
 
-        VerifyOrReturn(CheckValue("errorType", errorType, 0));
+        VerifyOrReturn(CheckValue("status", status, 0));
 
         NextTest();
     }

@@ -1542,7 +1542,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPChannelClusterChangeChannelResponseParams : NSObject
 @property (strong, nonatomic) CHIPChannelClusterChannelInfo * _Nonnull channelMatch;
-@property (strong, nonatomic) NSNumber * _Nonnull errorType;
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 - (instancetype)init;
 @end
 

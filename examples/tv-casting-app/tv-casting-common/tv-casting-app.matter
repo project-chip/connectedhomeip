@@ -149,11 +149,6 @@ client cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  bitmap ChannelFeature : BITMAP32 {
-    kChannelList = 0x1;
-    kLineupInfo = 0x2;
-  }
-
   struct Application {
     INT16U catalogVendorId = 0;
     CHAR_STRING applicationId = 1;
@@ -297,13 +292,19 @@ server cluster Binding = 30 {
 }
 
 client cluster Channel = 1284 {
-  enum ErrorTypeEnum : ENUM8 {
-    kMultipleMatches = 0;
-    kNoMatches = 1;
-  }
-
   enum LineupInfoTypeEnum : ENUM8 {
     kMso = 0;
+  }
+
+  enum StatusEnum : ENUM8 {
+    kSuccess = 0;
+    kMultipleMatches = 1;
+    kNoMatches = 2;
+  }
+
+  bitmap ChannelFeature : BITMAP32 {
+    kChannelList = 0x1;
+    kLineupInfo = 0x2;
   }
 
   struct ChannelInfo {
