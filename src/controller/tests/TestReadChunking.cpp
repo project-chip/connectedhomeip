@@ -32,7 +32,9 @@
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
@@ -53,7 +55,9 @@ nlTestSuite * gSuite     = nullptr;
 //
 constexpr EndpointId kTestEndpointId = 2;
 // Another endpoint, with a list attribute only.
-constexpr EndpointId kTestEndpointId3    = 3;
+constexpr EndpointId kTestEndpointId3 = 3;
+// Another endpoint, for adding / enabling during running.
+constexpr EndpointId kTestEndpointId4    = 4;
 constexpr AttributeId kTestListAttribute = 6;
 constexpr AttributeId kTestBadAttribute  = 7; // Reading this attribute will return CHIP_NO_MEMORY but nothing is actually encoded.
 
@@ -64,6 +68,7 @@ public:
     static void TestChunking(nlTestSuite * apSuite, void * apContext);
     static void TestListChunking(nlTestSuite * apSuite, void * apContext);
     static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
+    static void TestDynamicEndpoint(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -88,6 +93,14 @@ DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3, nullptr, n
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpoint3Clusters);
 
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint4)
+DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+
+DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint4Clusters)
+DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+
+DECLARE_DYNAMIC_ENDPOINT(testEndpoint4, testEndpoint4Clusters);
+
 //clang-format on
 
 uint8_t sAnStringThatCanNeverFitIntoTheMTU[4096] = { 0 };
@@ -103,8 +116,11 @@ public:
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
-    uint32_t mAttributeCount = 0;
-    bool mOnReportEnd        = false;
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+
+    uint32_t mAttributeCount        = 0;
+    bool mOnReportEnd               = false;
+    bool mOnSubscriptionEstablished = false;
     app::BufferedReadCallback mBufferedCallback;
 };
 
@@ -384,6 +400,8 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
     // Initialize the ember side server logic
     InitDataModelHandler(&ctx.GetExchangeManager());
 
+    app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
+
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0, Span<DataVersion>(dataVersionStorage));
@@ -427,12 +445,125 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
     emberAfClearDynamicEndpoint(0);
 }
 
+/*
+ * This test contains two parts, one is to enable a new endpoint on the fly, another is to disable it and re-enable it.
+ */
+void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                    = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                   = ctx.GetSessionBobToAlice();
+    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    // Register our fake dynamic endpoint.
+    DataVersion dataVersionStorage[ArraySize(testEndpoint4Clusters)];
+
+    app::AttributePathParams attributePath;
+    app::ReadPrepareParams readParams(sessionHandle);
+
+    readParams.mpAttributePathParamsList    = &attributePath;
+    readParams.mAttributePathParamsListSize = 1;
+    readParams.mMaxIntervalCeilingSeconds   = 1;
+
+    TestReadCallback readCallback;
+
+    {
+
+        app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
+
+        for (int j = 0; j < 3 && !readCallback.mOnSubscriptionEstablished; j++)
+        {
+            ctx.DrainAndServiceIO();
+            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+            ctx.DrainAndServiceIO();
+        }
+
+        // We should not receive any reports in initial reports, so check mOnSubscriptionEstablished instead.
+        NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablished);
+        readCallback.mAttributeCount = 0;
+
+        // Enable the new endpoint
+        emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, 0, 0, Span<DataVersion>(dataVersionStorage));
+
+        for (int j = 0; j < 2 && !readCallback.mOnReportEnd; j++)
+        {
+            ctx.DrainAndServiceIO();
+            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+            ctx.DrainAndServiceIO();
+        }
+
+        // Ensure we have received the report, we do not care about the initial report here.
+        // ClientGeneratedCommandList / ServerGeneratedCommandList / AttributeList attribute are not include in
+        // testClusterAttrsOnEndpoint4.
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
+
+        // We have received all report data.
+        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
+
+        readCallback.mAttributeCount = 0;
+        readCallback.mOnReportEnd    = false;
+
+        // Disable the new endpoint
+        emberAfEndpointEnableDisable(kTestEndpointId4, false);
+
+        for (int j = 0; j < 2 && !readCallback.mOnReportEnd; j++)
+        {
+            ctx.DrainAndServiceIO();
+            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+            ctx.DrainAndServiceIO();
+        }
+
+        // We may receive some attribute reports for descriptor cluster, but we does not care about it for now.
+
+        // Enable the new endpoint
+
+        readCallback.mAttributeCount = 0;
+        readCallback.mOnReportEnd    = false;
+
+        emberAfEndpointEnableDisable(kTestEndpointId4, true);
+        for (int j = 0; j < 2 && !readCallback.mOnReportEnd; j++)
+        {
+            ctx.DrainAndServiceIO();
+            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+            ctx.DrainAndServiceIO();
+        }
+
+        // Ensure we have received the report, we do not care about the initial report here.
+        // ClientGeneratedCommandList / ServerGeneratedCommandList / AttributeList attribute are not include in
+        // testClusterAttrsOnEndpoint4.
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
+
+        // We have received all report data.
+        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
+    }
+
+    chip::test_utils::SleepMillis(secondsToMilliseconds(2));
+
+    // Destroy the read client will terminate the subscription transaction.
+    for (int j = 0; j < 2 && !readCallback.mOnReportEnd; j++)
+    {
+        ctx.DrainAndServiceIO();
+        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        ctx.DrainAndServiceIO();
+    }
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(0);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestChunking", TestCommandInteraction::TestChunking),
     NL_TEST_DEF("TestListChunking", TestCommandInteraction::TestListChunking),
     NL_TEST_DEF("TestBadChunking", TestCommandInteraction::TestBadChunking),
+    NL_TEST_DEF("TestDynamicEndpoint", TestCommandInteraction::TestDynamicEndpoint),
     NL_TEST_SENTINEL()
 };
 
