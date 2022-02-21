@@ -6656,108 +6656,61 @@ struct TypeInfo
 } // namespace Descriptor
 namespace Binding {
 
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace Bind {
-struct Type;
-struct DecodableType;
-} // namespace Bind
-
-namespace Unbind {
-struct Type;
-struct DecodableType;
-} // namespace Unbind
-
-} // namespace Commands
-
-namespace Commands {
-namespace Bind {
+namespace Structs {
+namespace TargetStruct {
 enum class Fields
 {
-    kNodeId     = 0,
-    kGroupId    = 1,
-    kEndpointId = 2,
-    kClusterId  = 3,
+    kFabricIndex = 0,
+    kNode        = 1,
+    kGroup       = 2,
+    kEndpoint    = 3,
+    kCluster     = 4,
 };
 
 struct Type
 {
 public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Bind::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    Optional<chip::NodeId> node;
+    Optional<chip::GroupId> group;
+    Optional<chip::EndpointId> endpoint;
+    Optional<chip::ClusterId> cluster;
 
-    chip::NodeId nodeId         = static_cast<chip::NodeId>(0);
-    chip::GroupId groupId       = static_cast<chip::GroupId>(0);
-    chip::EndpointId endpointId = static_cast<chip::EndpointId>(0);
-    chip::ClusterId clusterId   = static_cast<chip::ClusterId>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Bind::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-
-    chip::NodeId nodeId         = static_cast<chip::NodeId>(0);
-    chip::GroupId groupId       = static_cast<chip::GroupId>(0);
-    chip::EndpointId endpointId = static_cast<chip::EndpointId>(0);
-    chip::ClusterId clusterId   = static_cast<chip::ClusterId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Bind
-namespace Unbind {
-enum class Fields
-{
-    kNodeId     = 0,
-    kGroupId    = 1,
-    kEndpointId = 2,
-    kClusterId  = 3,
-};
 
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Unbind::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
-    chip::NodeId nodeId         = static_cast<chip::NodeId>(0);
-    chip::GroupId groupId       = static_cast<chip::GroupId>(0);
-    chip::EndpointId endpointId = static_cast<chip::EndpointId>(0);
-    chip::ClusterId clusterId   = static_cast<chip::ClusterId>(0);
+    auto GetFabricIndex() const { return fabricIndex; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 
-    using ResponseType = DataModel::NullObjectType;
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const;
 };
 
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Unbind::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+using DecodableType = Type;
 
-    chip::NodeId nodeId         = static_cast<chip::NodeId>(0);
-    chip::GroupId groupId       = static_cast<chip::GroupId>(0);
-    chip::EndpointId endpointId = static_cast<chip::EndpointId>(0);
-    chip::ClusterId clusterId   = static_cast<chip::ClusterId>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Unbind
-} // namespace Commands
+} // namespace TargetStruct
+} // namespace Structs
 
 namespace Attributes {
 
+namespace Binding {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::TargetStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Binding::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Binding
 namespace ServerGeneratedCommandList {
 struct TypeInfo
 {
@@ -6827,6 +6780,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::Binding::TypeInfo::DecodableType binding;
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

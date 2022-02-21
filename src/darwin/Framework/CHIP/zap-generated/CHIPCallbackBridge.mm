@@ -2123,6 +2123,66 @@ void CHIPBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
+void CHIPBindingBindingListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            CHIPBindingClusterTargetStruct * newElement_0;
+            newElement_0 = [CHIPBindingClusterTargetStruct new];
+            newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+            if (entry_0.node.HasValue()) {
+                newElement_0.node = [NSNumber numberWithUnsignedLongLong:entry_0.node.Value()];
+            } else {
+                newElement_0.node = nil;
+            }
+            if (entry_0.group.HasValue()) {
+                newElement_0.group = [NSNumber numberWithUnsignedShort:entry_0.group.Value()];
+            } else {
+                newElement_0.group = nil;
+            }
+            if (entry_0.endpoint.HasValue()) {
+                newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint.Value()];
+            } else {
+                newElement_0.endpoint = nil;
+            }
+            if (entry_0.cluster.HasValue()) {
+                newElement_0.cluster = [NSNumber numberWithUnsignedInt:entry_0.cluster.Value()];
+            } else {
+                newElement_0.cluster = nil;
+            }
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBindingBindingListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBindingBindingListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPBindingServerGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {

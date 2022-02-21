@@ -2157,62 +2157,13 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void bind(
-        DefaultClusterCallback callback,
-        Long nodeId,
-        Integer groupId,
-        Integer endpointId,
-        Long clusterId) {
-      bind(chipClusterPtr, callback, nodeId, groupId, endpointId, clusterId, null);
+    public interface BindingAttributeCallback {
+      void onSuccess(List<ChipStructs.BindingClusterTargetStruct> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
     }
-
-    public void bind(
-        DefaultClusterCallback callback,
-        Long nodeId,
-        Integer groupId,
-        Integer endpointId,
-        Long clusterId,
-        int timedInvokeTimeoutMs) {
-      bind(chipClusterPtr, callback, nodeId, groupId, endpointId, clusterId, timedInvokeTimeoutMs);
-    }
-
-    public void unbind(
-        DefaultClusterCallback callback,
-        Long nodeId,
-        Integer groupId,
-        Integer endpointId,
-        Long clusterId) {
-      unbind(chipClusterPtr, callback, nodeId, groupId, endpointId, clusterId, null);
-    }
-
-    public void unbind(
-        DefaultClusterCallback callback,
-        Long nodeId,
-        Integer groupId,
-        Integer endpointId,
-        Long clusterId,
-        int timedInvokeTimeoutMs) {
-      unbind(
-          chipClusterPtr, callback, nodeId, groupId, endpointId, clusterId, timedInvokeTimeoutMs);
-    }
-
-    private native void bind(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Long nodeId,
-        Integer groupId,
-        Integer endpointId,
-        Long clusterId,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void unbind(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Long nodeId,
-        Integer groupId,
-        Integer endpointId,
-        Long clusterId,
-        @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ServerGeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
@@ -2236,6 +2187,27 @@ public class ChipClusters {
       void onError(Exception ex);
 
       default void onSubscriptionEstablished() {}
+    }
+
+    public void readBindingAttribute(BindingAttributeCallback callback) {
+      readBindingAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeBindingAttribute(
+        DefaultClusterCallback callback, ArrayList<ChipStructs.BindingClusterTargetStruct> value) {
+      writeBindingAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeBindingAttribute(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.BindingClusterTargetStruct> value,
+        int timedWriteTimeoutMs) {
+      writeBindingAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeBindingAttribute(
+        BindingAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeBindingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readServerGeneratedCommandListAttribute(
@@ -2277,6 +2249,18 @@ public class ChipClusters {
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
+
+    private native void readBindingAttribute(
+        long chipClusterPtr, BindingAttributeCallback callback);
+
+    private native void writeBindingAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.BindingClusterTargetStruct> value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeBindingAttribute(
+        long chipClusterPtr, BindingAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readServerGeneratedCommandListAttribute(
         long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
