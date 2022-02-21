@@ -152,10 +152,8 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
         {
             InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
             MoveToState(HandlerState::GeneratingReports);
-            if (mpExchangeCtx)
-            {
-                mpExchangeCtx->WillSendMessage();
-            }
+            mpExchangeCtx->WillSendMessage();
+
             // Trigger ReportingEngine run for sending next chunk of data.
             SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
         }
@@ -363,12 +361,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
 
-    // mpExchangeCtx can be null here due to
-    // https://github.com/project-chip/connectedhomeip/issues/8031
-    if (mpExchangeCtx)
-    {
-        mpExchangeCtx->WillSendMessage();
-    }
+    mpExchangeCtx->WillSendMessage();
 
     // There must be no code after the WillSendMessage() call that can cause
     // this method to return a failure.
@@ -695,12 +688,9 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     MoveToState(HandlerState::GeneratingReports);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-    // mpExchangeCtx can be null here due to
-    // https://github.com/project-chip/connectedhomeip/issues/8031
-    if (mpExchangeCtx)
-    {
-        mpExchangeCtx->WillSendMessage();
-    }
+
+    mpExchangeCtx->WillSendMessage();
+
     return CHIP_NO_ERROR;
 }
 
