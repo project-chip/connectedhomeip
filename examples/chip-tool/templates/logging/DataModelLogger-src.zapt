@@ -26,7 +26,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, {{zapTyp
 
 {{#zcl_clusters}}
 {{#zcl_events}}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=parent.name isArgument=true forceNotOptional=true}} value)
 {
   DataModelLogger::LogString(label, indent, "{");
 {{#zcl_event_fields}}
@@ -48,7 +48,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{
 
 {{#chip_client_clusters}}
 {{#zcl_commands_source_server}}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=parent.name isArgument=true forceNotOptional=true}} value)
 {
   DataModelLogger::LogString(label, indent, "{");
   {{#zcl_command_arguments}}
@@ -112,7 +112,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
 {{/first}}
             case {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id:
             {
-                {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType value;
+                {{zapTypeToDecodableClusterObjectType name ns=parent.name forceNotOptional=true}} value;
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
                 return DataModelLogger::LogValue("{{name}}", 1, value);
             }

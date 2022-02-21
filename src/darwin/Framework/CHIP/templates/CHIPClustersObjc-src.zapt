@@ -40,7 +40,7 @@ using namespace chip::app::Clusters;
 {{/chip_cluster_command_arguments}}
 {
     ListFreer listFreer;
-    {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
+    {{zapTypeToEncodableClusterObjectType name ns=parent.name forceNotOptional=true}} request;
     {{#chip_cluster_command_arguments}}
       {{#first}}
         {{#unless (commandHasRequiredField parent)}}

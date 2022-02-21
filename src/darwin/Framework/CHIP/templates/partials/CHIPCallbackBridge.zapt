@@ -22,7 +22,7 @@ public:
         {{#if (isStrEqual partial-type "Status")}}
         {{! No more args in this case }}
         {{else if (isStrEqual partial-type "Command")}}
-        , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
+        , {{zapTypeToDecodableClusterObjectType name ns=parent.name isArgument=true forceNotOptional=true}} data
         {{else if (isStrEqual partial-type "CommandStatus")}}
         , const chip::app::DataModel::NullObjectType &
         {{else}}
@@ -56,7 +56,7 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
     {{#if (isStrEqual partial-type "Status")}}
     {{! No more args in this case }}
     {{else if (isStrEqual partial-type "Command")}}
-    , const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data
+    , {{zapTypeToDecodableClusterObjectType name ns=parent.name isArgument=true forceNotOptional=true}} data
     {{else if (isStrEqual partial-type "CommandStatus")}}
     , const chip::app::DataModel::NullObjectType &
     {{else}}

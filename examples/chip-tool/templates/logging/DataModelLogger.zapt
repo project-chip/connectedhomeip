@@ -6,12 +6,12 @@ static CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodab
 
 {{#zcl_clusters}}
 {{#zcl_events}}
-static CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=parent.name isArgument=true forceNotOptional=true}} value);
 {{/zcl_events}}
 {{/zcl_clusters}}
 
 {{#chip_client_clusters}}
 {{#zcl_commands_source_server}}
-static CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=parent.name isArgument=true forceNotOptional=true}} value);
 {{/zcl_commands_source_server}}
 {{/chip_client_clusters}}

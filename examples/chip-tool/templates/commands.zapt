@@ -46,7 +46,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
+    {{zapTypeToEncodableClusterObjectType name ns=parent.name forceNotOptional=true}} mRequest;
     {{#zcl_command_arguments}}
     {{#if_chip_complex}}
     TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}> mComplex_{{asUpperCamelCase label}};

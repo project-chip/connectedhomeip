@@ -299,7 +299,7 @@ class {{filename}}: public TestCommand
         {{/inline~}}
 
         {{#if isCommand}}
-        using RequestType = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
+        using RequestType = {{zapTypeToEncodableClusterObjectType (asUpperCamelCase command) ns=cluster forceNotOptional=true}};
 
         ListFreer listFreer;
         RequestType request;

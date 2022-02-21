@@ -28,12 +28,31 @@ const dbEnum       = require(zapPath + '../src-shared/db-enum.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
+const { Deferred }    = require('../../common/Deferred.js');
 
 zclHelper['isEvent'] = function(db, event_name, packageId) {
-    return queryEvents
-      .selectAllEvents(db, packageId)
+    if (!this._cacheEvents) {
+        this._cacheEvents = new Deferred();
+        queryEvents.selectAllEvents(db, packageId).then(events => {
+          this._cacheEvents.resolve(events);
+        });
+    }
+    return this._cacheEvents
       .then(events => events.find(event => event.name == event_name))
       .then(events => events ? 'event' : dbEnum.zclType.unknown);
+}
+
+zclHelper['isCommand'] = async function(db, command_name, packageId) {
+    if (!this._cacheCommands) {
+        this._cacheCommands = new Deferred();
+        queryCommand.selectAllCommands(db, packageId).then(commands => {
+          this._cacheCommands.resolve(commands);
+        });
+    }
+
+    return this._cacheCommands
+      .then(commands => commands.find(command => command.name == command_name))
+      .then(commands => commands ? 'commands' : dbEnum.zclType.unknown);
 }
 
 // This list of attributes is taken from section '11.2. Global Attributes' of the
@@ -495,6 +514,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
       isBitmap : await typeChecker('isBitmap'),
       isEvent : await typeChecker('isEvent'),
       isStruct : await typeChecker('isStruct'),
+      isCommand : await typeChecker('isCommand'),
     };
 
     const typesCount = Object.values(types).filter(isType => isType).length;
@@ -524,6 +544,11 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     if (types.isEvent) {
       passByReference = true;
       return ns + 'Events::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
+    }
+
+    if (types.isCommand) {
+      passByReference = true;
+      return ns + 'Commands::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
     }
 
     return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);

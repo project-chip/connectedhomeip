@@ -120,7 +120,7 @@ public:
 
     using ResponseType =
     {{~#if responseName}}
-      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{responseName}}::DecodableType;
+      {{zapTypeToDecodableClusterObjectType responseName ns=parent.name forceNotOptional=true}};
     {{else}}
       DataModel::NullObjectType;
     {{/if}}
