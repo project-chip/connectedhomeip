@@ -114,7 +114,6 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
 {
     // TODO: Insert code here
     uint64_t newPosition = mPlaybackPosition.position.Value() - deltaPositionMilliseconds;
-    newPosition          = newPosition < 0 ? 0 : newPosition;
     mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
 
     Commands::PlaybackResponse::Type response;
@@ -139,7 +138,7 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
                                       const uint64_t & positionMilliseconds)
 {
     // TODO: Insert code here
-    if (positionMilliseconds > mDuration || positionMilliseconds < 0)
+    if (positionMilliseconds > mDuration)
     {
         Commands::PlaybackResponse::Type response;
         response.status = StatusEnum::kSeekOutOfRange;
