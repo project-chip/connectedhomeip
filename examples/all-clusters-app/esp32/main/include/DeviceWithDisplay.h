@@ -69,7 +69,6 @@
 
 void SetupPretendDevices();
 void InitM5Stack(std::string qrCodeText);
-void PollButtons();
 #endif
 
 #if CONFIG_HAVE_DISPLAY

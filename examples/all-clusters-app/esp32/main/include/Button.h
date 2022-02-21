@@ -38,76 +38,22 @@ public:
     /**
      * @brief
      *  Initialize a button
-     *
      * @param gpioNum           The GPIO pin this button should keep track of
-     * @param debouncePeriod    The debouncing period in FreeRTOS ticks
      * @return esp_err_t
      */
-    esp_err_t Init(gpio_num_t gpioNum, uint16_t debouncePeriod);
+    esp_err_t Init(gpio_num_t gpioNum);
     /**
      * @brief
-     *  Poll on the button and read its current state
-     *
-     * @return true     If a button event occurred
-     * @return false    If no button event occurred
+     *  Get the pin number assosiate to a button
+     * @return gpio_num_t
      */
-    bool Poll();
-    /**
-     * @brief
-     *  Returns the state of the button
-     *
-     * @return true     If the button is pressed
-     * @return false    If the button is not pressed or released if poll() is true.
-     */
-    bool IsPressed();
-    /**
-     * @brief
-     *  Get the time timestamp since the button entered its current state
-     *
-     * @return uint32_t The time in milliseconds since the app started
-     */
-    uint32_t GetStateStartTime();
-    /**
-     * @brief
-     *  Get the duration in milliseconds since the button entered its current state
-     *
-     * @return uint32_t The time in milliseconds
-     */
-    uint32_t GetStateDuration();
-    /**
-     * @brief
-     *  Get the duration in milliseconds the button spent in its previous state
-     *
-     * @return uint32_t The time in milliseconds
-     */
-    uint32_t GetPrevStateDuration();
+    inline gpio_num_t GetGPIONum();
 
 private:
-    // in ticks
-    uint32_t mLastReadTime;
-    // in ticks
-    uint32_t mStateStartTime;
-    // in ticks
-    uint32_t mPrevStateDur;
     gpio_num_t mGPIONum;
-    // in ticks
-    uint16_t mDebouncePeriod;
-    // true when button is pressed
-    bool mState;
-    bool mLastPolledState;
 };
 
-inline bool Button::IsPressed()
+inline gpio_num_t Button::GetGPIONum()
 {
-    return mState;
-}
-
-inline uint32_t Button::GetStateStartTime()
-{
-    return mStateStartTime * portTICK_PERIOD_MS;
-}
-
-inline uint32_t Button::GetPrevStateDuration()
-{
-    return mPrevStateDur * portTICK_PERIOD_MS;
+    return mGPIONum;
 }
