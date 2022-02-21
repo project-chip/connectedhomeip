@@ -45,12 +45,12 @@ enum chipBLEServiceDataType
  */
 struct ChipBLEDeviceIdentificationInfo
 {
-    constexpr static uint16_t kDiscriminatorMask     = 0xfff;
-    constexpr static uint8_t kAdditionalDataFlagMask = 0x1;
-    constexpr static uint16_t kAdvertisementVersionMask  = 0xf000;
+    constexpr static uint16_t kDiscriminatorMask        = 0xfff;
+    constexpr static uint8_t kAdditionalDataFlagMask    = 0x1;
+    constexpr static uint16_t kAdvertisementVersionMask = 0xf000;
 
     uint8_t OpCode;
-    uint8_t DeviceDiscriminator[2];                // 12 bits for device discriminator and 4 bits for advertisement version
+    uint8_t DeviceDiscriminator[2]; // 12 bits for device discriminator and 4 bits for advertisement version
     uint8_t DeviceVendorId[2];
     uint8_t DeviceProductId[2];
     uint8_t AdditionalDataFlag;
