@@ -10,6 +10,7 @@
   {{/if}}
 {{else if isArray}}
 
+  {{ensureIsArray definedValue~}}
   {{! forceNotList=true because we really want the type of a single item here.
       Similarly, forceNotOptional=true and forceNotNullable=true because we
       have accounted for those already. }}

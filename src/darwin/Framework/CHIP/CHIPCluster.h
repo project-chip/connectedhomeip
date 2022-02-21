@@ -33,4 +33,19 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)new NS_UNAVAILABLE;
 @end
 
+/**
+ * CHIPReadParams
+ *    This is used to control the behavior of attribute reads.
+ */
+@interface CHIPReadParams : NSObject
+
+/**
+ * Whether the read is fabric-filtered. nil (the default), or YES value,
+ * means fabric-filtered.  NO means not fabric-filtered.
+ */
+@property (strong, nonatomic, nullable) NSNumber * fabricFiltered;
+
+- (instancetype)init;
+@end
+
 NS_ASSUME_NONNULL_END

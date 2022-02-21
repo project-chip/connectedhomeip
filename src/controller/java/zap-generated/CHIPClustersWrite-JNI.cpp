@@ -57,7 +57,7 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -66,7 +66,7 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 jobject element_0_fabricIndexItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Integer;",
                                                                   element_0_fabricIndexItem_1);
@@ -99,7 +99,7 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)
                         using ListType_3       = std::remove_reference_t<decltype(nonNullValue_2)>;
                         using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
                         jint element_0_subjectsItem_1Size;
-                        chip::JniReferences::GetInstance().GetArrayListSize(element_0_subjectsItem_1, element_0_subjectsItem_1Size);
+                        chip::JniReferences::GetInstance().GetListSize(element_0_subjectsItem_1, element_0_subjectsItem_1Size);
                         if (element_0_subjectsItem_1Size != 0)
                         {
                             auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0_subjectsItem_1Size);
@@ -108,7 +108,7 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)
                             for (size_t i_3 = 0; i_3 < static_cast<size_t>(element_0_subjectsItem_1Size); ++i_3)
                             {
                                 jobject element_3;
-                                chip::JniReferences::GetInstance().GetArrayListItem(element_0_subjectsItem_1, i_3, element_3);
+                                chip::JniReferences::GetInstance().GetListItem(element_0_subjectsItem_1, i_3, element_3);
                                 listHolder_3->mList[i_3] = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3])>>(
                                     chip::JniReferences::GetInstance().LongToPrimitive(element_3));
                             }
@@ -134,7 +134,7 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)
                         using ListType_3       = std::remove_reference_t<decltype(nonNullValue_2)>;
                         using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
                         jint element_0_targetsItem_1Size;
-                        chip::JniReferences::GetInstance().GetArrayListSize(element_0_targetsItem_1, element_0_targetsItem_1Size);
+                        chip::JniReferences::GetInstance().GetListSize(element_0_targetsItem_1, element_0_targetsItem_1Size);
                         if (element_0_targetsItem_1Size != 0)
                         {
                             auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0_targetsItem_1Size);
@@ -143,7 +143,7 @@ JNI_METHOD(void, AccessControlCluster, writeAclAttribute)
                             for (size_t i_3 = 0; i_3 < static_cast<size_t>(element_0_targetsItem_1Size); ++i_3)
                             {
                                 jobject element_3;
-                                chip::JniReferences::GetInstance().GetArrayListItem(element_0_targetsItem_1, i_3, element_3);
+                                chip::JniReferences::GetInstance().GetListItem(element_0_targetsItem_1, i_3, element_3);
                                 jobject element_3_clusterItem_4;
                                 chip::JniReferences::GetInstance().GetObjectField(element_3, "cluster", "Ljava/lang/Long;",
                                                                                   element_3_clusterItem_4);
@@ -254,7 +254,7 @@ JNI_METHOD(void, AccessControlCluster, writeExtensionAttribute)
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -263,7 +263,7 @@ JNI_METHOD(void, AccessControlCluster, writeExtensionAttribute)
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 jobject element_0_fabricIndexItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Integer;",
                                                                   element_0_fabricIndexItem_1);
@@ -597,7 +597,7 @@ JNI_METHOD(void, BindingCluster, writeBindingAttribute)
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -606,7 +606,7 @@ JNI_METHOD(void, BindingCluster, writeBindingAttribute)
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 jobject element_0_fabricIndexItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Integer;",
                                                                   element_0_fabricIndexItem_1);
@@ -1911,7 +1911,7 @@ JNI_METHOD(void, GroupKeyManagementCluster, writeGroupKeyMapAttribute)
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -1920,7 +1920,7 @@ JNI_METHOD(void, GroupKeyManagementCluster, writeGroupKeyMapAttribute)
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 jobject element_0_fabricIndexItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Integer;",
                                                                   element_0_fabricIndexItem_1);
@@ -2612,7 +2612,7 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProvidersAttr
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -2621,7 +2621,7 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProvidersAttr
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 jobject element_0_fabricIndexItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Integer;",
                                                                   element_0_fabricIndexItem_1);
@@ -4471,7 +4471,7 @@ JNI_METHOD(void, TestClusterCluster, writeListInt8uAttribute)
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -4480,7 +4480,7 @@ JNI_METHOD(void, TestClusterCluster, writeListInt8uAttribute)
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
                     chip::JniReferences::GetInstance().IntegerToPrimitive(element_0));
             }
@@ -4545,7 +4545,7 @@ JNI_METHOD(void, TestClusterCluster, writeListOctetStringAttribute)
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -4554,7 +4554,7 @@ JNI_METHOD(void, TestClusterCluster, writeListOctetStringAttribute)
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 cleanupByteArrays.push_back(
                     chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0)));
                 listHolder_0->mList[i_0] = cleanupByteArrays.back()->byteSpan();
@@ -4620,7 +4620,7 @@ JNI_METHOD(void, TestClusterCluster, writeListStructOctetStringAttribute)
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -4629,7 +4629,7 @@ JNI_METHOD(void, TestClusterCluster, writeListStructOctetStringAttribute)
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 jobject element_0_fabricIndexItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Long;",
                                                                   element_0_fabricIndexItem_1);
@@ -5014,7 +5014,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -5023,7 +5023,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 jobject element_0_nullableIntItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableInt", "Ljava/lang/Integer;",
                                                                   element_0_nullableIntItem_1);
@@ -5289,8 +5289,8 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                         using ListType_3       = std::remove_reference_t<decltype(nonNullValue_2)>;
                         using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
                         jint element_0_nullableListItem_1Size;
-                        chip::JniReferences::GetInstance().GetArrayListSize(element_0_nullableListItem_1,
-                                                                            element_0_nullableListItem_1Size);
+                        chip::JniReferences::GetInstance().GetListSize(element_0_nullableListItem_1,
+                                                                       element_0_nullableListItem_1Size);
                         if (element_0_nullableListItem_1Size != 0)
                         {
                             auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0_nullableListItem_1Size);
@@ -5299,7 +5299,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                             for (size_t i_3 = 0; i_3 < static_cast<size_t>(element_0_nullableListItem_1Size); ++i_3)
                             {
                                 jobject element_3;
-                                chip::JniReferences::GetInstance().GetArrayListItem(element_0_nullableListItem_1, i_3, element_3);
+                                chip::JniReferences::GetInstance().GetListItem(element_0_nullableListItem_1, i_3, element_3);
                                 listHolder_3->mList[i_3] = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3])>>(
                                     chip::JniReferences::GetInstance().IntegerToPrimitive(element_3));
                             }
@@ -5323,7 +5323,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                         using ListType_3       = std::remove_reference_t<decltype(definedValue_2)>;
                         using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
                         jint optionalValue_2Size;
-                        chip::JniReferences::GetInstance().GetArrayListSize(optionalValue_2, optionalValue_2Size);
+                        chip::JniReferences::GetInstance().GetListSize(optionalValue_2, optionalValue_2Size);
                         if (optionalValue_2Size != 0)
                         {
                             auto * listHolder_3 = new ListHolder<ListMemberType_3>(optionalValue_2Size);
@@ -5332,7 +5332,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                             for (size_t i_3 = 0; i_3 < static_cast<size_t>(optionalValue_2Size); ++i_3)
                             {
                                 jobject element_3;
-                                chip::JniReferences::GetInstance().GetArrayListItem(optionalValue_2, i_3, element_3);
+                                chip::JniReferences::GetInstance().GetListItem(optionalValue_2, i_3, element_3);
                                 listHolder_3->mList[i_3] = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3])>>(
                                     chip::JniReferences::GetInstance().IntegerToPrimitive(element_3));
                             }
@@ -5363,7 +5363,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                             using ListType_4       = std::remove_reference_t<decltype(nonNullValue_3)>;
                             using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
                             jint optionalValue_2Size;
-                            chip::JniReferences::GetInstance().GetArrayListSize(optionalValue_2, optionalValue_2Size);
+                            chip::JniReferences::GetInstance().GetListSize(optionalValue_2, optionalValue_2Size);
                             if (optionalValue_2Size != 0)
                             {
                                 auto * listHolder_4 = new ListHolder<ListMemberType_4>(optionalValue_2Size);
@@ -5372,7 +5372,7 @@ JNI_METHOD(void, TestClusterCluster, writeListNullablesAndOptionalsStructAttribu
                                 for (size_t i_4 = 0; i_4 < static_cast<size_t>(optionalValue_2Size); ++i_4)
                                 {
                                     jobject element_4;
-                                    chip::JniReferences::GetInstance().GetArrayListItem(optionalValue_2, i_4, element_4);
+                                    chip::JniReferences::GetInstance().GetListItem(optionalValue_2, i_4, element_4);
                                     listHolder_4->mList[i_4] =
                                         static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(
                                             chip::JniReferences::GetInstance().IntegerToPrimitive(element_4));
@@ -5708,7 +5708,7 @@ JNI_METHOD(void, TestClusterCluster, writeListLongOctetStringAttribute)
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -5717,7 +5717,7 @@ JNI_METHOD(void, TestClusterCluster, writeListLongOctetStringAttribute)
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 cleanupByteArrays.push_back(
                     chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0)));
                 listHolder_0->mList[i_0] = cleanupByteArrays.back()->byteSpan();
@@ -8687,7 +8687,7 @@ JNI_METHOD(void, UserLabelCluster, writeLabelListAttribute)
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -8696,7 +8696,7 @@ JNI_METHOD(void, UserLabelCluster, writeLabelListAttribute)
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 jobject element_0_labelItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "label", "Ljava/lang/String;", element_0_labelItem_1);
                 cleanupStrings.push_back(

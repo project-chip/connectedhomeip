@@ -84,8 +84,6 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     AttributeStatusIBs::Parser attributeStatusesParser;
 
     reader.Init(std::move(payload));
-    err = reader.Next();
-    SuccessOrExit(err);
 
     err = writeResponse.Init(reader);
     SuccessOrExit(err);
@@ -117,6 +115,8 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     {
         err = CHIP_NO_ERROR;
     }
+    SuccessOrExit(err);
+    ReturnErrorOnFailure(writeResponse.ExitContainer());
 
 exit:
     return err;

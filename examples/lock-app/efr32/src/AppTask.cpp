@@ -49,6 +49,8 @@
 #endif
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
 #endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
@@ -61,6 +63,11 @@
 #define LOCK_STATE_LED &sl_led_led1
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LOCK_BUTTON &sl_button_btn1
+
+using namespace chip;
+using namespace chip::TLV;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 
 namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -75,6 +82,9 @@ LEDWidget sLockLED;
 bool sIsWiFiProvisioned = false;
 bool sIsWiFiEnabled     = false;
 bool sIsWiFiAttached    = false;
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -86,10 +96,6 @@ bool sHaveBLEConnections = false;
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 } // namespace
-
-using namespace chip::TLV;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
@@ -120,6 +126,8 @@ CHIP_ERROR AppTask::Init()
     }
     EFR32_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
+
+    sWiFiNetworkCommissioningInstance.Init();
 #endif
     // Init ZCL Data Model
     chip::Server::GetInstance().Init();

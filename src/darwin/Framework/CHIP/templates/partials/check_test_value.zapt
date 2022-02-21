@@ -19,6 +19,7 @@
     {{/if}}
   {{/if}}
 {{else if isArray}}
+    {{ensureIsArray expected~}}
     XCTAssertEqual([{{actual}} count], {{expected.length}});
     {{#each expected}}
       {{>check_test_value actual=(concat ../actual "[" @index "]") expected=this cluster=../cluster isArray=false type=../type parent=../parent}}

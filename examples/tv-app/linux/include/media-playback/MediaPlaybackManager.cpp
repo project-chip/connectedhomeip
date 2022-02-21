@@ -23,7 +23,7 @@ using namespace chip::app::Clusters::MediaPlayback;
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
-    return PlaybackStateEnum::kPlaying;
+    return mCurrentState;
 }
 
 uint64_t MediaPlaybackManager::HandleGetStartTime()
@@ -63,6 +63,7 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    mCurrentState = PlaybackStateEnum::kPlaying;
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
@@ -71,6 +72,7 @@ void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    mCurrentState = PlaybackStateEnum::kPaused;
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
@@ -79,6 +81,7 @@ void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackR
 void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    mCurrentState = PlaybackStateEnum::kNotPlaying;
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
     helper.Success(response);

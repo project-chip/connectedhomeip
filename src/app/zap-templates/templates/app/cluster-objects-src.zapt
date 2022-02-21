@@ -95,7 +95,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_event_fields}}
+    {{#if_is_fabric_scoped_struct type}}
+    ReturnErrorOnFailure(DataModel::EncodeForRead(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase name}})), GetFabricIndex(), {{asLowerCamelCase name}}));
+    {{else}}
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase name}})), {{asLowerCamelCase name}}));
+    {{/if_is_fabric_scoped_struct}}
     {{/zcl_event_fields}}
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;

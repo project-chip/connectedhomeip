@@ -11,6 +11,7 @@
     {{>test_value target=target definedValue=definedValue cluster=cluster isNullable=false depth=(incrementDepth depth)}}
   {{/if}}
 {{else if isArray}}
+  {{ensureIsArray definedValue~}}
   {
     NSMutableArray * temp_{{depth}} = [[NSMutableArray alloc] init];
     {{#each definedValue}}

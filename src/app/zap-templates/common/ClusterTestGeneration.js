@@ -518,6 +518,12 @@ function chip_tests_items(options)
 
 function getVariable(context, key, name)
 {
+  if (!(typeof name == "string" || (typeof name == "object" && (name instanceof String)))) {
+    // Non-string key; don't try to look it up.  Could end up looking like a
+    // variable name by accident when stringified.
+    return null;
+  }
+
   while (!('variables' in context) && context.parent) {
     context = context.parent;
   }
@@ -756,6 +762,15 @@ function if_include_struct_item_value(structValue, name, options)
   return options.inverse(this);
 }
 
+// To be used to verify that things are actually arrays before trying to use
+// #each with them, since that silently treats non-arrays as empty arrays.
+function ensureIsArray(value, options)
+{
+  if (!(value instanceof Array)) {
+    printErrorAndExit(this, `Expected array but instead got ${typeof value}: ${JSON.stringify(value)}\n`);
+  }
+}
+
 //
 // Module exports
 //
@@ -775,3 +790,4 @@ exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
 exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;
 exports.if_include_struct_item_value        = if_include_struct_item_value;
+exports.ensureIsArray                       = ensureIsArray;

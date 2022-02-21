@@ -26,14 +26,14 @@
     using ListType_{{depth}} = std::remove_reference_t<decltype({{target}})>;
     using ListMemberType_{{depth}} = ListMemberTypeGetter<ListType_{{depth}}>::Type;
     jint {{source}}Size;
-    chip::JniReferences::GetInstance().GetArrayListSize({{source}}, {{source}}Size);
+    chip::JniReferences::GetInstance().GetListSize({{source}}, {{source}}Size);
     if ({{source}}Size != 0) {
       auto * listHolder_{{depth}} = new ListHolder<ListMemberType_{{depth}}>({{source}}Size);
       listFreer.add(listHolder_{{depth}});
 
       for (size_t i_{{depth}} = 0; i_{{depth}} < static_cast<size_t>({{source}}Size); ++i_{{depth}}) {
         jobject element_{{depth}};
-        chip::JniReferences::GetInstance().GetArrayListItem({{source}}, i_{{depth}}, element_{{depth}});
+        chip::JniReferences::GetInstance().GetListItem({{source}}, i_{{depth}}, element_{{depth}});
         {{encode_value(
            "listHolder_{}->mList[i_{}]".format(depth, depth),
            "element_{}".format(depth),

@@ -248,12 +248,12 @@ bool CheckForSuccess(GenericContext * context, const char * name, DNSServiceErro
             }
             case ContextType::Resolve: {
                 ResolveContext * resolveContext = reinterpret_cast<ResolveContext *>(context);
-                resolveContext->callback(resolveContext->context, nullptr, CHIP_ERROR_INTERNAL);
+                resolveContext->callback(resolveContext->context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 break;
             }
             case ContextType::GetAddrInfo: {
                 GetAddrInfoContext * resolveContext = reinterpret_cast<GetAddrInfoContext *>(context);
-                resolveContext->callback(resolveContext->context, nullptr, CHIP_ERROR_INTERNAL);
+                resolveContext->callback(resolveContext->context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 break;
             }
             }
@@ -403,18 +403,35 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
 
     ChipLogDetail(DeviceLayer, "Mdns: %s hostname:%s", __func__, hostname);
 
+    chip::Inet::IPAddress ip;
+    CHIP_ERROR status = chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip);
+    if (status == CHIP_NO_ERROR)
+    {
+        sdCtx->addresses.push_back(ip);
+    }
+
+    if (flags & kDNSServiceFlagsMoreComing)
+    {
+        // Wait for that.
+        return;
+    }
+
     DnssdService service   = {};
     service.mPort          = sdCtx->port;
     service.mTextEntries   = sdCtx->textEntries.empty() ? nullptr : sdCtx->textEntries.data();
     service.mTextEntrySize = sdCtx->textEntries.empty() ? 0 : sdCtx->textEntries.size();
-    chip::Inet::IPAddress ip;
-    CHIP_ERROR status = chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip);
-    service.mAddress.SetValue(ip);
+    // Use the first IP we got for the DnssdService.
+    if (sdCtx->addresses.size() != 0)
+    {
+        service.mAddress.SetValue(sdCtx->addresses.front());
+        sdCtx->addresses.erase(sdCtx->addresses.begin());
+    }
     Platform::CopyString(service.mName, sdCtx->name);
     Platform::CopyString(service.mHostName, hostname);
     service.mInterface = Inet::InterfaceId(sdCtx->interfaceId);
 
-    sdCtx->callback(sdCtx->context, &service, status);
+    // TODO: Does it really make sense to pass in the status from our last "get the IP address" operation?
+    sdCtx->callback(sdCtx->context, &service, Span<Inet::IPAddress>(sdCtx->addresses.data(), sdCtx->addresses.size()), status);
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 
@@ -512,6 +529,9 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
 
     GetAddrInfo(sdCtx->context, sdCtx->callback, interfaceId, sdCtx->addressType, sdCtx->name, hostname, ntohs(port), txtLen,
                 txtRecord);
+
+    // TODO: If flags & kDNSServiceFlagsMoreComing should we keep waiting to see
+    // what else we resolve instead of calling Remove() here?
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 
