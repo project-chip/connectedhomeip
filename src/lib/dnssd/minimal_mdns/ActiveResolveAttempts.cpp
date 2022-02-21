@@ -119,6 +119,7 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
     }
 
     entryToUse->peerId         = peerId;
+    entryToUse->firstSend      = true;
     entryToUse->queryDueTime   = mClock->GetMonotonicTimestamp();
     entryToUse->nextRetryDelay = System::Clock::Seconds16(1);
 }
@@ -152,7 +153,7 @@ Optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpected
     return minDelay;
 }
 
-Optional<PeerId> ActiveResolveAttempts::NextScheduledPeer()
+Optional<ActiveResolveAttempts::ScheduledResolve> ActiveResolveAttempts::NextScheduledPeer()
 {
     chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
@@ -178,10 +179,13 @@ Optional<PeerId> ActiveResolveAttempts::NextScheduledPeer()
         entry.queryDueTime = now + entry.nextRetryDelay;
         entry.nextRetryDelay *= 2;
 
-        return Optional<PeerId>::Value(entry.peerId);
+        ScheduledResolve result(entry);
+        entry.firstSend = false;
+
+        return Optional<ScheduledResolve>::Value(result);
     }
 
-    return Optional<PeerId>::Missing();
+    return Optional<ScheduledResolve>::Missing();
 }
 
 } // namespace Minimal
