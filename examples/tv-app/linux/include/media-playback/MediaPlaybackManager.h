@@ -53,12 +53,9 @@ public:
 
 protected:
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum mCurrentState;
-    PlaybackPositionType mPlaybackPosition = {
-      0,
-      chip::app::DataModel::Nullable<uint64_t>(0)
-    };
-    float mPlaybackSpeed = 0;
-    uint64_t mStartTime = 0;
+    PlaybackPositionType mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    float mPlaybackSpeed                   = 0;
+    uint64_t mStartTime                    = 0;
     // Magic number for testing.
     uint64_t mDuration = 80000;
 };

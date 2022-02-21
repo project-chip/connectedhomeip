@@ -94,10 +94,7 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
 void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mPlaybackPosition = {
-      0,
-      chip::app::DataModel::Nullable<uint64_t>(0)
-    };
+    mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
@@ -106,10 +103,7 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
 void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mPlaybackPosition = {
-      0,
-      chip::app::DataModel::Nullable<uint64_t>(0)
-    };
+    mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
@@ -120,11 +114,8 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
 {
     // TODO: Insert code here
     uint64_t newPosition = mPlaybackPosition.position.Value() - deltaPositionMilliseconds;
-    newPosition = newPosition < 0 ? 0 : newPosition;
-    mPlaybackPosition = {
-      0,
-      chip::app::DataModel::Nullable<uint64_t>(newPosition)
-    };
+    newPosition          = newPosition < 0 ? 0 : newPosition;
+    mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
 
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
@@ -136,11 +127,8 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
 {
     // TODO: Insert code here
     uint64_t newPosition = mPlaybackPosition.position.Value() + deltaPositionMilliseconds;
-    newPosition = newPosition > mDuration ? mDuration : newPosition;
-    mPlaybackPosition = {
-      0,
-      chip::app::DataModel::Nullable<uint64_t>(newPosition)
-    };
+    newPosition          = newPosition > mDuration ? mDuration : newPosition;
+    mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
 
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
@@ -151,15 +139,15 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
                                       const uint64_t & positionMilliseconds)
 {
     // TODO: Insert code here
-    if (positionMilliseconds > mDuration || positionMilliseconds < 0) {
+    if (positionMilliseconds > mDuration || positionMilliseconds < 0)
+    {
         Commands::PlaybackResponse::Type response;
         response.status = StatusEnum::kSeekOutOfRange;
         helper.Success(response);
-    } else {
-        mPlaybackPosition = {
-          0,
-          chip::app::DataModel::Nullable<uint64_t>(positionMilliseconds)
-        };
+    }
+    else
+    {
+        mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(positionMilliseconds) };
 
         Commands::PlaybackResponse::Type response;
         response.status = StatusEnum::kSuccess;
@@ -178,10 +166,7 @@ void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mPlaybackPosition = {
-      0,
-      chip::app::DataModel::Nullable<uint64_t>(0)
-    };
+    mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
     Commands::PlaybackResponse::Type response;
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
