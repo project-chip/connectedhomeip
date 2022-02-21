@@ -50,11 +50,13 @@ class AmebaApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
+
 def OptionalFlags(self):
     if self.app.ExampleName == 'pigweed-app':
         return '-r'
     else:
         return ''
+
 
 class AmebaBuilder(Builder):
 
