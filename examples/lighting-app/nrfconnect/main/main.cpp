@@ -47,7 +47,6 @@ int main()
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("Failed to initialize USB device");
-        goto exit;
     }
 #endif
 
