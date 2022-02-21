@@ -269,23 +269,28 @@
                 CHIPOperationalCredentials * cluster =
                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command sent."] isError:NO];
-                CHIPReadParams *params = [[CHIPReadParams alloc] init];
+                CHIPReadParams * params = [[CHIPReadParams alloc] init];
                 params.fabricFiltered = @NO;
-                [cluster readAttributeFabricsWithParams:params completionHandler:^(NSArray * _Nullable fabricsList, NSError * _Nullable error) {
-                    if (error) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command failed: %@.", error]
-                                       isError:YES];
-                        });
-                    } else {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [self updateResult:[NSString stringWithFormat:@"Command readAttributeFabrics command succeeded."]
-                                       isError:NO];
-                        });
-                    }
-                    NSLog(@"Got back fabrics list: %@ error %@", fabricsList, error);
-                    [self updateFabricsListUIWithFabrics:fabricsList error:error];
-                }];
+                [cluster
+                    readAttributeFabricsWithParams:params
+                                 completionHandler:^(NSArray * _Nullable fabricsList, NSError * _Nullable error) {
+                                     if (error) {
+                                         dispatch_async(dispatch_get_main_queue(), ^{
+                                             [self updateResult:[NSString
+                                                                    stringWithFormat:@"readAttributeFabrics command failed: %@.",
+                                                                    error]
+                                                        isError:YES];
+                                         });
+                                     } else {
+                                         dispatch_async(dispatch_get_main_queue(), ^{
+                                             [self updateResult:[NSString stringWithFormat:
+                                                                              @"Command readAttributeFabrics command succeeded."]
+                                                        isError:NO];
+                                         });
+                                     }
+                                     NSLog(@"Got back fabrics list: %@ error %@", fabricsList, error);
+                                     [self updateFabricsListUIWithFabrics:fabricsList error:error];
+                                 }];
             } else {
                 [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
             }
