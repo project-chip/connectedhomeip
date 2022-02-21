@@ -54,7 +54,7 @@ public:
 protected:
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum mCurrentState;
     PlaybackPositionType mPlaybackPosition = {
-      0, 
+      0,
       chip::app::DataModel::Nullable<uint64_t>(0)
     };
     float mPlaybackSpeed = 0;

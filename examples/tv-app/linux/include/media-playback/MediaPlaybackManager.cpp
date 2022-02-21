@@ -95,7 +95,7 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
 {
     // TODO: Insert code here
     mPlaybackPosition = {
-      0, 
+      0,
       chip::app::DataModel::Nullable<uint64_t>(0)
     };
     Commands::PlaybackResponse::Type response;
@@ -107,7 +107,7 @@ void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playback
 {
     // TODO: Insert code here
     mPlaybackPosition = {
-      0, 
+      0,
       chip::app::DataModel::Nullable<uint64_t>(0)
     };
     Commands::PlaybackResponse::Type response;
@@ -122,7 +122,7 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
     uint64_t newPosition = mPlaybackPosition.position.Value() - deltaPositionMilliseconds;
     newPosition = newPosition < 0 ? 0 : newPosition;
     mPlaybackPosition = {
-      0, 
+      0,
       chip::app::DataModel::Nullable<uint64_t>(newPosition)
     };
 
@@ -133,12 +133,12 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
 
 void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                              const uint64_t & deltaPositionMilliseconds)
-{  
+{
     // TODO: Insert code here
     uint64_t newPosition = mPlaybackPosition.position.Value() + deltaPositionMilliseconds;
     newPosition = newPosition > mDuration ? mDuration : newPosition;
     mPlaybackPosition = {
-      0, 
+      0,
       chip::app::DataModel::Nullable<uint64_t>(newPosition)
     };
 
@@ -157,7 +157,7 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
         helper.Success(response);
     } else {
         mPlaybackPosition = {
-          0, 
+          0,
           chip::app::DataModel::Nullable<uint64_t>(positionMilliseconds)
         };
 
@@ -179,7 +179,7 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
 {
     // TODO: Insert code here
     mPlaybackPosition = {
-      0, 
+      0,
       chip::app::DataModel::Nullable<uint64_t>(0)
     };
     Commands::PlaybackResponse::Type response;

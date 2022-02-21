@@ -175,4 +175,4 @@ tests:
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: { updatedAt: 0, position: 1000 }            
+          value: { updatedAt: 0, position: 1000 }
