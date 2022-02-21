@@ -269,9 +269,9 @@
                 CHIPOperationalCredentials * cluster =
                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command sent."] isError:NO];
-                [cluster readAttributeFabricsWithCompletionHandler:^(
-                    NSArray<CHIPOperationalCredentialsClusterFabricDescriptor *> * _Nullable fabricsList,
-                    NSError * _Nullable error) {
+                CHIPReadParams *params = [[CHIPReadParams alloc] init];
+                params.fabricFiltered = @NO;
+                [cluster readAttributeFabricsWithParams:params completionHandler:^(NSArray * _Nullable fabricsList, NSError * _Nullable error) {
                     if (error) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command failed: %@.", error]
