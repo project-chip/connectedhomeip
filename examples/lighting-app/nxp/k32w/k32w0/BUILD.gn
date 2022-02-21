@@ -112,7 +112,7 @@ k32w0_executable("light_app") {
 
 if (chip_pw_tokenizer_logging) {
   pw_tokenizer_database("light_app.database") {
-    database = "//out/debug/chip-k32w061-light-example-database.bin"
+    database = "$root_build_dir/chip-k32w061-light-example-database.bin"
     create = "binary"
     deps = [ ":light_app" ]
     optional_paths = [ "$root_build_dir/chip-k32w061-light-example" ]
