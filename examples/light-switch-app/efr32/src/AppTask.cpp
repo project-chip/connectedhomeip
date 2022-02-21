@@ -352,7 +352,7 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchToggleOnOff, reinterpret_cast<intptr_t>(nullptr));
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchToggleOnOff, 0);
     }
 }
 
