@@ -85,7 +85,6 @@ public:
      * Generate Rotating Device ID in Binary Format
      *
      * @param params parameters needed to generate additional data payload
-     * @param rotatingDeviceUniqueId unique id for rotating device id
      * @param [in,out] rotatingDeviceIdBuffer as input, the buffer to use for
      *                 the binary data.  As output, will have its size set to
      *                 the actual size used upon successful generation
