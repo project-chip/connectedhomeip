@@ -24,6 +24,7 @@ chip_enable_openthread = true
 chip_openthread_ftd = false
 
 # Disable stack lock tracking
+# Example will not be maintained in the long term and will be depraceted now that OTA is beeing intagrated into our examples
 chip_stack_lock_tracking = "None"
 
 declare_args() {
