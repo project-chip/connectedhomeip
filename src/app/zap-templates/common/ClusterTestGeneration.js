@@ -31,23 +31,22 @@ const { getClusters, getCommands, getAttributes, getEvents, isTestOnlyCluster }
 const { asBlocks, ensureClusters } = require('./ClustersHelper.js');
 const { Variables }                = require('./variables/Variables.js');
 
-const kIdentityName           = 'identity';
-const kClusterName            = 'cluster';
-const kEndpointName           = 'endpoint';
-const kGroupId                = 'groupId';
-const kCommandName            = 'command';
-const kWaitCommandName        = 'wait';
-const kIndexName              = 'index';
-const kValuesName             = 'values';
-const kConstraintsName        = 'constraints';
-const kArgumentsName          = 'arguments';
-const kResponseName           = 'response';
-const kDisabledName           = 'disabled';
-const kResponseErrorName      = 'error';
-const kResponseWrongErrorName = 'errorWrongValue';
-const kPICSName               = 'PICS';
-const kSaveAsName             = 'saveAs';
-const kFabricFiltered         = 'fabricFiltered';
+const kIdentityName      = 'identity';
+const kClusterName       = 'cluster';
+const kEndpointName      = 'endpoint';
+const kGroupId           = 'groupId';
+const kCommandName       = 'command';
+const kWaitCommandName   = 'wait';
+const kIndexName         = 'index';
+const kValuesName        = 'values';
+const kConstraintsName   = 'constraints';
+const kArgumentsName     = 'arguments';
+const kResponseName      = 'response';
+const kDisabledName      = 'disabled';
+const kResponseErrorName = 'error';
+const kPICSName          = 'PICS';
+const kSaveAsName        = 'saveAs';
+const kFabricFiltered    = 'fabricFiltered';
 
 class NullObject {
   toString()
@@ -242,11 +241,10 @@ function setDefaultResponse(test)
   const defaultResponse = {};
   setDefault(test, kResponseName, defaultResponse);
 
-  const hasResponseError = (kResponseErrorName in test[kResponseName]) || (kResponseWrongErrorName in test[kResponseName]);
+  const hasResponseError = (kResponseErrorName in test[kResponseName]);
 
   const defaultResponseError = 0;
   setDefault(test[kResponseName], kResponseErrorName, defaultResponseError);
-  setDefault(test[kResponseName], kResponseWrongErrorName, defaultResponseError);
 
   const defaultResponseValues = [];
   setDefault(test[kResponseName], kValuesName, defaultResponseValues);
@@ -275,7 +273,6 @@ function setDefaultResponse(test)
   }
 
   ensureValidError(test[kResponseName], kResponseErrorName);
-  ensureValidError(test[kResponseName], kResponseWrongErrorName);
 
   // Step that waits for a particular event does not requires constraints nor expected values.
   if (test.isWait) {

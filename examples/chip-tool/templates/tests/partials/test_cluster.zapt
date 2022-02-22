@@ -374,9 +374,6 @@ class {{filename}}: public TestCommand
         {{#if response.error}}
           VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
           {{#unless async}}NextTest();{{/unless}}
-        {{else if response.errorWrongValue}}
-          VerifyOrReturn(CheckConstraintNotValue("status", chip::to_underlying(status.mStatus), 0));
-          {{#unless async}}NextTest();{{/unless}}
         {{else}}
           {{#if optional}}(status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : {{/if}}ThrowFailureResponse();
         {{/if}}
