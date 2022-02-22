@@ -74,6 +74,7 @@ public:
     void Retain() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Retain(); }
     void Release() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Release(); }
 
+    Access::Subject GetSubject() const override { return Access::Subject(); }
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
         return Access::SubjectDescriptor(); // return an empty ISD for unauthenticated session.

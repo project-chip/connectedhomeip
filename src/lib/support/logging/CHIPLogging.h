@@ -378,5 +378,12 @@ bool IsCategoryEnabled(uint8_t category);
  */
 #define ChipLogFormatMessageType "0x%x"
 
+/**
+ * Logging helpers for Subject
+ */
+#define ChipLogFormatSubject "< %u, %s, " ChipLogFormatX64 ">"
+#define ChipLogValueSubject(subject)                                                                                               \
+    subject.GetFabricIndex(), subject.GetScopedSubject().GetAuthModeString(), ChipLogValueX64(subject.GetScopedSubject().GetValue())
+
 } // namespace Logging
 } // namespace chip

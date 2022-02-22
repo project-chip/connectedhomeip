@@ -20,6 +20,23 @@
 namespace chip {
 namespace Transport {
 
+Access::Subject SecureSession::GetSubject() const
+{
+    if (IsOperationalNodeId(mPeerNodeId))
+    {
+        return Access::Subject::Create<Access::NodeSubject>(GetFabricIndex(), mPeerNodeId);
+    }
+    else if (IsPAKEKeyId(mPeerNodeId))
+    {
+        return Access::Subject::Create<Access::PaseSubject>(GetFabricIndex(), static_cast<uint16_t>(mPeerNodeId >> 48));
+    }
+    else
+    {
+        VerifyOrDie(false);
+        return Access::Subject();
+    }
+}
+
 Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
 {
     Access::SubjectDescriptor subjectDescriptor;
