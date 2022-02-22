@@ -33,6 +33,8 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 
+#include <thread>
+
 #include <arpa/inet.h>
 #include <dirent.h>
 #include <errno.h>
@@ -188,13 +190,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
 
     std::thread gdbusThread(GDBus_Thread);
-    mGdbusThreadHandle = gdbusThread.native_handle();
     gdbusThread.detach();
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     std::thread wifiIPThread(WiFIIPChangeListener);
-    mWifiIPThreadHandle = wifiIPThread.native_handle();
     wifiIPThread.detach();
 #endif
 
@@ -217,7 +217,6 @@ exit:
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
-    CHIP_ERROR err;
     uint64_t upTime = 0;
 
     if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
@@ -238,23 +237,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
-    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
-
-#if CHIP_WITH_GIO
-    if (pthread_cancel(mGdbusThreadHandle) != 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to cancel gDBus thread");
-    }
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    if (pthread_cancel(mWifiIPThreadHandle) != 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to cancel WiFI IP Change Listener thread");
-    }
-#endif
-
-    return err;
+    return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(
