@@ -173,8 +173,6 @@ CHIP_ERROR AppTask::Init()
     }
 
     NetWorkCommissioningInstInit();
-    P6_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-    P6_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
 
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);
@@ -187,17 +185,28 @@ CHIP_ERROR AppTask::Init()
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum update_state;
-    OtaRequestorServerGetUpdateState(0, update_state);
-    // Update state immediately after an update/reboot should be still applying.
-    if (update_state == chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying)
+    uint32_t savedSoftwareVersion;
+    err = ConfigurationMgr().GetSoftwareVersion(savedSoftwareVersion);
+    if (err != CHIP_NO_ERROR)
     {
+        P6_LOG("Can't get saved software version");
+        appError(err);
+    }
+
+    if (savedSoftwareVersion != CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION)
+    {
+        ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+
+        P6_LOG("Confirming update to version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
         chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
         if (requestor != nullptr)
         {
-            requestor->NotifyUpdateApplied(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION + 1);
+            requestor->NotifyUpdateApplied(savedSoftwareVersion);
         }
     }
+
+    P6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    P6_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
 
     // Print setup info
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
