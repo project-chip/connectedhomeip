@@ -161,13 +161,9 @@ int AppTask::Init()
         ThreadStackMgrImpl().GetIeeeEui64(EUI64);
         chip::Encoding::BytesToUppercaseHexString(EUI64, sizeof(EUI64), stringEUI64, sizeof(stringEUI64));
 	ret = ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64));
-        PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
-	if (ret != CHIP_NO_ERROR)
-        {
-            PLAT_LOG("ConfigurationMgr().StoreSerialNumber failed (%X)", ret.AsInteger());
-            while (1)
-                ;
-        }
+	PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
+	VerifyOrDieWithMsg(ret == CHIP_NO_ERROR, NotSpecified,
+			   "StoreSerialNumber: failed (%lX)", ret.AsInteger());
     }
 #endif
 
