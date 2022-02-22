@@ -279,7 +279,6 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
 
 void GenericOTARequestorDriver::StartDefaultProvidersTimer()
 { 
-
     ChipLogProgress(SoftwareUpdate, "Starting the Default Providers timer, timeout: %u", (unsigned int)mDefaultProvidersTimeoutSec);
 
     //  SL TODO: This has to be a method: PickNextDefaultProvider()
