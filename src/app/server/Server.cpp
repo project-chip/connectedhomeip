@@ -112,10 +112,12 @@ Server::Server() :
     mAttributePersister(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
 {}
 
-CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
+CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
+                        Inet::InterfaceId interfaceId)
 {
     mSecuredServicePort   = secureServicePort;
     mUnsecuredServicePort = unsecureServicePort;
+    mInterfaceId          = interfaceId;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -230,6 +232,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     app::DnssdServer::Instance().SetSecuredPort(mSecuredServicePort);
     app::DnssdServer::Instance().SetUnsecuredPort(mUnsecuredServicePort);
+    app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     // TODO @bzbarsky-apple @cecille Move to examples
