@@ -168,23 +168,31 @@ public class NsdManagerServiceResolver implements ServiceResolver {
 
           @Override
           public void onServiceRegistered(NsdServiceInfo serviceInfo) {
-            Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered");
+            Log.i(
+                TAG,
+                "service " + serviceInfo.getServiceName() + "(" + this + ") onServiceRegistered");
           }
 
           @Override
           public void onServiceUnregistered(NsdServiceInfo serviceInfo) {
-            Log.i(TAG, "service " + serviceInfo.getServiceName() + " onServiceRegistered");
+            Log.i(
+                TAG,
+                "service " + serviceInfo.getServiceName() + "(" + this + ") onServiceUnregistered");
           }
         };
     registrationListeners.add(registrationListener);
 
     nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
+    Log.d(TAG, "publish " + registrationListener + " count = " + registrationListeners.size());
   }
 
   @Override
   public void removeServices() {
+    Log.d(TAG, "removeServices: ");
     for (NsdManager.RegistrationListener l : registrationListeners) {
+      Log.i(TAG, "Remove " + l);
       nsdManager.unregisterService(l);
     }
+    registrationListeners.clear();
   }
 }

@@ -270,13 +270,13 @@ void CHIPChannelClusterChangeChannelResponseCallback::CallbackFn(
 
     channelMatch = env->NewObject(channelInfoStructClass, channelInfoStructCtor, channelMatch_majorNumber, channelMatch_minorNumber,
                                   channelMatch_name, channelMatch_callSign, channelMatch_affiliateCallSign);
-    jobject errorType;
-    std::string errorTypeClassName     = "java/lang/Integer";
-    std::string errorTypeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorTypeClassName.c_str(), errorTypeCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.errorType), errorType);
+    jobject status;
+    std::string statusClassName     = "java/lang/Integer";
+    std::string statusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), status);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, channelMatch, errorType);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, channelMatch, status);
 }
 CHIPContentLauncherClusterLaunchResponseCallback::CHIPContentLauncherClusterLaunchResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>(CallbackFn, this)
@@ -676,7 +676,7 @@ void CHIPDoorLockClusterGetUserResponseCallback::CallbackFn(
 
             newElement_1 = env->NewObject(dlCredentialStructClass, dlCredentialStructCtor, newElement_1_credentialType,
                                           newElement_1_credentialIndex);
-            chip::JniReferences::GetInstance().AddToArrayList(credentials, newElement_1);
+            chip::JniReferences::GetInstance().AddToList(credentials, newElement_1);
         }
     }
     jobject creatorFabricIndex;
@@ -1301,7 +1301,7 @@ void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback::Callback
         std::string newElement_0CtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0ClassName.c_str(),
                                                                        newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToArrayList(GroupKeySetIDs, newElement_0);
+        chip::JniReferences::GetInstance().AddToList(GroupKeySetIDs, newElement_0);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySetIDs);
@@ -1615,7 +1615,7 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallback::CallbackFn(
         std::string newElement_0CtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0ClassName.c_str(),
                                                                        newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToArrayList(groupList, newElement_0);
+        chip::JniReferences::GetInstance().AddToList(groupList, newElement_0);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, capacity, groupList);
@@ -2196,7 +2196,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
             newElement_1 = env->NewObject(wiFiInterfaceScanResultStructClass, wiFiInterfaceScanResultStructCtor,
                                           newElement_1_security, newElement_1_ssid, newElement_1_bssid, newElement_1_channel,
                                           newElement_1_wiFiBand, newElement_1_rssi);
-            chip::JniReferences::GetInstance().AddToArrayList(WiFiScanResults, newElement_1);
+            chip::JniReferences::GetInstance().AddToList(WiFiScanResults, newElement_1);
         }
     }
     jobject ThreadScanResults;
@@ -2279,7 +2279,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
                 env->NewObject(threadInterfaceScanResultStructClass, threadInterfaceScanResultStructCtor, newElement_1_panId,
                                newElement_1_extendedPanId, newElement_1_networkName, newElement_1_channel, newElement_1_version,
                                newElement_1_extendedAddress, newElement_1_rssi, newElement_1_lqi);
-            chip::JniReferences::GetInstance().AddToArrayList(ThreadScanResults, newElement_1);
+            chip::JniReferences::GetInstance().AddToList(ThreadScanResults, newElement_1);
         }
     }
 
@@ -2940,7 +2940,7 @@ void CHIPScenesClusterGetSceneMembershipResponseCallback::CallbackFn(
         std::string newElement_0CtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToArrayList(sceneList, newElement_0);
+        chip::JniReferences::GetInstance().AddToList(sceneList, newElement_0);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, capacity, groupId, sceneCount, sceneList);
@@ -3269,7 +3269,7 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
 
         newElement_0 = env->NewObject(sceneExtensionFieldSetStructClass, sceneExtensionFieldSetStructCtor, newElement_0_clusterId,
                                       newElement_0_length, newElement_0_value);
-        chip::JniReferences::GetInstance().AddToArrayList(extensionFieldSets, newElement_0);
+        chip::JniReferences::GetInstance().AddToList(extensionFieldSets, newElement_0);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
@@ -3770,7 +3770,7 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallback::CallbackFn(
         std::string newElement_0CtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToArrayList(arg1, newElement_0);
+        chip::JniReferences::GetInstance().AddToList(arg1, newElement_0);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, arg1);
@@ -4118,7 +4118,7 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CallbackFn(
         std::string newElement_0CtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToArrayList(payload, newElement_0);
+        chip::JniReferences::GetInstance().AddToList(payload, newElement_0);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence,

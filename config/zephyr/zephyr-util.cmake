@@ -34,6 +34,13 @@ function(zephyr_get_compile_flags VAR LANG)
     set(${VAR} ${INCLUDES} ${SYSTEM_INCLUDES} ${DEFINES} ${FLAGS} ${${VAR}} PARENT_SCOPE)
 endfunction()
 
+# Add include directories to the zephyr interface target.
+# It works like zephyr_include_directories(), doesn't prepend the directories with
+# the current directory. Hence it works correctly with generator expressions, too.
+function(zephyr_include_directories_raw)
+    target_include_directories(zephyr_interface INTERFACE ${ARGN})
+endfunction()
+
 # Select gnu++<YY> standard based on Kconfig configuration
 macro(zephyr_get_gnu_cpp_standard VAR)
     if (CONFIG_STD_CPP11)

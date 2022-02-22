@@ -242,12 +242,12 @@ public:
      * @param[in] iterations      The number of iterations to use when generating the verifier
      * @param[in] setupPincode    The desired PIN code to use
      * @param[in] salt            The 16-byte salt for verifier computation
-     * @param[out] outVerifier    The PASEVerifier to be populated on success
+     * @param[out] outVerifier    The Spake2pVerifier to be populated on success
      * @param[out] outPasscodeId  The passcode ID to be populated on success
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
+    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, Spake2pVerifier & outVerifier,
                                    PasscodeId & outPasscodeId);
 
     /**
@@ -574,18 +574,9 @@ public:
      * @brief
      *   This function validates the Attestation Information sent by the device.
      *
-     * @param[in] attestationElements Attestation Elements TLV.
-     * @param[in] signature           Attestation signature generated for all the above fields + Attestation Challenge.
-     * @param[in] attestationNonce    Attestation nonce
-     * @param[in] pai                 PAI certificate
-     * @param[in] dac                 DAC certificates
-     * @param[in] remoteVendorId      vendor ID read from the device Basic Information cluster
-     * @param[in] remoteProductId     product ID read from the device Basic Information cluster
-     * @param[in] proxy               device proxy that is being attested.
+     * @param[in] info Structure contatining all the required information for validating the device attestation.
      */
-    CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
-                                       const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
+    CHIP_ERROR ValidateAttestationInfo(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
 
     /**
      * @brief

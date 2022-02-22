@@ -93,7 +93,6 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     InvokeRequestMessage::Parser invokeRequestMessage;
     InvokeRequests::Parser invokeRequests;
     reader.Init(std::move(payload));
-    ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(invokeRequestMessage.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(invokeRequestMessage.CheckSchemaValidity());
@@ -147,7 +146,8 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     {
         err = CHIP_NO_ERROR;
     }
-    return err;
+    ReturnErrorOnFailure(err);
+    return invokeRequestMessage.ExitContainer();
 }
 
 void CommandHandler::Close()
@@ -273,12 +273,6 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-        if (err != CHIP_NO_ERROR)
-        {
-            // Grace period until ACLs are in place
-            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
-            err = CHIP_NO_ERROR;
-        }
         if (err != CHIP_NO_ERROR)
         {
             if (err != CHIP_ERROR_ACCESS_DENIED)
@@ -407,12 +401,6 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
             Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
             err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-            if (err != CHIP_NO_ERROR)
-            {
-                // Grace period until ACLs are in place
-                ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
-                err = CHIP_NO_ERROR;
-            }
             if (err != CHIP_NO_ERROR)
             {
                 // TODO: handle errors that aren't CHIP_ERROR_ACCESS_DENIED, etc.

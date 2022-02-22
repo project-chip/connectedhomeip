@@ -65,6 +65,9 @@ if (chip_device_platform != "none") {
     # todo: below operates are not work without root permission
     # pthread_attr_setschedpolicy in GenericPlatformManagerImpl_POSIX.cpp
     chip_device_config_run_as_root = current_os != "android"
+
+    # Indication that the CHIP data model is included
+    chip_enable_data_model = false
   }
 
   if (chip_stack_lock_tracking == "auto") {
@@ -200,6 +203,8 @@ if (chip_device_platform != "none") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_MBED=1",
         "CHIP_DEVICE_LAYER_TARGET=mbed",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+        "CHIP_DEVICE_ENABLE_DATA_MODEL=${chip_enable_data_model}",
       ]
     } else if (chip_device_platform == "fake") {
       defines += [

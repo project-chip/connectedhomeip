@@ -171,11 +171,6 @@ client cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  bitmap ChannelFeature : BITMAP32 {
-    kChannelList = 0x1;
-    kLineupInfo = 0x2;
-  }
-
   struct ApplicationEP {
     Application application = 0;
     optional ENDPOINT_NO endpoint = 1;
@@ -325,27 +320,19 @@ client cluster BinaryInputBasic = 15 {
 }
 
 client cluster Binding = 30 {
+  struct TargetStruct {
+    FABRIC_IDX fabricIndex = 0;
+    optional NODE_ID node = 1;
+    optional GROUP_ID group = 2;
+    optional ENDPOINT_NO endpoint = 3;
+    optional CLUSTER_ID cluster = 4;
+  }
+
+  attribute TargetStruct binding[] = 0;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
-
-  request struct BindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  request struct UnbindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  command Bind(BindRequest): DefaultSuccess = 0;
-  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 client cluster BooleanState = 69 {
@@ -536,7 +523,7 @@ client cluster BridgedDeviceBasic = 57 {
   }
 
   readonly attribute char_string<32> vendorName = 1;
-  readonly attribute int16u vendorID = 2;
+  readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
   attribute char_string<32> nodeLabel = 5;
   readonly attribute int16u hardwareVersion = 7;
@@ -549,6 +536,7 @@ client cluster BridgedDeviceBasic = 57 {
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
   readonly attribute boolean reachable = 17;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -556,13 +544,19 @@ client cluster BridgedDeviceBasic = 57 {
 }
 
 client cluster Channel = 1284 {
-  enum ErrorTypeEnum : ENUM8 {
-    kMultipleMatches = 0;
-    kNoMatches = 1;
-  }
-
   enum LineupInfoTypeEnum : ENUM8 {
     kMso = 0;
+  }
+
+  enum StatusEnum : ENUM8 {
+    kSuccess = 0;
+    kMultipleMatches = 1;
+    kNoMatches = 2;
+  }
+
+  bitmap ChannelFeature : BITMAP32 {
+    kChannelList = 0x1;
+    kLineupInfo = 0x2;
   }
 
   struct ChannelInfo {
@@ -603,7 +597,7 @@ client cluster Channel = 1284 {
 
   response struct ChangeChannelResponse {
     ChannelInfo channelMatch = 0;
-    ErrorTypeEnum errorType = 1;
+    StatusEnum status = 1;
   }
 
   command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
@@ -1661,9 +1655,9 @@ client cluster FixedLabel = 64 {
 }
 
 client cluster FlowMeasurement = 1028 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
@@ -1691,8 +1685,8 @@ client cluster GeneralCommissioning = 48 {
 
   attribute int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
-  readonly attribute enum8 regulatoryConfig = 2;
-  readonly attribute enum8 locationCapability = 3;
+  readonly attribute RegulatoryLocationType regulatoryConfig = 2;
+  readonly attribute RegulatoryLocationType locationCapability = 3;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -2913,9 +2907,9 @@ client cluster PowerSourceConfiguration = 46 {
 }
 
 client cluster PressureMeasurement = 1027 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 }

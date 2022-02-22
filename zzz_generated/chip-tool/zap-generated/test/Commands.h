@@ -33,6 +33,7 @@ public:
     TestList() : Command("list"){};
     CHIP_ERROR Run() override
     {
+        printf("TestAccessControlCluster\n");
         printf("Test_TC_BI_1_1\n");
         printf("Test_TC_BI_2_1\n");
         printf("Test_TC_BI_2_2\n");
@@ -142,6 +143,10 @@ public:
         printf("Test_TC_WNCV_3_1\n");
         printf("Test_TC_WNCV_3_2\n");
         printf("Test_TC_WNCV_3_3\n");
+        printf("Test_TC_WNCV_3_4\n");
+        printf("Test_TC_WNCV_3_5\n");
+        printf("Test_TC_WNCV_4_3\n");
+        printf("Test_TC_WNCV_4_4\n");
         printf("TV_TargetNavigatorCluster\n");
         printf("TV_AudioOutputCluster\n");
         printf("TV_ApplicationLauncherCluster\n");
@@ -167,6 +172,7 @@ public:
         printf("TestOperationalCredentialsCluster\n");
         printf("TestModeSelectCluster\n");
         printf("TestSystemCommands\n");
+        printf("TestBinding\n");
         printf("Test_TC_SWDIAG_1_1\n");
         printf("Test_TC_SWDIAG_2_1\n");
         printf("Test_TC_SWDIAG_3_1\n");
@@ -195,14 +201,832 @@ public:
         printf("Test_TC_DD_1_8\n");
         printf("Test_TC_DD_1_9\n");
         printf("Test_TC_DD_1_10\n");
+        printf("Test_TC_DD_2_1\n");
+        printf("Test_TC_DD_2_2\n");
+        printf("Test_TC_DD_3_1\n");
+        printf("Test_TC_DD_3_2\n");
+        printf("Test_TC_DD_3_5\n");
+        printf("Test_TC_DD_3_6\n");
+        printf("Test_TC_DD_3_9\n");
+        printf("Test_TC_DD_3_10\n");
+        printf("Test_TC_DD_4_1\n");
         printf("TestGroupDemoCommand\n");
         printf("TestGroupDemoConfig\n");
         printf("Test_TC_BDX_1_1\n");
         printf("Test_TC_BDX_1_2\n");
+        printf("Test_TC_BDX_1_3\n");
+        printf("Test_TC_BDX_1_5\n");
+        printf("Test_TC_BDX_1_6\n");
         printf("Test_TC_BDX_2_1\n");
         printf("Test_TC_BDX_2_2\n");
+        printf("Test_TC_BDX_2_3\n");
+        printf("Test_TC_BDX_2_4\n");
+        printf("Test_TC_BDX_2_5\n");
+        printf("Test_TC_BR_1\n");
+        printf("Test_TC_BR_2\n");
+        printf("Test_TC_BR_3\n");
+        printf("Test_TC_BRAC_2_1\n");
+        printf("Test_TC_BRAC_2_2\n");
+        printf("Test_TC_DM_1_2\n");
+        printf("Test_TC_DM_2_3\n");
+        printf("Test_TC_DM_3_2\n");
+        printf("Test_TC_DIAG_LOG_1_1\n");
+        printf("Test_TC_DIAG_LOG_1_2\n");
+        printf("Test_TC_DIAG_LOG_1_3\n");
+        printf("Test_TC_DESC_1_1\n");
+        printf("Test_TC_ETHDIAG_1_2\n");
+        printf("Test_TC_GC_1_1\n");
+        printf("Test_TC_GC_1_2\n");
+        printf("Test_TC_GC_1_3\n");
+        printf("Test_TC_GENDIAG_1_1\n");
+        printf("Test_TC_GENDIAG_1_2\n");
+        printf("Test_TC_I_1_1\n");
+        printf("Test_TC_I_2_1\n");
+        printf("Test_TC_I_2_2\n");
+        printf("Test_TC_I_2_3\n");
+        printf("Test_TC_ILL_2_1\n");
+        printf("Test_TC_IDM_1_1\n");
+        printf("Test_TC_IDM_1_2\n");
+        printf("Test_TC_IDM_2_1\n");
+        printf("Test_TC_IDM_2_2\n");
+        printf("Test_TC_IDM_3_1\n");
+        printf("Test_TC_IDM_3_2\n");
+        printf("Test_TC_IDM_4_1\n");
+        printf("Test_TC_IDM_4_2\n");
+        printf("Test_TC_IDM_5_1\n");
+        printf("Test_TC_IDM_5_2\n");
+        printf("Test_TC_IDM_6_1\n");
+        printf("Test_TC_IDM_6_2\n");
+        printf("Test_TC_MC_3_12\n");
+        printf("Test_TC_MC_4_1\n");
+        printf("Test_TC_MC_8_2\n");
+        printf("Test_TC_MC_9_2\n");
+        printf("Test_TC_MC_10_1\n");
+        printf("Test_TC_MC_10_2\n");
+        printf("Test_TC_MC_10_3\n");
+        printf("Test_TC_MC_10_4\n");
+        printf("Test_TC_MC_10_5\n");
+        printf("Test_TC_MC_10_6\n");
+        printf("Test_TC_MF_1_1\n");
+        printf("Test_TC_MF_1_2\n");
+        printf("Test_TC_MF_1_3\n");
+        printf("Test_TC_MF_1_4\n");
+        printf("Test_TC_MF_1_5\n");
+        printf("Test_TC_MF_1_6\n");
+        printf("Test_TC_MF_1_7\n");
+        printf("Test_TC_MF_1_8\n");
+        printf("Test_TC_MF_1_9\n");
+        printf("Test_TC_MF_1_10\n");
+        printf("Test_TC_MF_1_11\n");
+        printf("Test_TC_MF_1_12\n");
+        printf("Test_TC_MF_1_13\n");
+        printf("Test_TC_MF_1_14\n");
+        printf("Test_TC_MF_1_15\n");
+        printf("Test_TC_MF_1_16\n");
+        printf("Test_TC_MF_1_17\n");
+        printf("Test_TC_MF_1_18\n");
+        printf("Test_TC_MF_1_19\n");
+        printf("Test_TC_MF_1_20\n");
+        printf("Test_TC_MF_1_21\n");
+        printf("Test_TC_MF_1_22\n");
+        printf("Test_TC_MF_1_23\n");
+        printf("Test_TC_MF_1_24\n");
+        printf("Test_TC_MOD_1_1\n");
+        printf("Test_TC_MOD_1_2\n");
+        printf("Test_TC_MOD_2_1\n");
+        printf("Test_TC_SU_1_1\n");
+        printf("Test_TC_SU_2_1\n");
+        printf("Test_TC_SU_2_2\n");
+        printf("Test_TC_SU_2_3\n");
+        printf("Test_TC_SU_2_4\n");
+        printf("Test_TC_SU_2_5\n");
+        printf("Test_TC_SU_2_6\n");
+        printf("Test_TC_SU_2_7\n");
+        printf("Test_TC_SU_3_1\n");
+        printf("Test_TC_SU_3_2\n");
+        printf("Test_TC_SU_3_3\n");
+        printf("Test_TC_SU_3_4\n");
+        printf("Test_TC_PSCFG_1_1\n");
+        printf("Test_TC_PSCFG_2_1\n");
+        printf("Test_TC_SC_4_5\n");
+        printf("Test_TC_SC_4_6\n");
+        printf("Test_TC_SC_4_7\n");
+        printf("Test_TC_SC_4_8\n");
+        printf("Test_TC_SC_4_9\n");
+        printf("Test_TC_SWDIAG_1_2\n");
+        printf("Test_TC_WIFIDIAG_1_2\n");
+        printf("Test_TC_WIFIDIAG_2_1\n");
+        printf("Test_TC_WNCV_2_3\n");
 
         return CHIP_NO_ERROR;
+    }
+};
+
+class TestAccessControlCluster : public TestCommand
+{
+public:
+    TestAccessControlCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestAccessControlCluster", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestAccessControlCluster() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestAccessControlCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestAccessControlCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for commissionee\n");
+            err = TestWaitForCommissionee_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Write three entries\n");
+            err = TestWriteThreeEntries_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read three entries\n");
+            err = TestReadThreeEntries_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Write two entries\n");
+            err = TestWriteTwoEntries_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read two entries\n");
+            err = TestReadTwoEntries_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Write one entry\n");
+            err = TestWriteOneEntry_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read one entry\n");
+            err = TestReadOneEntry_6();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 7;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context) { (static_cast<TestAccessControlCluster *>(context))->OnSuccessResponse_1(); }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnSuccessResponse_2(acl);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<TestAccessControlCluster *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnSuccessResponse_4(acl);
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context) { (static_cast<TestAccessControlCluster *>(context))->OnSuccessResponse_5(); }
+
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnFailureResponse_6(error);
+    }
+
+    static void OnSuccessCallback_6(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        (static_cast<TestAccessControlCluster *>(context))->OnSuccessResponse_6(acl);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForCommissionee_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR TestWriteThreeEntries_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(3);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<chip::app::Clusters::AccessControl::Structs::Target::Type>(3);
+                listFreer.add(listHolder_3);
+
+                listHolder_3->mList[0].cluster.SetNull();
+                listHolder_3->mList[0].endpoint.SetNonNull();
+                listHolder_3->mList[0].endpoint.Value() = 0U;
+                listHolder_3->mList[0].deviceType.SetNull();
+
+                listHolder_3->mList[1].cluster.SetNonNull();
+                listHolder_3->mList[1].cluster.Value() = 1UL;
+                listHolder_3->mList[1].endpoint.SetNull();
+                listHolder_3->mList[1].deviceType.SetNull();
+
+                listHolder_3->mList[2].cluster.SetNonNull();
+                listHolder_3->mList[2].cluster.Value() = 2UL;
+                listHolder_3->mList[2].endpoint.SetNonNull();
+                listHolder_3->mList[2].endpoint.Value() = 3U;
+                listHolder_3->mList[2].deviceType.SetNull();
+
+                listHolder_0->mList[0].targets.Value() =
+                    chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 3);
+            }
+
+            listHolder_0->mList[1].fabricIndex = 0;
+            listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
+            listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[1].subjects.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<uint64_t>(4);
+                listFreer.add(listHolder_3);
+                listHolder_3->mList[0]                  = 1234ULL;
+                listHolder_3->mList[1]                  = 5678ULL;
+                listHolder_3->mList[2]                  = 32896ULL;
+                listHolder_3->mList[3]                  = 65535ULL;
+                listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 4);
+            }
+            listHolder_0->mList[1].targets.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<chip::app::Clusters::AccessControl::Structs::Target::Type>(3);
+                listFreer.add(listHolder_3);
+
+                listHolder_3->mList[0].cluster.SetNull();
+                listHolder_3->mList[0].endpoint.SetNonNull();
+                listHolder_3->mList[0].endpoint.Value() = 1U;
+                listHolder_3->mList[0].deviceType.SetNull();
+
+                listHolder_3->mList[1].cluster.SetNonNull();
+                listHolder_3->mList[1].cluster.Value() = 2UL;
+                listHolder_3->mList[1].endpoint.SetNull();
+                listHolder_3->mList[1].deviceType.SetNull();
+
+                listHolder_3->mList[2].cluster.SetNonNull();
+                listHolder_3->mList[2].cluster.Value() = 3UL;
+                listHolder_3->mList[2].endpoint.SetNonNull();
+                listHolder_3->mList[2].endpoint.Value() = 4U;
+                listHolder_3->mList[2].deviceType.SetNull();
+
+                listHolder_0->mList[1].targets.Value() =
+                    chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 3);
+            }
+
+            listHolder_0->mList[2].fabricIndex = 0;
+            listHolder_0->mList[2].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
+            listHolder_0->mList[2].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
+            listHolder_0->mList[2].subjects.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<uint64_t>(4);
+                listFreer.add(listHolder_3);
+                listHolder_3->mList[0]                  = 257ULL;
+                listHolder_3->mList[1]                  = 258ULL;
+                listHolder_3->mList[2]                  = 43690ULL;
+                listHolder_3->mList[3]                  = 48059ULL;
+                listHolder_0->mList[2].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 4);
+            }
+            listHolder_0->mList[2].targets.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<chip::app::Clusters::AccessControl::Structs::Target::Type>(3);
+                listFreer.add(listHolder_3);
+
+                listHolder_3->mList[0].cluster.SetNull();
+                listHolder_3->mList[0].endpoint.SetNonNull();
+                listHolder_3->mList[0].endpoint.Value() = 2U;
+                listHolder_3->mList[0].deviceType.SetNull();
+
+                listHolder_3->mList[1].cluster.SetNonNull();
+                listHolder_3->mList[1].cluster.Value() = 3UL;
+                listHolder_3->mList[1].endpoint.SetNull();
+                listHolder_3->mList[1].deviceType.SetNull();
+
+                listHolder_3->mList[2].cluster.SetNonNull();
+                listHolder_3->mList[2].cluster.Value() = 4UL;
+                listHolder_3->mList[2].endpoint.SetNonNull();
+                listHolder_3->mList[2].endpoint.Value() = 5U;
+                listHolder_3->mList[2].deviceType.SetNull();
+
+                listHolder_0->mList[2].targets.Value() =
+                    chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 3);
+            }
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 3);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR TestReadThreeEntries_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        {
+            auto iter_0 = acl.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 0));
+            VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
+            VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNonNull("acl[0].targets", iter_0.GetValue().targets));
+            {
+                auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 0));
+                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValue("acl[0].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 0U));
+                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 1));
+                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValue("acl[0].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 1UL));
+                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 2));
+                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValue("acl[0].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 2UL));
+                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValue("acl[0].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 3U));
+                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 3));
+            }
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 1));
+            VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[1].privilege", iter_0.GetValue().privilege, 1));
+            VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNonNull("acl[1].subjects", iter_0.GetValue().subjects));
+            {
+                auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 0));
+                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_NaN.GetValue(), 1234ULL));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 1));
+                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_NaN.GetValue(), 5678ULL));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 2));
+                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[2]", iter_NaN.GetValue(), 32896ULL));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 3));
+                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[3]", iter_NaN.GetValue(), 65535ULL));
+                VerifyOrReturn(
+                    CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 4));
+            }
+            VerifyOrReturn(CheckValueNonNull("acl[1].targets", iter_0.GetValue().targets));
+            {
+                auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 0));
+                VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 1));
+                VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValue("acl[1].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 2UL));
+                VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 2));
+                VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValue("acl[1].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 3UL));
+                VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValue("acl[1].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 4U));
+                VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 3));
+            }
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 2));
+            VerifyOrReturn(CheckValue("acl[2].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[2].privilege", iter_0.GetValue().privilege, 3));
+            VerifyOrReturn(CheckValue("acl[2].authMode", iter_0.GetValue().authMode, 3));
+            VerifyOrReturn(CheckValueNonNull("acl[2].subjects", iter_0.GetValue().subjects));
+            {
+                auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()", iter_NaN, 0));
+                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[0]", iter_NaN.GetValue(), 257ULL));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()", iter_NaN, 1));
+                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[1]", iter_NaN.GetValue(), 258ULL));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()", iter_NaN, 2));
+                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[2]", iter_NaN.GetValue(), 43690ULL));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()", iter_NaN, 3));
+                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[3]", iter_NaN.GetValue(), 48059ULL));
+                VerifyOrReturn(
+                    CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()", iter_NaN, 4));
+            }
+            VerifyOrReturn(CheckValueNonNull("acl[2].targets", iter_0.GetValue().targets));
+            {
+                auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_NaN, 0));
+                VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValue("acl[2].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 2U));
+                VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_NaN, 1));
+                VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValue("acl[2].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 3UL));
+                VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_NaN, 2));
+                VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValue("acl[2].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 4UL));
+                VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValue("acl[2].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 5U));
+                VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_NaN, 3));
+            }
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 3));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTwoEntries_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<chip::app::Clusters::AccessControl::Structs::Target::Type>(3);
+                listFreer.add(listHolder_3);
+
+                listHolder_3->mList[0].cluster.SetNull();
+                listHolder_3->mList[0].endpoint.SetNonNull();
+                listHolder_3->mList[0].endpoint.Value() = 0U;
+                listHolder_3->mList[0].deviceType.SetNull();
+
+                listHolder_3->mList[1].cluster.SetNonNull();
+                listHolder_3->mList[1].cluster.Value() = 1UL;
+                listHolder_3->mList[1].endpoint.SetNull();
+                listHolder_3->mList[1].deviceType.SetNull();
+
+                listHolder_3->mList[2].cluster.SetNonNull();
+                listHolder_3->mList[2].cluster.Value() = 2UL;
+                listHolder_3->mList[2].endpoint.SetNonNull();
+                listHolder_3->mList[2].endpoint.Value() = 3U;
+                listHolder_3->mList[2].deviceType.SetNull();
+
+                listHolder_0->mList[0].targets.Value() =
+                    chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 3);
+            }
+
+            listHolder_0->mList[1].fabricIndex = 0;
+            listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
+            listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[1].subjects.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<uint64_t>(2);
+                listFreer.add(listHolder_3);
+                listHolder_3->mList[0]                  = 52428ULL;
+                listHolder_3->mList[1]                  = 56797ULL;
+                listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 2);
+            }
+            listHolder_0->mList[1].targets.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<chip::app::Clusters::AccessControl::Structs::Target::Type>(1);
+                listFreer.add(listHolder_3);
+
+                listHolder_3->mList[0].cluster.SetNonNull();
+                listHolder_3->mList[0].cluster.Value() = 5UL;
+                listHolder_3->mList[0].endpoint.SetNonNull();
+                listHolder_3->mList[0].endpoint.Value() = 6U;
+                listHolder_3->mList[0].deviceType.SetNull();
+
+                listHolder_0->mList[1].targets.Value() =
+                    chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 1);
+            }
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 2);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3() { NextTest(); }
+
+    CHIP_ERROR TestReadTwoEntries_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        {
+            auto iter_0 = acl.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 0));
+            VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
+            VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNonNull("acl[0].targets", iter_0.GetValue().targets));
+            {
+                auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 0));
+                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValue("acl[0].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 0U));
+                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 1));
+                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValue("acl[0].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 1UL));
+                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 2));
+                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValue("acl[0].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 2UL));
+                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValue("acl[0].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 3U));
+                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 3));
+            }
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 1));
+            VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[1].privilege", iter_0.GetValue().privilege, 1));
+            VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNonNull("acl[1].subjects", iter_0.GetValue().subjects));
+            {
+                auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 0));
+                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_NaN.GetValue(), 52428ULL));
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 1));
+                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_NaN.GetValue(), 56797ULL));
+                VerifyOrReturn(
+                    CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 2));
+            }
+            VerifyOrReturn(CheckValueNonNull("acl[1].targets", iter_0.GetValue().targets));
+            {
+                auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                VerifyOrReturn(
+                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 0));
+                VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
+                VerifyOrReturn(CheckValue("acl[1].targets.Value()[0].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 5UL));
+                VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                VerifyOrReturn(CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 6U));
+                VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                VerifyOrReturn(
+                    CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 1));
+            }
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 2));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteOneEntry_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(1);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 1);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestReadOneEntry_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        {
+            auto iter_0 = acl.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 0));
+            VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
+            VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 1));
+        }
+
+        NextTest();
     }
 };
 
@@ -20697,7 +21521,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_1(measuredValue);
     }
@@ -20707,7 +21531,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, int16_t minMeasuredValue)
+    static void OnSuccessCallback_2(void * context, const chip::app::DataModel::Nullable<uint16_t> & minMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_2(minMeasuredValue);
     }
@@ -20717,7 +21541,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, int16_t maxMeasuredValue)
+    static void OnSuccessCallback_3(void * context, const chip::app::DataModel::Nullable<uint16_t> & maxMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_3(maxMeasuredValue);
     }
@@ -20748,7 +21572,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_7(void * context, const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_7(measuredValue);
     }
@@ -20758,7 +21582,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context, int16_t minMeasuredValue)
+    static void OnSuccessCallback_8(void * context, const chip::app::DataModel::Nullable<uint16_t> & minMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_8(minMeasuredValue);
     }
@@ -20768,7 +21592,7 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context, int16_t maxMeasuredValue)
+    static void OnSuccessCallback_9(void * context, const chip::app::DataModel::Nullable<uint16_t> & maxMeasuredValue)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_9(maxMeasuredValue);
     }
@@ -20839,7 +21663,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(int16_t measuredValue)
+    void OnSuccessResponse_1(const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -20864,7 +21688,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(int16_t minMeasuredValue)
+    void OnSuccessResponse_2(const chip::app::DataModel::Nullable<uint16_t> & minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
         NextTest();
@@ -20889,7 +21713,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(int16_t maxMeasuredValue)
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<uint16_t> & maxMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "uint16"));
         NextTest();
@@ -20902,8 +21726,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t measuredValueArgument;
-        measuredValueArgument = 0;
+        chip::app::DataModel::Nullable<uint16_t> measuredValueArgument;
+        measuredValueArgument.SetNonNull();
+        measuredValueArgument.Value() = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
             measuredValueArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
@@ -20926,8 +21751,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t minMeasuredValueArgument;
-        minMeasuredValueArgument = 0;
+        chip::app::DataModel::Nullable<uint16_t> minMeasuredValueArgument;
+        minMeasuredValueArgument.SetNonNull();
+        minMeasuredValueArgument.Value() = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             minMeasuredValueArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
@@ -20950,8 +21776,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t maxMeasuredValueArgument;
-        maxMeasuredValueArgument = 0;
+        chip::app::DataModel::Nullable<uint16_t> maxMeasuredValueArgument;
+        maxMeasuredValueArgument.SetNonNull();
+        maxMeasuredValueArgument.Value() = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
             maxMeasuredValueArgument, this, OnSuccessCallback_6, OnFailureCallback_6));
@@ -20986,7 +21813,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(int16_t measuredValue)
+    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -21011,7 +21838,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8(int16_t minMeasuredValue)
+    void OnSuccessResponse_8(const chip::app::DataModel::Nullable<uint16_t> & minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
         NextTest();
@@ -21036,7 +21863,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9(int16_t maxMeasuredValue)
+    void OnSuccessResponse_9(const chip::app::DataModel::Nullable<uint16_t> & maxMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "uint16"));
         NextTest();
@@ -21225,7 +22052,7 @@ private:
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnSuccessResponse_1(measuredValue);
     }
@@ -21235,7 +22062,7 @@ private:
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_2(void * context, const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnSuccessResponse_2(measuredValue);
     }
@@ -21269,7 +22096,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(int16_t measuredValue)
+    void OnSuccessResponse_1(const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -21294,7 +22121,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(int16_t measuredValue)
+    void OnSuccessResponse_2(const chip::app::DataModel::Nullable<uint16_t> & measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
@@ -33010,7 +33837,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::Nullable<int16_t> & measuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_1(measuredValue);
     }
@@ -33027,7 +33854,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, int16_t measuredValue)
+    static void OnSuccessCallback_3(void * context, const chip::app::DataModel::Nullable<int16_t> & measuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_3(measuredValue);
     }
@@ -33037,7 +33864,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context, int16_t minMeasuredValue)
+    static void OnSuccessCallback_4(void * context, const chip::app::DataModel::Nullable<int16_t> & minMeasuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_4(minMeasuredValue);
     }
@@ -33054,7 +33881,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, int16_t minMeasuredValue)
+    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::Nullable<int16_t> & minMeasuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_6(minMeasuredValue);
     }
@@ -33064,7 +33891,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context, int16_t maxMeasuredValue)
+    static void OnSuccessCallback_7(void * context, const chip::app::DataModel::Nullable<int16_t> & maxMeasuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_7(maxMeasuredValue);
     }
@@ -33081,7 +33908,7 @@ private:
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context, int16_t maxMeasuredValue)
+    static void OnSuccessCallback_9(void * context, const chip::app::DataModel::Nullable<int16_t> & maxMeasuredValue)
     {
         (static_cast<Test_TC_PRS_2_1 *>(context))->OnSuccessResponse_9(maxMeasuredValue);
     }
@@ -33115,7 +33942,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(int16_t measuredValue)
+    void OnSuccessResponse_1(const chip::app::DataModel::Nullable<int16_t> & measuredValue)
     {
         VerifyOrReturn(CheckConstraintType("measuredValue", "", "int16"));
         NextTest();
@@ -33128,8 +33955,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t measuredValueArgument;
-        measuredValueArgument = 0;
+        chip::app::DataModel::Nullable<int16_t> measuredValueArgument;
+        measuredValueArgument.SetNonNull();
+        measuredValueArgument.Value() = 0;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo>(
             measuredValueArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
@@ -33164,9 +33992,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(int16_t measuredValue)
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<int16_t> & measuredValue)
     {
-        VerifyOrReturn(CheckValue("measuredValue", measuredValue, 0));
+        VerifyOrReturn(CheckValueNonNull("measuredValue", measuredValue));
+        VerifyOrReturn(CheckValue("measuredValue.Value()", measuredValue.Value(), 0));
 
         NextTest();
     }
@@ -33191,7 +34020,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(int16_t minMeasuredValue)
+    void OnSuccessResponse_4(const chip::app::DataModel::Nullable<int16_t> & minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "int16"));
         NextTest();
@@ -33204,8 +34033,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t minMeasuredValueArgument;
-        minMeasuredValueArgument = 0;
+        chip::app::DataModel::Nullable<int16_t> minMeasuredValueArgument;
+        minMeasuredValueArgument.SetNonNull();
+        minMeasuredValueArgument.Value() = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
@@ -33242,9 +34072,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(int16_t minMeasuredValue)
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<int16_t> & minMeasuredValue)
     {
-        VerifyOrReturn(CheckValue("minMeasuredValue", minMeasuredValue, 0));
+        VerifyOrReturn(CheckValueNonNull("minMeasuredValue", minMeasuredValue));
+        VerifyOrReturn(CheckValue("minMeasuredValue.Value()", minMeasuredValue.Value(), 0));
 
         NextTest();
     }
@@ -33269,7 +34100,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(int16_t maxMeasuredValue)
+    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<int16_t> & maxMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "int16"));
         NextTest();
@@ -33282,8 +34113,9 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        int16_t maxMeasuredValueArgument;
-        maxMeasuredValueArgument = 0;
+        chip::app::DataModel::Nullable<int16_t> maxMeasuredValueArgument;
+        maxMeasuredValueArgument.SetNonNull();
+        maxMeasuredValueArgument.Value() = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
@@ -33320,9 +34152,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9(int16_t maxMeasuredValue)
+    void OnSuccessResponse_9(const chip::app::DataModel::Nullable<int16_t> & maxMeasuredValue)
     {
-        VerifyOrReturn(CheckValue("maxMeasuredValue", maxMeasuredValue, 0));
+        VerifyOrReturn(CheckValueNonNull("maxMeasuredValue", maxMeasuredValue));
+        VerifyOrReturn(CheckValue("maxMeasuredValue.Value()", maxMeasuredValue.Value(), 0));
 
         NextTest();
     }
@@ -50385,6 +51218,1341 @@ private:
     }
 };
 
+class Test_TC_WNCV_3_4 : public TestCommand
+{
+public:
+    Test_TC_WNCV_3_4(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_4", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("fastMotionDuration", 0, UINT16_MAX, &mFastMotionDuration);
+        AddArgument("fullMotionDuration", 0, UINT16_MAX, &mFullMotionDuration);
+    }
+
+    ~Test_TC_WNCV_3_4() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_3_4\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_3_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 0: Wait for the commissioned device to be retrieved\n");
+            err = Test0WaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 1 : 1a: TH sends DownOrClose command to preposition the DUT in the opposite direction\n");
+            err = Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 2 : 1b: TH Waits for fastMotionDuration seconds movement(s) on the device\n");
+            err = Test1bThWaitsForFastMotionDurationSecondsMovementsOnTheDevice_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : 2a: TH sends UpOrOpen command to DUT\n");
+            err = Test2aThSendsUpOrOpenCommandToDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 4 : 2b: TH Waits for fullMotionDuration seconds movement(s) on the device\n");
+            err = Test2bThWaitsForFullMotionDurationSecondsMovementsOnTheDevice_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 5 : 3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3aIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_5();
+            break;
+        case 6:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 6 : 3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3bIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 7 : 3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3cIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_7();
+            break;
+        case 8:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 8 : 3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3dIfPaTlThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_8();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 9;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mFastMotionDuration;
+    chip::Optional<uint16_t> mFullMotionDuration;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_4 *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_4 *>(context))->OnSuccessResponse_5(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_4 *>(context))->OnFailureResponse_6(error);
+    }
+
+    static void OnSuccessCallback_6(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_4 *>(context))->OnSuccessResponse_6(currentPositionLiftPercentage);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_4 *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_4 *>(context))->OnSuccessResponse_7(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_4 *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_4 *>(context))->OnSuccessResponse_8(currentPositionTiltPercentage);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_3_4 *>(context))->OnSuccessResponse_1();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_3_4 *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR Test1bThWaitsForFastMotionDurationSecondsMovementsOnTheDevice_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(mFastMotionDuration.HasValue() ? mFastMotionDuration.Value() : 3000U);
+    }
+
+    CHIP_ERROR Test2aThSendsUpOrOpenCommandToDut_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_3_4 *>(context))->OnSuccessResponse_3();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_3_4 *>(context))->OnFailureResponse_3(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3() { NextTest(); }
+
+    CHIP_ERROR Test2bThWaitsForFullMotionDurationSecondsMovementsOnTheDevice_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+    }
+
+    CHIP_ERROR Test3aIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_5, OnFailureCallback_5, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckValueNonNull("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths));
+        VerifyOrReturn(CheckValue("currentPositionLiftPercent100ths.Value()", currentPositionLiftPercent100ths.Value(), 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test3bIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        VerifyOrReturn(CheckValueNonNull("currentPositionLiftPercentage", currentPositionLiftPercentage));
+        VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", currentPositionLiftPercentage.Value(), 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test3cIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_7, OnFailureCallback_7, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckValueNonNull("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths));
+        VerifyOrReturn(CheckValue("currentPositionTiltPercent100ths.Value()", currentPositionTiltPercent100ths.Value(), 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test3dIfPaTlThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+                this, OnSuccessCallback_8, OnFailureCallback_8, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        VerifyOrReturn(CheckValueNonNull("currentPositionTiltPercentage", currentPositionTiltPercentage));
+        VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", currentPositionTiltPercentage.Value(), 0));
+
+        NextTest();
+    }
+};
+
+class Test_TC_WNCV_3_5 : public TestCommand
+{
+public:
+    Test_TC_WNCV_3_5(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("fastMotionDuration", 0, UINT16_MAX, &mFastMotionDuration);
+        AddArgument("fullMotionDuration", 0, UINT16_MAX, &mFullMotionDuration);
+    }
+
+    ~Test_TC_WNCV_3_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_3_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_3_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 0: Wait for the commissioned device to be retrieved\n");
+            err = Test0WaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 1 : 1a: TH sends UpOrOpen command to preposition the DUT in the opposite direction\n");
+            err = Test1aThSendsUpOrOpenCommandToPrepositionTheDutInTheOppositeDirection_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 2 : 1b: TH Waits for fastMotionDuration seconds movement(s) on the device\n");
+            err = Test1bThWaitsForFastMotionDurationSecondsMovementsOnTheDevice_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : 2a: TH sends DownOrClose command to DUT\n");
+            err = Test2aThSendsDownOrCloseCommandToDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 4 : 2b: TH Waits for fullMotionDuration seconds movement(s) on the device\n");
+            err = Test2bThWaitsForFullMotionDurationSecondsMovementsOnTheDevice_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 5 : 3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3aIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_5();
+            break;
+        case 6:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 6 : 3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3bIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 7 : 3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3cIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_7();
+            break;
+        case 8:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 8 : 3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3dIfPaTlThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_8();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 9;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mFastMotionDuration;
+    chip::Optional<uint16_t> mFullMotionDuration;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_5 *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_5 *>(context))->OnSuccessResponse_5(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_5 *>(context))->OnFailureResponse_6(error);
+    }
+
+    static void OnSuccessCallback_6(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_5 *>(context))->OnSuccessResponse_6(currentPositionLiftPercentage);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_5 *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_5 *>(context))->OnSuccessResponse_7(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_5 *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_5 *>(context))->OnSuccessResponse_8(currentPositionTiltPercentage);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR Test1aThSendsUpOrOpenCommandToPrepositionTheDutInTheOppositeDirection_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_3_5 *>(context))->OnSuccessResponse_1();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_3_5 *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR Test1bThWaitsForFastMotionDurationSecondsMovementsOnTheDevice_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(mFastMotionDuration.HasValue() ? mFastMotionDuration.Value() : 3000U);
+    }
+
+    CHIP_ERROR Test2aThSendsDownOrCloseCommandToDut_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_3_5 *>(context))->OnSuccessResponse_3();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_3_5 *>(context))->OnFailureResponse_3(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3() { NextTest(); }
+
+    CHIP_ERROR Test2bThWaitsForFullMotionDurationSecondsMovementsOnTheDevice_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+    }
+
+    CHIP_ERROR Test3aIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_5, OnFailureCallback_5, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckValueNonNull("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths));
+        VerifyOrReturn(CheckValue("currentPositionLiftPercent100ths.Value()", currentPositionLiftPercent100ths.Value(), 10000U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test3bIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        VerifyOrReturn(CheckValueNonNull("currentPositionLiftPercentage", currentPositionLiftPercentage));
+        VerifyOrReturn(CheckValue("currentPositionLiftPercentage.Value()", currentPositionLiftPercentage.Value(), 100));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test3cIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_7, OnFailureCallback_7, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckValueNonNull("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths));
+        VerifyOrReturn(CheckValue("currentPositionTiltPercent100ths.Value()", currentPositionTiltPercent100ths.Value(), 10000U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test3dIfPaTlThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+                this, OnSuccessCallback_8, OnFailureCallback_8, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        VerifyOrReturn(CheckValueNonNull("currentPositionTiltPercentage", currentPositionTiltPercentage));
+        VerifyOrReturn(CheckValue("currentPositionTiltPercentage.Value()", currentPositionTiltPercentage.Value(), 100));
+
+        NextTest();
+    }
+};
+
+class Test_TC_WNCV_4_3 : public TestCommand
+{
+public:
+    Test_TC_WNCV_4_3(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_4_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_WNCV_4_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_4_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_4_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 0: Wait for the commissioned device to be retrieved\n");
+            err = Test0WaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 1 : 1a: If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1aIfPaLfLfThReadsCurrentPositionLiftPercent100thsFromDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 1b: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1bIfPaLfLfThReadsCurrentPositionLiftPercentageFromDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : 2b: TH sends GoToLiftPercentage command with BadParam to DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test2bThSendsGoToLiftPercentageCommandWithBadParamToDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : 3a: TH sends GoToLiftPercentage command with 10001 to DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3aThSendsGoToLiftPercentageCommandWith10001ToDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : 4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test4aThSendsGoToLiftPercentageCommandWith0xFFFFToDut_5();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 6;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    chip::app::DataModel::Nullable<chip::Percent100ths> attrCurrentPositionLiftPercent100ths;
+    chip::app::DataModel::Nullable<chip::Percent> attrCurrentPositionLiftPercentage;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_3 *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_4_3 *>(context))->OnSuccessResponse_1(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_3 *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        (static_cast<Test_TC_WNCV_4_3 *>(context))->OnSuccessResponse_2(currentPositionLiftPercentage);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR Test1aIfPaLfLfThReadsCurrentPositionLiftPercent100thsFromDut_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
+                                                                    currentPositionLiftPercent100ths, 10000U));
+        attrCurrentPositionLiftPercent100ths = currentPositionLiftPercent100ths;
+        NextTest();
+    }
+
+    CHIP_ERROR Test1bIfPaLfLfThReadsCurrentPositionLiftPercentageFromDut_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
+        attrCurrentPositionLiftPercentage = currentPositionLiftPercentage;
+        NextTest();
+    }
+
+    CHIP_ERROR Test2bThSendsGoToLiftPercentageCommandWithBadParamToDut_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.liftPercentageValue    = 63;
+        request.liftPercent100thsValue = 12288U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_3 *>(context))->OnSuccessResponse_3();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_3 *>(context))->OnFailureResponse_3(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3aThSendsGoToLiftPercentageCommandWith10001ToDut_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.liftPercentageValue    = 100;
+        request.liftPercent100thsValue = 10001U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_3 *>(context))->OnSuccessResponse_4();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_3 *>(context))->OnFailureResponse_4(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test4aThSendsGoToLiftPercentageCommandWith0xFFFFToDut_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.liftPercentageValue    = 255;
+        request.liftPercent100thsValue = 65535U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_3 *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_3 *>(context))->OnFailureResponse_5(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
+};
+
+class Test_TC_WNCV_4_4 : public TestCommand
+{
+public:
+    Test_TC_WNCV_4_4(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_4_4", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_WNCV_4_4() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_4_4\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_4_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 0: Wait for the commissioned device to be retrieved\n");
+            err = Test0WaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 1 : 1a: If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1aIfPaTlTlThReadsCurrentPositionTiltPercent100thsFromDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 1b: If (PA_TL & TL) TH reads CurrentPositionTiltPercentage from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1bIfPaTlTlThReadsCurrentPositionTiltPercentageFromDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : 2b: TH sends GoToTiltPercentage command with BadParam to DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test2bThSendsGoToTiltPercentageCommandWithBadParamToDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : 3a: TH sends GoToTiltPercentage command with 10001 to DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3aThSendsGoToTiltPercentageCommandWith10001ToDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : 4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test4aThSendsGoToTiltPercentageCommandWith0xFFFFToDut_5();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 6;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    chip::app::DataModel::Nullable<chip::Percent100ths> attrCurrentPositionTiltPercent100ths;
+    chip::app::DataModel::Nullable<chip::Percent> attrCurrentPositionTiltPercentage;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_4 *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_4_4 *>(context))->OnSuccessResponse_1(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_4 *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        (static_cast<Test_TC_WNCV_4_4 *>(context))->OnSuccessResponse_2(currentPositionTiltPercentage);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR Test1aIfPaTlTlThReadsCurrentPositionTiltPercent100thsFromDut_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_1, OnFailureCallback_1, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
+                                                                    currentPositionTiltPercent100ths, 10000U));
+        attrCurrentPositionTiltPercent100ths = currentPositionTiltPercent100ths;
+        NextTest();
+    }
+
+    CHIP_ERROR Test1bIfPaTlTlThReadsCurrentPositionTiltPercentageFromDut_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
+        attrCurrentPositionTiltPercentage = currentPositionTiltPercentage;
+        NextTest();
+    }
+
+    CHIP_ERROR Test2bThSendsGoToTiltPercentageCommandWithBadParamToDut_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.tiltPercentageValue    = 63;
+        request.tiltPercent100thsValue = 12288U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_4 *>(context))->OnSuccessResponse_3();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_4 *>(context))->OnFailureResponse_3(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test3aThSendsGoToTiltPercentageCommandWith10001ToDut_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.tiltPercentageValue    = 100;
+        request.tiltPercent100thsValue = 10001U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_4 *>(context))->OnSuccessResponse_4();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_4 *>(context))->OnFailureResponse_4(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR Test4aThSendsGoToTiltPercentageCommandWith0xFFFFToDut_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.tiltPercentageValue    = 255;
+        request.tiltPercent100thsValue = 65535U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_4 *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_4 *>(context))->OnFailureResponse_5(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
+};
+
 class TV_TargetNavigatorCluster : public TestCommand
 {
 public:
@@ -50658,6 +52826,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Rename Output Command\n");
             err = TestRenameOutputCommand_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read attribute Audio Output list\n");
+            err = TestReadAttributeAudioOutputList_5();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -50669,7 +52841,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 6;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -50704,6 +52876,19 @@ private:
     static void OnSuccessCallback_2(void * context, uint8_t currentOutput)
     {
         (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_2(currentOutput);
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &
+            outputList)
+    {
+        (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_5(outputList);
     }
 
     //
@@ -50744,15 +52929,15 @@ private:
             VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 0));
             VerifyOrReturn(CheckValue("outputList[0].index", iter_0.GetValue().index, 1));
             VerifyOrReturn(CheckValue("outputList[0].outputType", iter_0.GetValue().outputType, 0));
-            VerifyOrReturn(CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 1));
             VerifyOrReturn(CheckValue("outputList[1].index", iter_0.GetValue().index, 2));
             VerifyOrReturn(CheckValue("outputList[1].outputType", iter_0.GetValue().outputType, 0));
-            VerifyOrReturn(CheckValueAsString("outputList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("outputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 2));
             VerifyOrReturn(CheckValue("outputList[2].index", iter_0.GetValue().index, 3));
             VerifyOrReturn(CheckValue("outputList[2].outputType", iter_0.GetValue().outputType, 0));
-            VerifyOrReturn(CheckValueAsString("outputList[2].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("outputList[2].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
             VerifyOrReturn(CheckNoMoreListItems<decltype(outputList)>("outputList", iter_0, 3));
         }
 
@@ -50780,7 +52965,7 @@ private:
 
     void OnSuccessResponse_2(uint8_t currentOutput)
     {
-        VerifyOrReturn(CheckValue("currentOutput", currentOutput, 0));
+        VerifyOrReturn(CheckValue("currentOutput", currentOutput, 1));
 
         NextTest();
     }
@@ -50822,7 +53007,7 @@ private:
         ListFreer listFreer;
         RequestType request;
         request.index = 1;
-        request.name  = chip::Span<const char>("exampleNamegarbage: not in length on purpose", 11);
+        request.name  = chip::Span<const char>("HDMI Testgarbage: not in length on purpose", 9);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_4();
@@ -50843,6 +53028,49 @@ private:
     }
 
     void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeAudioOutputList_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 2;
+        chip::Controller::AudioOutputClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::OutputList::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &
+            outputList)
+    {
+        {
+            auto iter_0 = outputList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 0));
+            VerifyOrReturn(CheckValue("outputList[0].index", iter_0.GetValue().index, 1));
+            VerifyOrReturn(CheckValue("outputList[0].outputType", iter_0.GetValue().outputType, 0));
+            VerifyOrReturn(CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI Test", 9)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 1));
+            VerifyOrReturn(CheckValue("outputList[1].index", iter_0.GetValue().index, 2));
+            VerifyOrReturn(CheckValue("outputList[1].outputType", iter_0.GetValue().outputType, 0));
+            VerifyOrReturn(CheckValueAsString("outputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 2));
+            VerifyOrReturn(CheckValue("outputList[2].index", iter_0.GetValue().index, 3));
+            VerifyOrReturn(CheckValue("outputList[2].outputType", iter_0.GetValue().outputType, 0));
+            VerifyOrReturn(CheckValueAsString("outputList[2].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(outputList)>("outputList", iter_0, 3));
+        }
+
+        NextTest();
+    }
 };
 
 class TV_ApplicationLauncherCluster : public TestCommand
@@ -50892,16 +53120,20 @@ public:
             err = TestReadAttributeApplicationLauncherList_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Launch App Command\n");
-            err = TestLaunchAppCommand_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read attribute application launcher app\n");
+            err = TestReadAttributeApplicationLauncherApp_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Stop App Command\n");
-            err = TestStopAppCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Launch App Command\n");
+            err = TestLaunchAppCommand_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Hide App Command\n");
-            err = TestHideAppCommand_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Stop App Command\n");
+            err = TestStopAppCommand_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Hide App Command\n");
+            err = TestHideAppCommand_5();
             break;
         }
 
@@ -50914,7 +53146,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 6;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -50936,6 +53168,19 @@ private:
     static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<uint16_t> & catalogList)
     {
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_1(catalogList);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &
+            currentApp)
+    {
+        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(currentApp);
     }
 
     //
@@ -50981,7 +53226,35 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestLaunchAppCommand_2()
+    CHIP_ERROR TestReadAttributeApplicationLauncherApp_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ApplicationLauncherClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &
+            currentApp)
+    {
+        VerifyOrReturn(CheckValueNull("currentApp", currentApp));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestLaunchAppCommand_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
@@ -50994,44 +53267,6 @@ private:
 
         request.data.Emplace();
         request.data.Value() = chip::ByteSpan(chip::Uint8::from_const_char("datagarbage: not in length on purpose"), 4);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(data.status, data.data);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_2(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestStopAppCommand_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type;
-
-        ListFreer listFreer;
-        RequestType request;
-
-        request.application.catalogVendorId = 123U;
-        request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_3(data.status, data.data);
@@ -51060,10 +53295,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestHideAppCommand_4()
+    CHIP_ERROR TestStopAppCommand_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type;
+        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -51090,6 +53325,44 @@ private:
     }
 
     void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestHideAppCommand_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+
+        request.application.catalogVendorId = 123U;
+        request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_5(data.status, data.data);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_5(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
@@ -51581,8 +53854,16 @@ public:
             err = TestReadAttributeApplicationStatus_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute application version\n");
-            err = TestReadAttributeApplicationVersion_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute application status\n");
+            err = TestReadAttributeApplicationStatus_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read attribute application version\n");
+            err = TestReadAttributeApplicationVersion_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read attribute application allowed vendor list\n");
+            err = TestReadAttributeApplicationAllowedVendorList_8();
             break;
         }
 
@@ -51595,7 +53876,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 9;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -51664,9 +53945,31 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, chip::CharSpan applicationVersion)
+    static void OnSuccessCallback_6(
+        void * context,
+        const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & application)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_6(applicationVersion);
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_6(application);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context, chip::CharSpan applicationVersion)
+    {
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_7(applicationVersion);
+    }
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & allowedVendorList)
+    {
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_8(allowedVendorList);
     }
 
     //
@@ -51809,7 +54112,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeApplicationVersion_6()
+    CHIP_ERROR TestReadAttributeApplicationStatus_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
@@ -51817,7 +54120,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
@@ -51828,9 +54131,71 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(chip::CharSpan applicationVersion)
+    void OnSuccessResponse_6(
+        const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & application)
+    {
+        VerifyOrReturn(CheckValue("application.catalogVendorId", application.catalogVendorId, 123U));
+        VerifyOrReturn(
+            CheckValueAsString("application.applicationId", application.applicationId, chip::CharSpan("applicationId", 13)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeApplicationVersion_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        chip::Controller::ApplicationBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(chip::CharSpan applicationVersion)
     {
         VerifyOrReturn(CheckValueAsString("applicationVersion", applicationVersion, chip::CharSpan("exampleVersion", 14)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeApplicationAllowedVendorList_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        chip::Controller::ApplicationBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(const chip::app::DataModel::DecodableList<chip::VendorId> & allowedVendorList)
+    {
+        {
+            auto iter_0 = allowedVendorList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(allowedVendorList)>("allowedVendorList", iter_0, 0));
+            VerifyOrReturn(CheckValue("allowedVendorList[0]", iter_0.GetValue(), 1U));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(allowedVendorList)>("allowedVendorList", iter_0, 1));
+            VerifyOrReturn(CheckValue("allowedVendorList[1]", iter_0.GetValue(), 456U));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(allowedVendorList)>("allowedVendorList", iter_0, 2));
+        }
 
         NextTest();
     }
@@ -51891,60 +54256,76 @@ public:
             err = TestReadAttributeDuration_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read attribute playback speed\n");
-            err = TestReadAttributePlaybackSpeed_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read attribute position\n");
+            err = TestReadAttributePosition_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read attribute seek range end\n");
-            err = TestReadAttributeSeekRangeEnd_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read attribute playback speed\n");
+            err = TestReadAttributePlaybackSpeed_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute seek range start\n");
-            err = TestReadAttributeSeekRangeStart_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute seek range end\n");
+            err = TestReadAttributeSeekRangeEnd_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Media Playback Play Command\n");
-            err = TestMediaPlaybackPlayCommand_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read attribute seek range start\n");
+            err = TestReadAttributeSeekRangeStart_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Media Playback Pause Command\n");
-            err = TestMediaPlaybackPauseCommand_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Media Playback Play Command\n");
+            err = TestMediaPlaybackPlayCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Media Playback Stop Command\n");
-            err = TestMediaPlaybackStopCommand_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Media Playback Pause Command\n");
+            err = TestMediaPlaybackPauseCommand_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Media Playback Start Over Command\n");
-            err = TestMediaPlaybackStartOverCommand_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Media Playback Stop Command\n");
+            err = TestMediaPlaybackStopCommand_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Media Playback Previous Command\n");
-            err = TestMediaPlaybackPreviousCommand_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Media Playback Start Over Command\n");
+            err = TestMediaPlaybackStartOverCommand_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Media Playback Next Command\n");
-            err = TestMediaPlaybackNextCommand_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Media Playback Previous Command\n");
+            err = TestMediaPlaybackPreviousCommand_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Media Playback Rewind Command\n");
-            err = TestMediaPlaybackRewindCommand_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Media Playback Next Command\n");
+            err = TestMediaPlaybackNextCommand_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Media Playback Fast Forward Command\n");
-            err = TestMediaPlaybackFastForwardCommand_14();
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Media Playback Rewind Command\n");
+            err = TestMediaPlaybackRewindCommand_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Media Playback Skip Forward Command\n");
-            err = TestMediaPlaybackSkipForwardCommand_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Media Playback Fast Forward Command\n");
+            err = TestMediaPlaybackFastForwardCommand_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : Media Playback Skip Backward Command\n");
-            err = TestMediaPlaybackSkipBackwardCommand_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Media Playback Skip Forward Command\n");
+            err = TestMediaPlaybackSkipForwardCommand_16();
             break;
         case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : Media Playback Seek Command\n");
-            err = TestMediaPlaybackSeekCommand_17();
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Read attribute position after skip forward\n");
+            err = TestReadAttributePositionAfterSkipForward_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Media Playback Skip Backward Command\n");
+            err = TestMediaPlaybackSkipBackwardCommand_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Read attribute position after skip backward\n");
+            err = TestReadAttributePositionAfterSkipBackward_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Media Playback Seek Command\n");
+            err = TestMediaPlaybackSeekCommand_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Read attribute position after seek\n");
+            err = TestReadAttributePositionAfterSeek_21();
             break;
         }
 
@@ -51957,7 +54338,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 18;
+    const uint16_t mTestCount = 22;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -52006,9 +54387,12 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context, float playbackSpeed)
+    static void OnSuccessCallback_4(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_4(playbackSpeed);
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_4(sampledPosition);
     }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
@@ -52016,9 +54400,9 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
+    static void OnSuccessCallback_5(void * context, float playbackSpeed)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_5(seekRangeEnd);
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_5(playbackSpeed);
     }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
@@ -52026,9 +54410,58 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
+    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_6(seekRangeStart);
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_6(seekRangeEnd);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_7(seekRangeStart);
+    }
+
+    static void OnFailureCallback_17(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_17(error);
+    }
+
+    static void OnSuccessCallback_17(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_17(sampledPosition);
+    }
+
+    static void OnFailureCallback_19(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_19(error);
+    }
+
+    static void OnSuccessCallback_19(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_19(sampledPosition);
+    }
+
+    static void OnFailureCallback_21(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_21(error);
+    }
+
+    static void OnSuccessCallback_21(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_21(sampledPosition);
     }
 
     //
@@ -52116,12 +54549,12 @@ private:
     void OnSuccessResponse_3(const chip::app::DataModel::Nullable<uint64_t> & duration)
     {
         VerifyOrReturn(CheckValueNonNull("duration", duration));
-        VerifyOrReturn(CheckValue("duration.Value()", duration.Value(), 0ULL));
+        VerifyOrReturn(CheckValue("duration.Value()", duration.Value(), 80000ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributePlaybackSpeed_4()
+    CHIP_ERROR TestReadAttributePosition_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
@@ -52129,7 +54562,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4, true));
         return CHIP_NO_ERROR;
     }
@@ -52140,14 +54573,19 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(float playbackSpeed)
+    void OnSuccessResponse_4(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
     {
-        VerifyOrReturn(CheckValue("playbackSpeed", playbackSpeed, 0.0f));
+        VerifyOrReturn(CheckValueNonNull("sampledPosition", sampledPosition));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().updatedAt", sampledPosition.Value().updatedAt, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("sampledPosition.Value().position", sampledPosition.Value().position));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().position.Value()", sampledPosition.Value().position.Value(), 0ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeSeekRangeEnd_5()
+    CHIP_ERROR TestReadAttributePlaybackSpeed_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
@@ -52155,7 +54593,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5, true));
         return CHIP_NO_ERROR;
     }
@@ -52166,15 +54604,14 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
+    void OnSuccessResponse_5(float playbackSpeed)
     {
-        VerifyOrReturn(CheckValueNonNull("seekRangeEnd", seekRangeEnd));
-        VerifyOrReturn(CheckValue("seekRangeEnd.Value()", seekRangeEnd.Value(), 0ULL));
+        VerifyOrReturn(CheckValue("playbackSpeed", playbackSpeed, 0.0f));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeSeekRangeStart_6()
+    CHIP_ERROR TestReadAttributeSeekRangeEnd_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
@@ -52182,7 +54619,7 @@ private:
 
         ListFreer listFreer;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6, true));
         return CHIP_NO_ERROR;
     }
@@ -52193,31 +54630,24 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
     {
-        VerifyOrReturn(CheckValueNonNull("seekRangeStart", seekRangeStart));
-        VerifyOrReturn(CheckValue("seekRangeStart.Value()", seekRangeStart.Value(), 0ULL));
+        VerifyOrReturn(CheckValueNonNull("seekRangeEnd", seekRangeEnd));
+        VerifyOrReturn(CheckValue("seekRangeEnd.Value()", seekRangeEnd.Value(), 80000ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackPlayCommand_7()
+    CHIP_ERROR TestReadAttributeSeekRangeStart_7()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Play::Type;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        RequestType request;
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_7(data.status);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_7(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52227,17 +54657,18 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
+        VerifyOrReturn(CheckValueNonNull("seekRangeStart", seekRangeStart));
+        VerifyOrReturn(CheckValue("seekRangeStart.Value()", seekRangeStart.Value(), 0ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackPauseCommand_8()
+    CHIP_ERROR TestMediaPlaybackPlayCommand_8()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Pause::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Play::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -52267,10 +54698,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackStopCommand_9()
+    CHIP_ERROR TestMediaPlaybackPauseCommand_9()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Pause::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -52300,10 +54731,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackStartOverCommand_10()
+    CHIP_ERROR TestMediaPlaybackStopCommand_10()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StartOver::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -52333,10 +54764,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackPreviousCommand_11()
+    CHIP_ERROR TestMediaPlaybackStartOverCommand_11()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Previous::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StartOver::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -52366,10 +54797,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackNextCommand_12()
+    CHIP_ERROR TestMediaPlaybackPreviousCommand_12()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Next::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Previous::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -52399,10 +54830,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackRewindCommand_13()
+    CHIP_ERROR TestMediaPlaybackNextCommand_13()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Rewind::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Next::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -52432,10 +54863,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackFastForwardCommand_14()
+    CHIP_ERROR TestMediaPlaybackRewindCommand_14()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::FastForward::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Rewind::Type;
 
         ListFreer listFreer;
         RequestType request;
@@ -52465,14 +54896,13 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackSkipForwardCommand_15()
+    CHIP_ERROR TestMediaPlaybackFastForwardCommand_15()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::FastForward::Type;
 
         ListFreer listFreer;
         RequestType request;
-        request.deltaPositionMilliseconds = 100ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_15(data.status);
@@ -52499,14 +54929,14 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackSkipBackwardCommand_16()
+    CHIP_ERROR TestMediaPlaybackSkipForwardCommand_16()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type;
 
         ListFreer listFreer;
         RequestType request;
-        request.deltaPositionMilliseconds = 100ULL;
+        request.deltaPositionMilliseconds = 500ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_16(data.status);
@@ -52533,24 +54963,16 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestMediaPlaybackSeekCommand_17()
+    CHIP_ERROR TestReadAttributePositionAfterSkipForward_17()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Seek::Type;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        RequestType request;
-        request.position = 100ULL;
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_17(data.status);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_17(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo>(
+            this, OnSuccessCallback_17, OnFailureCallback_17, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52560,9 +54982,144 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_17(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_17(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        VerifyOrReturn(CheckValueNonNull("sampledPosition", sampledPosition));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().updatedAt", sampledPosition.Value().updatedAt, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("sampledPosition.Value().position", sampledPosition.Value().position));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().position.Value()", sampledPosition.Value().position.Value(), 500ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMediaPlaybackSkipBackwardCommand_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.deltaPositionMilliseconds = 100ULL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_18(data.status);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_18(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_18(chip::app::Clusters::MediaPlayback::StatusEnum status)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributePositionAfterSkipBackward_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo>(
+            this, OnSuccessCallback_19, OnFailureCallback_19, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        VerifyOrReturn(CheckValueNonNull("sampledPosition", sampledPosition));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().updatedAt", sampledPosition.Value().updatedAt, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("sampledPosition.Value().position", sampledPosition.Value().position));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().position.Value()", sampledPosition.Value().position.Value(), 400ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMediaPlaybackSeekCommand_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Seek::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.position = 1000ULL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_20(data.status);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_20(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_20(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributePositionAfterSeek_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo>(
+            this, OnSuccessCallback_21, OnFailureCallback_21, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_21(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &
+            sampledPosition)
+    {
+        VerifyOrReturn(CheckValueNonNull("sampledPosition", sampledPosition));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().updatedAt", sampledPosition.Value().updatedAt, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("sampledPosition.Value().position", sampledPosition.Value().position));
+        VerifyOrReturn(CheckValue("sampledPosition.Value().position.Value()", sampledPosition.Value().position.Value(), 1000ULL));
 
         NextTest();
     }
@@ -52615,16 +55172,24 @@ public:
             err = TestReadAttributeChannelList_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Change Channel Command\n");
-            err = TestChangeChannelCommand_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read attribute channel lineup\n");
+            err = TestReadAttributeChannelLineup_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Change Channel By Number Command\n");
-            err = TestChangeChannelByNumberCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read attribute current channel\n");
+            err = TestReadAttributeCurrentChannel_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Skip Channel Command\n");
-            err = TestSkipChannelCommand_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Change Channel Command\n");
+            err = TestChangeChannelCommand_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Change Channel By Number Command\n");
+            err = TestChangeChannelByNumberCommand_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Skip Channel Command\n");
+            err = TestSkipChannelCommand_6();
             break;
         }
 
@@ -52637,7 +55202,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -52661,6 +55226,30 @@ private:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & channelList)
     {
         (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_1(channelList);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & lineup)
+    {
+        (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_2(lineup);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & currentChannel)
+    {
+        (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_3(currentChannel);
     }
 
     //
@@ -52698,53 +55287,69 @@ private:
         {
             auto iter_0 = channelList.begin();
             VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 0));
-            VerifyOrReturn(CheckValue("channelList[0].majorNumber", iter_0.GetValue().majorNumber, 1U));
-            VerifyOrReturn(CheckValue("channelList[0].minorNumber", iter_0.GetValue().minorNumber, 2U));
+            VerifyOrReturn(CheckValue("channelList[0].majorNumber", iter_0.GetValue().majorNumber, 6U));
+            VerifyOrReturn(CheckValue("channelList[0].minorNumber", iter_0.GetValue().minorNumber, 0U));
             VerifyOrReturn(CheckValuePresent("channelList[0].name", iter_0.GetValue().name));
-            VerifyOrReturn(CheckValueAsString("channelList[0].name.Value()", iter_0.GetValue().name.Value(),
-                                              chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(
+                CheckValueAsString("channelList[0].name.Value()", iter_0.GetValue().name.Value(), chip::CharSpan("ABC", 3)));
             VerifyOrReturn(CheckValuePresent("channelList[0].callSign", iter_0.GetValue().callSign));
             VerifyOrReturn(CheckValueAsString("channelList[0].callSign.Value()", iter_0.GetValue().callSign.Value(),
-                                              chip::CharSpan("exampleCSign", 12)));
+                                              chip::CharSpan("KAAL-TV", 7)));
             VerifyOrReturn(CheckValuePresent("channelList[0].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
             VerifyOrReturn(CheckValueAsString("channelList[0].affiliateCallSign.Value()",
-                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("exampleASign", 12)));
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("KAAL", 4)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 1));
-            VerifyOrReturn(CheckValue("channelList[1].majorNumber", iter_0.GetValue().majorNumber, 2U));
-            VerifyOrReturn(CheckValue("channelList[1].minorNumber", iter_0.GetValue().minorNumber, 3U));
+            VerifyOrReturn(CheckValue("channelList[1].majorNumber", iter_0.GetValue().majorNumber, 9U));
+            VerifyOrReturn(CheckValue("channelList[1].minorNumber", iter_0.GetValue().minorNumber, 1U));
             VerifyOrReturn(CheckValuePresent("channelList[1].name", iter_0.GetValue().name));
-            VerifyOrReturn(CheckValueAsString("channelList[1].name.Value()", iter_0.GetValue().name.Value(),
-                                              chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(
+                CheckValueAsString("channelList[1].name.Value()", iter_0.GetValue().name.Value(), chip::CharSpan("PBS", 3)));
             VerifyOrReturn(CheckValuePresent("channelList[1].callSign", iter_0.GetValue().callSign));
             VerifyOrReturn(CheckValueAsString("channelList[1].callSign.Value()", iter_0.GetValue().callSign.Value(),
-                                              chip::CharSpan("exampleCSign", 12)));
+                                              chip::CharSpan("KCTS-TV", 7)));
             VerifyOrReturn(CheckValuePresent("channelList[1].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
             VerifyOrReturn(CheckValueAsString("channelList[1].affiliateCallSign.Value()",
-                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("exampleASign", 12)));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(channelList)>("channelList", iter_0, 2));
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("KCTS", 4)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 2));
+            VerifyOrReturn(CheckValue("channelList[2].majorNumber", iter_0.GetValue().majorNumber, 9U));
+            VerifyOrReturn(CheckValue("channelList[2].minorNumber", iter_0.GetValue().minorNumber, 2U));
+            VerifyOrReturn(CheckValuePresent("channelList[2].name", iter_0.GetValue().name));
+            VerifyOrReturn(
+                CheckValueAsString("channelList[2].name.Value()", iter_0.GetValue().name.Value(), chip::CharSpan("PBS Kids", 8)));
+            VerifyOrReturn(CheckValuePresent("channelList[2].callSign", iter_0.GetValue().callSign));
+            VerifyOrReturn(CheckValueAsString("channelList[2].callSign.Value()", iter_0.GetValue().callSign.Value(),
+                                              chip::CharSpan("KCTS-TV", 7)));
+            VerifyOrReturn(CheckValuePresent("channelList[2].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
+            VerifyOrReturn(CheckValueAsString("channelList[2].affiliateCallSign.Value()",
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("KCTS", 4)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 3));
+            VerifyOrReturn(CheckValue("channelList[3].majorNumber", iter_0.GetValue().majorNumber, 9U));
+            VerifyOrReturn(CheckValue("channelList[3].minorNumber", iter_0.GetValue().minorNumber, 3U));
+            VerifyOrReturn(CheckValuePresent("channelList[3].name", iter_0.GetValue().name));
+            VerifyOrReturn(CheckValueAsString("channelList[3].name.Value()", iter_0.GetValue().name.Value(),
+                                              chip::CharSpan("World Channel", 13)));
+            VerifyOrReturn(CheckValuePresent("channelList[3].callSign", iter_0.GetValue().callSign));
+            VerifyOrReturn(CheckValueAsString("channelList[3].callSign.Value()", iter_0.GetValue().callSign.Value(),
+                                              chip::CharSpan("KCTS-TV", 7)));
+            VerifyOrReturn(CheckValuePresent("channelList[3].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
+            VerifyOrReturn(CheckValueAsString("channelList[3].affiliateCallSign.Value()",
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("KCTS", 4)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(channelList)>("channelList", iter_0, 4));
         }
 
         NextTest();
     }
 
-    CHIP_ERROR TestChangeChannelCommand_2()
+    CHIP_ERROR TestReadAttributeChannelLineup_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannel::Type;
+        chip::Controller::ChannelClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        RequestType request;
-        request.match = chip::Span<const char>("CNNgarbage: not in length on purpose", 3);
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_2(data.channelMatch, data.errorType);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_2(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::Lineup::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52754,44 +55359,33 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & channelMatch,
-                             chip::app::Clusters::Channel::ErrorTypeEnum errorType)
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & lineup)
     {
-        VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 1U));
-        VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 0U));
-        VerifyOrReturn(CheckValuePresent("channelMatch.name", channelMatch.name));
-        VerifyOrReturn(CheckValueAsString("channelMatch.name.Value()", channelMatch.name.Value(), chip::CharSpan("name", 4)));
-        VerifyOrReturn(CheckValuePresent("channelMatch.callSign", channelMatch.callSign));
+        VerifyOrReturn(CheckValueNonNull("lineup", lineup));
         VerifyOrReturn(
-            CheckValueAsString("channelMatch.callSign.Value()", channelMatch.callSign.Value(), chip::CharSpan("callSign", 8)));
-        VerifyOrReturn(CheckValuePresent("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign));
-        VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign.Value()", channelMatch.affiliateCallSign.Value(),
-                                          chip::CharSpan("affiliateCallSign", 17)));
-
-        VerifyOrReturn(CheckValue("errorType", errorType, 0));
+            CheckValueAsString("lineup.Value().operatorName", lineup.Value().operatorName, chip::CharSpan("Comcast", 7)));
+        VerifyOrReturn(CheckValuePresent("lineup.Value().lineupName", lineup.Value().lineupName));
+        VerifyOrReturn(CheckValueAsString("lineup.Value().lineupName.Value()", lineup.Value().lineupName.Value(),
+                                          chip::CharSpan("Comcast King County", 19)));
+        VerifyOrReturn(CheckValuePresent("lineup.Value().postalCode", lineup.Value().postalCode));
+        VerifyOrReturn(
+            CheckValueAsString("lineup.Value().postalCode.Value()", lineup.Value().postalCode.Value(), chip::CharSpan("98052", 5)));
+        VerifyOrReturn(CheckValue("lineup.Value().lineupInfoType", lineup.Value().lineupInfoType, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestChangeChannelByNumberCommand_3()
+    CHIP_ERROR TestReadAttributeCurrentChannel_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type;
+        chip::Controller::ChannelClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ListFreer listFreer;
-        RequestType request;
-        request.majorNumber = 1U;
-        request.minorNumber = 2U;
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_3();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_3(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::CurrentChannel::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3, true));
         return CHIP_NO_ERROR;
     }
 
@@ -52801,19 +55395,36 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3() { NextTest(); }
+    void OnSuccessResponse_3(
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & currentChannel)
+    {
+        VerifyOrReturn(CheckValueNonNull("currentChannel", currentChannel));
+        VerifyOrReturn(CheckValue("currentChannel.Value().majorNumber", currentChannel.Value().majorNumber, 6U));
+        VerifyOrReturn(CheckValue("currentChannel.Value().minorNumber", currentChannel.Value().minorNumber, 0U));
+        VerifyOrReturn(CheckValuePresent("currentChannel.Value().name", currentChannel.Value().name));
+        VerifyOrReturn(CheckValueAsString("currentChannel.Value().name.Value()", currentChannel.Value().name.Value(),
+                                          chip::CharSpan("ABC", 3)));
+        VerifyOrReturn(CheckValuePresent("currentChannel.Value().callSign", currentChannel.Value().callSign));
+        VerifyOrReturn(CheckValueAsString("currentChannel.Value().callSign.Value()", currentChannel.Value().callSign.Value(),
+                                          chip::CharSpan("KAAL-TV", 7)));
+        VerifyOrReturn(CheckValuePresent("currentChannel.Value().affiliateCallSign", currentChannel.Value().affiliateCallSign));
+        VerifyOrReturn(CheckValueAsString("currentChannel.Value().affiliateCallSign.Value()",
+                                          currentChannel.Value().affiliateCallSign.Value(), chip::CharSpan("KAAL", 4)));
 
-    CHIP_ERROR TestSkipChannelCommand_4()
+        NextTest();
+    }
+
+    CHIP_ERROR TestChangeChannelCommand_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::SkipChannel::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannel::Type;
 
         ListFreer listFreer;
         RequestType request;
-        request.count = 1U;
+        request.match = chip::Span<const char>("PBSgarbage: not in length on purpose", 3);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_4();
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_4(data.channelMatch, data.status);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -52830,7 +55441,83 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4() { NextTest(); }
+    void OnSuccessResponse_4(const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & channelMatch,
+                             chip::app::Clusters::Channel::StatusEnum status)
+    {
+        VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 9U));
+        VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 1U));
+        VerifyOrReturn(CheckValuePresent("channelMatch.name", channelMatch.name));
+        VerifyOrReturn(CheckValueAsString("channelMatch.name.Value()", channelMatch.name.Value(), chip::CharSpan("PBS", 3)));
+        VerifyOrReturn(CheckValuePresent("channelMatch.callSign", channelMatch.callSign));
+        VerifyOrReturn(
+            CheckValueAsString("channelMatch.callSign.Value()", channelMatch.callSign.Value(), chip::CharSpan("KCTS-TV", 7)));
+        VerifyOrReturn(CheckValuePresent("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign));
+        VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign.Value()", channelMatch.affiliateCallSign.Value(),
+                                          chip::CharSpan("KCTS", 4)));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestChangeChannelByNumberCommand_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.majorNumber = 6U;
+        request.minorNumber = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_5(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestSkipChannelCommand_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Channel::Commands::SkipChannel::Type;
+
+        ListFreer listFreer;
+        RequestType request;
+        request.count = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_6();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_6(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6() { NextTest(); }
 };
 
 class TV_LowPowerCluster : public TestCommand
@@ -53364,6 +56051,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Rename Input Command\n");
             err = TestRenameInputCommand_6();
             break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read attribute media input list\n");
+            err = TestReadAttributeMediaInputList_7();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -53375,7 +56066,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 8;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -53409,6 +56100,18 @@ private:
     static void OnSuccessCallback_2(void * context, uint8_t currentInput)
     {
         (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_2(currentInput);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & inputList)
+    {
+        (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_7(inputList);
     }
 
     //
@@ -53448,15 +56151,15 @@ private:
             VerifyOrReturn(CheckNextListItemDecodes<decltype(inputList)>("inputList", iter_0, 0));
             VerifyOrReturn(CheckValue("inputList[0].index", iter_0.GetValue().index, 1));
             VerifyOrReturn(CheckValue("inputList[0].inputType", iter_0.GetValue().inputType, 4));
-            VerifyOrReturn(CheckValueAsString("inputList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("inputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
             VerifyOrReturn(CheckValueAsString("inputList[0].description", iter_0.GetValue().description,
-                                              chip::CharSpan("exampleDescription", 18)));
+                                              chip::CharSpan("High-Definition Multimedia Interface", 36)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(inputList)>("inputList", iter_0, 1));
             VerifyOrReturn(CheckValue("inputList[1].index", iter_0.GetValue().index, 2));
             VerifyOrReturn(CheckValue("inputList[1].inputType", iter_0.GetValue().inputType, 4));
-            VerifyOrReturn(CheckValueAsString("inputList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("inputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
             VerifyOrReturn(CheckValueAsString("inputList[1].description", iter_0.GetValue().description,
-                                              chip::CharSpan("exampleDescription", 18)));
+                                              chip::CharSpan("High-Definition Multimedia Interface", 36)));
             VerifyOrReturn(CheckNoMoreListItems<decltype(inputList)>("inputList", iter_0, 2));
         }
 
@@ -53484,7 +56187,7 @@ private:
 
     void OnSuccessResponse_2(uint8_t currentInput)
     {
-        VerifyOrReturn(CheckValue("currentInput", currentInput, 0));
+        VerifyOrReturn(CheckValue("currentInput", currentInput, 1));
 
         NextTest();
     }
@@ -53582,7 +56285,7 @@ private:
         ListFreer listFreer;
         RequestType request;
         request.index = 1;
-        request.name  = chip::Span<const char>("newNamegarbage: not in length on purpose", 7);
+        request.name  = chip::Span<const char>("HDMI Testgarbage: not in length on purpose", 9);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_6();
@@ -53603,6 +56306,48 @@ private:
     }
 
     void OnSuccessResponse_6() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeMediaInputList_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::MediaInputClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::InputList::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & inputList)
+    {
+        {
+            auto iter_0 = inputList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(inputList)>("inputList", iter_0, 0));
+            VerifyOrReturn(CheckValue("inputList[0].index", iter_0.GetValue().index, 1));
+            VerifyOrReturn(CheckValue("inputList[0].inputType", iter_0.GetValue().inputType, 4));
+            VerifyOrReturn(CheckValueAsString("inputList[0].name", iter_0.GetValue().name, chip::CharSpan("HDMI Test", 9)));
+            VerifyOrReturn(CheckValueAsString("inputList[0].description", iter_0.GetValue().description,
+                                              chip::CharSpan("High-Definition Multimedia Interface", 36)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(inputList)>("inputList", iter_0, 1));
+            VerifyOrReturn(CheckValue("inputList[1].index", iter_0.GetValue().index, 2));
+            VerifyOrReturn(CheckValue("inputList[1].inputType", iter_0.GetValue().inputType, 4));
+            VerifyOrReturn(CheckValueAsString("inputList[1].name", iter_0.GetValue().name, chip::CharSpan("HDMI", 4)));
+            VerifyOrReturn(CheckValueAsString("inputList[1].description", iter_0.GetValue().description,
+                                              chip::CharSpan("High-Definition Multimedia Interface", 36)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(inputList)>("inputList", iter_0, 2));
+        }
+
+        NextTest();
+    }
 };
 
 class TestCluster : public TestCommand
@@ -80925,6 +83670,341 @@ private:
     }
 };
 
+class TestBinding : public TestCommand
+{
+public:
+    TestBinding(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestBinding", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestBinding() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestBinding\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestBinding\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Write empty binding table\n");
+            err = TestWriteEmptyBindingTable_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read empty binding table\n");
+            err = TestReadEmptyBindingTable_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Write invalid binding table\n");
+            err = TestWriteInvalidBindingTable_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Write binding table\n");
+            err = TestWriteBindingTable_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read binding table\n");
+            err = TestReadBindingTable_5();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 6;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBinding *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context) { (static_cast<TestBinding *>(context))->OnSuccessResponse_1(); }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBinding *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & binding)
+    {
+        (static_cast<TestBinding *>(context))->OnSuccessResponse_2(binding);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBinding *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<TestBinding *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBinding *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context) { (static_cast<TestBinding *>(context))->OnSuccessResponse_4(); }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBinding *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & binding)
+    {
+        (static_cast<TestBinding *>(context))->OnSuccessResponse_5(binding);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR TestWriteEmptyBindingTable_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BindingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::TargetStruct::Type> bindingArgument;
+
+        bindingArgument = chip::app::DataModel::List<chip::app::Clusters::Binding::Structs::TargetStruct::Type>();
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+            bindingArgument, this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR TestReadEmptyBindingTable_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BindingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & binding)
+    {
+        {
+            auto iter_0 = binding.begin();
+            VerifyOrReturn(CheckNoMoreListItems<decltype(binding)>("binding", iter_0, 0));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteInvalidBindingTable_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BindingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::TargetStruct::Type> bindingArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(2);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+
+            listHolder_0->mList[1].fabricIndex = 0;
+            listHolder_0->mList[1].node.Emplace();
+            listHolder_0->mList[1].node.Value() = 1ULL;
+            listHolder_0->mList[1].group.Emplace();
+            listHolder_0->mList[1].group.Value() = 1U;
+            listHolder_0->mList[1].endpoint.Emplace();
+            listHolder_0->mList[1].endpoint.Value() = 1U;
+            listHolder_0->mList[1].cluster.Emplace();
+            listHolder_0->mList[1].cluster.Value() = 6UL;
+
+            bindingArgument =
+                chip::app::DataModel::List<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(listHolder_0->mList, 2);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+            bindingArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestWriteBindingTable_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BindingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::TargetStruct::Type> bindingArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(3);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].group.Emplace();
+            listHolder_0->mList[0].group.Value() = 1U;
+
+            listHolder_0->mList[1].fabricIndex = 0;
+            listHolder_0->mList[1].node.Emplace();
+            listHolder_0->mList[1].node.Value() = 1ULL;
+            listHolder_0->mList[1].endpoint.Emplace();
+            listHolder_0->mList[1].endpoint.Value() = 1U;
+            listHolder_0->mList[1].cluster.Emplace();
+            listHolder_0->mList[1].cluster.Value() = 6UL;
+
+            listHolder_0->mList[2].fabricIndex = 0;
+            listHolder_0->mList[2].node.Emplace();
+            listHolder_0->mList[2].node.Value() = 2ULL;
+            listHolder_0->mList[2].endpoint.Emplace();
+            listHolder_0->mList[2].endpoint.Value() = 1U;
+
+            bindingArgument =
+                chip::app::DataModel::List<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(listHolder_0->mList, 3);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+            bindingArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestReadBindingTable_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BindingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & binding)
+    {
+        {
+            auto iter_0 = binding.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(binding)>("binding", iter_0, 0));
+            VerifyOrReturn(CheckValue("binding[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValuePresent("binding[0].group", iter_0.GetValue().group));
+            VerifyOrReturn(CheckValue("binding[0].group.Value()", iter_0.GetValue().group.Value(), 1U));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(binding)>("binding", iter_0, 1));
+            VerifyOrReturn(CheckValue("binding[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValuePresent("binding[1].node", iter_0.GetValue().node));
+            VerifyOrReturn(CheckValue("binding[1].node.Value()", iter_0.GetValue().node.Value(), 1ULL));
+            VerifyOrReturn(CheckValuePresent("binding[1].endpoint", iter_0.GetValue().endpoint));
+            VerifyOrReturn(CheckValue("binding[1].endpoint.Value()", iter_0.GetValue().endpoint.Value(), 1U));
+            VerifyOrReturn(CheckValuePresent("binding[1].cluster", iter_0.GetValue().cluster));
+            VerifyOrReturn(CheckValue("binding[1].cluster.Value()", iter_0.GetValue().cluster.Value(), 6UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(binding)>("binding", iter_0, 2));
+            VerifyOrReturn(CheckValue("binding[2].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValuePresent("binding[2].node", iter_0.GetValue().node));
+            VerifyOrReturn(CheckValue("binding[2].node.Value()", iter_0.GetValue().node.Value(), 2ULL));
+            VerifyOrReturn(CheckValuePresent("binding[2].endpoint", iter_0.GetValue().endpoint));
+            VerifyOrReturn(CheckValue("binding[2].endpoint.Value()", iter_0.GetValue().endpoint.Value(), 1U));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(binding)>("binding", iter_0, 3));
+        }
+
+        NextTest();
+    }
+};
+
 class Test_TC_SWDIAG_1_1 : public TestCommand
 {
 public:
@@ -94727,6 +97807,609 @@ private:
     //
 };
 
+class Test_TC_DD_2_1 : public TestCommand
+{
+public:
+    Test_TC_DD_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_2_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DD_2_2 : public TestCommand
+{
+public:
+    Test_TC_DD_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_2_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_2_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_2_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_2_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DD_3_1 : public TestCommand
+{
+public:
+    Test_TC_DD_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_3_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_3_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_3_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DD_3_2 : public TestCommand
+{
+public:
+    Test_TC_DD_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_3_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_3_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_3_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DD_3_5 : public TestCommand
+{
+public:
+    Test_TC_DD_3_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_3_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_3_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_3_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DD_3_6 : public TestCommand
+{
+public:
+    Test_TC_DD_3_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_6", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_3_6() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_3_6\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_3_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DD_3_9 : public TestCommand
+{
+public:
+    Test_TC_DD_3_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_9", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_3_9() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_3_9\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_3_9\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DD_3_10 : public TestCommand
+{
+public:
+    Test_TC_DD_3_10(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_10", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_3_10() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_3_10\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_3_10\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DD_4_1 : public TestCommand
+{
+public:
+    Test_TC_DD_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_4_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_4_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_4_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_4_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
 class TestGroupDemoCommand : public TestCommand
 {
 public:
@@ -95632,6 +99315,207 @@ private:
     //
 };
 
+class Test_TC_BDX_1_3 : public TestCommand
+{
+public:
+    Test_TC_BDX_1_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_1_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BDX_1_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BDX_1_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BDX_1_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_BDX_1_5 : public TestCommand
+{
+public:
+    Test_TC_BDX_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_1_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BDX_1_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BDX_1_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BDX_1_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_BDX_1_6 : public TestCommand
+{
+public:
+    Test_TC_BDX_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_1_6", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BDX_1_6() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BDX_1_6\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BDX_1_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
 class Test_TC_BDX_2_1 : public TestCommand
 {
 public:
@@ -95766,6 +99650,6587 @@ private:
     //
 };
 
+class Test_TC_BDX_2_3 : public TestCommand
+{
+public:
+    Test_TC_BDX_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_2_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BDX_2_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BDX_2_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BDX_2_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_BDX_2_4 : public TestCommand
+{
+public:
+    Test_TC_BDX_2_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_2_4", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BDX_2_4() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BDX_2_4\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BDX_2_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_BDX_2_5 : public TestCommand
+{
+public:
+    Test_TC_BDX_2_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_2_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BDX_2_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BDX_2_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BDX_2_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_BR_1 : public TestCommand
+{
+public:
+    Test_TC_BR_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BR_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BR_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BR_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BR_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_BR_2 : public TestCommand
+{
+public:
+    Test_TC_BR_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BR_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BR_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BR_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BR_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_BR_3 : public TestCommand
+{
+public:
+    Test_TC_BR_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BR_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BR_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BR_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BR_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_BRAC_2_1 : public TestCommand
+{
+public:
+    Test_TC_BRAC_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BRAC_2_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BRAC_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BRAC_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BRAC_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_BRAC_2_2 : public TestCommand
+{
+public:
+    Test_TC_BRAC_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BRAC_2_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_BRAC_2_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_BRAC_2_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_BRAC_2_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DM_1_2 : public TestCommand
+{
+public:
+    Test_TC_DM_1_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_1_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DM_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DM_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DM_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DM_2_3 : public TestCommand
+{
+public:
+    Test_TC_DM_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_2_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DM_2_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DM_2_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DM_2_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DM_3_2 : public TestCommand
+{
+public:
+    Test_TC_DM_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_3_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DM_3_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DM_3_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DM_3_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DIAG_LOG_1_1 : public TestCommand
+{
+public:
+    Test_TC_DIAG_LOG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DIAG_LOG_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DIAG_LOG_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAG_LOG_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAG_LOG_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DIAG_LOG_1_2 : public TestCommand
+{
+public:
+    Test_TC_DIAG_LOG_1_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DIAG_LOG_1_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DIAG_LOG_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAG_LOG_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAG_LOG_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DIAG_LOG_1_3 : public TestCommand
+{
+public:
+    Test_TC_DIAG_LOG_1_3(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DIAG_LOG_1_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DIAG_LOG_1_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAG_LOG_1_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAG_LOG_1_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_DESC_1_1 : public TestCommand
+{
+public:
+    Test_TC_DESC_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DESC_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DESC_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DESC_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DESC_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_ETHDIAG_1_2 : public TestCommand
+{
+public:
+    Test_TC_ETHDIAG_1_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_ETHDIAG_1_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_ETHDIAG_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_ETHDIAG_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_ETHDIAG_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_GC_1_1 : public TestCommand
+{
+public:
+    Test_TC_GC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GC_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_GC_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_GC_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_GC_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_GC_1_2 : public TestCommand
+{
+public:
+    Test_TC_GC_1_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GC_1_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_GC_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_GC_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_GC_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_GC_1_3 : public TestCommand
+{
+public:
+    Test_TC_GC_1_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GC_1_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_GC_1_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_GC_1_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_GC_1_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_GENDIAG_1_1 : public TestCommand
+{
+public:
+    Test_TC_GENDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_GENDIAG_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_GENDIAG_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_GENDIAG_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_GENDIAG_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_GENDIAG_1_2 : public TestCommand
+{
+public:
+    Test_TC_GENDIAG_1_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_GENDIAG_1_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_GENDIAG_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_GENDIAG_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_GENDIAG_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_I_1_1 : public TestCommand
+{
+public:
+    Test_TC_I_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_I_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_I_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_I_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_I_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_I_2_1 : public TestCommand
+{
+public:
+    Test_TC_I_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_I_2_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_I_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_I_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_I_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_I_2_2 : public TestCommand
+{
+public:
+    Test_TC_I_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_I_2_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_I_2_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_I_2_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_I_2_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_I_2_3 : public TestCommand
+{
+public:
+    Test_TC_I_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_I_2_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_I_2_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_I_2_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_I_2_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_ILL_2_1 : public TestCommand
+{
+public:
+    Test_TC_ILL_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ILL_2_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_ILL_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_ILL_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_ILL_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_1_1 : public TestCommand
+{
+public:
+    Test_TC_IDM_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_1_2 : public TestCommand
+{
+public:
+    Test_TC_IDM_1_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_1_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_2_1 : public TestCommand
+{
+public:
+    Test_TC_IDM_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_2_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_2_2 : public TestCommand
+{
+public:
+    Test_TC_IDM_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_2_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_2_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_2_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_2_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_3_1 : public TestCommand
+{
+public:
+    Test_TC_IDM_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_3_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_3_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_3_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_3_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_3_2 : public TestCommand
+{
+public:
+    Test_TC_IDM_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_3_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_3_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_3_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_3_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_4_1 : public TestCommand
+{
+public:
+    Test_TC_IDM_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_4_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_4_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_4_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_4_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_4_2 : public TestCommand
+{
+public:
+    Test_TC_IDM_4_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_4_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_4_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_4_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_4_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_5_1 : public TestCommand
+{
+public:
+    Test_TC_IDM_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_5_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_5_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_5_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_5_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_5_2 : public TestCommand
+{
+public:
+    Test_TC_IDM_5_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_5_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_5_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_5_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_5_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_6_1 : public TestCommand
+{
+public:
+    Test_TC_IDM_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_6_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_6_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_6_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_6_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_IDM_6_2 : public TestCommand
+{
+public:
+    Test_TC_IDM_6_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_6_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_IDM_6_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_IDM_6_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_IDM_6_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_3_12 : public TestCommand
+{
+public:
+    Test_TC_MC_3_12(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_12", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MC_3_12() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_3_12\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_3_12\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_4_1 : public TestCommand
+{
+public:
+    Test_TC_MC_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_4_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MC_4_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_4_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_4_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_8_2 : public TestCommand
+{
+public:
+    Test_TC_MC_8_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_8_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MC_8_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_8_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_8_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_9_2 : public TestCommand
+{
+public:
+    Test_TC_MC_9_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_9_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MC_9_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_9_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_9_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_10_1 : public TestCommand
+{
+public:
+    Test_TC_MC_10_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MC_10_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_10_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_10_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_10_2 : public TestCommand
+{
+public:
+    Test_TC_MC_10_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MC_10_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_10_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_10_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_10_3 : public TestCommand
+{
+public:
+    Test_TC_MC_10_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MC_10_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_10_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_10_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_10_4 : public TestCommand
+{
+public:
+    Test_TC_MC_10_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_4", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MC_10_4() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_10_4\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_10_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_10_5 : public TestCommand
+{
+public:
+    Test_TC_MC_10_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MC_10_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_10_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_10_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MC_10_6 : public TestCommand
+{
+public:
+    Test_TC_MC_10_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_6", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MC_10_6() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_10_6\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_10_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_1 : public TestCommand
+{
+public:
+    Test_TC_MF_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_2 : public TestCommand
+{
+public:
+    Test_TC_MF_1_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_3 : public TestCommand
+{
+public:
+    Test_TC_MF_1_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_4 : public TestCommand
+{
+public:
+    Test_TC_MF_1_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_4", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_4() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_4\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_5 : public TestCommand
+{
+public:
+    Test_TC_MF_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_6 : public TestCommand
+{
+public:
+    Test_TC_MF_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_6", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_6() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_6\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_7 : public TestCommand
+{
+public:
+    Test_TC_MF_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_7", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_7() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_7\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_7\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_8 : public TestCommand
+{
+public:
+    Test_TC_MF_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_8", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_8() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_8\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_8\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_9 : public TestCommand
+{
+public:
+    Test_TC_MF_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_9", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_9() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_9\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_9\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_10 : public TestCommand
+{
+public:
+    Test_TC_MF_1_10(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_10", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_10() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_10\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_10\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_11 : public TestCommand
+{
+public:
+    Test_TC_MF_1_11(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_11", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_11() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_11\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_11\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_12 : public TestCommand
+{
+public:
+    Test_TC_MF_1_12(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_12", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_12() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_12\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_12\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_13 : public TestCommand
+{
+public:
+    Test_TC_MF_1_13(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_13", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_13() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_13\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_13\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_14 : public TestCommand
+{
+public:
+    Test_TC_MF_1_14(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_14", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_14() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_14\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_14\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_15 : public TestCommand
+{
+public:
+    Test_TC_MF_1_15(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_15", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_15() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_15\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_15\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_16 : public TestCommand
+{
+public:
+    Test_TC_MF_1_16(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_16", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_16() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_16\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_16\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_17 : public TestCommand
+{
+public:
+    Test_TC_MF_1_17(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_17", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_17() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_17\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_17\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_18 : public TestCommand
+{
+public:
+    Test_TC_MF_1_18(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_18", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_18() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_18\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_18\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_19 : public TestCommand
+{
+public:
+    Test_TC_MF_1_19(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_19", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_19() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_19\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_19\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_20 : public TestCommand
+{
+public:
+    Test_TC_MF_1_20(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_20", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_20() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_20\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_20\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_21 : public TestCommand
+{
+public:
+    Test_TC_MF_1_21(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_21", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_21() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_21\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_21\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_22 : public TestCommand
+{
+public:
+    Test_TC_MF_1_22(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_22", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_22() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_22\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_22\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_23 : public TestCommand
+{
+public:
+    Test_TC_MF_1_23(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_23", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_23() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_23\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_23\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MF_1_24 : public TestCommand
+{
+public:
+    Test_TC_MF_1_24(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_24", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MF_1_24() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MF_1_24\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MF_1_24\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MOD_1_1 : public TestCommand
+{
+public:
+    Test_TC_MOD_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MOD_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MOD_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MOD_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MOD_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MOD_1_2 : public TestCommand
+{
+public:
+    Test_TC_MOD_1_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MOD_1_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MOD_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MOD_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MOD_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_MOD_2_1 : public TestCommand
+{
+public:
+    Test_TC_MOD_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MOD_2_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_MOD_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MOD_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MOD_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_1_1 : public TestCommand
+{
+public:
+    Test_TC_SU_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_2_1 : public TestCommand
+{
+public:
+    Test_TC_SU_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_2_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_2_2 : public TestCommand
+{
+public:
+    Test_TC_SU_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_2_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_2_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_2_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_2_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_2_3 : public TestCommand
+{
+public:
+    Test_TC_SU_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_2_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_2_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_2_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_2_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_2_4 : public TestCommand
+{
+public:
+    Test_TC_SU_2_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_2_4", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_2_4() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_2_4\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_2_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_2_5 : public TestCommand
+{
+public:
+    Test_TC_SU_2_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_2_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_2_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_2_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_2_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_2_6 : public TestCommand
+{
+public:
+    Test_TC_SU_2_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_2_6", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_2_6() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_2_6\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_2_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_2_7 : public TestCommand
+{
+public:
+    Test_TC_SU_2_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_2_7", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_2_7() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_2_7\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_2_7\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_3_1 : public TestCommand
+{
+public:
+    Test_TC_SU_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_3_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_3_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_3_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_3_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_3_2 : public TestCommand
+{
+public:
+    Test_TC_SU_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_3_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_3_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_3_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_3_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_3_3 : public TestCommand
+{
+public:
+    Test_TC_SU_3_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_3_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_3_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_3_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_3_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SU_3_4 : public TestCommand
+{
+public:
+    Test_TC_SU_3_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SU_3_4", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SU_3_4() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SU_3_4\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SU_3_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_PSCFG_1_1 : public TestCommand
+{
+public:
+    Test_TC_PSCFG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_PSCFG_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_PSCFG_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PSCFG_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PSCFG_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_PSCFG_2_1 : public TestCommand
+{
+public:
+    Test_TC_PSCFG_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_PSCFG_2_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_PSCFG_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_PSCFG_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_PSCFG_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SC_4_5 : public TestCommand
+{
+public:
+    Test_TC_SC_4_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SC_4_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SC_4_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SC_4_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SC_4_6 : public TestCommand
+{
+public:
+    Test_TC_SC_4_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_6", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SC_4_6() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SC_4_6\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SC_4_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SC_4_7 : public TestCommand
+{
+public:
+    Test_TC_SC_4_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_7", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SC_4_7() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SC_4_7\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SC_4_7\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SC_4_8 : public TestCommand
+{
+public:
+    Test_TC_SC_4_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_8", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SC_4_8() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SC_4_8\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SC_4_8\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SC_4_9 : public TestCommand
+{
+public:
+    Test_TC_SC_4_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_9", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SC_4_9() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SC_4_9\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SC_4_9\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SWDIAG_1_2 : public TestCommand
+{
+public:
+    Test_TC_SWDIAG_1_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWDIAG_1_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SWDIAG_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_WIFIDIAG_1_2 : public TestCommand
+{
+public:
+    Test_TC_WIFIDIAG_1_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WIFIDIAG_1_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_WIFIDIAG_1_2() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WIFIDIAG_1_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WIFIDIAG_1_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_WIFIDIAG_2_1 : public TestCommand
+{
+public:
+    Test_TC_WIFIDIAG_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WIFIDIAG_2_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_WIFIDIAG_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WIFIDIAG_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WIFIDIAG_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_WNCV_2_3 : public TestCommand
+{
+public:
+    Test_TC_WNCV_2_3(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_3", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_WNCV_2_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_2_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_2_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+};
+
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Tests";
@@ -95773,6 +106238,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
     commands_list clusterCommands = {
         make_unique<TestList>(),
         make_unique<ManualTestList>(),
+        make_unique<TestAccessControlCluster>(credsIssuerConfig),
         make_unique<Test_TC_BI_1_1>(credsIssuerConfig),
         make_unique<Test_TC_BI_2_1>(credsIssuerConfig),
         make_unique<Test_TC_BI_2_2>(credsIssuerConfig),
@@ -95882,6 +106348,10 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_WNCV_3_1>(credsIssuerConfig),
         make_unique<Test_TC_WNCV_3_2>(credsIssuerConfig),
         make_unique<Test_TC_WNCV_3_3>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_4>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_5>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_4_3>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_4_4>(credsIssuerConfig),
         make_unique<TV_TargetNavigatorCluster>(credsIssuerConfig),
         make_unique<TV_AudioOutputCluster>(credsIssuerConfig),
         make_unique<TV_ApplicationLauncherCluster>(credsIssuerConfig),
@@ -95907,6 +106377,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestOperationalCredentialsCluster>(credsIssuerConfig),
         make_unique<TestModeSelectCluster>(credsIssuerConfig),
         make_unique<TestSystemCommands>(credsIssuerConfig),
+        make_unique<TestBinding>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_1_1>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_2_1>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_3_1>(credsIssuerConfig),
@@ -95924,12 +106395,122 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_DD_1_8>(credsIssuerConfig),
         make_unique<Test_TC_DD_1_9>(credsIssuerConfig),
         make_unique<Test_TC_DD_1_10>(credsIssuerConfig),
+        make_unique<Test_TC_DD_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_DD_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_5>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_6>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_9>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_10>(credsIssuerConfig),
+        make_unique<Test_TC_DD_4_1>(credsIssuerConfig),
         make_unique<TestGroupDemoCommand>(credsIssuerConfig),
         make_unique<TestGroupDemoConfig>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_1>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_BDX_1_3>(credsIssuerConfig),
+        make_unique<Test_TC_BDX_1_5>(credsIssuerConfig),
+        make_unique<Test_TC_BDX_1_6>(credsIssuerConfig),
         make_unique<Test_TC_BDX_2_1>(credsIssuerConfig),
         make_unique<Test_TC_BDX_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_BDX_2_3>(credsIssuerConfig),
+        make_unique<Test_TC_BDX_2_4>(credsIssuerConfig),
+        make_unique<Test_TC_BDX_2_5>(credsIssuerConfig),
+        make_unique<Test_TC_BR_1>(credsIssuerConfig),
+        make_unique<Test_TC_BR_2>(credsIssuerConfig),
+        make_unique<Test_TC_BR_3>(credsIssuerConfig),
+        make_unique<Test_TC_BRAC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_BRAC_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_DM_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_DM_2_3>(credsIssuerConfig),
+        make_unique<Test_TC_DM_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_DIAG_LOG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_DIAG_LOG_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_DIAG_LOG_1_3>(credsIssuerConfig),
+        make_unique<Test_TC_DESC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_ETHDIAG_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_GC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_GC_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_GC_1_3>(credsIssuerConfig),
+        make_unique<Test_TC_GENDIAG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_GENDIAG_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_I_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_I_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_I_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_I_2_3>(credsIssuerConfig),
+        make_unique<Test_TC_ILL_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_4_1>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_4_2>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_5_1>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_5_2>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_6_1>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_6_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_12>(credsIssuerConfig),
+        make_unique<Test_TC_MC_4_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_8_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_9_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_10_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_10_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_10_3>(credsIssuerConfig),
+        make_unique<Test_TC_MC_10_4>(credsIssuerConfig),
+        make_unique<Test_TC_MC_10_5>(credsIssuerConfig),
+        make_unique<Test_TC_MC_10_6>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_3>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_4>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_5>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_6>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_7>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_8>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_9>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_10>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_11>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_12>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_13>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_14>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_15>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_16>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_17>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_18>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_19>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_20>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_21>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_22>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_23>(credsIssuerConfig),
+        make_unique<Test_TC_MF_1_24>(credsIssuerConfig),
+        make_unique<Test_TC_MOD_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_MOD_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_MOD_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_SU_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_SU_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_SU_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_SU_2_3>(credsIssuerConfig),
+        make_unique<Test_TC_SU_2_4>(credsIssuerConfig),
+        make_unique<Test_TC_SU_2_5>(credsIssuerConfig),
+        make_unique<Test_TC_SU_2_6>(credsIssuerConfig),
+        make_unique<Test_TC_SU_2_7>(credsIssuerConfig),
+        make_unique<Test_TC_SU_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_SU_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_SU_3_3>(credsIssuerConfig),
+        make_unique<Test_TC_SU_3_4>(credsIssuerConfig),
+        make_unique<Test_TC_PSCFG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_PSCFG_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_SC_4_5>(credsIssuerConfig),
+        make_unique<Test_TC_SC_4_6>(credsIssuerConfig),
+        make_unique<Test_TC_SC_4_7>(credsIssuerConfig),
+        make_unique<Test_TC_SC_4_8>(credsIssuerConfig),
+        make_unique<Test_TC_SC_4_9>(credsIssuerConfig),
+        make_unique<Test_TC_SWDIAG_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_WIFIDIAG_1_2>(credsIssuerConfig),
+        make_unique<Test_TC_WIFIDIAG_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_3>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);

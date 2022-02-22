@@ -53,6 +53,8 @@
 #endif
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
 #endif /* SL_WIFI */
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
@@ -67,6 +69,9 @@
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
 
+using namespace chip;
+using namespace ::chip::DeviceLayer;
+
 namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -79,6 +84,9 @@ LEDWidget sStatusLED;
 bool sIsWiFiProvisioned = false;
 bool sIsWiFiEnabled     = false;
 bool sIsWiFiAttached    = false;
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -178,6 +186,8 @@ CHIP_ERROR AppTask::Init()
     }
     EFR32_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
+
+    sWiFiNetworkCommissioningInstance.Init();
 #endif
     // Init ZCL Data Model
     chip::Server::GetInstance().Init();

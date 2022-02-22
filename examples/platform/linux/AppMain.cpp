@@ -307,7 +307,9 @@ CHIP_ERROR InitCommissioner()
 
     factoryParams.fabricStorage = &gFabricStorage;
     // use a different listen port for the commissioner than the default used by chip-tool.
-    factoryParams.listenPort              = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
+    factoryParams.listenPort               = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
+    factoryParams.fabricIndependentStorage = &gServerStorage;
+
     params.storageDelegate                = &gServerStorage;
     params.deviceAddressUpdateDelegate    = nullptr;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
@@ -584,7 +586,7 @@ void ChipLinuxAppMainLoop()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    InitCommissioner();
+    VerifyOrReturn(InitCommissioner() == CHIP_NO_ERROR);
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)

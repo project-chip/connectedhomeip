@@ -14,7 +14,8 @@ using chip::Dnssd::DnssdService;
 using chip::Dnssd::DnssdServiceProtocol;
 using chip::Dnssd::TextEntry;
 
-static void HandleResolve(void * context, DnssdService * result, CHIP_ERROR error)
+static void HandleResolve(void * context, DnssdService * result, const chip::Span<chip::Inet::IPAddress> & extraIPs,
+                          CHIP_ERROR error)
 {
     char addrBuf[100];
     nlTestSuite * suite = static_cast<nlTestSuite *>(context);

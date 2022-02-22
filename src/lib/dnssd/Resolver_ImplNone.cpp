@@ -29,7 +29,8 @@ class NoneResolver : public Resolver
 public:
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> *) override { return CHIP_NO_ERROR; }
     void Shutdown() override {}
-    void SetResolverDelegate(ResolverDelegate *) override {}
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
 
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override
     {

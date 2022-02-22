@@ -75,6 +75,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Operational
     VerifyOrReturn(successMethod != nullptr, ChipLogError(Controller, "Could not find onDeviceConnected method"));
 
     static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
+    DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(javaCallback, successMethod, reinterpret_cast<jlong>(device));
 }
 
@@ -108,6 +109,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, Pee
     jmethodID exceptionConstructor = env->GetMethodID(controllerExceptionCls, "<init>", "(ILjava/lang/String;)V");
     jobject exception = env->NewObject(controllerExceptionCls, exceptionConstructor, error, env->NewStringUTF(ErrorStr(error)));
 
+    DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(javaCallback, failureMethod, peerId.GetNodeId(), exception);
 }
 
@@ -173,6 +175,7 @@ void ReportCallback::OnReportEnd()
     err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onReport", "(Ljava/util/Map;)V", &onReportMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onReport method"));
 
+    DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mReportCallbackRef, onReportMethod, map);
 }
 
@@ -274,6 +277,7 @@ void ReportCallback::ReportError(jobject attributePath, const char * message, Ch
                                                   &onErrorMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 
+    DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mReportCallbackRef, onErrorMethod, attributePath, exception);
 }
 

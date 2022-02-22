@@ -176,6 +176,7 @@ public:
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
     uint32_t GetLastWrittenEventsBytes() { return mLastWrittenEventsBytes; }
+    CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
 private:
     friend class TestReadInteraction;

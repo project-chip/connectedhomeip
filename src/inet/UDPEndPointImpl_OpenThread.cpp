@@ -79,7 +79,7 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
         ChipLogError(Inet, "Failed to copy OpenThread buffer into System Packet buffer");
         return;
     }
-    payload->SetDataLength(msgLen + sizeof(IPPacketInfo));
+    payload->SetDataLength(static_cast<uint16_t>(msgLen + sizeof(IPPacketInfo)));
 
     ep->Retain();
     CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(payload)] {
