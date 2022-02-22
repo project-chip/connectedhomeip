@@ -144,6 +144,14 @@ jobs:
                     nrfconnect nrf52840dk_nrf52840 pump-controller-app \
                     examples/pump-controller-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
+            - name: Build example nRF Connect SDK All Clusters App on nRF52840 DK
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nrfconnect nrf52840dk_nrf52840 all-clusters-app \
+                    examples/all-clusters-app/nrfconnect/build/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
             - name: Run unit tests for Zephyr native_posix_64 platform
               timeout-minutes: 10
               run: |
