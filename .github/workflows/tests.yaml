@@ -29,7 +29,7 @@ concurrency:
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
-        timeout-minutes: 150
+        timeout-minutes: 120
 
         strategy:
             matrix:
@@ -95,21 +95,6 @@ jobs:
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}-test-group/chip-all-clusters-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
-            - name: Build and run OTA example
-              timeout-minutes: 30
-              run: |
-                  rm -rf /tmp/ota/
-                  mkdir -p /tmp/ota/
-                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug chip_config_network_layer_ble=false
-                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug chip_config_network_layer_ble=false
-                  scripts/tests/ota_test.sh
-            - name: Uploading OTA logs
-              if: always()
-              uses: actions/upload-artifact@v2
-              with:
-                  name: OTA,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/ota/
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
@@ -130,7 +115,7 @@ jobs:
                   retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 150
+        timeout-minutes: 120
 
         strategy:
             matrix:
@@ -200,22 +185,6 @@ jobs:
                      --iterations 1 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
-            - name: Build and run OTA example
-              timeout-minutes: 30
-              run: |
-                  brew install openssl pkg-config coreutils
-                  rm -rf /tmp/ota/
-                  mkdir -p /tmp/ota/
-                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug chip_config_network_layer_ble=false
-                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug chip_config_network_layer_ble=false
-                  scripts/tests/ota_test.sh
-            - name: Uploading OTA logs
-              if: always()
-              uses: actions/upload-artifact@v2
-              with:
-                  name: OTA,Darwin-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/ota/
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
