@@ -54,11 +54,16 @@ uint16_t GenericOTARequestorDriver::GetMaxDownloadBlockSize()
 
 void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error)
 {
-    // Any error encountered by the OTARequestor results a call to this function. The OTARequestor enters the 
-    // kIdle state, the default providers timer must be started
 
+}
+
+void GenericOTARequestorDriver::HandleIdleState()
+{
+    // Default profivers timer runs if and only if the OTARequestor's update state is kIdle.
+    // Must (re)start the timer every time we enter the kIdle state
     StartDefaultProvidersTimer();
 }
+
 
 void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
 {
@@ -135,15 +140,17 @@ void GenericOTARequestorDriver::UpdateCancelled()
     CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
 }
 
+
+    // SL TODO: Get rid of state
 void GenericOTARequestorDriver::ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay,
                                                       System::TimerCompleteCallback action, void * aAppState)
 {
-    CHIP_ERROR error = SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState);
+    SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState);
 
-    if (error != CHIP_NO_ERROR)
-    {
-        HandleError(state, error);
-    }
+    //    if (error != CHIP_NO_ERROR)
+    // {
+    //    HandleError(state, error);
+    // }
 }
 
 void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState)
@@ -151,17 +158,6 @@ void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallbac
     SystemLayer().CancelTimer(action, aAppState);
 }
 
-
-// void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
-// {
-//     ChipLogDetail(SoftwareUpdate, "LISS StartDelayTimerHandler appState %p", appState);
-
-//     VerifyOrReturn(appState != nullptr);
-
-//  ChipLogDetail(SoftwareUpdate, "LISS StartDelayTimerHandler appState %p", appState);
-
-//     static_cast<GenericOTARequestorDriver *>(appState)->mRequestor->ConnectToProvider(OTARequestorInterface::kQueryImage);
-// }
 
 
 void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
@@ -248,12 +244,15 @@ void GenericOTARequestorDriver::DriverTriggerQuery()
 {
 
     // IMPLEMENTATION CHOICE
-    // In this implementation explicitly triggering a query cancels any in-progress update
+    // In this implementation explicitly triggering a query cancels any in-progress update.
     UpdateCancelled();
+
+    // Default providers timer only runs when there is no ongoing query/update; must stop it now. 
+    StopDefaultProvidersTimer();
 
     // Select a provider to query and set it in the OTARequestor
 
-    // Put the right API call here when available
+    // SL TODO Put the right API call here when available
 
     // app::AttributeValueEncoder encoder;
     // mRequestor->GetDefaultOtaProviderList(encoder);
@@ -271,23 +270,29 @@ void GenericOTARequestorDriver::DriverTriggerQuery()
 
 void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState)
 {
+    ChipLogProgress(SoftwareUpdate, "Default Providers timer handler is invoked");
+
     // In this implementation the default provider timer runs only if there is no other update in progress.
     // Nevertheless, even though no other timers should be running, call a cleanup method to be safe 
     DriverTriggerQuery();
 }
 
 void GenericOTARequestorDriver::StartDefaultProvidersTimer()
-{
+{ 
+
+    ChipLogProgress(SoftwareUpdate, "Starting the Default Providers timer, timeout: %u", (unsigned int)mDefaultProvidersTimeoutSec);
+
     //  SL TODO: This has to be a method: PickNextDefaultProvider()
     //    mProviderNodeId = mTestingProviderNodeId;
     ScheduleDelayedAction(UpdateFailureState::kIdle,
-                                               System::Clock::Seconds32(),
+                                               System::Clock::Seconds32(mDefaultProvidersTimeoutSec),
                                                [](System::Layer *, void * context){ (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context); },
                                                this);
 }
 
 void GenericOTARequestorDriver::StopDefaultProvidersTimer()
 {
+    ChipLogProgress(SoftwareUpdate, "Stopping the Default Providers timer");
     CancelDelayedAction([](System::Layer *, void * context){ (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context); },
                                                this);
 }

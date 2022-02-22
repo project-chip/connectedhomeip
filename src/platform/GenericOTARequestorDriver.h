@@ -31,6 +31,8 @@ namespace DeviceLayer {
 class GenericOTARequestorDriver : public OTARequestorDriver
 {
 public:
+
+    //// Public API methods
     /**
      * Called to perform some initialization including:
      *   - Set the OTA requestor instance used to direct download progress
@@ -42,10 +44,14 @@ public:
         mImageProcessor = processor;
     }
 
+    // Set the timeout (in seconds) for the Default Provider timer
+    void SetDefaultProvidersTimeoutSec(uint32_t timeout) { mDefaultProvidersTimeoutSec = timeout; }
+
     //// Virtual methods from OTARequestorDriver
     bool CanConsent() override;
     uint16_t GetMaxDownloadBlockSize() override;
     void HandleError(UpdateFailureState state, CHIP_ERROR error) override;
+    void HandleIdleState() override;
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
     void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;
     void UpdateDownloaded() override;
@@ -69,6 +75,7 @@ private:
     OTARequestorInterface      * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
     uint32_t mOtaStartDelayMs                 = 0;
+    uint32_t mDefaultProvidersTimeoutSec      = 86400;  // Timeout for the Default Provider timer
 
  using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     Optional<ProviderLocationType> mLastProviderLocation; // Provider location used for the last query or update 

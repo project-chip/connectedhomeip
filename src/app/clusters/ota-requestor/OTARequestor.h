@@ -259,20 +259,6 @@ private:
     CHIP_ERROR SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy);
 
     /**
-     * Start the periodic timer for querying the default OTA Provider
-     */
-    void StartDefaultProvidersTimer();
-
-    /**
-     * Stop the periodic timer for querying the default OTA Provider
-     */
-    void StopDefaultProvidersTimer();
-    /**
-     * Timer handler for querying the default OTA Provider
-     */
-    void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
-
-    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
@@ -305,7 +291,6 @@ private:
 
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
-    uint32_t mOtaStartDelayMs                 = 0;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;

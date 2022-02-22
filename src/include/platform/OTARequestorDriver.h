@@ -89,6 +89,9 @@ public:
     /// Called when an error occurs at any OTA requestor operation
     virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
 
+    // Called when the OTA Requestor enters the kIdle update state
+    virtual void HandleIdleState() = 0;
+
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;
 

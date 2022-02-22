@@ -406,17 +406,13 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
 
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
-
     if (mProviderLocation.HasValue())
     {
-        // SL TODO: Revisit this logic. Can all of it be moved to the driver?
-
-        // We are now querying some provider. Stop the default provider timer and leave the kIdle state.
-        // Spec doesn't define a specific state for this but we can't be in kIdle
-        StopDefaultProvidersTimer();
+        // We are now querying some provider, leave the kIdle state. 
+        // Spec doesn't define a specific state for this but we can't be in kIdle. 
         RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
-        // Go through the driver as it may make its own choices here
+        // Go through the driver as it has additional logic to execute
         mOtaRequestorDriver->DriverTriggerQuery();
 
         return kTriggerSuccessful;
@@ -579,10 +575,10 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
     OtaRequestorServerOnStateTransition(previousState, newState, reason, targetSoftwareVersion);
 
-    // The default providers timer runs if and only if we are in the kIdle state, timer must be started
-    // every time we enter this state
+    // Inform the driver that the OTARequestor has entered the kIdle state. A driver implementation
+    // may choose to restart the default providers timer in this case
     if( mCurrentUpdateState != OTAUpdateStateEnum::kIdle) {
-        StartDefaultProvidersTimer();
+        mOtaRequestorDriver->HandleIdleState();
     }
 
     mCurrentUpdateState = newState;
@@ -751,65 +747,6 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
     return cluster.InvokeCommand(args, this, OnNotifyUpdateAppliedResponse, OnNotifyUpdateAppliedFailure);
 }
 
-/*
-void OTARequestor::DefaultOTAProvidersUpdated()
-{
-
-    // Determine whether our current state allows us to proceed
-    OTARequestorAction action = mOtaRequestorDriver->GetRequestorAction(OTARequestorIncomingEvent::DefaultProvidersAttrSet);
-    if(action == OTARequestorAction::DoNotProceed) {
-        ChipLogProgress(SoftwareUpdate, "Wrong UpdateState, ignoring command");
-        return EMBER_ZCL_STATUS_SUCCESS;
-    } else if(action == OTARequestorAction::CancelCurrentUpdateAndProceed) {
-        CancelImageUpdate();
-    } else if(action == OTARequestorAction::Proceed) {
-        // Fall through
-    }
-}
-*/
-// !!!!!!!! SL TODO For testing only. do not commit !!!!!!!!
-NodeId mTestingProviderNodeId =    NodeId(0x77);
-
-
-void OTARequestor::DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState)
-{
-    // Determine whether our current state allows us to proceed
-    OTARequestorAction action = mOtaRequestorDriver->GetRequestorAction(OTARequestorIncomingEvent::DefaultProvidersTimerExpiry);
-
-    if(action == OTARequestorAction::DoNotProceed) {
-        ChipLogProgress(SoftwareUpdate, "Wrong UpdateState, ignoring command");
-    } else if(action == OTARequestorAction::CancelCurrentUpdateAndProceed) {
-        ChipLogProgress(SoftwareUpdate, "Cancelling current update and querying the default provider");
-        CancelImageUpdate();
-    } else if(action == OTARequestorAction::Proceed) {
-        // Fall through
-    }
-
-    VerifyOrReturn(appState != nullptr);
-    OTARequestor *requestorCore =  static_cast<OTARequestor *>(appState);
-
-    //  SL TODO -- implement better API here
-    //    TestModeSetProviderParameters(mTestingProviderNodeId, 0 , 0);
-    requestorCore->ConnectToProvider(OTARequestor::kQueryImage);
-}
-
-void OTARequestor::StartDefaultProvidersTimer()
-{
-    //  SL TODO: This has to be a method: PickNextDefaultProvider()
-    //    mProviderNodeId = mTestingProviderNodeId;
-    mOtaRequestorDriver->ScheduleDelayedAction(UpdateFailureState::kIdle,
-                                               System::Clock::Seconds32(),
-                                               [](System::Layer *, void * context){ (static_cast<OTARequestor *>(context))->DefaultProviderTimerHandler(nullptr, context); },
-                                               this);
-}
-
-void OTARequestor::StopDefaultProvidersTimer()
-{
-
-    mOtaRequestorDriver->CancelDelayedAction([](System::Layer *, void * context){ (static_cast<OTARequestor *>(context))->DefaultProviderTimerHandler(nullptr, context); },
-                                               this);
-}
-
 // Invoked when the device becomes commissioned
 void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -817,7 +754,7 @@ void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDevic
 
     // TODO: Should we also send UpdateApplied here?
 
-    // Query the default provider
+    // Query the default provider. At the end of this query/update process the Default Providers timer is started
     (reinterpret_cast<OTARequestor *>(arg))->mOtaRequestorDriver->DriverTriggerQuery();
 }
 
