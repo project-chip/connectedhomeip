@@ -189,7 +189,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionIgnoreQueryImage:
-            gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUpdateAction:
         if (aValue == NULL)
