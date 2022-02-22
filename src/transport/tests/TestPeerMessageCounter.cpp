@@ -24,10 +24,10 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <transport/PeerMessageCounter.h>
 
+#include <errno.h>
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
-
-#include <errno.h>
+#include <vector>
 
 namespace {
 
@@ -37,16 +37,15 @@ static uint32_t counterValuesArray[] = { 0, 10, 0x7FFFFFFF, 0x80000000, 0x800000
 
 void GroupRollOverTest(nlTestSuite * inSuite, void * inContext)
 {
-    chip::Transport::PeerMessageCounter counter;
-
     for (auto n : counterValuesArray)
     {
-        new (&counter) chip::Transport::PeerMessageCounter();
-        NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n, true) == CHIP_NO_ERROR);
-
-        counter.CommitWithRollOver(n);
         for (uint32_t k = 1; k <= 2 * CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; k++)
         {
+            chip::Transport::PeerMessageCounter counter;
+            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n, true) == CHIP_NO_ERROR);
+
+            counter.CommitWithRollOver(n);
+
             // 1. A counter value of N + k comes in, we detect it as valid and commit it.
             NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n + k, true) == CHIP_NO_ERROR);
             counter.CommitWithRollOver(n + k);
@@ -63,14 +62,14 @@ void GroupRollOverTest(nlTestSuite * inSuite, void * inContext)
 
             // 3. A counter value between N - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW and N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW
             //    (but not including N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW) comes in, we treat it as duplicate.
-            for (uint32_t i = n - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; i < (n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE);
+            for (uint32_t i = n - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; i != (n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE);
                  i++)
             {
                 NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(i, true) != CHIP_NO_ERROR);
             }
 
             // 4. A counter value of N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW comes in, is treated as valid.
-            if (k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            if (k != CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
                 NL_TEST_ASSERT(
                     inSuite, counter.VerifyOrTrustFirst((n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE), true) == CHIP_NO_ERROR);
@@ -86,55 +85,54 @@ void GroupRollOverTest(nlTestSuite * inSuite, void * inContext)
 
 void GroupBackTrackTest(nlTestSuite * inSuite, void * inContext)
 {
-    chip::Transport::PeerMessageCounter counter;
-
     for (auto n : counterValuesArray)
     {
-        new (&counter) chip::Transport::PeerMessageCounter();
+        chip::Transport::PeerMessageCounter counter;
         NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n, true) == CHIP_NO_ERROR);
 
         counter.CommitWithRollOver(n);
         // 1.   Some set of values N - k come in, for 0 < k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW.
         //      All of those should be considered valid and committed.
-        for (uint32_t k = 1; k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; k += 2)
+        for (uint32_t k = 1; k * k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; k++)
         {
-            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n - k, true) == CHIP_NO_ERROR);
-            counter.CommitWithRollOver(n - k);
+            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n - (k * k), true) == CHIP_NO_ERROR);
+            counter.CommitWithRollOver(n - (k * k));
         }
         // 2. Counter value N + 3 comes in
         NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n + 3, true) == CHIP_NO_ERROR);
         counter.CommitWithRollOver(n + 3);
 
-        // 3. The same set of value N - k come in as in step (1) and are all considered duplicates/out of window.
-        for (uint32_t k = 1; k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; k += 2)
+        // 3. The same set of values N - k come in as in step (1) and are all considered duplicates/out of window.
+        for (uint32_t k = 1; k * k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; k++)
         {
-            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n - k, true) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n - (k * k), true) != CHIP_NO_ERROR);
         }
 
         // 4. The values that were not in the set in step (a) (but are at least N + 3 - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW)
         //    come in, and all are treated as allowed.
-        for (uint32_t k = 2; k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; k += 2)
+        for (uint32_t k = n + 3 - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; k != n + 3; ++k)
         {
-            if ((n - k) > (n + 3 - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE))
+            if (n - k == 0 || n - k == 1 || n - k == 4 || n - k == 9 || n - k == 16 || n - k == 25)
             {
-                NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n - k, true) == CHIP_NO_ERROR);
+                continue;
             }
+            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(k, true) == CHIP_NO_ERROR);
+            counter.CommitWithRollOver(k);
         }
     }
 }
 
 void GroupBigLeapTest(nlTestSuite * inSuite, void * inContext)
 {
-    chip::Transport::PeerMessageCounter counter;
-
     for (auto n : counterValuesArray)
     {
-        new (&counter) chip::Transport::PeerMessageCounter();
-        NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n, true) == CHIP_NO_ERROR);
-
-        counter.CommitWithRollOver(n);
-        for (uint32_t k = (static_cast<uint32_t>(1 << 31) - 5); k <= (static_cast<uint32_t>(1 << 3) - 1); k++)
+        for (uint32_t k = (static_cast<uint32_t>(1 << 31) - 5); k <= (static_cast<uint32_t>(1 << 31) - 1); k++)
         {
+            chip::Transport::PeerMessageCounter counter;
+            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n, true) == CHIP_NO_ERROR);
+
+            counter.CommitWithRollOver(n);
+
             // 1. A counter value of N + k comes in, we detect it as valid and commit it.
             NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n + k, true) == CHIP_NO_ERROR);
             counter.CommitWithRollOver(n + k);
@@ -144,41 +142,45 @@ void GroupBigLeapTest(nlTestSuite * inSuite, void * inContext)
 
             // 3. A counter value between N - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW and N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW
             //    (but not including N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW) comes in, we treat it as duplicate.
-            for (uint32_t i = n - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; i < (n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE);
-                 i++)
+
+            // Only test some values to save processing time
+            std::vector<uint32_t> testValues;
+            testValues.push_back(static_cast<uint32_t>(n + (k / 32) - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE));
+            testValues.push_back(static_cast<uint32_t>(n + (k / 16) - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE));
+            testValues.push_back(static_cast<uint32_t>(n + (k / 8) - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE));
+            testValues.push_back(static_cast<uint32_t>(n + (k / 4) - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE));
+            testValues.push_back(static_cast<uint32_t>(n + (k / 3) - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE));
+            testValues.push_back(static_cast<uint32_t>(n + (k / 2) - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE));
+            testValues.push_back(static_cast<uint32_t>(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE - 1));
+
+            // Will be inside the valid window of counter + (2^31 -1)
+            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE, true) == CHIP_NO_ERROR);
+
+            for (auto it : testValues)
             {
-                NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(i, true) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(it, true) != CHIP_NO_ERROR);
             }
 
             // 4. A counter value of N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW comes in, is treated as valid.
-            if (k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
-            {
-                NL_TEST_ASSERT(
-                    inSuite, counter.VerifyOrTrustFirst((n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE), true) == CHIP_NO_ERROR);
-            }
-            else
-            {
-                NL_TEST_ASSERT(
-                    inSuite, counter.VerifyOrTrustFirst((n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE), true) != CHIP_NO_ERROR);
-            }
+            NL_TEST_ASSERT(inSuite,
+                           counter.VerifyOrTrustFirst((n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE), true) == CHIP_NO_ERROR);
         }
     }
 }
 
 void GroupOutOfWindow(nlTestSuite * inSuite, void * inContext)
 {
-    chip::Transport::PeerMessageCounter counter;
-
     for (auto n : counterValuesArray)
     {
-        new (&counter) chip::Transport::PeerMessageCounter();
-        NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n, true) == CHIP_NO_ERROR);
-
-        counter.CommitWithRollOver(n);
-        for (uint32_t k = (static_cast<uint32_t>(1 << 31)); k <= (static_cast<uint32_t>(1 << 3) + 2); k++)
+        for (uint32_t k = (static_cast<uint32_t>(1 << 31)); k <= (static_cast<uint32_t>(1 << 31) + 2); k++)
         {
-            // 1. A counter value of N + k comes in, we detect it as duplicate/out of window
-            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n + k, true) != CHIP_NO_ERROR);
+            chip::Transport::PeerMessageCounter counter;
+            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n, true) == CHIP_NO_ERROR);
+
+            counter.CommitWithRollOver(n);
+
+            // 1. A counter value of N + k comes in, we detect it as out of window
+            NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n + k, true) == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW);
         }
     }
 }

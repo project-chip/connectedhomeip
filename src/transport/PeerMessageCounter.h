@@ -202,6 +202,9 @@ public:
         if (offset <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
         {
 
+            // Make sure that offset is never 0.
+            // This should no happen but we cannot guarantee it
+            // since this class doesn't own the call to this function
             if (offset != 0)
             {
                 mSynced.mWindow.set(offset - 1);
@@ -219,8 +222,8 @@ public:
             else
             {
                 mSynced.mWindow <<= shift;
+                mSynced.mWindow.set(shift - 1);
             }
-            mSynced.mWindow.set(0);
         }
     }
 
