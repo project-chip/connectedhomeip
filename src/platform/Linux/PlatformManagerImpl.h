@@ -30,8 +30,6 @@
 #include <gio/gio.h>
 #endif
 
-#include <thread>
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -90,7 +88,7 @@ private:
 
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we depercate the rendezvous session.
-    static void WiFIIPChangeListener(int sock);
+    static void * WiFIIPChangeListener(void * arg);
 
 #if CHIP_WITH_GIO
     struct GDBusConnectionDeleter
@@ -100,13 +98,11 @@ private:
     using UniqueGDBusConnection = std::unique_ptr<GDBusConnection, GDBusConnectionDeleter>;
     UniqueGDBusConnection mpGDBusConnection;
 
-    std::thread mGdbusThread;
-    GMainLoop * mGdbusLoop = nullptr;
+    pthread_t mGdbusThread;
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    std::thread mWifiIPThread;
-    int mWiFiSocket = 0;
+    pthread_t mWifiIPThread;
 #endif
 };
 
