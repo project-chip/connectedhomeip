@@ -55,7 +55,9 @@ public:
     ScopedSubject() {}
 
     template <typename T, class... Args>
-    constexpr explicit ScopedSubject(InPlaceTemplateType<T>, Args &&... args) : mSubject(InPlaceTemplate<T>, std::forward<Args>(args)...) {}
+    constexpr explicit ScopedSubject(InPlaceTemplateType<T>, Args &&... args) :
+        mSubject(InPlaceTemplate<T>, std::forward<Args>(args)...)
+    {}
 
     template <typename T, typename... Args>
     static ScopedSubject Create(Args &&... args)
@@ -88,15 +90,15 @@ public:
     {
         switch (GetAuthMode())
         {
-            case Access::AuthMode::kPase:
-                return "Pase";
-            case Access::AuthMode::kCase:
-                return "Case";
-            case Access::AuthMode::kGroup:
-                return "Group";
-            case Access::AuthMode::kNone:
-            default:
-                return "None";
+        case Access::AuthMode::kPase:
+            return "Pase";
+        case Access::AuthMode::kCase:
+            return "Case";
+        case Access::AuthMode::kGroup:
+            return "Group";
+        case Access::AuthMode::kNone:
+        default:
+            return "None";
         }
     }
 #endif // CHIP_DETAIL_LOGGING
@@ -128,7 +130,6 @@ private:
     Variant<PaseSubject, NodeSubject, GroupSubject> mSubject;
 };
 
-
 /**
  * A subject is a global unique identifier. It suite 2 purpose:
  *
@@ -141,7 +142,9 @@ public:
     Subject() : mFabricIndex(kUndefinedFabricIndex) {}
 
     template <typename T, class... Args>
-    constexpr explicit Subject(FabricIndex fabricIndex, InPlaceTemplateType<T>, Args &&... args) : mFabricIndex(fabricIndex), mScopedSubject(InPlaceTemplate<T>, std::forward<Args>(args)...) {}
+    constexpr explicit Subject(FabricIndex fabricIndex, InPlaceTemplateType<T>, Args &&... args) :
+        mFabricIndex(fabricIndex), mScopedSubject(InPlaceTemplate<T>, std::forward<Args>(args)...)
+    {}
 
     template <typename T, typename... Args>
     static Subject Create(FabricIndex fabricIndex, Args &&... args)
