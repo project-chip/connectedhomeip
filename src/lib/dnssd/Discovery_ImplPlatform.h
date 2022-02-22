@@ -68,8 +68,6 @@ private:
     DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
 
     CHIP_ERROR InitImpl();
-    CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
-    CHIP_ERROR PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
 
     static void HandleDnssdInit(void * context, CHIP_ERROR initError);
     static void HandleDnssdError(void * context, CHIP_ERROR initError);
