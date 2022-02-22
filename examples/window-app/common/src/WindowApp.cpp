@@ -453,6 +453,9 @@ void WindowApp::Cover::LiftDown()
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
     chip::Percent100ths percent100ths = 5000; // set at middle
 
+    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::LiftDown - Out of Memory for WorkData"));
+
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -469,9 +472,10 @@ void WindowApp::Cover::LiftDown()
         percent100ths = 10000;
     }
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    LiftPositionSet(mEndpoint, percent100ths);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    data->mEndpointId   = mEndpoint;
+    data->percent100ths = percent100ths;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleLiftPositionSet, reinterpret_cast<intptr_t>(data));
 }
 
 void WindowApp::Cover::LiftUp()
@@ -479,6 +483,9 @@ void WindowApp::Cover::LiftUp()
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
     chip::Percent100ths percent100ths = 5000; // set at middle
+
+    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::LiftUp - Out of Memory for WorkData"));
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
@@ -496,9 +503,10 @@ void WindowApp::Cover::LiftUp()
         percent100ths = 0;
     }
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    LiftPositionSet(mEndpoint, percent100ths);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    data->mEndpointId   = mEndpoint;
+    data->percent100ths = percent100ths;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleLiftPositionSet, reinterpret_cast<intptr_t>(data));
 }
 
 void WindowApp::Cover::LiftUpdate(bool newTarget)
@@ -735,6 +743,14 @@ void WindowApp::Cover::ScheduleTiltPositionSet(intptr_t arg)
 {
     WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
     TiltPositionSet(data->mEndpointId, data->percent100ths);
+
+    chip::Platform::Delete(data);
+}
+
+void WindowApp::Cover::ScheduleLiftPositionSet(intptr_t arg)
+{
+    WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
+    LiftPositionSet(data->mEndpointId, data->percent100ths);
 
     chip::Platform::Delete(data);
 }

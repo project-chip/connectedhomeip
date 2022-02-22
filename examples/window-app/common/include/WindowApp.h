@@ -148,6 +148,7 @@ public:
         };
 
         static void ScheduleTiltPositionSet(intptr_t arg);
+        static void ScheduleLiftPositionSet(intptr_t arg);
         static void ScheduleOperationalStatusSetWithGlobalUpdate(intptr_t arg);
     };
 
