@@ -239,7 +239,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
                                                 .providerNodeID = commandData.providerNodeId,
                                                 .endpoint       = commandData.endpoint };
 
-    mProviderLocation.SetValue(providerLocation);
+    SetDefaultProviderLocation(providerLocation);
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %u", providerLocation.fabricIndex);
@@ -448,58 +448,45 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
     ConnectToProvider(kNotifyUpdateApplied);
 }
 
-CHIP_ERROR OTARequestor::GetDefaultOtaProviderList(AttributeValueEncoder & encoder)
-{
-    return encoder.EncodeList([&](const auto & enc) -> CHIP_ERROR {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        mDefaultOtaProviderList.ForEachActiveObject([&](ProviderLocation::Type * pl) {
-            err = enc.Encode(*pl);
-            VerifyOrReturnError(err == CHIP_NO_ERROR, Loop::Break);
-            return Loop::Continue;
-        });
-        return err;
-    });
-}
-
 CHIP_ERROR OTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
 {
     // Remove all entries for the fabric index indicated
-    mDefaultOtaProviderList.ForEachActiveObject([&](ProviderLocation::Type * pl) {
-        if (pl->GetFabricIndex() == fabricIndex)
+    auto iterator = mDefaultOtaProviderList.Begin();
+    while (iterator.Next())
+    {
+        ProviderLocation::Type pl = iterator.GetValue();
+        if (pl.GetFabricIndex() == fabricIndex)
         {
-            mDefaultOtaProviderList.ReleaseObject(pl);
+            mDefaultOtaProviderList.Delete(pl);
         }
-        return Loop::Continue;
-    });
+    }
+
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTARequestor::AddDefaultOtaProvider(ProviderLocation::Type const & providerLocation)
+CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocation::Type & providerLocation)
 {
     // Look for an entry with the same fabric index indicated
-    Loop result = mDefaultOtaProviderList.ForEachActiveObject([&](auto * pl) {
-        if (pl->GetFabricIndex() == providerLocation.GetFabricIndex())
+    auto iterator = mDefaultOtaProviderList.Begin();
+    while (iterator.Next())
+    {
+        ProviderLocation::Type pl = iterator.GetValue();
+        if (pl.GetFabricIndex() == providerLocation.GetFabricIndex())
         {
-            return Loop::Break;
+            ChipLogError(SoftwareUpdate, "Default OTA provider entry with fabric %d already exists", pl.GetFabricIndex());
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        return Loop::Continue;
-    });
-
-    // Check if there is already an entry with the same fabric index
-    if (result == Loop::Break)
-    {
-        ChipLogError(SoftwareUpdate, "Default OTA provider entry with fabric %d already exists", providerLocation.GetFabricIndex());
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    ProviderLocation::Type * entry = mDefaultOtaProviderList.CreateObject(providerLocation);
-    if (entry == nullptr)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ReturnErrorOnFailure(mDefaultOtaProviderList.Add(providerLocation));
 
-    // Update the cached provider location if necessary
-    UpdateDefaultProviderLocation();
+    // Should be removed when periodic queries is implemented
+    iterator = mDefaultOtaProviderList.Begin();
+    while (iterator.Next())
+    {
+        SetDefaultProviderLocation(iterator.GetValue());
+        break;
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -530,20 +517,28 @@ void OTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
     OtaRequestorServerSetUpdateStateProgress(percent);
 }
 
-void OTARequestor::UpdateDefaultProviderLocation()
+bool OTARequestor::SetDefaultProviderLocation(const ProviderLocationType & providerLocation)
 {
-    // If there is currently no cached provider location or there is no OTA update in progress, update for the next periodic query
-    if (!mProviderLocation.HasValue() || (mCurrentUpdateState == OTAUpdateStateEnum::kIdle))
+    // Provider location cannot be modified if there is an OTA update in progress
+    if (mCurrentUpdateState != OTAUpdateStateEnum::kIdle)
     {
-        // Make sure to clear any cached provider location that did not come from the default OTA provider list
-        mProviderLocation.ClearValue();
-
-        mDefaultOtaProviderList.ForEachActiveObject([&](ProviderLocation::Type * pl) {
-            // For now, just find the first available
-            mProviderLocation.SetValue(*pl);
-            return Loop::Break;
-        });
+        return false;
     }
+
+    mProviderLocation.SetValue(providerLocation);
+    return true;
+}
+
+bool OTARequestor::ClearDefaultProviderLocation(void)
+{
+    // Provider location cannot be modified if there is an OTA update in progress
+    if (mCurrentUpdateState != OTAUpdateStateEnum::kIdle)
+    {
+        return false;
+    }
+
+    mProviderLocation.ClearValue();
+    return true;
 }
 
 void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason)
@@ -572,8 +567,11 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
 
     mCurrentUpdateState = newState;
 
-    // Update the cached provider location if necessary
-    UpdateDefaultProviderLocation();
+    // Provider location should not exist if no OTA update in progress
+    if (mCurrentUpdateState == OTAUpdateStateEnum::kIdle)
+    {
+        ClearDefaultProviderLocation();
+    }
 }
 
 void OTARequestor::RecordErrorUpdateState(UpdateFailureState failureState, CHIP_ERROR error, OTAChangeReasonEnum reason)

@@ -266,6 +266,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                                  .SetPeerId(fabricInfo.GetPeerId())
                                                  .SetMac(mac)
                                                  .SetPort(GetSecuredPort())
+                                                 .SetInterfaceId(GetInterfaceId())
                                                  .SetMRPConfig(GetLocalMRPConfig())
                                                  .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
                                                  .EnableIpV4(true);
@@ -287,6 +288,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 {
     auto advertiseParameters = chip::Dnssd::CommissionAdvertisingParameters()
                                    .SetPort(commissionableNode ? GetSecuredPort() : GetUnsecuredPort())
+                                   .SetInterfaceId(GetInterfaceId())
                                    .EnableIpV4(true);
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Dnssd::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Dnssd::CommssionAdvertiseMode::kCommissioner);
