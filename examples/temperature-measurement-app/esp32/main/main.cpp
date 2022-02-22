@@ -33,10 +33,6 @@
 #include <string>
 #include <vector>
 
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <app/server/OnboardingCodesUtil.h>
-#include <lib/support/ErrorStr.h>
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -44,8 +40,12 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/support/ErrorStr.h>
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -64,12 +64,9 @@ static void InitServer(intptr_t context)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Sets it to 20C
-    int16_t value_16 = 2000;
-    EmberAfStatus status = emberAfWriteAttribute(1,
-      ZCL_TEMP_MEASUREMENT_CLUSTER_ID,
-      ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
-      CLUSTER_MASK_SERVER, (uint8_t*) &value_16,
-      ZCL_INT16S_ATTRIBUTE_TYPE);
+    int16_t value_16     = 2000;
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
+                                                 CLUSTER_MASK_SERVER, (uint8_t *) &value_16, ZCL_INT16S_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
