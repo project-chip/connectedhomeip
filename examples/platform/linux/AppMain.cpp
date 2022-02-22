@@ -572,8 +572,10 @@ void ChipLinuxAppMainLoop()
     unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+    Inet::InterfaceId interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
+
     // Init ZCL Data Model and CHIP App Server
-    Server::GetInstance().Init(nullptr, securePort, unsecurePort);
+    Server::GetInstance().Init(nullptr, securePort, unsecurePort, interfaceId);
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
