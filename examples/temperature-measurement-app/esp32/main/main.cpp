@@ -35,8 +35,17 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
+#include <app/server/OnboardingCodesUtil.h>
 #include <lib/support/ErrorStr.h>
+#include <app-common/zap-generated/att-storage.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app/util/af-event.h>
+#include <app/util/af.h>
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -46,6 +55,27 @@ using namespace ::chip::DeviceLayer;
 const char * TAG = "temperature-measurement-app";
 
 static DeviceCallbacks EchoCallbacks;
+
+static void InitServer(intptr_t context)
+{
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    // Sets it to 20C
+    int16_t value_16 = 2000;
+    EmberAfStatus status = emberAfWriteAttribute(1,
+      ZCL_TEMP_MEASUREMENT_CLUSTER_ID,
+      ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
+      CLUSTER_MASK_SERVER, (uint8_t*) &value_16,
+      ZCL_INT16S_ATTRIBUTE_TYPE);
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Shell, "Temp measurement set failed");
+    }
+}
 
 extern "C" void app_main()
 {
@@ -80,8 +110,8 @@ extern "C" void app_main()
         return;
     }
 
-    chip::Server::GetInstance().Init();
+    // Print QR Code URL
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

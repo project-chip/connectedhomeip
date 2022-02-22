@@ -71,6 +71,28 @@ server cluster Basic = 40 {
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
+client cluster Binding = 30 {
+  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct BindRequest {
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
+  }
+
+  request struct UnbindRequest {
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
+  }
+
+  command Bind(BindRequest): DefaultSuccess = 0;
+  command Unbind(UnbindRequest): DefaultSuccess = 1;
+}
+
 server cluster Descriptor = 29 {
   struct DeviceType {
     DEVTYPE_ID type = 1;
@@ -81,6 +103,7 @@ server cluster Descriptor = 29 {
   attribute(readonly) CLUSTER_ID serverList[] = 1;
   attribute(readonly) CLUSTER_ID clientList[] = 2;
   attribute(readonly) ENDPOINT_NO partsList[] = 3;
+  attribute(readonly) attrib_id attributeList[] = 65531;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
@@ -527,6 +550,7 @@ server cluster TemperatureMeasurement = 1026 {
   attribute(readonly) int16s measuredValue = 0;
   attribute(readonly) int16s minMeasuredValue = 1;
   attribute(readonly) int16s maxMeasuredValue = 2;
+  attribute(readonly) attrib_id attributeList[] = 65531;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
@@ -615,6 +639,7 @@ endpoint 0 {
 }
 
 endpoint 1 {
+  binding cluster Binding;
   server  cluster Descriptor;
   server  cluster TemperatureMeasurement;
 }
