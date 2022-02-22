@@ -81,7 +81,7 @@ public:
 
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
-  
+
     using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     void SetCurrentProviderLocation(ProviderLocationType providerLocation) { mProviderLocation.SetValue(providerLocation); }
 
@@ -285,7 +285,7 @@ private:
     static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
     /**
-     * Commissioning callback 
+     * Commissioning callback
      */
     static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 

@@ -62,7 +62,7 @@ public:
     OTARequestorAction GetRequestorAction(OTARequestorIncomingEvent input) override;
     void ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState) override;
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) override;
-    void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
+    void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation,
                                         app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
     void DriverTriggerQuery() override;
 
@@ -70,7 +70,7 @@ public:
     void StartDefaultProvidersTimer();
     void StopDefaultProvidersTimer();
     void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
- 
+
 private:
     OTARequestorInterface      * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
@@ -78,7 +78,7 @@ private:
     uint32_t mDefaultProvidersTimeoutSec      = 86400;  // Timeout for the Default Provider timer
 
  using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-    Optional<ProviderLocationType> mLastProviderLocation; // Provider location used for the last query or update 
+    Optional<ProviderLocationType> mLastProviderLocation; // Provider location used for the last query or update
 };
 
 } // namespace DeviceLayer

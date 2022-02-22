@@ -86,7 +86,7 @@ public:
     // Get the value of the UpdateState attribute of the OTA Software Update Requestor Cluster on the given endpoint
     virtual CHIP_ERROR GetState(EndpointId endpointId,
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
-    // Getter for the value of the UpdateState cached by the object 
+    // Getter for the value of the UpdateState cached by the object
     virtual app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum GetCurrentUpdateState() = 0;
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is

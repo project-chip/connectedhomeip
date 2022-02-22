@@ -67,7 +67,7 @@ enum class OTARequestorIncomingEvent
     DefaultProvidersTimerExpiry,
 };
 
-enum class OTARequestorAction 
+enum class OTARequestorAction
 {
     DoNotProceed,
     CancelCurrentUpdateAndProceed,
@@ -124,7 +124,7 @@ public:
     virtual void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) = 0;
 
  using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-    virtual void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
+    virtual void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation,
                                         app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) = 0;
 
     virtual void DriverTriggerQuery() = 0;
