@@ -34,8 +34,9 @@
 #include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
@@ -90,8 +91,39 @@ chip::OTARequestor sOTARequestor;
 
 AppTask AppTask::sAppTask;
 
-int AppTask::Init()
+CHIP_ERROR AppTask::Init()
 {
+    // Initialize CHIP stack
+    LOG_INF("Init CHIP stack");
+
+    CHIP_ERROR err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("Platform::MemoryInit() failed");
+        return err;
+    }
+
+    err = PlatformMgr().InitChipStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("PlatformMgr().InitChipStack() failed");
+        return err;
+    }
+
+    err = ThreadStackMgr().InitThreadStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("ThreadStackMgr().InitThreadStack() failed");
+        return err;
+    }
+
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
+        return err;
+    }
+
     // Initialize LEDs
     LEDWidget::InitGpio();
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
@@ -102,48 +134,52 @@ int AppTask::Init()
 
     UpdateStatusLED();
 
+    int ret = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL);
+    if (ret != 0)
+    {
+        return chip::System::MapErrorZephyr(ret);
+    }
+
+    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
     // Initialize buttons
-    int ret = dk_buttons_init(ButtonEventHandler);
+    ret = dk_buttons_init(ButtonEventHandler);
     if (ret)
     {
         LOG_ERR("dk_buttons_init() failed");
-        return ret;
+        return chip::System::MapErrorZephyr(ret);
     }
 
-    // Initialize timer user data
+    // Initialize function button timer
     k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
 #ifdef CONFIG_MCUMGR_SMP_BT
+    // Initialize DFU over SMP
     GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
     GetDFUOverSMP().ConfirmNewImage();
 #endif
 
-    ret = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL);
-    if (ret != 0)
-        return ret;
-
-    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-
-    // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
+    // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    InitOTARequestor();
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init());
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY)
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
-#endif
-
-#if defined(CONFIG_CHIP_NFC_COMMISSIONING)
+    // Add CHIP event handler and start CHIP thread.
+    // Note that all the initialization code should happen prior to this point to avoid data races
+    // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
-#endif
 
-    InitOTARequestor();
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
+    }
 
-    return 0;
+    return err;
 }
 
 void AppTask::InitOTARequestor()
@@ -157,15 +193,9 @@ void AppTask::InitOTARequestor()
 #endif
 }
 
-int AppTask::StartApp()
+CHIP_ERROR AppTask::StartApp()
 {
-    int ret = Init();
-
-    if (ret)
-    {
-        LOG_ERR("AppTask.Init() failed");
-        return ret;
-    }
+    ReturnErrorOnFailure(Init());
 
     AppEvent event = {};
 
@@ -174,6 +204,8 @@ int AppTask::StartApp()
         k_msgq_get(&sAppEventQueue, &event, K_FOREVER);
         DispatchEvent(&event);
     }
+
+    return CHIP_NO_ERROR;
 }
 
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
