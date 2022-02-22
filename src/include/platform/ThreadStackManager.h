@@ -97,6 +97,11 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
     CHIP_ERROR GetAndLogThreadTopologyFull();
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
+    /**
+     * @brief Get the factory-assigned IEEE EUI-64 for this interface.
+     *
+     * @param buf buffer in which to store the EUI64, must be at least 8 bytes
+     */
     CHIP_ERROR GetIeeeEui64(uint8_t * buf);
     CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR GetPollPeriod(uint32_t & buf);

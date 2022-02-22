@@ -846,7 +846,11 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary80215
     memcpy(buf, extendedAddr, sizeof(otExtAddress));
     return CHIP_NO_ERROR;
 }
-
+/**
+ * @brief Get the factory-assigned IEEE EUI-64 for this interface.
+ *
+ * @param buf buffer in which to store the EUI64, must be at least 8 bytes
+ */
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetIeeeEui64(uint8_t * buf)
 {
