@@ -369,7 +369,9 @@ public:
         kAlwaysFail = 2,
     };
 
-    void SetBypassACL(BypassACL aConfig) { mBypassACL = aConfig; }
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    inline void SetBypassACL(BypassACL aConfig) { mBypassACL = aConfig; }
+#endif
 
 private:
     /**
@@ -487,12 +489,12 @@ private:
     /**
      * @brief checking if the given path is an interested path, this is a helper function for EventManagement::EventIterator
      *
-     * @retval CHIP_NO_ERROR This path should be excluded in the generated event report.
+     * @retval CHIP_ERROR_UNEXPECTED_EVENT This path should be excluded in the generated event report.
      * @retval CHIP_EVENT_ID_FOUND This path should be included in the generated event report.
      * @retval CHIP_ERROR_ACCESS_DENIED This path should be included in the generated event report, but the client does not have
      * .       enough privilege to access it.
      */
-    static CHIP_ERROR IsInterestedEventPaths(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
+    static CHIP_ERROR CheckEventContext(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
 
     /**
      * @brief copy event from circular buffer to target buffer for report
@@ -532,8 +534,10 @@ private:
     EventNumber mLastEventNumber = 0; ///< Last event Number vended for this priority
     Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
     /// Debug flag for bypassing ACL check when retrieving events
     BypassACL mBypassACL = BypassACL::kNoBypass;
+#endif
 };
 } // namespace app
 } // namespace chip

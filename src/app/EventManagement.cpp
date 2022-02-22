@@ -595,21 +595,21 @@ CHIP_ERROR EventManagement::WriteEventStatusIB(TLVWriter & aWriter, const Concre
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EventManagement::IsInterestedEventPaths(EventLoadOutContext * eventLoadOutContext,
-                                                   const EventManagement::EventEnvelopeContext & event)
+CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContext,
+                                              const EventManagement::EventEnvelopeContext & event)
 {
     if (eventLoadOutContext->mCurrentEventNumber < eventLoadOutContext->mStartingEventNumber)
     {
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_UNEXPECTED_EVENT;
     }
 
     if (event.mFabricIndex != kUndefinedFabricIndex && eventLoadOutContext->mSubjectDescriptor.fabricIndex != event.mFabricIndex)
     {
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_UNEXPECTED_EVENT;
     }
 
     ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
-    CHIP_ERROR ret = CHIP_NO_ERROR;
+    CHIP_ERROR ret = CHIP_ERROR_UNEXPECTED_EVENT;
 
     bool isPathInterestedByConcretePath = false;
 
@@ -618,7 +618,7 @@ CHIP_ERROR EventManagement::IsInterestedEventPaths(EventLoadOutContext * eventLo
     {
         if (interestedPath->IsEventPathSupersetOf(path))
         {
-            ret = CHIP_EVENT_ID_FOUND;
+            ret = CHIP_NO_ERROR;
             if (!interestedPath->HasEventWildcard())
             {
                 isPathInterestedByConcretePath = true;
@@ -627,36 +627,39 @@ CHIP_ERROR EventManagement::IsInterestedEventPaths(EventLoadOutContext * eventLo
         }
     }
 
-    if (ret == CHIP_EVENT_ID_FOUND)
+    ReturnErrorOnFailure(ret);
+
+    Access::RequestPath requestPath{ .cluster = event.mClusterId, .endpoint = event.mEndpointId };
+    Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
+    CHIP_ERROR aclError                = CHIP_NO_ERROR;
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    switch (GetInstance().mBypassACL)
     {
-        Access::RequestPath requestPath{ .cluster = event.mClusterId, .endpoint = event.mEndpointId };
-        Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
-        CHIP_ERROR aclError                = CHIP_NO_ERROR;
+    case BypassACL::kAlwaysPass:
+        aclError = CHIP_NO_ERROR;
+        break;
+    case BypassACL::kAlwaysFail:
+        aclError = CHIP_ERROR_ACCESS_DENIED;
+        break;
+    case BypassACL::kNoBypass:
+#endif
+        aclError = Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+        break;
+    }
+#endif
 
-        switch (GetInstance().mBypassACL)
+    if (aclError != CHIP_NO_ERROR)
+    {
+        ReturnErrorCodeIf(aclError != CHIP_ERROR_ACCESS_DENIED, aclError);
+        if (isPathInterestedByConcretePath)
         {
-        case BypassACL::kAlwaysPass:
-            aclError = CHIP_NO_ERROR;
-            break;
-        case BypassACL::kAlwaysFail:
-            aclError = CHIP_ERROR_ACCESS_DENIED;
-            break;
-        case BypassACL::kNoBypass:
-            aclError = Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
-            break;
+            ret = CHIP_ERROR_ACCESS_DENIED;
         }
-
-        if (aclError != CHIP_NO_ERROR)
+        else
         {
-            ReturnErrorCodeIf(aclError != CHIP_ERROR_ACCESS_DENIED, aclError);
-            if (isPathInterestedByConcretePath)
-            {
-                ret = CHIP_ERROR_ACCESS_DENIED;
-            }
-            else
-            {
-                ret = CHIP_NO_ERROR;
-            }
+            ret = CHIP_ERROR_UNEXPECTED_EVENT;
         }
     }
 
@@ -693,7 +696,17 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     apEventLoadOutContext->mCurrentTime        = event->mCurrentTime;
     apEventLoadOutContext->mCurrentEventNumber = event->mEventNumber;
 
-    return IsInterestedEventPaths(apEventLoadOutContext, *event);
+    err = CheckEventContext(apEventLoadOutContext, *event);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = CHIP_EVENT_ID_FOUND;
+    }
+    else if (err == CHIP_ERROR_UNEXPECTED_EVENT)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+    return err;
 }
 
 CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aDepth, void * apContext)

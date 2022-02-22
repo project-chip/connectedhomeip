@@ -149,7 +149,7 @@ private:
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableEventType value;
 
-        VerifyOrExit(apStatus != nullptr && !apStatus->IsSuccess(), err = apStatus->ToChipError());
+        VerifyOrExit(apStatus == nullptr || apStatus->IsSuccess(), err = apStatus->ToChipError());
 
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 

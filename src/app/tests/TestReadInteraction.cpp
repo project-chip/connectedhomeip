@@ -1047,7 +1047,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
     GenerateEvents(apSuite, apContext);
 
     EventManagement::GetInstance().SetBypassACL(chip::app::EventManagement::BypassACL::kAlwaysFail);
-    // When read events with withcard paths without enough privilege for reading one or more event, we will not exclude the events
+    // When reading events with withcard paths without enough privilege for reading one or more event, we will exclude the events
     // when generating the report.
     {
         chip::app::EventPathParams eventPathParams[1];
