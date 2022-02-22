@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <access/Subjects.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPConfig.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -63,6 +64,7 @@ public:
     virtual void Retain() {}
     virtual void Release() {}
 
+    virtual Access::Subject GetSubject() const                         = 0;
     virtual Access::SubjectDescriptor GetSubjectDescriptor() const     = 0;
     virtual bool RequireMRP() const                                    = 0;
     virtual const ReliableMessageProtocolConfig & GetMRPConfig() const = 0;
