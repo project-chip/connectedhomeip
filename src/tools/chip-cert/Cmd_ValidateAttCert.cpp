@@ -25,9 +25,7 @@
 
 #include "chip-cert.h"
 
-//#include "vector"
-
-#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace {
 
