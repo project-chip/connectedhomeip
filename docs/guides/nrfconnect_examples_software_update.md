@@ -72,7 +72,8 @@ To test the DFU over Matter, you need to complete the following steps:
 
         $ ./out/chiptool/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
 
-10.  Initiate the DFU procedure in one of the following ways:
+10. Initiate the DFU procedure in one of the following ways:
+
 
     -   If you have built the device firmware with `-DCONFIG_CHIP_LIB_SHELL=y`
         option, which enables Matter shell commands, run the following command
