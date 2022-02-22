@@ -146,6 +146,7 @@ class TestTarget(Enum):
 class ApplicationPaths:
     chip_tool: typing.List[str]
     all_clusters_app: typing.List[str]
+    door_lock_app: typing.List[str]
     tv_app: typing.List[str]
 
 
@@ -206,10 +207,7 @@ class TestDefinition:
             elif self.target == TestTarget.TV:
                 app_cmd = paths.tv_app
             elif self.target == TestTarget.DOOR_LOCK:
-                logging.info(
-                    "Ignore test - test is made for door lock which"
-                    " is not supported yet")
-                return
+                app_cmd = paths.door_lock_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
