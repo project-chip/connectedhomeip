@@ -1645,7 +1645,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t capacity = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint8_t> capacity;
     DataModel::List<const chip::GroupId> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1661,7 +1661,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t capacity = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint8_t> capacity;
     DataModel::DecodableList<chip::GroupId> groupList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

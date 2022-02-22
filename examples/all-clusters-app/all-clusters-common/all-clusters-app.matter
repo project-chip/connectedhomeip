@@ -1553,7 +1553,7 @@ server cluster Groups = 4 {
   }
 
   response struct GetGroupMembershipResponse {
-    INT8U capacity = 0;
+    nullable INT8U capacity = 0;
     group_id groupList[] = 1;
   }
 

@@ -93053,9 +93053,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(uint8_t capacity, const chip::app::DataModel::DecodableList<chip::GroupId> & groupList)
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<uint8_t> & capacity,
+                             const chip::app::DataModel::DecodableList<chip::GroupId> & groupList)
     {
-        VerifyOrReturn(CheckValue("capacity", capacity, 255));
+        VerifyOrReturn(CheckValueNull("capacity", capacity));
 
         {
             auto iter_0 = groupList.begin();
@@ -93317,9 +93318,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13(uint8_t capacity, const chip::app::DataModel::DecodableList<chip::GroupId> & groupList)
+    void OnSuccessResponse_13(const chip::app::DataModel::Nullable<uint8_t> & capacity,
+                              const chip::app::DataModel::DecodableList<chip::GroupId> & groupList)
     {
-        VerifyOrReturn(CheckValue("capacity", capacity, 255));
+        VerifyOrReturn(CheckValueNull("capacity", capacity));
 
         {
             auto iter_0 = groupList.begin();
@@ -93500,9 +93502,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_18(uint8_t capacity, const chip::app::DataModel::DecodableList<chip::GroupId> & groupList)
+    void OnSuccessResponse_18(const chip::app::DataModel::Nullable<uint8_t> & capacity,
+                              const chip::app::DataModel::DecodableList<chip::GroupId> & groupList)
     {
-        VerifyOrReturn(CheckValue("capacity", capacity, 255));
+        VerifyOrReturn(CheckValueNull("capacity", capacity));
 
         {
             auto iter_0 = groupList.begin();

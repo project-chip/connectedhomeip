@@ -1599,10 +1599,17 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject capacity;
-    std::string capacityClassName     = "java/lang/Integer";
-    std::string capacityCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(capacityClassName.c_str(), capacityCtorSignature.c_str(),
-                                                                  dataResponse.capacity, capacity);
+    if (dataResponse.capacity.IsNull())
+    {
+        capacity = nullptr;
+    }
+    else
+    {
+        std::string capacityClassName     = "java/lang/Integer";
+        std::string capacityCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(capacityClassName.c_str(), capacityCtorSignature.c_str(),
+                                                                      dataResponse.capacity.Value(), capacity);
+    }
     jobject groupList;
     chip::JniReferences::GetInstance().CreateArrayList(groupList);
 

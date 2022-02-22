@@ -1777,11 +1777,11 @@ class Groups(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="capacity", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="capacity", Tag=0, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="groupList", Tag=1, Type=typing.List[uint]),
                     ])
 
-            capacity: 'uint' = 0
+            capacity: 'typing.Union[Nullable, uint]' = NullValue
             groupList: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
