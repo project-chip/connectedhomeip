@@ -599,7 +599,7 @@ JNI_METHOD(jbyteArray, getAttestationChallenge)
     err                                      = wrapper->Controller()->GetAttestationChallenge(attestationChallenge);
     SuccessOrExit(err);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), sizeof(attestationChallenge.data()),
+    err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), attestationChallenge.size(),
                                                      attestationChallengeJbytes);
     SuccessOrExit(err);
 
