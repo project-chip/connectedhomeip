@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace chip {
 namespace Credentials {
