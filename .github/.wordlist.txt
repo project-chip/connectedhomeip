@@ -623,7 +623,6 @@ js
 json
 JTAG
 Jupyter
-jupyter
 jupyterlab
 KA
 kBusy
@@ -929,7 +928,6 @@ protobuf
 protos
 Prover
 providerFabricIndex
-providerNodeId
 ProviderLocation
 providerNodeId
 ProxyConfiguration
@@ -993,7 +991,6 @@ RendezvousInformation
 RendezvousParameters
 RendezVousTest
 REPL
-repl
 repo
 req
 Requestor
