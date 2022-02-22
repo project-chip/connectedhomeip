@@ -30,7 +30,7 @@ jobs:
 
         strategy:
             matrix:
-                type: [main, clang, mbedtls]
+                type: [main, clang, mbedtls, rotating_device_id]
         env:
             BUILD_TYPE: ${{ matrix.type }}
 
@@ -75,6 +75,7 @@ jobs:
                      "main") GN_ARGS='';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
+                     "rotating_device_id") GN_ARGS='chip_enable_rotating_device_id=true';;
                      *) ;;
                   esac
 
