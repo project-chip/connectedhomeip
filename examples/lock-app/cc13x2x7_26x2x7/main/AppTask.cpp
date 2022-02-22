@@ -159,8 +159,7 @@ int AppTask::Init()
         // set serial number to flash
         // this is before ZCL is started, so Basic Cluster populates Serial Number with this EUI64 (in string)
         ThreadStackMgrImpl().GetIeeeEui64(EUI64);
-        sprintf(stringEUI64, "%02X%02X%02X%02X%02X%02X%02X%02X",
-			EUI64[0], EUI64[1], EUI64[2], EUI64[3], EUI64[4], EUI64[5], EUI64[6], EUI64[7]);
+        chip::Encoding::BytesToUppercaseHexString(EUI64, sizeof(EUI64), stringEUI64, sizeof(stringEUI64));
 	ret = ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64));
         PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
 	if (ret != CHIP_NO_ERROR)
