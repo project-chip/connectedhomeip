@@ -78,16 +78,6 @@ void PrintOnboardingCodes(const chip::SetupPayload & payload)
     {
         ChipLogError(AppServer, "Getting manual pairing code failed!");
     }
-
-    // Hand a copy of the payload to GetLongManualPairingCode.
-    if (GetLongManualPairingCode(manualPairingCode, chip::SetupPayload(payload)) == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "Long manual pairing code: [%s]", manualPairingCode.c_str());
-    }
-    else
-    {
-        ChipLogError(AppServer, "Getting long manual pairing code failed!");
-    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC
