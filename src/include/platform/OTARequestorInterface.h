@@ -148,8 +148,20 @@ public:
     enum OTATriggerResult
     {
         kTriggerSuccessful = 0,
-        kNoProviderKnown   = 1
+        kNoProviderKnown   = 1,
+        kWrongState        = 2
     };
+
+    // Various actions to take when OnConnected callback is called
+    enum OnConnectedAction
+    {
+        kQueryImage = 0,
+        kStartBDX,
+        kApplyUpdate,
+        kNotifyUpdateApplied,
+    };
+
+    virtual void ConnectToProvider(OnConnectedAction onConnectedAction) = 0;
 
     // Handler for the AnnounceOTAProvider command
     virtual EmberAfStatus HandleAnnounceOTAProvider(
@@ -180,9 +192,11 @@ public:
     // Get image update progress in percents unit
     virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
 
-    // Get requestor state
+    // Get the value of the UpdateState attribute of the OTA Software Update Requestor Cluster on the given endpoint
     virtual CHIP_ERROR GetState(EndpointId endpointId,
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
+    // Getter for the value of the UpdateState cached by the object 
+    virtual app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum GetCurrentUpdateState() = 0;
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
@@ -190,6 +204,9 @@ public:
 
     // Clear all entries with the specified fabric index in the default OTA provider list
     virtual CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) = 0;
+
+    using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
 
     // Add a default OTA provider to the cached list
     virtual CHIP_ERROR

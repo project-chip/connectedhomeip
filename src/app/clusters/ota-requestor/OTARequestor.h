@@ -37,14 +37,14 @@ namespace chip {
 class OTARequestor : public OTARequestorInterface, public BDXDownloader::StateDelegate
 {
 public:
-    // Various actions to take when OnConnected callback is called
-    enum OnConnectedAction
-    {
-        kQueryImage = 0,
-        kStartBDX,
-        kApplyUpdate,
-        kNotifyUpdateApplied,
-    };
+    // // Various actions to take when OnConnected callback is called
+    // enum OnConnectedAction
+    // {
+    //     kQueryImage = 0,
+    //     kStartBDX,
+    //     kApplyUpdate,
+    //     kNotifyUpdateApplied,
+    // };
 
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
@@ -78,6 +78,9 @@ public:
 
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
+  
+    using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    void SetCurrentProviderLocation(ProviderLocationType providerLocation) { mProviderLocation.SetValue(providerLocation); }
 
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(
@@ -113,6 +116,8 @@ public:
         app::DataModel::Nullable<uint8_t> percent;
         percent.SetNull();
         OtaRequestorServerSetUpdateStateProgress(percent);
+
+        chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor, reinterpret_cast<intptr_t>(this));
     }
 
     /**
@@ -121,7 +126,10 @@ public:
      *
      * @param onConnectedAction  The action to take once session to provider has been established
      */
-    void ConnectToProvider(OnConnectedAction onConnectedAction);
+    void ConnectToProvider(OnConnectedAction onConnectedAction) override;
+
+    // Getter for the value of the UpdateState cached by the object
+    app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum GetCurrentUpdateState() { return mCurrentUpdateState; }
 
     /**
      * Called to set optional requestorCanConsent value provided by Requestor.
@@ -135,7 +143,7 @@ public:
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
-    using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+
     using OTAUpdateStateEnum               = app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
     using OTAChangeReasonEnum              = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
 
@@ -281,8 +289,13 @@ private:
     static void OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response);
     static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
+    /**
+     * Commissioning callback 
+     */
+    static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
+
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
-    uint32_t mOtaStartDelayMs                 = 0;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;

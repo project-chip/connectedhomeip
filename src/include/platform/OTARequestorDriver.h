@@ -43,6 +43,8 @@ struct UpdateDescription
 
 enum class UpdateFailureState
 {
+    kUnknown,
+    kIdle,
     kQuerying,
     kDownloading,
     kApplying,
@@ -55,6 +57,21 @@ enum class UpdateNotFoundReason
     Busy,
     NotAvailable,
     UpToDate
+};
+
+enum class OTARequestorIncomingEvent
+{
+    AnnouncedOTAProviderReceived,
+    TriggerImmediateQueryInvoked,
+    DefaultProvidersAttrSet,
+    DefaultProvidersTimerExpiry,
+};
+
+enum class OTARequestorAction 
+{
+    DoNotProceed,
+    CancelCurrentUpdateAndProceed,
+    Proceed,
 };
 
 // Interface class to abstract the OTA-related business logic. Each application
@@ -72,6 +89,9 @@ public:
 
     /// Called when an error occurs at any OTA requestor operation
     virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
+
+    // Called when the OTA Requestor enters the kIdle update state
+    virtual void HandleIdleState() = 0;
 
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;
@@ -93,6 +113,22 @@ public:
 
     /// Called when the current software update has been cancelled by the local application
     virtual void UpdateCancelled() = 0;
+
+    /// Called at various stages of OTA update process to determine whether to proceed
+    virtual OTARequestorAction GetRequestorAction(OTARequestorIncomingEvent input) = 0;
+
+    /// Platform-specific timer setting method
+    virtual void ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState) = 0;
+
+    /// Platform-specific timer cancelling method
+    virtual void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) = 0;
+
+ using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    virtual void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
+                                        app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) = 0;
+
+    virtual void DriverTriggerQuery() = 0;
+
 };
 
 } // namespace chip
