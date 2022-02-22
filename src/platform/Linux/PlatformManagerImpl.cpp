@@ -33,8 +33,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 
-#include <thread>
-
 #include <arpa/inet.h>
 #include <dirent.h>
 #include <errno.h>
@@ -86,26 +84,17 @@ void SignalHandler(int signum)
 }
 
 #if CHIP_WITH_GIO
-void GDBus_Thread()
+void GDBus_Thread(GMainLoop * gdbusLoop)
 {
-    GMainLoop * loop = g_main_loop_new(nullptr, false);
-
-    g_main_loop_run(loop);
-    g_main_loop_unref(loop);
+    g_main_loop_run(gdbusLoop);
+    g_main_loop_unref(gdbusLoop);
 }
 #endif
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-void PlatformManagerImpl::WiFIIPChangeListener()
+void PlatformManagerImpl::WiFIIPChangeListener(int sock)
 {
-    int sock;
-    if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to init netlink socket for ip addresses.");
-        return;
-    }
-
     struct sockaddr_nl addr;
     memset(&addr, 0, sizeof(addr));
     addr.nl_family = AF_NETLINK;
@@ -175,6 +164,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     CHIP_ERROR err;
     struct sigaction action;
+#if CHIP_WITH_GIO
+    GError * error = nullptr;
+#endif
 
     memset(&action, 0, sizeof(action));
     action.sa_handler = SignalHandler;
@@ -183,20 +175,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     sigaction(SIGUSR1, &action, NULL);
     sigaction(SIGUSR2, &action, NULL);
     sigaction(SIGTSTP, &action, NULL);
-
-#if CHIP_WITH_GIO
-    GError * error = nullptr;
-
-    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
-
-    std::thread gdbusThread(GDBus_Thread);
-    gdbusThread.detach();
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    std::thread wifiIPThread(WiFIIPChangeListener);
-    wifiIPThread.detach();
-#endif
 
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
@@ -210,6 +188,23 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SuccessOrExit(err);
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+#if CHIP_WITH_GIO
+    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
+    mGdbusLoop              = g_main_loop_new(nullptr, false);
+    mGdbusThread            = std::thread(GDBus_Thread, mGdbusLoop);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if ((mWiFiSocket = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to init netlink socket for ip addresses.");
+    }
+    else
+    {
+        mWifiIPThread = std::thread(WiFIIPChangeListener, mWiFiSocket);
+    }
+#endif
 
 exit:
     return err;
@@ -236,6 +231,27 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     {
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
+
+#if CHIP_WITH_GIO
+    g_main_loop_quit(mGdbusLoop);
+
+    if (mGdbusThread.joinable())
+    {
+        mGdbusThread.join();
+    }
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (mWiFiSocket != -1)
+    {
+        shutdown(mWiFiSocket, SHUT_RD);
+    }
+
+    if (mWifiIPThread.joinable())
+    {
+        mWifiIPThread.join();
+    }
+#endif
 
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
