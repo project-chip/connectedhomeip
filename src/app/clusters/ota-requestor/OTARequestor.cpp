@@ -238,7 +238,6 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-
     ProviderLocation::Type providerLocation = { .fabricIndex    = commandObj->GetAccessingFabricIndex(),
                                                 .providerNodeID = commandData.providerNodeId,
                                                 .endpoint       = commandData.endpoint };
@@ -254,7 +253,6 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     }
     ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, providerLocation.endpoint);
 
-
     mOtaRequestorDriver->ProcessAnnounceOTAProviders(providerLocation, announcementReason);
 
     return EMBER_ZCL_STATUS_SUCCESS;
@@ -265,19 +263,22 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
     // SL TODO: With every error condition we must restart the default provider timer, enter kIdle state.
     // applies to all flavors of the solution
 
-    if(mOtaRequestorDriver == nullptr) {
+    if (mOtaRequestorDriver == nullptr)
+    {
         ChipLogError(SoftwareUpdate, "OTA requestor driver not set");
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
-    if(mServer == nullptr) {
+    if (mServer == nullptr)
+    {
         ChipLogError(SoftwareUpdate, "Server not set");
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
-    if(!mProviderLocation.HasValue()) {
+    if (!mProviderLocation.HasValue())
+    {
         ChipLogError(SoftwareUpdate, "Provider location not set");
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
@@ -285,7 +286,8 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 
     FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
 
-    if(fabricInfo == nullptr) {
+    if (fabricInfo == nullptr)
+    {
         ChipLogError(SoftwareUpdate, "Cannot find fabric");
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
@@ -299,7 +301,8 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
     CHIP_ERROR err =
         mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID),
                                                     &mOnConnectedCallback, &mOnConnectionFailureCallback);
-    if(err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format());
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
@@ -462,7 +465,8 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
 
     // Log the VersionApplied event
     uint16_t productId;
-    if(DeviceLayer::ConfigurationMgr().GetProductId(productId) != CHIP_NO_ERROR) {
+    if (DeviceLayer::ConfigurationMgr().GetProductId(productId) != CHIP_NO_ERROR)
+    {
         ChipLogError(SoftwareUpdate, "Cannot get Product ID");
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
@@ -601,7 +605,8 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
 
     // Inform the driver that the OTARequestor has entered the kIdle state. A driver implementation
     // may choose to restart the default providers timer in this case
-    if( mCurrentUpdateState != OTAUpdateStateEnum::kIdle) {
+    if (mCurrentUpdateState != OTAUpdateStateEnum::kIdle)
+    {
         mOtaRequestorDriver->HandleIdleState();
     }
 
