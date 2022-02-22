@@ -152,5 +152,3 @@ void BindingClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Ca
     Callback::Callback<BindingAttributeListListAttributeCallback> * cb = Callback::Callback<BindingAttributeListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
-
-

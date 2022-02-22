@@ -467,4 +467,3 @@ const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {\
 
 // Array of networks supported on each endpoint
 #define FIXED_NETWORKS { 0, 0 }
-
