@@ -71,26 +71,6 @@ public class DiagnosticDataProviderImpl implements DiagnosticDataProvider {
 
           anInterface.offPremiseServicesReachableIPv4 = NetworkInterface.REACHABLE_UNKNOWN;
           anInterface.offPremiseServicesReachableIPv6 = NetworkInterface.REACHABLE_UNKNOWN;
-          for (Enumeration<InetAddress> inetAddresses = nif.getInetAddresses();
-              inetAddresses.hasMoreElements(); ) {
-            InetAddress inetAddress = inetAddresses.nextElement();
-            if (inetAddress instanceof Inet4Address) {
-              anInterface.offPremiseServicesReachableIPv4 = NetworkInterface.REACHABLE_YES;
-
-              if (anInterface.offPremiseServicesReachableIPv6
-                  == NetworkInterface.REACHABLE_UNKNOWN) {
-                anInterface.offPremiseServicesReachableIPv6 = NetworkInterface.REACHABLE_NO;
-              }
-            } else if (inetAddress instanceof Inet6Address) {
-              anInterface.offPremiseServicesReachableIPv6 = NetworkInterface.REACHABLE_YES;
-
-              if (anInterface.offPremiseServicesReachableIPv4
-                  == NetworkInterface.REACHABLE_UNKNOWN) {
-                anInterface.offPremiseServicesReachableIPv4 = NetworkInterface.REACHABLE_NO;
-              }
-            }
-          }
-
           destInterfaces.add(anInterface);
         }
       }
