@@ -9456,9 +9456,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::Nullable<OTAUpdateStateEnum> previousState;
-    OTAUpdateStateEnum newState = static_cast<OTAUpdateStateEnum>(0);
-    OTAChangeReasonEnum reason  = static_cast<OTAChangeReasonEnum>(0);
+    OTAUpdateStateEnum previousState = static_cast<OTAUpdateStateEnum>(0);
+    OTAUpdateStateEnum newState      = static_cast<OTAUpdateStateEnum>(0);
+    OTAChangeReasonEnum reason       = static_cast<OTAChangeReasonEnum>(0);
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -9471,9 +9471,9 @@ public:
     static constexpr EventId GetEventId() { return Events::StateTransition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    DataModel::Nullable<OTAUpdateStateEnum> previousState;
-    OTAUpdateStateEnum newState = static_cast<OTAUpdateStateEnum>(0);
-    OTAChangeReasonEnum reason  = static_cast<OTAChangeReasonEnum>(0);
+    OTAUpdateStateEnum previousState = static_cast<OTAUpdateStateEnum>(0);
+    OTAUpdateStateEnum newState      = static_cast<OTAUpdateStateEnum>(0);
+    OTAChangeReasonEnum reason       = static_cast<OTAChangeReasonEnum>(0);
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

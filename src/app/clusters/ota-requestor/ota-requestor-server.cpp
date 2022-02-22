@@ -195,10 +195,10 @@ EmberAfStatus OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpoint
     return Attributes::UpdateStateProgress::Get(endpointId, value);
 }
 
-void OtaRequestorServerOnStateTransition(DataModel::Nullable<OTAUpdateStateEnum> previousState, OTAUpdateStateEnum newState,
-                                         OTAChangeReasonEnum reason, DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
+void OtaRequestorServerOnStateTransition(OTAUpdateStateEnum previousState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason,
+                                         DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
 {
-    if (!previousState.IsNull() && previousState.Value() == newState)
+    if (previousState == newState)
     {
         ChipLogError(Zcl, "Previous state and new state are the same, no event to log");
         return;

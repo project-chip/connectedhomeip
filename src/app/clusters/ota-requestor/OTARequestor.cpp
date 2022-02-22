@@ -555,15 +555,13 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
 
     // Log the StateTransition event
-    Nullable<OTAUpdateStateEnum> previousState;
-    previousState.SetNonNull(mCurrentUpdateState);
     Nullable<uint32_t> targetSoftwareVersion;
     if ((newState == OTAUpdateStateEnum::kDownloading) || (newState == OTAUpdateStateEnum::kApplying) ||
         (newState == OTAUpdateStateEnum::kRollingBack))
     {
         targetSoftwareVersion.SetNonNull(mTargetVersion);
     }
-    OtaRequestorServerOnStateTransition(previousState, newState, reason, targetSoftwareVersion);
+    OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
     mCurrentUpdateState = newState;
 
