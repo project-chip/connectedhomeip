@@ -60,9 +60,9 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int Initialize(void * context)
+    static int InitializeAsync(void * context)
     {
-        if (AppContext::Initialize(context) != SUCCESS)
+        if (AppContext::InitializeAsync(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -294,7 +294,7 @@ nlTestSuite sSuite =
 {
     "EventLogging",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on
