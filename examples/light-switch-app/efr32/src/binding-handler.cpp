@@ -44,12 +44,12 @@ void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::Dev
         return;
     }
 
-    if (binding.type == EMBER_UNICAST_BINDING && binding.local == 1 &&
-        binding.clusterId.HasValue() && binding.clusterId.Value() == Clusters::OnOff::Id)
+    if (binding.type == EMBER_UNICAST_BINDING && binding.local == 1 && binding.clusterId.HasValue() &&
+        binding.clusterId.Value() == Clusters::OnOff::Id)
     {
         Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                         binding.remote, toggleCommand, onSuccess, onFailure);
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         toggleCommand, onSuccess, onFailure);
     }
 }
 } // namespace
