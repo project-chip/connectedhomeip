@@ -68,7 +68,7 @@
 
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
-#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if defined(CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI)
 extern "C" void otAppCliInit(otInstance * aInstance);
 #endif
 
