@@ -34,13 +34,13 @@ namespace Controller {
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
 
-
 // Binding Cluster Commands
-CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
+CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer     = nullptr;
-    uint8_t argSeqNumber        = 0;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
 
     // Used when encoding non-empty command. Suppress error message when encoding empty commands.
     (void) writer;
@@ -51,7 +51,8 @@ CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Binding::Commands::Bind::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandle sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -74,17 +75,20 @@ CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callba
 
     SuccessOrExit(err = mDevice->SendCommands(sender.get()));
 
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object now.
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
     sender.release();
 exit:
     return err;
 }
 
-CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
+CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId,
+                                  chip::ClusterId clusterId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer     = nullptr;
-    uint8_t argSeqNumber        = 0;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
 
     // Used when encoding non-empty command. Suppress error message when encoding empty commands.
     (void) writer;
@@ -95,7 +99,8 @@ CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Call
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Binding::Commands::Unbind::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandle sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -118,13 +123,12 @@ CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Call
 
     SuccessOrExit(err = mDevice->SendCommands(sender.get()));
 
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object now.
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
     sender.release();
 exit:
     return err;
 }
-
-
 
 } // namespace Controller
 } // namespace chip

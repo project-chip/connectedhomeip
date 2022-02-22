@@ -37,8 +37,10 @@ public:
     ~BindingCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
-    CHIP_ERROR Unbind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
+    CHIP_ERROR Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId,
+                    chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
+    CHIP_ERROR Unbind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId,
+                      chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
 };
 
 } // namespace Controller

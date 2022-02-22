@@ -22,10 +22,10 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
-#include <app/util/af.h>
-#include <app/util/af-enums.h>
-#include <app/util/basic-types.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
+#include <app/util/af-enums.h>
+#include <app/util/af.h>
+#include <app/util/basic-types.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
@@ -35,11 +35,10 @@ using namespace ::chip;
 using namespace ::chip::app::DataModel;
 
 namespace {
-  [[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
+[[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
 } // namespace
 
-
-#define CHECK_STATUS_WITH_RETVAL(error, retval) \
+#define CHECK_STATUS_WITH_RETVAL(error, retval)                                                                                    \
     if (CHIP_NO_ERROR != error)                                                                                                    \
     {                                                                                                                              \
         ChipLogError(Zcl, "CHECK_STATUS %s", ErrorStr(error));                                                                     \
@@ -55,8 +54,8 @@ namespace {
 #define CHECK_STATUS(error) CHECK_STATUS_WITH_RETVAL(error, true)
 #define CHECK_STATUS_VOID(error) CHECK_STATUS_WITH_RETVAL(error, )
 
-#define CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, retval)                                                                                                \
-    if (!CanCastTo<uint16_t>(value))                                                                                         \
+#define CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, retval)                                                                            \
+    if (!CanCastTo<uint16_t>(value))                                                                                               \
     {                                                                                                                              \
         ChipLogError(Zcl, "CHECK_MESSAGE_LENGTH expects a uint16_t value, got: %d", value);                                        \
         if (onFailureCallback != nullptr)                                                                                          \
@@ -107,7 +106,6 @@ namespace {
         return true;                                                                                                               \
     }
 
-
 #define GET_CLUSTER_RESPONSE_CALLBACKS(name)                                                                                       \
     Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
     Callback::Cancelable * onFailureCallback = nullptr;                                                                            \
@@ -130,12 +128,11 @@ namespace {
         return true;                                                                                                               \
     }
 
-
-
 // Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-void BindingClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+void BindingClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::AttributeId> list;
     CHIP_ERROR err = Decode(*tlvData, list);
@@ -143,12 +140,14 @@ void BindingClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Ca
     {
         if (onFailureCallback != nullptr)
         {
-            Callback::Callback<DefaultFailureCallback> * cb = Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
             cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
         }
         return;
     }
 
-    Callback::Callback<BindingAttributeListListAttributeCallback> * cb = Callback::Callback<BindingAttributeListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<BindingAttributeListListAttributeCallback> * cb =
+        Callback::Callback<BindingAttributeListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
