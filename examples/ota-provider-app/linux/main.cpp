@@ -46,7 +46,7 @@ constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 constexpr uint16_t kOptionFilepath             = 'f';
 constexpr uint16_t kOptionOtaImageList         = 'o';
 constexpr uint16_t kOptionQueryImageStatus     = 'q';
-constexpr uint16_t kOptionIgnoreQueryImage     = 'b';
+constexpr uint16_t kOptionIgnoreQueryImage     = 'x';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionUpdateAction         = 'a';
 constexpr uint16_t kOptionDelayedActionTimeSec = 't';
@@ -189,8 +189,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionIgnoreQueryImage:
-        gIgnoreQueryImageCount = 1;
-        // gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+            gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUpdateAction:
         if (aValue == NULL)
@@ -278,7 +277,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
     { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
     { "queryImageStatus", chip::ArgParser::kArgumentRequired, kOptionQueryImageStatus },
-    { "ignoreQueryImage", chip::ArgParser::kNoArgument, kOptionIgnoreQueryImage },
+    { "ignoreQueryImage", chip::ArgParser::kArgumentRequired, kOptionIgnoreQueryImage },
     { "applyUpdateAction", chip::ArgParser::kArgumentRequired, kOptionUpdateAction },
     { "delayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
@@ -295,7 +294,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Path to a file containing a list of OTA images\n"
                              "  -q/--queryImageStatus <updateAvailable | busy | updateNotAvailable>\n"
                              "        Value for the Status field in the QueryImageResponse\n"
-                             "  -b/--ignoreQueryImage <num_times_to_ignore>\n"
+                             "  -x/--ignoreQueryImage <num_times_to_ignore>\n"
                              "        The number of times to ignore the QueryImage Command and not send a response.\n"
                              "        If no value is supplied, ignore only once.\n"
                              "  -a/--applyUpdateAction <proceed | awaitNextAction | discontinue>\n"
