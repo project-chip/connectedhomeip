@@ -1,7 +1,8 @@
 # Matter nRF Connect All Clusters Example Application
 
-The nRF All Clusters Example Application implements various ZCL clusters populated on three endpoints.
-You can use this example as a reference for creating your own application.
+The nRF All Clusters Example Application implements various ZCL clusters
+populated on three endpoints. You can use this example as a reference for
+creating your own application.
 
 <p align="center">
   <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
@@ -10,7 +11,9 @@ You can use this example as a reference for creating your own application.
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and Nordic
-Semiconductor's nRF Connect SDK, and was created to facilitate testing and certification of a Matter device communicating over a low-power, 802.15.4 Thread network.
+Semiconductor's nRF Connect SDK, and was created to facilitate testing and
+certification of a Matter device communicating over a low-power, 802.15.4 Thread
+network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
 into an existing Matter network and can be controlled by this network.
@@ -49,9 +52,9 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
-The Matter device that runs the all clusters application is controlled by the Matter
-controller device over the Thread protocol. By default, the Matter device has
-Thread disabled, and it should be paired with Matter controller and get
+The Matter device that runs the all clusters application is controlled by the
+Matter controller device over the Thread protocol. By default, the Matter device
+has Thread disabled, and it should be paired with Matter controller and get
 configuration from it. Some actions required before establishing full
 communication are described below.
 
@@ -134,7 +137,8 @@ following states are possible:
     procedure. **LEDs 1-4** blink in unison when the factory reset procedure is
     initiated.
 
-**Button 4** &mdash; Pressing the button once starts Bluetooth LE advertising for the predefined period of time (15 minutes by default).
+**Button 4** &mdash; Pressing the button once starts Bluetooth LE advertising
+for the predefined period of time (15 minutes by default).
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
