@@ -35,6 +35,9 @@ void FailSafeContext::HandleArmFailSafe(System::Layer * layer, void * aAppState)
 
 void FailSafeContext::CommissioningFailedTimerComplete()
 {
+    // TODO: If the fail-safe timer expires before the CommissioningComplete command is
+    // successfully invoked, conduct clean-up steps.
+
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;
     event.CommissioningComplete.status = CHIP_ERROR_TIMEOUT;

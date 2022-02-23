@@ -132,6 +132,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
     FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    Commands::ArmFailSafeResponse::Type response;
 
     /*
      * If the fail-safe timer was not currently armed, the the fail-safe timer SHALL be armed.
@@ -140,8 +141,6 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
      */
     if (!failSafeContext.IsFailSafeArmed())
     {
-        Commands::ArmFailSafeResponse::Type response;
-
         CheckSuccess(failSafeContext.ArmFailSafe(commandObj->GetAccessingFabricIndex(),
                                                  System::Clock::Seconds16(commandData.expiryLengthSeconds)),
                      Failure);
@@ -150,7 +149,8 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
     }
     else
     {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Busy));
+        response.errorCode = CommissioningError::kBusyWithOtherAdmin;
+        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
     }
 
     return true;
