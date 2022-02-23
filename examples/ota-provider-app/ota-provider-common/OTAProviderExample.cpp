@@ -306,6 +306,13 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     // TODO: handle multiple transfers by tracking updateTokens
     char tokenBuf[kUpdateTokenStrLen] = { 0 };
 
+    if (mIgnoreApplyUpdateCount > 0)
+    {
+        ChipLogDetail(SoftwareUpdate, "Skip HandleApplyUpdateRequest response. mIgnoreApplyUpdateCount %" PRIu32, mIgnoreApplyUpdateCount);
+        mIgnoreApplyUpdateCount--;
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
     ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.newVersion);
 
