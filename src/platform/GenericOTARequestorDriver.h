@@ -63,14 +63,17 @@ public:
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) override;
     void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
                                         app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
-    void DriverTriggerQuery() override;
-
+    void DriverSendQuery() override;
+    // Determines the next available Provider location and sets it in the OTARequestor
+    void DetermineAndSetProviderLocation() override;
+   
     //// Regular methods
     void StartDefaultProvidersTimer();
     void StopDefaultProvidersTimer();
     void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
  
 private:
+    // Returns the next available Provider location
     bool DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation);
 
     OTARequestorInterface      * mRequestor           = nullptr;

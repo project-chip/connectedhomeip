@@ -398,10 +398,6 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                  ChipLogValueX64(peerId.GetNodeId()), error.Format());
 
-    // SL TODO: Here look for another provider from the default list. If found, query it, do not
-    // call RecordErrorUpdateState() -- otherwise enter idle state
-    // state. Take into the account when was the last time we queried it.
-
     switch (requestorCore->mOnConnectedAction)
     {
     case kQueryImage:
@@ -417,20 +413,28 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
         break;
     }
 
-    // Give driver a chance to reschedule a query
+    // Give driver a chance to schedule another query
     requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::ConnectionFailed, chip::System::Clock::Seconds32(0));
 }
 
+// Sends the QueryImage command to the next available Provider
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
+{
+    mOtaRequestorDriver->DetermineAndSetProviderLocation();
+    return SendQuery();
+}
+
+// Sends the QueryImage command, requires that the Provider location is already set in OTARequestor
+OTARequestorInterface::OTATriggerResult OTARequestor::SendQuery()
 {
     if (mProviderLocation.HasValue())
     {
-        // We are now querying some provider, leave the kIdle state. 
+        // We are now querying a provider, leave the kIdle state. 
         // Spec doesn't define a specific state for this but we can't be in kIdle. 
         RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
         // Go through the driver as it has additional logic to execute
-        mOtaRequestorDriver->DriverTriggerQuery();
+        mOtaRequestorDriver->DriverSendQuery();
 
         return kTriggerSuccessful;
     }
@@ -516,10 +520,7 @@ void OTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTAChangeR
     case OTADownloader::State::kIdle:
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
-            // SL TODO: Here look for another provider from the default list. If found, query it, do not
-            // call RecordErrorUpdateState(), otherwise enter idle state
-            // state. Take into the account when was the last time we queried it.
-
+            // TODO: Should we call some driver API to give it a chance to reschedule?
             RecordErrorUpdateState(UpdateFailureState::kDownloading, CHIP_ERROR_CONNECTION_ABORTED, reason);
         }
 
@@ -736,7 +737,7 @@ void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDevic
     // TODO: Should we also send UpdateApplied here?
 
     // Query the default provider. At the end of this query/update process the Default Providers timer is started
-    (reinterpret_cast<OTARequestor *>(arg))->mOtaRequestorDriver->DriverTriggerQuery();
+    (reinterpret_cast<OTARequestor *>(arg))->mOtaRequestorDriver->DriverSendQuery();
 }
 
 } // namespace chip

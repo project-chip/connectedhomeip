@@ -177,8 +177,11 @@ public:
     // Destructor
     virtual ~OTARequestorInterface() = default;
 
-    // Send QueryImage command
+    // Send QueryImage command, requires that the Provider location is already set in OTARequestor
     virtual OTATriggerResult TriggerImmediateQuery() = 0;
+
+    // Send QueryImage command to the next available Provider
+    virtual OTATriggerResult SendQuery() = 0;
 
     // Download image
     virtual void DownloadUpdate() = 0;

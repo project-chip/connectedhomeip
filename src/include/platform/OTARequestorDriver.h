@@ -125,7 +125,10 @@ public:
     virtual void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
                                         app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) = 0;
 
-    virtual void DriverTriggerQuery() = 0;
+    virtual void DriverSendQuery() = 0;
+
+    // Determines the next available Provider location and sets it in the OTARequestor
+    virtual void DetermineAndSetProviderLocation() = 0;
 
 };
 

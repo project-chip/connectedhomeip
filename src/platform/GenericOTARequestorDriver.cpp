@@ -21,6 +21,14 @@
 #include <platform/OTAImageProcessor.h>
 #include <platform/OTARequestorInterface.h>
 
+// This implementation of the OTARequestorDriver operates according the following rules:
+// - Only a single timer can be active at any given moment 
+// - The default providers timer is running if and only if there is no update in progress (the OTARequestor
+//   UpdateState is kIdle
+// - AnnounceOTAProviders command is ignored if an update is in progress
+// - The provider location passed in AnnounceOTAProviders is used in a single query (possibly retried) and then discarded
+// - Explicitly triggering a query through TriggerImmediateQuery() or SendQuery() cancels any in-progress update
+
 namespace chip {
 namespace DeviceLayer {
 namespace {
@@ -55,7 +63,7 @@ void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
     // us out of the kIdle state
     //static_cast<OTARequestor *>(appState)->mOtaRequestorDriver->StopDefaultProvidersTimer();
 
-    static_cast<OTARequestorInterface *>(appState)->TriggerImmediateQuery();
+    static_cast<OTARequestorInterface *>(appState)->SendQuery();
 
     // static_cast<OTARequestor *>(appState)->ConnectToProvider(OTARequestor::kQueryImage);
 }
@@ -232,7 +240,7 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocati
     ScheduleDelayedAction(UpdateFailureState::kQuerying, System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, mRequestor);
 }
 
-void GenericOTARequestorDriver::DriverTriggerQuery()
+void GenericOTARequestorDriver::DriverSendQuery()
 {
 
     // IMPLEMENTATION CHOICE
@@ -242,21 +250,6 @@ void GenericOTARequestorDriver::DriverTriggerQuery()
     // Default providers timer only runs when there is no ongoing query/update; must stop it now. 
     // ConnectToProvider() will change the state from kIdle
     StopDefaultProvidersTimer();
-
-    // Select a provider to query and set it in the OTARequestor
-
-    // SL TODO Put the right API call here when available
-
-    // app::AttributeValueEncoder encoder;
-    // mRequestor->GetDefaultOtaProviderList(encoder);
-    // encoder.ForEachActiveObject([&](ProviderLocation::Type * pl) {
-    //         // For now, just find the first available
-
-    //         mRequestor->SetCurrentProviderLocation(*pl);
-    //         return Loop::Break;
-    //                             });
- 
-    // mRequestor->SetCurrentProviderLocation(*pl);
 
     mRequestor->ConnectToProvider(OTARequestorInterface::kQueryImage);
 }
@@ -277,7 +270,7 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
 
     // In this implementation the default provider timer runs only if there is no other update in progress.
     // Nevertheless, even though no other timers should be running, call a cleanup method to be safe 
-    DriverTriggerQuery();
+    DriverSendQuery();
 }
 
 void GenericOTARequestorDriver::StartDefaultProvidersTimer()
@@ -297,6 +290,19 @@ void GenericOTARequestorDriver::StopDefaultProvidersTimer()
                                                this);
 }
 
+// Determines the next available Provider location and sets it in the OTARequestor
+void GenericOTARequestorDriver::DetermineAndSetProviderLocation()
+{
+    ProviderLocation::Type providerLocation;
+    if (DetermineProviderLocation(providerLocation) != true) {
+        return;
+    }
+
+    mRequestor->SetCurrentProviderLocation(providerLocation);
+    mLastUsedProvider = providerLocation;
+}
+
+// Returns the next available Provider location
 bool GenericOTARequestorDriver::DetermineProviderLocation(ProviderLocation::Type & providerLocation)
 {
     auto iterator = mRequestor->GetDefaultOTAProviderListIterator();

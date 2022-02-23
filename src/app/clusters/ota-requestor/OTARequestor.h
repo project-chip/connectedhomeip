@@ -54,8 +54,11 @@ public:
         const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
 
     // Application directs the Requestor to start the Image Query process
-    // and download the new image if available
+    // and download the new image if available; requires that the Provider location is already set in OTARequestor
     OTATriggerResult TriggerImmediateQuery() override;
+
+    // Send QueryImage command to the next available Provider
+    virtual OTATriggerResult SendQuery() override;
 
     // Initiate download of the new image
     void DownloadUpdate() override;
