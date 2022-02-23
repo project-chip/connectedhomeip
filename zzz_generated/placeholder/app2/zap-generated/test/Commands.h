@@ -159,7 +159,7 @@ private:
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
     {
         bool isExpectedDnssdResult = false;
 
@@ -490,7 +490,7 @@ private:
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
     {
         bool isExpectedDnssdResult = false;
 
@@ -672,7 +672,7 @@ private:
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
     {
         bool isExpectedDnssdResult = false;
 

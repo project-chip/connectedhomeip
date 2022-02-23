@@ -21,6 +21,14 @@
             "path": "../../../examples/chip-tool/templates/tests/partials/test_cluster.zapt"
         },
         {
+            "name": "setupSaveAs",
+            "path": "../../../examples/chip-tool/templates/tests/partials/saveAs/setupSaveAs.zapt"
+        },
+        {
+            "name": "teardownSaveAs",
+            "path": "../../../examples/chip-tool/templates/tests/partials/saveAs/teardownSaveAs.zapt"
+        },
+        {
             "name": "commandValue",
             "path": "../../../examples/chip-tool/templates/tests/partials/command_value.zapt"
         },
