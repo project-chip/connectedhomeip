@@ -139,4 +139,3 @@ tests:
       attribute: "NodeLabel"
       arguments:
           value: readFromAlpha
-
