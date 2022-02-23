@@ -60,15 +60,16 @@ void GroupRollOverTest(nlTestSuite * inSuite, void * inContext)
                 NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n, true) == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW);
             }
 
-            // 3. A counter value between N - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW and N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW
-            //    (but not including N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW) comes in, we treat it as duplicate.
+            // 3. A counter value between N - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE and N + k -
+            // CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE
+            //    (but not including N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) comes in, we treat it as duplicate.
             for (uint32_t i = n - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; i != (n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE);
                  i++)
             {
                 NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(i, true) != CHIP_NO_ERROR);
             }
 
-            // 4. A counter value of N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW comes in, is treated as valid.
+            // 4. A counter value of N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE comes in, is treated as valid.
             if (k != CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
                 NL_TEST_ASSERT(
@@ -91,7 +92,7 @@ void GroupBackTrackTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n, true) == CHIP_NO_ERROR);
 
         counter.CommitWithRollOver(n);
-        // 1.   Some set of values N - k come in, for 0 < k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW.
+        // 1.   Some set of values N - k come in, for 0 < k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE.
         //      All of those should be considered valid and committed.
         for (uint32_t k = 1; k * k < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; k++)
         {
@@ -108,7 +109,7 @@ void GroupBackTrackTest(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n - (k * k), true) != CHIP_NO_ERROR);
         }
 
-        // 4. The values that were not in the set in step (a) (but are at least N + 3 - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW)
+        // 4. The values that were not in the set in step (a) (but are at least N + 3 - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
         //    come in, and all are treated as allowed.
         for (uint32_t k = n + 3 - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; k != n + 3; ++k)
         {
@@ -140,8 +141,9 @@ void GroupBigLeapTest(nlTestSuite * inSuite, void * inContext)
             // 2. A counter value of N comes in, we detect it as duplicate.
             NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(n, true) != CHIP_NO_ERROR);
 
-            // 3. A counter value between N - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW and N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW
-            //    (but not including N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW) comes in, we treat it as duplicate.
+            // 3. A counter value between N - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE and N + k -
+            // CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE
+            //    (but not including N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) comes in, we treat it as duplicate.
 
             // Only test some values to save processing time
             std::vector<uint32_t> testValues;
@@ -161,7 +163,7 @@ void GroupBigLeapTest(nlTestSuite * inSuite, void * inContext)
                 NL_TEST_ASSERT(inSuite, counter.VerifyOrTrustFirst(it, true) != CHIP_NO_ERROR);
             }
 
-            // 4. A counter value of N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW comes in, is treated as valid.
+            // 4. A counter value of N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE comes in, is treated as valid.
             NL_TEST_ASSERT(inSuite,
                            counter.VerifyOrTrustFirst((n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE), true) == CHIP_NO_ERROR);
         }

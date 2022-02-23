@@ -203,7 +203,7 @@ public:
         {
 
             // Make sure that offset is never 0.
-            // This should no happen but we cannot guarantee it
+            // This should not happen but we cannot guarantee it
             // since this class doesn't own the call to this function
             if (offset != 0)
             {
@@ -286,7 +286,7 @@ private:
     {
         /*
          *  Past <--                --> Future
-         *             MaxCounter
+         *          MaxCounter - 1
          *                 |
          *                 v
          *  | <-- mWindow -->|
