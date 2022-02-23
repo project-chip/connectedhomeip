@@ -30,10 +30,8 @@ public class NetworkInterface {
   public String name;
   public boolean isOperational;
 
-  @Nullable
-  public Boolean offPremiseServicesReachableIPv4;
-  @Nullable
-  public Boolean offPremiseServicesReachableIPv6;
+  @Nullable public Boolean offPremiseServicesReachableIPv4;
+  @Nullable public Boolean offPremiseServicesReachableIPv6;
   public byte[] hardwareAddress;
   public int type;
 }

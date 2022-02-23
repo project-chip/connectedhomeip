@@ -134,21 +134,27 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             ifp->isOperational          = static_cast<bool>(env->GetBooleanField(nifObject, isOperationalField));
 
             jfieldID getOpsrIPV4Field = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv4", "Ljava/lang/Boolean;");
-            jobject opsrIPV4Obj            = env->GetObjectField(nifObject, getOpsrIPV4Field);
-            if (opsrIPV4Obj == nullptr) {
+            jobject opsrIPV4Obj       = env->GetObjectField(nifObject, getOpsrIPV4Field);
+            if (opsrIPV4Obj == nullptr)
+            {
                 ifp->offPremiseServicesReachableIPv4.SetNull();
-            } else {
+            }
+            else
+            {
                 jboolean opsrIPV4 = JniReferences::GetInstance().BooleanToPrimitive(opsrIPV4Obj);
-                ifp->offPremiseServicesReachableIPv4.SetNonNull(static_cast<bool>(opsrIPV4));   
+                ifp->offPremiseServicesReachableIPv4.SetNonNull(static_cast<bool>(opsrIPV4));
             }
 
             jfieldID getOpsrIPV6Field = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv6", "Ljava/lang/Boolean;");
-            jobject opsrIPV6Obj            = env->GetObjectField(nifObject, getOpsrIPV6Field);
-            if (opsrIPV6Obj == nullptr) {
+            jobject opsrIPV6Obj       = env->GetObjectField(nifObject, getOpsrIPV6Field);
+            if (opsrIPV6Obj == nullptr)
+            {
                 ifp->offPremiseServicesReachableIPv6.SetNull();
-            } else {
+            }
+            else
+            {
                 jboolean opsrIPV6 = JniReferences::GetInstance().BooleanToPrimitive(opsrIPV6Obj);
-                ifp->offPremiseServicesReachableIPv6.SetNonNull(static_cast<bool>(opsrIPV6));   
+                ifp->offPremiseServicesReachableIPv6.SetNonNull(static_cast<bool>(opsrIPV6));
             }
 
             jfieldID gethardwareAddressField = env->GetFieldID(nifClass, "hardwareAddress", "[B");

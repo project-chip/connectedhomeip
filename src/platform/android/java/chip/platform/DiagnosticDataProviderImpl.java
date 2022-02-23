@@ -19,13 +19,9 @@ package chip.platform;
 
 import android.content.Context;
 import android.util.Log;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 
 public class DiagnosticDataProviderImpl implements DiagnosticDataProvider {
