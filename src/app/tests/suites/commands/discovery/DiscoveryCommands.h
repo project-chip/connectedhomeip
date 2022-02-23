@@ -43,7 +43,7 @@ struct DiscoveryCommandResult
     chip::Optional<uint32_t> mrpRetryIntervalActive;
 };
 
-class DiscoveryCommands : public chip::Dnssd::CommissioningDelegate
+class DiscoveryCommands : public chip::Dnssd::CommissioningResolveDelegate
 {
 public:
     DiscoveryCommands(){};
