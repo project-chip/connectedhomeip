@@ -34,7 +34,7 @@ public final class EndpointState {
 
   /**
    * Convenience utility for getting an {@code ClusterState}.
-   * 
+   *
    * @return the {@code ClusterState} for the specified id, or null if not found.
    */
   @Nullable

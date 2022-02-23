@@ -32,8 +32,8 @@ public final class AttributeState {
     return valueObject;
   }
 
-  /** 
-   * Return a byte array containing the TLV for an attribute, wrapped within an 
+  /**
+   * Return a byte array containing the TLV for an attribute, wrapped within an
    * anonymous TLV tag.
    */
   public byte[] getTlv() {
