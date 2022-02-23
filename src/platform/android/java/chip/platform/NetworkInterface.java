@@ -17,6 +17,8 @@
  */
 package chip.platform;
 
+import androidx.annotation.Nullable;
+
 public class NetworkInterface {
 
   public static final int INTERFACE_TYPE_UNSPECIFIED = 0x00;
@@ -25,14 +27,13 @@ public class NetworkInterface {
   public static final int INTERFACE_TYPE_CELLULAR = 0x03;
   public static final int INTERFACE_TYPE_THREAD = 0x04;
 
-  public static final int REACHABLE_UNKNOWN = 0;
-  public static final int REACHABLE_YES = 1;
-  public static final int REACHABLE_NO = 2;
-
   public String name;
   public boolean isOperational;
-  public int offPremiseServicesReachableIPv4;
-  public int offPremiseServicesReachableIPv6;
+
+  @Nullable
+  public Boolean offPremiseServicesReachableIPv4;
+  @Nullable
+  public Boolean offPremiseServicesReachableIPv6;
   public byte[] hardwareAddress;
   public int type;
 }

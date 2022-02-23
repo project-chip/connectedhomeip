@@ -65,7 +65,10 @@ static_library("android") {
 android_library("java") {
   output_name = "AndroidPlatform.jar"
 
-  deps = [ ":android_sdk" ]
+  deps = [
+    ":android_sdk",
+    "${chip_root}/third_party/android_deps:annotation",
+  ]
   data_deps = [ ":android" ]
 
   sources = [

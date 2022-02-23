@@ -68,9 +68,6 @@ public class DiagnosticDataProviderImpl implements DiagnosticDataProvider {
               name.startsWith("wlan")
                   ? NetworkInterface.INTERFACE_TYPE_WI_FI
                   : NetworkInterface.INTERFACE_TYPE_ETHERNET;
-          
-          anInterface.offPremiseServicesReachableIPv4 = NetworkInterface.REACHABLE_UNKNOWN;
-          anInterface.offPremiseServicesReachableIPv6 = NetworkInterface.REACHABLE_UNKNOWN;
           destInterfaces.add(anInterface);
         }
       }

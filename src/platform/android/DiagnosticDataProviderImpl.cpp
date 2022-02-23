@@ -133,34 +133,22 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             jfieldID isOperationalField = env->GetFieldID(nifClass, "isOperational", "Z");
             ifp->isOperational          = static_cast<bool>(env->GetBooleanField(nifObject, isOperationalField));
 
-            jfieldID getOpsrIPV4Field = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv4", "I");
-            jint jOpsrIPV4            = env->GetIntField(nifObject, getOpsrIPV4Field);
-            switch (jOpsrIPV4)
-            {
-            case offPremiseServicesReachableUnknown:
+            jfieldID getOpsrIPV4Field = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv4", "Ljava/lang/Boolean;");
+            jobject opsrIPV4Obj            = env->GetObjectField(nifObject, getOpsrIPV4Field);
+            if (opsrIPV4Obj == nullptr) {
                 ifp->offPremiseServicesReachableIPv4.SetNull();
-                break;
-            case offPremiseServicesReachableYes:
-                ifp->offPremiseServicesReachableIPv4.SetNonNull(true);
-                break;
-            case offPremiseServicesReachableNo:
-                ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
-                break;
+            } else {
+                jboolean opsrIPV4 = JniReferences::GetInstance().BooleanToPrimitive(opsrIPV4Obj);
+                ifp->offPremiseServicesReachableIPv4.SetNonNull(static_cast<bool>(opsrIPV4));   
             }
 
-            jfieldID getOpsrIPV6Field = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv6", "I");
-            jint jOpsrIPV6            = env->GetIntField(nifObject, getOpsrIPV6Field);
-            switch (jOpsrIPV6)
-            {
-            case offPremiseServicesReachableUnknown:
+            jfieldID getOpsrIPV6Field = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv6", "Ljava/lang/Boolean;");
+            jobject opsrIPV6Obj            = env->GetObjectField(nifObject, getOpsrIPV6Field);
+            if (opsrIPV6Obj == nullptr) {
                 ifp->offPremiseServicesReachableIPv6.SetNull();
-                break;
-            case offPremiseServicesReachableYes:
-                ifp->offPremiseServicesReachableIPv6.SetNonNull(true);
-                break;
-            case offPremiseServicesReachableNo:
-                ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
-                break;
+            } else {
+                jboolean opsrIPV6 = JniReferences::GetInstance().BooleanToPrimitive(opsrIPV6Obj);
+                ifp->offPremiseServicesReachableIPv6.SetNonNull(static_cast<bool>(opsrIPV6));   
             }
 
             jfieldID gethardwareAddressField = env->GetFieldID(nifClass, "hardwareAddress", "[B");
