@@ -96073,10 +96073,10 @@ private:
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
-        (static_cast<TestGroupDemoConfig *>(context))->OnFailureResponse_4(error);
+        (static_cast<TestGroupDemoConfigSuite *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context) { (static_cast<TestGroupDemoConfig *>(context))->OnSuccessResponse_4(); }
+    static void OnSuccessCallback_4(void * context) { (static_cast<TestGroupDemoConfigSuite *>(context))->OnSuccessResponse_4(); }
 
     //
     // Tests methods
