@@ -135,16 +135,21 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        if (counter <= mSynced.mMaxCounter)
+        if (counter == mSynced.mMaxCounter)
+        {
+            return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
+        }
+
+        if (counter < mSynced.mMaxCounter)
         {
             uint32_t offset = mSynced.mMaxCounter - counter;
 
-            if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            if (offset > CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
                 return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW; // outside valid range
             }
 
-            if (mSynced.mWindow.test(offset))
+            if (mSynced.mWindow.test(offset - 1))
             {
                 return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
             }
@@ -171,7 +176,7 @@ public:
             SetCounter(counter);
             return CHIP_NO_ERROR;
         case Status::Synced: {
-            CHIP_ERROR err = Verify(counter, useGroupAlgorithm);
+            CHIP_ERROR err = Verify(counter, true);
             if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW && !useGroupAlgorithm)
             {
                 // According to chip spec, when global unencrypted message
@@ -236,25 +241,30 @@ public:
      */
     void Commit(uint32_t counter)
     {
-        if (counter <= mSynced.mMaxCounter)
+        if (counter < mSynced.mMaxCounter)
         {
             uint32_t offset = mSynced.mMaxCounter - counter;
-            mSynced.mWindow.set(offset);
+            mSynced.mWindow.set(offset - 1);
+        }
+        else if (counter == mSynced.mMaxCounter)
+        {
+            // No action needed.  We already trusted this counter when the
+            // VerifyOrTrustFirst call happened.
         }
         else
         {
             uint32_t offset = counter - mSynced.mMaxCounter;
             // advance max counter by `offset`
             mSynced.mMaxCounter = counter;
-            if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            if (offset <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
                 mSynced.mWindow <<= offset;
+                mSynced.mWindow.set(offset - 1);
             }
             else
             {
                 mSynced.mWindow.reset();
             }
-            mSynced.mWindow.set(0);
         }
     }
 
