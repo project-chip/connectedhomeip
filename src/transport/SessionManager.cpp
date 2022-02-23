@@ -251,9 +251,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     {
     case Transport::Session::SessionType::kGroup: {
         auto groupSession = sessionHandle->AsGroupSession();
-        multicastAddress =
-            Transport::PeerAddress::Multicast(groupSession->GetFabricIndex(), groupSession->GetGroupId());
-        destination = &multicastAddress;
+        multicastAddress  = Transport::PeerAddress::Multicast(groupSession->GetFabricIndex(), groupSession->GetGroupId());
+        destination       = &multicastAddress;
         char addressStr[Transport::PeerAddress::kMaxToStringSize];
         multicastAddress.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
 
