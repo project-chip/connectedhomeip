@@ -308,7 +308,8 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
 
     if (mIgnoreApplyUpdateCount > 0)
     {
-        ChipLogDetail(SoftwareUpdate, "Skip HandleApplyUpdateRequest response. mIgnoreApplyUpdateCount %" PRIu32, mIgnoreApplyUpdateCount);
+        ChipLogDetail(SoftwareUpdate, "Skip HandleApplyUpdateRequest response. mIgnoreApplyUpdateCount %" PRIu32,
+                      mIgnoreApplyUpdateCount);
         mIgnoreApplyUpdateCount--;
         return EMBER_ZCL_STATUS_SUCCESS;
     }
