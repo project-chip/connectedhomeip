@@ -216,8 +216,9 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        chip::NodeId tvNodeId             = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr().GetPeerNodeId();
-        chip::FabricIndex peerFabricIndex = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFabricIndex();
+        chip::NodeId tvNodeId = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr().GetPeerNodeId();
+        chip::FabricIndex peerFabricIndex =
+            chip::DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext().GetFabricIndex();
 
         Server * server           = &(chip::Server::GetInstance());
         chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);

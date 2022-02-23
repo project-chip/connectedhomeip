@@ -60,6 +60,8 @@ private:
     bool mNocCommandHasBeenInvoked = false;
     FabricIndex mFabricIndex       = kUndefinedFabricIndex;
 
+    // TODO:: Track the state of what was mutated during fail-safe.
+
     inline bool MatchedFabricIndex(FabricIndex accessingFabric) { return (accessingFabric == mFabricIndex); }
     static void HandleArmFailSafe(System::Layer * layer, void * aAppState);
     void CommissioningFailedTimerComplete();

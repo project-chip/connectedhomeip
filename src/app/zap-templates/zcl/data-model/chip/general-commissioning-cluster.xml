@@ -21,7 +21,8 @@ limitations under the License.
     <item name="Ok" value="0x0"/>
     <item name="ValueOutsideRange" value="0x1"/>
     <item name="InvalidAuthentication" value="0x2"/>
-    <item name="NotCommissioning" value="0x3"/>    
+    <item name="NoFailSafe" value="0x3"/>
+    <item name="BusyWithOtherAdmin" value="0x4"/>       
   </enum>
   <enum name="RegulatoryLocationType" type="ENUM8">
     <cluster code="0x0030"/>
