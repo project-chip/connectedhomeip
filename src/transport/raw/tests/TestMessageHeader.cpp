@@ -219,8 +219,8 @@ void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
 void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
 {
     PacketHeader header;
-    uint8_t buffer[64];
-    uint16_t unusedLen;
+    uint8_t buffer[64] = {};
+    uint16_t unusedLen = 0;
 
     for (uint16_t shortLen = 0; shortLen < 8; shortLen++)
     {
@@ -294,8 +294,8 @@ void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
 void TestPayloadHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
 {
     PayloadHeader header;
-    uint8_t buffer[64];
-    uint16_t unusedLen;
+    uint8_t buffer[64] = {};
+    uint16_t unusedLen = 0;
 
     for (uint16_t shortLen = 0; shortLen < 6; shortLen++)
     {
