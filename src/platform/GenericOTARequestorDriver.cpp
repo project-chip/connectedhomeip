@@ -28,6 +28,7 @@ namespace {
 constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this value when starting OTA "immediately"
 
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
+using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 
 GenericOTARequestorDriver * ToDriver(void * context)
 {
@@ -210,6 +211,7 @@ void GenericOTARequestorDriver::DriverTriggerQuery()
     UpdateCancelled();
 
     // Default providers timer only runs when there is no ongoing query/update; must stop it now. 
+    // ConnectToProvider() will change the state from kIdle
     StopDefaultProvidersTimer();
 
     // Select a provider to query and set it in the OTARequestor
@@ -234,6 +236,15 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
 {
     ChipLogProgress(SoftwareUpdate, "Default Providers timer handler is invoked");
 
+    //  SL TODO: This has to be a method: PickNextDefaultProvider()
+    //    mProviderNodeId = mTestingProviderNodeId;
+
+    // Determine which provider to query next 
+    ProviderLocation::Type providerLocation;
+    DetermineProviderLocation(providerLocation);
+
+    mRequestor->SetCurrentProviderLocation(providerLocation);
+
     // In this implementation the default provider timer runs only if there is no other update in progress.
     // Nevertheless, even though no other timers should be running, call a cleanup method to be safe 
     DriverTriggerQuery();
@@ -241,10 +252,8 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
 
 void GenericOTARequestorDriver::StartDefaultProvidersTimer()
 { 
-    ChipLogProgress(SoftwareUpdate, "Starting the Default Providers timer, timeout: %u", (unsigned int)mDefaultProvidersTimeoutSec);
+    ChipLogProgress(SoftwareUpdate, "Starting the Default Providers timer, timeout: %u", (unsigned int)mDefaultProvidersTimeoutSec);   
 
-    //  SL TODO: This has to be a method: PickNextDefaultProvider()
-    //    mProviderNodeId = mTestingProviderNodeId;
     ScheduleDelayedAction(UpdateFailureState::kIdle,
                                                System::Clock::Seconds32(mDefaultProvidersTimeoutSec),
                                                [](System::Layer *, void * context){ (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context); },
@@ -258,6 +267,18 @@ void GenericOTARequestorDriver::StopDefaultProvidersTimer()
                                                this);
 }
 
+bool GenericOTARequestorDriver::DetermineProviderLocation(ProviderLocation::Type & providerLocation)
+{
+    auto iterator = mRequestor->GetDefaultOTAProviderListIterator();
+    while (iterator.Next())
+    {
+        // For now, just return the first one
+        providerLocation = iterator.GetValue();
+       return true;
+    }
+
+   return false;
+}
 
 } // namespace DeviceLayer
 } // namespace chip

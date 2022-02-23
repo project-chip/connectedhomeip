@@ -257,6 +257,10 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
+    // We are now connecting to a provider, leave the kIdle state. 
+    // Spec doesn't define a specific state for this but we can't be in kIdle. 
+    RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
+
     if(mOtaRequestorDriver == nullptr) {
         ChipLogError(SoftwareUpdate, "OTA requestor driver not set");
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
@@ -282,10 +286,6 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
-
-    // We are now connecting to a provider, leave the kIdle state. 
-    // Spec doesn't define a specific state for this but we can't be in kIdle. 
-    RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
     
     // Set the action to take once connection is successfully established
     mOnConnectedAction = onConnectedAction;
@@ -501,14 +501,6 @@ CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocation::Type & pr
 
     ReturnErrorOnFailure(mDefaultOtaProviderList.Add(providerLocation));
 
-    // Should be removed when periodic queries is implemented
-    iterator = mDefaultOtaProviderList.Begin();
-    while (iterator.Next())
-    {
-        SetDefaultProviderLocation(iterator.GetValue());
-        break;
-    }
-
     return CHIP_NO_ERROR;
 }
 
@@ -592,7 +584,8 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
 
     // Inform the driver that the OTARequestor has entered the kIdle state. A driver implementation
     // may choose to restart the default providers timer in this case
-    if( mCurrentUpdateState != OTAUpdateStateEnum::kIdle) {
+    if((newState == OTAUpdateStateEnum::kIdle) && ( mCurrentUpdateState != OTAUpdateStateEnum::kIdle)) {
+        // SL TODO: Make this API a general state change
         mOtaRequestorDriver->HandleIdleState();
     }
 

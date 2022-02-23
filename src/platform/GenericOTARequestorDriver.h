@@ -71,6 +71,8 @@ public:
     void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
  
 private:
+    bool DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation);
+
     OTARequestorInterface      * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
     uint32_t mOtaStartDelayMs                 = 0;
