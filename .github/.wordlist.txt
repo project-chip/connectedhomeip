@@ -567,11 +567,8 @@ idx
 ifdef
 ifdefs
 IGMP
-<<<<<<< HEAD
-ignoreQueryImage
-=======
 ignoreApplyUpdate
->>>>>>> e412d488f (Issue #11759 - Support for error/timeout in response to ApplyUpdateRequest command)
+ignoreQueryImage
 ihex
 IlluminanceMeasurement
 IM
