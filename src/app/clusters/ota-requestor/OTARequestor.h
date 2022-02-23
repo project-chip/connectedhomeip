@@ -213,16 +213,6 @@ private:
     };
 
     /**
-     * Set the cached default OTA provider location to use for the next query
-     */
-    bool SetDefaultProviderLocation(const ProviderLocationType & providerLocation);
-
-    /**
-     * Clear the cached default OTA provider location to indicate no OTA update may be in progress
-     */
-    bool ClearDefaultProviderLocation(void);
-
-    /**
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
      */
     void RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason);

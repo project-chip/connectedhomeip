@@ -56,7 +56,8 @@ enum class UpdateNotFoundReason
 {
     Busy,
     NotAvailable,
-    UpToDate
+    UpToDate,
+    ConnectionFailed,
 };
 
 enum class OTARequestorIncomingEvent

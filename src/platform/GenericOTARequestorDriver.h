@@ -78,8 +78,8 @@ private:
     uint32_t mOtaStartDelayMs                 = 0;
     uint32_t mDefaultProvidersTimeoutSec      = 86400;  // Timeout for the Default Provider timer
 
- using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-    Optional<ProviderLocationType> mLastProviderLocation; // Provider location used for the last query or update 
+    using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    ProviderLocationType mLastUsedProvider; // Provider location used for the last query or update 
 };
 
 } // namespace DeviceLayer

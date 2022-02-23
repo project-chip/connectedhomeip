@@ -141,6 +141,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             ChipLogDetail(SoftwareUpdate, "Version %" PRIu32 " is older or same than current version %" PRIu32 ", not updating",
                           update.softwareVersion, requestorCore->mCurrentVersion);
 
+            requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
             requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
@@ -148,18 +149,14 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         break;
     }
     case OTAQueryStatus::kBusy:
-        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::Busy,
-                                                           System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnQuery, OTAChangeReasonEnum::kDelayByProvider);
+        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::Busy,
+                                                           System::Clock::Seconds32(response.delayedActionTime.ValueOr(0))); 
         break;
     case OTAQueryStatus::kNotAvailable:
+        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::NotAvailable,
                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-
-        // SL TODO: Here look for another provider from the default list. If found, query it -- otherwise enter idle 
-        // state. Take into the account when was the last time we queried it.
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
-
         break;
     default:
         requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_BAD_REQUEST);
@@ -189,12 +186,12 @@ void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateRespon
         requestorCore->mOtaRequestorDriver->UpdateConfirmed(System::Clock::Seconds32(response.delayedActionTime));
         break;
     case OTAApplyUpdateAction::kAwaitNextAction:
-        requestorCore->mOtaRequestorDriver->UpdateSuspended(System::Clock::Seconds32(response.delayedActionTime));
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnApply, OTAChangeReasonEnum::kDelayByProvider);
+        requestorCore->mOtaRequestorDriver->UpdateSuspended(System::Clock::Seconds32(response.delayedActionTime));
         break;
     case OTAApplyUpdateAction::kDiscontinue:
-        requestorCore->mOtaRequestorDriver->UpdateDiscontinued();
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+        requestorCore->mOtaRequestorDriver->UpdateDiscontinued();
         break;
     }
 }
@@ -419,6 +416,9 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
     default:
         break;
     }
+
+    // Give driver a chance to reschedule a query
+    requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::ConnectionFailed, chip::System::Clock::Seconds32(0));
 }
 
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
@@ -534,30 +534,6 @@ void OTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
     OtaRequestorServerSetUpdateStateProgress(percent);
 }
 
-bool OTARequestor::SetDefaultProviderLocation(const ProviderLocationType & providerLocation)
-{
-    // Provider location cannot be modified if there is an OTA update in progress
-    if (mCurrentUpdateState != OTAUpdateStateEnum::kIdle)
-    {
-        return false;
-    }
-
-    mProviderLocation.SetValue(providerLocation);
-    return true;
-}
-
-bool OTARequestor::ClearDefaultProviderLocation(void)
-{
-    // Provider location cannot be modified if there is an OTA update in progress
-    if (mCurrentUpdateState != OTAUpdateStateEnum::kIdle)
-    {
-        return false;
-    }
-
-    mProviderLocation.ClearValue();
-    return true;
-}
-
 void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason)
 {
     // Set server UpdateState attribute
@@ -590,12 +566,6 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
 
     mCurrentUpdateState = newState;
-
-    // Provider location should not exist if no OTA update in progress
-    if (mCurrentUpdateState == OTAUpdateStateEnum::kIdle)
-    {
-        ClearDefaultProviderLocation();
-    }
 }
 
 void OTARequestor::RecordErrorUpdateState(UpdateFailureState failureState, CHIP_ERROR error, OTAChangeReasonEnum reason)
