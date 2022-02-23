@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,3 +29,8 @@ extern BluetoothWidget bluetoothLED;
 extern WiFiWidget wifiLED;
 extern const chip::NodeId kLocalNodeId;
 extern WiFiWidget pairingWindowLED;
+
+#define STATUS_LED_GPIO_NUM ((gpio_num_t) CONFIG_STATUS_LED_GPIO_NUM)
+#define APP_BUTTON_PRESSED 0
+#define APP_BUTTON_RELEASED 1
+#define BUTTON_NUMBER 3

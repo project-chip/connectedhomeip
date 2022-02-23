@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +19,7 @@
 /**
  * @file Button.h
  *
- * Describes a Button tied to a GPIO that provides debouncing and polling APIs
+ * Describes a Button tied to a GPIO that provides debouncing
  *
  **/
 
@@ -31,13 +30,30 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/timers.h"
 
 class Button
 {
 public:
     /**
      * @brief
+     *  construct a button
+     */
+    Button();
+    /**
+     * @brief
+     *  construct a button with given GPIO number
+     */
+    Button(gpio_num_t gpioNum);
+    /**
+     * @brief
      *  Initialize a button
+     * @return esp_err_t
+     */
+    esp_err_t Init();
+    /**
+     * @brief
+     *  Initialize a button with given GPIO number
      * @param gpioNum           The GPIO pin this button should keep track of
      * @return esp_err_t
      */
@@ -48,9 +64,20 @@ public:
      * @return gpio_num_t
      */
     inline gpio_num_t GetGPIONum();
+    /**
+     * @brief
+     *  Global Button debouncing Timer Callback function
+     */
+    static void TimerCallback(TimerHandle_t xTimer);
+    /**
+     * @brief
+     *  Button gpio isr
+     */
+    friend void IRAM_ATTR button_isr_handler(void * arg);
 
 private:
     gpio_num_t mGPIONum;
+    TimerHandle_t mbuttonTimer; // FreeRTOS timers used for debouncing buttons
 };
 
 inline gpio_num_t Button::GetGPIONum()

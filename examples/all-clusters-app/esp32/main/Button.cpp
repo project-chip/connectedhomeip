@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,58 +19,62 @@
 /**
  * @file Button.cpp
  *
- * Implements a Button tied to a GPIO and provides debouncing and polling
+ * Implements a Button tied to a GPIO and provides debouncing
  *
  **/
 
 #include "driver/gpio.h"
+#include "esp_check.h"
 #include "esp_log.h"
 #include "esp_system.h"
 
+#include "AppTask.h"
 #include "Button.h"
+#include "Globals.h"
 #include "ScreenManager.h"
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <vector>
 
 static const char * TAG = "Button.cpp";
 
-static xQueueHandle button_evt_queue = NULL;
+extern Button gButtons[BUTTON_NUMBER];
 
-static void IRAM_ATTR button_isr_handler(void * arg)
+Button::Button() {}
+
+Button::Button(gpio_num_t gpioNum)
 {
-    uint32_t gpio_num = (uint32_t) arg;
-    xQueueSendFromISR(button_evt_queue, &gpio_num, NULL);
+    mGPIONum = gpioNum;
 }
 
-static void button_task(void * arg)
+int32_t Find_Button_Via_Pin(gpio_num_t gpioNum)
 {
-    uint32_t io_num;
-
-    while (1)
+    for (int i = 0; i < BUTTON_NUMBER; i++)
     {
-        if (xQueueReceive(button_evt_queue, &io_num, portMAX_DELAY))
+        if (gButtons[i].GetGPIONum() == gpioNum)
         {
-            vTaskDelay(50 / portTICK_PERIOD_MS);
-#if CONFIG_DEVICE_TYPE_M5STACK
-            int level = gpio_get_level((gpio_num_t) io_num);
-            ESP_LOGI(TAG, "GPIO[%d] intr, val: %d, pressed\n", io_num, level);
-            if (level == 0)
-            {
-                bool woken = false;
-                if (!woken)
-                {
-                    woken = WakeDisplay();
-                }
-                if (woken)
-                {
-                    continue;
-                }
-
-                ScreenManager::ButtonPressed(40 - io_num);
-            }
-#endif
+            return i;
         }
     }
+    return -1;
+}
+
+void IRAM_ATTR button_isr_handler(void * arg)
+{
+    uint32_t gpio_num = (uint32_t) arg;
+    int32_t idx       = Find_Button_Via_Pin((gpio_num_t) gpio_num);
+    if (idx == -1)
+    {
+        return;
+    }
+    BaseType_t taskWoken = pdFALSE;
+    xTimerStartFromISR(gButtons[idx].mbuttonTimer,
+                       &taskWoken); // If the timer had already been started ,restart it will reset its expiry time
+}
+
+esp_err_t Button::Init()
+{
+    return Init(mGPIONum);
 }
 
 esp_err_t Button::Init(gpio_num_t gpioNum)
@@ -94,19 +97,21 @@ esp_err_t Button::Init(gpio_num_t gpioNum)
 
     // hook isr handler for specific gpio pin
     ret = gpio_isr_handler_add(gpioNum, button_isr_handler, (void *) gpioNum);
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "gpio_isr_handler_add failed: %s", esp_err_to_name(ret));
-        return ret;
-    }
+    ESP_RETURN_ON_ERROR(ret, TAG, "gpio_isr_handler_add failed: %s", esp_err_to_name(ret));
 
-    if (button_evt_queue == NULL)
-    {
-        // create a queue to handle gpio event from isr
-        button_evt_queue = xQueueCreate(10, sizeof(uint32_t));
-        // start gpio task
-        xTaskCreate(button_task, "button_task", 3500, NULL, 10, NULL);
-    }
+    mbuttonTimer = xTimerCreate("BtnTmr",               // Just a text name, not used by the RTOS kernel
+                                pdMS_TO_TICKS(50),      // timer period
+                                false,                  // no timer reload (==one-shot)
+                                (void *) (int) gpioNum, // init timer id = gpioNum index
+                                TimerCallback           // timer callback handler (all buttons use
+                                                        // the same timer cn function)
+    );
 
     return ESP_OK;
+}
+void Button::TimerCallback(TimerHandle_t xTimer)
+{
+    // Get the button index of the expired timer and call button event Handler.
+    uint32_t gpio_num = (uint32_t) pvTimerGetTimerID(xTimer);
+    GetAppTask().ButtonEventHandler(gpio_num, APP_BUTTON_PRESSED);
 }
