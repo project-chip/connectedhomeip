@@ -252,7 +252,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to cancel GDBus thread");
     }
 
-    if (pthread_join(mGdbusThread, NULL))
+    if (pthread_join(mGdbusThread, NULL) != 0)
     {
         ChipLogError(DeviceLayer, "Failed to join GDBus thread");
     }
