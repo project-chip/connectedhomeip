@@ -63,20 +63,24 @@ jobs:
                    .environment/pigweed-venv/*.log
 
             - name: Build some BRD4161A variants
-              timeout-minutes: 30
+              timeout-minutes: 50
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target-glob '*-brd4161a-{lock,light,unit-test}' \
+                        --target-glob '*-brd4161a-{lock,light,switch,window-covering,unit-test}' \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
-            - name: Prepare bloat report for light app
+            - name: Prepare some bloat report from the previous builds
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                      efr32 BRD4161A lighting-app \
                      out/efr32-brd4161a-light/chip-efr32-lighting-example.out \
+                     /tmp/bloat_reports/
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py  \
+                     efr32 BRD4161A window-app \
+                     out/window_app_debug/BRD4161A/chip-efr32-window-example.out \
                      /tmp/bloat_reports/
             - name: Build example EFR32 Lighting App for BRD4161A with RPCs
               timeout-minutes: 10
@@ -85,13 +89,12 @@ jobs:
                     'import("//with_pw_rpc.gni")'
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rpc lighting-app \
                     out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
-            - name: Build example EFR32 Window Covering for BRD4161A
+            - name: Build example EFR32+RS911x WiFi light app for BRD4161A
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_efr32_example.sh examples/window-app/efr32/ out/window_app_debug BRD4161A
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A window-app \
-                    out/window_app_debug/BRD4161A/chip-efr32-window-example.out /tmp/bloat_reports/
-
+                  scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_wifi_rs911 BRD4161A --wifi rs911x
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rs911x lighting-app \
+                    out/lighting_app_wifi_rs911/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/ 
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}

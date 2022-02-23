@@ -21,6 +21,7 @@ from .gn import GnBuilder
 class Efr32App(Enum):
     LIGHT = auto()
     LOCK = auto()
+    SWITCH = auto()
     WINDOW_COVERING = auto()
     UNIT_TEST = auto()
 
@@ -29,6 +30,8 @@ class Efr32App(Enum):
             return 'lighting-app'
         elif self == Efr32App.LOCK:
             return 'lock-app'
+        elif self == Efr32App.SWITCH:
+            return 'light-switch-app'
         elif self == Efr32App.WINDOW_COVERING:
             return 'window-app'
         else:
@@ -38,6 +41,8 @@ class Efr32App(Enum):
         if self == Efr32App.LIGHT:
             return 'chip-efr32-lighting-example'
         elif self == Efr32App.LOCK:
+            return 'chip-efr32-lock-example'
+        elif self == Efr32App.SWITCH:
             return 'chip-efr32-lock-example'
         elif self == Efr32App.WINDOW_COVERING:
             return 'chip-efr32-window-example'
@@ -51,6 +56,8 @@ class Efr32App(Enum):
             return 'lighting_app.flashbundle.txt'
         elif self == Efr32App.LOCK:
             return 'lock_app.flashbundle.txt'
+        elif self == Efr32App.SWITCH:
+            return 'light_switch_app.flashbundle.txt'
         elif self == Efr32App.WINDOW_COVERING:
             return 'window_app.flashbundle.txt'
         elif self == Efr32App.UNIT_TEST:
