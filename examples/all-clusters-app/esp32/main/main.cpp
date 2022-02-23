@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "AppTask.h"
 #include "BluetoothWidget.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
@@ -34,11 +36,11 @@
 #include "platform/PlatformManager.h"
 #include "shell_extension/launch.h"
 
-
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/util/af.h>
 #include <binding-handler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -64,8 +66,6 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-#define STATUS_LED_GPIO_NUM ((gpio_num_t) CONFIG_STATUS_LED_GPIO_NUM)
-
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
@@ -76,33 +76,33 @@ static DeviceCallbacks EchoCallbacks;
 namespace {
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-    OTARequestor gRequestorCore;
-    GenericOTARequestorDriver gRequestorUser;
-    BDXDownloader gDownloader;
-    OTAImageProcessorImpl gImageProcessor;
+OTARequestor gRequestorCore;
+GenericOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+OTAImageProcessorImpl gImageProcessor;
 #endif
 
-    namespace {
-        app::Clusters::NetworkCommissioning::Instance
-            sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
-    } // namespace
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+} // namespace
 
-    class AppCallbacks : public AppDelegate
+class AppCallbacks : public AppDelegate
+{
+public:
+    void OnRendezvousStarted() override { bluetoothLED.Set(true); }
+    void OnRendezvousStopped() override
     {
-        public:
-            void OnRendezvousStarted() override { bluetoothLED.Set(true); }
-            void OnRendezvousStopped() override
-            {
-                bluetoothLED.Set(false);
-                pairingWindowLED.Set(false);
-            }
-            void OnPairingWindowOpened() override { pairingWindowLED.Set(true); }
-            void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
-    };
+        bluetoothLED.Set(false);
+        pairingWindowLED.Set(false);
+    }
+    void OnPairingWindowOpened() override { pairingWindowLED.Set(true); }
+    void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
+};
 
-    AppCallbacks sCallbacks;
+AppCallbacks sCallbacks;
 
-    constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 } // namespace
 
@@ -118,7 +118,6 @@ static void InitServer(intptr_t context)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     sWiFiNetworkCommissioningInstance.Init();
     InitBindingHandlers();
-
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
@@ -137,19 +136,6 @@ static void InitOTARequestor(void)
 
 extern "C" void app_main()
 {
-    ESP_LOGI(TAG, "All Clusters Demo!");
-    /* Print chip information */
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-
-    ESP_LOGI(TAG, "This is ESP32 chip with %d CPU cores, WiFi%s%s, ", chip_info.cores,
-            (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "", (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-
-    ESP_LOGI(TAG, "silicon revision %d, ", chip_info.revision);
-
-    ESP_LOGI(TAG, "%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-            (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-
     // Initialize the ESP NVS layer.
     esp_err_t err = nvs_flash_init();
     if (err != ESP_OK)
@@ -160,6 +146,10 @@ extern "C" void app_main()
 #if CONFIG_ENABLE_PW_RPC
     chip::rpc::Init();
 #endif
+
+    ESP_LOGI(TAG, "==================================================");
+    ESP_LOGI(TAG, "chip-esp32-all-cluster-demo starting");
+    ESP_LOGI(TAG, "==================================================");
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
@@ -173,31 +163,23 @@ extern "C" void app_main()
 #endif
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
-
-    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
+    CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
         return;
     }
 
-    statusLED1.Init(STATUS_LED_GPIO_NUM);
-    // Our second LED doesn't map to any physical LEDs so far, just to virtual
-    // "LED"s on devices with screens.
-    statusLED2.Init(GPIO_NUM_MAX);
-    bluetoothLED.Init();
-    wifiLED.Init();
-    pairingWindowLED.Init();
-
     InitOTARequestor();
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
+    error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %s", ErrorStr(error));
+    }
 
-    // Print QR Code URL
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
-#if CONFIG_HAVE_DISPLAY
-    InitDeviceDisplay();
-#endif
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
 
 bool lowPowerClusterSleep()
