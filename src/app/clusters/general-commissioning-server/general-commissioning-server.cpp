@@ -127,20 +127,20 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
-    DeviceControlServer * server      = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    FailSafeContext & failSafeContext = server->GetFailSafeContext();
+    FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
     /*
      * If the fail-safe timer was not currently armed, the the fail-safe timer SHALL be armed.
      * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
      * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
      */
-    if (!failSafeContext.IsFailSafeArmed() ||
-        failSafeContext.MatchesFailSafeContextFabricIndex(commandObj->GetAccessingFabricIndex()))
+    if (!failSafeContext.IsFailSafeArmed())
     {
         Commands::ArmFailSafeResponse::Type response;
 
-        CheckSuccess(server->ArmFailSafe(System::Clock::Seconds16(commandData.expiryLengthSeconds)), Failure);
+        CheckSuccess(failSafeContext.ArmFailSafe(commandObj->GetAccessingFabricIndex(),
+                                                 System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                     Failure);
         response.errorCode = CommissioningError::kOk;
         CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
     }

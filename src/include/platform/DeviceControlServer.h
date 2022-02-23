@@ -88,19 +88,10 @@ class DeviceControlServer final
 public:
     // ===== Members for internal use by other Device Layer components.
 
-    /**
-     * @brief
-     *  Only a single fail-safe timer is started on the device, if this function is called again
-     *  when the fail-safe timer is currently armed, the currently-running fail-safe timer will
-     *  first be cancelled, then the fail-safe timer will be re-armed.
-     */
-    CHIP_ERROR ArmFailSafe(System::Clock::Timeout expiryLength);
-    CHIP_ERROR DisarmFailSafe();
     CHIP_ERROR CommissioningComplete();
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb);
     CHIP_ERROR ConnectNetworkForOperational(ByteSpan networkID);
 
-    inline FabricIndex GetFabricIndex() { return mFailSafeContext.GetFabricIndex(); }
     inline NodeId GetPeerNodeId() { return mPeerNodeId; }
     inline void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetSwitchDelegate(SwitchDeviceControlDelegate * delegate) { mSwitchDelegate = delegate; }
@@ -114,9 +105,6 @@ private:
     static DeviceControlServer sInstance;
     FailSafeContext mFailSafeContext;
     SwitchDeviceControlDelegate * mSwitchDelegate = nullptr;
-
-    friend void HandleArmFailSafe(System::Layer * layer, void * aAppState);
-    void CommissioningFailedTimerComplete();
 
     // ===== Private members reserved for use by this class only.
 

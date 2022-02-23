@@ -537,7 +537,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
         return true;
     }
 
-    if (failSafeContext.IsNocCommandInvoked())
+    if (failSafeContext.NocCommandHasBeenInvoked())
     {
         LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::ConstraintError));
         return true;
@@ -611,7 +611,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
         return true;
     }
 
-    if (failSafeContext.IsNocCommandInvoked())
+    if (failSafeContext.NocCommandHasBeenInvoked())
     {
         LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::ConstraintError));
         return true;

@@ -33,32 +33,36 @@ class FailSafeContext
 public:
     // ===== Members for internal use by other Device Layer components.
 
-    inline bool MatchesFailSafeContextFabricIndex(FabricIndex accessingFabric) { return (accessingFabric == mFabricIndex); }
+    /**
+     * @brief
+     *  Only a single fail-safe timer is started on the device, if this function is called again
+     *  when the fail-safe timer is currently armed, the currently-running fail-safe timer will
+     *  first be cancelled, then the fail-safe timer will be re-armed.
+     */
+    CHIP_ERROR ArmFailSafe(FabricIndex accessingFabric, System::Clock::Timeout expiryLength);
+    CHIP_ERROR DisarmFailSafe();
 
-    inline bool IsFailSafeArmed(FabricIndex accessingFabric)
-    {
-        return mFailSafeArmed && MatchesFailSafeContextFabricIndex(accessingFabric);
-    }
-
-    inline void SetFailSafeArmed(bool armed)
-    {
-        if (!armed)
-        {
-            mFabricIndex = kUndefinedFabricIndex;
-        }
-        mFailSafeArmed = armed;
-    }
+    inline bool IsFailSafeArmed(FabricIndex accessingFabric) { return mFailSafeArmed && MatchedFabricIndex(accessingFabric); }
 
     inline bool IsFailSafeArmed() { return mFailSafeArmed; }
-    inline bool IsNocCommandInvoked() { return (mFabricIndex != kUndefinedFabricIndex); }
-    inline void SetNocCommandInvoked(FabricIndex fabricId) { mFabricIndex = fabricId; }
+    inline bool NocCommandHasBeenInvoked() { return mNocCommandHasBeenInvoked; }
+    inline void SetNocCommandInvoked(FabricIndex fabricId)
+    {
+        mNocCommandHasBeenInvoked = true;
+        mFabricIndex              = fabricId;
+    }
     inline FabricIndex GetFabricIndex() { return mFabricIndex; }
 
 private:
     // ===== Private members reserved for use by this class only.
 
-    bool mFailSafeArmed      = false;
-    FabricIndex mFabricIndex = kUndefinedFabricIndex;
+    bool mFailSafeArmed            = false;
+    bool mNocCommandHasBeenInvoked = false;
+    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
+
+    inline bool MatchedFabricIndex(FabricIndex accessingFabric) { return (accessingFabric == mFabricIndex); }
+    static void HandleArmFailSafe(System::Layer * layer, void * aAppState);
+    void CommissioningFailedTimerComplete();
 };
 
 } // namespace DeviceLayer

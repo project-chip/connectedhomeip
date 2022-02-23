@@ -27,12 +27,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-void HandleArmFailSafe(System::Layer * layer, void * aAppState)
-{
-    DeviceControlServer * server = reinterpret_cast<DeviceControlServer *>(aAppState);
-    server->CommissioningFailedTimerComplete();
-}
-
 DeviceControlServer DeviceControlServer::sInstance;
 
 DeviceControlServer & DeviceControlServer::DeviceControlSvr()
@@ -40,38 +34,9 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
-void DeviceControlServer::CommissioningFailedTimerComplete()
-{
-    ChipDeviceEvent event;
-    event.Type                         = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.status = CHIP_ERROR_TIMEOUT;
-    CHIP_ERROR status                  = PlatformMgr().PostEvent(&event);
-
-    mFailSafeContext.SetFailSafeArmed(false);
-
-    if (status != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to post commissioning complete: %" CHIP_ERROR_FORMAT, status.Format());
-    }
-}
-
-CHIP_ERROR DeviceControlServer::ArmFailSafe(System::Clock::Timeout expiryLength)
-{
-    mFailSafeContext.SetFailSafeArmed(true);
-    DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControlServer::DisarmFailSafe()
-{
-    mFailSafeContext.SetFailSafeArmed(false);
-    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafe, this);
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DeviceControlServer::CommissioningComplete()
 {
-    VerifyOrReturnError(CHIP_NO_ERROR == DisarmFailSafe(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(CHIP_NO_ERROR == mFailSafeContext.DisarmFailSafe(), CHIP_ERROR_INTERNAL);
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;
     event.CommissioningComplete.status = CHIP_NO_ERROR;
