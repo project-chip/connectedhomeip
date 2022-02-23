@@ -38,7 +38,7 @@ public:
         static AppTask sAppTask;
         return sAppTask;
     };
-    int StartApp();
+    CHIP_ERROR StartApp();
 
 private:
     enum class OperatingMode : uint8_t
@@ -48,7 +48,7 @@ private:
         Invalid
     };
 
-    int Init();
+    CHIP_ERROR Init();
     void DispatchEvent(AppEvent * aEvent);
     void InitOTARequestor();
 
