@@ -70,7 +70,11 @@ public:
     } DeviceSoftwareVersionModel;
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
+<<<<<<< HEAD
     void SetIgnoreQueryImageCount(uint32_t count) { mIgnoreQueryImageCount = count; }
+=======
+    void SetIgnoreApplyUpdateCount(uint32_t count) { mIgnoreApplyUpdateCount = count; }
+>>>>>>> e412d488f (Issue #11759 - Support for error/timeout in response to ApplyUpdateRequest command)
     void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
     {
         mUpdateAction = action;
@@ -87,7 +91,11 @@ private:
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     QueryImageBehaviorType mQueryImageBehavior;
+<<<<<<< HEAD
     uint32_t mIgnoreQueryImageCount = 0;
+=======
+    uint32_t mIgnoreApplyUpdateCount = 0;
+>>>>>>> e412d488f (Issue #11759 - Support for error/timeout in response to ApplyUpdateRequest command)
     chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction mUpdateAction;
     uint32_t mDelayedActionTimeSec;
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
