@@ -92,7 +92,7 @@ public:
      * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up
      * on the fabric that was configured for the CASESessionManager object.
      *
-     * The results of the DNS-SD resolution request is provided to the class via `ResolverDelegate`
+     * The results of the DNS-SD resolution request is provided to the class via `OperationalResolveDelegate`
      * implementation of CASESessionManager.
      */
     CHIP_ERROR ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId);
