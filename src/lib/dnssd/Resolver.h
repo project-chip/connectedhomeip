@@ -267,6 +267,22 @@ struct DiscoveredNodeData
             ChipLogDetail(Discovery, "\tPort: %u", port);
         }
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
+        if (mrpRetryIntervalIdle.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval idle: %" PRIu32 " ms", mrpRetryIntervalIdle.Value().count());
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval idle: not present");
+        }
+        if (mrpRetryIntervalActive.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval active: %" PRIu32 " ms", mrpRetryIntervalActive.Value().count());
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval active: not present");
+        }
     }
 };
 
