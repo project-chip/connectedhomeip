@@ -89,6 +89,11 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
     if (chip_device_platform == "linux") {
       test_sources += [ "TestConnectivityMgr.cpp" ]
     }
+
+    if (chip_enable_ota_requestor) {
+      test_sources += [ "TestGenericOTARequestorStorage.cpp" ]
+      public_deps += ["${chip_root}/src/lib/asn1" ]
+    }
   }
 } else {
   import("${chip_root}/build/chip/chip_test_group.gni")

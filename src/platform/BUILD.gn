@@ -318,6 +318,8 @@ if (chip_device_platform != "none") {
       sources += [
         "GenericOTARequestorDriver.cpp",
         "GenericOTARequestorDriver.h",
+        "GenericOTARequestorStorage.cpp",
+        "GenericOTARequestorStorage.h",
       ]
     }
 

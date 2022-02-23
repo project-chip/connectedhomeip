@@ -69,6 +69,9 @@ public:
         return Format("a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
+    const char * OTAProviderLocation() { return Format("opl"); }
+    const char * OTAUpdateToken() { return Format("out"); }
+
 private:
     static const size_t kKeyLengthMax = 32;
 

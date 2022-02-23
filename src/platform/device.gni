@@ -68,7 +68,11 @@ declare_args() {
   chip_enable_nfc = false
 
   # Enable OTA requestor support
-  chip_enable_ota_requestor = false
+  if (chip_device_platform == "linux") {
+    chip_enable_ota_requestor = true
+  } else {
+    chip_enable_ota_requestor = false
+  }
 
   # Select DNS-SD implementation
   if (chip_device_platform == "linux" || chip_device_platform == "esp32" ||
