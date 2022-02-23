@@ -342,6 +342,9 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
         mNodeData.LogNodeIdResolved();
         mNodeData.PrioritizeAddresses();
 
+        //
+        // This is a quick fix to address some failing tests. Issue #15489 tracks the correct fix here.
+        //
         const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
         mNodeData.mExpiryTime                      = currentTime + System::Clock::Seconds16(kDefaultTtlSeconds);
 
