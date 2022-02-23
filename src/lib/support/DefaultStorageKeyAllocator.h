@@ -69,6 +69,10 @@ public:
         return Format("a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
+    const char * OTADefaultProvider(FabricIndex fabric) { return Format("o/dp/%x", fabric); }
+    const char * OTACurrentProvider() { return "o/pl"; }
+    const char * OTAUpdateToken() { return "o/ut"; }
+
 private:
     static const size_t kKeyLengthMax = 32;
 
