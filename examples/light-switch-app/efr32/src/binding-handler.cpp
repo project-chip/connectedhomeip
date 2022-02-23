@@ -26,7 +26,7 @@
 #include "controller/InvokeInteraction.h"
 
 namespace {
-void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, chip::DeviceProxy * peer_device, void * context)
+void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device, void * context)
 {
     using namespace chip;
     using namespace chip::app;
@@ -38,22 +38,23 @@ void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, chip::Dev
         ChipLogError(NotSpecified, "OnOff command failed: %" CHIP_ERROR_FORMAT, error.Format());
     };
 
-    if (binding->type == EMBER_MULTICAST_BINDING)
+    if (binding.type == EMBER_MULTICAST_BINDING)
     {
         ChipLogError(NotSpecified, "Group binding is not supported now");
         return;
     }
 
-    if (binding->type == EMBER_UNICAST_BINDING && binding->local == 1 && binding->clusterId == Clusters::OnOff::Id)
+    if (binding.type == EMBER_UNICAST_BINDING && binding.local == 1 && binding.clusterId.HasValue() &&
+        binding.clusterId.Value() == Clusters::OnOff::Id)
     {
         Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                         binding->remote, toggleCommand, onSuccess, onFailure);
+        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         toggleCommand, onSuccess, onFailure);
     }
 }
 } // namespace
 
-void SwitchToggleOnOff()
+void SwitchToggleOnOff(intptr_t context)
 {
     chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
 }

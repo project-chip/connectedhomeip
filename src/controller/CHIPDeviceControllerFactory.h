@@ -31,7 +31,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace chip {
 

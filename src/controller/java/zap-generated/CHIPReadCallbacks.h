@@ -1416,6 +1416,37 @@ private:
     bool keepAlive;
 };
 
+class CHIPBindingBindingAttributeCallback : public chip::Callback::Callback<CHIPBindingClusterBindingAttributeCallbackType>
+{
+public:
+    CHIPBindingBindingAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBindingBindingAttributeCallback();
+
+    static void maybeDestroy(CHIPBindingBindingAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBindingBindingAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBindingBindingAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPBindingServerGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPBindingClusterServerGeneratedCommandListAttributeCallbackType>
 {

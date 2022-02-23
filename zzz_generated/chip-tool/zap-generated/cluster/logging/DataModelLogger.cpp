@@ -2038,6 +2038,54 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Node", indent + 1, value.node);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Node'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Group", indent + 1, value.group);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Group'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Cluster", indent + 1, value.cluster);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cluster'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -3463,7 +3511,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("channelMatch", indent + 1, value.channelMatch));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("errorType", indent + 1, value.errorType));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -4700,6 +4748,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case Binding::Id: {
         switch (path.mAttributeId)
         {
+        case Binding::Attributes::Binding::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Binding", 1, value);
+        }
         case Binding::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

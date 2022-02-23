@@ -21,8 +21,8 @@
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/SafeInt.h>
@@ -121,6 +121,9 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
  */
 void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr)
 {
+    // DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_tv_casting_kvs");
+    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+
     // Enter commissioning mode, open commissioning window
     Server::GetInstance().Init();
     Server::GetInstance().GetFabricTable().DeleteAllFabrics();

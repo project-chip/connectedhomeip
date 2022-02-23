@@ -41,8 +41,8 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
-#include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/FabricTable.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -364,8 +364,6 @@ protected:
     CHIP_ERROR InitializePairedDeviceList();
     CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
-
-    void PersistNextKeyId();
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
@@ -691,8 +689,6 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void SetupCluster(ClusterBase & base, DeviceProxy * proxy, EndpointId endpoint, Optional<System::Clock::Timeout> timeout);
-
-    void FreeRendezvousSession();
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 

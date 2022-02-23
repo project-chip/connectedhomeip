@@ -104,10 +104,10 @@ if (CONFIG_POSIX_API)
 endif()
 
 if (CONFIG_NORDIC_SECURITY_BACKEND)
-    zephyr_include_directories($<TARGET_PROPERTY:mbedtls_external,INTERFACE_INCLUDE_DIRECTORIES>)
-    zephyr_include_directories($<TARGET_PROPERTY:mbedcrypto_includes,INTERFACE_INCLUDE_DIRECTORIES>)
+    zephyr_include_directories_raw($<TARGET_PROPERTY:mbedtls_external,INTERFACE_INCLUDE_DIRECTORIES>)
+    zephyr_include_directories_raw($<TARGET_PROPERTY:mbedcrypto_includes,INTERFACE_INCLUDE_DIRECTORIES>)
     if(TARGET platform_cc3xx)
-        zephyr_include_directories($<TARGET_PROPERTY:platform_cc3xx,INTERFACE_INCLUDE_DIRECTORIES>)
+        zephyr_include_directories_raw($<TARGET_PROPERTY:platform_cc3xx,INTERFACE_INCLUDE_DIRECTORIES>)
     endif()
     list(APPEND CHIP_CFLAGS -DMBEDTLS_CONFIG_FILE=<nrf-config.h>)
 endif()
@@ -149,6 +149,16 @@ if (CONFIG_CHIP_OPENTHREAD_CONFIG)
     )
     zephyr_set_openthread_config(${CHIP_OPENTHREAD_CONFIG})
 endif()
+
+# Set up Zephyr symbol level
+
+if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
+    set_compiler_property(PROPERTY debug -g0)
+endif()
+
+# Determine if ccache should be used
+
+get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
 # Find required programs
 
@@ -201,8 +211,8 @@ chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 
 if (CONFIG_CHIP_ROTATING_DEVICE_ID)
-    chip_gn_arg_bool  ("chip_enable_rotating_device_id"          "true")
-    chip_gn_arg_bool  ("chip_enable_additional_data_advertising" "true")
+    chip_gn_arg_bool("chip_enable_rotating_device_id"          "true")
+    chip_gn_arg_bool("chip_enable_additional_data_advertising" "true")
 endif()
 
 if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
@@ -218,6 +228,14 @@ if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
 elseif (BOARD STREQUAL "native_posix_64")
     chip_gn_arg_string("target_cpu" "x64")
+endif()
+
+if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
+    chip_gn_arg_string("symbol_level" "0")
+endif()
+
+if (CHIP_COMPILER_LAUNCHER)
+    chip_gn_arg_string("pw_command_launcher" ${CHIP_COMPILER_LAUNCHER})
 endif()
 
 if (CONFIG_CHIP_PW_RPC)

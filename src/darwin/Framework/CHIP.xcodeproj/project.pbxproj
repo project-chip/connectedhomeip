@@ -52,6 +52,17 @@
 		51B22C262740CB32008D5055 /* CHIPStructsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C252740CB32008D5055 /* CHIPStructsObjc.mm */; };
 		51B22C2A2740CB47008D5055 /* CHIPCommandPayloadsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C292740CB47008D5055 /* CHIPCommandPayloadsObjc.mm */; };
 		51E24E73274E0DAC007CCF6E /* CHIPErrorTestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51E24E72274E0DAC007CCF6E /* CHIPErrorTestUtils.mm */; };
+		5A6FEC9027B563D900F25F42 /* CHIPDeviceControllerOverXPC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6FEC8F27B563D900F25F42 /* CHIPDeviceControllerOverXPC.m */; };
+		5A6FEC9227B5669C00F25F42 /* CHIPDeviceControllerOverXPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A6FEC8D27B5624E00F25F42 /* CHIPDeviceControllerOverXPC.h */; };
+		5A6FEC9627B5983000F25F42 /* CHIPDeviceControllerXPCConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6FEC9527B5983000F25F42 /* CHIPDeviceControllerXPCConnection.m */; };
+		5A6FEC9827B5C6AF00F25F42 /* CHIPDeviceOverXPC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6FEC9727B5C6AF00F25F42 /* CHIPDeviceOverXPC.m */; };
+		5A6FEC9927B5C88900F25F42 /* CHIPDeviceOverXPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A6FEC8B27B5609C00F25F42 /* CHIPDeviceOverXPC.h */; };
+		5A6FEC9A27B5C89300F25F42 /* CHIPDeviceControllerXPCConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A6FEC9427B5976200F25F42 /* CHIPDeviceControllerXPCConnection.h */; };
+		5A6FEC9D27B5E48900F25F42 /* CHIPXPCProtocolTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6FEC9C27B5E48800F25F42 /* CHIPXPCProtocolTests.m */; };
+		5A7947DE27BEC3F500434CF2 /* CHIPXPCListenerSampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7947DD27BEC3F500434CF2 /* CHIPXPCListenerSampleTests.m */; };
+		5A7947E427C0129600434CF2 /* CHIPDeviceController+XPC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7947E327C0129500434CF2 /* CHIPDeviceController+XPC.m */; };
+		5A7947E527C0129F00434CF2 /* CHIPDeviceController+XPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A7947E227C0101200434CF2 /* CHIPDeviceController+XPC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5AE6D4E427A99041001F2493 /* CHIPDeviceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6D4E327A99041001F2493 /* CHIPDeviceTests.m */; };
 		991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* CHIPDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0872475F47D00C13860 /* CHIPDeviceController.mm */; };
 		991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC08A247704DC00C13860 /* CHIPLogging.h */; };
@@ -137,6 +148,17 @@
 		51B22C252740CB32008D5055 /* CHIPStructsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPStructsObjc.mm; path = "zap-generated/CHIPStructsObjc.mm"; sourceTree = "<group>"; };
 		51B22C292740CB47008D5055 /* CHIPCommandPayloadsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPCommandPayloadsObjc.mm; path = "zap-generated/CHIPCommandPayloadsObjc.mm"; sourceTree = "<group>"; };
 		51E24E72274E0DAC007CCF6E /* CHIPErrorTestUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPErrorTestUtils.mm; sourceTree = "<group>"; };
+		5A6FEC8B27B5609C00F25F42 /* CHIPDeviceOverXPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceOverXPC.h; sourceTree = "<group>"; };
+		5A6FEC8D27B5624E00F25F42 /* CHIPDeviceControllerOverXPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceControllerOverXPC.h; sourceTree = "<group>"; };
+		5A6FEC8F27B563D900F25F42 /* CHIPDeviceControllerOverXPC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPDeviceControllerOverXPC.m; sourceTree = "<group>"; };
+		5A6FEC9427B5976200F25F42 /* CHIPDeviceControllerXPCConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceControllerXPCConnection.h; sourceTree = "<group>"; };
+		5A6FEC9527B5983000F25F42 /* CHIPDeviceControllerXPCConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPDeviceControllerXPCConnection.m; sourceTree = "<group>"; };
+		5A6FEC9727B5C6AF00F25F42 /* CHIPDeviceOverXPC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPDeviceOverXPC.m; sourceTree = "<group>"; };
+		5A6FEC9C27B5E48800F25F42 /* CHIPXPCProtocolTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPXPCProtocolTests.m; sourceTree = "<group>"; };
+		5A7947DD27BEC3F500434CF2 /* CHIPXPCListenerSampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPXPCListenerSampleTests.m; sourceTree = "<group>"; };
+		5A7947E227C0101200434CF2 /* CHIPDeviceController+XPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CHIPDeviceController+XPC.h"; sourceTree = "<group>"; };
+		5A7947E327C0129500434CF2 /* CHIPDeviceController+XPC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "CHIPDeviceController+XPC.m"; sourceTree = "<group>"; };
+		5AE6D4E327A99041001F2493 /* CHIPDeviceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPDeviceTests.m; sourceTree = "<group>"; };
 		991DC0822475F45400C13860 /* CHIPDeviceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceController.h; sourceTree = "<group>"; };
 		991DC0872475F47D00C13860 /* CHIPDeviceController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceController.mm; sourceTree = "<group>"; };
 		991DC08A247704DC00C13860 /* CHIPLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPLogging.h; sourceTree = "<group>"; };
@@ -291,10 +313,18 @@
 				B2E0D7B0245B0B5C003C5B48 /* CHIPSetupPayload.mm */,
 				991DC0822475F45400C13860 /* CHIPDeviceController.h */,
 				991DC0872475F47D00C13860 /* CHIPDeviceController.mm */,
+				5A7947E227C0101200434CF2 /* CHIPDeviceController+XPC.h */,
+				5A7947E327C0129500434CF2 /* CHIPDeviceController+XPC.m */,
 				B20252912459E34F00F97062 /* Info.plist */,
 				998F286C26D55E10001846C6 /* CHIPKeypair.h */,
 				998F286E26D55EC5001846C6 /* CHIPP256KeypairBridge.h */,
 				998F287026D56940001846C6 /* CHIPP256KeypairBridge.mm */,
+				5A6FEC8B27B5609C00F25F42 /* CHIPDeviceOverXPC.h */,
+				5A6FEC9727B5C6AF00F25F42 /* CHIPDeviceOverXPC.m */,
+				5A6FEC8D27B5624E00F25F42 /* CHIPDeviceControllerOverXPC.h */,
+				5A6FEC8F27B563D900F25F42 /* CHIPDeviceControllerOverXPC.m */,
+				5A6FEC9427B5976200F25F42 /* CHIPDeviceControllerXPCConnection.h */,
+				5A6FEC9527B5983000F25F42 /* CHIPDeviceControllerXPCConnection.m */,
 			);
 			path = CHIP;
 			sourceTree = "<group>";
@@ -305,6 +335,9 @@
 				51E24E72274E0DAC007CCF6E /* CHIPErrorTestUtils.mm */,
 				1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */,
 				99C65E0F267282F1003402F6 /* CHIPControllerTests.m */,
+				5AE6D4E327A99041001F2493 /* CHIPDeviceTests.m */,
+				5A6FEC9C27B5E48800F25F42 /* CHIPXPCProtocolTests.m */,
+				5A7947DD27BEC3F500434CF2 /* CHIPXPCListenerSampleTests.m */,
 				B2F53AF1245B0DCF0010745E /* CHIPSetupPayloadParserTests.m */,
 				997DED1926955D0200975E97 /* CHIPThreadOperationalDatasetTests.mm */,
 				B202529D2459E34F00F97062 /* Info.plist */,
@@ -328,10 +361,12 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A6FEC9927B5C88900F25F42 /* CHIPDeviceOverXPC.h in Headers */,
 				51B22C222740CB1D008D5055 /* CHIPCommandPayloadsObjc.h in Headers */,
 				51B22C1E2740CB0A008D5055 /* CHIPStructsObjc.h in Headers */,
 				2CB7163B252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h in Headers */,
 				1E16A90326B98AF100683C53 /* CHIPTestClustersObjc.h in Headers */,
+				5A6FEC9227B5669C00F25F42 /* CHIPDeviceControllerOverXPC.h in Headers */,
 				2C1B027B2641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.h in Headers */,
 				99D466E12798936D0089A18F /* CHIPCommissioningParameters.h in Headers */,
 				B289D4212639C0D300D4E314 /* CHIPOnboardingPayloadParser.h in Headers */,
@@ -346,6 +381,7 @@
 				9956064426420367000C28DE /* CHIPSetupPayload_Internal.h in Headers */,
 				998F286D26D55E10001846C6 /* CHIPKeypair.h in Headers */,
 				1ED276E426C5832500547A89 /* CHIPCluster.h in Headers */,
+				5A6FEC9A27B5C89300F25F42 /* CHIPDeviceControllerXPCConnection.h in Headers */,
 				5129BCFD26A9EE3300122DDF /* CHIPError.h in Headers */,
 				2C8C8FC1253E0C2100797F05 /* CHIPPersistentStorageDelegate.h in Headers */,
 				B2E0D7B5245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h in Headers */,
@@ -355,6 +391,7 @@
 				998F286F26D55EC5001846C6 /* CHIPP256KeypairBridge.h in Headers */,
 				2C222ADF255C811800E446B9 /* CHIPDevice_Internal.h in Headers */,
 				991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */,
+				5A7947E527C0129F00434CF2 /* CHIPDeviceController+XPC.h in Headers */,
 				B2E0D7B4245B0B5C003C5B48 /* CHIPError_Internal.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -502,9 +539,12 @@
 				1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */,
 				1E857310265519AE0050A4D9 /* IMClusterCommandHandler.cpp in Sources */,
 				1ED276E026C57CF000547A89 /* CHIPCallbackBridge.mm in Sources */,
+				5A6FEC9627B5983000F25F42 /* CHIPDeviceControllerXPCConnection.m in Sources */,
 				1E85732D26551A490050A4D9 /* util.cpp in Sources */,
 				513DDB8A2761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm in Sources */,
 				2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */,
+				5A7947E427C0129600434CF2 /* CHIPDeviceController+XPC.m in Sources */,
+				5A6FEC9027B563D900F25F42 /* CHIPDeviceControllerOverXPC.m in Sources */,
 				1E85732A26551A490050A4D9 /* ember-compatibility-functions.cpp in Sources */,
 				B289D4222639C0D300D4E314 /* CHIPOnboardingPayloadParser.m in Sources */,
 				1E85732F26551A490050A4D9 /* attribute-size-util.cpp in Sources */,
@@ -512,6 +552,7 @@
 				1E85732926551A490050A4D9 /* af-event.cpp in Sources */,
 				B2E0D7B9245B0B5C003C5B48 /* CHIPSetupPayload.mm in Sources */,
 				B2E0D7B6245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm in Sources */,
+				5A6FEC9827B5C6AF00F25F42 /* CHIPDeviceOverXPC.m in Sources */,
 				1E85732826551A490050A4D9 /* attribute-table.cpp in Sources */,
 				1E85732626551A490050A4D9 /* attribute-storage.cpp in Sources */,
 				1E85732C26551A490050A4D9 /* DataModelHandler.cpp in Sources */,
@@ -525,6 +566,9 @@
 				1EB41B7B263C4CC60048E4C1 /* CHIPClustersTests.m in Sources */,
 				997DED1A26955D0200975E97 /* CHIPThreadOperationalDatasetTests.mm in Sources */,
 				99C65E10267282F1003402F6 /* CHIPControllerTests.m in Sources */,
+				5A6FEC9D27B5E48900F25F42 /* CHIPXPCProtocolTests.m in Sources */,
+				5AE6D4E427A99041001F2493 /* CHIPDeviceTests.m in Sources */,
+				5A7947DE27BEC3F500434CF2 /* CHIPXPCListenerSampleTests.m in Sources */,
 				B2F53AF2245B0DCF0010745E /* CHIPSetupPayloadParserTests.m in Sources */,
 				51E24E73274E0DAC007CCF6E /* CHIPErrorTestUtils.mm in Sources */,
 			);

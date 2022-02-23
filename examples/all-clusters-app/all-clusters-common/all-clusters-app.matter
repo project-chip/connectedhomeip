@@ -136,11 +136,6 @@ server cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  bitmap ChannelFeature : BITMAP32 {
-    kChannelList = 0x1;
-    kLineupInfo = 0x2;
-  }
-
   struct Application {
     INT16U catalogVendorId = 0;
     CHAR_STRING applicationId = 1;
@@ -235,24 +230,16 @@ server cluster BinaryInputBasic = 15 {
 }
 
 server cluster Binding = 30 {
+  struct TargetStruct {
+    FABRIC_IDX fabricIndex = 0;
+    optional NODE_ID node = 1;
+    optional GROUP_ID group = 2;
+    optional ENDPOINT_NO endpoint = 3;
+    optional CLUSTER_ID cluster = 4;
+  }
+
+  attribute TargetStruct binding[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
-
-  request struct BindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  request struct UnbindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  command Bind(BindRequest): DefaultSuccess = 0;
-  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 server cluster BooleanState = 69 {
@@ -344,13 +331,19 @@ server cluster BridgedActions = 37 {
 }
 
 server cluster Channel = 1284 {
-  enum ErrorTypeEnum : ENUM8 {
-    kMultipleMatches = 0;
-    kNoMatches = 1;
-  }
-
   enum LineupInfoTypeEnum : ENUM8 {
     kMso = 0;
+  }
+
+  enum StatusEnum : ENUM8 {
+    kSuccess = 0;
+    kMultipleMatches = 1;
+    kNoMatches = 2;
+  }
+
+  bitmap ChannelFeature : BITMAP32 {
+    kChannelList = 0x1;
+    kLineupInfo = 0x2;
   }
 
   struct ChannelInfo {
@@ -2205,7 +2198,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   info event StateTransition = 0 {
-    nullable OTAUpdateStateEnum previousState = 0;
+    OTAUpdateStateEnum previousState = 0;
     OTAUpdateStateEnum newState = 1;
     OTAChangeReasonEnum reason = 2;
     nullable INT32U targetSoftwareVersion = 3;

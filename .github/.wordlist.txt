@@ -529,6 +529,7 @@ gradlew
 GroupId
 GroupKeyManagement
 gtk
+GUA
 Gv
 gz
 HaloaceticAcidsConcentrationMeasurement
@@ -1214,6 +1215,7 @@ udpPort
 ug
 ui
 uint
+ULA
 UNBLUR
 uncommissioned
 unfocus

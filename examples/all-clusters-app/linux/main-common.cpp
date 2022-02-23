@@ -107,11 +107,10 @@ NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
 Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary,
                                                                            &sLinuxWiFiDriver);
 #endif
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
 Clusters::NetworkCommissioning::NullNetworkDriver sNullNetworkDriver;
 Clusters::NetworkCommissioning::Instance sNullNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sNullNetworkDriver);
-
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 } // namespace
 
 void ApplicationInit()
@@ -165,11 +164,11 @@ void ApplicationInit()
 #endif
     }
     else
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     {
         // Use NullNetworkCommissioningInstance to disable the network commissioning functions.
         sNullNetworkCommissioningInstance.Init();
     }
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)

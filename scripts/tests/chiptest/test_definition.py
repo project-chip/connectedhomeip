@@ -107,6 +107,7 @@ class App:
         logging.debug(
             'Executing application under test with discriminator %s.' % discriminator)
         app_cmd = command + ['--discriminator', str(discriminator)]
+        app_cmd = app_cmd + ['--interface-id', str(-1)]
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
     def __waitFor(self, waitForString, server_process, outpipe):

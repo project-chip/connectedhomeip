@@ -31,6 +31,8 @@ else
     echo Provider not commissioned properly
 fi
 
+./out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
+
 stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app --discriminator "$DISCRIMINATOR" --secured-device-port "$UDP_PORT" --KVS /tmp/chip_kvs_requestor | tee /tmp/ota/requestor-log.txt &
 requestor_pid=$!
 
@@ -48,8 +50,8 @@ echo "Sending announce-ota-provider"
 
 ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0 | tee /tmp/ota/chip-tool-announce-ota.txt
 
-# timeout 30 grep -q "OTA image downloaded to" <(tail -n0 -f /tmp/ota/requestor-log.txt)
-sleep 20
+timeout 30 grep -q "OTA image downloaded to" <(tail -n0 -f /tmp/ota/requestor-log.txt)
+
 echo "Exiting, logs are in tmp/ota/"
 
 kill "$provider_pid"

@@ -136,7 +136,7 @@ limitations under the License.
         </command>
         <event side="server" code="0x00" name="StateTransition" priority="info" optional="false">
           <description>This event SHALL be generated when a change of the UpdateState attribute occurs due to an OTA Requestor moving through the states necessary to query for updates.</description>
-          <field id="0" name="PreviousState" type="OTAUpdateStateEnum" isNullable="true"/>
+          <field id="0" name="PreviousState" type="OTAUpdateStateEnum"/>
           <field id="1" name="NewState" type="OTAUpdateStateEnum"/>
           <field id="2" name="Reason" type="OTAChangeReasonEnum"/>
           <field id="3" name="TargetSoftwareVersion" type="INT32U" isNullable="true"/>

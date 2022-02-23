@@ -416,7 +416,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(passcodeId));
-    VerifyOrExit(passcodeId == mPasscodeID, err = CHIP_ERROR_INVALID_PASE_PARAMETER);
+    // TODO: uncomment once proper fix for #15362 is implemented
+    // VerifyOrExit(passcodeId == mPasscodeID, err = CHIP_ERROR_INVALID_PASE_PARAMETER);
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);

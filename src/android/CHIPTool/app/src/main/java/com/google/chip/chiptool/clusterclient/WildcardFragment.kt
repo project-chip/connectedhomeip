@@ -79,7 +79,7 @@ class WildcardFragment : Fragment() {
                                      reportCallback,
                                      ChipClient.getConnectedDevicePointer(requireContext(),
                                                                           addressUpdateFragment.deviceId),
-                                     attributePath,
+                                     listOf(attributePath),
                                      minInterval,
                                      maxInterval)
   }
@@ -93,7 +93,7 @@ class WildcardFragment : Fragment() {
     deviceController.readPath(reportCallback,
                               ChipClient.getConnectedDevicePointer(requireContext(),
                                                                    addressUpdateFragment.deviceId),
-                              attributePath)
+                              listOf(attributePath))
   }
 
   private fun showSubscribeDialog() {
