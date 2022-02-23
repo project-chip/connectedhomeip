@@ -37,14 +37,14 @@ struct NodeSubject
 {
     NodeSubject(NodeId aNodeId) : nodeId(aNodeId) {}
     NodeId nodeId;
-    bool operator==(const NodeSubject & that) const { return this->nodeId == that.nodeId; }
+    bool operator==(const NodeSubject & that) const { return nodeId == that.nodeId; }
 };
 
 struct GroupSubject
 {
     GroupSubject(GroupId aGroupId) : groupId(aGroupId) {}
     GroupId groupId;
-    bool operator==(const GroupSubject & that) const { return this->groupId == that.groupId; }
+    bool operator==(const GroupSubject & that) const { return groupId == that.groupId; }
 };
 
 class OperationalNodeId;
@@ -125,14 +125,14 @@ public:
         }
     }
 
-    bool operator==(const ScopedSubject & that) const { return this->mSubject == that.mSubject; }
+    bool operator==(const ScopedSubject & that) const { return mSubject == that.mSubject; }
 
 private:
     Variant<PaseSubject, NodeSubject, GroupSubject> mSubject;
 };
 
 /**
- * A subject is a global unique identifier. It suite 2 purpose:
+ * A subject is a global unique identifier. It serves 2 purposes:
  *
  *  1. Identify an entity. operator== can be used to check if 2 subjects are identical.
  *  2. Associate to ACL entries to grant privileges
@@ -164,7 +164,7 @@ public:
 
     bool operator==(const Subject & that) const
     {
-        return this->mFabricIndex == that.mFabricIndex && this->mScopedSubject == that.mScopedSubject;
+        return mFabricIndex == that.mFabricIndex && mScopedSubject == that.mScopedSubject;
     }
 
 private:
@@ -193,7 +193,7 @@ private:
 
     bool operator==(const OperationalNodeId & that) const
     {
-        return this->mFabricIndex == that.mFabricIndex && this->mNodeId == that.mNodeId;
+        return mFabricIndex == that.mFabricIndex && mNodeId == that.mNodeId;
     }
 
     friend bool operator==(const Subject &, const OperationalNodeId &);
