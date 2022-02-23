@@ -92,7 +92,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
 
     if (chip_enable_ota_requestor) {
       test_sources += [ "TestGenericOTARequestorStorage.cpp" ]
-      public_deps += ["${chip_root}/src/lib/asn1" ]
+      public_deps += [ "${chip_root}/src/lib/asn1" ]
     }
   }
 } else {
