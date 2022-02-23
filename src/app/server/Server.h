@@ -69,6 +69,11 @@ public:
 
     CHIP_ERROR AddTestCommissioning();
 
+    /**
+     * @brief Call this function to rejoin existing groups found in the GroupDataProvider
+     */
+    void RejoinExistingMulticastGroups();
+
     FabricTable & GetFabricTable() { return mFabrics; }
 
     CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
