@@ -279,11 +279,9 @@ class NetworkCommissioningTests:
             raise AssertionError(
                 f"LastNetworkID, LastConnectErrorValue and LastNetworkingStatus should not be Null")
 
-        # TODO: Linux Thread driver cannot get infomation of current connected networks.
-        '''
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
-        networkList = res[endpointId][Clusters.NetworkCommissioning].networks
+        networkList = res[0][endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 1:
             raise AssertionError(
@@ -294,7 +292,6 @@ class NetworkCommissioningTests:
         if not networkList[0].connected:
             raise AssertionError(
                 f"Unexpected result: network is not marked as connected")
-        '''
 
     async def run(self):
         try:
