@@ -28,7 +28,7 @@ Access::Subject SecureSession::GetSubject() const
     }
     else if (IsPAKEKeyId(mPeerNodeId))
     {
-        return Access::Subject::Create<Access::PaseSubject>(GetFabricIndex(), static_cast<uint16_t>(mPeerNodeId >> 48));
+        return Access::Subject::CreatePaseSubject();
     }
     else
     {

@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <limits>
+
 #include <access/AuthMode.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/InPlace.h>
@@ -27,9 +29,8 @@ namespace Access {
 
 struct PaseSubject
 {
-    PaseSubject(uint16_t aPasscodeId) : passcodeId(aPasscodeId) {}
-    uint16_t passcodeId;
-    bool operator==(const PaseSubject & that) const { return this->passcodeId == that.passcodeId; }
+    static constexpr uint16_t kPasscodeId = 0;
+    bool operator==(const PaseSubject & that) const { return true; }
 };
 
 struct NodeSubject
@@ -108,7 +109,7 @@ public:
     {
         if (mSubject.Is<PaseSubject>())
         {
-            return static_cast<uint64_t>(mSubject.Get<PaseSubject>().passcodeId) << 48;
+            return static_cast<uint64_t>(mSubject.Get<PaseSubject>().kPasscodeId) << 48;
         }
         else if (mSubject.Is<NodeSubject>())
         {
@@ -120,7 +121,7 @@ public:
         }
         else
         {
-            return -1ull;
+            return std::numeric_limits<uint64_t>::max();
         }
     }
 
@@ -150,6 +151,12 @@ public:
     static Subject Create(FabricIndex fabricIndex, Args &&... args)
     {
         return Subject(fabricIndex, InPlaceTemplate<T>, std::forward<Args>(args)...);
+    }
+
+    static Subject CreatePaseSubject()
+    {
+        // Return a unique subject for all PASE sessions.
+        return Subject(kUndefinedFabricIndex, InPlaceTemplate<PaseSubject>);
     }
 
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
