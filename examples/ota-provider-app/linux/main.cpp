@@ -69,7 +69,7 @@ static bool gUserConsentNeeded                                        = false;
 static chip::Optional<uint32_t> gSoftwareVersion;
 static const char * gSoftwareVersionString = nullptr;
 static uint32_t gIgnoreQueryImageCount     = 0;
-static uint32_t gIgnoreApplyUpdateCount = 0;
+static uint32_t gIgnoreApplyUpdateCount    = 0;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
