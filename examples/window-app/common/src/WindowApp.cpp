@@ -213,7 +213,7 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
         break;
 
     case EventId::Reset:
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
         break;
 
     case EventId::UpPressed:

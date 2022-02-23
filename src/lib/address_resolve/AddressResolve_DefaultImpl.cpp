@@ -178,11 +178,11 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 CHIP_ERROR Resolver::Init(System::Layer * systemLayer)
 {
     mSystemLayer = systemLayer;
-    Dnssd::Resolver::Instance().SetResolverDelegate(this);
+    Dnssd::Resolver::Instance().SetOperationalDelegate(this);
     return CHIP_NO_ERROR;
 }
 
-void Resolver::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
+void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData)
 {
     auto it = mActiveLookups.begin();
     while (it != mActiveLookups.end())
@@ -230,7 +230,7 @@ void Resolver::HandleTimer()
     ReArmTimer();
 }
 
-void Resolver::OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error)
+void Resolver::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error)
 {
     auto it = mActiveLookups.begin();
     while (it != mActiveLookups.end())
@@ -286,15 +286,6 @@ void Resolver::ReArmTimer()
             it = mActiveLookups.begin();
         }
     }
-}
-
-void Resolver::OnNodeDiscoveryComplete(const Dnssd::DiscoveredNodeData & nodeData)
-{
-    // This is for Commissionable discovery and such lookup is not performed by
-    // the address resolver.
-    //
-    // Getting this callback likely means that linkages of delegates is not done correctly.
-    ChipLogError(Discovery, "UNEXPECTED/UNIMPLEMENTED commissionable discovery callback");
 }
 
 } // namespace Impl

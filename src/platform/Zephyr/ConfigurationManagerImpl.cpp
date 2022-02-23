@@ -36,8 +36,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <power/reboot.h>
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -204,9 +202,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ThreadStackMgr().ErasePersistentInfo();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#if CONFIG_REBOOT
-    sys_reboot(SYS_REBOOT_WARM);
-#endif
+    PlatformMgr().Shutdown();
 }
 
 } // namespace DeviceLayer
