@@ -41,6 +41,17 @@ constexpr size_t kMaxIPv6AddrSize  = 16;
 constexpr size_t kMaxIPv4AddrCount = 4;
 constexpr size_t kMaxIPv6AddrCount = 8;
 
+enum BootReasonType : uint8_t
+{
+    Unspecified             = 0,
+    PowerOnReboot           = 1,
+    BrownOutReset           = 2,
+    SoftwareWatchdogReset   = 3,
+    HardwareWatchdogReset   = 4,
+    SoftwareUpdateCompleted = 5,
+    SoftwareReset           = 6,
+};
+
 struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type
 {
     char NameBuf[kMaxThreadNameLength + 1];
@@ -70,7 +81,7 @@ public:
      * @brief
      *   Called after the current device is rebooted.
      */
-    virtual void OnDeviceRebooted(uint8_t bootReason) {}
+    virtual void OnDeviceRebooted(BootReasonType bootReason) {}
 
     /**
      * @brief
@@ -142,17 +153,6 @@ public:
 class DiagnosticDataProvider
 {
 public:
-    enum BootReasonType : uint8_t
-    {
-        Unspecified             = 0,
-        PowerOnReboot           = 1,
-        BrownOutReset           = 2,
-        SoftwareWatchdogReset   = 3,
-        HardwareWatchdogReset   = 4,
-        SoftwareUpdateCompleted = 5,
-        SoftwareReset           = 6,
-    };
-
     void SetGeneralDiagnosticsDelegate(GeneralDiagnosticsDelegate * delegate) { mGeneralDiagnosticsDelegate = delegate; }
     GeneralDiagnosticsDelegate * GetGeneralDiagnosticsDelegate() const { return mGeneralDiagnosticsDelegate; }
 

@@ -301,7 +301,7 @@ void GenericPlatformManagerImpl<ImplClass>::HandleDeviceRebooted(intptr_t arg)
         uint8_t bootReason;
 
         if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
-            generalDiagnosticsDelegate->OnDeviceRebooted(bootReason);
+            generalDiagnosticsDelegate->OnDeviceRebooted(static_cast<BootReasonType>(bootReason));
     }
 
     // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
