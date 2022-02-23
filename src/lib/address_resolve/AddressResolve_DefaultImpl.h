@@ -71,7 +71,7 @@ private:
     unsigned mBestAddressScore = 0;
 };
 
-class Resolver : public ::chip::AddressResolve::Resolver, public Dnssd::ResolverDelegate
+class Resolver : public ::chip::AddressResolve::Resolver, public Dnssd::OperationalResolveDelegate
 {
 public:
     virtual ~Resolver() = default;
@@ -81,11 +81,10 @@ public:
     CHIP_ERROR Init(System::Layer * systemLayer) override;
     CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) override;
 
-    // Dnssd::ResolverDelegate
+    // Dnssd::OperationalResolveDelegate
 
-    void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override;
-    void OnNodeDiscoveryComplete(const Dnssd::DiscoveredNodeData & nodeData) override;
+    void OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData) override;
+    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override;
 
 private:
     static void OnResolveTimer(System::Layer * layer, void * context) { static_cast<Resolver *>(context)->HandleTimer(); }
