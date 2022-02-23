@@ -128,7 +128,7 @@ void LightingManager::Set(bool aOn)
 
 void LightingManager::UpdateLight()
 {
-    constexpr uint32_t kPwmWidthUs = 20000u;
+    constexpr uint32_t kPwmWidthUs  = 20000u;
     const uint8_t maxEffectiveLevel = mMaxLevel - mMinLevel;
     const uint8_t effectiveLevel    = mState == kState_On ? chip::min<uint8_t>(mLevel - mMinLevel, maxEffectiveLevel) : 0;
 
