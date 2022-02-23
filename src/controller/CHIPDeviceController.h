@@ -171,7 +171,8 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
 class DLL_EXPORT DeviceController : public SessionRecoveryDelegate
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     ,
-                                    public AbstractDnssdDiscoveryController
+                                    public AbstractDnssdDiscoveryController,
+                                    public Dnssd::OperationalResolveDelegate
 #endif
 {
 public:
