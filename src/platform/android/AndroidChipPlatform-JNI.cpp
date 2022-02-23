@@ -35,6 +35,7 @@
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
+#include "DiagnosticDataProviderImpl.h"
 #include "DnssdImpl.h"
 
 using namespace chip;
@@ -219,6 +220,13 @@ JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject man
     {
         configurationManagerImpl->InitializeWithObject(manager);
     }
+}
+
+// for DiagnosticDataProviderManager
+JNI_METHOD(void, setDiagnosticDataProviderManager)(JNIEnv * env, jclass self, jobject manager)
+{
+    chip::DeviceLayer::StackLock lock;
+    chip::DeviceLayer::DiagnosticDataProviderImpl::GetDefaultInstance().InitializeWithObject(manager);
 }
 
 // for ServiceResolver
