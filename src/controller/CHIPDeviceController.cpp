@@ -344,15 +344,6 @@ CHIP_ERROR DeviceController::SetPairedDeviceList(ByteSpan serialized)
     return err;
 }
 
-void DeviceController::PersistNextKeyId()
-{
-    if (mStorageDelegate != nullptr && mState == State::Initialized)
-    {
-        uint16_t nextKeyID = mIDAllocator.Peek();
-        mStorageDelegate->SyncSetKeyValue(kNextAvailableKeyID, &nextKeyID, sizeof(nextKeyID));
-    }
-}
-
 CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -607,22 +598,6 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
     params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
-#if 0 //
-      // We cannot reinstantiate session ID allocator state from each fabric-scoped commissioner
-      // individually because the session ID allocator space is and must be shared for all users
-      // of the Session Manager. Disable persistence for now. #12821 tracks a proper fix this issue.
-      //
-
-    uint16_t nextKeyID = 0;
-    uint16_t size      = sizeof(nextKeyID);
-    CHIP_ERROR error   = mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &nextKeyID, size);
-    if ((error != CHIP_NO_ERROR) || (size != sizeof(nextKeyID)))
-    {
-        nextKeyID = 0;
-    }
-    ReturnErrorOnFailure(mIDAllocator.ReserveUpTo(nextKeyID));
-#endif
-
     mPairingDelegate = params.pairingDelegate;
     if (params.defaultCommissioner != nullptr)
     {
@@ -856,22 +831,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                                     Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), exchangeCtxt, this);
     SuccessOrExit(err);
 
-    // Immediately persist the updated mNextKeyID value
-    // TODO maybe remove FreeRendezvousSession() since mNextKeyID is always persisted immediately
-    //
-    // Disabling session ID persistence (see previous comment in Init() about persisting key ids)
-    //
-    // PersistNextKeyId();
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        // Delete the current rendezvous session only if a device is not currently being paired.
-        if (mDeviceBeingCommissioned == nullptr)
-        {
-            FreeRendezvousSession();
-        }
-
         if (device != nullptr)
         {
             ReleaseCommissioneeDevice(device);
@@ -942,8 +904,6 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
-    FreeRendezvousSession();
-
     ReleaseCommissioneeDevice(device);
     return CHIP_NO_ERROR;
 }
@@ -954,15 +914,8 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::FreeRendezvousSession()
-{
-    PersistNextKeyId();
-}
-
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
-    FreeRendezvousSession();
-
     if (mDeviceBeingCommissioned != nullptr)
     {
         // Release the commissionee device. For BLE, this is stored,
