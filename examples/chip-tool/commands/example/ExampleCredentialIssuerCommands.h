@@ -21,8 +21,8 @@
 #include <commands/common/CredentialIssuerCommands.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 class ExampleCredentialIssuerCommands : public CredentialIssuerCommands
@@ -32,13 +32,12 @@ public:
     {
         return mOpCredsIssuer.Initialize(storage);
     }
-    CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams) override
+    CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
+                                      const chip::Credentials::AttestationTrustStore * trustStore) override
     {
         chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        setupParams.deviceAttestationVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+        setupParams.deviceAttestationVerifier = chip::Credentials::GetDefaultDACVerifier(trustStore);
 
         return CHIP_NO_ERROR;
     }

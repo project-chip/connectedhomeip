@@ -2581,10 +2581,10 @@ void CheckCHIPTLVPutStringF(nlTestSuite * inSuite, void * inContext)
     err = reader.Next();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = reader.GetString(valStr, 256);
+    err = reader.GetString(valStr, bufsize);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, 256) == 0);
+    NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, bufsize) == 0);
 }
 
 void CheckCHIPTLVPutStringSpan(nlTestSuite * inSuite, void * inContext)
@@ -2629,10 +2629,10 @@ void CheckCHIPTLVPutStringSpan(nlTestSuite * inSuite, void * inContext)
         err = reader.Next();
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = reader.GetString(valStr, 256);
+        err = reader.GetString(valStr, bufsize);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, 256) == 0);
+        NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, bufsize) == 0);
     }
 }
 

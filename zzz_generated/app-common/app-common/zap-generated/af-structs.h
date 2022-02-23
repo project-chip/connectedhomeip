@@ -509,6 +509,16 @@ typedef struct _TargetInfo
     chip::CharSpan name;
 } TargetInfo;
 
+// Struct for TargetStruct
+typedef struct _TargetStruct
+{
+    chip::FabricIndex FabricIndex;
+    chip::NodeId Node;
+    chip::GroupId Group;
+    chip::EndpointId Endpoint;
+    chip::ClusterId Cluster;
+} TargetStruct;
+
 // Struct for TestFabricScoped
 typedef struct _TestFabricScoped
 {

@@ -37,18 +37,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPAccessControl : CHIPCluster
 
-- (void)readAttributeAclWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeAclWithParams:(CHIPReadParams * _Nullable)params
+                 completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeAclWithMinInterval:(NSNumber * _Nonnull)minInterval
                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                      params:(CHIPReadParams * _Nullable)params
                      subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeExtensionWithCompletionHandler:(void (^)(
-                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeExtensionWithParams:(CHIPReadParams * _Nullable)params
+                       completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeExtensionWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeExtensionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPReadParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -785,8 +788,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBinding : CHIPCluster
 
-- (void)bindWithParams:(CHIPBindingClusterBindParams *)params completionHandler:(StatusCompletion)completionHandler;
-- (void)unbindWithParams:(CHIPBindingClusterUnbindParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)readAttributeBindingWithParams:(CHIPReadParams * _Nullable)params
+                     completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeBindingWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeBindingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPReadParams * _Nullable)params
+                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
@@ -2700,18 +2709,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)keySetWriteWithParams:(CHIPGroupKeyManagementClusterKeySetWriteParams *)params
             completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeGroupKeyMapWithCompletionHandler:(void (^)(
-                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeGroupKeyMapWithParams:(CHIPReadParams * _Nullable)params
+                         completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeGroupKeyMapWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeGroupKeyMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPReadParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeGroupTableWithCompletionHandler:(void (^)(
-                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeGroupTableWithParams:(CHIPReadParams * _Nullable)params
+                        completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeGroupTableWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPReadParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3734,11 +3745,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)announceOtaProviderWithParams:(CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                     completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeDefaultOtaProvidersWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                  NSError * _Nullable error))completionHandler;
+- (void)readAttributeDefaultOtaProvidersWithParams:(CHIPReadParams * _Nullable)params
+                                 completionHandler:
+                                     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeDefaultOtaProvidersWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeDefaultOtaProvidersWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPReadParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -4039,15 +4052,19 @@ NS_ASSUME_NONNULL_BEGIN
           completionHandler:(void (^)(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeNOCsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeNOCsWithParams:(CHIPReadParams * _Nullable)params
+                  completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNOCsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                       params:(CHIPReadParams * _Nullable)params
                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeFabricsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeFabricsWithParams:(CHIPReadParams * _Nullable)params
+                     completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPReadParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 

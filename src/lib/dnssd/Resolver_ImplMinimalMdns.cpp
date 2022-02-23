@@ -563,9 +563,9 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
 {
     while (true)
     {
-        Optional<PeerId> peerId = mActiveResolves.NextScheduledPeer();
+        Optional<ActiveResolveAttempts::ScheduledResolve> resolve = mActiveResolves.NextScheduledPeer();
 
-        if (!peerId.HasValue())
+        if (!resolve.HasValue())
         {
             break;
         }
@@ -580,15 +580,15 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
             char nameBuffer[kMaxOperationalServiceNameSize] = "";
 
             // Node and fabricid are encoded in server names.
-            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId.Value()));
+            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), resolve.Value().peerId));
 
             const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
             Query query(instanceQName);
 
             query
-                .SetClass(QClass::IN)      //
-                .SetType(QType::ANY)       //
-                .SetAnswerViaUnicast(true) //
+                .SetClass(QClass::IN)                           //
+                .SetType(QType::ANY)                            //
+                .SetAnswerViaUnicast(resolve.Value().firstSend) //
                 ;
 
             // NOTE: type above is NOT A or AAAA because the name searched for is
@@ -609,7 +609,14 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
 
         ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
+        if (resolve.Value().firstSend)
+        {
+            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
+        }
+        else
+        {
+            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+        }
     }
 
     return ScheduleResolveRetries();

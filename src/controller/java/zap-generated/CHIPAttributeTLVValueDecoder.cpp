@@ -93,7 +93,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         std::string newElement_NaNCtorSignature = "(J)V";
                         chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
                             newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
-                        chip::JniReferences::GetInstance().AddToArrayList(newElement_0_subjects, newElement_NaN);
+                        chip::JniReferences::GetInstance().AddToList(newElement_0_subjects, newElement_NaN);
                     }
                 }
                 jobject newElement_0_targets;
@@ -168,7 +168,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                         newElement_NaN = env->NewObject(targetStructClass, targetStructCtor, newElement_NaN_cluster,
                                                         newElement_NaN_endpoint, newElement_NaN_deviceType);
-                        chip::JniReferences::GetInstance().AddToArrayList(newElement_0_targets, newElement_NaN);
+                        chip::JniReferences::GetInstance().AddToList(newElement_0_targets, newElement_NaN);
                     }
                 }
 
@@ -192,7 +192,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 newElement_0 =
                     env->NewObject(accessControlEntryStructClass, accessControlEntryStructCtor, newElement_0_fabricIndex,
                                    newElement_0_privilege, newElement_0_authMode, newElement_0_subjects, newElement_0_targets);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -242,7 +242,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(extensionEntryStructClass, extensionEntryStructCtor, newElement_0_fabricIndex,
                                               newElement_0_data);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -266,7 +266,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -290,7 +290,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -314,7 +314,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -363,7 +363,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -387,7 +387,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -411,7 +411,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -505,7 +505,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -529,7 +529,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -553,7 +553,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -723,7 +723,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint16_t>(entry_0), newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -747,7 +747,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -771,7 +771,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -795,7 +795,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -844,7 +844,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -948,7 +948,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -972,7 +972,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -996,7 +996,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1074,7 +1074,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(outputInfoStructClass, outputInfoStructCtor, newElement_0_index,
                                               newElement_0_outputType, newElement_0_name);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1113,7 +1113,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1137,7 +1137,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1161,7 +1161,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1270,7 +1270,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1294,7 +1294,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1318,7 +1318,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1616,7 +1616,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1640,7 +1640,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1664,7 +1664,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1758,7 +1758,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1782,7 +1782,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1806,7 +1806,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1835,6 +1835,104 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::Binding;
         switch (aPath.mAttributeId)
         {
+        case Attributes::Binding::Id: {
+            using TypeInfo = Attributes::Binding::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
+                jobject newElement_0_node;
+                if (!entry_0.node.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_node);
+                }
+                else
+                {
+                    std::string newElement_0_nodeClassName     = "java/lang/Long";
+                    std::string newElement_0_nodeCtorSignature = "(J)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_nodeClassName.c_str(),
+                                                                                   newElement_0_nodeCtorSignature.c_str(),
+                                                                                   entry_0.node.Value(), newElement_0_node);
+                }
+                jobject newElement_0_group;
+                if (!entry_0.group.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_group);
+                }
+                else
+                {
+                    std::string newElement_0_groupClassName     = "java/lang/Integer";
+                    std::string newElement_0_groupCtorSignature = "(I)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_groupClassName.c_str(),
+                                                                                   newElement_0_groupCtorSignature.c_str(),
+                                                                                   entry_0.group.Value(), newElement_0_group);
+                }
+                jobject newElement_0_endpoint;
+                if (!entry_0.endpoint.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_endpoint);
+                }
+                else
+                {
+                    std::string newElement_0_endpointClassName     = "java/lang/Integer";
+                    std::string newElement_0_endpointCtorSignature = "(I)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_endpointClassName.c_str(),
+                                                                                   newElement_0_endpointCtorSignature.c_str(),
+                                                                                   entry_0.endpoint.Value(), newElement_0_endpoint);
+                }
+                jobject newElement_0_cluster;
+                if (!entry_0.cluster.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_cluster);
+                }
+                else
+                {
+                    std::string newElement_0_clusterClassName     = "java/lang/Long";
+                    std::string newElement_0_clusterCtorSignature = "(J)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_clusterClassName.c_str(),
+                                                                                   newElement_0_clusterCtorSignature.c_str(),
+                                                                                   entry_0.cluster.Value(), newElement_0_cluster);
+                }
+
+                jclass targetStructStructClass;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$BindingClusterTargetStruct", targetStructStructClass);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$BindingClusterTargetStruct");
+                    return nullptr;
+                }
+                jmethodID targetStructStructCtor = env->GetMethodID(
+                    targetStructStructClass, "<init>",
+                    "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
+                if (targetStructStructCtor == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$BindingClusterTargetStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(targetStructStructClass, targetStructStructCtor, newElement_0_fabricIndex,
+                                              newElement_0_node, newElement_0_group, newElement_0_endpoint, newElement_0_cluster);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
         case Attributes::ServerGeneratedCommandList::Id: {
             using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -1855,7 +1953,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1879,7 +1977,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1903,7 +2001,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1967,7 +2065,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -1991,7 +2089,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2015,7 +2113,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2114,7 +2212,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 newElement_0 = env->NewObject(actionStructStructClass, actionStructStructCtor, newElement_0_actionID,
                                               newElement_0_name, newElement_0_type, newElement_0_endpointListID,
                                               newElement_0_supportedCommands, newElement_0_status);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2160,7 +2258,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     std::string newElement_NaNCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
                         newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
-                    chip::JniReferences::GetInstance().AddToArrayList(newElement_0_endpoints, newElement_NaN);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_endpoints, newElement_NaN);
                 }
 
                 jclass endpointListStructStructClass;
@@ -2184,7 +2282,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 newElement_0 =
                     env->NewObject(endpointListStructStructClass, endpointListStructStructCtor, newElement_0_endpointListID,
                                    newElement_0_name, newElement_0_type, newElement_0_endpoints);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2220,7 +2318,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2244,7 +2342,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2268,7 +2366,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2509,7 +2607,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2533,7 +2631,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2557,7 +2655,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2665,7 +2763,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 newElement_0 = env->NewObject(channelInfoStructClass, channelInfoStructCtor, newElement_0_majorNumber,
                                               newElement_0_minorNumber, newElement_0_name, newElement_0_callSign,
                                               newElement_0_affiliateCallSign);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2839,7 +2937,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2863,7 +2961,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -2887,7 +2985,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -3713,7 +3811,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -3737,7 +3835,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -3761,7 +3859,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -3807,7 +3905,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
                 newElement_0 = env->NewStringUTF(std::string(entry_0.data(), entry_0.size()).c_str());
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -3846,7 +3944,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -3870,7 +3968,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -3894,7 +3992,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -3969,7 +4067,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 =
                     env->NewObject(deviceTypeStructClass, deviceTypeStructCtor, newElement_0_type, newElement_0_revision);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -3993,7 +4091,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4017,7 +4115,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4041,7 +4139,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4065,7 +4163,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4089,7 +4187,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4113,7 +4211,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4162,7 +4260,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4186,7 +4284,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4210,7 +4308,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4570,7 +4668,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4594,7 +4692,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4618,7 +4716,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4832,7 +4930,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4856,7 +4954,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -4880,7 +4978,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5085,7 +5183,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5109,7 +5207,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5133,7 +5231,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5216,7 +5314,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 =
                     env->NewObject(labelStructStructClass, labelStructStructCtor, newElement_0_label, newElement_0_value);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5240,7 +5338,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5264,7 +5362,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5288,7 +5386,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5418,7 +5516,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5442,7 +5540,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5466,7 +5564,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5597,7 +5695,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5621,7 +5719,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5645,7 +5743,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5745,7 +5843,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     env->SetByteArrayRegion(newElement_NaNByteArray, 0, static_cast<jsize>(entry_NaN.size()),
                                             reinterpret_cast<const jbyte *>(entry_NaN.data()));
                     newElement_NaN = newElement_NaNByteArray;
-                    chip::JniReferences::GetInstance().AddToArrayList(newElement_0_IPv4Addresses, newElement_NaN);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_IPv4Addresses, newElement_NaN);
                 }
                 jobject newElement_0_IPv6Addresses;
                 chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv6Addresses);
@@ -5759,7 +5857,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     env->SetByteArrayRegion(newElement_NaNByteArray, 0, static_cast<jsize>(entry_NaN.size()),
                                             reinterpret_cast<const jbyte *>(entry_NaN.data()));
                     newElement_NaN = newElement_NaNByteArray;
-                    chip::JniReferences::GetInstance().AddToArrayList(newElement_0_IPv6Addresses, newElement_NaN);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_IPv6Addresses, newElement_NaN);
                 }
                 jobject newElement_0_type;
                 std::string newElement_0_typeClassName     = "java/lang/Integer";
@@ -5791,7 +5889,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                               newElement_0_isOperational, newElement_0_offPremiseServicesReachableIPv4,
                                               newElement_0_offPremiseServicesReachableIPv6, newElement_0_hardwareAddress,
                                               newElement_0_IPv4Addresses, newElement_0_IPv6Addresses, newElement_0_type);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5875,7 +5973,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5899,7 +5997,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5923,7 +6021,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5947,7 +6045,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5971,7 +6069,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -5995,7 +6093,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6078,7 +6176,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(groupKeyMapStructStructClass, groupKeyMapStructStructCtor, newElement_0_fabricIndex,
                                               newElement_0_groupId, newElement_0_groupKeySetID);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6122,7 +6220,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     std::string newElement_NaNCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
                         newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
-                    chip::JniReferences::GetInstance().AddToArrayList(newElement_0_endpoints, newElement_NaN);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_endpoints, newElement_NaN);
                 }
                 jobject newElement_0_groupName;
                 if (!entry_0.groupName.HasValue())
@@ -6155,7 +6253,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(groupInfoMapStructStructClass, groupInfoMapStructStructCtor, newElement_0_fabricIndex,
                                               newElement_0_groupId, newElement_0_endpoints, newElement_0_groupName);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6209,7 +6307,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6233,7 +6331,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6257,7 +6355,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6321,7 +6419,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6345,7 +6443,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6369,7 +6467,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6448,7 +6546,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6472,7 +6570,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6496,7 +6594,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6648,7 +6746,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6672,7 +6770,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6696,7 +6794,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6745,7 +6843,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6769,7 +6867,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -6793,7 +6891,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7087,7 +7185,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7111,7 +7209,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7135,7 +7233,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7208,7 +7306,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
                 newElement_0 = env->NewStringUTF(std::string(entry_0.data(), entry_0.size()).c_str());
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7232,7 +7330,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7256,7 +7354,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7305,7 +7403,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7329,7 +7427,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7353,7 +7451,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7435,7 +7533,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(inputInfoStructClass, inputInfoStructCtor, newElement_0_index, newElement_0_inputType,
                                               newElement_0_name, newElement_0_description);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7474,7 +7572,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7498,7 +7596,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7522,7 +7620,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7744,7 +7842,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7768,7 +7866,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7792,7 +7890,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7884,7 +7982,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(modeOptionStructStructClass, modeOptionStructStructCtor, newElement_0_label,
                                               newElement_0_mode, newElement_0_semanticTag);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7950,7 +8048,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7974,7 +8072,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -7998,7 +8096,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8087,7 +8185,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 =
                     env->NewObject(networkInfoStructClass, networkInfoStructCtor, newElement_0_networkID, newElement_0_connected);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8222,7 +8320,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8246,7 +8344,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8310,7 +8408,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8393,7 +8491,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(providerLocationStructClass, providerLocationStructCtor, newElement_0_fabricIndex,
                                               newElement_0_providerNodeID, newElement_0_endpoint);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8469,7 +8567,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8563,7 +8661,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8587,7 +8685,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8611,7 +8709,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8735,7 +8833,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8759,7 +8857,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8783,7 +8881,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8877,7 +8975,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8901,7 +8999,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -8925,7 +9023,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9011,7 +9109,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(NOCStructStructClass, NOCStructStructCtor, newElement_0_fabricIndex, newElement_0_noc,
                                               newElement_0_icac);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9085,7 +9183,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 newElement_0 = env->NewObject(fabricDescriptorStructClass, fabricDescriptorStructCtor, newElement_0_fabricIndex,
                                               newElement_0_rootPublicKey, newElement_0_vendorId, newElement_0_fabricId,
                                               newElement_0_nodeId, newElement_0_label);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9139,7 +9237,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
                                         reinterpret_cast<const jbyte *>(entry_0.data()));
                 newElement_0 = newElement_0ByteArray;
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9178,7 +9276,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9202,7 +9300,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9226,7 +9324,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9377,7 +9475,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9416,7 +9514,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9440,7 +9538,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9464,7 +9562,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9528,7 +9626,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9552,7 +9650,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9576,7 +9674,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9600,7 +9698,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -9715,7 +9813,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10138,7 +10236,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10162,7 +10260,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10186,7 +10284,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10310,7 +10408,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10334,7 +10432,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10358,7 +10456,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10482,7 +10580,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10506,7 +10604,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10530,7 +10628,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10620,7 +10718,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(threadMetricsStructClass, threadMetricsStructCtor, newElement_0_id, newElement_0_name,
                                               newElement_0_stackFreeCurrent, newElement_0_stackFreeMinimum, newElement_0_stackSize);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10689,7 +10787,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10713,7 +10811,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10737,7 +10835,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10846,7 +10944,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10870,7 +10968,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10894,7 +10992,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -10981,7 +11079,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 =
                     env->NewObject(targetInfoStructClass, targetInfoStructCtor, newElement_0_identifier, newElement_0_name);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -11020,7 +11118,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -11044,7 +11142,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -11068,7 +11166,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -11177,7 +11275,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -11616,7 +11714,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -11640,7 +11738,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
                                         reinterpret_cast<const jbyte *>(entry_0.data()));
                 newElement_0 = newElement_0ByteArray;
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -11692,7 +11790,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(testListStructOctetStructClass, testListStructOctetStructCtor,
                                               newElement_0_fabricIndex, newElement_0_operationalCert);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -12153,7 +12251,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                             newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), static_cast<uint8_t>(entry_NaN),
                             newElement_NaN);
-                        chip::JniReferences::GetInstance().AddToArrayList(newElement_0_nullableList, newElement_NaN);
+                        chip::JniReferences::GetInstance().AddToList(newElement_0_nullableList, newElement_NaN);
                     }
                 }
                 jobject newElement_0_optionalList;
@@ -12175,7 +12273,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                             newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), static_cast<uint8_t>(entry_NaN),
                             newElement_NaN);
-                        chip::JniReferences::GetInstance().AddToArrayList(newElement_0_optionalList, newElement_NaN);
+                        chip::JniReferences::GetInstance().AddToList(newElement_0_optionalList, newElement_NaN);
                     }
                 }
                 jobject newElement_0_nullableOptionalList;
@@ -12203,7 +12301,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                                 newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(),
                                 static_cast<uint8_t>(entry_NaN), newElement_NaN);
-                            chip::JniReferences::GetInstance().AddToArrayList(newElement_0_nullableOptionalList, newElement_NaN);
+                            chip::JniReferences::GetInstance().AddToList(newElement_0_nullableOptionalList, newElement_NaN);
                         }
                     }
                 }
@@ -12234,7 +12332,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                    newElement_0_nullableString, newElement_0_optionalString, newElement_0_nullableOptionalString,
                                    newElement_0_nullableStruct, newElement_0_optionalStruct, newElement_0_nullableOptionalStruct,
                                    newElement_0_nullableList, newElement_0_optionalList, newElement_0_nullableOptionalList);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -12402,7 +12500,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
                                         reinterpret_cast<const jbyte *>(entry_0.data()));
                 newElement_0 = newElement_0ByteArray;
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -13263,7 +13361,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -13287,7 +13385,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -13311,7 +13409,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -13615,7 +13713,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -13724,7 +13822,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -13748,7 +13846,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -13772,7 +13870,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -14027,7 +14125,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0_rloc16, newElement_0_linkFrameCounter, newElement_0_mleFrameCounter, newElement_0_lqi,
                     newElement_0_averageRssi, newElement_0_lastRssi, newElement_0_frameErrorRate, newElement_0_messageErrorRate,
                     newElement_0_rxOnWhenIdle, newElement_0_fullThreadDevice, newElement_0_fullNetworkData, newElement_0_isChild);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -14129,7 +14227,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     env->NewObject(routeTableStructClass, routeTableStructCtor, newElement_0_extAddress, newElement_0_rloc16,
                                    newElement_0_routerId, newElement_0_nextHop, newElement_0_pathCost, newElement_0_LQIIn,
                                    newElement_0_LQIOut, newElement_0_age, newElement_0_allocated, newElement_0_linkEstablished);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -14931,7 +15029,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 = env->NewObject(securityPolicyStructClass, securityPolicyStructCtor, newElement_0_rotationTime,
                                               newElement_0_flags);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15068,7 +15166,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0_networkNamePresent, newElement_0_extendedPanIdPresent, newElement_0_meshLocalPrefixPresent,
                     newElement_0_delayPresent, newElement_0_panIdPresent, newElement_0_channelPresent, newElement_0_pskcPresent,
                     newElement_0_securityPolicyPresent, newElement_0_channelMaskPresent);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15092,7 +15190,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15116,7 +15214,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15140,7 +15238,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15164,7 +15262,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15258,7 +15356,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15282,7 +15380,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15306,7 +15404,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15370,7 +15468,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15453,7 +15551,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 newElement_0 =
                     env->NewObject(labelStructStructClass, labelStructStructCtor, newElement_0_label, newElement_0_value);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15477,7 +15575,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15501,7 +15599,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15562,7 +15660,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15586,7 +15684,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15610,7 +15708,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15889,7 +15987,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15913,7 +16011,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -15937,7 +16035,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -16327,7 +16425,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -16351,7 +16449,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
@@ -16375,7 +16473,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }

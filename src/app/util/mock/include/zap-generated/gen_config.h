@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +15,6 @@
  *    limitations under the License.
  */
 
-#ifndef _SERVICE_PROVISIONING_H
-#define _SERVICE_PROVISIONING_H
+#pragma once
 
-#include <lib/core/CHIPError.h>
-
-CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key);
-
-#endif // _SERVICE_PROVISIONING_H
+#define EMBER_BINDING_TABLE_SIZE 20

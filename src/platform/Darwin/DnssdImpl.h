@@ -91,6 +91,7 @@ struct ResolveContext : public GenericContext
 struct GetAddrInfoContext : public GenericContext
 {
     DnssdResolveCallback callback;
+    std::vector<Inet::IPAddress> addresses;
     std::vector<TextEntry> textEntries;
     char name[Common::kInstanceNameMaxLength + 1];
     uint32_t interfaceId;

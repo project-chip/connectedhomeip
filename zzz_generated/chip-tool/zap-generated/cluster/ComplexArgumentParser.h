@@ -219,6 +219,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TargetNavigator
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Binding::Structs::TargetStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Binding::Structs::TargetStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type & request,
                         Json::Value & value);
 

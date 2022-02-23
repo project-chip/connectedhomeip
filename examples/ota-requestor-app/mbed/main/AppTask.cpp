@@ -103,8 +103,6 @@ int AppTask::Init()
     sFunctionButton2.rise(mbed::callback(this, &AppTask::FunctionButton2ReleaseEventHandler));
 #endif
 
-    ConnectivityMgrImpl().StartWiFiManagement();
-
     // Init ZCL Data Model and start server
     error = Server::GetInstance().Init();
     if (error != CHIP_NO_ERROR)
@@ -418,7 +416,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
             sAppTask.CancelTimer(kFunction_Button_1);
             sAppTask.mFunction[kFunction_Button_1] = kFunction_NoneSelected;
 
-            ConfigurationMgr().InitiateFactoryReset();
+            chip::Server::GetInstance().ScheduleFactoryReset();
         }
         break;
     case kFunction_Button_2:

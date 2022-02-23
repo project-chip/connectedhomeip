@@ -21,19 +21,20 @@
 #include "LEDWidget.h"
 #include "PumpManager.h"
 #include "ThreadUtil.h"
-#include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
-#include <platform/CHIPDeviceLayer.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <system/SystemClock.h>
 
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
@@ -68,8 +69,39 @@ using namespace ::chip::app::Clusters;
 
 AppTask AppTask::sAppTask;
 
-int AppTask::Init()
+CHIP_ERROR AppTask::Init()
 {
+    // Initialize CHIP stack
+    LOG_INF("Init CHIP stack");
+
+    CHIP_ERROR err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("Platform::MemoryInit() failed");
+        return err;
+    }
+
+    err = PlatformMgr().InitChipStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("PlatformMgr().InitChipStack() failed");
+        return err;
+    }
+
+    err = ThreadStackMgr().InitThreadStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("ThreadStackMgr().InitThreadStack() failed");
+        return err;
+    }
+
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
+        return err;
+    }
+
     // Initialize LEDs
     LEDWidget::InitGpio();
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
@@ -83,49 +115,50 @@ int AppTask::Init()
 
     UpdateStatusLED();
 
+    PumpMgr().Init();
+    PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
     // Initialize buttons
     int ret = dk_buttons_init(ButtonEventHandler);
     if (ret)
     {
         LOG_ERR("dk_buttons_init() failed");
-        return ret;
+        return chip::System::MapErrorZephyr(ret);
     }
 
-    // Initialize timer user data
+    // Initialize function button timer
     k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
 #ifdef CONFIG_MCUMGR_SMP_BT
+    // Initialize DFU over SMP
     GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
     GetDFUOverSMP().ConfirmNewImage();
 #endif
 
-    PumpMgr().Init();
-    PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-
-    // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
+    // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init());
     ConfigurationMgr().LogDeviceConfig();
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-#if defined(CONFIG_CHIP_NFC_COMMISSIONING) || defined(CONFIG_MCUMGR_SMP_BT)
+    // Add CHIP event handler and start CHIP thread.
+    // Note that all the initialization code should happen prior to this point to avoid data races
+    // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
-#endif
-    return 0;
+
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
+    }
+
+    return err;
 }
 
-int AppTask::StartApp()
+CHIP_ERROR AppTask::StartApp()
 {
-    int ret = Init();
-
-    if (ret)
-    {
-        LOG_ERR("AppTask.Init() failed");
-        return ret;
-    }
+    ReturnErrorOnFailure(Init());
 
     AppEvent event = {};
 
@@ -134,6 +167,8 @@ int AppTask::StartApp()
         k_msgq_get(&sAppEventQueue, &event, K_FOREVER);
         DispatchEvent(&event);
     }
+
+    return CHIP_NO_ERROR;
 }
 
 void AppTask::StartActionEventHandler(AppEvent * aEvent)
@@ -232,7 +267,8 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 

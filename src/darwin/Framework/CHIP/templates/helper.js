@@ -79,11 +79,6 @@ function asObjectiveCNumberType(label, type, asLowerCased)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asTestIndex(index)
-{
-  return index.toString().padStart(6, 0);
-}
-
 async function asObjectiveCClass(type, cluster, options)
 {
   let pkgId    = await templateUtil.ensureZclPackageId(this);
@@ -155,7 +150,6 @@ function commandHasRequiredField(command)
 //
 exports.asObjectiveCBasicType   = asObjectiveCBasicType;
 exports.asObjectiveCNumberType  = asObjectiveCNumberType;
-exports.asTestIndex             = asTestIndex;
 exports.asObjectiveCClass       = asObjectiveCClass;
 exports.asObjectiveCType        = asObjectiveCType;
 exports.asStructPropertyName    = asStructPropertyName;

@@ -19,4 +19,4 @@
 #include "lib/core/CHIPError.h"
 
 CHIP_ERROR InitBindingHandler();
-void SwitchToggleOnOff();
+void SwitchToggleOnOff(intptr_t context);

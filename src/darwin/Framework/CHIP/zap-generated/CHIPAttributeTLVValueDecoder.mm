@@ -1550,6 +1550,53 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::Binding::Id: {
         using namespace Clusters::Binding;
         switch (aPath.mAttributeId) {
+        case Attributes::Binding::Id: {
+            using TypeInfo = Attributes::Binding::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPBindingClusterTargetStruct * newElement_0;
+                    newElement_0 = [CHIPBindingClusterTargetStruct new];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    if (entry_0.node.HasValue()) {
+                        newElement_0.node = [NSNumber numberWithUnsignedLongLong:entry_0.node.Value()];
+                    } else {
+                        newElement_0.node = nil;
+                    }
+                    if (entry_0.group.HasValue()) {
+                        newElement_0.group = [NSNumber numberWithUnsignedShort:entry_0.group.Value()];
+                    } else {
+                        newElement_0.group = nil;
+                    }
+                    if (entry_0.endpoint.HasValue()) {
+                        newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint.Value()];
+                    } else {
+                        newElement_0.endpoint = nil;
+                    }
+                    if (entry_0.cluster.HasValue()) {
+                        newElement_0.cluster = [NSNumber numberWithUnsignedInt:entry_0.cluster.Value()];
+                    } else {
+                        newElement_0.cluster = nil;
+                    }
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
         case Attributes::ServerGeneratedCommandList::Id: {
             using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;

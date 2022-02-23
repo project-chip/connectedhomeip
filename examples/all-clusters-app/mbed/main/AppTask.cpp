@@ -62,8 +62,6 @@ int AppTask::Init()
         },
         0);
 
-    ConnectivityMgrImpl().StartWiFiManagement();
-
     // Init ZCL Data Model and start server
     error = Server::GetInstance().Init();
     if (error != CHIP_NO_ERROR)
