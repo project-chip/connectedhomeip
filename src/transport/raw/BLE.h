@@ -48,8 +48,17 @@ public:
 
     Ble::BleLayer * GetBleLayer() const { return mLayer; }
 
+    bool HasOverrideExistingTransport() const { return mOverrideExistingTransport; }
+    BleListenParameters & SetOverrideExistingTransport(bool overrideExistingTransport)
+    {
+        mOverrideExistingTransport = overrideExistingTransport;
+
+        return *this;
+    }
+
 private:
     Ble::BleLayer * mLayer;
+    bool mOverrideExistingTransport = false;
 };
 
 /** Implements a transport using BLE.
@@ -90,6 +99,14 @@ public:
     }
 
     CHIP_ERROR SetEndPoint(Ble::BLEEndPoint * endPoint) override;
+
+    /**
+     * Change BLE transport to this
+     *
+     * This is relevant when a device is both a commissioner and a commissionee
+     * and so BLE transport needs to be able to toggle between these
+     */
+    void OverrideTransport() { mBleLayer->mBleTransport = this; }
 
 private:
     void ClearState();
