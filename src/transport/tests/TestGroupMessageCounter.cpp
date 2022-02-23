@@ -326,11 +326,8 @@ void ReorderPeerRemovalTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetNodeIdAt(1, 0, false) == 9);
 }
 
-// Disabled for Zephyr since CHIP_CONFIG_MAX_FABRICS < 12
-#if !__ZEPHYR__
-#if CHIP_CONFIG_MAX_FABRICS < 12
-#error "Unit Test expect support for at least 12 fabrics."
-#endif
+// Disabled for devices with fabric count lower than 12
+#if CHIP_CONFIG_MAX_FABRICS > 12
 void ReorderFabricRemovalTest(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err                                = CHIP_NO_ERROR;
@@ -383,7 +380,7 @@ void ReorderFabricRemovalTest(nlTestSuite * inSuite, void * inContext)
     err = counter->VerifyOrTrustFirst(4756, true);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
-#endif // !__ZEPHYR__
+#endif // CHIP_CONFIG_MAX_FABRICS > 12
 void GroupMessageCounterTest(nlTestSuite * inSuite, void * inContext)
 {
 
@@ -452,9 +449,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("Counter Rollover",       CounterCommitRolloverTest),
     NL_TEST_DEF("Counter Trust first",    CounterTrustFirstTest),
     NL_TEST_DEF("Reorder Peer removal",   ReorderPeerRemovalTest),
-    #if !__ZEPHYR__
+    #if CHIP_CONFIG_MAX_FABRICS > 12
     NL_TEST_DEF("Reorder Fabric Removal", ReorderFabricRemovalTest),
-    #endif
+    #endif // CHIP_CONFIG_MAX_FABRICS > 12
     NL_TEST_DEF("Group Message Counter",  GroupMessageCounterTest),
     NL_TEST_SENTINEL()
 };
