@@ -74,8 +74,7 @@ config("p6_ota_config") {
 
   if (build_update_image) {
     defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=2" ]
-  }
-  else {
+  } else {
     defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=1" ]
   }
 }
