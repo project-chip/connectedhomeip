@@ -264,7 +264,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to cancel WiFi IP thread");
     }
 
-    if (pthread_join(mWifiIPThread, NULL))
+    if (pthread_join(mWifiIPThread, NULL) != 0)
     {
         ChipLogError(DeviceLayer, "Failed to join WiFi IP thread");
     }
