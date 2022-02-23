@@ -22,9 +22,6 @@
 #include <platform/OTARequestorInterface.h>
 
 namespace chip {
-
-extern void StartDelayTimerHandler(System::Layer * systemLayer, void * appState);
-
 namespace DeviceLayer {
 namespace {
 
@@ -158,6 +155,16 @@ void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallbac
     SystemLayer().CancelTimer(action, aAppState);
 }
 
+void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    // Cancel the default providers timer, ConnectToProvider() will immediately move
+    // us out of the kIdle state
+    //static_cast<OTARequestor *>(appState)->mOtaRequestorDriver->StopDefaultProvidersTimer();
+
+    static_cast<OTARequestorInterface *>(appState)->TriggerImmediateQuery();
+
+    // static_cast<OTARequestor *>(appState)->ConnectToProvider(OTARequestor::kQueryImage);
+}
 
 
 void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
@@ -181,63 +188,18 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocati
     }
 
     // IMPLEMENTATION CHOICE:
-    // This implementation of the OTARequestor driver chooses to unconditionally start the query using the Provider specified in this command. 
+    // This implementation of the OTARequestor driver ignores the announcement if an update is in progress, 
+    // otherwise it queries the provider passed in the announcement
 
-    // Point  mProviderNodeId to the announced node and cancel the default providers timer
+    if(mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle) {
+        ChipLogProgress(SoftwareUpdate, "State is not kIdle, ignoring the AnnounceOTAProviders. State: %d", (int)mRequestor->GetCurrentUpdateState());
+        return;
+   }
+
+    // Point the OTARequestor to the announced provider 
     mRequestor->SetCurrentProviderLocation(providerLocation);
-    StopDefaultProvidersTimer();
 
     ScheduleDelayedAction(UpdateFailureState::kQuerying, System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, mRequestor);
-}
-
-OTARequestorAction GenericOTARequestorDriver::GetRequestorAction(OTARequestorIncomingEvent input)
-{
-
-    OTAUpdateStateEnum state  = mRequestor->GetCurrentUpdateState();
-    OTARequestorAction action = OTARequestorAction::DoNotProceed;
-
-    switch(input)
-        {
-            case OTARequestorIncomingEvent::AnnouncedOTAProviderReceived:
-                {
-                    if(state != OTAUpdateStateEnum::kIdle) {
-                        action = OTARequestorAction::DoNotProceed;
-                    } else {
-                        action = OTARequestorAction::Proceed;
-                    }
-
-                    break;
-                }
-            case OTARequestorIncomingEvent::TriggerImmediateQueryInvoked:
-                {
-                    if(state != OTAUpdateStateEnum::kIdle) {
-                        action = OTARequestorAction::DoNotProceed;
-                    } else {
-                        action = OTARequestorAction::Proceed;
-                    }
-                    break;
-                }
-            case OTARequestorIncomingEvent::DefaultProvidersAttrSet:
-                {
-                    if(state != OTAUpdateStateEnum::kIdle) {
-                        action = OTARequestorAction::CancelCurrentUpdateAndProceed;
-                    } else {
-                        action = OTARequestorAction::Proceed;
-                    }
-                    break;
-                }
-            case OTARequestorIncomingEvent::DefaultProvidersTimerExpiry:
-                {
-                    action = OTARequestorAction:: Proceed;
-                    break;
-                }
-            default:
-                {
-                    action = OTARequestorAction::Proceed;
-                }
-        }
-
-    return action;
 }
 
 void GenericOTARequestorDriver::DriverTriggerQuery()

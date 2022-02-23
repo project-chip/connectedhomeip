@@ -59,7 +59,6 @@ public:
     void UpdateSuspended(System::Clock::Seconds32 delay) override;
     void UpdateDiscontinued() override;
     void UpdateCancelled() override;
-    OTARequestorAction GetRequestorAction(OTARequestorIncomingEvent input) override;
     void ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState) override;
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) override;
     void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 

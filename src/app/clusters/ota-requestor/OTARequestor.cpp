@@ -88,11 +88,6 @@ static void LogApplyUpdateResponse(const ApplyUpdateResponse::DecodableType & re
     ChipLogDetail(SoftwareUpdate, "  delayedActionTime: %" PRIu32 " seconds", response.delayedActionTime);
 }
 
-void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
-{
-    static_cast<OTARequestor *>(appState)->ConnectToProvider(OTARequestor::kQueryImage);
-}
-
 void SetRequestorInstance(OTARequestorInterface * instance)
 {
     globalOTARequestorInstance = instance;
@@ -262,9 +257,6 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
-    // SL TODO: With every error condition we must restart the default provider timer, enter kIdle state. 
-    // applies to all flavors of the solution
-
     if(mOtaRequestorDriver == nullptr) {
         ChipLogError(SoftwareUpdate, "OTA requestor driver not set");
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
@@ -291,6 +283,10 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
         return;
     }
 
+    // We are now connecting to a provider, leave the kIdle state. 
+    // Spec doesn't define a specific state for this but we can't be in kIdle. 
+    RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
+    
     // Set the action to take once connection is successfully established
     mOnConnectedAction = onConnectedAction;
 

@@ -114,9 +114,6 @@ public:
     /// Called when the current software update has been cancelled by the local application
     virtual void UpdateCancelled() = 0;
 
-    /// Called at various stages of OTA update process to determine whether to proceed
-    virtual OTARequestorAction GetRequestorAction(OTARequestorIncomingEvent input) = 0;
-
     /// Platform-specific timer setting method
     virtual void ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState) = 0;
 
