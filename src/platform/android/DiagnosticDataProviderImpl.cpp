@@ -139,7 +139,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 ifp->offPremiseServicesReachableIPv4.SetNull();
             } else {
                 jboolean opsrIPV4 = JniReferences::GetInstance().BooleanToPrimitive(opsrIPV4Obj);
-                ifp->offPremiseServicesReachableIPv4.SetNonNull(static_cast<bool>(opsrIPV4));   
+                ifp->offPremiseServicesReachableIPv4.SetNonNull(static_cast<bool>(opsrIPV4));
             }
 
             jfieldID getOpsrIPV6Field = env->GetFieldID(nifClass, "offPremiseServicesReachableIPv6", "Ljava/lang/Boolean;");
@@ -148,7 +148,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 ifp->offPremiseServicesReachableIPv6.SetNull();
             } else {
                 jboolean opsrIPV6 = JniReferences::GetInstance().BooleanToPrimitive(opsrIPV6Obj);
-                ifp->offPremiseServicesReachableIPv6.SetNonNull(static_cast<bool>(opsrIPV6));   
+                ifp->offPremiseServicesReachableIPv6.SetNonNull(static_cast<bool>(opsrIPV6));
             }
 
             jfieldID gethardwareAddressField = env->GetFieldID(nifClass, "hardwareAddress", "[B");
