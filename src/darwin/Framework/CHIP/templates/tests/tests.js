@@ -146,6 +146,7 @@ function getTests()
 
   const PowerSource = [
     'Test_TC_PS_1_1',
+    'Test_TC_PS_2_1',
   ];
 
   const PressureMeasurement = [
@@ -191,6 +192,7 @@ function getTests()
 
   const ThreadNetworkDiagnostics = [
     'Test_TC_DIAG_TH_NW_1_1',
+    'Test_TC_DIAG_TH_NW_1_2',
   ];
 
   const WiFiNetworkDiagnostics = [

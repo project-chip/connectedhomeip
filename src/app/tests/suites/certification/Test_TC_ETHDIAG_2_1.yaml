@@ -28,41 +28,34 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Below steps disabled due to issue #13648
     - label: "Sends ResetCounts command"
-      disabled: true
       command: "ResetCounts"
 
     - label: "Read the PacketRxCount attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "PacketRxCount"
       response:
           value: 0
 
     - label: "Read the PacketTxCount attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
           value: 0
 
     - label: "Read the TxErrCount attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
           value: 0
 
     - label: "Read the CollisionCount attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
           value: 0
 
     - label: "Read the OverrunCount attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "OverrunCount"
       response:

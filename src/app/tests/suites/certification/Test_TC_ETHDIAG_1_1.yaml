@@ -37,7 +37,6 @@ tests:
           value: null
 
     - label: "Read PHYRate attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "PHYRate"
       response:
@@ -54,7 +53,6 @@ tests:
           value: null
 
     - label: "Read FullDuplex attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "FullDuplex"
       response:
@@ -62,14 +60,12 @@ tests:
               type: bool
 
     - label: "Read PacketRxCount attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "PacketRxCount"
       response:
           value: 0
 
     - label: "Read PacketRxCount attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "PacketRxCount"
       response:
@@ -77,14 +73,12 @@ tests:
               type: uint64
 
     - label: "Read PacketTxCount attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
           value: 0
 
     - label: "Read PacketTxCount attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
@@ -92,14 +86,12 @@ tests:
               type: uint64
 
     - label: "Read TxErrCount attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
           value: 0
 
     - label: "Read TxErrCount attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
@@ -107,14 +99,12 @@ tests:
               type: uint64
 
     - label: "Read CollisionCount attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
           value: 0
 
     - label: "Read CollisionCount attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
@@ -122,14 +112,12 @@ tests:
               type: uint64
 
     - label: "Read OverrunCount attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
           value: 0
 
     - label: "Read OverrunCount attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
@@ -144,7 +132,6 @@ tests:
           value: null
 
     - label: "Read CarrierDetect attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "CarrierDetect"
       response:
@@ -152,14 +139,12 @@ tests:
               type: bool
 
     - label: "Read TimeSinceReset attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "TimeSinceReset"
       response:
           value: 0
 
     - label: "Read TimeSinceReset attribute constraints"
-      disabled: true
       command: "readAttribute"
       attribute: "TimeSinceReset"
       response:
