@@ -60,16 +60,22 @@ commissioning time or later to enable processing of QueryImage commands from OTA
 Requestors on their fabric, otherwise that OTA Provider will not be usable by
 OTA Requestors.
 
-Since the ACL attribute contains a list of ACL entries, writing of the attribute should not just contain the values for the new entry. Any existing entries should be read and included as part of the write. Below is an example of how to write the ACL attribute with two entries:
+Since the ACL attribute contains a list of ACL entries, writing of the attribute
+should not just contain the values for the new entry. Any existing entries
+should be read and included as part of the write. Below is an example of how to
+write the ACL attribute with two entries:
 
 ```
 out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 0xDEADBEEF 0
 ```
 
-- Entry 1: Administer privilege, CASE authentication mode, 112233 subject node (default controller node ID), wildcard target (all clusters on every endpoint)
--- This is the original entry created as part of commissioning
-- Entry 2: Operate privilege, CASE authentication mode, wildcard subject (all nodes), OTA Provider cluster on every endpoint target
--- This is the new entry being added which grants operate privileges to the OTA Provider cluster (0x0029) on any endpoint
+-   Entry 1: Administer privilege, CASE authentication mode, 112233 subject node
+    (default controller node ID), wildcard target (all clusters on every
+    endpoint) -- This is the original entry created as part of commissioning
+-   Entry 2: Operate privilege, CASE authentication mode, wildcard subject (all
+    nodes), OTA Provider cluster on every endpoint target -- This is the new
+    entry being added which grants operate privileges to the OTA Provider
+    cluster (0x0029) on any endpoint
 
 In the example above, the provider is operating on fabric index 1, provider node
 ID is 0xDEADBEEF on endpoint 0.
