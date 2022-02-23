@@ -149,23 +149,20 @@ int AppTask::Init()
         PLAT_LOG("ThreadStackMgr().StartThreadTask() failed");
         while (1)
             ;
-    }
+  }
 
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING && CHIP_ENABLE_ROTATING_DEVICE_ID
-    {
-	uint8_t EUI64[8];
-        char stringEUI64[sizeof(EUI64) * 2 + 1]; // just big enough for string(EUI64)
 
-        // set serial number to flash
-        // this is before ZCL is started, so Basic Cluster populates Serial Number with this EUI64 (in string)
-        ThreadStackMgrImpl().GetIeeeEui64(EUI64);
-        chip::Encoding::BytesToUppercaseHexString(EUI64, sizeof(EUI64), stringEUI64, sizeof(stringEUI64));
-	ret = ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64));
-	PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
-	VerifyOrDieWithMsg(ret == CHIP_NO_ERROR, NotSpecified,
-			   "StoreSerialNumber: failed (%" CHIP_ERROR_FORMAT ")", ret.Format());
-    }
-#endif
+    uint8_t EUI64[8];
+    char stringEUI64[sizeof(EUI64) * 2 + 1]; // just big enough for string(EUI64)
+
+    // set serial number to flash
+    // this is before ZCL is started, so Basic Cluster populates Serial Number with this EUI64 (in string)
+    ThreadStackMgrImpl().GetIeeeEui64(EUI64);
+    chip::Encoding::BytesToUppercaseHexString(EUI64, sizeof(EUI64), stringEUI64, sizeof(stringEUI64));
+    ret = ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64));
+    PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
+    VerifyOrDieWithMsg(ret == CHIP_NO_ERROR, NotSpecified,
+		       "StoreSerialNumber: failed (%" CHIP_ERROR_FORMAT ")", ret.Format());
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
