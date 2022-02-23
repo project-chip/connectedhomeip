@@ -61,8 +61,9 @@ private:
     NodeData & mNodeData;
 };
 
-constexpr size_t kMdnsMaxPacketSize = 1024;
-constexpr uint16_t kMdnsPort        = 5353;
+constexpr size_t kMdnsMaxPacketSize   = 1024;
+constexpr uint16_t kMdnsPort          = 5353;
+constexpr uint16_t kDefaultTtlSeconds = 120;
 
 using namespace mdns::Minimal;
 using DnssdCacheType = Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE>;
@@ -340,6 +341,9 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
         activeAttempts.Complete(mNodeData.mPeerId);
         mNodeData.LogNodeIdResolved();
         mNodeData.PrioritizeAddresses();
+
+        const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
+        mNodeData.mExpiryTime                      = currentTime + System::Clock::Seconds16(kDefaultTtlSeconds);
 
         if (mOperationalDelegate != nullptr)
         {
