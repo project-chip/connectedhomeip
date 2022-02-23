@@ -45,13 +45,15 @@ enum chipBLEServiceDataType
  */
 struct ChipBLEDeviceIdentificationInfo
 {
-    constexpr static uint16_t kDiscriminatorMask       = 0xfff;
-    constexpr static uint8_t kAdditionalDataFlagMask   = 0x1;
-    constexpr static uint8_t kAdvertisementVersionMask = 0x0f;
-    constexpr static uint16_t kAdvertisementMask       = 0xf000;
+    constexpr static uint16_t kDiscriminatorMask           = 0xfff;
+    constexpr static uint8_t kAdditionalDataFlagMask       = 0x1;
+    constexpr static uint8_t kAdvertisementVersionMask     = 0x0f;
+    constexpr static uint8_t AdvertisementVersionShiftBits = 4u;
 
     uint8_t OpCode;
-    uint8_t DeviceDiscriminatorAndAdvVersion[2]; // 12 bits for device discriminator and 4 bits for advertisement version
+    // from lsb 0-11 bits (i.e. 8 bits of DeviceDiscriminatorAndAdvVersion[0] and 4 bits of DeviceDiscriminatorAndAdvVersion[1]) for
+    // device discriminator and 12-15 bits (i.e 4 bits of DeviceDiscriminatorAndAdvVersion[1]) for advertisement version
+    uint8_t DeviceDiscriminatorAndAdvVersion[2];
     uint8_t DeviceVendorId[2];
     uint8_t DeviceProductId[2];
     uint8_t AdditionalDataFlag;
@@ -66,18 +68,21 @@ struct ChipBLEDeviceIdentificationInfo
 
     void SetProductId(uint16_t productId) { chip::Encoding::LittleEndian::Put16(DeviceProductId, productId); }
 
-    uint16_t GetAdvertisementVersion() const
+    uint8_t GetAdvertisementVersion() const
     {
-        return chip::Encoding::LittleEndian::Get16(DeviceDiscriminatorAndAdvVersion) & kAdvertisementMask;
+        uint8_t advertisementVersion = static_cast<uint8_t>((DeviceDiscriminatorAndAdvVersion[1] >> AdvertisementVersionShiftBits) &
+                                                            kAdvertisementVersionMask);
+        return advertisementVersion;
     }
 
     // Use only 4 bits to set advertisement version
     void SetAdvertisementVersion(uint8_t advertisementVersion)
     {
         // Advertisement Version is 4 bit long from 12th to 15th
-        advertisementVersion &= kAdvertisementVersionMask;
-        advertisementVersion <<= 4u;
-        DeviceDiscriminatorAndAdvVersion[1] |= advertisementVersion;
+        advertisementVersion =
+            static_cast<uint8_t>((advertisementVersion & kAdvertisementVersionMask) << AdvertisementVersionShiftBits);
+        DeviceDiscriminatorAndAdvVersion[1] =
+            (DeviceDiscriminatorAndAdvVersion[1] & kAdvertisementVersionMask) | advertisementVersion;
     }
 
     uint16_t GetDeviceDiscriminator() const

@@ -41,6 +41,7 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
+// TODO : may be we can make it configurable
 #define BLE_ADVERTISEMENT_VERSION 0
 
 namespace chip {
