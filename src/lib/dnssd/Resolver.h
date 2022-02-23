@@ -338,35 +338,6 @@ public:
     virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
 };
 
-/// Groups callbacks for CHIP service resolution requests
-///
-/// TEMPORARY defined as a stop-gap to implementing
-/// OperationalRsolveDelegate or CommissioningResolveDelegate
-class ResolverDelegate : public OperationalResolveDelegate, public CommissioningResolveDelegate
-{
-public:
-    virtual ~ResolverDelegate() = default;
-
-    /// Called when a requested CHIP node ID has been successfully resolved
-    virtual void OnNodeIdResolved(const ResolvedNodeData & nodeData) = 0;
-
-    /// Called when a CHIP node ID resolution has failed
-    virtual void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
-
-    // Called when a CHIP Node acting as Commissioner or in commissioning mode is found
-    virtual void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) = 0;
-
-    // OperationalResolveDelegate
-    void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) override { OnNodeIdResolved(nodeData); }
-    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
-    {
-        OnNodeIdResolutionFailed(peerId, error);
-    }
-
-    // CommissioningNodeResolveDelegate
-    void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override { OnNodeDiscoveryComplete(nodeData); }
-};
-
 /**
  * Interface for resolving CHIP DNS-SD services
  */
@@ -397,15 +368,6 @@ public:
      * If nullptr is passed, the previously registered delegate is unregistered.
      */
     virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
-
-    /**
-     * TEMPORARY setter that sets both operational and commissioning delegates
-     */
-    void SetResolverDelegate(ResolverDelegate * delegate)
-    {
-        SetOperationalDelegate(delegate);
-        SetCommissioningDelegate(delegate);
-    }
 
     /**
      * Requests resolution of the given operational node service.
