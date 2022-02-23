@@ -52,12 +52,12 @@ public:
 
     void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override
     {
-        ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolved");
+        ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnOperationalNodeResolved");
     }
 
     void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
     {
-        ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolutionFailed");
+        ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnOperationalNodeResolutionFailed");
     }
 
 protected:
