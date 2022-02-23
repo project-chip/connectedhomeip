@@ -78,7 +78,7 @@ CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId 
     return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
 }
 
-void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
+void CASESessionManager::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData)
 {
     ChipLogProgress(Controller, "Address resolved for node: 0x" ChipLogFormatX64, ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
 
@@ -94,7 +94,7 @@ void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeDa
     LogErrorOnFailure(session->UpdateDeviceData(OperationalDeviceProxy::ToPeerAddress(nodeData), nodeData.GetMRPConfig()));
 }
 
-void CASESessionManager::OnNodeIdResolutionFailed(const PeerId & peer, CHIP_ERROR error)
+void CASESessionManager::OnOperationalNodeResolutionFailed(const PeerId & peer, CHIP_ERROR error)
 {
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
 }
