@@ -43,7 +43,7 @@ class Efr32App(Enum):
         elif self == Efr32App.LOCK:
             return 'chip-efr32-lock-example'
         elif self == Efr32App.SWITCH:
-            return 'chip-efr32-lock-example'
+            return 'chip-efr32-light-switch-example'
         elif self == Efr32App.WINDOW_COVERING:
             return 'chip-efr32-window-example'
         elif self == Efr32App.UNIT_TEST:
