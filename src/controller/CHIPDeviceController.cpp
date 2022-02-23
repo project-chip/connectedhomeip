@@ -127,6 +127,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     ReturnErrorOnFailure(mDNSResolver.Init(params.systemState->UDPEndPointManager()));
     mDNSResolver.SetOperationalDelegate(this);
+    mDNSResolver.SetCommissioningDelegate(this);
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -613,12 +614,12 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv6)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv4)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
                                                     ));
 
