@@ -210,7 +210,7 @@ private:
     CHIP_ERROR Init(uint16_t mySessionId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
-                                       System::PacketBufferHandle && msg);
+                                       const System::PacketBufferHandle & msg);
 
     CHIP_ERROR SetupSpake2p();
 

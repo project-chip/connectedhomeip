@@ -385,7 +385,7 @@ exit:
         }
         LogState();
 
-        if (!data.IsNull())
+        if (!data.IsNull()) // NOLINT(bugprone-use-after-move)
         {
             // Tack received data onto rx buffer, to be freed when end point resets protocol engine on close.
             if (!mRxBuf.IsNull())
