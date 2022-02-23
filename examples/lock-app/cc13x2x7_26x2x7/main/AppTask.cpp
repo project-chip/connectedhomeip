@@ -163,7 +163,7 @@ int AppTask::Init()
 	ret = ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64));
 	PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
 	VerifyOrDieWithMsg(ret == CHIP_NO_ERROR, NotSpecified,
-			   "StoreSerialNumber: failed (%lX)", ret.AsInteger());
+			   "StoreSerialNumber: failed (%" CHIP_ERROR_FORMAT ")", ret.Format());
     }
 #endif
 
