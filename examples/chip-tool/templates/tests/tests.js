@@ -461,6 +461,10 @@ function getTests()
     'TestBinding',
   ];
 
+  const MultiAdmin = [
+    'TestMultiAdmin',
+  ];
+
   const SoftwareDiagnostics = [
     'Test_TC_SWDIAG_1_1',
     'Test_TC_SWDIAG_2_1',
@@ -511,6 +515,7 @@ function getTests()
     WindowCovering, //
     TV, //
     Others, //
+    MultiAdmin, //
     SoftwareDiagnostics, //
     Subscriptions, //
     DoorLock, //
