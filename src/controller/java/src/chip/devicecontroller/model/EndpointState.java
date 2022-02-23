@@ -45,15 +45,14 @@ public final class EndpointState {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    clusters
-        .forEach(
-            (clusterId, clusterState) -> {
-              builder.append("Cluster ");
-              builder.append(clusterId);
-              builder.append(": {\n");
-              builder.append(clusterState.toString());
-              builder.append("}\n");
-            });
+    clusters.forEach(
+        (clusterId, clusterState) -> {
+          builder.append("Cluster ");
+          builder.append(clusterId);
+          builder.append(": {\n");
+          builder.append(clusterState.toString());
+          builder.append("}\n");
+        });
     return builder.toString();
   }
 }

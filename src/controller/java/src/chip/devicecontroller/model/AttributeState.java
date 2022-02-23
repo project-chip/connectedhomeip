@@ -1,4 +1,3 @@
-
 /*
  *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
@@ -33,8 +32,7 @@ public final class AttributeState {
   }
 
   /**
-   * Return a byte array containing the TLV for an attribute, wrapped within an
-   * anonymous TLV tag.
+   * Return a byte array containing the TLV for an attribute, wrapped within an anonymous TLV tag.
    */
   public byte[] getTlv() {
     return tlv;

@@ -45,15 +45,15 @@ public final class ClusterState {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    attributes
-        .forEach(
-            (attributeId, attributeState) -> {
-              builder.append("Attribute ");
-              builder.append(attributeId);
-              builder.append(": ");
-              builder.append(attributeState.getValue() == null ? "null" : attributeState.getValue().toString());
-              builder.append("\n");
-            });
+    attributes.forEach(
+        (attributeId, attributeState) -> {
+          builder.append("Attribute ");
+          builder.append(attributeId);
+          builder.append(": ");
+          builder.append(
+              attributeState.getValue() == null ? "null" : attributeState.getValue().toString());
+          builder.append("\n");
+        });
     return builder.toString();
   }
 }
