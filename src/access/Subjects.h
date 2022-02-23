@@ -191,10 +191,7 @@ private:
     FabricIndex mFabricIndex;
     NodeId mNodeId;
 
-    bool operator==(const OperationalNodeId & that) const
-    {
-        return mFabricIndex == that.mFabricIndex && mNodeId == that.mNodeId;
-    }
+    bool operator==(const OperationalNodeId & that) const { return mFabricIndex == that.mFabricIndex && mNodeId == that.mNodeId; }
 
     friend bool operator==(const Subject &, const OperationalNodeId &);
 };
