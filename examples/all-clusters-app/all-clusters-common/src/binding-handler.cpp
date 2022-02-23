@@ -24,6 +24,7 @@
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
 #include "lib/core/CHIPError.h"
+#include "platform/CHIPDeviceLayer.h"
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "lib/shell/Engine.h"
@@ -102,12 +103,17 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
     }
 }
 
-CHIP_ERROR InitBindingHandlers()
+static void InitBindingHandlerInternal(intptr_t arg)
 {
     chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
     chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
 #if defined(ENABLE_CHIP_SHELL)
     RegisterSwitchCommands();
 #endif
+}
+
+CHIP_ERROR InitBindingHandlers()
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
     return CHIP_NO_ERROR;
 }

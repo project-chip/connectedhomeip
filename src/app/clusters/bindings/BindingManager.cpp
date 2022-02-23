@@ -16,8 +16,10 @@
  */
 
 #include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/bindings/bindings.h>
 #include <app/util/binding-table.h>
 #include <credentials/FabricTable.h>
+#include <lib/support/CHIPMem.h>
 
 namespace {
 
@@ -25,12 +27,13 @@ class BindingFabricTableDelegate : public chip::FabricTableDelegate
 {
     void OnFabricDeletedFromStorage(chip::CompressedFabricId compressedFabricId, chip::FabricIndex fabricIndex)
     {
-        auto iter = chip::BindingTable::GetInstance().begin();
-        while (iter != chip::BindingTable::GetInstance().end())
+        chip::BindingTable & bindingTable = chip::BindingTable::GetInstance();
+        auto iter                         = bindingTable.begin();
+        while (iter != bindingTable.end())
         {
             if (iter->fabricIndex == fabricIndex)
             {
-                iter = chip::BindingTable::GetInstance().RemoveAt(iter);
+                iter = bindingTable.RemoveAt(iter);
             }
             else
             {
@@ -38,6 +41,26 @@ class BindingFabricTableDelegate : public chip::FabricTableDelegate
             }
         }
         chip::BindingManager::GetInstance().FabricRemoved(compressedFabricId, fabricIndex);
+
+        EmberBindingTableEntry * table = static_cast<EmberBindingTableEntry *>(
+            chip::Platform::MemoryAlloc(bindingTable.Size() * sizeof(EmberBindingTableEntry)));
+        uint8_t idx = 0;
+        if (table == nullptr)
+        {
+            return;
+        }
+        for (const EmberBindingTableEntry & entry : chip::BindingTable::GetInstance())
+        {
+            table[idx++] = entry;
+        }
+        CHIP_ERROR error = chip::Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(
+            chip::kBindingStoargeKey, table, static_cast<uint16_t>(bindingTable.Size() * sizeof(EmberBindingTableEntry)));
+        // Error recovery is not possible here, the fabricIndex will be filtered upon next reboot.
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to save binding table after fabric removed %" CHIP_ERROR_FORMAT, error.Format());
+        }
+        chip::Platform::MemoryFree(table);
     }
 
     // Intentionally left blank
@@ -48,6 +71,28 @@ class BindingFabricTableDelegate : public chip::FabricTableDelegate
 };
 
 BindingFabricTableDelegate gFabricTableDelegate;
+
+void LoadBindingTableFromStorage(chip::Server * appServer)
+{
+    EmberBindingTableEntry * table = static_cast<EmberBindingTableEntry *>(
+        chip::Platform::MemoryAlloc(EMBER_BINDING_TABLE_SIZE * sizeof(EmberBindingTableEntry)));
+    uint16_t readSize = EMBER_BINDING_TABLE_SIZE * sizeof(EmberBindingTableEntry);
+
+    if (appServer->GetPersistentStorage().SyncGetKeyValue(chip::kBindingStoargeKey, table, readSize) == CHIP_NO_ERROR &&
+        readSize % sizeof(EmberBindingTableEntry) == 0)
+    {
+        size_t numEntries = readSize / sizeof(EmberBindingTableEntry);
+        for (size_t i = 0; i < numEntries; i++)
+        {
+            // In case the binding table storage failed when fabric removed
+            if (appServer->GetFabricTable().FindFabricWithIndex(table[i].fabricIndex) != nullptr)
+            {
+                chip::AddBindingEntry(table[i]);
+            }
+        }
+    }
+    chip::Platform::MemoryFree(table);
+}
 
 } // namespace
 
@@ -84,6 +129,7 @@ void BindingManager::SetAppServer(Server * appServer)
 {
     mAppServer = appServer;
     mAppServer->GetFabricTable().AddFabricDelegate(&gFabricTableDelegate);
+    LoadBindingTableFromStorage(appServer);
 }
 
 CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)

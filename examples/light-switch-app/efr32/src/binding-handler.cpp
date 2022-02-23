@@ -22,6 +22,7 @@
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
+#include "platform/CHIPDeviceLayer.h"
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "lib/shell/Engine.h"
@@ -132,6 +133,16 @@ static void RegisterSwitchCommands()
     return;
 }
 #endif // ENABLE_CHIP_SHELL
+
+void InitBindingHandlerInternal(intptr_t arg)
+{
+    chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
+    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
+#if defined(ENABLE_CHIP_SHELL)
+    RegisterSwitchCommands();
+#endif
+}
+
 } // namespace
 
 void SwitchToggleOnOff(intptr_t context)
@@ -169,12 +180,6 @@ void SwitchOnOffOff(intptr_t context)
 
 CHIP_ERROR InitBindingHandler()
 {
-    BindingManager::GetInstance().SetAppServer(&Server::GetInstance());
-    BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-
-#if defined(ENABLE_CHIP_SHELL)
-    RegisterSwitchCommands();
-#endif
-
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
     return CHIP_NO_ERROR;
 }
