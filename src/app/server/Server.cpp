@@ -273,29 +273,32 @@ exit:
 void Server::RejoinExistingMulticastGroups()
 {
     ChipLogProgress(AppServer, "Joining Multicast groups");
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     for (const FabricInfo & fabric : mFabrics)
     {
         Credentials::GroupDataProvider::GroupInfo groupInfo;
 
         auto * iterator = mGroupsProvider.IterateGroupInfo(fabric.GetFabricIndex());
-        while (iterator->Next(groupInfo))
+        if (iterator)
         {
-            err = mTransports.MulticastGroupJoinLeave(
-                Transport::PeerAddress::Multicast(fabric.GetFabricIndex(), groupInfo.group_id), true);
-            if (err != CHIP_NO_ERROR)
+            while (iterator->Next(groupInfo))
             {
-                ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %u", groupInfo.group_id,
-                             fabric.GetFabricIndex());
+                err = mTransports.MulticastGroupJoinLeave(
+                    Transport::PeerAddress::Multicast(fabric.GetFabricIndex(), groupInfo.group_id), true);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %u : %" CHIP_ERROR_FORMAT,
+                                 groupInfo.group_id, fabric.GetFabricIndex(), err.Format());
 
-                // We assume the failure is caused by a network issue or a lack of rescources; neither of which will be solved
-                // before the next join. Exit the loop to save resources.
-                iterator->Release();
-                return;
+                    // We assume the failure is caused by a network issue or a lack of rescources; neither of which will be solved
+                    // before the next join. Exit the loop to save rescources.
+                    iterator->Release();
+                    return;
+                }
             }
-        }
 
-        iterator->Release();
+            iterator->Release();
+        }
     }
 }
 
