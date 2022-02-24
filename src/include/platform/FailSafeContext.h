@@ -39,7 +39,7 @@ public:
      *  when the fail-safe timer is currently armed, the currently-running fail-safe timer will
      *  first be cancelled, then the fail-safe timer will be re-armed.
      */
-    CHIP_ERROR ArmFailSafe(FabricIndex accessingFabric, System::Clock::Timeout expiryLength);
+    CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
 
     inline bool IsFailSafeArmed(FabricIndex accessingFabric) { return mFailSafeArmed && MatchedFabricIndex(accessingFabric); }
