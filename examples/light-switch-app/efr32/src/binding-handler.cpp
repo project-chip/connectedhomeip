@@ -25,19 +25,21 @@
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "lib/shell/Engine.h"
-
-using chip::Shell::Engine;
-using chip::Shell::shell_command_t;
-using chip::Shell::streamer_get;
-using chip::Shell::streamer_printf;
-#endif // defined(ENABLE_CHIP_SHELL)
+#endif // ENABLE_CHIP_SHELL
 
 using namespace chip;
 using namespace chip::app;
 
+#if defined(ENABLE_CHIP_SHELL)
+using Shell::Engine;
+using Shell::shell_command_t;
+using Shell::streamer_get;
+using Shell::streamer_printf;
+#endif // defined(ENABLE_CHIP_SHELL)
+
 namespace {
 
-void ProcessOnOffBindingCommand(chip::CommandId commandId, const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device)
+void ProcessOnOffBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding, DeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "OnOff command succeeds");
@@ -73,7 +75,7 @@ void ProcessOnOffBindingCommand(chip::CommandId commandId, const EmberBindingTab
     }
 }
 
-void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device, void * context)
+void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "Invalid context for Light switch handler"););
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
@@ -97,7 +99,7 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, chip::Dev
         }
     }
 
-    chip::Platform::Delete(data);
+    Platform::Delete(data);
 }
 
 #ifdef ENABLE_CHIP_SHELL
@@ -105,15 +107,15 @@ CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
 {
     if (argc == 1 && strcmp(argv[0], "on") == 0)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchOnOffOn, 0);
+        DeviceLayer::PlatformMgr().ScheduleWork(SwitchOnOffOn, 0);
     }
     else if (argc == 1 && strcmp(argv[0], "off") == 0)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchOnOffOff, 0);
+        DeviceLayer::PlatformMgr().ScheduleWork(SwitchOnOffOff, 0);
     }
     else if (argc == 1 && strcmp(argv[0], "toggle") == 0)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchToggleOnOff, 0);
+        DeviceLayer::PlatformMgr().ScheduleWork(SwitchToggleOnOff, 0);
     }
     else
     {
@@ -134,44 +136,44 @@ static void RegisterSwitchCommands()
 
 void SwitchToggleOnOff(intptr_t context)
 {
-    BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+    BindingCommandData * data = Platform::New<BindingCommandData>();
     VerifyOrReturn(data != nullptr, ChipLogError(NotSpecified, "SwitchToggleOnOff -  Out of Memory of work data"));
 
-    data->clusterId = chip::app::Clusters::OnOff::Id;
-    data->commandId = chip::app::Clusters::OnOff::Commands::Toggle::Id;
+    data->clusterId = Clusters::OnOff::Id;
+    data->commandId = Clusters::OnOff::Commands::Toggle::Id;
 
-    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, chip::app::Clusters::OnOff::Id,
+    BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, Clusters::OnOff::Id,
                                                                   static_cast<void *>(data));
 }
 
 void SwitchOnOffOn(intptr_t context)
 {
-    BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+    BindingCommandData * data = Platform::New<BindingCommandData>();
     VerifyOrReturn(data != nullptr, ChipLogError(NotSpecified, "SwitchOnOffOn -  Out of Memory of work data"));
 
-    data->clusterId = chip::app::Clusters::OnOff::Id;
-    data->commandId = chip::app::Clusters::OnOff::Commands::On::Id;
+    data->clusterId = Clusters::OnOff::Id;
+    data->commandId = Clusters::OnOff::Commands::On::Id;
 
-    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, chip::app::Clusters::OnOff::Id,
+    BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, Clusters::OnOff::Id,
                                                                   static_cast<void *>(data));
 }
 
 void SwitchOnOffOff(intptr_t context)
 {
-    BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+    BindingCommandData * data = Platform::New<BindingCommandData>();
     VerifyOrReturn(data != nullptr, ChipLogError(NotSpecified, "SwitchOnOffOff -  Out of Memory of work data"));
 
-    data->clusterId = chip::app::Clusters::OnOff::Id;
-    data->commandId = chip::app::Clusters::OnOff::Commands::Off::Id;
+    data->clusterId = Clusters::OnOff::Id;
+    data->commandId = Clusters::OnOff::Commands::Off::Id;
 
-    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, chip::app::Clusters::OnOff::Id,
+    BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, Clusters::OnOff::Id,
                                                                   static_cast<void *>(data));
 }
 
 CHIP_ERROR InitBindingHandler()
 {
-    chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    BindingManager::GetInstance().SetAppServer(&Server::GetInstance());
+    BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
 
 #if defined(ENABLE_CHIP_SHELL)
     RegisterSwitchCommands();
