@@ -258,6 +258,7 @@ def Efr32Targets():
 
     for board_target in board_targets:
         yield board_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
+        yield board_target.Extend('switch', app=Efr32App.SWITCH)
         yield board_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
 
         rpc_aware_targets = [
