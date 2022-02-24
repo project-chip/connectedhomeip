@@ -394,7 +394,6 @@ constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
 constexpr EndpointId kLocalSpeakerEndpointId         = 2;
 // the fabric index can't be 0, but needs to be validated as 1
 constexpr FabricIndex kLocalFabricIndex   = 1;
-constexpr GroupId kNoGroupIdSpecified     = kUndefinedGroupId;
 constexpr ClusterId kNoClusterIdSpecified = kInvalidClusterId;
 
 CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targetDeviceProxy, uint16_t targetVendorId,

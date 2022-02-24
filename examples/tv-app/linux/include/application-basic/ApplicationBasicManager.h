@@ -42,8 +42,8 @@ public:
         mVendorId = vendorId;
         CopyString(mApplicationVersion, sizeof(mApplicationVersion), szApplicationVersion);
         mProductId = productId;
-        mAllowedVendorList.push_back(456); // test
         mAllowedVendorList.push_back(vendorId);
+        mAllowedVendorList.push_back(456); // test
     };
     virtual ~ApplicationBasicManager(){};
 
