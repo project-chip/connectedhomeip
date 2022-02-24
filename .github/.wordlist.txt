@@ -59,6 +59,7 @@ ApplicationBasic
 ApplicationId
 ApplicationIdentifier
 ApplicationLauncher
+ApplyUpdate
 applyUpdateAction
 ApplyUpdateRequest
 ApplyUpdateResponse
@@ -567,6 +568,7 @@ idx
 ifdef
 ifdefs
 IGMP
+ignoreApplyUpdate
 ignoreQueryImage
 ihex
 IlluminanceMeasurement
