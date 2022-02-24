@@ -96,8 +96,6 @@ public:
 
     inline FabricIndex GetFabricIndex() { return mFabric; }
     inline void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
-    inline NodeId GetPeerNodeId() { return mPeerNodeId; }
-    inline void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetSwitchDelegate(SwitchDeviceControlDelegate * delegate) { mSwitchDelegate = delegate; }
     SwitchDeviceControlDelegate * GetSwitchDelegate() const { return mSwitchDelegate; }
 
@@ -121,7 +119,6 @@ private:
     DeviceControlServer(const DeviceControlServer &&) = delete;
     DeviceControlServer & operator=(const DeviceControlServer &) = delete;
 
-    NodeId mPeerNodeId  = 0;
     FabricIndex mFabric = 0;
 };
 
