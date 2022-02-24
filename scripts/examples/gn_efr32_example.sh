@@ -74,7 +74,8 @@ if [ "$#" == "0" ]; then
             Build wifi example with extension board wf200. (Default false)
         'import("//with_pw_rpc.gni")'
             Use to build the example with pigweed RPC
-
+        OTA_periodic_query_timeout
+            Periodic query timeout variable for OTA in seconds
         Presets
         --sed
             enable sleepy end device and set thread mtd
