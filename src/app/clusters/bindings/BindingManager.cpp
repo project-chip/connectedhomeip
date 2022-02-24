@@ -71,6 +71,7 @@ BindingManager BindingManager::sBindingManager;
 
 CHIP_ERROR BindingManager::UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId)
 {
+    ChipLogError(NotSpecified, "BindingManager::UnicastBindingCreated");
     return EstablishConnection(fabricIndex, nodeId);
 }
 
@@ -159,6 +160,16 @@ void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, Fabric
 {
     mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
     mAppServer->GetCASESessionManager()->ReleaseSessionForFabric(compressedFabricId);
+}
+
+CHIP_ERROR BindingManager::NotifyBindingChanged(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device,
+                                                void * context)
+{
+    if (mBoundDeviceChangedHandler)
+    {
+        mBoundDeviceChangedHandler(binding, peer_device, context);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)

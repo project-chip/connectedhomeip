@@ -93,6 +93,11 @@ public:
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
+    /*
+     * Notify the BoundDeviceChangedHandler that a binding has changed.
+     */
+    CHIP_ERROR NotifyBindingChanged(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device, void * context);
+
     static BindingManager & GetInstance() { return sBindingManager; }
 
 private:

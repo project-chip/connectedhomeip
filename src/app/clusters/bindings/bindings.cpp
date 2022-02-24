@@ -106,7 +106,10 @@ void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
                 ChipLogValueX64(entry.node.Value()), err.Format());
         }
     }
+    ChipLogError(NotSpecified, "AddBindingEntry");
     BindingTable::GetInstance().Add(bindingEntry);
+
+    BindingManager::GetInstance().NotifyBindingChanged(bindingEntry, nullptr, nullptr);
 }
 
 CHIP_ERROR BindingTableAccess::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)

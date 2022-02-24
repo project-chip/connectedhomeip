@@ -115,27 +115,28 @@ HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
-static void MyBoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device, void * context)
+static void OnBinding(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device, void * context)
 {
-    using namespace chip;
-    using namespace chip::app;
-
     if (binding.type == EMBER_MULTICAST_BINDING)
     {
-        ChipLogError(NotSpecified, "Group binding received");
+        ChipLogError(NotSpecified,
+                     "Group binding received nodeId=0x" ChipLogFormatX64 " remote endpoint=%d cluster=" ChipLogFormatMEI,
+                     ChipLogValueX64(binding.nodeId), binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
         return;
     }
 
     if (binding.type == EMBER_UNICAST_BINDING)
     {
-        ChipLogError(NotSpecified, "Unicast binding received");
+        ChipLogError(NotSpecified,
+                     "Unicast binding received nodeId=0x" ChipLogFormatX64 " remote endpoint=%d cluster=" ChipLogFormatMEI,
+                     ChipLogValueX64(binding.nodeId), binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
     }
 }
 
 CHIP_ERROR InitBindingHandlers()
 {
     chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(MyBoundDeviceChangedHandler);
+    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(OnBinding);
     return CHIP_NO_ERROR;
 }
 

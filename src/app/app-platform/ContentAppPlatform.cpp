@@ -395,35 +395,50 @@ constexpr EndpointId kLocalSpeakerEndpointId         = 2;
 // the fabric index can't be 0, but needs to be validated as 1
 constexpr FabricIndex kLocalFabricIndex   = 1;
 constexpr ClusterId kNoClusterIdSpecified = kInvalidClusterId;
+constexpr ClusterId kClusterIdOnOff       = 0x0006;
+constexpr ClusterId kClusterIdWakeOnLAN   = 0x0503;
+// constexpr ClusterId kClusterIdChannel             = 0x0504;
+// constexpr ClusterId kClusterIdTargetNavigator     = 0x0505;
+constexpr ClusterId kClusterIdMediaPlayback = 0x0506;
+// constexpr ClusterId kClusterIdMediaInput          = 0x0507;
+constexpr ClusterId kClusterIdLowPower        = 0x0508;
+constexpr ClusterId kClusterIdKeypadInput     = 0x0509;
+constexpr ClusterId kClusterIdContentLauncher = 0x050a;
+constexpr ClusterId kClusterIdAudioOutput     = 0x050b;
+// constexpr ClusterId kClusterIdApplicationLauncher = 0x050c;
+// constexpr ClusterId kClusterIdAccountLogin        = 0x050e;
 
 CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targetDeviceProxy, uint16_t targetVendorId,
                                                   NodeId localNodeId, Controller::WriteResponseSuccessCallback successCb,
                                                   Controller::WriteResponseFailureCallback failureCb)
 {
     Access::AccessControl::Entry entry;
-    GetAccessControl().PrepareEntry(entry);
+    ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
     entry.SetAuthMode(Access::AuthMode::kCase);
     entry.SetFabricIndex(kLocalFabricIndex);
     entry.SetPrivilege(Access::Privilege::kOperate);
     entry.AddSubject(nullptr, targetDeviceProxy->GetDeviceId());
 
-    std::list<Binding::Structs::TargetStruct::Type> bindings;
+    std::vector<Binding::Structs::TargetStruct::Type> bindings;
+
+    /**
+     * Here we are creating a single ACL entry containing:
+     * a) selection of clusters on video player endpoint (7 targets)
+     * b) speaker endpoint (1 target)
+     * c) selection of content app endpoints (0 to many)
+     * d) single subject which is the casting app
+     * This organization was selected to make it easy to remove access (single ACL removal)
+     *
+     * We could have organized things differently, for example,
+     * - a single ACL for (a) and (b) which is shared by many subjects
+     * - a single ACL entry per subject for (c)
+     */
 
     ChipLogProgress(Controller, "Create video player endpoint ACL and binding");
     {
-        // 0x0006 = OnOff
-        // 0x0503 = Wake On LAN
-        // 0x0504 = Channel
-        // 0x0505 = TargetNavigator
-        // 0x0506 = Media Playback
-        // 0x0507 = Media Input
-        // 0x0508 = Low Power
-        // 0x0509 = Keypad Input
-        // 0x050a = content launcher
-        // 0x050b = Audio Output
-        // 0x050c = Application Launcher
-        // 0x050e = Account Login
-        std::list<ClusterId> allowedClusterList = { 0x0006, 0x0503, 0x0506, 0x0508, 0x0509, 0x050a, 0x050b };
+        std::list<ClusterId> allowedClusterList = { kClusterIdOnOff,      kClusterIdWakeOnLAN,   kClusterIdMediaPlayback,
+                                                    kClusterIdLowPower,   kClusterIdKeypadInput, kClusterIdContentLauncher,
+                                                    kClusterIdAudioOutput };
 
         for (const auto & clusterId : allowedClusterList)
         {
@@ -431,7 +446,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
                                                                 Access::AccessControl::Entry::Target::kEndpoint,
                                                             .cluster  = clusterId,
                                                             .endpoint = kLocalVideoPlayerEndpointId };
-            entry.AddTarget(nullptr, target);
+            ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
         }
 
         bindings.push_back(Binding::Structs::TargetStruct::Type{
@@ -447,7 +462,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
     {
         Access::AccessControl::Entry::Target target = { .flags    = Access::AccessControl::Entry::Target::kEndpoint,
                                                         .endpoint = kLocalSpeakerEndpointId };
-        entry.AddTarget(nullptr, target);
+        ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
 
         bindings.push_back(Binding::Structs::TargetStruct::Type{
             .fabricIndex = kUndefinedFabricIndex,
@@ -475,7 +490,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
                 {
                     Access::AccessControl::Entry::Target target = { .flags    = Access::AccessControl::Entry::Target::kEndpoint,
                                                                     .endpoint = app->GetEndpointId() };
-                    entry.AddTarget(nullptr, target);
+                    ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
 
                     bindings.push_back(Binding::Structs::TargetStruct::Type{
                         .fabricIndex = kUndefinedFabricIndex,
@@ -491,16 +506,10 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
 
     ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, entry, nullptr));
 
-    for (const auto & binding : bindings)
-    {
-        Binding::Structs::TargetStruct::Type entries[1];
-        entries[0] = binding;
-        BindingListTypeInfo bindingList(entries);
-
-        ChipLogProgress(Controller, "Attempting to create Binding");
-        ReturnErrorOnFailure(
-            CreateBindingWithCallback(targetDeviceProxy, kTargetBindingClusterEndpointId, bindingList, successCb, failureCb));
-    }
+    ChipLogProgress(Controller, "Attempting to create Binding list of size %ld", bindings.size());
+    BindingListTypeInfo bindingList(bindings.data(), bindings.size());
+    ReturnErrorOnFailure(
+        CreateBindingWithCallback(targetDeviceProxy, kTargetBindingClusterEndpointId, bindingList, successCb, failureCb));
 
     ChipLogProgress(Controller, "Completed Bindings and ACLs");
 
