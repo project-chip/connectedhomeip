@@ -37,7 +37,7 @@ namespace chip {
 class OTARequestor : public OTARequestorInterface, public BDXDownloader::StateDelegate
 {
 public:
- 
+
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
     //////////// OTARequestorInterface Implementation ///////////////
@@ -75,7 +75,7 @@ public:
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
 
     using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-    void SetCurrentProviderLocation(ProviderLocationType providerLocation) override { mProviderLocation.SetValue(providerLocation); } 
+    void SetCurrentProviderLocation(ProviderLocationType providerLocation) override { mProviderLocation.SetValue(providerLocation); }
 
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(
@@ -275,7 +275,7 @@ private:
     static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
     /**
-     * Commissioning callback 
+     * Commissioning callback
      */
     static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 

@@ -151,7 +151,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
     case OTAQueryStatus::kBusy:
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnQuery, OTAChangeReasonEnum::kDelayByProvider);
         requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::Busy,
-                                                           System::Clock::Seconds32(response.delayedActionTime.ValueOr(0))); 
+                                                           System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         break;
     case OTAQueryStatus::kNotAvailable:
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
@@ -247,9 +247,9 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, providerLocation.endpoint);
 
     mOtaRequestorDriver->ProcessAnnounceOTAProviders(providerLocation, announcementReason);
- 
+
     // We are now querying a provider, leave the kIdle state. No state matching this one fully but we can't be in kIdle.
-    // Have to set the state after the ProcessAnnounceOTAProviders() call since it may need to know the prior state 
+    // Have to set the state after the ProcessAnnounceOTAProviders() call since it may need to know the prior state
     RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
     return EMBER_ZCL_STATUS_SUCCESS;
@@ -257,8 +257,8 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
-    // We are now connecting to a provider, leave the kIdle state. 
-    // No state matching this one fully but we can't be in kIdle. 
+    // We are now connecting to a provider, leave the kIdle state.
+    // No state matching this one fully but we can't be in kIdle.
     RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
     if(mOtaRequestorDriver == nullptr) {
@@ -286,7 +286,7 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
-    
+
     // Set the action to take once connection is successfully established
     mOnConnectedAction = onConnectedAction;
 
@@ -432,8 +432,8 @@ OTARequestorInterface::OTATriggerResult OTARequestor::SendQuery()
 {
     if (mProviderLocation.HasValue())
     {
-        // We are now querying a provider, leave the kIdle state. 
-        // No state matches this one fully but we can't be in kIdle. 
+        // We are now querying a provider, leave the kIdle state.
+        // No state matches this one fully but we can't be in kIdle.
         RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
         // Go through the driver as it has additional logic to execute

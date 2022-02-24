@@ -61,17 +61,17 @@ public:
     void UpdateCancelled() override;
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState) override;
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) override;
-    void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation, 
+    void ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation,
                                         app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
     void DriverSendQuery() override;
     // Determines the next available Provider location and sets it in the OTARequestor
     void DetermineAndSetProviderLocation() override;
-   
+
     //// Regular methods
     void StartDefaultProviderTimer();
     void StopDefaultProviderTimer();
     void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
- 
+
 private:
     // Returns the next available Provider location
     bool DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation);
@@ -82,7 +82,7 @@ private:
     uint32_t mDefaultProviderTimeoutSec      = 86400;  // Timeout for the Default Provider timer
 
     using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-    ProviderLocationType mLastUsedProvider; // Provider location used for the last query or update 
+    ProviderLocationType mLastUsedProvider; // Provider location used for the last query or update
 };
 
 } // namespace DeviceLayer
