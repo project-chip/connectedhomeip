@@ -78,7 +78,7 @@ void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR
 
 void GenericOTARequestorDriver::HandleIdleState()
 {
-    // Default profivers timer runs if and only if the OTARequestor's update state is kIdle.
+    // Default provider timer runs if and only if the OTARequestor's update state is kIdle.
     // Must (re)start the timer every time we enter the kIdle state
     StartDefaultProviderTimer();
 }
@@ -263,10 +263,10 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
 void GenericOTARequestorDriver::StartDefaultProviderTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Starting the Default Provider timer, timeout: %u seconds",
-                    (unsigned int) mDefaultProviderTimeoutSec);
+                    (unsigned int) mPeriodicQueryTimeInterval);
 
     ScheduleDelayedAction(
-        System::Clock::Seconds32(mDefaultProviderTimeoutSec),
+        System::Clock::Seconds32(mPeriodicQueryTimeInterval),
         [](System::Layer *, void * context) {
             (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context);
         },
