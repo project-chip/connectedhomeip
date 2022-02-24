@@ -41,22 +41,6 @@ tests:
           constraints:
               type: uint16
 
-    - label:
-          "write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
-      arguments:
-          value: 1
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "reads back global attribute: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 1
-
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -88,12 +72,3 @@ tests:
       response:
           constraints:
               type: list
-
-    #Disabled due to issue #13442
-    - label: "Read the optional global attribute : FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: map32

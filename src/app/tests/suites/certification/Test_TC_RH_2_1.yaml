@@ -28,42 +28,23 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads the mandatory attribute: MeasuredValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "measured value"
-      response:
-          value: 65535
-
     - label: "Reads constraints of attribute: MeasuredValue"
       command: "readAttribute"
       attribute: "measured value"
       response:
           constraints:
-              type: uint16
-
-    - label: "Reads the mandatory attribute: MinMeasuredValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "min measured value"
-      response:
-          value: 65535
+              type: int16
+              minValue: 0
+              maxValue: 10000
 
     - label: "Reads constraints of attribute: MinMeasuredValue"
       command: "readAttribute"
       attribute: "min measured value"
       response:
           constraints:
-              type: uint16
+              type: int16
               minValue: 0
               maxValue: 9999
-
-    - label: "Reads the mandatory attribute: MaxMeasuredValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "max measured value"
-      response:
-          value: 65535
 
     - label: "Reads constraints of attribute: MaxMeasuredValue"
       disabled: true
@@ -71,16 +52,9 @@ tests:
       attribute: "max measured value"
       response:
           constraints:
-              type: uint16
+              type: int16
               minValue: 1
               maxValue: 10000
-
-    - label: "Reads the optional attribute: Tolerance"
-      optional: true
-      command: "readAttribute"
-      attribute: "tolerance"
-      response:
-          value: 0
 
     - label: "Reads constraints of attribute: Tolerance"
       optional: true

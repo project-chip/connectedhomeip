@@ -40,3 +40,43 @@ tests:
       response:
           constraints:
               type: uint16
+
+    - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
+    - label: "Read the global attribute: EventList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: ClientGeneratedCommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ClientGeneratedCommandList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: ServerGeneratedCommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ServerGeneratedCommandList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the optional global attribute : FeatureMap"
+      disabled: true
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: map32

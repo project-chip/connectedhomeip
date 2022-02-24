@@ -58,7 +58,7 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 1
+          value: 3
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

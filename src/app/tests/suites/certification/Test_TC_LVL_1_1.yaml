@@ -90,7 +90,6 @@ tests:
               type: list
 
     - label: "read the optional global attribute: FeatureMap"
-      disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:

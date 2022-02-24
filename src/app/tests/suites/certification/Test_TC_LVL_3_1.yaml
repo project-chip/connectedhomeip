@@ -33,18 +33,21 @@ tests:
       attribute: "current level"
       response:
           value: 254
+          saveAs: CurrentLevelValue
 
     - label: "Reads the MinLevel attribute"
       command: "readAttribute"
       attribute: "min level"
       response:
           value: 0
+          saveAs: MinLevelValue
 
     - label: "Reads the MaxLevel attribute"
       command: "readAttribute"
       attribute: "max level"
       response:
           value: 254
+          saveAs: MaxLevelValue
 
     - label: "sends a Move to level command"
       command: "MoveToLevel"

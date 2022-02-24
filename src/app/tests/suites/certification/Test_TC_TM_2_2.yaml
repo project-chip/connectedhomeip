@@ -28,6 +28,26 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "read the mandatory attribute: MinMeasuredValue"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          constraints:
+              type: int16
+              minValue: -27315
+              maxValue: 32766
+
+    - label: "read the mandatory attribute: MaxMeasuredValue"
+      disabled: true
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          constraints:
+              type: int16
+              minValue: -27314
+              maxValue: 32767
+
     #Disabled as values needs to be stored for comparison
     - label: "Reads MeasuredValue attribute from DUT"
       disabled: true

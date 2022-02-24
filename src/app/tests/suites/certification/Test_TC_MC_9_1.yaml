@@ -20,6 +20,12 @@ config:
     nodeId: 0x12344321
     cluster: "Application Basic"
     endpoint: 1
+    vendorId:
+        type: INT16U
+        defaultValue: 65521
+    productId:
+        type: INT16U
+        defaultValue: 32769
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -50,10 +56,9 @@ tests:
       command: "readAttribute"
       attribute: "VendorID"
       response:
-          value: 0
+          value: vendorId
           constraints:
               type: vendor-id
-              saveAs: vendorID
 
     - label: "Reads the ApplicationName attribute"
       command: "readAttribute"
@@ -67,6 +72,7 @@ tests:
       command: "readAttribute"
       attribute: "ProductID"
       response:
+          value: productId
           constraints:
               type: uint16
 

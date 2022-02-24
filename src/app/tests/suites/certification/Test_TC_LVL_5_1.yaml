@@ -39,7 +39,7 @@ tests:
               - name: "stepMode"
                 value: 1
               - name: "stepSize"
-                value: 126
+                value: 1
               - name: "transitionTime"
                 value: 20
               - name: "optionMask"
@@ -59,7 +59,8 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 128
+          value: 1
+          saveAs: CurrentlevelValue
 
     - label: "Sends step down command to DUT"
       command: "Step"
@@ -89,13 +90,14 @@ tests:
       attribute: "current level"
       response:
           value: 64
+          notValue: CurrentlevelValue
 
     - label: "Sends a Step up command"
       command: "Step"
       arguments:
           values:
               - name: "stepMode"
-                value: 0
+                value: 1
               - name: "stepSize"
                 value: 64
               - name: "transitionTime"
@@ -117,7 +119,7 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 128
+          value: CurrentlevelValue
 
     - label: "Reset level to 254"
       command: "MoveToLevel"

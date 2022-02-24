@@ -194,7 +194,6 @@ tests:
     # Disabled because this fails on Linux because we have no Wi-Fi interface.
     - label: "Reads CurrentMaxRate attribute from DUT"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "CurrentMaxRate"
       response:
@@ -203,7 +202,6 @@ tests:
     # Disabled because this fails on Linux because we have no Wi-Fi interface.
     - label: "Reads CurrentMaxRate attribute constraints"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "CurrentMaxRate"
       response:

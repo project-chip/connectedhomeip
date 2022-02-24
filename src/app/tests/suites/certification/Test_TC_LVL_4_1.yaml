@@ -28,17 +28,12 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "reads CurrentLevel attribute from DUT"
-      command: "readAttribute"
-      attribute: "current level"
-      response:
-          value: 254
-
     - label: "reads max level attribute from DUT"
       command: "readAttribute"
       attribute: "max level"
       response:
           value: 254
+          saveAs: MaxlevelValue
 
     - label: "sends a Move up command"
       command: "Move"
@@ -47,7 +42,7 @@ tests:
               - name: "moveMode"
                 value: 0
               - name: "rate"
-                value: 200
+                value: 32
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
@@ -65,13 +60,14 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 254
+          value: MaxlevelValue
 
     - label: "reads min level attribute from DUT"
       command: "readAttribute"
       attribute: "min level"
       response:
           value: 0
+          saveAs: MinlevelValue
 
     - label: "sends a Move down command"
       command: "Move"
@@ -80,7 +76,7 @@ tests:
               - name: "moveMode"
                 value: 1
               - name: "rate"
-                value: 250
+                value: 64
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
@@ -99,21 +95,17 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
+          value: MinlevelValue
           constraints:
               minValue: 0
               maxValue: 1
-
-    - label: "Write default move rate attribute from DUT"
-      command: "writeAttribute"
-      attribute: "default move rate"
-      arguments:
-          value: 20
 
     - label: "reads default move rate attribute from DUT"
       command: "readAttribute"
       attribute: "default move rate"
       response:
           value: 20
+          saveAs: DefaultmoverateValue
 
     - label: "sends a Move up command at default move rate"
       command: "Move"

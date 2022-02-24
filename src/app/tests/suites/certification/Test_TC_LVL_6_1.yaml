@@ -58,6 +58,7 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
+          saveAs: CurrentLevelValue
           constraints:
               minValue: 0
               maxValue: 1
@@ -69,7 +70,7 @@ tests:
               - name: "moveMode"
                 value: 0
               - name: "rate"
-                value: 1
+                value: 10
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
@@ -96,6 +97,7 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
+          value: 2
           constraints:
               minValue: 2
               maxValue: 3

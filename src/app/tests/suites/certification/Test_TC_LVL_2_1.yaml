@@ -62,17 +62,17 @@ tests:
       command: "readAttribute"
       attribute: "remaining time"
       response:
-          value: 0
           constraints:
               type: uint16
+              maxValue: 16
 
     - label: "Reads the MinLevel attribute"
       command: "readAttribute"
       attribute: "min level"
       response:
-          value: 0
           constraints:
               type: uint8
+              maxValue: 8
 
     - label: "Reads the MaxLevel attribute"
       command: "readAttribute"
@@ -85,78 +85,60 @@ tests:
       command: "readAttribute"
       attribute: "current frequency"
       response:
-          value: 0
           constraints:
               type: uint16
+              maxValue: 16
 
     - label: "Reads the MinFrequency attribute"
       command: "readAttribute"
       attribute: "min frequency"
       response:
-          value: 0
           constraints:
               type: uint16
+              maxValue: 16
 
     - label: "Reads the MaxFrequency attribute"
       command: "readAttribute"
       attribute: "max frequency"
       response:
-          value: 0
           constraints:
               type: uint16
+              maxValue: 16
 
     - label: "Reads the OnOffTransitionTime attribute"
       command: "readAttribute"
       attribute: "on off transition time"
       response:
-          value: 0
           constraints:
               type: uint16
+              maxValue: 16
 
     #Disabled due to issue - #13414
-    - label: "Reads the OnLevel attribute "
-      disabled: true
-      command: "readAttribute"
-      attribute: "on level"
-      response:
-          value: null
-
     - label: "Reads the OnLevel attribute "
       command: "readAttribute"
       attribute: "on level"
       response:
           constraints:
               type: uint8
+              maxValue: 8
 
     #Disabled due to issue - #13414
-    - label: "Reads the OnTransitionTime attribute "
-      disabled: true
-      command: "readAttribute"
-      attribute: "on transition time"
-      response:
-          value: null
-
     - label: "Reads the OnTransitionTime attribute "
       command: "readAttribute"
       attribute: "on transition time"
       response:
           constraints:
               type: uint16
+              maxValue: 16
 
     #Disabled due to issue - #13414
-    - label: "Reads the OffTransitionTime attribute "
-      disabled: true
-      command: "readAttribute"
-      attribute: "off transition time"
-      response:
-          value: null
-
     - label: "Reads the OffTransitionTime attribute "
       command: "readAttribute"
       attribute: "off transition time"
       response:
           constraints:
               type: uint16
+              maxValue: 16
 
     - label: "Reads the DefaultMoveRate attribute "
       command: "readAttribute"
@@ -164,19 +146,22 @@ tests:
       response:
           constraints:
               type: uint8
+              maxValue: 8
 
+    #Bitwise operator is required
     - label: "Reads the Options attribute "
       command: "readAttribute"
       attribute: "options"
       response:
-          value: 0
           constraints:
               type: map8
+              maxValue: 8
 
     #Disabled due to issue - #13414
     - label: "Reads the StartUpCurrentLevel attribute "
-      disabled: true
       command: "readAttribute"
       attribute: "start up current level"
       response:
-          value: null
+          constraints:
+              type: uint8
+              maxValue: 8

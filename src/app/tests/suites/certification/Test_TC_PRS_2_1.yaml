@@ -91,13 +91,23 @@ tests:
       response:
           value: 0
 
-    #disabled due to issue #13442
+    #disabled due to issue #15473
     - label: "Read the optional attribute: Tolerance"
       disabled: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:
           value: 0
+
+    - label: "Read the optional constraints: Tolerance"
+      disabled: true
+      command: "readAttribute"
+      attribute: "Tolerance"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 2048
 
     - label: "Write the default values to optional attribute: Tolerance"
       disabled: true
@@ -200,6 +210,16 @@ tests:
           value: 0
       response:
           error: UNSUPPORTED_WRITE
+
+    - label: "Read the optional constraints: ScaledTolerance"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ScaledTolerance"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 2048
 
     - label: "Reads back optional attribute: ScaledTolerance"
       disabled: true
