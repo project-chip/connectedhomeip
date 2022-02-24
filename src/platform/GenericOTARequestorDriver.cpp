@@ -62,21 +62,19 @@ void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
     static_cast<GenericOTARequestorDriver *>(appState)->DriverSendQuery();
 }
 
-bool ProviderLocationsEqual(const ProviderLocation::Type &a, const ProviderLocation::Type &b)
+bool ProviderLocationsEqual(const ProviderLocation::Type & a, const ProviderLocation::Type & b)
 {
-    if((a.fabricIndex == b.fabricIndex) &&
-       (a.providerNodeID == b.providerNodeID) &&
-       (a.endpoint == b.endpoint)) {
+    if ((a.fabricIndex == b.fabricIndex) && (a.providerNodeID == b.providerNodeID) && (a.endpoint == b.endpoint))
+    {
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }
 
-void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error)
-{
-
-}
+void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) {}
 
 void GenericOTARequestorDriver::HandleIdleState()
 {
@@ -91,7 +89,8 @@ void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update
     // This implementation unconditionally downloads an available update
 
     VerifyOrDie(mRequestor != nullptr);
-    ScheduleDelayedAction(delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
+    ScheduleDelayedAction(
+        delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
 }
 
 void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
@@ -100,28 +99,28 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
 
     ProviderLocation::Type providerLocation;
 
-    switch(reason)
+    switch (reason)
+    {
+    case UpdateNotFoundReason::UpToDate:
+        return;
+        break;
+    case UpdateNotFoundReason::Busy:
+        // This will schedule a query with the same provider
+        break;
+    case UpdateNotFoundReason::ConnectionFailed:
+    case UpdateNotFoundReason::NotAvailable:
+        // IMPLEMENTATION CHOICE:
+        // This implementation schedules a query only if a different provider is available
+        if ((DetermineProviderLocation(providerLocation) != true) || ProviderLocationsEqual(providerLocation, mLastUsedProvider))
         {
-            case UpdateNotFoundReason::UpToDate:
-                return;
-                break;
-            case UpdateNotFoundReason::Busy:
-                // This will schedule a query with the same provider
-                break;
-            case UpdateNotFoundReason::ConnectionFailed:
-            case UpdateNotFoundReason::NotAvailable:
-                // IMPLEMENTATION CHOICE:
-                // This implementation schedules a query only if a different provider is available
-                if ((DetermineProviderLocation(providerLocation) != true) ||
-                     ProviderLocationsEqual(providerLocation, mLastUsedProvider)){
-                    return;
-                }
-                mRequestor->SetCurrentProviderLocation(providerLocation);
-                mLastUsedProvider = providerLocation;
-                break;
-            default:
-                return;
+            return;
         }
+        mRequestor->SetCurrentProviderLocation(providerLocation);
+        mLastUsedProvider = providerLocation;
+        break;
+    default:
+        return;
+    }
 
     if (delay < kDefaultDelayedActionTime)
     {
@@ -140,7 +139,8 @@ void GenericOTARequestorDriver::UpdateDownloaded()
 void GenericOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mImageProcessor != nullptr);
-    ScheduleDelayedAction(delay, [](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); }, this);
+    ScheduleDelayedAction(
+        delay, [](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); }, this);
 }
 
 void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
@@ -152,7 +152,8 @@ void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
         delay = kDefaultDelayedActionTime;
     }
 
-    ScheduleDelayedAction(delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
+    ScheduleDelayedAction(
+        delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
 }
 
 void GenericOTARequestorDriver::UpdateDiscontinued()
@@ -177,8 +178,8 @@ void GenericOTARequestorDriver::UpdateCancelled()
     CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
 }
 
-void GenericOTARequestorDriver::ScheduleDelayedAction(System::Clock::Seconds32 delay,
-                                                      System::TimerCompleteCallback action, void * aAppState)
+void GenericOTARequestorDriver::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
+                                                      void * aAppState)
 {
     SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState);
 }
@@ -188,8 +189,9 @@ void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallbac
     SystemLayer().CancelTimer(action, aAppState);
 }
 
-void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocationType &providerLocation,
-                                                          app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason)
+void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
+    const ProviderLocationType & providerLocation,
+    app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason)
 {
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
@@ -212,16 +214,18 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocati
     // This implementation of the OTARequestor driver ignores the announcement if an update is in progress,
     // otherwise it queries the provider passed in the announcement
 
-    if(mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle) {
-        ChipLogProgress(SoftwareUpdate, "State is not kIdle, ignoring the AnnounceOTAProviders. State: %d", (int)mRequestor->GetCurrentUpdateState());
+    if (mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle)
+    {
+        ChipLogProgress(SoftwareUpdate, "State is not kIdle, ignoring the AnnounceOTAProviders. State: %d",
+                        (int) mRequestor->GetCurrentUpdateState());
         return;
-   }
+    }
 
     // Point the OTARequestor to the announced provider
     mRequestor->SetCurrentProviderLocation(providerLocation);
     mLastUsedProvider = providerLocation;
 
-    ScheduleDelayedAction(System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, this);
+    ScheduleDelayedAction(System::Clock::Seconds32(msToStart / 1000), StartDelayTimerHandler, this);
 }
 
 void GenericOTARequestorDriver::DriverSendQuery()
@@ -244,7 +248,8 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
 
     // Determine which provider to query next
     ProviderLocation::Type providerLocation;
-    if (DetermineProviderLocation(providerLocation) != true) {
+    if (DetermineProviderLocation(providerLocation) != true)
+    {
         StartDefaultProviderTimer();
         return;
     }
@@ -257,25 +262,33 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
 
 void GenericOTARequestorDriver::StartDefaultProviderTimer()
 {
-    ChipLogProgress(SoftwareUpdate, "Starting the Default Provider timer, timeout: %u seconds", (unsigned int)mDefaultProviderTimeoutSec);
+    ChipLogProgress(SoftwareUpdate, "Starting the Default Provider timer, timeout: %u seconds",
+                    (unsigned int) mDefaultProviderTimeoutSec);
 
-    ScheduleDelayedAction( System::Clock::Seconds32(mDefaultProviderTimeoutSec),
-                           [](System::Layer *, void * context){ (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context); },
-                           this);
+    ScheduleDelayedAction(
+        System::Clock::Seconds32(mDefaultProviderTimeoutSec),
+        [](System::Layer *, void * context) {
+            (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context);
+        },
+        this);
 }
 
 void GenericOTARequestorDriver::StopDefaultProviderTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the Default Provider timer");
-    CancelDelayedAction([](System::Layer *, void * context){ (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context); },
-                                               this);
+    CancelDelayedAction(
+        [](System::Layer *, void * context) {
+            (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context);
+        },
+        this);
 }
 
 // Determines the next available Provider location and sets it in the OTARequestor
 void GenericOTARequestorDriver::DetermineAndSetProviderLocation()
 {
     ProviderLocation::Type providerLocation;
-    if (DetermineProviderLocation(providerLocation) != true) {
+    if (DetermineProviderLocation(providerLocation) != true)
+    {
         return;
     }
 
@@ -291,10 +304,10 @@ bool GenericOTARequestorDriver::DetermineProviderLocation(ProviderLocation::Type
     {
         // For now, just return the first one
         providerLocation = iterator.GetValue();
-       return true;
+        return true;
     }
 
-   return false;
+    return false;
 }
 
 } // namespace DeviceLayer
