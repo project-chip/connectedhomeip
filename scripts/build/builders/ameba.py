@@ -50,7 +50,6 @@ class AmebaApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
-
 class AmebaBuilder(Builder):
 
     def __init__(self,
@@ -63,8 +62,14 @@ class AmebaBuilder(Builder):
         self.app = app
 
     def generate(self):
-        cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh %s ninja %s %s' % (
-            self.root, self.output_dir, self.app.ExampleName)
+        cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh '
+        if self.app.ExampleName == 'pigweed-app':
+           # rpc flag: -r
+           cmd += '-r '
+
+        # <build root> <build_system> <output_directory> <application>
+        cmd += ' '.join([self.root, 'ninja', self.output_dir, self.app.ExampleName])
+
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
