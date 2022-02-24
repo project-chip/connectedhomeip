@@ -412,7 +412,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
         return;
     }
 
-    PacketDataReporter reporter(mOperationalDelegate, mCommissioningDelegate, info->Interface, mDiscoveryType, data, sDnssdCache);
+    PacketDataReporter reporter(mOperationalDelegate, mCommissioningDelegate, info->Interface, mDiscoveryType, data);
 
     if (!ParsePacket(data, &reporter))
     {
