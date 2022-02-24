@@ -265,7 +265,7 @@ exit:
     }
     else
     {
-        ChipLogProgress(AppServer, "Server Listening...");
+        ChipLogProgress(AppServer, "Server Listening on port %" PRIu16 "...", mSecuredServicePort);
     }
     return err;
 }
@@ -281,6 +281,7 @@ void Server::RejoinExistingMulticastGroups()
         auto * iterator = mGroupsProvider.IterateGroupInfo(fabric.GetFabricIndex());
         if (iterator)
         {
+            // GroupDataProvider was able to allocate rescources for an iterator
             while (iterator->Next(groupInfo))
             {
                 err = mTransports.MulticastGroupJoinLeave(
