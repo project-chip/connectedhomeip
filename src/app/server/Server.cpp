@@ -274,13 +274,11 @@ void Server::RejoinExistingMulticastGroups()
 {
     ChipLogProgress(AppServer, "Joining Multicast groups");
     CHIP_ERROR err                     = CHIP_NO_ERROR;
-    ConstFabricIterator fabricIterator = mFabrics.cbegin();
-    while (!fabricIterator.IsAtEnd())
+    for (const FabricInfo & fabric : mFabrics)
     {
-        const FabricInfo & fabric = *fabricIterator;
         Credentials::GroupDataProvider::GroupInfo groupInfo;
 
-        Credentials::GroupDataProvider::GroupInfoIterator * iterator = mGroupsProvider.IterateGroupInfo(fabric.GetFabricIndex());
+        auto * iterator = mGroupsProvider.IterateGroupInfo(fabric.GetFabricIndex());
         while (iterator->Next(groupInfo))
         {
             err = mTransports.MulticastGroupJoinLeave(
@@ -291,13 +289,12 @@ void Server::RejoinExistingMulticastGroups()
                              fabric.GetFabricIndex());
 
                 // We assume the failure is caused by a network issue or a lack of rescources; neither of which will be solved
-                // before the next join Exit the loop to save rescources
+                // before the next join. Exit the loop to save resources.
                 iterator->Release();
                 return;
             }
         }
 
-        fabricIterator++;
         iterator->Release();
     }
 }
