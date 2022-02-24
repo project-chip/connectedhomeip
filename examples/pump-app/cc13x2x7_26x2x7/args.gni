@@ -38,4 +38,8 @@ chip_bypass_rendezvous = false
 
 # Disable lock tracking, since our FreeRTOS configuration does not set
 # INCLUDE_xSemaphoreGetMutexHolder
+<<<<<<< HEAD
 chip_stack_lock_tracking = "none"
+=======
+chip_stack_lock_tracking = "none"
+>>>>>>> Disable debug and chip_Stack_lock_Tracking
