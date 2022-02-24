@@ -434,7 +434,7 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
                                              const Optional<ClusterStatus> & aClusterStatus)
 {
     StatusIB statusIB;
-    ReturnLogErrorOnFailure(PrepareStatus(aCommandPath));
+    ReturnErrorOnFailure(PrepareStatus(aCommandPath));
     CommandStatusIB::Builder & commandStatus = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus();
     StatusIB::Builder & statusIBBuilder      = commandStatus.CreateErrorStatus();
     ReturnErrorOnFailure(commandStatus.GetError());

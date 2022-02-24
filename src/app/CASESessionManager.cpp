@@ -84,14 +84,22 @@ void CASESessionManager::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData
 
     if (mConfig.dnsCache != nullptr)
     {
-        LogErrorOnFailure(mConfig.dnsCache->Insert(nodeData));
+        CHIP_ERROR err = mConfig.dnsCache->Insert(nodeData);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "DNS Cache insert: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     OperationalDeviceProxy * session = FindExistingSession(nodeData.mPeerId);
     VerifyOrReturn(session != nullptr,
                    ChipLogDetail(Controller, "OnNodeIdResolved was called for a device with no active sessions, ignoring it."));
 
-    LogErrorOnFailure(session->UpdateDeviceData(OperationalDeviceProxy::ToPeerAddress(nodeData), nodeData.GetMRPConfig()));
+    CHIP_ERROR err = session->UpdateDeviceData(OperationalDeviceProxy::ToPeerAddress(nodeData), nodeData.GetMRPConfig());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Update Service Data: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void CASESessionManager::OnOperationalNodeResolutionFailed(const PeerId & peer, CHIP_ERROR error)
