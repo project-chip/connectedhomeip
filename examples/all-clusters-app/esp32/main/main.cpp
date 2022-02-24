@@ -628,12 +628,17 @@ public:
 
 AppCallbacks sCallbacks;
 
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+
 } // namespace
 
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
     chip::Server::GetInstance().Init(&sCallbacks);
+
+    // We only have network commissioning on endpoint 0.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
