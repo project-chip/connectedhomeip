@@ -63,7 +63,9 @@ void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
     // us out of the kIdle state
     //static_cast<OTARequestor *>(appState)->mOtaRequestorDriver->StopDefaultProvidersTimer();
 
-    static_cast<OTARequestorInterface *>(appState)->SendQuery();
+    //  static_cast<OTARequestorInterface *>(appState)->SendQuery();
+
+    static_cast<GenericOTARequestorDriver *>(appState)->DriverSendQuery();
 
     // static_cast<OTARequestor *>(appState)->ConnectToProvider(OTARequestor::kQueryImage);
 }
@@ -136,7 +138,7 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
         delay = kDefaultDelayedActionTime;
     }
 
-    ScheduleDelayedAction(UpdateFailureState::kQuerying, delay, StartDelayTimerHandler, mRequestor);
+    ScheduleDelayedAction(UpdateFailureState::kQuerying, delay, StartDelayTimerHandler, this);
 }
 
 void GenericOTARequestorDriver::UpdateDownloaded()
@@ -182,7 +184,7 @@ void GenericOTARequestorDriver::UpdateCancelled()
 {
     // Cancel all OTA Update timers started by  OTARequestorDriver regardless of whether thery are running or not
     CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
-    CancelDelayedAction(StartDelayTimerHandler, mRequestor);
+    CancelDelayedAction(StartDelayTimerHandler, this);
     CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); }, this);
     CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
 }
@@ -237,7 +239,7 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocati
     mRequestor->SetCurrentProviderLocation(providerLocation);
     mLastUsedProvider = providerLocation;
 
-    ScheduleDelayedAction(UpdateFailureState::kQuerying, System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, mRequestor);
+    ScheduleDelayedAction(UpdateFailureState::kQuerying, System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, this);
 }
 
 void GenericOTARequestorDriver::DriverSendQuery()
@@ -268,8 +270,6 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
     mRequestor->SetCurrentProviderLocation(providerLocation);
     mLastUsedProvider = providerLocation;
 
-    // In this implementation the default provider timer runs only if there is no other update in progress.
-    // Nevertheless, even though no other timers should be running, call a cleanup method to be safe 
     DriverSendQuery();
 }
 

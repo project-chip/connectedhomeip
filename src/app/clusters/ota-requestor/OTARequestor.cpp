@@ -246,8 +246,11 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     }
     ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, providerLocation.endpoint);
 
-
     mOtaRequestorDriver->ProcessAnnounceOTAProviders(providerLocation, announcementReason);
+ 
+    // We are now querying a provider, leave the kIdle state. Spec doesn't define a specific state for this but we can't be in kIdle.
+    // Have to set the state after the ProcessAnnounceOTAProviders() call since it may need to know the prior state 
+    RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
