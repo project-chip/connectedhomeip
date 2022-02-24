@@ -65,6 +65,7 @@ public:
     void DriverSendQuery() override;
     // Determines the next available Provider location and sets it in the OTARequestor
     void DetermineAndSetProviderLocation() override;
+
 protected:
     void StartDefaultProviderTimer();
     void StopDefaultProviderTimer();
@@ -76,7 +77,7 @@ protected:
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
     uint32_t mOtaStartDelayMs                    = 0;
-    uint32_t mPeriodicQueryTimeInterval          = (24 * 60 * 60); // Timeout for querying providers on the default OTA provider list
+    uint32_t mPeriodicQueryTimeInterval = (24 * 60 * 60); // Timeout for querying providers on the default OTA provider list
 
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     ProviderLocationType mLastUsedProvider; // Provider location used for the last query or update
