@@ -52,7 +52,7 @@ void FailSafeContext::CommissioningFailedTimerComplete()
     }
 }
 
-CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabric, System::Clock::Timeout expiryLength)
+CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
 {
     VerifyOrReturnError(MatchedFabricIndex(accessingFabric), CHIP_ERROR_ACCESS_DENIED);
 
