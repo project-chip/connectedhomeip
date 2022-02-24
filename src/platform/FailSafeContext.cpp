@@ -40,7 +40,7 @@ void FailSafeContext::CommissioningFailedTimerComplete()
 
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.status = CHIP_ERROR_TIMEOUT;
+    event.CommissioningComplete.Status = CHIP_ERROR_TIMEOUT;
     CHIP_ERROR status                  = PlatformMgr().PostEvent(&event);
 
     mFailSafeArmed            = false;
@@ -54,9 +54,8 @@ void FailSafeContext::CommissioningFailedTimerComplete()
 
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
 {
-    VerifyOrReturnError(MatchedFabricIndex(accessingFabric), CHIP_ERROR_ACCESS_DENIED);
-
     mFailSafeArmed = true;
+    mFabricIndex = accessingFabricIndex;
     DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
