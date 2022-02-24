@@ -47,9 +47,10 @@ will then join the network.
 
 *   The following applications must be built to demonstrate the OTA process:
 
-    -   The P6 OTA Requestor App - The Updated P6 OTA Requestor App (or other
-        app) - An OTA Provider App (the Linux ota-provider app is used here) -
-        chip-tool
+          - The P6 OTA Requestor App 
+          - The Updated P6 OTA Requestor App (or other app) 
+          - An OTA Provider App (the Linux ota-provider app is used here) 
+          - chip-tool
 
 *   Build the P6 OTA Requestor application from the chip root dir:
 
@@ -101,21 +102,23 @@ will then join the network.
 -   Transfer out/ota_requestor_update_debug/chip-p6-ota-requestor-example.bin to
     a RPi4.
 
--   On the RPi: In terminal 1 run the Linux ota-provider-app as follows: \$
-    ./out/ota_provider_debug/chip-ota-provider-app -f
-    chip-p6-ota-requestor-example.bin
+-   On the RPi: In terminal 1 run the Linux ota-provider-app as follows:
+
+        $ ./out/ota_provider_debug/chip-ota-provider-app -f chip-p6-ota-requestor-example.bin
 
 -   On the RPi: In terminal 2 run the following chip-tool commands
-    $ ./out/chip-tool/chip-tool pairing ble-wifi 2 "<SSID>" "<PASSWORD>" 20202021 3840
-    $
-    ./out/chip-tool/chip-tool pairing onnetwork 1 20202021 \$
-    ./out/chip-tool/chip-tool otasoftwareupdaterequestor announce-ota-provider 1
-    0 0 0 2 0
 
--   Using a serial emulator reading from the CY8CKIT-062S2-43012, upon the
-    announce-ota-provider call being made, you should observe the updated
-    application being transferred to the board, written to flash, and, when
-    completed, booted into.
+    $ ./out/chip-tool/chip-tool pairing ble-wifi 2 "<SSID>" "<PASSWORD>" 20202021 3840
+    $ ./out/chip-tool/chip-tool pairing onnetwork 1 20202021
+    $ ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1, 2], "targets": [{"cluster": null, "endpoint": 0, "deviceType": null}]}]' 1 0
+    $ ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1, 2], "targets": [{"cluster": null, "endpoint": 0, "deviceType": null}]}]' 2 0
+    $ ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 1, "endpoint": 0}]' 2 0
+
+-   Press user button 1 on the CY8CKIT-062S2-43012. This will trigger a query-image call from the board using the default ota provider list written in the above commands.
+
+-   Using a serial emulator reading from the CY8CKIT-062S2-43012, you should
+    observe the updated application being transferred to the board, written to
+    flash, and, when completed, booted into.
 
 <a name="notes"></a>
 
