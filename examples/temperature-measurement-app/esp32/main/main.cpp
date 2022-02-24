@@ -40,6 +40,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
@@ -51,6 +52,7 @@ using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::app::Clusters;
 
 const char * TAG = "temperature-measurement-app";
 
@@ -64,10 +66,8 @@ static void InitServer(intptr_t context)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Sets it to 20C
-    int16_t value_16     = 2000;
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
-                                                 CLUSTER_MASK_SERVER, (uint8_t *) &value_16, ZCL_INT16S_ATTRIBUTE_TYPE);
-
+    int16_t temperature = 2000;
+    auto status = DeviceTemperatureConfiguration::Attributes::CurrentTemperature::Set(1, temperature);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Shell, "Temp measurement set failed");
