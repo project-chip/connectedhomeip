@@ -36,11 +36,11 @@
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
@@ -67,7 +67,7 @@ static void InitServer(intptr_t context)
 
     // Sets it to 20C
     int16_t temperature = 2000;
-    auto status = DeviceTemperatureConfiguration::Attributes::CurrentTemperature::Set(1, temperature);
+    auto status         = DeviceTemperatureConfiguration::Attributes::CurrentTemperature::Set(1, temperature);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Shell, "Temp measurement set failed");
