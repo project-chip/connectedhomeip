@@ -178,6 +178,8 @@ public:
      */
     size_t GetNumActiveReadClients();
 
+    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool

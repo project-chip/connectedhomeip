@@ -525,6 +525,22 @@ bool InteractionModelEngine::InActiveReadClientList(ReadClient * apReadClient)
     return false;
 }
 
+bool InteractionModelEngine::HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath)
+{
+    for (auto & writeHandler : mWriteHandlers)
+    {
+        if (writeHandler.IsFree() || &writeHandler == apWriteHandler)
+        {
+            continue;
+        }
+        if (writeHandler.IsConflictWrite(aPath))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
 {
     ClusterInfo * current = aClusterInfo;
