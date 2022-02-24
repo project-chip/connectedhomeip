@@ -142,8 +142,7 @@ void SwitchToggleOnOff(intptr_t context)
     data->clusterId = Clusters::OnOff::Id;
     data->commandId = Clusters::OnOff::Commands::Toggle::Id;
 
-    BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, Clusters::OnOff::Id,
-                                                                  static_cast<void *>(data));
+    BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, Clusters::OnOff::Id, static_cast<void *>(data));
 }
 
 void SwitchOnOffOn(intptr_t context)
@@ -154,8 +153,7 @@ void SwitchOnOffOn(intptr_t context)
     data->clusterId = Clusters::OnOff::Id;
     data->commandId = Clusters::OnOff::Commands::On::Id;
 
-    BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, Clusters::OnOff::Id,
-                                                                  static_cast<void *>(data));
+    BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, Clusters::OnOff::Id, static_cast<void *>(data));
 }
 
 void SwitchOnOffOff(intptr_t context)
@@ -166,8 +164,7 @@ void SwitchOnOffOff(intptr_t context)
     data->clusterId = Clusters::OnOff::Id;
     data->commandId = Clusters::OnOff::Commands::Off::Id;
 
-    BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, Clusters::OnOff::Id,
-                                                                  static_cast<void *>(data));
+    BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, Clusters::OnOff::Id, static_cast<void *>(data));
 }
 
 CHIP_ERROR InitBindingHandler()
