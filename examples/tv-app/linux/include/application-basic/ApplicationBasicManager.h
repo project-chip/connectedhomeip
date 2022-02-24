@@ -42,6 +42,8 @@ public:
         mVendorId = vendorId;
         CopyString(mApplicationVersion, sizeof(mApplicationVersion), szApplicationVersion);
         mProductId = productId;
+        mAllowedVendorList.push_back(456); // test
+        mAllowedVendorList.push_back(vendorId);
     };
     virtual ~ApplicationBasicManager(){};
 
@@ -51,6 +53,8 @@ public:
     uint16_t HandleGetProductId() override;
     CHIP_ERROR HandleGetApplicationVersion(AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetAllowedVendorList(AttributeValueEncoder & aEncoder) override;
+
+    std::list<uint16_t> GetAllowedVendorList() override { return mAllowedVendorList; };
 
 protected:
     static const int kVendorNameSize         = 32;
@@ -62,4 +66,5 @@ protected:
     char mApplicationName[kApplicationNameSize];
     uint16_t mProductId;
     char mApplicationVersion[kApplicationVersionSize];
+    std::list<uint16_t> mAllowedVendorList = {};
 };

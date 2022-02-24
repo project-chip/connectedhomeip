@@ -49,7 +49,6 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
-using namespace chip::Access;
 
 bool emberAfBasicClusterMfgSpecificPingCallback(app::CommandHandler * commandObj)
 {
@@ -116,71 +115,13 @@ class MyPincodeService : public PincodeService
 };
 MyPincodeService gMyPincodeService;
 
-// extern CHIP_ERROR LogAccessControlEvent(const Access::AccessControl::Entry & entry,
-//                                         const Access::SubjectDescriptor & subjectDescriptor,
-//                                         Controller::AccessControlCluster::ChangeTypeEnum changeType);
-
 class MyPostCommissioningListener : public PostCommissioningListener
 {
     void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) override
     {
 
-        // TODO:
-        // - the videoPlayerEndpointId chosen should come from the App Platform (determined based upon vid/pid of node)
-        // - the cluster(s) chosen should come from the App Platform
-        // - the contentAppEndpointId chosen should come from the App Platform (determined by which apps allow this vendorId)
-        // - the number of contentAppEndpointId could be 0 or more
-        // - the fabric index can't be 0, but needs to be validated
-        constexpr EndpointId kBindingClusterEndpoint = 0;
-
-        GroupId groupId                  = kUndefinedGroupId;
-        EndpointId videoPlayerEndpointId = 1;
-        EndpointId contentAppEndpointId  = 6;
-        ClusterId clusterId              = kInvalidClusterId;
-        FabricIndex fabricIndex          = 1;
-
-        ChipLogProgress(Controller, "Attempting to create ACL");
-
-        // size_t subjectIndex;
-        // size_t targetIndex;
-        Access::AccessControl::Entry::Target targets[] = {
-            { .flags    = Access::AccessControl::Entry::Target::kEndpoint,
-              .endpoint = contentAppEndpointId }, // grant access to the content app endpoint
-            { .flags    = Access::AccessControl::Entry::Target::kCluster | Access::AccessControl::Entry::Target::kEndpoint,
-              .cluster  = 0x050a,
-              .endpoint = videoPlayerEndpointId }, // 0x050a is content launcher
-        };
-
-        Access::AccessControl::Entry entry;
-        GetAccessControl().PrepareEntry(entry);
-        entry.SetAuthMode(Access::AuthMode::kCase);
-        entry.SetFabricIndex(fabricIndex);
-        entry.SetPrivilege(Access::Privilege::kOperate);
-        entry.AddSubject(nullptr, nodeId);
-        for (auto & target : targets)
-        {
-            entry.AddTarget(nullptr, target);
-        }
-
-        Access::AuthMode a;
-        FabricIndex f;
-        Access::Privilege p;
-        entry.GetAuthMode(a);
-        entry.GetFabricIndex(f);
-        entry.GetPrivilege(p);
-        ChipLogProgress(Controller, "Entry authmode=%d fabricIndex=%d privilege=%d", static_cast<int>(a), f, static_cast<int>(p));
-
-        GetAccessControl().CreateEntry(nullptr, entry, &fabricIndex);
-
-        // SubjectDescriptor subjectDescriptor = { .fabricIndex = fabricIndex, .authMode = AuthMode::kCase, .subject = nodeId };
-        // LogAccessControlEvent(entry, subjectDescriptor, Controller::AccessControlCluster::ChangeTypeEnum::kAdded);
-
-        ChipLogProgress(Controller, "Attempting to create Binding");
-
-        // todo: nodeId passed below should be this device's nodeId
-        ContentAppPlatform::GetInstance().CreateBindingWithCallback(device, kBindingClusterEndpoint, nodeId, groupId,
-                                                                    videoPlayerEndpointId, clusterId, OnSuccessResponse,
-                                                                    OnFailureResponse);
+        ContentAppPlatform::GetInstance().ManageClientAccess(device, vendorId, GetDeviceCommissioner()->GetNodeId(),
+                                                             OnSuccessResponse, OnFailureResponse);
     }
 
     /* Callback when command results in success */
