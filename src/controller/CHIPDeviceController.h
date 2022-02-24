@@ -327,6 +327,8 @@ public:
      */
     NodeId GetNodeId() const { return mLocalId.GetNodeId(); }
 
+    FabricInfo * GetFabricInfo() { return mFabricInfo; }
+
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }

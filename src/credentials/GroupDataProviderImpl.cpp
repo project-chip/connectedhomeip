@@ -1582,7 +1582,8 @@ void GroupDataProviderImpl::GroupKeyIteratorImpl::Release()
 
 constexpr size_t GroupDataProvider::EpochKey::kLengthBytes;
 
-CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, const KeySet & in_keyset)
+CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, const ByteSpan & compressed_fabric_id,
+                                            const KeySet & in_keyset)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
@@ -1609,7 +1610,7 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     {
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
         MutableByteSpan key_span(keyset.operational_keys[i].value);
-        ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, key_span));
+        ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, key_span));
         ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(key_span, keyset.operational_keys[i].hash));
     }
     if (found)
