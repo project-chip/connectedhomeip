@@ -48,7 +48,7 @@ declare_args() {
   # Enable Sleepy end device
   enable_sleepy_device = false
 
-  # OTA timeout
+  # OTA timeout in seconds
   OTA_periodic_query_timeout = 10
 
   # Wifi related stuff - they are overriden by gn -args="use_wf200=true"
