@@ -56,7 +56,7 @@ void MatterBridgedDeviceBasicClusterServerAttributeChangedCallback(const Concret
 {
     if (attributePath.mClusterId != BridgedDeviceBasic::Id)
     {
-        // This shouldn't be.
+        ChipLogError(Zcl, "MatterBridgedDeviceBasicClusterServerAttributeChangedCallback: Incorrect cluster ID");
         return;
     }
 
