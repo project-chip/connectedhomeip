@@ -337,8 +337,9 @@ public:
     CHIP_ERROR Decode(T & aArg)
     {
         mTriedDecode = true;
-        // TODO: We may want to reject kUndefinedFabricIndex for writing fabric scoped data. mAccessingFabricIndex will be
-        // kUndefinedFabricIndex on PASE sessions.
+        // The WriteRequest comes with no fabric index, this will happen when receiving a write request on a PASE session before
+        // AddNOC.
+        VerifyOrReturnError(AccessingFabricIndex() != kUndefinedFabricIndex, CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
         ReturnErrorOnFailure(DataModel::Decode(mReader, aArg));
         aArg.SetFabricIndex(AccessingFabricIndex());
         return CHIP_NO_ERROR;
