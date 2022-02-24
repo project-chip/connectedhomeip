@@ -451,7 +451,7 @@ void Instance::_OnCommissioningComplete(const DeviceLayer::ChipDeviceEvent * eve
 {
     Instance * this_ = reinterpret_cast<Instance *>(arg);
     VerifyOrReturn(event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete);
-    this_->OnCommissioningComplete(event->CommissioningComplete.status);
+    this_->OnCommissioningComplete(event->CommissioningComplete.Status);
 }
 
 void Instance::OnCommissioningComplete(CHIP_ERROR err)

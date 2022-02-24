@@ -89,7 +89,7 @@ public:
 
     CHIP_ERROR ArmFailSafe(System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
-    CHIP_ERROR CommissioningComplete();
+    CHIP_ERROR CommissioningComplete(NodeId peerNodeId);
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb);
 
     CHIP_ERROR ConnectNetworkForOperational(ByteSpan networkID);

@@ -152,7 +152,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
     server->SetFabricIndex(handle->GetFabricIndex());
 
-    CheckSuccess(server->CommissioningComplete(), Failure);
+    CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId()), Failure);
 
     Commands::CommissioningCompleteResponse::Type response;
     response.errorCode = CommissioningError::kOk;
