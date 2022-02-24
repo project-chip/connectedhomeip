@@ -45,7 +45,7 @@ public:
     }
 
     // Set the timeout (in seconds) for the Default Provider timer
-    void SetDefaultProvidersTimeoutSec(uint32_t timeout) { mDefaultProvidersTimeoutSec = timeout; }
+    void SetDefaultProvidersTimeoutSec(uint32_t timeout) { mDefaultProviderTimeoutSec = timeout; }
 
     //// Virtual methods from OTARequestorDriver
     bool CanConsent() override;
@@ -68,8 +68,8 @@ public:
     void DetermineAndSetProviderLocation() override;
    
     //// Regular methods
-    void StartDefaultProvidersTimer();
-    void StopDefaultProvidersTimer();
+    void StartDefaultProviderTimer();
+    void StopDefaultProviderTimer();
     void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
  
 private:
@@ -79,7 +79,7 @@ private:
     OTARequestorInterface      * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
     uint32_t mOtaStartDelayMs                 = 0;
-    uint32_t mDefaultProvidersTimeoutSec      = 86400;  // Timeout for the Default Provider timer
+    uint32_t mDefaultProviderTimeoutSec      = 86400;  // Timeout for the Default Provider timer
 
     using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     ProviderLocationType mLastUsedProvider; // Provider location used for the last query or update 

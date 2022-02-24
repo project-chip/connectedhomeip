@@ -248,7 +248,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 
     mOtaRequestorDriver->ProcessAnnounceOTAProviders(providerLocation, announcementReason);
  
-    // We are now querying a provider, leave the kIdle state. Spec doesn't define a specific state for this but we can't be in kIdle.
+    // We are now querying a provider, leave the kIdle state. No state matching this one fully but we can't be in kIdle.
     // Have to set the state after the ProcessAnnounceOTAProviders() call since it may need to know the prior state 
     RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
@@ -258,7 +258,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
     // We are now connecting to a provider, leave the kIdle state. 
-    // Spec doesn't define a specific state for this but we can't be in kIdle. 
+    // No state matching this one fully but we can't be in kIdle. 
     RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
     if(mOtaRequestorDriver == nullptr) {
@@ -433,7 +433,7 @@ OTARequestorInterface::OTATriggerResult OTARequestor::SendQuery()
     if (mProviderLocation.HasValue())
     {
         // We are now querying a provider, leave the kIdle state. 
-        // Spec doesn't define a specific state for this but we can't be in kIdle. 
+        // No state matches this one fully but we can't be in kIdle. 
         RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
         // Go through the driver as it has additional logic to execute
@@ -563,7 +563,7 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     OtaRequestorServerOnStateTransition(previousState, newState, reason, targetSoftwareVersion);
 
     // Inform the driver that the OTARequestor has entered the kIdle state. A driver implementation
-    // may choose to restart the default providers timer in this case
+    // may choose to restart the default provider timer in this case
     if((newState == OTAUpdateStateEnum::kIdle) && ( mCurrentUpdateState != OTAUpdateStateEnum::kIdle)) {
         // SL TODO: Make this API a general state change
         mOtaRequestorDriver->HandleIdleState();
@@ -739,7 +739,7 @@ void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDevic
 
     // TODO: Should we also send UpdateApplied here?
 
-    // Query the default provider. At the end of this query/update process the Default Providers timer is started
+    // Query the default provider. At the end of this query/update process the Default Provider timer is started
     (reinterpret_cast<OTARequestor *>(arg))->mOtaRequestorDriver->DriverSendQuery();
 }
 
