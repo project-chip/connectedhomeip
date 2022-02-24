@@ -48,6 +48,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/af-event.h>
 #include <app/util/util.h>
 
 #include <app/reporting/reporting.h>
@@ -1117,6 +1118,25 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 
-void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {}
+static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)
+{
+    /* emberAfPushEndpointNetworkIndex(endpoint); */
+    emberEventControlSetInactive(control);
+    (*callback)(endpoint);
+    /* emberAfPopNetworkIndex(); */
+}
+
+EmberEventControl ctrl;
+
+void MatterLevelControlClusterServerTickCallbackWrapperFunction(uint8_t endpoint)
+{
+    clusterTickWrapper(&ctrl, emberAfLevelControlClusterServerTickCallback, endpoint);
+}
+
+void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {
+    EmberEventData data = { &ctrl, MatterLevelControlClusterServerTickCallbackWrapperFunction };
+    EmberAfEventContext context = { .endpoint = endpoint, .clusterId = LevelControl::Id, .isClient = false, .pollControl = EMBER_AF_LONG_POLL, .sleepControl = EMBER_AF_OK_TO_SLEEP, .eventControl = &ctrl };
+    MatterRegisterAfEvent(data, "Level Control", context);
+}
 
 void MatterLevelControlPluginServerInitCallback() {}

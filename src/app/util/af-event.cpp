@@ -37,6 +37,7 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <vector>
 #include <app/util/af-event.h>
 
 #include <app/util/af.h>
@@ -54,14 +55,6 @@
 
 using namespace chip;
 
-struct EmberEventData
-{
-    /** The control structure for the event. */
-    EmberEventControl * control;
-    /** The procedure to call when the event fires. */
-    void (*handler)(void);
-};
-
 // *****************************************************************************
 // Globals
 
@@ -73,28 +66,19 @@ void emberAfPluginIasZoneClientStateMachineEventHandler(void){};
 EMBER_AF_GENERATED_EVENT_CODE
 #endif // EMBER_AF_GENERATED_EVENT_CODE
 
-#if defined(EMBER_AF_GENERATED_EVENT_CONTEXT)
-uint16_t emAfAppEventContextLength        = EMBER_AF_EVENT_CONTEXT_LENGTH;
-EmberAfEventContext emAfAppEventContext[] = { EMBER_AF_GENERATED_EVENT_CONTEXT };
-#endif // EMBER_AF_GENERATED_EVENT_CONTEXT
-
-const char * emAfEventStrings[] = {
-
-#ifdef EMBER_AF_GENERATED_EVENTS
-    EMBER_AF_GENERATED_EVENT_STRINGS
-#endif
-
-    nullptr,
+struct MatterEventMetaContext {
+    EmberAfEventContext context;
+    const char* eventString;
+    EmberEventData event;
 };
 
-EmberEventData emAfEvents[] = {
+std::vector<MatterEventMetaContext> metaContextList;
 
-#ifdef EMBER_AF_GENERATED_EVENTS
-    EMBER_AF_GENERATED_EVENTS
-#endif
-
-    { nullptr, nullptr }
-};
+void MatterRegisterAfEvent(EmberEventData data, const char* eventString, EmberAfEventContext eventContext)
+{
+    MatterEventMetaContext ctx = {eventContext, eventString, data};
+    metaContextList.push_back(ctx);
+}
 
 void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
 {
@@ -109,12 +93,13 @@ void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
             return;
         }
 
-        for (const EmberEventData & event : emAfEvents)
+        for (const auto metaContext : metaContextList)
         {
+            const EmberEventData & event = metaContext.event;
             if (event.control != control)
                 continue;
             control->status = EMBER_EVENT_INACTIVE;
-            event.handler();
+            event.handler((uint8_t)metaContext.context.endpoint);
             break;
         }
     }
@@ -130,23 +115,24 @@ void emAfInitEvents(void) {}
 
 const char * emberAfGetEventString(uint8_t index)
 {
-    return (index == 0XFF ? emAfStackEventString : emAfEventStrings[index]);
+    if ((index == 0xFF) || (index >= metaContextList.size())) {
+        return emAfStackEventString;
+    } else {
+        return metaContextList[index].eventString;
+    }
 }
 
 static EmberAfEventContext * findEventContext(EndpointId endpoint, ClusterId clusterId, bool isClient)
 {
-#if defined(EMBER_AF_GENERATED_EVENT_CONTEXT)
-    uint16_t i;
-    for (i = 0; i < emAfAppEventContextLength; i++)
+    for (auto& metaContext : metaContextList)
     {
-        EmberAfEventContext * context = &(emAfAppEventContext[i]);
-        if (context->endpoint == endpoint && context->clusterId == clusterId && context->isClient == isClient)
+        auto& context = metaContext.context;
+        if (context.endpoint == endpoint && context.clusterId == clusterId && context.isClient == isClient)
         {
-            return context;
+            return &context;
         }
     }
-#endif // EMBER_AF_GENERATED_EVENT_CONTEXT
-    return nullptr;
+    return NULL;
 }
 
 EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs)

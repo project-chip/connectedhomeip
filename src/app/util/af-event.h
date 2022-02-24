@@ -51,7 +51,15 @@
  * The main loop passes the array to ::emberRunEvents() to call
  * the handlers of any events whose time has arrived.
  */
-typedef struct EmberEventData EmberEventData;
+typedef struct
+{
+    /** The control structure for the event. */
+    EmberEventControl * control;
+    /** The procedure to call when the event fires. */
+    void (*handler)(uint8_t endpoint);
+    //void (*handler)(EmberEventControl* ctrl);
+} EmberEventData;
+
 
 // A function used to retrieve the proper NCP timer duration and unit based on a given
 // passed number of milliseconds.
@@ -76,3 +84,5 @@ bool emberEventControlGetActive(EmberEventControl * control);
 /** @brief Sets this ::EmberEventControl to run as soon as possible.
  */
 void emberEventControlSetActive(EmberEventControl * control);
+
+void MatterRegisterAfEvent(EmberEventData data, const char* eventString, EmberAfEventContext eventContext);

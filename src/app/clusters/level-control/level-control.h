@@ -59,3 +59,5 @@
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
 void emberAfPluginLevelControlClusterServerPostInitCallback(chip::EndpointId endpoint);
+
+void MatterLevelControlPluginServerInitCallback();
