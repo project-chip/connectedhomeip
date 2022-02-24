@@ -21,6 +21,17 @@
 
 namespace chip {
 
+CHIP_ERROR CASESessionManager::Init()
+{
+    if (mConfig.dnsResolver == nullptr)
+    {
+        ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
+        mDNSResolver.SetOperationalDelegate(this);
+        mConfig.dnsResolver = &mDNSResolver;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {

@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "DnssdCache.h"
 #include "Resolver.h"
 
 #include <limits>
@@ -66,14 +65,12 @@ constexpr uint16_t kMdnsPort          = 5353;
 constexpr uint16_t kDefaultTtlSeconds = 120;
 
 using namespace mdns::Minimal;
-using DnssdCacheType = Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE>;
 
 class PacketDataReporter : public ParserDelegate
 {
 public:
     PacketDataReporter(OperationalResolveDelegate * opDelegate, CommissioningResolveDelegate * commissionDelegate,
-                       chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType, const BytesRange & packet,
-                       DnssdCacheType & mdnsCache) :
+                       chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType, const BytesRange & packet) :
         mOperationalDelegate(opDelegate),
         mCommissioningDelegate(commissionDelegate), mDiscoveryType(discoveryType), mPacketRange(packet)
     {
@@ -406,9 +403,6 @@ private:
     }
     static constexpr int kMaxQnameSize = 100;
     char qnameStorage[kMaxQnameSize];
-    // should this be static?
-    // original version had:    static Dnssd::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> sIPCache;
-    DnssdCacheType sDnssdCache;
 };
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
