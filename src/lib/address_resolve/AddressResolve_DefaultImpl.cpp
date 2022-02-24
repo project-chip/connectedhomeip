@@ -95,11 +95,10 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
 
 void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLookupRequest & request)
 {
-    mRequestStartTime     = now;
-    mRequest              = request;
-    mBestResult.address   = Transport::PeerAddress();
-    mBestResult.mrpConfig = GetLocalMRPConfig();
-    mBestAddressScore     = ScoreValue(IpScore::kInvalid);
+    mRequestStartTime = now;
+    mRequest          = request;
+    mBestResult       = ResolveResult();
+    mBestAddressScore = ScoreValue(IpScore::kInvalid);
 }
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
@@ -199,7 +198,8 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
 
         result.address.SetPort(nodeData.mPort);
         result.address.SetInterface(nodeData.mInterfaceId);
-        result.mrpConfig = nodeData.GetMRPConfig();
+        result.mrpConfig   = nodeData.GetMRPConfig();
+        result.supportsTcp = nodeData.mSupportsTcp;
 
         for (size_t i = 0; i < nodeData.mNumIPs; i++)
         {

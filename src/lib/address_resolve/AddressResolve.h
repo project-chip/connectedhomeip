@@ -26,10 +26,14 @@
 namespace chip {
 namespace AddressResolve {
 
+/// Contains resolve information received from nodes. Contains all information
+/// bits that are considered useful but does not contain a full DNSSD data
+/// structure since not all DNSSD data is useful during operational processing.
 struct ResolveResult
 {
     Transport::PeerAddress address;
     ReliableMessageProtocolConfig mrpConfig;
+    bool supportsTcp = false;
 
     ResolveResult() : address(Transport::Type::kUdp), mrpConfig(GetLocalMRPConfig()) {}
 };
