@@ -218,7 +218,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         chip::MutableByteSpan icac;
 
         errorCode = _operationalCredentialsDelegate->GenerateNOCChainAfterValidation(
-            _localDeviceId, 0, ephemeralKey.Pubkey(), rcac, icac, noc);
+            _localDeviceId, /* fabricId = */ 1, ephemeralKey.Pubkey(), rcac, icac, noc);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }
