@@ -216,7 +216,13 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        chip::FabricIndex peerFabricIndex = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFabricIndex();
+        if (event->CommissioningComplete.Status != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Commissioning is not successfully Complete");
+            return;
+        }
+
+        chip::FabricIndex peerFabricIndex = event->CommissioningComplete.PeerFabricIndex;
 
         Server * server           = &(chip::Server::GetInstance());
         chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);

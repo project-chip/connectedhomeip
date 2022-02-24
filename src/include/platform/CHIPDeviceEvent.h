@@ -25,6 +25,8 @@
 #pragma once
 #include <stdint.h>
 
+#include <lib/core/DataModelTypes.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace DeviceEventType {
@@ -441,6 +443,7 @@ struct ChipDeviceEvent final
         {
             CHIP_ERROR Status;
             uint64_t PeerNodeId;
+            FabricIndex PeerFabricIndex;
         } CommissioningComplete;
 
         struct

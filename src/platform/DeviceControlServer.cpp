@@ -64,13 +64,14 @@ CHIP_ERROR DeviceControlServer::DisarmFailSafe()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId)
+CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId, FabricIndex accessingFabricIndex)
 {
     VerifyOrReturnError(CHIP_NO_ERROR == DisarmFailSafe(), CHIP_ERROR_INTERNAL);
     ChipDeviceEvent event;
-    event.Type                             = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.PeerNodeId = peerNodeId;
-    event.CommissioningComplete.Status     = CHIP_NO_ERROR;
+    event.Type                                  = DeviceEventType::kCommissioningComplete;
+    event.CommissioningComplete.PeerNodeId      = peerNodeId;
+    event.CommissioningComplete.PeerFabricIndex = accessingFabricIndex;
+    event.CommissioningComplete.Status          = CHIP_NO_ERROR;
     return PlatformMgr().PostEvent(&event);
 }
 
