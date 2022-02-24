@@ -42,16 +42,24 @@ public:
     CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
 
-    inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) { return mFailSafeArmed && MatchedFabricIndex(accessingFabricIndex); }
+    inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex)
+    {
+        return mFailSafeArmed && MatchesFabricIndex(accessingFabricIndex);
+    }
 
     inline bool IsFailSafeArmed() { return mFailSafeArmed; }
+    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) { return (accessingFabricIndex == mFabricIndex); }
     inline bool NocCommandHasBeenInvoked() { return mNocCommandHasBeenInvoked; }
     inline void SetNocCommandInvoked(FabricIndex fabricId)
     {
         mNocCommandHasBeenInvoked = true;
         mFabricIndex              = fabricId;
     }
-    inline FabricIndex GetFabricIndex() { return mFabricIndex; }
+    inline FabricIndex GetFabricIndex()
+    {
+        VerifyOrDie(mFailSafeArmed);
+        return mFabricIndex;
+    }
 
 private:
     // ===== Private members reserved for use by this class only.
@@ -62,7 +70,6 @@ private:
 
     // TODO:: Track the state of what was mutated during fail-safe.
 
-    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) { return (accessingFabricIndex == mFabricIndex); }
     static void HandleArmFailSafe(System::Layer * layer, void * aAppState);
     void CommissioningFailedTimerComplete();
 };

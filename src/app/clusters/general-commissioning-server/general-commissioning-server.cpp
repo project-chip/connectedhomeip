@@ -135,10 +135,12 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
      * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
      * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
      */
-    if (!failSafeContext.IsFailSafeArmed())
+
+    FabricIndex accessingFabricIndex = commandObj->GetAccessingFabricIndex();
+
+    if (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex))
     {
-        CheckSuccess(failSafeContext.ArmFailSafe(commandObj->GetAccessingFabricIndex(),
-                                                 System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+        CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
                      Failure);
         response.errorCode = CommissioningError::kOk;
         CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
