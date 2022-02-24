@@ -59,6 +59,7 @@ ApplicationBasic
 ApplicationId
 ApplicationIdentifier
 ApplicationLauncher
+ApplyUpdate
 applyUpdateAction
 ApplyUpdateRequest
 ApplyUpdateResponse
