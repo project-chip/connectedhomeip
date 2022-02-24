@@ -62,7 +62,7 @@ private:
 
     // TODO:: Track the state of what was mutated during fail-safe.
 
-    inline bool MatchedFabricIndex(FabricIndex accessingFabric) { return (accessingFabric == mFabricIndex); }
+    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) { return (accessingFabricIndex == mFabricIndex); }
     static void HandleArmFailSafe(System::Layer * layer, void * aAppState);
     void CommissioningFailedTimerComplete();
 };
