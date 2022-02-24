@@ -41,8 +41,7 @@ void OTARequestorDriverImpl::UpdateAvailable(const UpdateDescription & update, S
             return;
         }
     }
-    ScheduleDelayedAction(UpdateFailureState::kDownloading, delay,
-                          [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); });
+    ScheduleDelayedAction(delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); });
 }
 
 void OTARequestorDriverImpl::UpdateDownloaded()

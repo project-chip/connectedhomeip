@@ -58,16 +58,8 @@ uint16_t GenericOTARequestorDriver::GetMaxDownloadBlockSize()
 }
 
 void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
-{
-    // Cancel the default providers timer, ConnectToProvider() will immediately move
-    // us out of the kIdle state
-    //static_cast<OTARequestor *>(appState)->mOtaRequestorDriver->StopDefaultProvidersTimer();
-
-    //  static_cast<OTARequestorInterface *>(appState)->SendQuery();
-
+{  
     static_cast<GenericOTARequestorDriver *>(appState)->DriverSendQuery();
-
-    // static_cast<OTARequestor *>(appState)->ConnectToProvider(OTARequestor::kQueryImage);
 }
 
 bool ProviderLocationsEqual(const ProviderLocation::Type &a, const ProviderLocation::Type &b)
@@ -93,15 +85,13 @@ void GenericOTARequestorDriver::HandleIdleState()
     StartDefaultProvidersTimer();
 }
 
-
 void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
 {
     // IMPLEMENTATION CHOICE:
     // This implementation unconditionally downloads an available update
 
     VerifyOrDie(mRequestor != nullptr);
-    ScheduleDelayedAction(UpdateFailureState::kDownloading, delay,
-                          [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
+    ScheduleDelayedAction(delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
 }
 
 void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
@@ -138,7 +128,7 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
         delay = kDefaultDelayedActionTime;
     }
 
-    ScheduleDelayedAction(UpdateFailureState::kQuerying, delay, StartDelayTimerHandler, this);
+    ScheduleDelayedAction(delay, StartDelayTimerHandler, this);
 }
 
 void GenericOTARequestorDriver::UpdateDownloaded()
@@ -150,8 +140,7 @@ void GenericOTARequestorDriver::UpdateDownloaded()
 void GenericOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mImageProcessor != nullptr);
-    ScheduleDelayedAction(UpdateFailureState::kApplying, delay,
-                          [](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); }, this);
+    ScheduleDelayedAction(delay, [](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); }, this);
 }
 
 void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
@@ -163,8 +152,7 @@ void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
         delay = kDefaultDelayedActionTime;
     }
 
-    ScheduleDelayedAction(UpdateFailureState::kAwaitingNextAction, delay,
-                          [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
+    ScheduleDelayedAction(delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
 }
 
 void GenericOTARequestorDriver::UpdateDiscontinued()
@@ -189,16 +177,10 @@ void GenericOTARequestorDriver::UpdateCancelled()
     CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
 }
 
-    // SL TODO: Get rid of state
-void GenericOTARequestorDriver::ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay,
+void GenericOTARequestorDriver::ScheduleDelayedAction(System::Clock::Seconds32 delay,
                                                       System::TimerCompleteCallback action, void * aAppState)
 {
     SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState);
-
-    //    if (error != CHIP_NO_ERROR)
-    // {
-    //    HandleError(state, error);
-    // }
 }
 
 void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState)
@@ -239,7 +221,7 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(const ProviderLocati
     mRequestor->SetCurrentProviderLocation(providerLocation);
     mLastUsedProvider = providerLocation;
 
-    ScheduleDelayedAction(UpdateFailureState::kQuerying, System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, this);
+    ScheduleDelayedAction(System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, this);
 }
 
 void GenericOTARequestorDriver::DriverSendQuery()
@@ -277,10 +259,9 @@ void GenericOTARequestorDriver::StartDefaultProvidersTimer()
 { 
     ChipLogProgress(SoftwareUpdate, "Starting the Default Providers timer, timeout: %u seconds", (unsigned int)mDefaultProvidersTimeoutSec);   
 
-    ScheduleDelayedAction(UpdateFailureState::kIdle,
-                                               System::Clock::Seconds32(mDefaultProvidersTimeoutSec),
-                                               [](System::Layer *, void * context){ (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context); },
-                                               this);
+    ScheduleDelayedAction( System::Clock::Seconds32(mDefaultProvidersTimeoutSec),
+                           [](System::Layer *, void * context){ (static_cast<GenericOTARequestorDriver *>(context))->DefaultProviderTimerHandler(nullptr, context); },
+                           this);
 }
 
 void GenericOTARequestorDriver::StopDefaultProvidersTimer()

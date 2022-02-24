@@ -37,15 +37,7 @@ namespace chip {
 class OTARequestor : public OTARequestorInterface, public BDXDownloader::StateDelegate
 {
 public:
-    // // Various actions to take when OnConnected callback is called
-    // enum OnConnectedAction
-    // {
-    //     kQueryImage = 0,
-    //     kStartBDX,
-    //     kApplyUpdate,
-    //     kNotifyUpdateApplied,
-    // };
-
+ 
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
     //////////// OTARequestorInterface Implementation ///////////////
