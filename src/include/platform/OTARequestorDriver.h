@@ -60,14 +60,6 @@ enum class UpdateNotFoundReason
     ConnectionFailed,
 };
 
-enum class OTARequestorIncomingEvent
-{
-    AnnouncedOTAProviderReceived,
-    TriggerImmediateQueryInvoked,
-    DefaultProvidersAttrSet,
-    DefaultProvidersTimerExpiry,
-};
-
 enum class OTARequestorAction
 {
     DoNotProceed,
