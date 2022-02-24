@@ -115,6 +115,7 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(Mutab
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+
     bool useLongCode = (mPayloadContents.commissioningFlow != CommissioningFlow::kStandard);
 
     // Add two for the check digit and null terminator.
