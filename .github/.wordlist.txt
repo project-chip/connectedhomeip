@@ -340,6 +340,7 @@ DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 deviceSoftwareVersionModel
 DeviceTemperatureConfiguration
+deviceType
 DevKitC
 DevKitM
 devtype
