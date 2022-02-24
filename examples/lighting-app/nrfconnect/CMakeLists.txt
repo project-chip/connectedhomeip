@@ -132,6 +132,17 @@ pw_proto_library(button_service
     pw_protobuf.common_protos
 )
 
+pw_proto_library(descriptor_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/descriptor_service.proto
+  PREFIX
+    descriptor_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
 pw_proto_library(device_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/device_service.proto
@@ -201,6 +212,7 @@ target_include_directories(app PRIVATE
 target_compile_options(app PRIVATE
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
                        "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
@@ -209,6 +221,7 @@ target_compile_options(app PRIVATE
 target_link_libraries(app PRIVATE
   attributes_service.nanopb_rpc
   button_service.nanopb_rpc
+  descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
   lighting_service.nanopb_rpc
   thread_service.nanopb_rpc
