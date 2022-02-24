@@ -273,7 +273,7 @@ exit:
 void Server::RejoinExistingMulticastGroups()
 {
     ChipLogProgress(AppServer, "Joining Multicast groups");
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     for (const FabricInfo & fabric : mFabrics)
     {
         Credentials::GroupDataProvider::GroupInfo groupInfo;
