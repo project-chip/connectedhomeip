@@ -73,9 +73,9 @@ public:
 
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
-  
+
     using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-    void SetCurrentProviderLocation(ProviderLocationType providerLocation) { mProviderLocation.SetValue(providerLocation); }
+    void SetCurrentProviderLocation(ProviderLocationType providerLocation) override { mProviderLocation.SetValue(providerLocation); } 
 
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(
@@ -124,7 +124,7 @@ public:
     void ConnectToProvider(OnConnectedAction onConnectedAction) override;
 
     // Getter for the value of the UpdateState cached by the object
-    app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum GetCurrentUpdateState() { return mCurrentUpdateState; }
+    app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
 
     /**
      * Called to set optional requestorCanConsent value provided by Requestor.
