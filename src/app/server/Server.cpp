@@ -265,7 +265,7 @@ exit:
     }
     else
     {
-        ChipLogProgress(AppServer, "Server Listening on port %" PRIu16 "...", mSecuredServicePort);
+        ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
 }
