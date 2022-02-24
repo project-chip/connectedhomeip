@@ -71,7 +71,6 @@ BindingManager BindingManager::sBindingManager;
 
 CHIP_ERROR BindingManager::UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId)
 {
-    ChipLogError(NotSpecified, "BindingManager::UnicastBindingCreated");
     return EstablishConnection(fabricIndex, nodeId);
 }
 
