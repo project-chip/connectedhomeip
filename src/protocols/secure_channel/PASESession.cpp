@@ -856,7 +856,7 @@ CHIP_ERROR PASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
 }
 
 CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, const PayloadHeader & payloadHeader,
-                                                System::PacketBufferHandle && msg)
+                                                const System::PacketBufferHandle & msg)
 {
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -886,7 +886,7 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
 CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && msg)
 {
-    CHIP_ERROR err = ValidateReceivedMessage(exchange, payloadHeader, std::move(msg));
+    CHIP_ERROR err = ValidateReceivedMessage(exchange, payloadHeader, msg);
     SuccessOrExit(err);
 
     switch (static_cast<MsgType>(payloadHeader.GetMessageType()))
