@@ -84,6 +84,8 @@ public:
 #endif
 
     Access::Subject GetSubject() const override;
+    bool MatchSubject(const Access::Subject & subject) const override;
+    bool MatchSubject(const Access::ScopedSubject & scopedSubject) const override;
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
     bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }

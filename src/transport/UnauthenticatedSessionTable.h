@@ -75,6 +75,11 @@ public:
     void Release() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Release(); }
 
     Access::Subject GetSubject() const override { return Access::Subject(); }
+
+    bool MatchSubject(const Access::Subject & subject) const override { return false; }
+
+    bool MatchSubject(const Access::ScopedSubject & scopedSubject) const override { return false; }
+
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
         return Access::SubjectDescriptor(); // return an empty ISD for unauthenticated session.

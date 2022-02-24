@@ -27,27 +27,63 @@
 namespace chip {
 namespace Access {
 
-struct PaseSubject
+// An wildcard subject to grant access based on Authentication Mode
+class WildcardSubject
 {
+public:
+    WildcardSubject(Access::AuthMode authMode) : mAuthMode(authMode) {}
+    Access::AuthMode GetAuthMode() const { return mAuthMode; }
+    bool Match(const WildcardSubject & that) const { return mAuthMode == that.mAuthMode; }
+
+private:
+    const Access::AuthMode mAuthMode;
+};
+
+class PaseSubject
+{
+public:
     static constexpr uint16_t kPasscodeId = 0;
-    bool operator==(const PaseSubject & that) const { return true; }
+    bool Match(const PaseSubject & that) const { return true; }
 };
 
-struct NodeSubject
+class NodeSubject
 {
-    NodeSubject(NodeId aNodeId) : nodeId(aNodeId) {}
-    NodeId nodeId;
-    bool operator==(const NodeSubject & that) const { return nodeId == that.nodeId; }
+public:
+    NodeSubject(NodeId nodeId) : mNodeId(nodeId) {}
+    NodeId GetNodeId() const { return mNodeId; }
+    bool Match(const NodeSubject & that) const { return mNodeId == that.mNodeId; }
+
+private:
+    const NodeId mNodeId;
 };
 
-struct GroupSubject
+class GroupSubject
 {
-    GroupSubject(GroupId aGroupId) : groupId(aGroupId) {}
-    GroupId groupId;
-    bool operator==(const GroupSubject & that) const { return groupId == that.groupId; }
+public:
+    GroupSubject(GroupId groupId) : mGroupId(groupId) {}
+    GroupId GetGroupId() const { return mGroupId; }
+    bool Match(const GroupSubject & that) const { return mGroupId == that.mGroupId; }
+
+private:
+    const GroupId mGroupId;
 };
 
-class OperationalNodeId;
+class CaseAuthenticatedTagSubject
+{
+public:
+    CaseAuthenticatedTagSubject(uint16_t caseAuthenticatedTag, uint16_t version) :
+        mCaseAuthenticatedTag(caseAuthenticatedTag), mVersion(version)
+    {}
+    uint16_t GetCaseAuthenticatedTag() const { return mCaseAuthenticatedTag; }
+    bool Match(const CaseAuthenticatedTagSubject & that) const
+    {
+        return mVersion >= that.mVersion && mCaseAuthenticatedTag == that.mCaseAuthenticatedTag;
+    }
+
+private:
+    const uint16_t mCaseAuthenticatedTag;
+    const uint16_t mVersion;
+};
 
 /** A scoped subject is a unique identifier with-in a fabric scope. */
 class ScopedSubject
@@ -68,44 +104,70 @@ public:
 
     Access::AuthMode GetAuthMode() const
     {
-        if (mSubject.Is<PaseSubject>())
+        if (!mSubject.Is<WildcardSubject>())
         {
-            return Access::AuthMode::kPase;
-        }
-        else if (mSubject.Is<NodeSubject>())
-        {
-            return Access::AuthMode::kCase;
-        }
-        else if (mSubject.Is<GroupSubject>())
-        {
-            return Access::AuthMode::kGroup;
+            if (mSubject.Is<PaseSubject>())
+            {
+                return Access::AuthMode::kPase;
+            }
+            else if (mSubject.Is<NodeSubject>() || mSubject.Is<CaseAuthenticatedTagSubject>())
+            {
+                return Access::AuthMode::kCase;
+            }
+            else if (mSubject.Is<GroupSubject>())
+            {
+                return Access::AuthMode::kGroup;
+            }
+            else
+            {
+                return Access::AuthMode::kNone;
+            }
         }
         else
         {
-            return Access::AuthMode::kNone;
+            return mSubject.Get<WildcardSubject>().GetAuthMode();
         }
     }
 
 #if CHIP_DETAIL_LOGGING
     const char * GetAuthModeString() const
     {
-        switch (GetAuthMode())
+        if (!mSubject.Is<WildcardSubject>())
         {
-        case Access::AuthMode::kPase:
-            return "Pase";
-        case Access::AuthMode::kCase:
-            return "Case";
-        case Access::AuthMode::kGroup:
-            return "Group";
-        case Access::AuthMode::kNone:
-        default:
-            return "None";
+            switch (GetAuthMode())
+            {
+            case Access::AuthMode::kPase:
+                return "Pase";
+            case Access::AuthMode::kCase:
+                return "Case";
+            case Access::AuthMode::kGroup:
+                return "Group";
+            case Access::AuthMode::kNone:
+            default:
+                return "None";
+            }
+        }
+        else
+        {
+            return "Wildcard";
+        }
+    }
+
+    uint64_t GetSubjectIdLogValue() const
+    {
+        if (!mSubject.Is<WildcardSubject>())
+        {
+            return GetSubjectId();
+        }
+        else
+        {
+            return static_cast<uint64_t>(mSubject.Get<WildcardSubject>().GetAuthMode());
         }
     }
 #endif // CHIP_DETAIL_LOGGING
 
-    /** Return subject value described in spec */
-    uint64_t GetValue() const
+    /** Return SubjectId value  */
+    uint64_t GetSubjectId() const
     {
         if (mSubject.Is<PaseSubject>())
         {
@@ -113,28 +175,73 @@ public:
         }
         else if (mSubject.Is<NodeSubject>())
         {
-            return mSubject.Get<NodeSubject>().nodeId;
+            return mSubject.Get<NodeSubject>().GetNodeId();
+        }
+        else if (mSubject.Is<CaseAuthenticatedTagSubject>())
+        {
+            return kCaseAuthenticatedTagBase ||
+                (static_cast<uint64_t>(mSubject.Get<CaseAuthenticatedTagSubject>().GetCaseAuthenticatedTag()) << 16);
         }
         else if (mSubject.Is<GroupSubject>())
         {
-            return static_cast<uint64_t>(mSubject.Get<GroupSubject>().groupId) << 48;
+            return static_cast<uint64_t>(mSubject.Get<GroupSubject>().GetGroupId()) << 48;
         }
         else
         {
-            return std::numeric_limits<uint64_t>::max();
+            VerifyOrDie(false);
+            return kUndefinedNodeId;
         }
     }
 
-    bool operator==(const ScopedSubject & that) const { return mSubject == that.mSubject; }
+    // Match a subject retrieved from a session (this) against a subject in an ACL entry (that).
+    bool Match(const ScopedSubject & that) const
+    {
+        VerifyOrDie(!mSubject.Is<WildcardSubject>());
+        if (that.mSubject.Is<WildcardSubject>())
+        {
+            return that.mSubject.Get<WildcardSubject>().GetAuthMode() == GetAuthMode();
+        }
+
+        if (mSubject.GetType() != that.mSubject.GetType())
+        {
+            return false;
+        }
+
+        if (mSubject.Is<PaseSubject>())
+        {
+            return mSubject.Get<PaseSubject>().Match(that.mSubject.Get<PaseSubject>());
+        }
+        else if (mSubject.Is<NodeSubject>())
+        {
+            return mSubject.Get<NodeSubject>().Match(that.mSubject.Get<NodeSubject>());
+        }
+        else if (mSubject.Is<CaseAuthenticatedTagSubject>())
+        {
+            return mSubject.Get<CaseAuthenticatedTagSubject>().Match(that.mSubject.Get<CaseAuthenticatedTagSubject>());
+        }
+        else if (mSubject.Is<GroupSubject>())
+        {
+            return mSubject.Get<GroupSubject>().Match(that.mSubject.Get<GroupSubject>());
+        }
+        else
+        {
+            VerifyOrDie(false);
+            return false;
+        }
+    }
 
 private:
-    Variant<PaseSubject, NodeSubject, GroupSubject> mSubject;
+    Variant<PaseSubject, NodeSubject, GroupSubject, CaseAuthenticatedTagSubject, WildcardSubject> mSubject;
+
+    static constexpr const uint64_t kCaseAuthenticatedTagBase = 0xFFFFFFFD00000000ull;
 };
 
+class OperationalNodeId;
+
 /**
- * A subject is a global unique identifier. It serves 2 purposes:
+ * A subject is a unique subject identifier within the context of a given node. It serves 2 purposes:
  *
- *  1. Identify an entity. operator== can be used to check if 2 subjects are identical.
+ *  1. Identify an entity. Match function can be used to check if a subject matches another subject.
  *  2. Associate to ACL entries to grant privileges
  */
 class Subject
@@ -162,21 +269,20 @@ public:
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
     const ScopedSubject & GetScopedSubject() const { return mScopedSubject; }
 
-    bool operator==(const Subject & that) const
+    // Match a subject retrieved from a session (this) against a subject in an ACL entry (that).
+    bool Match(const Subject & that) const
     {
-        return mFabricIndex == that.mFabricIndex && mScopedSubject == that.mScopedSubject;
+        return mFabricIndex == that.mFabricIndex && mScopedSubject.Match(that.mScopedSubject);
     }
 
 private:
     FabricIndex mFabricIndex;
     ScopedSubject mScopedSubject;
-
-    friend bool operator==(const Subject &, const OperationalNodeId &);
 };
 
 /**
- * OperationalNodeId identifies an individual Node on a Fabric. It is a special type of Subject targeting to NodeSubject. It is
- * interchangeable with the generic Subject type but uses less memory.
+ * OperationalNodeId identifies an individual node on a fabric from the point of view of some specific node. It can be converted to
+ * a subject to be matched against another subject (probably retrieved from a session).
  */
 class OperationalNodeId
 {
@@ -191,18 +297,8 @@ private:
     FabricIndex mFabricIndex;
     NodeId mNodeId;
 
-    bool operator==(const OperationalNodeId & that) const
-    {
-        return mFabricIndex == that.mFabricIndex && mNodeId == that.mNodeId;
-    }
-
-    friend bool operator==(const Subject &, const OperationalNodeId &);
+    bool operator==(const OperationalNodeId & that) const { return mFabricIndex == that.mFabricIndex && mNodeId == that.mNodeId; }
 };
-
-inline bool operator==(const Subject & subject, const OperationalNodeId & node)
-{
-    return subject.mFabricIndex == node.mFabricIndex && subject.mScopedSubject == ScopedSubject::Create<NodeSubject>(node.mNodeId);
-}
 
 } // namespace Access
 } // namespace chip

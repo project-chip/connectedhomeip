@@ -64,8 +64,11 @@ public:
     virtual void Retain() {}
     virtual void Release() {}
 
-    virtual Access::Subject GetSubject() const                         = 0;
-    virtual Access::SubjectDescriptor GetSubjectDescriptor() const     = 0;
+    virtual Access::Subject GetSubject() const                                   = 0;
+    virtual bool MatchSubject(const Access::Subject & subject) const             = 0;
+    virtual bool MatchSubject(const Access::ScopedSubject & scopedSubject) const = 0;
+    virtual Access::SubjectDescriptor GetSubjectDescriptor() const               = 0;
+
     virtual bool RequireMRP() const                                    = 0;
     virtual const ReliableMessageProtocolConfig & GetMRPConfig() const = 0;
     virtual System::Clock::Milliseconds32 GetAckTimeout() const        = 0;

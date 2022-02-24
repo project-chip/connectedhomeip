@@ -43,6 +43,16 @@ public:
         return Access::Subject::Create<Access::GroupSubject>(GetFabricIndex(), mGroupId);
     }
 
+    bool MatchSubject(const Access::Subject & subject) const override
+    {
+        return Access::Subject::Create<Access::GroupSubject>(GetFabricIndex(), mGroupId).Match(subject);
+    }
+
+    bool MatchSubject(const Access::ScopedSubject & scopedSubject) const override
+    {
+        return Access::ScopedSubject::Create<Access::GroupSubject>(mGroupId).Match(scopedSubject);
+    }
+
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
         Access::SubjectDescriptor subjectDescriptor;

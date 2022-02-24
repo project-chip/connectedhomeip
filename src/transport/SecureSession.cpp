@@ -37,6 +37,37 @@ Access::Subject SecureSession::GetSubject() const
     }
 }
 
+bool SecureSession::MatchSubject(const Access::Subject & subject) const
+{
+    return GetFabricIndex() == subject.GetFabricIndex() && MatchSubject(subject.GetScopedSubject());
+}
+
+bool SecureSession::MatchSubject(const Access::ScopedSubject & scopedSubject) const
+{
+    if (IsOperationalNodeId(mPeerNodeId))
+    {
+        if (Access::ScopedSubject::Create<Access::NodeSubject>(mPeerNodeId).Match(scopedSubject))
+        {
+            return true;
+        }
+    }
+    else if (IsPAKEKeyId(mPeerNodeId))
+    {
+        if (Access::ScopedSubject::Create<Access::PaseSubject>().Match(scopedSubject))
+        {
+            return true;
+        }
+    }
+    else
+    {
+        VerifyOrDie(false);
+        return false;
+    }
+
+    // TODO: match againse CATs
+    return false;
+}
+
 Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
 {
     Access::SubjectDescriptor subjectDescriptor;
