@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/EventLogging.h>
 #include <app/util/af-enums.h>
 #include <app/util/basic-types.h>
@@ -28,6 +29,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BridgedDeviceBasic;
 
 namespace {
@@ -52,6 +54,12 @@ void ReachableChanged(EndpointId endpointId)
 
 void MatterBridgedDeviceBasicClusterServerAttributeChangedCallback(const ConcreteAttributePath & attributePath)
 {
+    if (attributePath.mClusterId != BridgedDeviceBasic::Id)
+    {
+        ChipLogError(Zcl, "MatterBridgedDeviceBasicClusterServerAttributeChangedCallback: Incorrect cluster ID");
+        return;
+    }
+
     switch (attributePath.mAttributeId)
     {
     case Attributes::Reachable::Id:
