@@ -24,7 +24,7 @@
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <lib/dnssd/Resolver.h>
 
-class Resolve : public DiscoverCommand, public chip::Dnssd::ResolverDelegate
+class Resolve : public DiscoverCommand, public chip::Dnssd::OperationalResolveDelegate
 {
 public:
     Resolve(CredentialIssuerCommands * credsIssuerConfig) : DiscoverCommand("resolve", credsIssuerConfig) {}
@@ -33,13 +33,13 @@ public:
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
         ReturnErrorOnFailure(mDNSResolver.Init(chip::DeviceLayer::UDPEndPointManager()));
-        mDNSResolver.SetResolverDelegate(this);
+        mDNSResolver.SetOperationalDelegate(this);
         ChipLogProgress(chipTool, "Dnssd: Searching for NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
         return mDNSResolver.ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetCompressedFabricId(fabricId),
                                           chip::Inet::IPAddressType::kAny);
     }
 
-    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override
+    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override
     {
         char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
 
@@ -65,12 +65,11 @@ public:
         SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
+    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "NodeId Resolution: failed!");
         SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     }
-    void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override {}
 
 private:
     chip::Dnssd::ResolverProxy mDNSResolver;
