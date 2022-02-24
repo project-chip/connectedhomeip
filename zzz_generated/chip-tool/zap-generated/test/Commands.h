@@ -96015,6 +96015,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Map Group Key Set to group ID on a given fabric\n");
             err = TestMapGroupKeySetToGroupIdOnAGivenFabric_3();
             break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Install ACLs for test\n");
+            err = TestInstallACLsForTest_4();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -96026,7 +96030,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -96046,6 +96050,13 @@ private:
     }
 
     static void OnSuccessCallback_3(void * context) { (static_cast<TestGroupDemoConfigSuite *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupDemoConfigSuite *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context) { (static_cast<TestGroupDemoConfigSuite *>(context))->OnSuccessResponse_4(); }
 
     //
     // Tests methods
@@ -96102,7 +96113,7 @@ private:
 
         request.groupKeySet.groupKeySetID = 417U;
         request.groupKeySet.groupKeySecurityPolicy =
-            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(1);
         request.groupKeySet.epochKey0.SetNonNull();
         request.groupKeySet.epochKey0.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
@@ -96180,6 +96191,55 @@ private:
     }
 
     void OnSuccessResponse_3() { NextTest(); }
+
+    CHIP_ERROR TestInstallACLsForTest_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 1;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
+
+            listHolder_0->mList[1].fabricIndex = 1;
+            listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
+            listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
+            listHolder_0->mList[1].subjects.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<uint64_t>(1);
+                listFreer.add(listHolder_3);
+                listHolder_3->mList[0]                  = 257ULL;
+                listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 1);
+            }
+            listHolder_0->mList[1].targets.SetNull();
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 2);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4() { NextTest(); }
 };
 
 class Test_TC_BDX_1_1Suite : public TestCommand
