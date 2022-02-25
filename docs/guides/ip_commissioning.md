@@ -64,7 +64,7 @@ This will discover, connect over IP with the code from the QR and resolve.
 ### chip-tool
 
 You can connect using chip-tool either using the setup codes or by discovering
-the device on the network using one of the mdns subtypes. To get a list of the
+the device on the network using one of the mDNS sub types. To get a list of the
 available options run
 
 ```
