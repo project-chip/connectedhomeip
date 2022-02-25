@@ -33,7 +33,7 @@ void ActiveResolveAttempts::Reset()
 {
     for (auto & item : mRetryQueue)
     {
-        item.peerId.SetNodeId(kUndefinedNodeId);
+        item.attempt.Clear();
     }
 }
 
@@ -41,9 +41,9 @@ void ActiveResolveAttempts::Complete(const PeerId & peerId)
 {
     for (auto & item : mRetryQueue)
     {
-        if (item.peerId == peerId)
+        if (item.attempt.Matches(peerId))
         {
-            item.peerId.SetNodeId(kUndefinedNodeId);
+            item.attempt.Clear();
             return;
         }
     }
@@ -53,7 +53,30 @@ void ActiveResolveAttempts::Complete(const PeerId & peerId)
     ChipLogProgress(Discovery, "Discovered node without a pending query");
 }
 
-void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
+void ActiveResolveAttempts::Complete(const chip::Dnssd::DiscoveredNodeData & data)
+{
+    for (auto & item : mRetryQueue)
+    {
+        if (item.attempt.Matches(data))
+        {
+            item.attempt.Clear();
+            return;
+        }
+    }
+}
+
+void ActiveResolveAttempts::MarkPending(const chip::PeerId & peerId)
+{
+    ScheduledAttempt attempt(peerId, true);
+    MarkPending(attempt);
+}
+void ActiveResolveAttempts::MarkPending(const chip::Dnssd::DiscoveryFilter & filter, const chip::Dnssd::DiscoveryType type)
+{
+    ScheduledAttempt attempt(filter, type, true);
+    MarkPending(attempt);
+}
+
+void ActiveResolveAttempts::MarkPending(const ScheduledAttempt & attempt)
 {
     // Strategy when picking the peer id to use:
     //   1 if a matching peer id is already found, use that one
@@ -66,27 +89,27 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
 
     for (size_t i = 1; i < kRetryQueueSize; i++)
     {
-        if (entryToUse->peerId == peerId)
+        if (entryToUse->attempt.Matches(attempt))
         {
             break; // best match possible
         }
 
         RetryEntry * entry = mRetryQueue + i;
 
-        // Rule 1: peer id match always matches
-        if (entry->peerId == peerId)
+        // Rule 1: attempt match always matches
+        if (entry->attempt.Matches(attempt))
         {
             entryToUse = entry;
             continue;
         }
 
         // Rule 2: select unused entries
-        if ((entryToUse->peerId.GetNodeId() != kUndefinedNodeId) && (entry->peerId.GetNodeId() == kUndefinedNodeId))
+        if (!entryToUse->attempt.IsEmpty() && entry->attempt.IsEmpty())
         {
             entryToUse = entry;
             continue;
         }
-        else if (entryToUse->peerId.GetNodeId() == kUndefinedNodeId)
+        else if (entryToUse->attempt.IsEmpty())
         {
             continue;
         }
@@ -106,7 +129,7 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
         }
     }
 
-    if ((entryToUse->peerId.GetNodeId() != kUndefinedNodeId) && (entryToUse->peerId != peerId))
+    if ((!entryToUse->attempt.IsEmpty()) && (!entryToUse->attempt.Matches(attempt)))
     {
         // TODO: node was evicted here, if/when resolution failures are
         // supported this could be a place for error callbacks
@@ -118,8 +141,7 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
         ChipLogError(Discovery, "Re-using pending resolve entry before reply was received.");
     }
 
-    entryToUse->peerId         = peerId;
-    entryToUse->firstSend      = true;
+    entryToUse->attempt        = attempt;
     entryToUse->queryDueTime   = mClock->GetMonotonicTimestamp();
     entryToUse->nextRetryDelay = System::Clock::Seconds16(1);
 }
@@ -132,7 +154,7 @@ Optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpected
 
     for (auto & entry : mRetryQueue)
     {
-        if (entry.peerId.GetNodeId() == kUndefinedNodeId)
+        if (entry.attempt.IsEmpty())
         {
             continue;
         }
@@ -153,13 +175,13 @@ Optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpected
     return minDelay;
 }
 
-Optional<ActiveResolveAttempts::ScheduledResolve> ActiveResolveAttempts::NextScheduledPeer()
+Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextScheduled()
 {
     chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
     for (auto & entry : mRetryQueue)
     {
-        if (entry.peerId.GetNodeId() == kUndefinedNodeId)
+        if (entry.attempt.IsEmpty())
         {
             continue; // not a pending item
         }
@@ -172,20 +194,25 @@ Optional<ActiveResolveAttempts::ScheduledResolve> ActiveResolveAttempts::NextSch
         if (entry.nextRetryDelay > kMaxRetryDelay)
         {
             ChipLogError(Discovery, "Timeout waiting for mDNS resolution.");
-            entry.peerId.SetNodeId(kUndefinedNodeId);
+            entry.attempt.Clear();
             continue;
         }
 
         entry.queryDueTime = now + entry.nextRetryDelay;
         entry.nextRetryDelay *= 2;
 
-        ScheduledResolve result(entry);
-        entry.firstSend = false;
+        Optional<ScheduledAttempt> attempt = MakeOptional(entry.attempt);
+        ChipLogError(Controller, "sending back attempt %d %d", (int) entry.attempt.attemptType, entry.attempt.firstSend);
+        if (entry.attempt.attemptType == ScheduledAttempt::kResolve)
+        {
+            ChipLogError(Controller, "peer id = %" PRIX64, entry.attempt.peerId.GetNodeId());
+        }
+        entry.attempt.firstSend = false;
 
-        return Optional<ScheduledResolve>::Value(result);
+        return attempt;
     }
 
-    return Optional<ScheduledResolve>::Missing();
+    return Optional<ScheduledAttempt>::Missing();
 }
 
 } // namespace Minimal
