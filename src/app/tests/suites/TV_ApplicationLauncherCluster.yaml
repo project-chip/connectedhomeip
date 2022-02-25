@@ -34,13 +34,11 @@ tests:
       response:
           value: [123, 456]
 
-    # TODO: Enable once attribute struct is supported
     - label: "Read attribute application launcher app"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentApp"
       response:
-          value: { catalogVendorId: 123, applicationId: "applicationId" }
+          value: null
 
     - label: "Launch App Command"
       command: "launchApp"

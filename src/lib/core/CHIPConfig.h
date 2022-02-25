@@ -1516,7 +1516,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of GroupState entries to support per fabric
  */
 #ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 2
+#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 3
 #endif
 
 /**

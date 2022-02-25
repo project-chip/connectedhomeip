@@ -76,15 +76,15 @@ public:
     // cleared, UpdateState is reset to Idle
     void CancelImageUpdate() override;
 
-    // Retrieve the default OTA provider list as an encoded list
-    CHIP_ERROR GetDefaultOtaProviderList(app::AttributeValueEncoder & encoder) override;
-
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
 
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(
-        app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type const & providerLocation) override;
+        const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) override;
+
+    // Retrieve an iterator to the cached default OTA provider list
+    ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
@@ -205,9 +205,14 @@ private:
     };
 
     /**
-     * Update the cached default OTA provider location (with a value from the default list) to use for the next periodic query
+     * Set the cached default OTA provider location to use for the next query
      */
-    void UpdateDefaultProviderLocation(void);
+    bool SetDefaultProviderLocation(const ProviderLocationType & providerLocation);
+
+    /**
+     * Clear the cached default OTA provider location to indicate no OTA update may be in progress
+     */
+    bool ClearDefaultProviderLocation(void);
 
     /**
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
@@ -290,7 +295,7 @@ private:
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
     Server * mServer                       = nullptr;
     chip::Optional<bool> mRequestorCanConsent;
-    ObjectPool<ProviderLocationType, CHIP_CONFIG_MAX_FABRICS> mDefaultOtaProviderList;
+    ProviderLocationList mDefaultOtaProviderList;
     Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current update in progress
 };
 

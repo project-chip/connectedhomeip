@@ -686,28 +686,15 @@ class ChipClusters:
             "clusterName": "Binding",
             "clusterId": 0x0000001E,
             "commands": {
-            0x00000000: {
-                    "commandId": 0x00000000,
-                    "commandName": "Bind",
-                    "args": {
-                        "nodeId": "int",
-                        "groupId": "int",
-                        "endpointId": "int",
-                        "clusterId": "int",
-                    },
-                },
-            0x00000001: {
-                    "commandId": 0x00000001,
-                    "commandName": "Unbind",
-                    "args": {
-                        "nodeId": "int",
-                        "groupId": "int",
-                        "endpointId": "int",
-                        "clusterId": "int",
-                    },
-                },
             },
             "attributes": {
+                0x00000000: {
+                    "attributeName": "Binding",
+                    "attributeId": 0x00000000,
+                    "type": "",
+                    "reportable": True,
+                    "writable": True,
+                },
                 0x0000FFF8: {
                     "attributeName": "ServerGeneratedCommandList",
                     "attributeId": 0x0000FFF8,
@@ -1012,6 +999,12 @@ class ChipClusters:
                     "attributeName": "Reachable",
                     "attributeId": 0x00000011,
                     "type": "bool",
+                    "reportable": True,
+                },
+                0x00000012: {
+                    "attributeName": "UniqueID",
+                    "attributeId": 0x00000012,
+                    "type": "str",
                     "reportable": True,
                 },
                 0x0000FFF8: {

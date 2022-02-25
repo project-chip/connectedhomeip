@@ -28,32 +28,6 @@
 
 #include "enums.h"
 
-// Struct for SimpleStruct
-typedef struct _SimpleStruct
-{
-    uint8_t a;
-    bool b;
-    uint8_t c;
-    chip::ByteSpan d;
-    chip::CharSpan e;
-    uint8_t f;
-    float g;
-    double h;
-} SimpleStruct;
-
-// Struct for TestFabricScoped
-typedef struct _TestFabricScoped
-{
-    chip::FabricIndex fabricIndex;
-    uint8_t fabricSensitiveInt8u;
-    uint8_t optionalFabricSensitiveInt8u;
-    uint8_t nullableFabricSensitiveInt8u;
-    uint8_t nullableOptionalFabricSensitiveInt8u;
-    chip::CharSpan fabricSensitiveCharString;
-    SimpleStruct fabricSensitiveStruct;
-    /* TYPE WARNING: array array defaults to */ uint8_t * fabricSensitiveInt8uList;
-} TestFabricScoped;
-
 // Struct for Dimension
 typedef struct _Dimension
 {
@@ -68,6 +42,19 @@ typedef struct _AdditionalInfo
     chip::CharSpan name;
     chip::CharSpan value;
 } AdditionalInfo;
+
+// Struct for SimpleStruct
+typedef struct _SimpleStruct
+{
+    uint8_t a;
+    bool b;
+    uint8_t c;
+    chip::ByteSpan d;
+    chip::CharSpan e;
+    uint8_t f;
+    float g;
+    double h;
+} SimpleStruct;
 
 // Struct for NullablesAndOptionalsStruct
 typedef struct _NullablesAndOptionalsStruct
@@ -521,6 +508,22 @@ typedef struct _TargetInfo
     uint8_t identifier;
     chip::CharSpan name;
 } TargetInfo;
+
+// Struct for TargetStruct
+typedef struct _TargetStruct
+{
+    chip::FabricIndex FabricIndex;
+    chip::NodeId Node;
+    chip::GroupId Group;
+    chip::EndpointId Endpoint;
+    chip::ClusterId Cluster;
+} TargetStruct;
+
+// Struct for TestFabricScoped
+typedef struct _TestFabricScoped
+{
+    chip::FabricIndex fabricIndex;
+} TestFabricScoped;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet

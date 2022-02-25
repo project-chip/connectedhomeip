@@ -64,7 +64,7 @@ if [ "$#" == "0" ]; then
         setupDiscriminator
             Discriminatoor value used for BLE connexion. (Default 3840)
         setupPinCode
-            PIN code for PASE session establishment. (Default 73141520)
+            PIN code for PASE session establishment. (Default 20202021)
         enable_sleepy_device
             Enable Sleepy end device. (Default false)
             Must also set chip_openthread_ftd=false
@@ -74,7 +74,8 @@ if [ "$#" == "0" ]; then
             Build wifi example with extension board wf200. (Default false)
         'import("//with_pw_rpc.gni")'
             Use to build the example with pigweed RPC
-
+        OTA_periodic_query_timeout
+            Periodic query timeout variable for OTA in seconds
         Presets
         --sed
             enable sleepy end device and set thread mtd

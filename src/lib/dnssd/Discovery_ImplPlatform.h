@@ -68,8 +68,6 @@ private:
     DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
 
     CHIP_ERROR InitImpl();
-    CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
-    CHIP_ERROR PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
 
     static void HandleDnssdInit(void * context, CHIP_ERROR initError);
     static void HandleDnssdError(void * context, CHIP_ERROR initError);
@@ -80,8 +78,8 @@ private:
     CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
                               size_t subTypeSize, const CommissionAdvertisingParameters & params);
     CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
-                              size_t subTypeSize, uint16_t port, const chip::ByteSpan & mac, DnssdServiceProtocol procotol,
-                              PeerId peerId);
+                              size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
+                              DnssdServiceProtocol procotol, PeerId peerId);
 
     OperationalAdvertisingParameters mOperationalNodeAdvertisingParams;
     CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;

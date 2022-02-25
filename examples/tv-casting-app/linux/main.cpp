@@ -21,8 +21,8 @@
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/SafeInt.h>
@@ -121,6 +121,9 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
  */
 void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr)
 {
+    // DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_tv_casting_kvs");
+    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+
     // Enter commissioning mode, open commissioning window
     Server::GetInstance().Init();
     Server::GetInstance().GetFabricTable().DeleteAllFabrics();
@@ -213,8 +216,13 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        chip::NodeId tvNodeId             = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr().GetPeerNodeId();
-        chip::FabricIndex peerFabricIndex = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFabricIndex();
+        if (event->CommissioningComplete.Status != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Commissioning is not successfully Complete");
+            return;
+        }
+
+        chip::FabricIndex peerFabricIndex = event->CommissioningComplete.PeerFabricIndex;
 
         Server * server           = &(chip::Server::GetInstance());
         chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);
@@ -232,7 +240,7 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
             .clientPool     = &gCASEClientPool,
         };
 
-        PeerId peerID = fabric->GetPeerIdForNode(tvNodeId);
+        PeerId peerID = fabric->GetPeerIdForNode(event->CommissioningComplete.PeerNodeId);
         chip::OperationalDeviceProxy * operationalDeviceProxy =
             chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
         if (operationalDeviceProxy == nullptr)
@@ -241,7 +249,7 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
             return;
         }
 
-        SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(tvNodeId);
+        SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(event->CommissioningComplete.PeerNodeId);
         operationalDeviceProxy->SetConnectedSession(handle);
 
         ContentLauncherCluster cluster;

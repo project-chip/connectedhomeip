@@ -114,11 +114,11 @@ public:
 
     CHIP_ERROR CreateArrayList(jobject & outList);
 
-    CHIP_ERROR AddToArrayList(jobject list, jobject objectToAdd);
+    CHIP_ERROR AddToList(jobject list, jobject objectToAdd);
 
-    CHIP_ERROR GetArrayListSize(jobject list, jint & size);
+    CHIP_ERROR GetListSize(jobject list, jint & size);
 
-    CHIP_ERROR GetArrayListItem(jobject list, jint index, jobject & outItem);
+    CHIP_ERROR GetListItem(jobject list, jint index, jobject & outItem);
 
     CHIP_ERROR CreateHashMap(jobject & outMap);
 
@@ -168,6 +168,7 @@ private:
     jmethodID mFindClassMethod = nullptr;
 
     jclass mHashMapClass   = nullptr;
+    jclass mListClass      = nullptr;
     jclass mArrayListClass = nullptr;
 };
 } // namespace chip

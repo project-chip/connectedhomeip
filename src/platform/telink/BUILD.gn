@@ -58,12 +58,9 @@ static_library("telink") {
 
     if (chip_mdns == "platform") {
       sources += [ "../OpenThread/DnssdImpl.cpp" ]
-      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+      deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
 
-  public_deps += [
-    "${chip_root}/src/crypto",
-    "${chip_root}/src/setup_payload:additional_data_payload",
-  ]
+  public_deps += [ "${chip_root}/src/crypto" ]
 }

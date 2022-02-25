@@ -24,6 +24,7 @@ using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using MediaPlaybackDelegate = chip::app::Clusters::MediaPlayback::Delegate;
 using PlaybackResponseType  = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
+using PlaybackPositionType  = chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type;
 
 class MediaPlaybackManager : public MediaPlaybackDelegate
 {
@@ -49,4 +50,12 @@ public:
     void HandleSeek(CommandResponseHelper<PlaybackResponseType> & helper, const uint64_t & positionMilliseconds) override;
     void HandleNext(CommandResponseHelper<PlaybackResponseType> & helper) override;
     void HandleStartOver(CommandResponseHelper<PlaybackResponseType> & helper) override;
+
+protected:
+    chip::app::Clusters::MediaPlayback::PlaybackStateEnum mCurrentState;
+    PlaybackPositionType mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    float mPlaybackSpeed                   = 0;
+    uint64_t mStartTime                    = 0;
+    // Magic number for testing.
+    uint64_t mDuration = 80000;
 };

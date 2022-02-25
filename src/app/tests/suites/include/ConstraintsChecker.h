@@ -101,7 +101,7 @@ protected:
         bool isUpperCase = true;
         for (size_t i = 0; i < strlen(current); i++)
         {
-            if (!isupper(current[i]))
+            if (!isdigit(current[i]) && !isupper(current[i]))
             {
                 isUpperCase = false;
                 break;

@@ -84,7 +84,7 @@ bool CheckForSuccess(GenericContext * context, int err, const char * func, bool 
             }
             case ContextType::Resolve: {
                 ResolveContext * rCtx = reinterpret_cast<ResolveContext *>(context);
-                rCtx->callback(rCtx->context, nullptr, CHIP_ERROR_INTERNAL);
+                rCtx->callback(rCtx->context, nullptr, chip::Span<chip::Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 break;
             }
             }
@@ -459,12 +459,12 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     if (validIP)
     {
         mdnsService.mAddress.SetValue(ipStr);
-        rCtx->callback(rCtx->cbContext, &mdnsService, CHIP_NO_ERROR);
+        rCtx->callback(rCtx->cbContext, &mdnsService, chip::Span<chip::Inet::IPAddress>(), CHIP_NO_ERROR);
         StopResolve(rCtx);
     }
     else
     {
-        rCtx->callback(rCtx->cbContext, nullptr, CHIP_ERROR_INTERNAL);
+        rCtx->callback(rCtx->cbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
         RemoveContext(rCtx);
     }
 

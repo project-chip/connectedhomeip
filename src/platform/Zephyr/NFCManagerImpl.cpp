@@ -31,7 +31,7 @@
 namespace chip {
 namespace DeviceLayer {
 namespace {
-void nfcCallback(void * /* context */, nfc_t2t_event, const uint8_t * /* data */, size_t /* data_length */) {}
+void nfcCallback(void * /* context */, nfc_t2t_event_t, const uint8_t * /* data */, size_t /* data_length */) {}
 } // namespace
 
 NFCManagerImpl NFCManagerImpl::sInstance;

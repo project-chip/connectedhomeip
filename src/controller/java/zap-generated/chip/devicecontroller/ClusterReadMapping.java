@@ -1150,6 +1150,19 @@ public class ClusterReadMapping {
         readBinaryInputBasicClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("binaryInputBasic", readBinaryInputBasicInteractionInfo);
     Map<String, InteractionInfo> readBindingInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readBindingBindingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBindingBindingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BindingCluster) cluster)
+                  .readBindingAttribute(
+                      (ChipClusters.BindingCluster.BindingAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBindingClusterBindingAttributeCallback(),
+            readBindingBindingCommandParams);
+    readBindingInteractionInfo.put(
+        "readBindingAttribute", readBindingBindingAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readBindingServerGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readBindingServerGeneratedCommandListAttributeInteractionInfo =
@@ -1409,7 +1422,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicCluster) cluster)
-                  .readVendorIDAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readVendorIDAttribute(
+                      (ChipClusters.BridgedDeviceBasicCluster.VendorIDAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBridgedDeviceBasicVendorIDCommandParams);
@@ -1567,6 +1581,18 @@ public class ClusterReadMapping {
             readBridgedDeviceBasicReachableCommandParams);
     readBridgedDeviceBasicInteractionInfo.put(
         "readReachableAttribute", readBridgedDeviceBasicReachableAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicUniqueIDCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBridgedDeviceBasicUniqueIDAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
+                  .readUniqueIDAttribute((ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+            readBridgedDeviceBasicUniqueIDCommandParams);
+    readBridgedDeviceBasicInteractionInfo.put(
+        "readUniqueIDAttribute", readBridgedDeviceBasicUniqueIDAttributeInteractionInfo);
     Map<String, CommandParameterInfo>
         readBridgedDeviceBasicServerGeneratedCommandListCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();

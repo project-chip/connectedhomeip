@@ -65,6 +65,14 @@ public:
     }
     uint64_t GetPort() const { return mPort; }
 
+    Derived & SetInterfaceId(Inet::InterfaceId interfaceId)
+    {
+        mInterfaceId = interfaceId;
+        return *reinterpret_cast<Derived *>(this);
+    }
+
+    Inet::InterfaceId GetInterfaceId() const { return mInterfaceId; }
+
     Derived & EnableIpV4(bool enable)
     {
         mEnableIPv4 = enable;
@@ -95,6 +103,7 @@ public:
 
 private:
     uint16_t mPort                   = CHIP_PORT;
+    Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();
     bool mEnableIPv4                 = true;
     uint8_t mMacStorage[kMaxMacSize] = {};
     size_t mMacLength                = 0;

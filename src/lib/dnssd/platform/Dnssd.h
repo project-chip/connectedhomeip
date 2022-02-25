@@ -88,10 +88,13 @@ struct DnssdService
  *
  * @param[in] context     The context passed to ChipDnssdBrowse or ChipDnssdResolve.
  * @param[in] result      The mdns resolve result, can be nullptr if error happens.
+ * @param[in] extraIPs    IP addresses, in addition to the one in "result", for
+ *                        the same hostname.  Can be empty.
  * @param[in] error       The error code.
  *
  */
-using DnssdResolveCallback = void (*)(void * context, DnssdService * result, CHIP_ERROR error);
+using DnssdResolveCallback = void (*)(void * context, DnssdService * result, const Span<Inet::IPAddress> & extraIPs,
+                                      CHIP_ERROR error);
 
 /**
  * The callback function for mDNS browse.

@@ -204,6 +204,7 @@ private:
     friend class ConfigurationManagerImpl;
     friend class DeviceControlServer;
     friend class Dnssd::DiscoveryImplPlatform;
+    friend class FailSafeContext;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;

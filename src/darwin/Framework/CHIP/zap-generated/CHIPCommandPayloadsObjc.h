@@ -470,22 +470,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPBindingClusterBindParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull nodeId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
-@property (strong, nonatomic) NSNumber * _Nonnull endpointId;
-@property (strong, nonatomic) NSNumber * _Nonnull clusterId;
-- (instancetype)init;
-@end
-
-@interface CHIPBindingClusterUnbindParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull nodeId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
-@property (strong, nonatomic) NSNumber * _Nonnull endpointId;
-@property (strong, nonatomic) NSNumber * _Nonnull clusterId;
-- (instancetype)init;
-@end
-
 @interface CHIPPollControlClusterCheckInResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull startFastPolling;
 @property (strong, nonatomic) NSNumber * _Nonnull fastPollTimeout;
@@ -1542,7 +1526,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPChannelClusterChangeChannelResponseParams : NSObject
 @property (strong, nonatomic) CHIPChannelClusterChannelInfo * _Nonnull channelMatch;
-@property (strong, nonatomic) NSNumber * _Nonnull errorType;
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 - (instancetype)init;
 @end
 

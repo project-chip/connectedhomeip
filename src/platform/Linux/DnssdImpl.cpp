@@ -44,15 +44,14 @@ namespace {
 
 AvahiProtocol ToAvahiProtocol(chip::Inet::IPAddressType addressType)
 {
+#if INET_CONFIG_ENABLE_IPV4
     AvahiProtocol protocol;
 
     switch (addressType)
     {
-#if INET_CONFIG_ENABLE_IPV4
     case chip::Inet::IPAddressType::kIPv4:
         protocol = AVAHI_PROTO_INET;
         break;
-#endif
     case chip::Inet::IPAddressType::kIPv6:
         protocol = AVAHI_PROTO_INET6;
         break;
@@ -62,6 +61,11 @@ AvahiProtocol ToAvahiProtocol(chip::Inet::IPAddressType addressType)
     }
 
     return protocol;
+#else
+    // We only support IPV6, never tell AVAHI about INET4 or UNSPEC because
+    // UNSPEC may actually return IPv4 data.
+    return AVAHI_PROTO_INET6;
+#endif
 }
 
 chip::Inet::IPAddressType ToAddressType(AvahiProtocol protocol)
@@ -714,13 +718,13 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
             if (resolver == nullptr)
             {
                 ChipLogError(DeviceLayer, "Avahi resolve failed on retry");
-                context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
+                context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 chip::Platform::Delete(context);
             }
             return;
         }
         ChipLogError(DeviceLayer, "Avahi resolve failed");
-        context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
+        context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
         break;
     case AVAHI_RESOLVER_FOUND:
         DnssdService result   = {};
@@ -797,11 +801,11 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         if (result_err == CHIP_NO_ERROR)
         {
-            context->mCallback(context->mContext, &result, CHIP_NO_ERROR);
+            context->mCallback(context->mContext, &result, Span<Inet::IPAddress>(), CHIP_NO_ERROR);
         }
         else
         {
-            context->mCallback(context->mContext, nullptr, result_err);
+            context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), result_err);
         }
         break;
     }

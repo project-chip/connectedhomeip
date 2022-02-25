@@ -43,7 +43,7 @@ struct DiscoveryCommandResult
     chip::Optional<uint32_t> mrpRetryIntervalActive;
 };
 
-class DiscoveryCommands : public chip::Dnssd::ResolverDelegate
+class DiscoveryCommands : public chip::Dnssd::CommissioningResolveDelegate
 {
 public:
     DiscoveryCommands(){};
@@ -66,10 +66,8 @@ public:
     CHIP_ERROR TearDownDiscoveryCommands();
     virtual void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData){};
 
-    /////////// ResolverDelegate Interface /////////
-    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override{};
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override{};
-    void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    /////////// CommissioningDelegate Interface /////////
+    void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
 protected:
     // This function initialize a random discriminator once and returns it all the time afterwards

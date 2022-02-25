@@ -20,36 +20,52 @@
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;
 
+MediaInputManager::MediaInputManager()
+{
+    mCurrentInput = 1;
+
+    for (int i = 1; i < 3; ++i)
+    {
+        InputInfoType inputInfo;
+        inputInfo.description = chip::CharSpan::fromCharString("High-Definition Multimedia Interface");
+        inputInfo.name        = chip::CharSpan::fromCharString("HDMI");
+        inputInfo.inputType   = chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi;
+        inputInfo.index       = static_cast<uint8_t>(i);
+        mInputs.push_back(inputInfo);
+    }
+}
+
 CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
     // TODO: Insert code here
-
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        int maximumVectorSize = 2;
-        for (int i = 0; i < maximumVectorSize; ++i)
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & inputInfo : this->mInputs)
         {
-            chip::app::Clusters::MediaInput::Structs::InputInfo::Type inputInfo;
-            inputInfo.description = chip::CharSpan::fromCharString("exampleDescription");
-            inputInfo.name        = chip::CharSpan::fromCharString("exampleName");
-            inputInfo.inputType   = chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi;
-            inputInfo.index       = static_cast<uint8_t>(1 + i);
-
             ReturnErrorOnFailure(encoder.Encode(inputInfo));
         }
-
         return CHIP_NO_ERROR;
     });
 }
 
 uint8_t MediaInputManager::HandleGetCurrentInput()
 {
-    return 0;
+    return mCurrentInput;
 }
 
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
     // TODO: Insert code here
-    return true;
+    bool mediaInputSelected = false;
+    for (InputInfoType & input : mInputs)
+    {
+        if (input.index == index)
+        {
+            mediaInputSelected = true;
+            mCurrentInput      = index;
+        }
+    }
+
+    return mediaInputSelected;
 }
 
 bool MediaInputManager::HandleShowInputStatus()
@@ -67,5 +83,17 @@ bool MediaInputManager::HandleHideInputStatus()
 bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
-    return true;
+    bool mediaInputRenamed = false;
+
+    for (InputInfoType & input : mInputs)
+    {
+        if (input.index == index)
+        {
+            mediaInputRenamed = true;
+            memcpy(this->Data(index), name.data(), name.size());
+            input.name = chip::CharSpan(this->Data(index), name.size());
+        }
+    }
+
+    return mediaInputRenamed;
 }

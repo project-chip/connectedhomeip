@@ -65,7 +65,7 @@ public:
         if (CHIP_NO_ERROR != error)
         {
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
-            SetCommandExitStatus(error);
+            mError = error;
             return;
         }
 
@@ -75,7 +75,7 @@ public:
             if (CHIP_NO_ERROR != error)
             {
                 ChipLogError(chipTool, "Response Failure: Can not decode Data");
-                SetCommandExitStatus(error);
+                mError = error;
                 return;
             }
         }
@@ -84,13 +84,13 @@ public:
     virtual void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
-        SetCommandExitStatus(error);
+        mError = error;
     }
 
     virtual void OnDone(chip::app::CommandSender * client) override
     {
         mCommandSender.reset();
-        SetCommandExitStatus(CHIP_NO_ERROR);
+        SetCommandExitStatus(mError);
     }
 
     template <class T>
@@ -112,6 +112,7 @@ private:
     chip::CommandId mCommandId;
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
 
+    CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;
     std::unique_ptr<chip::app::CommandSender> mCommandSender;
 };
