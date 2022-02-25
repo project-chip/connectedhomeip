@@ -22,7 +22,7 @@
 namespace chip {
 namespace app {
 
-static constexpr System::Clock::Timeout kImMessageTimeout = System::Clock::Seconds16(30);
+static constexpr System::Clock::Timeout kImMessageTimeout = System::Clock::Seconds16(12);
 
 } // namespace app
 } // namespace chip

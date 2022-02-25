@@ -58,8 +58,7 @@ constexpr uint8_t kButtonReleaseEvent = 0;
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 
-LEDWidget sThreadStatusLED;
-LEDWidget sBleStatusLED;
+LEDWidget sStatusLED;
 
 Button sFactoryResetButton;
 Button sLightingButton;
@@ -83,9 +82,8 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR ret;
 
     // Initialize status LED
-    LEDWidget::InitGpio(LEDS_PORT);
-    sThreadStatusLED.Init(THREAD_STATE_LED_PIN);
-    sBleStatusLED.Init(BLE_STATE_LED_PIN);
+    LEDWidget::InitGpio(SYSTEM_STATE_LED_PORT);
+    sStatusLED.Init(SYSTEM_STATE_LED_PIN);
 
     InitButtons();
 
@@ -159,19 +157,19 @@ CHIP_ERROR AppTask::StartApp()
         {
             if (sIsThreadAttached)
             {
-                sThreadStatusLED.Blink(950, 50);
+                sStatusLED.Blink(950, 50);
             }
             else
             {
-                sThreadStatusLED.Blink(100, 100);
+                sStatusLED.Blink(100, 100);
             }
         }
         else
         {
-            sThreadStatusLED.Blink(50, 950);
+            sStatusLED.Blink(50, 950);
         }
 
-        sThreadStatusLED.Animate();
+        sStatusLED.Animate();
     }
 }
 
