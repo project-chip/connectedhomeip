@@ -34,6 +34,7 @@
 
 #include <drivers/entropy.h>
 #include <malloc.h>
+
 namespace chip {
 namespace DeviceLayer {
 
