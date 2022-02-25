@@ -12,24 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build example - Mbed OS
+name: Full builds - Mbed OS
 
 on:
     push:
-    pull_request:
     workflow_dispatch:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group: full-${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 jobs:
     mbedos:
-        name: Mbed OS examples building
+        name: Run
         timeout-minutes: 200
 
         env:
-            BUILD_TYPE: mbedos
             APP_PROFILE: release
             APP_TARGET: CY8CPROTO_062_4343W
 
@@ -119,7 +117,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE shell \
                     examples/ota-requestor-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-ota-requestor-app-example.elf \
                     /tmp/bloat_reports/
-            
+
             - name: Build unit tests
               timeout-minutes: 20
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
