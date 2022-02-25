@@ -348,10 +348,13 @@ void OnBrowseRemove(BrowseContext * context, const char * name, const char * typ
 
     VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
 
-    std::remove_if(context->services.begin(), context->services.end(), [name, type, interfaceId](const DnssdService & service) {
-        return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol) &&
-            service.mInterface == interfaceId;
-    });
+    context->services.erase(std::remove_if(context->services.begin(), context->services.end(),
+                                           [name, type, interfaceId](const DnssdService & service) {
+                                               return strcmp(name, service.mName) == 0 &&
+                                                   type == GetFullType(service.mType, service.mProtocol) &&
+                                                   service.mInterface == interfaceId;
+                                           }),
+                            context->services.end());
 }
 
 static void OnBrowse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err, const char * name,
