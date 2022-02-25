@@ -580,7 +580,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedListEntry(const Structs::TestFab
 
     VerifyOrReturnError(entry.fabricSensitiveCharString.size() < kFabricSensitiveCharLength, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(gListFabricScoped_fabricSensitiveCharBuf[index], entry.fabricSensitiveCharString.data(),
-            entry.fabricSensitiveCharString.size());
+           entry.fabricSensitiveCharString.size());
     gListFabricScopedAttributeValue[index].fabricSensitiveCharString =
         CharSpan(gListFabricScoped_fabricSensitiveCharBuf[index], entry.fabricSensitiveCharString.size());
 
@@ -636,7 +636,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
                 // We copy the data referenced by spans over to the right slot in the backing buffers.
                 //
                 memcpy(gListFabricScoped_fabricSensitiveCharBuf[dstIndex], srcEntry.fabricSensitiveCharString.data(),
-                        srcEntry.fabricSensitiveCharString.size());
+                       srcEntry.fabricSensitiveCharString.size());
                 dstEntry.fabricSensitiveCharString =
                     CharSpan(gListFabricScoped_fabricSensitiveCharBuf[dstIndex], srcEntry.fabricSensitiveCharString.size());
 
