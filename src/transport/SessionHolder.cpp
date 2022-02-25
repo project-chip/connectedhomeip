@@ -19,6 +19,11 @@
 
 namespace chip {
 
+SessionHolder::SessionHolder(const SessionHandle & session) : mSession(InPlace, session.mSession)
+{
+    session->AddHolder(*this);
+}
+
 SessionHolder::~SessionHolder()
 {
     Release();

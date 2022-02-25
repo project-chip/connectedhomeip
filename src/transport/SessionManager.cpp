@@ -527,6 +527,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     if (mCB != nullptr)
     {
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, unsecuredSession, peerAddress, msg->Start(), msg->TotalLength());
+        SessionHolder holder(session);
         mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
     }
 }
