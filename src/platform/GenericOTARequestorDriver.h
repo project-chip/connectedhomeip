@@ -43,8 +43,8 @@ public:
         mImageProcessor = processor;
     }
 
-    // Set the timeout (in seconds) for the Default Provider timer
-    void SetDefaultProvidersTimeoutSec(uint32_t timeout) { mPeriodicQueryTimeInterval = timeout; }
+    // Set the timeout (in seconds) for querying providers on the default OTA provider list; must be non-zero
+    void SetPeriodicQueryTimeout(uint32_t timeout) { if(timeout != 0) {mPeriodicQueryTimeInterval = timeout;} }
 
     //// Virtual methods from OTARequestorDriver
     bool CanConsent() override;

@@ -19,7 +19,7 @@ following command line options are available for the OTA Requestor application.
 
 | Directory                         | Description                                                                                                                                                                                                                                          |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -q/--delayQuery <Time in seconds> | From boot up, the amount of time to wait before triggering the QueryImage command. If none or zero is supplied, QueryImage will not be triggered automatically. At least one provider location must be written to the DefaultOTAProviders attribute. |
+| -p/--periodicQueryTimeout <Time in seconds> | Timeout for querying providers on the default OTA provider list. If none or zero is supplied the timeout is set to 24 hours  |
 | -c/--requestorCanConsent          | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.                                                                                                               |
 
 ## Software Image Header
@@ -86,7 +86,7 @@ Follow instructions
 #### Run the OTA Requestor application:
 
 ```
-out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --delayQuery ${TIME_IN_SECONDS}
+out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS}
 ```
 
 -   `${REQUESTOR_LONG_DISCRIMINATOR}` is the long discriminator specified for
@@ -99,8 +99,8 @@ out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --sec
 -   `${KVS_STORE_LOCATION}` is a location where the KVS items will be stored. If
     none is supplied, the default is /tmp/chip_kvs. This must be different from
     the value used by the OTA Provider application.
--   `${TIME_IN_SECONDS}` is the amount of time to wait before triggering the
-    QueryImage command specified by the DefaultOTAProviders attribute
+-   `${TIME_IN_SECONDS}` is the imeout for querying providers on the default OTA
+    provider list. If none or zero is supplied the timeout is set to 24 hours
 
 #### Commission the OTA Requestor application
 
@@ -206,7 +206,7 @@ scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux/ out chip_
 **Run the OTA Requestor application**
 
 ```
-out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --delayQuery 30
+out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --periodicQueryTimeout 60 
 ```
 
 #### In terminal 3:
@@ -225,14 +225,12 @@ out/chip-tool pairing onnetwork-long 0x1234567890 20202021 18
 
 **Write to the DefaultOTAProviders attribute**
 
-Note that this must be done within 30 seconds (as specified by the
-`--delayQuery 30`) from when the OTA Requestor application was launched
 
 ```
 out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
 ```
 
-After 30 seconds from when the OTA Requestor application has launched, the OTA
+Every 60 seconds from when the OTA Requestor application has launched, the OTA
 Requestor application with node ID 0x1234567890 will send a QueryImage command
 to the OTA Provider with node ID 0xDEADBEEF, as specified in the
 `DefaultOTAProviders` attribute.
