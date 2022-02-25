@@ -12507,6 +12507,12 @@ typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlAlarmMask) {
     CHIPDoorLockDlAlarmMaskForcedDoorOpenUnderDoorLockedCondition = 0x40,
 };
 
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlCredentialRuleMask) {
+    CHIPDoorLockDlCredentialRuleMaskSingle = 0x1,
+    CHIPDoorLockDlCredentialRuleMaskDual = 0x2,
+    CHIPDoorLockDlCredentialRuleMaskTri = 0x4,
+};
+
 typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlCredentialRulesSupport) {
     CHIPDoorLockDlCredentialRulesSupportSingle = 0x1,
     CHIPDoorLockDlCredentialRulesSupportDual = 0x2,
