@@ -221,7 +221,15 @@ class Flasher:
                     capture_output=True)
             else:
                 result = self
-                self.err = subprocess.call(command)
+                self.error = subprocess.check_call(command)
+        except subprocess.CalledProcessError as exception:
+            self.err = exception.returncode
+            if capture_output:
+                self.log(fail_level, '--- stdout ---')
+                self.log(fail_level, exception.stdout)
+                self.log(fail_level, '--- stderr ---')
+                self.log(fail_level, exception.stderr)
+                self.log(fail_level, '---')
         except FileNotFoundError as exception:
             self.err = exception.errno
             if self.err == errno.ENOENT:

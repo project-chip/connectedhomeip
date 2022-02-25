@@ -17,8 +17,7 @@
  */
 
 /* This file contains the declaration for the OTA Requestor interface.
- * Any implementation of the OTA Requestor (e.g. the OTARequestor class) must implement
- * this interface.
+ * Any implementation of the OTA Requestor must implement this interface.
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -140,7 +139,7 @@ private:
 };
 
 // Interface class to connect the OTA Software Update Requestor cluster command processing
-// with the core OTA Requestor logic. The OTARequestor class implements this interface
+// with the core OTA Requestor logic
 class OTARequestorInterface
 {
 public:
@@ -155,12 +154,6 @@ public:
     virtual EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
-
-    // TBD: This probably doesn't need to be a method OTARequestorInterface as the response handler is
-    // explicitly supplied at command invocation
-    // Handler for the QueryImageResponse command
-    // virtual bool
-    // HandleQueryImageResponse(chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType) = 0;
 
     // Destructor
     virtual ~OTARequestorInterface() = default;
