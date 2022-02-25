@@ -25,7 +25,7 @@ concurrency:
 jobs:
     android:
         name: Run
-        timeout-minutes: 45
+        timeout-minutes: 60
 
         env:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
@@ -54,11 +54,11 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Clean out build output
-              run: rm -rf ./out
             - name: Build Android CHIPTool and CHIPTest (ARM64)
               run: |
                 ./scripts/run_in_build_env.sh \
                   "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm64-chip-*' build"
-            - name: Clean out build output
-              run: rm -rf ./out
+            - name: Run Android build rule tests
+              run: |
+                ./scripts/run_in_build_env.sh \
+                  "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test.tests"
