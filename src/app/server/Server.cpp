@@ -68,7 +68,11 @@ constexpr bool isRendezvousBypassed()
 
 void StopEventLoop(intptr_t arg)
 {
-    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
+    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Stopping event loop: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void DispatchShutDownEvent(intptr_t arg)
@@ -332,7 +336,11 @@ void Server::Shutdown()
 {
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-    LogErrorOnFailure(mExchangeMgr.Shutdown());
+    CHIP_ERROR err = mExchangeMgr.Shutdown();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Exchange Mgr shutdown: %" CHIP_ERROR_FORMAT, err.Format());
+    }
     mSessions.Shutdown();
     mTransports.Close();
     mCommissioningWindowManager.Shutdown();
