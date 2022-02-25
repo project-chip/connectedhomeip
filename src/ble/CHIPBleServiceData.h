@@ -45,14 +45,15 @@ enum chipBLEServiceDataType
  */
 struct ChipBLEDeviceIdentificationInfo
 {
-    constexpr static uint16_t kDiscriminatorMask           = 0xfff;
-    constexpr static uint8_t kAdditionalDataFlagMask       = 0x1;
-    constexpr static uint8_t kAdvertisementVersionMask     = 0x0f;
-    constexpr static uint8_t AdvertisementVersionShiftBits = 4u;
+    constexpr static uint16_t kDiscriminatorMask            = 0xfff;
+    constexpr static uint8_t kAdditionalDataFlagMask        = 0x1;
+    constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
+    constexpr static uint8_t kAdvertisementVersionShiftBits = 4u;
 
     uint8_t OpCode;
-    // from lsb 0-11 bits (i.e. 8 bits of DeviceDiscriminatorAndAdvVersion[0] and 4 bits of DeviceDiscriminatorAndAdvVersion[1]) for
-    // device discriminator and 12-15 bits (i.e 4 bits of DeviceDiscriminatorAndAdvVersion[1]) for advertisement version
+    // DeviceDiscriminatorAndAdvVersion[0] contains the low 8 bits of the 12-bit discriminator.
+    // DeviceDiscriminatorAndAdvVersion[1] contains the high 8 bits of the 12-bit discriminator in its low 4 bits and
+    // the 4 bits of the advertisement version in its high 4 bits.
     uint8_t DeviceDiscriminatorAndAdvVersion[2];
     uint8_t DeviceVendorId[2];
     uint8_t DeviceProductId[2];
@@ -70,8 +71,8 @@ struct ChipBLEDeviceIdentificationInfo
 
     uint8_t GetAdvertisementVersion() const
     {
-        uint8_t advertisementVersion = static_cast<uint8_t>((DeviceDiscriminatorAndAdvVersion[1] >> AdvertisementVersionShiftBits) &
-                                                            kAdvertisementVersionMask);
+        uint8_t advertisementVersion = static_cast<uint8_t>((DeviceDiscriminatorAndAdvVersion[1] & kAdvertisementVersionMask) >>
+                                                            kAdvertisementVersionShiftBits);
         return advertisementVersion;
     }
 
@@ -80,9 +81,9 @@ struct ChipBLEDeviceIdentificationInfo
     {
         // Advertisement Version is 4 bit long from 12th to 15th
         advertisementVersion =
-            static_cast<uint8_t>((advertisementVersion & kAdvertisementVersionMask) << AdvertisementVersionShiftBits);
+            static_cast<uint8_t>((advertisementVersion << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask);
         DeviceDiscriminatorAndAdvVersion[1] =
-            (DeviceDiscriminatorAndAdvVersion[1] & kAdvertisementVersionMask) | advertisementVersion;
+            static_cast<uint8_t>((DeviceDiscriminatorAndAdvVersion[1] & ~kAdvertisementVersionMask) | advertisementVersion);
     }
 
     uint16_t GetDeviceDiscriminator() const
