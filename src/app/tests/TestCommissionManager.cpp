@@ -62,6 +62,8 @@ void ShutdownChipTest()
     mdnsAdvertiser.RemoveServices();
     mdnsAdvertiser.Shutdown();
 
+    // Server shudown will be called in TearDownTask
+
     // TODO: At this point UDP endpoits still seem leaked and the sanitizer
     // builds will attempt a memory free. As a result, we keep Memory initialized
     // so that the global UDPManager can still be destructed without a coredump.
@@ -69,7 +71,6 @@ void ShutdownChipTest()
     // This is likely either a missing shutdown or an actual UDP endpoint leak
     // which I have not been able to track down yet.
     //
-    // Server::GetInstance().Shutdown();
     // chip::Platform::MemoryShutdown();
 }
 
