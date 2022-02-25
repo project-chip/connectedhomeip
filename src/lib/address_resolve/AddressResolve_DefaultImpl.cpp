@@ -50,7 +50,7 @@ constexpr unsigned ScoreValue(IpScore score)
 }
 
 /**
- * Gives a score for an IP address, generally relating on "how good" the address
+ * Gives a score for an IP address, generally related to "how good" the address
  * is and how likely it is for it to be reachable.
  */
 IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
@@ -159,7 +159,7 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
         return NodeLookupAction::kKeepSearching;
     }
 
-    // Minimal time to search reached. If any Ip available, ready to return it.
+    // Minimal time to search reached. If any IP available, ready to return it.
     if (mBestAddressScore > ScoreValue(IpScore::kInvalid))
     {
         GetListener()->OnNodeAddressResolved(GetRequest().GetPeerId(), mBestResult);
@@ -289,7 +289,7 @@ void Resolver::ReArmTimer()
     {
         ChipLogError(Discovery, "Timer schedule error %s assumed permanent", err.AsString());
 
-        // Clear out all active lookups: without timers there is no guaranetee of success
+        // Clear out all active lookups: without timers there is no guarantee of success
         auto it = mActiveLookups.begin();
         while (it != mActiveLookups.end())
         {
