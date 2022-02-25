@@ -87,7 +87,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverBle(SetupPayload & payload)
 #if CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mCommissioner->PrepareBleTransport();
+    mCommissioner->ConnectBleTransportToSelf();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     return mBleLayer->NewBleConnectionByDiscriminator(payload.discriminator, this, OnDiscoveredDeviceOverBleSuccess,

@@ -774,7 +774,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     {
 #if CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-        PrepareBleTransport();
+        ConnectBleTransportToSelf();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
         if (!params.HasBleLayer())
         {
@@ -1331,9 +1331,13 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(Co
 
 #if CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-void DeviceCommissioner::PrepareBleTransport()
+void DeviceCommissioner::ConnectBleTransportToSelf()
 {
-    Transport::BLEBase transport = mSystemState->TransportMgr()->GetTransport().template GetImplAtIndex<2>();
+    // The following returns error on Linux builds:
+    // /usr/include/c++/9/tuple:1303:25: error: static assertion failed: tuple index is in range
+    // static_assert(__i < tuple_size<tuple<>>::value,
+    // Transport::BLEBase transport = mSystemState->TransportMgr()->GetTransport().template GetImplAtIndex<2>();
+    Transport::BLEBase transport = mSystemState->TransportMgr()->GetTransport().GetImplAtIndex<2>();
     if (!transport.IsBleLayerTransportSetToSelf())
     {
         transport.SetBleLayerTransportToSelf();

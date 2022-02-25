@@ -602,7 +602,7 @@ public:
      *   Prior to commissioning, the Controller should make sure the BleLayer transport
      *   is set to the Commissioner transport and not the Server transport.
      */
-    void PrepareBleTransport();
+    void ConnectBleTransportToSelf();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     /**
