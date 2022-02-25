@@ -22,7 +22,6 @@ chip_test_suite("tests") {
   output_name = "libMinimalMdnstests"
 
   test_sources = [
-    "TestActiveResolveAttempts.cpp",
     "TestMinimalMdnsAllocator.cpp",
     "TestQueryReplyFilter.cpp",
     "TestRecordData.cpp",
