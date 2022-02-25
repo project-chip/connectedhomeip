@@ -62,13 +62,16 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId, trustStore));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId, trustStore));
 
-    chip::FabricInfo * fabric = CurrentCommissioner().GetFabricInfo();
-    VerifyOrReturnError(nullptr != fabric, CHIP_ERROR_INTERNAL);
+    // Initialize Group Data
+    for(auto it = mCommissioners.begin(); it != mCommissioners.end(); it++) {
+        chip::FabricInfo * fabric = it->second->GetFabricInfo();
+        VerifyOrReturnError(nullptr != fabric, CHIP_ERROR_INTERNAL);
 
-    uint8_t compressed_fabric_id[sizeof(uint64_t)];
-    chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
-    ReturnLogErrorOnFailure(fabric->GetCompressedId(compressed_fabric_id_span));
-    ReturnLogErrorOnFailure(chip::GroupTesting::InitGroupData(fabric->GetFabricIndex(), compressed_fabric_id_span));
+        uint8_t compressed_fabric_id[sizeof(uint64_t)];
+        chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
+        ReturnLogErrorOnFailure(fabric->GetCompressedId(compressed_fabric_id_span));
+        ReturnLogErrorOnFailure(chip::GroupTesting::InitGroupData(fabric->GetFabricIndex(), compressed_fabric_id_span));
+    }
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
     CHIP_ERROR err = StartWaiting(GetWaitDuration());

@@ -2158,27 +2158,27 @@ static void TestPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-static const uint8_t kFabricIdBuffer1[] = { 0x29, 0x06, 0xC9, 0x08, 0xD1, 0x15, 0xD3, 0x62 };
+static const uint8_t kCompressedFabricId[] = { 0x29, 0x06, 0xC9, 0x08, 0xD1, 0x15, 0xD3, 0x62 };
 
 const uint8_t kEpochKeyBuffer1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7,
                                                                                    0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf };
 const uint8_t kEpochKeyBuffer2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7,
                                                                                    0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf };
-const uint8_t kGroupOperationalKey1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x9d, 0xe1, 0x07, 0xde, 0x33, 0x11,
-                                                                                        0x2c, 0x52, 0x11, 0x0b, 0x7e, 0xc1,
-                                                                                        0x20, 0x9e, 0x6f, 0x0c };
-const uint8_t kGroupOperationalKey2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x7a, 0x33, 0xdb, 0x90, 0x5c, 0x7b,
-                                                                                        0x7e, 0x14, 0xa9, 0x20, 0xf8, 0x40,
-                                                                                        0xae, 0x48, 0xd3, 0xfe };
-const uint16_t kGroupSessionId1                                                     = 0xbc66;
-const uint16_t kGroupSessionId2                                                     = 0x038d;
+const uint8_t kGroupOperationalKey1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x1f, 0x19, 0xed, 0x3c, 0xef, 0x8a,
+                                                                                        0x21, 0x1b, 0xaf, 0x30, 0x6f, 0xae,
+                                                                                        0xee, 0xe7, 0xaa, 0xc6 };
+const uint8_t kGroupOperationalKey2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xaa, 0x97, 0x9a, 0x48, 0xbd, 0x8c,
+                                                                                        0xdf, 0x29, 0x3a, 0x07, 0x09, 0xb9,
+                                                                                        0xc1, 0xeb, 0x19, 0x30 };
+const uint16_t kGroupSessionId1                                                     = 0x6c80;
+const uint16_t kGroupSessionId2                                                     = 0x0c48;
 
 static void TestGroup_OperationalKeyDerivation(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t key_buffer[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
     ByteSpan epoch_key(kEpochKeyBuffer1, sizeof(kEpochKeyBuffer1));
     MutableByteSpan operational_key(key_buffer, sizeof(key_buffer));
-    ByteSpan compressed_fabric_id(kFabricIdBuffer1);
+    ByteSpan compressed_fabric_id(kCompressedFabricId);
 
     // Invalid Epoch Key
     NL_TEST_ASSERT(inSuite,
