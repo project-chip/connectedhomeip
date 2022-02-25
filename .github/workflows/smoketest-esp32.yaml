@@ -21,7 +21,7 @@ on:
 concurrency:
     group: smoke-${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
-  
+
 jobs:
     esp32:
         name: run
@@ -58,7 +58,7 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build some M5Stack variations
+            - name: Build all-clusters on M5Stack
               timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
