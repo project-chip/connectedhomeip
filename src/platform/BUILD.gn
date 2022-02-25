@@ -253,6 +253,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/setup_payload:additional_data_payload",
       "${chip_root}/src/system",
     ]
 
@@ -270,6 +271,7 @@ if (chip_device_platform != "none") {
       "../include/platform/ConfigurationManager.h",
       "../include/platform/ConnectivityManager.h",
       "../include/platform/DeviceControlServer.h",
+      "../include/platform/FailSafeContext.h",
       "../include/platform/GeneralUtils.h",
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
@@ -295,6 +297,7 @@ if (chip_device_platform != "none") {
       "DeviceControlServer.cpp",
       "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
+      "FailSafeContext.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",
       "LockTracker.cpp",
@@ -325,7 +328,6 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
-      "${chip_root}/src/setup_payload:additional_data_payload",
     ]
 
     if (chip_device_platform == "cc13x2_26x2") {

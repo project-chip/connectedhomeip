@@ -9199,7 +9199,8 @@ class GeneralCommissioning(Cluster):
             kOk = 0x00
             kValueOutsideRange = 0x01
             kInvalidAuthentication = 0x02
-            kNotCommissioning = 0x03
+            kNoFailSafe = 0x03
+            kBusyWithOtherAdmin = 0x04
 
         class RegulatoryLocationType(IntEnum):
             kIndoor = 0x00

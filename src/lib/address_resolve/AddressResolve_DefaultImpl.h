@@ -47,7 +47,7 @@ public:
     void ResetForLookup(System::Clock::Timestamp now, const NodeLookupRequest & request);
 
     /// Mark that a specific IP address has been found
-    void LookupResult(const Transport::PeerAddress & addr);
+    void LookupResult(const ResolveResult & result);
 
     /// Called after timeouts or after a series of IP addresses have been
     /// marked as found.
@@ -67,7 +67,7 @@ public:
 private:
     System::Clock::Timestamp mRequestStartTime;
     NodeLookupRequest mRequest; // active request to process
-    Transport::PeerAddress mBestPeerAddress;
+    AddressResolve::ResolveResult mBestResult;
     unsigned mBestAddressScore = 0;
 };
 
