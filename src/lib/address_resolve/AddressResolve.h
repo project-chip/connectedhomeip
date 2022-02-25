@@ -18,12 +18,25 @@
 
 #include <lib/core/PeerId.h>
 #include <lib/support/IntrusiveList.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace AddressResolve {
+
+/// Contains resolve information received from nodes. Contains all information
+/// bits that are considered useful but does not contain a full DNSSD data
+/// structure since not all DNSSD data is useful during operational processing.
+struct ResolveResult
+{
+    Transport::PeerAddress address;
+    ReliableMessageProtocolConfig mrpConfig;
+    bool supportsTcp = false;
+
+    ResolveResult() : address(Transport::Type::kUdp), mrpConfig(GetLocalMRPConfig()) {}
+};
 
 /// Represents an object intersted in callbacks for a resolve operation.
 class NodeListener
@@ -37,7 +50,7 @@ public:
     ///
     /// The callback is expected to be executed within the chip event loop
     /// thread.
-    virtual void OnNodeAddressResolved(const PeerId & peerId, const Transport::PeerAddress & address) = 0;
+    virtual void OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result) = 0;
 
     /// Node resolution failure - occurs only once for a lookup, when an address
     /// could not be resolved - generally due to a timeout or due to DNSSD

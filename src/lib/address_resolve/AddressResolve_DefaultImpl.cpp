@@ -97,21 +97,21 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
 {
     mRequestStartTime = now;
     mRequest          = request;
-    mBestPeerAddress  = Transport::PeerAddress();
+    mBestResult       = ResolveResult();
     mBestAddressScore = ScoreValue(IpScore::kInvalid);
 }
 
-void NodeLookupHandle::LookupResult(const Transport::PeerAddress & addr)
+void NodeLookupHandle::LookupResult(const ResolveResult & result)
 {
-    unsigned newScore = ScoreValue(ScoreIpAddress(addr.GetIPAddress(), addr.GetInterface()));
+    unsigned newScore = ScoreValue(ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface()));
     if (newScore > mBestAddressScore)
     {
-        mBestPeerAddress  = addr;
+        mBestResult       = result;
         mBestAddressScore = newScore;
 
 #if CHIP_PROGRESS_LOGGING
         char addr_string[Transport::PeerAddress::kMaxToStringSize];
-        mBestPeerAddress.ToString(addr_string);
+        mBestResult.address.ToString(addr_string);
         ChipLogProgress(Discovery, "Address %s is scored at %u", addr_string, mBestAddressScore);
 #endif
     }
@@ -152,7 +152,7 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     // Minimal time to search reached. If any Ip available, ready to return it.
     if (mBestAddressScore > ScoreValue(IpScore::kInvalid))
     {
-        GetListener()->OnNodeAddressResolved(GetRequest().GetPeerId(), mBestPeerAddress);
+        GetListener()->OnNodeAddressResolved(GetRequest().GetPeerId(), mBestResult);
         return NodeLookupAction::kStopSearching;
     }
 
@@ -194,15 +194,17 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
             continue;
         }
 
-        // Assume we only search for UDP addresses for now
-        Transport::PeerAddress address(Transport::Type::kUdp);
-        address.SetPort(nodeData.mPort);
-        address.SetInterface(nodeData.mInterfaceId);
+        ResolveResult result;
+
+        result.address.SetPort(nodeData.mPort);
+        result.address.SetInterface(nodeData.mInterfaceId);
+        result.mrpConfig   = nodeData.GetMRPConfig();
+        result.supportsTcp = nodeData.mSupportsTcp;
 
         for (size_t i = 0; i < nodeData.mNumIPs; i++)
         {
-            address.SetIPAddress(nodeData.mAddress[i]);
-            current->LookupResult(address);
+            result.address.SetIPAddress(nodeData.mAddress[i]);
+            current->LookupResult(result);
         }
 
         if (current->NextAction(mTimeSource.GetMonotonicTimestamp()) == NodeLookupAction::kStopSearching)
