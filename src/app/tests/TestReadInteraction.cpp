@@ -205,7 +205,7 @@ public:
     bool mReadError                        = false;
     chip::app::ReadHandler * mpReadHandler = nullptr;
     chip::app::StatusIB mLastStatusReceived;
-    CHIP_ERROR mError                      = CHIP_NO_ERROR;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
 };
 
 //
@@ -1055,7 +1055,8 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        ctx.DrainAndServiceIO();
+
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived > 0);
         NL_TEST_ASSERT(apSuite, delegate.mLastStatusReceived.mStatus == Protocols::InteractionModel::Status::UnsupportedAccess);
@@ -1086,7 +1087,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived == 0);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
