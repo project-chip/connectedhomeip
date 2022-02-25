@@ -245,7 +245,7 @@ void Resolver::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERR
         }
 
         current->GetListener()->OnNodeAddressResolutionFailed(peerId, error);
-        mActiveLookups.Erase(it);
+        mActiveLookups.Erase(current);
     }
     ReArmTimer();
 }
