@@ -62,7 +62,7 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId, trustStore));
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
-    ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
+    CHIP_ERROR err = StartWaiting(GetWaitDuration());
 
     Shutdown();
 
@@ -77,7 +77,7 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
 
     StopTracing();
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 void CHIPCommand::StartTracing()
