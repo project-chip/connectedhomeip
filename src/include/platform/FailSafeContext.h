@@ -48,13 +48,21 @@ public:
     }
 
     inline bool IsFailSafeArmed() { return mFailSafeArmed; }
-    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) { return (accessingFabricIndex == mFabricIndex); }
+
+    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex)
+    {
+        VerifyOrDie(mFailSafeArmed);
+        return (accessingFabricIndex == mFabricIndex);
+    }
+
     inline bool NocCommandHasBeenInvoked() { return mNocCommandHasBeenInvoked; }
-    inline void SetNocCommandInvoked(FabricIndex fabricId)
+
+    inline void SetNocCommandInvoked(FabricIndex nocFabricIndex)
     {
         mNocCommandHasBeenInvoked = true;
-        mFabricIndex              = fabricId;
+        mFabricIndex              = nocFabricIndex;
     }
+
     inline FabricIndex GetFabricIndex()
     {
         VerifyOrDie(mFailSafeArmed);

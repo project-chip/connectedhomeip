@@ -55,7 +55,7 @@ void FailSafeContext::CommissioningFailedTimerComplete()
 CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength)
 {
     mFailSafeArmed = true;
-    mFabricIndex = accessingFabricIndex;
+    mFabricIndex   = accessingFabricIndex;
     DeviceLayer::SystemLayer().StartTimer(expiryLength, HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
