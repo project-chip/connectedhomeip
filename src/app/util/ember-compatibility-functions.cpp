@@ -1034,3 +1034,17 @@ void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
 {
     return MatterReportingAttributeChangeCallback(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 }
+
+void MatterReportingAttributeChangeCallback(EndpointId endpoint)
+{
+    // Attribute writes have asserted this already, but this assert should catch
+    // applications notifying about changes from their end.
+    assertChipStackLockedByCurrentThread();
+
+    ClusterInfo info;
+    info.mEndpointId = endpoint;
+
+    // We are adding or enabling a whole endpoint, in this case, we do not touch the cluster data version.
+
+    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+}
