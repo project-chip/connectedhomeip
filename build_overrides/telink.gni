@@ -13,6 +13,6 @@
 # limitations under the License.
 
 declare_args() {
-  # Root directory for Qorvo QPGxxxx SDK.
+  # Root directory for Telink SDK.
   telink_sdk_build_root = "//third_party/telink_sdk"
 }
