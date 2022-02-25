@@ -10681,7 +10681,8 @@ enum class CommissioningError : uint8_t
     kOk                    = 0x00,
     kValueOutsideRange     = 0x01,
     kInvalidAuthentication = 0x02,
-    kNotCommissioning      = 0x03,
+    kNoFailSafe            = 0x03,
+    kBusyWithOtherAdmin    = 0x04,
 };
 // Enum for RegulatoryLocationType
 enum class RegulatoryLocationType : uint8_t

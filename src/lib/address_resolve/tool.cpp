@@ -47,12 +47,15 @@ class PrintOutNodeListener : public chip::AddressResolve::NodeListener
 public:
     PrintOutNodeListener() { mSelfHandle.SetListener(this); }
 
-    void OnNodeAddressResolved(const PeerId & peerId, const PeerAddress & address) override
+    void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override
     {
         char addr_string[PeerAddress::kMaxToStringSize];
-        address.ToString(addr_string);
+        result.address.ToString(addr_string);
 
         ChipLogProgress(Discovery, "Resolve completed: %s", addr_string);
+        ChipLogProgress(Discovery, "   Supports TCP:                  %s", result.supportsTcp ? "YES" : "NO");
+        ChipLogProgress(Discovery, "   MRP IDLE retransmit timeout:   %u ms", result.mrpConfig.mIdleRetransTimeout.count());
+        ChipLogProgress(Discovery, "   MRP ACTIVE retransmit timeout: %u ms", result.mrpConfig.mActiveRetransTimeout.count());
         NotifyDone();
     }
 
