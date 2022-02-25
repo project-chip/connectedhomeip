@@ -33,7 +33,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace {
 
-constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this value when starting OTA "immediately"
+constexpr uint32_t kImmediateStartDelaySec = 1; // Start the timer with this value when starting OTA "immediately"
 
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
@@ -193,17 +193,18 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
     const ProviderLocationType & providerLocation,
     app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason)
 {
-    // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
+    // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelaySec.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
-    uint32_t msToStart = 0;
+    uint32_t secToStart = 0;
     switch (announcementReason)
     {
     case OTAAnnouncementReason::kSimpleAnnouncement:
     case OTAAnnouncementReason::kUpdateAvailable:
-        msToStart = mOtaStartDelayMs;
+        secToStart = mOtaStartDelaySec;
         break;
     case OTAAnnouncementReason::kUrgentUpdateAvailable:
-        msToStart = kImmediateStartDelayMs;
+        // TODO: Implement random delay per spec
+        secToStart = kImmediateStartDelaySec;
         break;
     default:
         ChipLogError(SoftwareUpdate, "Unexpected announcementReason: %u", static_cast<uint8_t>(announcementReason));
@@ -225,7 +226,7 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
     mRequestor->SetCurrentProviderLocation(providerLocation);
     mLastUsedProvider = providerLocation;
 
-    ScheduleDelayedAction(System::Clock::Seconds32(msToStart / 1000), StartDelayTimerHandler, this);
+    ScheduleDelayedAction(System::Clock::Seconds32(secToStart), StartDelayTimerHandler, this);
 }
 
 void GenericOTARequestorDriver::DriverSendQuery()
@@ -239,7 +240,7 @@ void GenericOTARequestorDriver::DriverSendQuery()
     // ConnectToProvider() will change the state from kIdle
     StopDefaultProviderTimer();
 
-    mRequestor->ConnectToProvider(OTARequestorInterface::kQueryImage);
+    DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->ConnectToProvider(OTARequestorInterface::kQueryImage); });
 }
 
 void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState)

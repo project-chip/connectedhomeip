@@ -76,7 +76,7 @@ protected:
 
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
-    uint32_t mOtaStartDelayMs                    = 0;
+    uint32_t mOtaStartDelaySec                    = 0;
     uint32_t mPeriodicQueryTimeInterval = (24 * 60 * 60); // Timeout for querying providers on the default OTA provider list
 
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
