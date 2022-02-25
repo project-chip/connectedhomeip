@@ -1881,6 +1881,53 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TargetNavigator::Struc
     ComplexArgumentParser::Finalize(request.identifier);
     ComplexArgumentParser::Finalize(request.name);
 }
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Binding::Structs::TargetStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("TargetStruct.fabricIndex", "fabricIndex", value.isMember("fabricIndex")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+
+    if (value.isMember("node"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "node");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.node, value["node"]));
+    }
+
+    if (value.isMember("group"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "group");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.group, value["group"]));
+    }
+
+    if (value.isMember("endpoint"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
+    }
+
+    if (value.isMember("cluster"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "cluster");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.cluster, value["cluster"]));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Binding::Structs::TargetStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.fabricIndex);
+    ComplexArgumentParser::Finalize(request.node);
+    ComplexArgumentParser::Finalize(request.group);
+    ComplexArgumentParser::Finalize(request.endpoint);
+    ComplexArgumentParser::Finalize(request.cluster);
+}
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type & request,
                                         Json::Value & value)

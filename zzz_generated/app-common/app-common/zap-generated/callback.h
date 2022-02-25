@@ -13735,16 +13735,6 @@ bool emberAfApplianceControlClusterOverloadWarningCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ApplianceControl::Commands::OverloadWarning::DecodableType & commandData);
 /**
- * @brief Binding Cluster Bind Command callback (from client)
- */
-bool emberAfBindingClusterBindCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                       const chip::app::Clusters::Binding::Commands::Bind::DecodableType & commandData);
-/**
- * @brief Binding Cluster Unbind Command callback (from client)
- */
-bool emberAfBindingClusterUnbindCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                         const chip::app::Clusters::Binding::Commands::Unbind::DecodableType & commandData);
-/**
  * @brief Poll Control Cluster CheckIn Command callback (from server)
  */
 bool emberAfPollControlClusterCheckInCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
@@ -14800,7 +14790,7 @@ bool emberAfChannelClusterChangeChannelCallback(
  */
 bool emberAfChannelClusterChangeChannelResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorType);
+    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t status);
 /**
  * @brief Channel Cluster ChangeChannelByNumber Command callback (from client)
  */

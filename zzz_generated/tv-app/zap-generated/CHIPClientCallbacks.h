@@ -31,6 +31,11 @@
 #include <lib/support/Span.h>
 
 // List specific responses
+void BindingClusterBindingListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
+                                              chip::Callback::Cancelable * onFailureCallback);
+typedef void (*BindingBindingListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & data);
 void NetworkCommissioningClusterNetworksListAttributeFilter(chip::TLV::TLVReader * data,
                                                             chip::Callback::Cancelable * onSuccessCallback,
                                                             chip::Callback::Cancelable * onFailureCallback);

@@ -226,6 +226,8 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
+
     GenerateWriteResponse(apSuite, apContext, buf);
 
     err = writeClient.ProcessWriteResponseMessage(std::move(buf));
@@ -255,6 +257,9 @@ void TestWriteInteraction::TestWriteClientGroup(nlTestSuite * apSuite, void * ap
     err = writeClient.SendWriteRequest(groupSession);
 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
     // The WriteClient should be shutdown once we SendWriteRequest for group.
     NL_TEST_ASSERT(apSuite, writeClient.mState == WriteClient::State::AwaitingDestruction);
 }
@@ -380,6 +385,8 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1);
 
     {
@@ -429,6 +436,8 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1);
 
     // By now we should have closed all exchanges and sent all pending acks, so
@@ -468,7 +477,7 @@ int Test_Setup(void * inContext)
 {
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
 
-    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
+    VerifyOrReturnError(TestContext::InitializeAsync(inContext) == SUCCESS, FAILURE);
 
     VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitGroupData(), FAILURE);
 

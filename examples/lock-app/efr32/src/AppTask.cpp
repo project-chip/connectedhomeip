@@ -129,11 +129,11 @@ CHIP_ERROR AppTask::Init()
 
     sWiFiNetworkCommissioningInstance.Init();
 #endif
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -164,7 +164,7 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
-    UpdateClusterState();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -363,7 +363,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -492,7 +492,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        UpdateClusterState();
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }
@@ -547,7 +547,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState(void)
+void AppTask::UpdateClusterState(intptr_t context)
 {
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 

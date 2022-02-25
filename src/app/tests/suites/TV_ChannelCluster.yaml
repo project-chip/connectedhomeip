@@ -97,7 +97,7 @@ tests:
                 value: "PBS"
       response:
           values:
-              - name: "errorType"
+              - name: "status"
                 value: 0
               - name: "channelMatch"
                 value:

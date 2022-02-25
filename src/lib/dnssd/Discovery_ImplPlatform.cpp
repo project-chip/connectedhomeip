@@ -373,6 +373,20 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
     {
         publisher->mDnssdInitialized = true;
 
+        // TODO: this is wrong, however we need resolverproxy initialized
+        // otherwise DiscoveryImplPlatform is not usable.
+        //
+        // We rely on the fact that resolverproxy does not use the endpoint
+        // nor does DiscoveryImplPlatform use it (since init will be called
+        // twice now)
+        //
+        // The problem is that:
+        //   - DiscoveryImplPlatform contains a ResolverProxy
+        //   - ResolverProxy::Init calls Dnssd::Resolver::Instance().Init
+        // which results in a recursive dependency (proxy initializes the
+        // class that it is contained in).
+        publisher->mResolverProxy.Init(nullptr);
+
 #if !CHIP_DEVICE_LAYER_NONE
         // Post an event that will start advertising
         chip::DeviceLayer::ChipDeviceEvent event;
@@ -447,21 +461,22 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                                                  const char ** subTypes, size_t subTypeSize,
                                                  const OperationalAdvertisingParameters & params)
 {
-    return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetMac(),
-                          DnssdServiceProtocol::kDnssdProtocolTcp, params.GetPeerId());
+    return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetInterfaceId(),
+                          params.GetMac(), DnssdServiceProtocol::kDnssdProtocolTcp, params.GetPeerId());
 }
 
 CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
                                                  const char ** subTypes, size_t subTypeSize,
                                                  const CommissionAdvertisingParameters & params)
 {
-    return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetMac(),
-                          DnssdServiceProtocol::kDnssdProtocolUdp, PeerId());
+    return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetInterfaceId(),
+                          params.GetMac(), DnssdServiceProtocol::kDnssdProtocolUdp, PeerId());
 }
 
 CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
                                                  const char ** subTypes, size_t subTypeSize, uint16_t port,
-                                                 const chip::ByteSpan & mac, DnssdServiceProtocol protocol, PeerId peerId)
+                                                 Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
+                                                 DnssdServiceProtocol protocol, PeerId peerId)
 {
     ReturnErrorCodeIf(mDnssdInitialized == false, CHIP_ERROR_INCORRECT_STATE);
 
@@ -472,7 +487,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                              : GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
     strncpy(service.mType, serviceType, sizeof(service.mType));
     service.mAddressType   = Inet::IPAddressType::kAny;
-    service.mInterface     = Inet::InterfaceId::Null();
+    service.mInterface     = interfaceId;
     service.mProtocol      = protocol;
     service.mPort          = port;
     service.mTextEntries   = textEntries;

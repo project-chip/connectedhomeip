@@ -3243,6 +3243,158 @@ void CHIPBinaryInputBasicAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
+CHIPBindingBindingAttributeCallback::CHIPBindingBindingAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPBindingClusterBindingAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPBindingBindingAttributeCallback::~CHIPBindingBindingAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPBindingBindingAttributeCallback::CallbackFn(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPBindingBindingAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPBindingBindingAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
+    {
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
+        jobject newElement_0_node;
+        if (!entry_0.node.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_node);
+        }
+        else
+        {
+            jobject newElement_0_nodeInsideOptional;
+            std::string newElement_0_nodeInsideOptionalClassName     = "java/lang/Long";
+            std::string newElement_0_nodeInsideOptionalCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_0_nodeInsideOptionalClassName.c_str(),
+                                                                           newElement_0_nodeInsideOptionalCtorSignature.c_str(),
+                                                                           entry_0.node.Value(), newElement_0_nodeInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_nodeInsideOptional, newElement_0_node);
+        }
+        jobject newElement_0_group;
+        if (!entry_0.group.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_group);
+        }
+        else
+        {
+            jobject newElement_0_groupInsideOptional;
+            std::string newElement_0_groupInsideOptionalClassName     = "java/lang/Integer";
+            std::string newElement_0_groupInsideOptionalCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_groupInsideOptionalClassName.c_str(),
+                                                                           newElement_0_groupInsideOptionalCtorSignature.c_str(),
+                                                                           entry_0.group.Value(), newElement_0_groupInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_groupInsideOptional, newElement_0_group);
+        }
+        jobject newElement_0_endpoint;
+        if (!entry_0.endpoint.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_endpoint);
+        }
+        else
+        {
+            jobject newElement_0_endpointInsideOptional;
+            std::string newElement_0_endpointInsideOptionalClassName     = "java/lang/Integer";
+            std::string newElement_0_endpointInsideOptionalCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                newElement_0_endpointInsideOptionalClassName.c_str(), newElement_0_endpointInsideOptionalCtorSignature.c_str(),
+                entry_0.endpoint.Value(), newElement_0_endpointInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_endpointInsideOptional, newElement_0_endpoint);
+        }
+        jobject newElement_0_cluster;
+        if (!entry_0.cluster.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_cluster);
+        }
+        else
+        {
+            jobject newElement_0_clusterInsideOptional;
+            std::string newElement_0_clusterInsideOptionalClassName     = "java/lang/Long";
+            std::string newElement_0_clusterInsideOptionalCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                newElement_0_clusterInsideOptionalClassName.c_str(), newElement_0_clusterInsideOptionalCtorSignature.c_str(),
+                entry_0.cluster.Value(), newElement_0_clusterInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_clusterInsideOptional, newElement_0_cluster);
+        }
+
+        jclass targetStructStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$BindingClusterTargetStruct",
+                                                             targetStructStructClass);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Could not find class ChipStructs$BindingClusterTargetStruct");
+            return;
+        }
+        jmethodID targetStructStructCtor = env->GetMethodID(
+            targetStructStructClass, "<init>",
+            "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
+        if (targetStructStructCtor == nullptr)
+        {
+            ChipLogError(Zcl, "Could not find ChipStructs$BindingClusterTargetStruct constructor");
+            return;
+        }
+
+        newElement_0 = env->NewObject(targetStructStructClass, targetStructStructCtor, newElement_0_fabricIndex, newElement_0_node,
+                                      newElement_0_group, newElement_0_endpoint, newElement_0_cluster);
+        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
 CHIPBindingServerGeneratedCommandListAttributeCallback::CHIPBindingServerGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                                bool keepAlive) :
     chip::Callback::Callback<CHIPBindingClusterServerGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
@@ -4468,7 +4620,10 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
         }
         else
         {
-            newElement_0_name = env->NewStringUTF(std::string(entry_0.name.Value().data(), entry_0.name.Value().size()).c_str());
+            jobject newElement_0_nameInsideOptional;
+            newElement_0_nameInsideOptional =
+                env->NewStringUTF(std::string(entry_0.name.Value().data(), entry_0.name.Value().size()).c_str());
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_nameInsideOptional, newElement_0_name);
         }
         jobject newElement_0_callSign;
         if (!entry_0.callSign.HasValue())
@@ -4477,8 +4632,10 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
         }
         else
         {
-            newElement_0_callSign =
+            jobject newElement_0_callSignInsideOptional;
+            newElement_0_callSignInsideOptional =
                 env->NewStringUTF(std::string(entry_0.callSign.Value().data(), entry_0.callSign.Value().size()).c_str());
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_callSignInsideOptional, newElement_0_callSign);
         }
         jobject newElement_0_affiliateCallSign;
         if (!entry_0.affiliateCallSign.HasValue())
@@ -4487,8 +4644,11 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
         }
         else
         {
-            newElement_0_affiliateCallSign = env->NewStringUTF(
+            jobject newElement_0_affiliateCallSignInsideOptional;
+            newElement_0_affiliateCallSignInsideOptional = env->NewStringUTF(
                 std::string(entry_0.affiliateCallSign.Value().data(), entry_0.affiliateCallSign.Value().size()).c_str());
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_affiliateCallSignInsideOptional,
+                                                              newElement_0_affiliateCallSign);
         }
 
         jclass channelInfoStructClass;
@@ -8648,8 +8808,10 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
         }
         else
         {
-            newElement_0_groupName =
+            jobject newElement_0_groupNameInsideOptional;
+            newElement_0_groupNameInsideOptional =
                 env->NewStringUTF(std::string(entry_0.groupName.Value().data(), entry_0.groupName.Value().size()).c_str());
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_groupNameInsideOptional, newElement_0_groupName);
         }
 
         jclass groupInfoMapStructStructClass;
@@ -16969,11 +17131,14 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
         }
         else
         {
-            std::string newElement_0_optionalIntClassName     = "java/lang/Integer";
-            std::string newElement_0_optionalIntCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_optionalIntClassName.c_str(),
-                                                                           newElement_0_optionalIntCtorSignature.c_str(),
-                                                                           entry_0.optionalInt.Value(), newElement_0_optionalInt);
+            jobject newElement_0_optionalIntInsideOptional;
+            std::string newElement_0_optionalIntInsideOptionalClassName     = "java/lang/Integer";
+            std::string newElement_0_optionalIntInsideOptionalCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                newElement_0_optionalIntInsideOptionalClassName.c_str(),
+                newElement_0_optionalIntInsideOptionalCtorSignature.c_str(), entry_0.optionalInt.Value(),
+                newElement_0_optionalIntInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_optionalIntInsideOptional, newElement_0_optionalInt);
         }
         jobject newElement_0_nullableOptionalInt;
         if (!entry_0.nullableOptionalInt.HasValue())
@@ -16982,18 +17147,22 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
         }
         else
         {
+            jobject newElement_0_nullableOptionalIntInsideOptional;
             if (entry_0.nullableOptionalInt.Value().IsNull())
             {
-                newElement_0_nullableOptionalInt = nullptr;
+                newElement_0_nullableOptionalIntInsideOptional = nullptr;
             }
             else
             {
-                std::string newElement_0_nullableOptionalIntClassName     = "java/lang/Integer";
-                std::string newElement_0_nullableOptionalIntCtorSignature = "(I)V";
+                std::string newElement_0_nullableOptionalIntInsideOptionalClassName     = "java/lang/Integer";
+                std::string newElement_0_nullableOptionalIntInsideOptionalCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                    newElement_0_nullableOptionalIntClassName.c_str(), newElement_0_nullableOptionalIntCtorSignature.c_str(),
-                    entry_0.nullableOptionalInt.Value().Value(), newElement_0_nullableOptionalInt);
+                    newElement_0_nullableOptionalIntInsideOptionalClassName.c_str(),
+                    newElement_0_nullableOptionalIntInsideOptionalCtorSignature.c_str(),
+                    entry_0.nullableOptionalInt.Value().Value(), newElement_0_nullableOptionalIntInsideOptional);
             }
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_nullableOptionalIntInsideOptional,
+                                                              newElement_0_nullableOptionalInt);
         }
         jobject newElement_0_nullableString;
         if (entry_0.nullableString.IsNull())
@@ -17012,8 +17181,11 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
         }
         else
         {
-            newElement_0_optionalString = env->NewStringUTF(
+            jobject newElement_0_optionalStringInsideOptional;
+            newElement_0_optionalStringInsideOptional = env->NewStringUTF(
                 std::string(entry_0.optionalString.Value().data(), entry_0.optionalString.Value().size()).c_str());
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_optionalStringInsideOptional,
+                                                              newElement_0_optionalString);
         }
         jobject newElement_0_nullableOptionalString;
         if (!entry_0.nullableOptionalString.HasValue())
@@ -17022,17 +17194,20 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
         }
         else
         {
+            jobject newElement_0_nullableOptionalStringInsideOptional;
             if (entry_0.nullableOptionalString.Value().IsNull())
             {
-                newElement_0_nullableOptionalString = nullptr;
+                newElement_0_nullableOptionalStringInsideOptional = nullptr;
             }
             else
             {
-                newElement_0_nullableOptionalString =
+                newElement_0_nullableOptionalStringInsideOptional =
                     env->NewStringUTF(std::string(entry_0.nullableOptionalString.Value().Value().data(),
                                                   entry_0.nullableOptionalString.Value().Value().size())
                                           .c_str());
             }
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_nullableOptionalStringInsideOptional,
+                                                              newElement_0_nullableOptionalString);
         }
         jobject newElement_0_nullableStruct;
         if (entry_0.nullableStruct.IsNull())
@@ -17118,52 +17293,59 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
         }
         else
         {
-            jobject newElement_0_optionalStruct_a;
-            std::string newElement_0_optionalStruct_aClassName     = "java/lang/Integer";
-            std::string newElement_0_optionalStruct_aCtorSignature = "(I)V";
+            jobject newElement_0_optionalStructInsideOptional;
+            jobject newElement_0_optionalStructInsideOptional_a;
+            std::string newElement_0_optionalStructInsideOptional_aClassName     = "java/lang/Integer";
+            std::string newElement_0_optionalStructInsideOptional_aCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                newElement_0_optionalStruct_aClassName.c_str(), newElement_0_optionalStruct_aCtorSignature.c_str(),
-                entry_0.optionalStruct.Value().a, newElement_0_optionalStruct_a);
-            jobject newElement_0_optionalStruct_b;
-            std::string newElement_0_optionalStruct_bClassName     = "java/lang/Boolean";
-            std::string newElement_0_optionalStruct_bCtorSignature = "(Z)V";
+                newElement_0_optionalStructInsideOptional_aClassName.c_str(),
+                newElement_0_optionalStructInsideOptional_aCtorSignature.c_str(), entry_0.optionalStruct.Value().a,
+                newElement_0_optionalStructInsideOptional_a);
+            jobject newElement_0_optionalStructInsideOptional_b;
+            std::string newElement_0_optionalStructInsideOptional_bClassName     = "java/lang/Boolean";
+            std::string newElement_0_optionalStructInsideOptional_bCtorSignature = "(Z)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-                newElement_0_optionalStruct_bClassName.c_str(), newElement_0_optionalStruct_bCtorSignature.c_str(),
-                entry_0.optionalStruct.Value().b, newElement_0_optionalStruct_b);
-            jobject newElement_0_optionalStruct_c;
-            std::string newElement_0_optionalStruct_cClassName     = "java/lang/Integer";
-            std::string newElement_0_optionalStruct_cCtorSignature = "(I)V";
+                newElement_0_optionalStructInsideOptional_bClassName.c_str(),
+                newElement_0_optionalStructInsideOptional_bCtorSignature.c_str(), entry_0.optionalStruct.Value().b,
+                newElement_0_optionalStructInsideOptional_b);
+            jobject newElement_0_optionalStructInsideOptional_c;
+            std::string newElement_0_optionalStructInsideOptional_cClassName     = "java/lang/Integer";
+            std::string newElement_0_optionalStructInsideOptional_cCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                newElement_0_optionalStruct_cClassName.c_str(), newElement_0_optionalStruct_cCtorSignature.c_str(),
-                static_cast<uint8_t>(entry_0.optionalStruct.Value().c), newElement_0_optionalStruct_c);
-            jobject newElement_0_optionalStruct_d;
-            jbyteArray newElement_0_optionalStruct_dByteArray =
+                newElement_0_optionalStructInsideOptional_cClassName.c_str(),
+                newElement_0_optionalStructInsideOptional_cCtorSignature.c_str(),
+                static_cast<uint8_t>(entry_0.optionalStruct.Value().c), newElement_0_optionalStructInsideOptional_c);
+            jobject newElement_0_optionalStructInsideOptional_d;
+            jbyteArray newElement_0_optionalStructInsideOptional_dByteArray =
                 env->NewByteArray(static_cast<jsize>(entry_0.optionalStruct.Value().d.size()));
-            env->SetByteArrayRegion(newElement_0_optionalStruct_dByteArray, 0,
+            env->SetByteArrayRegion(newElement_0_optionalStructInsideOptional_dByteArray, 0,
                                     static_cast<jsize>(entry_0.optionalStruct.Value().d.size()),
                                     reinterpret_cast<const jbyte *>(entry_0.optionalStruct.Value().d.data()));
-            newElement_0_optionalStruct_d = newElement_0_optionalStruct_dByteArray;
-            jobject newElement_0_optionalStruct_e;
-            newElement_0_optionalStruct_e = env->NewStringUTF(
+            newElement_0_optionalStructInsideOptional_d = newElement_0_optionalStructInsideOptional_dByteArray;
+            jobject newElement_0_optionalStructInsideOptional_e;
+            newElement_0_optionalStructInsideOptional_e = env->NewStringUTF(
                 std::string(entry_0.optionalStruct.Value().e.data(), entry_0.optionalStruct.Value().e.size()).c_str());
-            jobject newElement_0_optionalStruct_f;
-            std::string newElement_0_optionalStruct_fClassName     = "java/lang/Integer";
-            std::string newElement_0_optionalStruct_fCtorSignature = "(I)V";
+            jobject newElement_0_optionalStructInsideOptional_f;
+            std::string newElement_0_optionalStructInsideOptional_fClassName     = "java/lang/Integer";
+            std::string newElement_0_optionalStructInsideOptional_fCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                newElement_0_optionalStruct_fClassName.c_str(), newElement_0_optionalStruct_fCtorSignature.c_str(),
-                entry_0.optionalStruct.Value().f.Raw(), newElement_0_optionalStruct_f);
-            jobject newElement_0_optionalStruct_g;
-            std::string newElement_0_optionalStruct_gClassName     = "java/lang/Float";
-            std::string newElement_0_optionalStruct_gCtorSignature = "(F)V";
+                newElement_0_optionalStructInsideOptional_fClassName.c_str(),
+                newElement_0_optionalStructInsideOptional_fCtorSignature.c_str(), entry_0.optionalStruct.Value().f.Raw(),
+                newElement_0_optionalStructInsideOptional_f);
+            jobject newElement_0_optionalStructInsideOptional_g;
+            std::string newElement_0_optionalStructInsideOptional_gClassName     = "java/lang/Float";
+            std::string newElement_0_optionalStructInsideOptional_gCtorSignature = "(F)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<float>(
-                newElement_0_optionalStruct_gClassName.c_str(), newElement_0_optionalStruct_gCtorSignature.c_str(),
-                entry_0.optionalStruct.Value().g, newElement_0_optionalStruct_g);
-            jobject newElement_0_optionalStruct_h;
-            std::string newElement_0_optionalStruct_hClassName     = "java/lang/Double";
-            std::string newElement_0_optionalStruct_hCtorSignature = "(D)V";
+                newElement_0_optionalStructInsideOptional_gClassName.c_str(),
+                newElement_0_optionalStructInsideOptional_gCtorSignature.c_str(), entry_0.optionalStruct.Value().g,
+                newElement_0_optionalStructInsideOptional_g);
+            jobject newElement_0_optionalStructInsideOptional_h;
+            std::string newElement_0_optionalStructInsideOptional_hClassName     = "java/lang/Double";
+            std::string newElement_0_optionalStructInsideOptional_hCtorSignature = "(D)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<double>(
-                newElement_0_optionalStruct_hClassName.c_str(), newElement_0_optionalStruct_hCtorSignature.c_str(),
-                entry_0.optionalStruct.Value().h, newElement_0_optionalStruct_h);
+                newElement_0_optionalStructInsideOptional_hClassName.c_str(),
+                newElement_0_optionalStructInsideOptional_hCtorSignature.c_str(), entry_0.optionalStruct.Value().h,
+                newElement_0_optionalStructInsideOptional_h);
 
             jclass simpleStructStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
@@ -17183,10 +17365,14 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
                 return;
             }
 
-            newElement_0_optionalStruct = env->NewObject(
-                simpleStructStructClass, simpleStructStructCtor, newElement_0_optionalStruct_a, newElement_0_optionalStruct_b,
-                newElement_0_optionalStruct_c, newElement_0_optionalStruct_d, newElement_0_optionalStruct_e,
-                newElement_0_optionalStruct_f, newElement_0_optionalStruct_g, newElement_0_optionalStruct_h);
+            newElement_0_optionalStructInsideOptional =
+                env->NewObject(simpleStructStructClass, simpleStructStructCtor, newElement_0_optionalStructInsideOptional_a,
+                               newElement_0_optionalStructInsideOptional_b, newElement_0_optionalStructInsideOptional_c,
+                               newElement_0_optionalStructInsideOptional_d, newElement_0_optionalStructInsideOptional_e,
+                               newElement_0_optionalStructInsideOptional_f, newElement_0_optionalStructInsideOptional_g,
+                               newElement_0_optionalStructInsideOptional_h);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_optionalStructInsideOptional,
+                                                              newElement_0_optionalStruct);
         }
         jobject newElement_0_nullableOptionalStruct;
         if (!entry_0.nullableOptionalStruct.HasValue())
@@ -17195,66 +17381,68 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
         }
         else
         {
+            jobject newElement_0_nullableOptionalStructInsideOptional;
             if (entry_0.nullableOptionalStruct.Value().IsNull())
             {
-                newElement_0_nullableOptionalStruct = nullptr;
+                newElement_0_nullableOptionalStructInsideOptional = nullptr;
             }
             else
             {
-                jobject newElement_0_nullableOptionalStruct_a;
-                std::string newElement_0_nullableOptionalStruct_aClassName     = "java/lang/Integer";
-                std::string newElement_0_nullableOptionalStruct_aCtorSignature = "(I)V";
+                jobject newElement_0_nullableOptionalStructInsideOptional_a;
+                std::string newElement_0_nullableOptionalStructInsideOptional_aClassName     = "java/lang/Integer";
+                std::string newElement_0_nullableOptionalStructInsideOptional_aCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                    newElement_0_nullableOptionalStruct_aClassName.c_str(),
-                    newElement_0_nullableOptionalStruct_aCtorSignature.c_str(), entry_0.nullableOptionalStruct.Value().Value().a,
-                    newElement_0_nullableOptionalStruct_a);
-                jobject newElement_0_nullableOptionalStruct_b;
-                std::string newElement_0_nullableOptionalStruct_bClassName     = "java/lang/Boolean";
-                std::string newElement_0_nullableOptionalStruct_bCtorSignature = "(Z)V";
+                    newElement_0_nullableOptionalStructInsideOptional_aClassName.c_str(),
+                    newElement_0_nullableOptionalStructInsideOptional_aCtorSignature.c_str(),
+                    entry_0.nullableOptionalStruct.Value().Value().a, newElement_0_nullableOptionalStructInsideOptional_a);
+                jobject newElement_0_nullableOptionalStructInsideOptional_b;
+                std::string newElement_0_nullableOptionalStructInsideOptional_bClassName     = "java/lang/Boolean";
+                std::string newElement_0_nullableOptionalStructInsideOptional_bCtorSignature = "(Z)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-                    newElement_0_nullableOptionalStruct_bClassName.c_str(),
-                    newElement_0_nullableOptionalStruct_bCtorSignature.c_str(), entry_0.nullableOptionalStruct.Value().Value().b,
-                    newElement_0_nullableOptionalStruct_b);
-                jobject newElement_0_nullableOptionalStruct_c;
-                std::string newElement_0_nullableOptionalStruct_cClassName     = "java/lang/Integer";
-                std::string newElement_0_nullableOptionalStruct_cCtorSignature = "(I)V";
+                    newElement_0_nullableOptionalStructInsideOptional_bClassName.c_str(),
+                    newElement_0_nullableOptionalStructInsideOptional_bCtorSignature.c_str(),
+                    entry_0.nullableOptionalStruct.Value().Value().b, newElement_0_nullableOptionalStructInsideOptional_b);
+                jobject newElement_0_nullableOptionalStructInsideOptional_c;
+                std::string newElement_0_nullableOptionalStructInsideOptional_cClassName     = "java/lang/Integer";
+                std::string newElement_0_nullableOptionalStructInsideOptional_cCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                    newElement_0_nullableOptionalStruct_cClassName.c_str(),
-                    newElement_0_nullableOptionalStruct_cCtorSignature.c_str(),
-                    static_cast<uint8_t>(entry_0.nullableOptionalStruct.Value().Value().c), newElement_0_nullableOptionalStruct_c);
-                jobject newElement_0_nullableOptionalStruct_d;
-                jbyteArray newElement_0_nullableOptionalStruct_dByteArray =
+                    newElement_0_nullableOptionalStructInsideOptional_cClassName.c_str(),
+                    newElement_0_nullableOptionalStructInsideOptional_cCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.nullableOptionalStruct.Value().Value().c),
+                    newElement_0_nullableOptionalStructInsideOptional_c);
+                jobject newElement_0_nullableOptionalStructInsideOptional_d;
+                jbyteArray newElement_0_nullableOptionalStructInsideOptional_dByteArray =
                     env->NewByteArray(static_cast<jsize>(entry_0.nullableOptionalStruct.Value().Value().d.size()));
-                env->SetByteArrayRegion(newElement_0_nullableOptionalStruct_dByteArray, 0,
+                env->SetByteArrayRegion(newElement_0_nullableOptionalStructInsideOptional_dByteArray, 0,
                                         static_cast<jsize>(entry_0.nullableOptionalStruct.Value().Value().d.size()),
                                         reinterpret_cast<const jbyte *>(entry_0.nullableOptionalStruct.Value().Value().d.data()));
-                newElement_0_nullableOptionalStruct_d = newElement_0_nullableOptionalStruct_dByteArray;
-                jobject newElement_0_nullableOptionalStruct_e;
-                newElement_0_nullableOptionalStruct_e =
+                newElement_0_nullableOptionalStructInsideOptional_d = newElement_0_nullableOptionalStructInsideOptional_dByteArray;
+                jobject newElement_0_nullableOptionalStructInsideOptional_e;
+                newElement_0_nullableOptionalStructInsideOptional_e =
                     env->NewStringUTF(std::string(entry_0.nullableOptionalStruct.Value().Value().e.data(),
                                                   entry_0.nullableOptionalStruct.Value().Value().e.size())
                                           .c_str());
-                jobject newElement_0_nullableOptionalStruct_f;
-                std::string newElement_0_nullableOptionalStruct_fClassName     = "java/lang/Integer";
-                std::string newElement_0_nullableOptionalStruct_fCtorSignature = "(I)V";
+                jobject newElement_0_nullableOptionalStructInsideOptional_f;
+                std::string newElement_0_nullableOptionalStructInsideOptional_fClassName     = "java/lang/Integer";
+                std::string newElement_0_nullableOptionalStructInsideOptional_fCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                    newElement_0_nullableOptionalStruct_fClassName.c_str(),
-                    newElement_0_nullableOptionalStruct_fCtorSignature.c_str(),
-                    entry_0.nullableOptionalStruct.Value().Value().f.Raw(), newElement_0_nullableOptionalStruct_f);
-                jobject newElement_0_nullableOptionalStruct_g;
-                std::string newElement_0_nullableOptionalStruct_gClassName     = "java/lang/Float";
-                std::string newElement_0_nullableOptionalStruct_gCtorSignature = "(F)V";
+                    newElement_0_nullableOptionalStructInsideOptional_fClassName.c_str(),
+                    newElement_0_nullableOptionalStructInsideOptional_fCtorSignature.c_str(),
+                    entry_0.nullableOptionalStruct.Value().Value().f.Raw(), newElement_0_nullableOptionalStructInsideOptional_f);
+                jobject newElement_0_nullableOptionalStructInsideOptional_g;
+                std::string newElement_0_nullableOptionalStructInsideOptional_gClassName     = "java/lang/Float";
+                std::string newElement_0_nullableOptionalStructInsideOptional_gCtorSignature = "(F)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<float>(
-                    newElement_0_nullableOptionalStruct_gClassName.c_str(),
-                    newElement_0_nullableOptionalStruct_gCtorSignature.c_str(), entry_0.nullableOptionalStruct.Value().Value().g,
-                    newElement_0_nullableOptionalStruct_g);
-                jobject newElement_0_nullableOptionalStruct_h;
-                std::string newElement_0_nullableOptionalStruct_hClassName     = "java/lang/Double";
-                std::string newElement_0_nullableOptionalStruct_hCtorSignature = "(D)V";
+                    newElement_0_nullableOptionalStructInsideOptional_gClassName.c_str(),
+                    newElement_0_nullableOptionalStructInsideOptional_gCtorSignature.c_str(),
+                    entry_0.nullableOptionalStruct.Value().Value().g, newElement_0_nullableOptionalStructInsideOptional_g);
+                jobject newElement_0_nullableOptionalStructInsideOptional_h;
+                std::string newElement_0_nullableOptionalStructInsideOptional_hClassName     = "java/lang/Double";
+                std::string newElement_0_nullableOptionalStructInsideOptional_hCtorSignature = "(D)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<double>(
-                    newElement_0_nullableOptionalStruct_hClassName.c_str(),
-                    newElement_0_nullableOptionalStruct_hCtorSignature.c_str(), entry_0.nullableOptionalStruct.Value().Value().h,
-                    newElement_0_nullableOptionalStruct_h);
+                    newElement_0_nullableOptionalStructInsideOptional_hClassName.c_str(),
+                    newElement_0_nullableOptionalStructInsideOptional_hCtorSignature.c_str(),
+                    entry_0.nullableOptionalStruct.Value().Value().h, newElement_0_nullableOptionalStructInsideOptional_h);
 
                 jclass simpleStructStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -17274,13 +17462,15 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
                     return;
                 }
 
-                newElement_0_nullableOptionalStruct =
-                    env->NewObject(simpleStructStructClass, simpleStructStructCtor, newElement_0_nullableOptionalStruct_a,
-                                   newElement_0_nullableOptionalStruct_b, newElement_0_nullableOptionalStruct_c,
-                                   newElement_0_nullableOptionalStruct_d, newElement_0_nullableOptionalStruct_e,
-                                   newElement_0_nullableOptionalStruct_f, newElement_0_nullableOptionalStruct_g,
-                                   newElement_0_nullableOptionalStruct_h);
+                newElement_0_nullableOptionalStructInsideOptional = env->NewObject(
+                    simpleStructStructClass, simpleStructStructCtor, newElement_0_nullableOptionalStructInsideOptional_a,
+                    newElement_0_nullableOptionalStructInsideOptional_b, newElement_0_nullableOptionalStructInsideOptional_c,
+                    newElement_0_nullableOptionalStructInsideOptional_d, newElement_0_nullableOptionalStructInsideOptional_e,
+                    newElement_0_nullableOptionalStructInsideOptional_f, newElement_0_nullableOptionalStructInsideOptional_g,
+                    newElement_0_nullableOptionalStructInsideOptional_h);
             }
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_nullableOptionalStructInsideOptional,
+                                                              newElement_0_nullableOptionalStruct);
         }
         jobject newElement_0_nullableList;
         if (entry_0.nullableList.IsNull())
@@ -17311,20 +17501,22 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
         }
         else
         {
-            chip::JniReferences::GetInstance().CreateArrayList(newElement_0_optionalList);
+            jobject newElement_0_optionalListInsideOptional;
+            chip::JniReferences::GetInstance().CreateArrayList(newElement_0_optionalListInsideOptional);
 
-            auto iter_newElement_0_optionalList_NaN = entry_0.optionalList.Value().begin();
-            while (iter_newElement_0_optionalList_NaN.Next())
+            auto iter_newElement_0_optionalListInsideOptional_NaN = entry_0.optionalList.Value().begin();
+            while (iter_newElement_0_optionalListInsideOptional_NaN.Next())
             {
-                auto & entry_NaN = iter_newElement_0_optionalList_NaN.GetValue();
+                auto & entry_NaN = iter_newElement_0_optionalListInsideOptional_NaN.GetValue();
                 jobject newElement_NaN;
                 std::string newElement_NaNClassName     = "java/lang/Integer";
                 std::string newElement_NaNCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_NaNClassName.c_str(),
                                                                               newElement_NaNCtorSignature.c_str(),
                                                                               static_cast<uint8_t>(entry_NaN), newElement_NaN);
-                chip::JniReferences::GetInstance().AddToList(newElement_0_optionalList, newElement_NaN);
+                chip::JniReferences::GetInstance().AddToList(newElement_0_optionalListInsideOptional, newElement_NaN);
             }
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_optionalListInsideOptional, newElement_0_optionalList);
         }
         jobject newElement_0_nullableOptionalList;
         if (!entry_0.nullableOptionalList.HasValue())
@@ -17333,27 +17525,31 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
         }
         else
         {
+            jobject newElement_0_nullableOptionalListInsideOptional;
             if (entry_0.nullableOptionalList.Value().IsNull())
             {
-                newElement_0_nullableOptionalList = nullptr;
+                newElement_0_nullableOptionalListInsideOptional = nullptr;
             }
             else
             {
-                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_nullableOptionalList);
+                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_nullableOptionalListInsideOptional);
 
-                auto iter_newElement_0_nullableOptionalList_NaN = entry_0.nullableOptionalList.Value().Value().begin();
-                while (iter_newElement_0_nullableOptionalList_NaN.Next())
+                auto iter_newElement_0_nullableOptionalListInsideOptional_NaN =
+                    entry_0.nullableOptionalList.Value().Value().begin();
+                while (iter_newElement_0_nullableOptionalListInsideOptional_NaN.Next())
                 {
-                    auto & entry_NaN = iter_newElement_0_nullableOptionalList_NaN.GetValue();
+                    auto & entry_NaN = iter_newElement_0_nullableOptionalListInsideOptional_NaN.GetValue();
                     jobject newElement_NaN;
                     std::string newElement_NaNClassName     = "java/lang/Integer";
                     std::string newElement_NaNCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_NaNClassName.c_str(),
                                                                                   newElement_NaNCtorSignature.c_str(),
                                                                                   static_cast<uint8_t>(entry_NaN), newElement_NaN);
-                    chip::JniReferences::GetInstance().AddToList(newElement_0_nullableOptionalList, newElement_NaN);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_nullableOptionalListInsideOptional, newElement_NaN);
                 }
             }
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_nullableOptionalListInsideOptional,
+                                                              newElement_0_nullableOptionalList);
         }
 
         jclass nullablesAndOptionalsStructStructClass;

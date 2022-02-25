@@ -36,10 +36,10 @@ using chip::DeviceLayer::ConnectivityMgr;
 using chip::DeviceLayer::DiagnosticDataProvider;
 using chip::DeviceLayer::GetDiagnosticDataProvider;
 
-static_assert(sizeof(DiagnosticDataProvider::BootReasonType) == sizeof(EmberAfBootReasonType),
+static_assert(sizeof(chip::DeviceLayer::BootReasonType) == sizeof(EmberAfBootReasonType),
               "BootReasonType size doesn't match EmberAfBootReasonType size");
-static_assert(static_cast<uint8_t>(DiagnosticDataProvider::BootReasonType::Unspecified) == EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED &&
-                  static_cast<uint8_t>(DiagnosticDataProvider::BootReasonType::SoftwareReset) ==
+static_assert(static_cast<uint8_t>(chip::DeviceLayer::BootReasonType::Unspecified) == EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED &&
+                  static_cast<uint8_t>(chip::DeviceLayer::BootReasonType::SoftwareReset) ==
                       EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET,
               "BootReasonType and EmberAfBootReasonType values does not match.");
 
@@ -195,11 +195,22 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     }
 
     // Gets called when the device has been rebooted.
-    void OnDeviceRebooted() override
+    void OnDeviceRebooted(chip::DeviceLayer::BootReasonType bootReason) override
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
 
         ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReasons::Id);
+
+        // GeneralDiagnostics cluster should exist only for endpoint 0.
+
+        Events::BootReason::Type event{ static_cast<EmberAfBootReasonType>(bootReason) };
+        EventNumber eventNumber;
+
+        CHIP_ERROR err = LogEvent(event, 0, eventNumber, EventOptions::Type::kUrgent);
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     // Get called when the Node detects a hardware fault has been raised.

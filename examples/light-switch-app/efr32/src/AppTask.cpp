@@ -189,11 +189,11 @@ CHIP_ERROR AppTask::Init()
 
     sWiFiNetworkCommissioningInstance.Init();
 #endif
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -347,7 +347,7 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        SwitchToggleOnOff();
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchToggleOnOff, 0);
     }
 }
 
@@ -411,7 +411,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 

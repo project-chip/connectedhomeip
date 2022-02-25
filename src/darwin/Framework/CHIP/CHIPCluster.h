@@ -35,13 +35,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * CHIPReadParams
- *    This is used to control the behavior of attribute reads.
+ *    This is used to control the behavior of attribute reads and subscribes.
+ *    If not provided (i.e. nil passed for the CHIPReadParams argument), will be
+ *    treated as if a default-initialized object was passed in.
  */
 @interface CHIPReadParams : NSObject
 
 /**
- * Whether the read is fabric-filtered. nil (the default), or YES value,
- * means fabric-filtered.  NO means not fabric-filtered.
+ * Whether the read/subscribe is fabric-filtered. nil (the default value) is
+ * treated as YES.
+ *
+ * If YES, the read/subscribe is fabric-filtered and will only see things
+ * associated with the fabric of the reader/subscriber.
+ *
+ * If NO, the read/subscribe is not fabric-filtered and will see all
+ * non-fabric-sensitive data for the given attribute path.
  */
 @property (strong, nonatomic, nullable) NSNumber * fabricFiltered;
 

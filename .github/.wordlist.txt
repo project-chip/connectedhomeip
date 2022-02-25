@@ -59,6 +59,7 @@ ApplicationBasic
 ApplicationId
 ApplicationIdentifier
 ApplicationLauncher
+ApplyUpdate
 applyUpdateAction
 ApplyUpdateRequest
 ApplyUpdateResponse
@@ -340,6 +341,7 @@ DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 deviceSoftwareVersionModel
 DeviceTemperatureConfiguration
+deviceType
 DevKitC
 DevKitM
 devtype
@@ -529,6 +531,7 @@ gradlew
 GroupId
 GroupKeyManagement
 gtk
+GUA
 Gv
 gz
 HaloaceticAcidsConcentrationMeasurement
@@ -565,6 +568,8 @@ idx
 ifdef
 ifdefs
 IGMP
+ignoreApplyUpdate
+ignoreQueryImage
 ihex
 IlluminanceMeasurement
 IM
@@ -1214,6 +1219,7 @@ udpPort
 ug
 ui
 uint
+ULA
 UNBLUR
 uncommissioned
 unfocus
@@ -1341,3 +1347,4 @@ zephyrproject
 Zigbee
 zigbeealliance
 zigbeethread
+libshell

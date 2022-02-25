@@ -50,16 +50,6 @@ public:
      */
     const Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int idx);
 
-    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override
-    {
-        ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolved");
-    }
-
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
-    {
-        ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolutionFailed");
-    }
-
 protected:
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mDiscoveredCommissioners); }
 

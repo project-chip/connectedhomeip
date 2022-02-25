@@ -283,17 +283,8 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
 
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
-        //
-        // Service the IO + Engine till we get a ReportEnd callback on the client.
-        // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
-        // times this can run without seeing expected results.
-        //
-        for (int j = 0; j < 20 && !readCallback.mOnReportEnd; j++)
-        {
-            ctx.DrainAndServiceIO();
-            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-            ctx.DrainAndServiceIO();
-        }
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
 
         //
         // Always returns the same number of attributes read (5 + revision +
@@ -357,17 +348,8 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
 
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
-        //
-        // Service the IO + Engine till we get a ReportEnd callback on the client.
-        // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
-        // times this can run without seeing expected results.
-        //
-        for (int j = 0; j < 10 && !readCallback.mOnReportEnd; j++)
-        {
-            ctx.DrainAndServiceIO();
-            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-            ctx.DrainAndServiceIO();
-        }
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
 
         //
         // Always returns the same number of attributes read (merged by buffered read callback). The content is checked in
@@ -420,20 +402,15 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
 
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
-        //
-        // Service the IO + Engine till we get a ReportEnd callback on the client.
+        ctx.DrainAndServiceIO();
+
         // The server should return an empty list as attribute data for the first report (for list chunking), and encodes nothing
         // (then shuts down the read handler) for the second report.
         //
-        for (int j = 0; j < 2; j++)
-        {
-            ctx.DrainAndServiceIO();
-            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-            ctx.DrainAndServiceIO();
-        }
 
         // Nothing is actually encoded. buffered callback does not handle the message to us.
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 0);
+        NL_TEST_ASSERT(apSuite, !readCallback.mOnReportEnd);
 
         // The server should shutted down, while the client is still alive (pending for the attribute data.)
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
