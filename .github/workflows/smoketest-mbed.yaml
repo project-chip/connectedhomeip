@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
     mbedos:
-        name: Smoke test - MbedOs
+        name: Run
         timeout-minutes: 30
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'

@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
     mbedos:
-        name: Full Build - MbedOS
+        name: Run
         timeout-minutes: 200
 
         env:
