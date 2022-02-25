@@ -12611,12 +12611,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
                 else
                 {
-                    std::string newElement_0_optionalFabricSensitiveInt8uClassName     = "java/lang/Integer";
-                    std::string newElement_0_optionalFabricSensitiveInt8uCtorSignature = "(I)V";
+                    jobject newElement_0_optionalFabricSensitiveInt8uInsideOptional;
+                    std::string newElement_0_optionalFabricSensitiveInt8uInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_optionalFabricSensitiveInt8uInsideOptionalCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                        newElement_0_optionalFabricSensitiveInt8uClassName.c_str(),
-                        newElement_0_optionalFabricSensitiveInt8uCtorSignature.c_str(),
-                        entry_0.optionalFabricSensitiveInt8u.Value(), newElement_0_optionalFabricSensitiveInt8u);
+                        newElement_0_optionalFabricSensitiveInt8uInsideOptionalClassName.c_str(),
+                        newElement_0_optionalFabricSensitiveInt8uInsideOptionalCtorSignature.c_str(),
+                        entry_0.optionalFabricSensitiveInt8u.Value(), newElement_0_optionalFabricSensitiveInt8uInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_optionalFabricSensitiveInt8uInsideOptional,
+                                                                      newElement_0_optionalFabricSensitiveInt8u);
                 }
                 jobject newElement_0_nullableFabricSensitiveInt8u;
                 if (entry_0.nullableFabricSensitiveInt8u.IsNull())
@@ -12639,20 +12642,24 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
                 else
                 {
+                    jobject newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional;
                     if (entry_0.nullableOptionalFabricSensitiveInt8u.Value().IsNull())
                     {
-                        newElement_0_nullableOptionalFabricSensitiveInt8u = nullptr;
+                        newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional = nullptr;
                     }
                     else
                     {
-                        std::string newElement_0_nullableOptionalFabricSensitiveInt8uClassName     = "java/lang/Integer";
-                        std::string newElement_0_nullableOptionalFabricSensitiveInt8uCtorSignature = "(I)V";
+                        std::string newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalClassName = "java/lang/Integer";
+                        std::string newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalCtorSignature = "(I)V";
                         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                            newElement_0_nullableOptionalFabricSensitiveInt8uClassName.c_str(),
-                            newElement_0_nullableOptionalFabricSensitiveInt8uCtorSignature.c_str(),
+                            newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalClassName.c_str(),
+                            newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalCtorSignature.c_str(),
                             entry_0.nullableOptionalFabricSensitiveInt8u.Value().Value(),
-                            newElement_0_nullableOptionalFabricSensitiveInt8u);
+                            newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional);
                     }
+                    chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional,
+                        newElement_0_nullableOptionalFabricSensitiveInt8u);
                 }
                 jobject newElement_0_fabricSensitiveCharString;
                 newElement_0_fabricSensitiveCharString = env->NewStringUTF(
@@ -12747,7 +12754,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     std::string newElement_NaNCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                         newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
-                    chip::JniReferences::GetInstance().AddToArrayList(newElement_0_fabricSensitiveInt8uList, newElement_NaN);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_fabricSensitiveInt8uList, newElement_NaN);
                 }
 
                 jclass testFabricScopedStructClass;
@@ -12774,7 +12781,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                    newElement_0_nullableFabricSensitiveInt8u, newElement_0_nullableOptionalFabricSensitiveInt8u,
                                    newElement_0_fabricSensitiveCharString, newElement_0_fabricSensitiveStruct,
                                    newElement_0_fabricSensitiveInt8uList);
-                chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }

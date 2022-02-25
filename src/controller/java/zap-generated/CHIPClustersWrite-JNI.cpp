@@ -5820,7 +5820,7 @@ JNI_METHOD(void, TestClusterCluster, writeListFabricScopedAttribute)
         using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
         using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
         jint valueSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(value, valueSize);
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
         if (valueSize != 0)
         {
             auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
@@ -5829,7 +5829,7 @@ JNI_METHOD(void, TestClusterCluster, writeListFabricScopedAttribute)
             for (size_t i_0 = 0; i_0 < static_cast<size_t>(valueSize); ++i_0)
             {
                 jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
                 jobject element_0_fabricIndexItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Integer;",
                                                                   element_0_fabricIndexItem_1);
@@ -5850,9 +5850,12 @@ JNI_METHOD(void, TestClusterCluster, writeListFabricScopedAttribute)
                     jobject optionalValue_2;
                     chip::JniReferences::GetInstance().GetOptionalValue(element_0_optionalFabricSensitiveInt8uItem_1,
                                                                         optionalValue_2);
-                    auto & definedValue_2 = listHolder_0->mList[i_0].optionalFabricSensitiveInt8u.Emplace();
-                    definedValue_2        = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(
-                        chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2));
+                    if (optionalValue_2 != nullptr)
+                    {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].optionalFabricSensitiveInt8u.Emplace();
+                        definedValue_2        = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(
+                            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2));
+                    }
                 }
                 jobject element_0_nullableFabricSensitiveInt8uItem_1;
                 chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableFabricSensitiveInt8u", "Ljava/lang/Integer;",
@@ -5876,16 +5879,19 @@ JNI_METHOD(void, TestClusterCluster, writeListFabricScopedAttribute)
                     jobject optionalValue_2;
                     chip::JniReferences::GetInstance().GetOptionalValue(element_0_nullableOptionalFabricSensitiveInt8uItem_1,
                                                                         optionalValue_2);
-                    auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalFabricSensitiveInt8u.Emplace();
-                    if (optionalValue_2 == nullptr)
+                    if (optionalValue_2 != nullptr)
                     {
-                        definedValue_2.SetNull();
-                    }
-                    else
-                    {
-                        auto & nonNullValue_3 = definedValue_2.SetNonNull();
-                        nonNullValue_3        = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(
-                            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2));
+                        auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalFabricSensitiveInt8u.Emplace();
+                        if (optionalValue_2 == nullptr)
+                        {
+                            definedValue_2.SetNull();
+                        }
+                        else
+                        {
+                            auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                            nonNullValue_3        = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(
+                                chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2));
+                        }
                     }
                 }
                 jobject element_0_fabricSensitiveCharStringItem_1;
@@ -5953,8 +5959,8 @@ JNI_METHOD(void, TestClusterCluster, writeListFabricScopedAttribute)
                     using ListType_2       = std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveInt8uList)>;
                     using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
                     jint element_0_fabricSensitiveInt8uListItem_1Size;
-                    chip::JniReferences::GetInstance().GetArrayListSize(element_0_fabricSensitiveInt8uListItem_1,
-                                                                        element_0_fabricSensitiveInt8uListItem_1Size);
+                    chip::JniReferences::GetInstance().GetListSize(element_0_fabricSensitiveInt8uListItem_1,
+                                                                   element_0_fabricSensitiveInt8uListItem_1Size);
                     if (element_0_fabricSensitiveInt8uListItem_1Size != 0)
                     {
                         auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0_fabricSensitiveInt8uListItem_1Size);
@@ -5963,8 +5969,8 @@ JNI_METHOD(void, TestClusterCluster, writeListFabricScopedAttribute)
                         for (size_t i_2 = 0; i_2 < static_cast<size_t>(element_0_fabricSensitiveInt8uListItem_1Size); ++i_2)
                         {
                             jobject element_2;
-                            chip::JniReferences::GetInstance().GetArrayListItem(element_0_fabricSensitiveInt8uListItem_1, i_2,
-                                                                                element_2);
+                            chip::JniReferences::GetInstance().GetListItem(element_0_fabricSensitiveInt8uListItem_1, i_2,
+                                                                           element_2);
                             listHolder_2->mList[i_2] = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2])>>(
                                 chip::JniReferences::GetInstance().IntegerToPrimitive(element_2));
                         }

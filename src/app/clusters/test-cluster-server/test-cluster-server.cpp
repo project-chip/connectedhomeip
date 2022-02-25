@@ -48,6 +48,12 @@ constexpr uint8_t kAttributeListLength = 4;
 // The maximum length of the test attribute list element in bytes
 constexpr uint8_t kAttributeEntryLength = 6;
 
+// The maximum length of the fabric sensitive string within the TestFabricScoped struct.
+constexpr uint8_t kFabricSensitiveCharLength = 128;
+
+// The maximum length of the fabric sensitive integer list within the TestFabricScoped struct.
+constexpr uint8_t kFabricSensitiveIntListLength = 8;
+
 namespace {
 
 class OctetStringData
@@ -110,9 +116,9 @@ Structs::SimpleStruct::Type gStructAttributeValue;
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
 
 TestCluster::Structs::TestFabricScoped::Type gListFabricScopedAttributeValue[kAttributeListLength];
-uint8_t gListFabricScoped_fabricSensitiveInt8uList[kAttributeListLength][64];
+uint8_t gListFabricScoped_fabricSensitiveInt8uList[kAttributeListLength][kFabricSensitiveIntListLength];
 size_t gListFabricScopedAttributeLen = 0;
-char gListFabricScoped_fabricSensitiveCharBuf[kAttributeListLength][128];
+char gListFabricScoped_fabricSensitiveCharBuf[kAttributeListLength][kFabricSensitiveCharLength];
 
 //                                                     /16             /32             /48             /64
 const char sLongOctetStringBuf[513] = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  // 64
@@ -572,9 +578,9 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedListEntry(const Structs::TestFab
     gListFabricScopedAttributeValue[index].nullableFabricSensitiveInt8u         = entry.nullableFabricSensitiveInt8u;
     gListFabricScopedAttributeValue[index].nullableOptionalFabricSensitiveInt8u = entry.nullableOptionalFabricSensitiveInt8u;
 
-    VerifyOrReturnError(entry.fabricSensitiveCharString.size() < 128, CHIP_ERROR_BUFFER_TOO_SMALL);
-    strncpy(gListFabricScoped_fabricSensitiveCharBuf[index], entry.fabricSensitiveCharString.begin(),
-            entry.fabricSensitiveCharString.size());
+    VerifyOrReturnError(entry.fabricSensitiveCharString.size() < kFabricSensitiveCharLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(gListFabricScoped_fabricSensitiveCharBuf[index], entry.fabricSensitiveCharString.data(),
+           entry.fabricSensitiveCharString.size());
     gListFabricScopedAttributeValue[index].fabricSensitiveCharString =
         CharSpan(gListFabricScoped_fabricSensitiveCharBuf[index], entry.fabricSensitiveCharString.size());
 
@@ -593,7 +599,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedListEntry(const Structs::TestFab
     size_t i     = 0;
     while (intIter.Next())
     {
-        VerifyOrReturnError(i < 64, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(i < kFabricSensitiveIntListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         gListFabricScoped_fabricSensitiveInt8uList[index][i++] = intIter.GetValue();
     }
     ReturnErrorOnFailure(intIter.GetStatus());
@@ -629,8 +635,8 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
                 //
                 // We copy the data referenced by spans over to the right slot in the backing buffers.
                 //
-                strncpy(gListFabricScoped_fabricSensitiveCharBuf[dstIndex], srcEntry.fabricSensitiveCharString.begin(),
-                        srcEntry.fabricSensitiveCharString.size());
+                memcpy(gListFabricScoped_fabricSensitiveCharBuf[dstIndex], srcEntry.fabricSensitiveCharString.data(),
+                       srcEntry.fabricSensitiveCharString.size());
                 dstEntry.fabricSensitiveCharString =
                     CharSpan(gListFabricScoped_fabricSensitiveCharBuf[dstIndex], srcEntry.fabricSensitiveCharString.size());
 
