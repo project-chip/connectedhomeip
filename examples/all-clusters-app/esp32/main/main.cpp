@@ -271,6 +271,24 @@ public:
                 // update the temp attribute here for hardcoded endpoint 1
                 chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
             }
+            else if (name == "Color Current Level")
+            {
+                // update the current level here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Brightness changed to : %d", (n * 100 / 255));
+                app::Clusters::LevelControl::Attributes::CurrentLevel::Set(1, n);
+            }
+            else if (name == "Current Hue")
+            {
+                // update the current hue here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Hue changed to : %d", n * 360 / 254);
+                app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, n);
+            }
+            else if (name == "Current Saturation")
+            {
+                // update the current saturation here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Saturation changed to : %d", n * 100 / 254);
+                app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, n);
+            }
             value = buffer;
         }
         else if (IsBooleanAttribute())
@@ -453,7 +471,7 @@ public:
         }
         else if (i == 1)
         {
-            ConfigurationMgr().InitiateFactoryReset();
+            chip::Server::GetInstance().ScheduleFactoryReset();
         }
         else if (i == 2)
         {
@@ -576,6 +594,21 @@ void SetupPretendDevices()
     AddCluster("Illuminance Measurement");
     AddAttribute("MeasuredValue", "1000");
     app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
+
+    AddDevice("Color Light");
+    AddEndpoint("1");
+    AddCluster("OnOff");
+    AddAttribute("OnOff", "Off");
+    app::Clusters::OnOff::Attributes::OnOff::Set(1, false);
+    AddCluster("Level Control");
+    AddAttribute("Color Current Level", "255");
+    app::Clusters::LevelControl::Attributes::CurrentLevel::Set(1, 255);
+    AddEndpoint("2");
+    AddCluster("Color Control");
+    AddAttribute("Current Hue", "200");
+    app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, 200);
+    AddAttribute("Current Saturation", "150");
+    app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, 150);
 }
 
 WiFiWidget pairingWindowLED;

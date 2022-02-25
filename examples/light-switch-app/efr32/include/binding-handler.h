@@ -16,7 +16,17 @@
  */
 #pragma once
 
+#include "app-common/zap-generated/ids/Clusters.h"
+#include "app-common/zap-generated/ids/Commands.h"
 #include "lib/core/CHIPError.h"
 
 CHIP_ERROR InitBindingHandler();
-void SwitchToggleOnOff();
+void SwitchToggleOnOff(intptr_t context);
+void SwitchOnOffOn(intptr_t context);
+void SwitchOnOffOff(intptr_t context);
+
+struct BindingCommandData
+{
+    chip::CommandId commandId;
+    chip::ClusterId clusterId;
+};

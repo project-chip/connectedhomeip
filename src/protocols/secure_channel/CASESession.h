@@ -229,7 +229,7 @@ private:
     CHIP_ERROR SetEffectiveTime();
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                       System::PacketBufferHandle & msg);
+                                       const System::PacketBufferHandle & msg);
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 

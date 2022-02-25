@@ -20,22 +20,26 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <netsocket/WiFiInterface.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
+#else
+#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
-#endif
-#include <inet/IPAddress.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <netsocket/WiFiInterface.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 namespace chip {
 namespace DeviceLayer {
@@ -45,84 +49,98 @@ namespace DeviceLayer {
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
                                       public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
-
+#else
+                                      public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
                                       public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
-public:
-    CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
-    void StartWiFiManagement() {}
-
 private:
-    // ===== Members that implement the ConnectivityManager abstract interface.
     CHIP_ERROR _Init(void);
-    void _ProcessInterfaceChange(nsapi_connection_status_t new_status);
-    void OnInterfaceEvent(nsapi_event_t event, intptr_t data);
-    WiFiStationMode _GetWiFiStationMode(void);
-    CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
-
-    WiFiAPMode _GetWiFiAPMode(void);
-
-    System::Clock::Timeout _GetWiFiStationReconnectInterval(void);
-    CHIP_ERROR _SetWiFiStationReconnectInterval(System::Clock::Timeout val);
-    bool _IsWiFiStationConnected(void);
-    bool _IsWiFiStationEnabled(void);
-    bool _IsWiFiStationProvisioned(void);
-    void _ClearWiFiStationProvision(void);
-    bool _IsWiFiStationApplicationControlled(void);
-    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
-    CHIP_ERROR OnStationConnected();
-    CHIP_ERROR OnStationDisconnected();
-    CHIP_ERROR OnStationConnecting();
-    const char * status2str(nsapi_connection_status_t sec);
-    ::chip::DeviceLayer::Internal::WiFiAuthSecurityType NsapiToNetworkSecurity(nsapi_security_t nsapi_security);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+private:
+    CHIP_ERROR InitWiFi(void);
+    void OnWiFiPlatformEvent(const ChipDeviceEvent * event);
 
-    void ExecuteStationChange(void);
-    static void OnWiFiStationChange(intptr_t arg);
+    WiFiStationMode _GetWiFiStationMode();
+    CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
+    bool _IsWiFiStationEnabled();
+    bool _IsWiFiStationApplicationControlled();
+    System::Clock::Timeout _GetWiFiStationReconnectInterval();
+    CHIP_ERROR _SetWiFiStationReconnectInterval(System::Clock::Timeout val);
+    bool _IsWiFiStationProvisioned();
+    bool _IsWiFiStationConnected(void);
+    void _ClearWiFiStationProvision();
+
     // ===== Members for internal use by the following friends.
+
+    WiFiStationMode mWiFiStationMode   = kWiFiStationMode_NotSupported;
+    WiFiStationState mWiFiStationState = kWiFiStationState_NotConnected;
+    System::Clock::Timeout mWiFiStationReconnectInterval =
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
+    bool mIsProvisioned = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     friend ConnectivityManager & ConnectivityMgr(void);
     friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
     static ConnectivityManagerImpl sInstance;
-    WiFiStationMode mWiFiStationMode   = kWiFiStationMode_NotSupported;
-    WiFiStationState mWiFiStationState = kWiFiStationState_NotConnected;
-    WiFiAPMode mWiFiAPMode             = kWiFiAPMode_NotSupported;
-    System::Clock::Timeout mWiFiStationReconnectInterval =
-        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
-    System::Clock::Timeout mWiFiAPIdleTimeout = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
-    WiFiInterface * mWiFiInterface            = nullptr;
-    nsapi_security_t mSecurityType            = NSAPI_SECURITY_WPA_WPA2;
-    bool mIsProvisioned                       = false;
-    Inet::IPAddress mIp4Address               = Inet::IPAddress::Any;
-    Inet::IPAddress mIp6Address               = Inet::IPAddress::Any;
+
+public:
+    CHIP_ERROR PostEvent(const ChipDeviceEvent * event, bool die);
+    void AddTask(AsyncWorkFunct workFunct, intptr_t arg);
+    void AddQueueEvent(void (*func)(nsapi_event_t, intptr_t), nsapi_event_t event, intptr_t data);
 };
 
-inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode(void)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+inline ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
-    return mWiFiAPMode;
+    return mWiFiStationMode;
+}
+
+inline bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
+{
+    return mWiFiStationMode == kWiFiStationMode_Enabled;
+}
+
+inline bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
+{
+    return mWiFiStationMode == kWiFiStationMode_ApplicationControlled;
 }
 
 inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiStationReconnectInterval(void)
 {
     return mWiFiStationReconnectInterval;
 }
+
+inline bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
+{
+    return mIsProvisioned;
+}
+
+inline bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
+{
+    return mWiFiStationState == kWiFiStationState_Connected;
+}
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 /**
  * Returns the public interface of the ConnectivityManager singleton object.

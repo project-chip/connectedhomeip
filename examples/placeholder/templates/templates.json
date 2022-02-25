@@ -17,24 +17,24 @@
             "path": "../../../src/app/zap-templates/partials/header.zapt"
         },
         {
-            "name": "clusters_header",
-            "path": "../../../src/app/zap-templates/partials/clusters_header.zapt"
-        },
-        {
-            "name": "cluster_header",
-            "path": "../../../src/app/zap-templates/partials/cluster_header.zapt"
-        },
-        {
             "name": "test_cluster",
-            "path": "../../../examples/chip-tool/templates/partials/test_cluster.zapt"
+            "path": "../../../examples/chip-tool/templates/tests/partials/test_cluster.zapt"
+        },
+        {
+            "name": "setupSaveAs",
+            "path": "../../../examples/chip-tool/templates/tests/partials/saveAs/setupSaveAs.zapt"
+        },
+        {
+            "name": "teardownSaveAs",
+            "path": "../../../examples/chip-tool/templates/tests/partials/saveAs/teardownSaveAs.zapt"
         },
         {
             "name": "commandValue",
-            "path": "../../../examples/chip-tool/templates/partials/test_cluster_command_value.zapt"
+            "path": "../../../examples/chip-tool/templates/tests/partials/command_value.zapt"
         },
         {
             "name": "valueEquals",
-            "path": "../../../examples/chip-tool/templates/partials/test_cluster_value_equals.zapt"
+            "path": "../../../examples/chip-tool/templates/tests/partials/value_equals.zapt"
         }
     ],
     "templates": [

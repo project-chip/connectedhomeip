@@ -91,6 +91,7 @@ public:
     static constexpr Key kConfigKey_RegulatoryLocation = K32WConfigKey(kPDMId_ChipConfig, 0x07);
     static constexpr Key kConfigKey_CountryCode        = K32WConfigKey(kPDMId_ChipConfig, 0x08);
     static constexpr Key kConfigKey_Breadcrumb         = K32WConfigKey(kPDMId_ChipConfig, 0x09);
+    static constexpr Key kConfigKey_UniqueId           = K32WConfigKey(kPDMId_ChipConfig, 0x0A);
 
     // CHIP Counter Keys
     static constexpr Key kCounterKey_RebootCount           = K32WConfigKey(kPDMId_ChipCounter, 0x00);

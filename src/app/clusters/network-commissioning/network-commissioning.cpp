@@ -28,6 +28,11 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::NetworkCommissioning;
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -239,12 +244,12 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
 
     if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
     {
-        mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
+        mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(req.ssid, this);
     }
     else if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
     {
-        mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
+        mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<ThreadDriver *>()->ScanNetworks(this);
     }
     else
@@ -285,7 +290,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
 
-    mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
+    mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 }
 
@@ -446,7 +451,7 @@ void Instance::_OnCommissioningComplete(const DeviceLayer::ChipDeviceEvent * eve
 {
     Instance * this_ = reinterpret_cast<Instance *>(arg);
     VerifyOrReturn(event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete);
-    this_->OnCommissioningComplete(event->CommissioningComplete.status);
+    this_->OnCommissioningComplete(event->CommissioningComplete.Status);
 }
 
 void Instance::OnCommissioningComplete(CHIP_ERROR err)
@@ -487,3 +492,48 @@ DeviceLayer::NetworkCommissioning::NetworkIterator * NullNetworkDriver::GetNetwo
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// These functions are ember interfaces, they should never be implemented since all network commissioning cluster functions are
+// implemented in NetworkCommissioning::Instance.
+bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::AddOrUpdateThreadNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::AddOrUpdateWiFiNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterConnectNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::ConnectNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                             const Commands::RemoveNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                            const Commands::ScanNetworks::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterReorderNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::ReorderNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+void MatterNetworkCommissioningPluginServerInitCallback()
+{
+    // Nothing to do, the server init routine will be done in Instance::Init()
+}

@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/app-platform/ContentAppPlatform.h>
+#include <app/server/Server.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPArgParser.hpp>
@@ -387,24 +388,49 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
     return (uint32_t) strtol(pinString.c_str(), &eptr, 10);
 }
 
-CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy * device, chip::EndpointId deviceEndpointId,
-                                                         chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
-                                                         chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
-                                                         CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
-                                                         CommandResponseFailureCallback failureCb)
+CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId,
+                                                         NodeId bindingNodeId, GroupId bindingGroupId, EndpointId bindingEndpointId,
+                                                         ClusterId bindingClusterId,
+                                                         Controller::WriteResponseSuccessCallback successCb,
+                                                         Controller::WriteResponseFailureCallback failureCb)
 {
     chip::Controller::BindingCluster cluster;
     cluster.Associate(device, deviceEndpointId);
+    Binding::Structs::TargetStruct::Type entries[1];
 
-    Binding::Commands::Bind::Type request;
-    request.nodeId     = bindingNodeId;
-    request.groupId    = bindingGroupId;
-    request.endpointId = bindingEndpointId;
-    request.clusterId  = bindingClusterId;
-    ReturnErrorOnFailure(cluster.InvokeCommand(request, this, successCb, failureCb));
+    if (bindingNodeId != kUndefinedNodeId)
+    {
+        entries[0] = Binding::Structs::TargetStruct::Type{
+            .fabricIndex = kUndefinedFabricIndex,
+            .node        = MakeOptional(bindingNodeId),
+            .group       = NullOptional,
+            .endpoint    = MakeOptional(bindingEndpointId),
+            .cluster     = MakeOptional(bindingClusterId),
+        };
+    }
+    else
+    {
+        entries[0] = Binding::Structs::TargetStruct::Type{
+            .fabricIndex = kUndefinedFabricIndex,
+            .node        = NullOptional,
+            .group       = MakeOptional(bindingGroupId),
+            .endpoint    = NullOptional,
+            .cluster     = MakeOptional(bindingClusterId),
+        };
+    }
+    using BindingListTypeInfo = Binding::Attributes::Binding::TypeInfo;
+    BindingListTypeInfo::Type bindingList(entries);
+    CHIP_ERROR error = cluster.WriteAttribute<BindingListTypeInfo>(bindingList, nullptr, successCb, failureCb);
+    if (error == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Controller, "CreateBindingWithCallback: Sent write request, waiting for response");
+    }
+    else
+    {
+        ChipLogError(Controller, "CreateBindingWithCallback: Failed to send write request: %" CHIP_ERROR_FORMAT, error.Format());
+    }
 
-    ChipLogDetail(Controller, "CreateBindingWithCallback: Sent Bind command request, waiting for response");
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 } // namespace AppPlatform

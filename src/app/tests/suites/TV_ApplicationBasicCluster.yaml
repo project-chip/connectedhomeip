@@ -59,9 +59,8 @@ tests:
       attribute: "Status"
       response:
           value: 0
-    # TODO: Enable once attribute struct is supported
+
     - label: "Read attribute application status"
-      disabled: true
       command: "readAttribute"
       attribute: "Application"
       response:
@@ -75,8 +74,7 @@ tests:
           value: "exampleVersion"
 
     - label: "Read attribute application allowed vendor list"
-      disabled: true
       command: "readAttribute"
       attribute: "AllowedVendorList"
       response:
-          value: [123, 456]
+          value: [1, 456]

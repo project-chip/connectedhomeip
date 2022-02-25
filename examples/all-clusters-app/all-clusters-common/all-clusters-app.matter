@@ -136,11 +136,6 @@ server cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  bitmap ChannelFeature : BITMAP32 {
-    kChannelList = 0x1;
-    kLineupInfo = 0x2;
-  }
-
   struct Application {
     INT16U catalogVendorId = 0;
     CHAR_STRING applicationId = 1;
@@ -235,24 +230,16 @@ server cluster BinaryInputBasic = 15 {
 }
 
 server cluster Binding = 30 {
+  struct TargetStruct {
+    FABRIC_IDX fabricIndex = 0;
+    optional NODE_ID node = 1;
+    optional GROUP_ID group = 2;
+    optional ENDPOINT_NO endpoint = 3;
+    optional CLUSTER_ID cluster = 4;
+  }
+
+  attribute TargetStruct binding[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
-
-  request struct BindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  request struct UnbindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  command Bind(BindRequest): DefaultSuccess = 0;
-  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 server cluster BooleanState = 69 {
@@ -343,47 +330,20 @@ server cluster BridgedActions = 37 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
-server cluster BridgedDeviceBasic = 57 {
-  critical event StartUp = 0 {
-    INT32U softwareVersion = 0;
-  }
-
-  critical event ShutDown = 1 {
-  }
-
-  info event Leave = 2 {
-  }
-
-  info event ReachableChanged = 3 {
-    boolean reachableNewValue = 0;
-  }
-
-  readonly attribute char_string<32> vendorName = 1;
-  readonly attribute int16u vendorID = 2;
-  readonly attribute char_string<32> productName = 3;
-  attribute char_string<32> nodeLabel = 5;
-  readonly attribute int16u hardwareVersion = 7;
-  readonly attribute char_string<64> hardwareVersionString = 8;
-  readonly attribute int32u softwareVersion = 9;
-  readonly attribute char_string<64> softwareVersionString = 10;
-  readonly attribute char_string<16> manufacturingDate = 11;
-  readonly attribute char_string<32> partNumber = 12;
-  readonly attribute long_char_string<256> productURL = 13;
-  readonly attribute char_string<64> productLabel = 14;
-  readonly attribute char_string<32> serialNumber = 15;
-  readonly attribute boolean reachable = 17;
-  readonly attribute char_string<32> uniqueID = 18;
-  readonly global attribute int16u clusterRevision = 65533;
-}
-
 server cluster Channel = 1284 {
-  enum ErrorTypeEnum : ENUM8 {
-    kMultipleMatches = 0;
-    kNoMatches = 1;
-  }
-
   enum LineupInfoTypeEnum : ENUM8 {
     kMso = 0;
+  }
+
+  enum StatusEnum : ENUM8 {
+    kSuccess = 0;
+    kMultipleMatches = 1;
+    kNoMatches = 2;
+  }
+
+  bitmap ChannelFeature : BITMAP32 {
+    kChannelList = 0x1;
+    kLineupInfo = 0x2;
   }
 
   struct ChannelInfo {
@@ -1366,8 +1326,8 @@ server cluster GeneralCommissioning = 48 {
 
   attribute int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
-  readonly attribute enum8 regulatoryConfig = 2;
-  readonly attribute enum8 locationCapability = 3;
+  readonly attribute RegulatoryLocationType regulatoryConfig = 2;
+  readonly attribute RegulatoryLocationType locationCapability = 3;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -2238,7 +2198,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   info event StateTransition = 0 {
-    nullable OTAUpdateStateEnum previousState = 0;
+    OTAUpdateStateEnum previousState = 0;
     OTAUpdateStateEnum newState = 1;
     OTAChangeReasonEnum reason = 2;
     nullable INT32U targetSoftwareVersion = 3;
@@ -3579,7 +3539,6 @@ endpoint 1 {
   server  cluster Binding;
   server  cluster BooleanState;
   server  cluster BridgedActions;
-  server  cluster BridgedDeviceBasic;
   server  cluster Channel;
   server  cluster ColorControl;
   server  cluster ContentLauncher;

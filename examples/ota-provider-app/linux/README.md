@@ -18,6 +18,8 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug c
 | -f/--filepath <file>                                                  | Path to a file containing an OTA image                                                                                                                                                                                                                                                                                                                                                |
 | -o/--otaImageList <file>                                              | Path to a file containing a list of OTA images                                                                                                                                                                                                                                                                                                                                        |
 | -q/--queryImageStatus <updateAvailable \| busy \| updateNotAvailable> | Value for the Status field in the QueryImageResponse                                                                                                                                                                                                                                                                                                                                  |
+| -x/--ignoreQueryImage <num_times_to_ignore>                           | The number of times to ignore the QueryImage Command and not send a response                                                                                                                                                                                                                                                                                                          |  |
+| -y/--ignoreApplyUpdate <num_times_to_ignore>                          | The number of times to ignore the ApplyUpdate Request and not send a response                                                                                                                                                                                                                                                                                                         |
 | -a/--applyUpdateAction <proceed \| awaitNextAction \| discontinue>    | Value for the Action field in the ApplyUpdateResponse                                                                                                                                                                                                                                                                                                                                 |
 | -t/--delayedActionTimeSec <time>                                      | Value in seconds for the DelayedActionTime field in the QueryImageResponse and ApplyUpdateResponse                                                                                                                                                                                                                                                                                    |
 | -u/--userConsentState <granted \| denied \| deferred>                 | Current user consent state which results in various values for Status field in QueryImageResponse <br> Note that -q/--queryImageStatus overrides this option <li> granted: Status field in QueryImageResponse is set to updateAvailable <li> denied: Status field in QueryImageResponse is set to updateNotAvailable <li> deferred: Status field in QueryImageResponse is set to busy |
@@ -51,6 +53,31 @@ An example of the `--otaImageList` file contents:
   ]
 }
 ```
+
+## Access Control Requirements
+
+Commissioner or Administrator SHOULD install necessary ACL entries at
+commissioning time or later to enable processing of QueryImage commands from OTA
+Requestors on their fabric, otherwise that OTA Provider will not be usable by
+OTA Requestors.
+
+Since the ACL attribute contains a list of ACL entries, writing of the attribute
+should not just contain the values for the new entry. Any existing entries
+should be read and included as part of the write. Below is an example of how to
+write the ACL attribute with two entries:
+
+```
+out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 0xDEADBEEF 0
+```
+
+-   Entry 1: This is the original entry created as part of commissioning which
+    grants administer privilege to the node ID 112233 (default controller node
+    ID) for all clusters on every endpoint
+-   Entry 2: This is the new entry being added which grants operate privileges
+    to all nodes for the OTA Provider cluster (0x0029) on every endpoint
+
+In the example above, the provider is on fabric index 1 with provider node ID
+being 0xDEADBEEF on endpoint 0.
 
 ## Current Limitations
 

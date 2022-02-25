@@ -58,6 +58,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
                                   TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
     static ListIndex listStructOctetStringElementCount = 0;
+
     if (aPath.mDataVersion.HasValue() && aPath.mDataVersion.Value() == kRejectedDataVersion)
     {
         return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
@@ -107,6 +108,38 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
         return CHIP_NO_ERROR;
     }
+    else if (aPath.mClusterId == TestCluster::Id && aPath.mAttributeId == Attributes::ListFabricScoped::Id)
+    {
+        // Mock a invalid SubjectDescriptor
+        AttributeValueDecoder decoder(aReader, Access::SubjectDescriptor());
+        if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+        {
+            Attributes::ListFabricScoped::TypeInfo::DecodableType value;
+
+            ReturnErrorOnFailure(decoder.Decode(value));
+
+            auto iter = value.begin();
+            while (iter.Next())
+            {
+                auto & item = iter.GetValue();
+                (void) item;
+            }
+
+            aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
+        }
+        else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            Structs::TestFabricScoped::DecodableType item;
+            ReturnErrorOnFailure(decoder.Decode(item));
+
+            aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
+        }
+        else
+        {
+            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        }
+        return CHIP_NO_ERROR;
+    }
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -124,6 +157,7 @@ public:
     static void TestDataResponseWithAcceptedDataVersion(nlTestSuite * apSuite, void * apContext);
     static void TestDataResponseWithRejectedDataVersion(nlTestSuite * apSuite, void * apContext);
     static void TestAttributeError(nlTestSuite * apSuite, void * apContext);
+    static void TestFabricScopedAttributeWithoutFabricIndex(nlTestSuite * apSuite, void * apContext);
     static void TestWriteTimeout(nlTestSuite * apSuite, void * apContext);
 };
 
@@ -287,6 +321,44 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestWriteInteraction::TestFabricScopedAttributeWithoutFabricIndex(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+    TestCluster::Structs::TestFabricScoped::Type valueBuf[4];
+    TestCluster::Attributes::ListFabricScoped::TypeInfo::Type value;
+
+    value = valueBuf;
+
+    uint8_t i = 0;
+    for (auto & item : valueBuf)
+    {
+        item.fabricIndex = i;
+        i++;
+    }
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked, &apSuite](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
+        onFailureCbInvoked = true;
+    };
+
+    chip::Controller::WriteAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(sessionHandle, kTestEndpointId, value,
+                                                                                          onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -294,6 +366,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestDataResponseWithAcceptedDataVersion", TestWriteInteraction::TestDataResponseWithAcceptedDataVersion),
     NL_TEST_DEF("TestDataResponseWithRejectedDataVersion", TestWriteInteraction::TestDataResponseWithRejectedDataVersion),
     NL_TEST_DEF("TestAttributeError", TestWriteInteraction::TestAttributeError),
+    NL_TEST_DEF("TestWriteFabricScopedAttributeWithoutFabricIndex", TestWriteInteraction::TestFabricScopedAttributeWithoutFabricIndex),
     NL_TEST_SENTINEL()
 };
 // clang-format on

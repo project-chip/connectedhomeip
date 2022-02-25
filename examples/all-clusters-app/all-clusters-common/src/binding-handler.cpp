@@ -66,18 +66,19 @@ static void RegisterSwitchCommands()
 }
 #endif // defined(ENABLE_CHIP_SHELL)
 
-static void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, chip::DeviceProxy * peer_device, void * context)
+static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device, void * context)
 {
     using namespace chip;
     using namespace chip::app;
 
-    if (binding->type == EMBER_MULTICAST_BINDING)
+    if (binding.type == EMBER_MULTICAST_BINDING)
     {
         ChipLogError(NotSpecified, "Group binding is not supported now");
         return;
     }
 
-    if (binding->type == EMBER_UNICAST_BINDING && binding->local == 1 && binding->clusterId == Clusters::OnOff::Id)
+    if (binding.type == EMBER_UNICAST_BINDING && binding.local == 1 &&
+        (!binding.clusterId.HasValue() || binding.clusterId.Value() == Clusters::OnOff::Id))
     {
         auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
             ChipLogProgress(NotSpecified, "OnOff command succeeds");
@@ -90,13 +91,13 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, ch
         {
             Clusters::OnOff::Commands::On::Type onCommand;
             Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding->remote, onCommand, onSuccess, onFailure);
+                                             binding.remote, onCommand, onSuccess, onFailure);
         }
         else
         {
             Clusters::OnOff::Commands::Off::Type offCommand;
             Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding->remote, offCommand, onSuccess, onFailure);
+                                             binding.remote, offCommand, onSuccess, onFailure);
         }
     }
 }

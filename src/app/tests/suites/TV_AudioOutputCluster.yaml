@@ -34,16 +34,16 @@ tests:
       response:
           value:
               [
-                  { index: 1, outputType: 0, name: "exampleName" },
-                  { index: 2, outputType: 0, name: "exampleName" },
-                  { index: 3, outputType: 0, name: "exampleName" },
+                  { index: 1, outputType: 0, name: "HDMI" },
+                  { index: 2, outputType: 0, name: "HDMI" },
+                  { index: 3, outputType: 0, name: "HDMI" },
               ]
 
     - label: "Read attribute current audio output"
       command: "readAttribute"
       attribute: "CurrentOutput"
       response:
-          value: 0
+          value: 1
 
     - label: "Select Output Command"
       command: "selectOutput"
@@ -59,4 +59,15 @@ tests:
               - name: "index"
                 value: 1
               - name: "name"
-                value: "exampleName"
+                value: "HDMI Test"
+
+    - label: "Read attribute Audio Output list"
+      command: "readAttribute"
+      attribute: "OutputList"
+      response:
+          value:
+              [
+                  { index: 1, outputType: 0, name: "HDMI Test" },
+                  { index: 2, outputType: 0, name: "HDMI" },
+                  { index: 3, outputType: 0, name: "HDMI" },
+              ]

@@ -6656,108 +6656,61 @@ struct TypeInfo
 } // namespace Descriptor
 namespace Binding {
 
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace Bind {
-struct Type;
-struct DecodableType;
-} // namespace Bind
-
-namespace Unbind {
-struct Type;
-struct DecodableType;
-} // namespace Unbind
-
-} // namespace Commands
-
-namespace Commands {
-namespace Bind {
+namespace Structs {
+namespace TargetStruct {
 enum class Fields
 {
-    kNodeId     = 0,
-    kGroupId    = 1,
-    kEndpointId = 2,
-    kClusterId  = 3,
+    kFabricIndex = 0,
+    kNode        = 1,
+    kGroup       = 2,
+    kEndpoint    = 3,
+    kCluster     = 4,
 };
 
 struct Type
 {
 public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Bind::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    Optional<chip::NodeId> node;
+    Optional<chip::GroupId> group;
+    Optional<chip::EndpointId> endpoint;
+    Optional<chip::ClusterId> cluster;
 
-    chip::NodeId nodeId         = static_cast<chip::NodeId>(0);
-    chip::GroupId groupId       = static_cast<chip::GroupId>(0);
-    chip::EndpointId endpointId = static_cast<chip::EndpointId>(0);
-    chip::ClusterId clusterId   = static_cast<chip::ClusterId>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Bind::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-
-    chip::NodeId nodeId         = static_cast<chip::NodeId>(0);
-    chip::GroupId groupId       = static_cast<chip::GroupId>(0);
-    chip::EndpointId endpointId = static_cast<chip::EndpointId>(0);
-    chip::ClusterId clusterId   = static_cast<chip::ClusterId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Bind
-namespace Unbind {
-enum class Fields
-{
-    kNodeId     = 0,
-    kGroupId    = 1,
-    kEndpointId = 2,
-    kClusterId  = 3,
-};
 
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Unbind::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
-    chip::NodeId nodeId         = static_cast<chip::NodeId>(0);
-    chip::GroupId groupId       = static_cast<chip::GroupId>(0);
-    chip::EndpointId endpointId = static_cast<chip::EndpointId>(0);
-    chip::ClusterId clusterId   = static_cast<chip::ClusterId>(0);
+    auto GetFabricIndex() const { return fabricIndex; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 
-    using ResponseType = DataModel::NullObjectType;
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const;
 };
 
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Unbind::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+using DecodableType = Type;
 
-    chip::NodeId nodeId         = static_cast<chip::NodeId>(0);
-    chip::GroupId groupId       = static_cast<chip::GroupId>(0);
-    chip::EndpointId endpointId = static_cast<chip::EndpointId>(0);
-    chip::ClusterId clusterId   = static_cast<chip::ClusterId>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Unbind
-} // namespace Commands
+} // namespace TargetStruct
+} // namespace Structs
 
 namespace Attributes {
 
+namespace Binding {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::TargetStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Binding::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Binding
 namespace ServerGeneratedCommandList {
 struct TypeInfo
 {
@@ -6827,6 +6780,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::Binding::TypeInfo::DecodableType binding;
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -9502,9 +9456,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::Nullable<OTAUpdateStateEnum> previousState;
-    OTAUpdateStateEnum newState = static_cast<OTAUpdateStateEnum>(0);
-    OTAChangeReasonEnum reason  = static_cast<OTAChangeReasonEnum>(0);
+    OTAUpdateStateEnum previousState = static_cast<OTAUpdateStateEnum>(0);
+    OTAUpdateStateEnum newState      = static_cast<OTAUpdateStateEnum>(0);
+    OTAChangeReasonEnum reason       = static_cast<OTAChangeReasonEnum>(0);
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -9517,9 +9471,9 @@ public:
     static constexpr EventId GetEventId() { return Events::StateTransition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    DataModel::Nullable<OTAUpdateStateEnum> previousState;
-    OTAUpdateStateEnum newState = static_cast<OTAUpdateStateEnum>(0);
-    OTAChangeReasonEnum reason  = static_cast<OTAChangeReasonEnum>(0);
+    OTAUpdateStateEnum previousState = static_cast<OTAUpdateStateEnum>(0);
+    OTAUpdateStateEnum newState      = static_cast<OTAUpdateStateEnum>(0);
+    OTAChangeReasonEnum reason       = static_cast<OTAChangeReasonEnum>(0);
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11040,9 +10994,9 @@ struct TypeInfo
 namespace RegulatoryConfig {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RegulatoryConfig::Id; }
@@ -11052,9 +11006,9 @@ struct TypeInfo
 namespace LocationCapability {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocationCapability::Id; }
@@ -11132,8 +11086,10 @@ struct TypeInfo
 
         Attributes::Breadcrumb::TypeInfo::DecodableType breadcrumb = static_cast<uint64_t>(0);
         Attributes::BasicCommissioningInfo::TypeInfo::DecodableType basicCommissioningInfo;
-        Attributes::RegulatoryConfig::TypeInfo::DecodableType regulatoryConfig     = static_cast<uint8_t>(0);
-        Attributes::LocationCapability::TypeInfo::DecodableType locationCapability = static_cast<uint8_t>(0);
+        Attributes::RegulatoryConfig::TypeInfo::DecodableType regulatoryConfig =
+            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType>(0);
+        Attributes::LocationCapability::TypeInfo::DecodableType locationCapability =
+            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType>(0);
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -14769,9 +14725,9 @@ struct TypeInfo
 namespace VendorID {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::VendorId;
+    using DecodableType    = chip::VendorId;
+    using DecodableArgType = chip::VendorId;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
@@ -15014,7 +14970,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::VendorName::TypeInfo::DecodableType vendorName;
-        Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<uint16_t>(0);
+        Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<chip::VendorId>(0);
         Attributes::ProductName::TypeInfo::DecodableType productName;
         Attributes::NodeLabel::TypeInfo::DecodableType nodeLabel;
         Attributes::HardwareVersion::TypeInfo::DecodableType hardwareVersion = static_cast<uint16_t>(0);
@@ -33451,16 +33407,24 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace WakeOnLan
 namespace Channel {
-// Enum for ErrorTypeEnum
-enum class ErrorTypeEnum : uint8_t
-{
-    kMultipleMatches = 0x00,
-    kNoMatches       = 0x01,
-};
 // Enum for LineupInfoTypeEnum
 enum class LineupInfoTypeEnum : uint8_t
 {
     kMso = 0x00,
+};
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
+{
+    kSuccess         = 0x00,
+    kMultipleMatches = 0x01,
+    kNoMatches       = 0x02,
+};
+
+// Bitmap for ChannelFeature
+enum class ChannelFeature : uint32_t
+{
+    kChannelList = 0x1,
+    kLineupInfo  = 0x2,
 };
 
 namespace Structs {
@@ -33584,7 +33548,7 @@ namespace ChangeChannelResponse {
 enum class Fields
 {
     kChannelMatch = 0,
-    kErrorType    = 1,
+    kStatus       = 1,
 };
 
 struct Type
@@ -33595,7 +33559,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     Structs::ChannelInfo::Type channelMatch;
-    ErrorTypeEnum errorType = static_cast<ErrorTypeEnum>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33611,7 +33575,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     Structs::ChannelInfo::DecodableType channelMatch;
-    ErrorTypeEnum errorType = static_cast<ErrorTypeEnum>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannelResponse
@@ -36085,13 +36049,6 @@ enum class StatusEnum : uint8_t
 enum class ApplicationLauncherFeature : uint32_t
 {
     kApplicationPlatform = 0x1,
-};
-
-// Bitmap for ChannelFeature
-enum class ChannelFeature : uint32_t
-{
-    kChannelList = 0x1,
-    kLineupInfo  = 0x2,
 };
 
 namespace Structs {

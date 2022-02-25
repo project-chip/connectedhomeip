@@ -47,7 +47,8 @@ enum
     kDeviceOption_UnsecuredCommissionerPort = 0x100c,
     kDeviceOption_Command                   = 0x100d,
     kDeviceOption_PICS                      = 0x100e,
-    kDeviceOption_KVS                       = 0x100f
+    kDeviceOption_KVS                       = 0x100f,
+    kDeviceOption_InterfaceId               = 0x1010
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -75,6 +76,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "command", kArgumentRequired, kDeviceOption_Command },
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
+    { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
     {}
 };
 
@@ -133,6 +135,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --KVS <filepath>\n"
     "       A file to store Key Value Store items.\n"
+    "\n"
+    "  --interface-id <interface>\n"
+    "       A interface id to advertise on.\n"
     "\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -218,6 +223,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_KVS:
         LinuxDeviceOptions::GetInstance().KVS = aValue;
+        break;
+
+    case kDeviceOption_InterfaceId:
+        LinuxDeviceOptions::GetInstance().interfaceId =
+            Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(atoi(aValue)));
         break;
 
     default:

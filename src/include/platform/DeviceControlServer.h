@@ -89,15 +89,10 @@ public:
 
     CHIP_ERROR ArmFailSafe(System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
-    CHIP_ERROR CommissioningComplete();
+    CHIP_ERROR CommissioningComplete(NodeId peerNodeId, FabricIndex accessingFabricIndex);
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb);
-
     CHIP_ERROR ConnectNetworkForOperational(ByteSpan networkID);
 
-    inline FabricIndex GetFabricIndex() { return mFabric; }
-    inline void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
-    inline NodeId GetPeerNodeId() { return mPeerNodeId; }
-    inline void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetSwitchDelegate(SwitchDeviceControlDelegate * delegate) { mSwitchDelegate = delegate; }
     SwitchDeviceControlDelegate * GetSwitchDelegate() const { return mSwitchDelegate; }
 
@@ -120,9 +115,6 @@ private:
     DeviceControlServer(const DeviceControlServer &)  = delete;
     DeviceControlServer(const DeviceControlServer &&) = delete;
     DeviceControlServer & operator=(const DeviceControlServer &) = delete;
-
-    NodeId mPeerNodeId  = 0;
-    FabricIndex mFabric = 0;
 };
 
 } // namespace DeviceLayer

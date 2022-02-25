@@ -37,7 +37,7 @@ CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryF
 #if CONFIG_DEVICE_LAYER
         ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
 #endif
-        mDNSResolver.SetResolverDelegate(this);
+        mDNSResolver.SetCommissioningDelegate(this);
         return mDNSResolver.FindCommissioners(discoveryFilter);
     }
     else

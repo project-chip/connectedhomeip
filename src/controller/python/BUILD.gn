@@ -90,6 +90,7 @@ shared_library("ChipDeviceCtrl") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd",

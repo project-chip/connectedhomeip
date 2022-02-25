@@ -63,8 +63,8 @@ public:
     }
 
     bool HasPASEVerifier() const { return mHasPASEVerifier; }
-    const PASEVerifier & GetPASEVerifier() const { return mPASEVerifier; }
-    RendezvousParameters & SetPASEVerifier(PASEVerifier & verifier)
+    const Spake2pVerifier & GetPASEVerifier() const { return mPASEVerifier; }
+    RendezvousParameters & SetPASEVerifier(Spake2pVerifier & verifier)
     {
         memmove(&mPASEVerifier, &verifier, sizeof(verifier));
         mHasPASEVerifier = true;
@@ -96,7 +96,7 @@ private:
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
 
-    PASEVerifier mPASEVerifier;
+    Spake2pVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
 
 #if CONFIG_NETWORK_LAYER_BLE
