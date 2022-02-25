@@ -559,6 +559,7 @@ int TestAdvertiser(void)
     nlTestRunner(&theSuite, &server);
     server.Shutdown();
     context.Shutdown();
+    chip::Platform::MemoryShutdown();
     return nlTestRunnerStats(&theSuite);
 }
 

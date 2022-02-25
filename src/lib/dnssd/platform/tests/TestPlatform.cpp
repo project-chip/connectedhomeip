@@ -221,7 +221,12 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
 
 int TestSetup(void * inContext)
 {
-    chip::Platform::MemoryInit();
+    return chip::Platform::MemoryInit() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+}
+
+int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
 
@@ -236,7 +241,7 @@ const nlTest sTests[] = {
 
 int TestDnssdPlatform(void)
 {
-    nlTestSuite theSuite = { "DnssdPlatform", &sTests[0], &TestSetup, nullptr };
+    nlTestSuite theSuite = { "DnssdPlatform", &sTests[0], &TestSetup, &TestTeardown };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

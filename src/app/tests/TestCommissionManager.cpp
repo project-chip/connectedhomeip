@@ -184,6 +184,7 @@ int TestCommissioningWindowManager()
     sleep(kTestTaskWaitSeconds);
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     chip::DeviceLayer::PlatformMgr().Shutdown();
+    chip::Platform::MemoryShutdown();
 
     return (nlTestRunnerStats(&theSuite));
 }
