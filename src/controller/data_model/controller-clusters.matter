@@ -1249,6 +1249,12 @@ client cluster DoorLock = 257 {
     kForcedDoorOpenUnderDoorLockedCondition = 0x40;
   }
 
+  bitmap DlCredentialRuleMask : BITMAP8 {
+    kSingle = 0x1;
+    kDual = 0x2;
+    kTri = 0x4;
+  }
+
   bitmap DlCredentialRulesSupport : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -1440,7 +1446,7 @@ client cluster DoorLock = 257 {
   attribute int32u autoRelockTime = 35;
   attribute int8u soundVolume = 36;
   attribute DlOperatingMode operatingMode = 37;
-  readonly attribute bitmap16 supportedOperatingModes = 38;
+  readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
   attribute boolean enableOneTouchLocking = 41;
   attribute boolean enablePrivacyModeButton = 43;
   attribute int8u wrongCodeEntryLimit = 48;

@@ -922,6 +922,12 @@ server cluster DoorLock = 257 {
     kForcedDoorOpenUnderDoorLockedCondition = 0x40;
   }
 
+  bitmap DlCredentialRuleMask : BITMAP8 {
+    kSingle = 0x1;
+    kDual = 0x2;
+    kTri = 0x4;
+  }
+
   bitmap DlCredentialRulesSupport : BITMAP8 {
     kSingle = 0x1;
     kDual = 0x2;
@@ -1110,13 +1116,13 @@ server cluster DoorLock = 257 {
   readonly attribute int8u numberOfHolidaySchedulesSupported = 22;
   readonly attribute int8u maxPINCodeLength = 23;
   readonly attribute int8u minPINCodeLength = 24;
-  readonly attribute bitmap8 credentialRulesSupport = 27;
+  readonly attribute DlCredentialRuleMask credentialRulesSupport = 27;
   attribute char_string<3> language = 33;
   attribute int32u autoRelockTime = 35;
   attribute int8u soundVolume = 36;
   attribute DlOperatingMode operatingMode = 37;
-  readonly attribute bitmap16 supportedOperatingModes = 38;
-  readonly attribute bitmap16 defaultConfigurationRegister = 39;
+  readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
+  readonly attribute DlDefaultConfigurationRegister defaultConfigurationRegister = 39;
   attribute boolean enableOneTouchLocking = 41;
   attribute boolean enableInsideStatusLED = 42;
   attribute boolean enablePrivacyModeButton = 43;
