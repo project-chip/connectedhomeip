@@ -40,11 +40,15 @@ namespace chip {
 
 namespace GroupTesting {
 
-CHIP_ERROR InitGroupData(chip::FabricIndex fabric_index, const ByteSpan & compressed_fabric_id)
+CHIP_ERROR InitProvider()
 {
     ReturnErrorOnFailure(sGroupsProvider.Init());
     chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
+    return CHIP_NO_ERROR;
+}
 
+CHIP_ERROR InitData(chip::FabricIndex fabric_index, const ByteSpan & compressed_fabric_id)
+{
     // Groups
 
     const chip::Credentials::GroupDataProvider::GroupInfo group1(kGroup1, "Group #1");

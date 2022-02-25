@@ -262,7 +262,7 @@ public:
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
        root public key of the fabric. The generated compressed ID is returned via compressedPeerId
        output parameter */
-    CHIP_ERROR GenerateCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
+    CHIP_ERROR GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
 
     friend class FabricTable;
 
