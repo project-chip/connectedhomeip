@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.52
+            image: connectedhomeip/chip-build-nrf-platform:0.5.56
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -83,7 +83,7 @@ jobs:
             - name: Build example nRF Connect SDK Lighting App on nRF52840 Dongle
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dongle_nrf52840
+                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dongle_nrf52840 -DCONFIG_CHIP_ROTATING_DEVICE_ID=y
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dongle_nrf52840 lighting-app \
                     examples/lighting-app/nrfconnect/build/zephyr/zephyr.elf \
@@ -143,6 +143,14 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 pump-controller-app \
                     examples/pump-controller-app/nrfconnect/build/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+            - name: Build example nRF Connect SDK All Clusters App on nRF52840 DK
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nrfconnect nrf52840dk_nrf52840 all-clusters-app \
+                    examples/all-clusters-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Run unit tests for Zephyr native_posix_64 platform
               timeout-minutes: 10

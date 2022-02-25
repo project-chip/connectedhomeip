@@ -105,11 +105,15 @@ endif()
 
 if (CONFIG_NORDIC_SECURITY_BACKEND)
     zephyr_include_directories_raw($<TARGET_PROPERTY:mbedtls_external,INTERFACE_INCLUDE_DIRECTORIES>)
-    zephyr_include_directories_raw($<TARGET_PROPERTY:mbedcrypto_includes,INTERFACE_INCLUDE_DIRECTORIES>)
+    zephyr_include_directories_raw($<TARGET_PROPERTY:mbedcrypto_common,INTERFACE_INCLUDE_DIRECTORIES>)
     if(TARGET platform_cc3xx)
         zephyr_include_directories_raw($<TARGET_PROPERTY:platform_cc3xx,INTERFACE_INCLUDE_DIRECTORIES>)
     endif()
     list(APPEND CHIP_CFLAGS -DMBEDTLS_CONFIG_FILE=<nrf-config.h>)
+endif()
+
+if (CONFIG_NRF_802154_RADIO_DRIVER)
+    zephyr_include_directories_raw($<TARGET_PROPERTY:nrf-802154-driver-interface,INTERFACE_INCLUDE_DIRECTORIES>)
 endif()
 
 zephyr_get_compile_flags(CHIP_CFLAGS_C C)

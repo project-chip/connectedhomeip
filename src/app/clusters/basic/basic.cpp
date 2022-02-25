@@ -305,8 +305,7 @@ CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attri
     {
     case Location::Id: {
         CHIP_ERROR err = WriteLocation(aDecoder);
-        // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
-        ChipLogError(Zcl, "WriteLocation status: %" CHIP_ERROR_FORMAT, err.Format());
+
         return err;
     }
     default:
@@ -322,9 +321,6 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
 
     ReturnErrorOnFailure(aDecoder.Decode(location));
 
-    // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
-    ChipLogError(Zcl, "WriteLocation received, size %zu, location '%.*s'", location.size(), (int) location.size(), location.data());
-
     bool isValidLength = location.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
     VerifyOrReturnError(isValidLength, StatusIB(Protocols::InteractionModel::Status::InvalidValue).ToChipError());
 
@@ -333,7 +329,7 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
 
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
-    // Gets called by the current Node after completing a boot or reboot process.
+    // Gets called by the current Node after completing a boot or reboot process
     void OnStartUp(uint32_t softwareVersion) override
     {
         ChipLogProgress(Zcl, "PlatformMgrDelegate: OnStartUp");

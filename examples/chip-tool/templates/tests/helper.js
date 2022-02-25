@@ -15,12 +15,40 @@
  *    limitations under the License.
  */
 
+const { asLowerCamelCase }  = require('../../../../src/app/zap-templates/templates/app/helper.js');
+const { isTestOnlyCluster } = require('../../../../src/app/zap-templates/common/simulated-clusters/SimulatedClusters.js');
+
 function utf8StringLength(str)
 {
   return new TextEncoder().encode(str).length
+}
+
+/*
+ * Returns the name to use for accessing a given property of
+ * a decodable type.
+ *
+ */
+function asPropertyValue(options)
+{
+  let name = '';
+
+  // The decodable type for simulated cluster is a struct by default, even if the
+  // command just returns a single value.
+  if (isTestOnlyCluster(this.parent.cluster)) {
+    name = 'value.'
+  }
+
+  name += asLowerCamelCase(this.name);
+
+  if (this.isOptional && !options.hash.dontUnwrapValue) {
+    name += '.Value()';
+  }
+
+  return name;
 }
 
 //
 // Module exports
 //
 exports.utf8StringLength = utf8StringLength;
+exports.asPropertyValue  = asPropertyValue;

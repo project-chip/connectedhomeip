@@ -309,6 +309,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @param[in]  expr        A Boolean expression to be evaluated.
  *  @param[in]  code        A value to return if @a expr is false.
  */
+#if CHIP_CONFIG_ERROR_SOURCE
 #define VerifyOrReturnLogError(expr, code)                                                                                         \
     do                                                                                                                             \
     {                                                                                                                              \
@@ -318,6 +319,17 @@ constexpr inline const _T & max(const _T & a, const _T & b)
             return code;                                                                                                           \
         }                                                                                                                          \
     } while (false)
+#else // CHIP_CONFIG_ERROR_SOURCE
+#define VerifyOrReturnLogError(expr, code)                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s:%d false: %" CHIP_ERROR_FORMAT, #expr, __LINE__, code.Format());                        \
+            return code;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
+#endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
  *  @def ReturnErrorCodeIf(expr, code)

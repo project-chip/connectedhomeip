@@ -46,6 +46,8 @@ constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 constexpr uint16_t kOptionFilepath             = 'f';
 constexpr uint16_t kOptionOtaImageList         = 'o';
 constexpr uint16_t kOptionQueryImageStatus     = 'q';
+constexpr uint16_t kOptionIgnoreQueryImage     = 'x';
+constexpr uint16_t kOptionIgnoreApplyUpdate    = 'y';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionUpdateAction         = 'a';
 constexpr uint16_t kOptionDelayedActionTimeSec = 't';
@@ -66,6 +68,8 @@ static chip::ota::UserConsentState gUserConsentState                  = chip::ot
 static bool gUserConsentNeeded                                        = false;
 static chip::Optional<uint32_t> gSoftwareVersion;
 static const char * gSoftwareVersionString = nullptr;
+static uint32_t gIgnoreQueryImageCount     = 0;
+static uint32_t gIgnoreApplyUpdateCount    = 0;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -186,6 +190,12 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             retval = false;
         }
         break;
+    case kOptionIgnoreQueryImage:
+        gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        break;
+    case kOptionIgnoreApplyUpdate:
+        gIgnoreApplyUpdateCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        break;
     case kOptionUpdateAction:
         if (aValue == NULL)
         {
@@ -272,6 +282,8 @@ OptionDef cmdLineOptionsDef[] = {
     { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
     { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
     { "queryImageStatus", chip::ArgParser::kArgumentRequired, kOptionQueryImageStatus },
+    { "ignoreQueryImage", chip::ArgParser::kArgumentRequired, kOptionIgnoreQueryImage },
+    { "ignoreApplyUpdate", chip::ArgParser::kArgumentRequired, kOptionIgnoreApplyUpdate },
     { "applyUpdateAction", chip::ArgParser::kArgumentRequired, kOptionUpdateAction },
     { "delayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
@@ -288,6 +300,10 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Path to a file containing a list of OTA images\n"
                              "  -q/--queryImageStatus <updateAvailable | busy | updateNotAvailable>\n"
                              "        Value for the Status field in the QueryImageResponse\n"
+                             "  -x/--ignoreQueryImage <num_times_to_ignore>\n"
+                             "        The number of times to ignore the QueryImage Command and not send a response.\n"
+                             "  -y/--ignoreApplyUpdate <num_times_to_ignore>\n"
+                             "        The number of times to ignore the ApplyUpdate Request and not send a response.\n"
                              "  -a/--applyUpdateAction <proceed | awaitNextAction | discontinue>\n"
                              "        Value for the Action field in the ApplyUpdateResponse\n"
                              "  -t/--delayedActionTimeSec <time>\n"
@@ -333,6 +349,8 @@ void ApplicationInit()
     }
 
     gOtaProvider.SetQueryImageBehavior(gQueryImageBehavior);
+    gOtaProvider.SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
+    gOtaProvider.SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
     gOtaProvider.SetApplyUpdateAction(gOptionUpdateAction);
     gOtaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
     if (gSoftwareVersion.HasValue())

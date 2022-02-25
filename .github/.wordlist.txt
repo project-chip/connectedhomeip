@@ -59,6 +59,7 @@ ApplicationBasic
 ApplicationId
 ApplicationIdentifier
 ApplicationLauncher
+ApplyUpdate
 applyUpdateAction
 ApplyUpdateRequest
 ApplyUpdateResponse
@@ -340,6 +341,7 @@ DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 deviceSoftwareVersionModel
 DeviceTemperatureConfiguration
+deviceType
 DevKitC
 DevKitM
 devtype
@@ -566,6 +568,8 @@ idx
 ifdef
 ifdefs
 IGMP
+ignoreApplyUpdate
+ignoreQueryImage
 ihex
 IlluminanceMeasurement
 IM
@@ -1343,3 +1347,4 @@ zephyrproject
 Zigbee
 zigbeealliance
 zigbeethread
+libshell

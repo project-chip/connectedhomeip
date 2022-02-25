@@ -107,7 +107,7 @@ See `examples/lighting-app/efr32/README.md`
 
 -   In the chip-tool terminal enter:
 
-            ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 73141520   3840
+            ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840
 
 where operationalDataset is obtained from the OpenThread Border Router.
 

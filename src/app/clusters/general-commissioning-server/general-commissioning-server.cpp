@@ -45,7 +45,11 @@ using namespace chip::DeviceLayer;
     {                                                                                                                              \
         if (!::chip::ChipError::IsSuccess(expr))                                                                                   \
         {                                                                                                                          \
-            LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::code));                      \
+            CHIP_ERROR statusErr = commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::code);                  \
+            if (statusErr != CHIP_NO_ERROR)                                                                                        \
+            {                                                                                                                      \
+                ChipLogError(Zcl, "%s: %" CHIP_ERROR_FORMAT, #expr, statusErr.Format());                                           \
+            }                                                                                                                      \
             return true;                                                                                                           \
         }                                                                                                                          \
     } while (false)
@@ -145,15 +149,13 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
 
     /*
-     * Pass fabric and nodeId of commissioner to DeviceControlSvr.
+     * Pass fabric of commissioner to DeviceControlSvr.
      * This allows device to send messages back to commissioner.
      * Once bindings are implemented, this may no longer be needed.
      */
     SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
-    server->SetFabricIndex(handle->GetFabricIndex());
-    server->SetPeerNodeId(handle->AsSecureSession()->GetPeerNodeId());
 
-    CheckSuccess(server->CommissioningComplete(), Failure);
+    CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()), Failure);
 
     Commands::CommissioningCompleteResponse::Type response;
     response.errorCode = CommissioningError::kOk;

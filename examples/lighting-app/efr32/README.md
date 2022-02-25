@@ -250,24 +250,17 @@ combination with JLinkRTTClient as follows:
 *   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
 
-    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
+*   You can provision and control the Chip device using the python controller,
+    Chip tool standalone, Android or iOS app
 
-    Here is an example with the Python controller:
+    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+
+    Here is an example with the CHIPTool:
 
     ```
-      chip-device-ctrl
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-      connect -ble 3840 73141520 1234
-
-      zcl NetworkCommissioning AddOrUpdateThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000000000000300000b35060004001fffe00208dead00beef00cafe0708fddead00beef000005108e11d8ea8ffaa875713699f59e8807e0030a4f70656e5468726561640102c2980410edc641eb63b100b87e90a9980959befc0c0402a0fff8 breadcrumb=0
-
-      zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=hex:dead00beef00cafe breadcrumb=0
-
-      close-ble
-
-      resolve 1234
-
-      zcl OnOff Toggle 1234 1 0
+    chip-tool onoff on 1 1
     ```
 
 ### Notes

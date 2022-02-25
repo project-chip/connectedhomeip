@@ -24,10 +24,10 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/CHIPMem.h>
@@ -39,11 +39,17 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_EVENT_QUEUE_SIZE 10
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
+constexpr EndpointId kLockEndpointId = 1;
 
 LOG_MODULE_DECLARE(app);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
@@ -58,9 +64,6 @@ static bool sIsThreadEnabled     = false;
 static bool sHaveBLEConnections  = false;
 
 static k_timer sFunctionTimer;
-
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
@@ -540,11 +543,9 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState()
 {
-    uint8_t newValue = !BoltLockMgr().IsUnlocked();
-
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kLockEndpointId, !BoltLockMgr().IsUnlocked());
+
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         LOG_ERR("Updating on/off %x", status);
