@@ -344,6 +344,7 @@ void Server::Shutdown()
     mSessions.Shutdown();
     mTransports.Close();
     mCommissioningWindowManager.Shutdown();
+    mCASESessionManager.Shutdown();
     chip::Platform::MemoryShutdown();
 }
 

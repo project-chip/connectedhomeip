@@ -559,7 +559,10 @@ int TestAdvertiser(void)
     nlTestRunner(&theSuite, &server);
     server.Shutdown();
     context.Shutdown();
+    mdnsAdvertiser.RemoveServices();
+    mdnsAdvertiser.Shutdown();
     chip::Platform::MemoryShutdown();
+
     return nlTestRunnerStats(&theSuite);
 }
 
