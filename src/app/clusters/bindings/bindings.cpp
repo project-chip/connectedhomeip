@@ -23,14 +23,11 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
-#include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/bindings/BindingManager.h>
-#include <app/clusters/bindings/bindings.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/binding-table.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -64,20 +61,7 @@ bool IsValidBinding(const TargetStructType & entry)
         (!entry.endpoint.HasValue() && !entry.node.HasValue() && entry.group.HasValue());
 }
 
-EmberBindingTableEntry BindingTableEntryFromTargetStruct(const TargetStructType & entry, EndpointId localEndpoint)
-{
-    if (entry.group.HasValue())
-    {
-        return EmberBindingTableEntry::ForGroup(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster);
-    }
-    else
-    {
-        return EmberBindingTableEntry::ForNode(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
-                                               entry.cluster);
-    }
-}
-
-CHIP_ERROR CheckValidBindingList(const DecodableBindingListType & bindingList, FabricIndex accessingFabricIndex, size_t * newSize)
+CHIP_ERROR CheckValidBindingList(const DecodableBindingListType & bindingList, FabricIndex accessingFabricIndex)
 {
     size_t listSize = 0;
     auto iter       = bindingList.begin();
@@ -97,9 +81,33 @@ CHIP_ERROR CheckValidBindingList(const DecodableBindingListType & bindingList, F
             oldListSize++;
         }
     }
-    *newSize = BindingTable::GetInstance().Size() - oldListSize + listSize;
-    ReturnErrorCodeIf(*newSize > EMBER_BINDING_TABLE_SIZE, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+    ReturnErrorCodeIf(BindingTable::GetInstance().Size() - oldListSize + listSize > EMBER_BINDING_TABLE_SIZE,
+                      CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
     return CHIP_NO_ERROR;
+}
+
+void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
+{
+    EmberBindingTableEntry bindingEntry;
+
+    if (entry.group.HasValue())
+    {
+        bindingEntry = EmberBindingTableEntry::ForGroup(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster);
+    }
+    else
+    {
+        bindingEntry = EmberBindingTableEntry::ForNode(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
+                                                       entry.cluster);
+        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.node.Value());
+        if (err != CHIP_NO_ERROR)
+        {
+            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
+            ChipLogProgress(
+                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                ChipLogValueX64(entry.node.Value()), err.Format());
+        }
+    }
+    BindingTable::GetInstance().Add(bindingEntry);
 }
 
 CHIP_ERROR BindingTableAccess::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
@@ -158,75 +166,15 @@ CHIP_ERROR BindingTableAccess::Write(const ConcreteDataAttributePath & path, Att
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SaveWithDecodableBindingList(const DecodableBindingListType & bindingList, size_t newTableSize,
-                                        FabricIndex accessingFabricIndex, EndpointId localEndpoint)
-{
-    // The binding table can be at most 480 bytes, allocate on heap to reduce static stack size allocation
-    // which cannot be reused.
-    EmberBindingTableEntry * table =
-        static_cast<EmberBindingTableEntry *>(Platform::MemoryAlloc(newTableSize * sizeof(EmberBindingTableEntry)));
-    uint8_t idx = 0;
-
-    if (table == nullptr)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
-    {
-        if (entry.fabricIndex != accessingFabricIndex)
-        {
-            table[idx++] = entry;
-        }
-    }
-    auto iter = bindingList.begin();
-    while (iter.Next())
-    {
-        table[idx++] = BindingTableEntryFromTargetStruct(iter.GetValue(), localEndpoint);
-    }
-    CHIP_ERROR error = Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(
-        kBindingStoargeKey, table, static_cast<uint16_t>(newTableSize * sizeof(EmberBindingTableEntry)));
-
-    Platform::MemoryFree(table);
-    return error;
-}
-
-CHIP_ERROR SaveWithNewEntry(const TargetStructType & newEntry, EndpointId localEndpoint)
-{
-    size_t newTableSize = BindingTable::GetInstance().Size() + 1;
-    EmberBindingTableEntry * table =
-        static_cast<EmberBindingTableEntry *>(Platform::MemoryAlloc(newTableSize * sizeof(EmberBindingTableEntry)));
-    uint8_t idx = 0;
-
-    if (table == nullptr)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
-    {
-        table[idx++] = entry;
-    }
-    table[idx++] = BindingTableEntryFromTargetStruct(newEntry, localEndpoint);
-
-    CHIP_ERROR error = Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(
-        kBindingStoargeKey, table, static_cast<uint16_t>(newTableSize * sizeof(EmberBindingTableEntry)));
-
-    Platform::MemoryFree(table);
-    return error;
-}
-
 CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
 {
     FabricIndex accessingFabricIndex = decoder.AccessingFabricIndex();
     if (!path.IsListOperation() || path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
         DecodableBindingListType newBindingList;
-        size_t newTableSize;
 
         ReturnErrorOnFailure(decoder.Decode(newBindingList));
-        ReturnErrorOnFailure(CheckValidBindingList(newBindingList, accessingFabricIndex, &newTableSize));
-
-        // Try saving to storage first, if saving fails we won't update the content.
-        ReturnErrorOnFailure(SaveWithDecodableBindingList(newBindingList, newTableSize, accessingFabricIndex, path.mEndpointId));
+        ReturnErrorOnFailure(CheckValidBindingList(newBindingList, accessingFabricIndex));
 
         // Clear all entries for the current accessing fabric
         auto bindingTableIter = BindingTable::GetInstance().begin();
@@ -238,7 +186,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
                 {
                     BindingManager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
                 }
-                bindingTableIter = BindingTable::GetInstance().RemoveAt(bindingTableIter);
+                ReturnErrorOnFailure(BindingTable::GetInstance().RemoveAt(bindingTableIter));
             }
             else
             {
@@ -250,7 +198,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         auto iter = newBindingList.begin();
         while (iter.Next())
         {
-            AddBindingEntry(BindingTableEntryFromTargetStruct(iter.GetValue(), path.mEndpointId));
+            AddBindingEntry(iter.GetValue(), path.mEndpointId);
         }
         return CHIP_NO_ERROR;
     }
@@ -262,36 +210,12 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        if (BindingTable::GetInstance().Size() == EMBER_BINDING_TABLE_SIZE)
-        {
-            return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
-        }
-        ReturnErrorOnFailure(SaveWithNewEntry(target, path.mEndpointId));
-        AddBindingEntry(BindingTableEntryFromTargetStruct(target, path.mEndpointId));
+        AddBindingEntry(target, path.mEndpointId);
         return CHIP_NO_ERROR;
     }
     return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
 }
 } // namespace
-
-namespace chip {
-
-void AddBindingEntry(const EmberBindingTableEntry & entry)
-{
-    if (entry.type == EMBER_UNICAST_BINDING)
-    {
-        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(
-                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
-                ChipLogValueX64(entry.nodeId), err.Format());
-        }
-    }
-    BindingTable::GetInstance().Add(entry);
-}
-
-} // namespace chip
 
 void MatterBindingPluginServerInitCallback()
 {

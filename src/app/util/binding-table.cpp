@@ -27,7 +27,7 @@ BindingTable BindingTable::sInstance;
 
 BindingTable::BindingTable()
 {
-    memset(mNextIndex, EMBER_BINDING_TABLE_SIZE, sizeof(mNextIndex));
+    memset(mNextIndex, kNextNullIndex, sizeof(mNextIndex));
 }
 
 CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
@@ -42,18 +42,45 @@ CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
         return CHIP_ERROR_NO_MEMORY;
     }
     mBindingTable[newIndex] = entry;
-    if (mTail == EMBER_BINDING_TABLE_SIZE)
+    CHIP_ERROR error        = SaveEntryToStorage(newIndex, kNextNullIndex);
+    if (error == CHIP_NO_ERROR)
     {
-        mTail = newIndex;
-        mHead = newIndex;
+        if (mTail == kNextNullIndex)
+        {
+            error = SaveListInfo(newIndex);
+        }
+        else
+        {
+            error = SaveEntryToStorage(mTail, newIndex);
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            mStorage->SyncDeleteKeyValue(mKeyAllocator.BindingTableEntry(newIndex));
+        }
+    }
+    if (error != CHIP_NO_ERROR)
+    {
+        // Roll back
+        mBindingTable[newIndex].type = EMBER_UNUSED_BINDING;
+        return error;
     }
     else
     {
-        mNextIndex[mTail] = newIndex;
-        mTail             = newIndex;
+        if (mTail == kNextNullIndex)
+        {
+            mTail = newIndex;
+            mHead = newIndex;
+        }
+        else
+        {
+            mNextIndex[mTail]    = newIndex;
+            mNextIndex[newIndex] = kNextNullIndex;
+            mTail                = newIndex;
+        }
+
+        mSize++;
+        return CHIP_NO_ERROR;
     }
-    mSize++;
-    return CHIP_NO_ERROR;
 }
 
 const EmberBindingTableEntry & BindingTable::GetAt(uint8_t index)
@@ -61,11 +88,154 @@ const EmberBindingTableEntry & BindingTable::GetAt(uint8_t index)
     return mBindingTable[index];
 }
 
-BindingTable::Iterator BindingTable::RemoveAt(Iterator iter)
+CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
 {
-    if (iter.mTable != this || iter.mIndex == EMBER_BINDING_TABLE_SIZE)
+    EmberBindingTableEntry & entry    = mBindingTable[index];
+    uint8_t buffer[kEntryStorageSize] = { 0 };
+    chip::TLV::TLVWriter writer;
+    writer.Init(buffer);
+    chip::TLV::TLVType container;
+    ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::TLVType::kTLVType_Structure, container));
+    ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagFabricIndex), entry.fabricIndex));
+    ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagLocalEndpoint), entry.local));
+    if (entry.clusterId.HasValue())
     {
-        return iter;
+        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagCluster), entry.clusterId.Value()));
+    }
+    if (entry.type == EMBER_UNICAST_BINDING)
+    {
+        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagRemoteEndpoint), entry.remote));
+        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagNodeId), entry.nodeId));
+    }
+    else
+    {
+        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagGroupId), entry.groupId));
+    }
+    ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagNextEntry), nextIndex));
+    ReturnErrorOnFailure(writer.EndContainer(container));
+    ReturnErrorOnFailure(writer.Finalize());
+    return mStorage->SyncSetKeyValue(mKeyAllocator.BindingTableEntry(index), buffer,
+                                     static_cast<uint16_t>(writer.GetLengthWritten()));
+}
+
+CHIP_ERROR BindingTable::SaveListInfo(uint8_t head)
+{
+    uint8_t buffer[kListInfoStorageSize] = { 0 };
+    chip::TLV::TLVWriter writer;
+    writer.Init(buffer);
+    chip::TLV::TLVType container;
+    ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::TLVType::kTLVType_Structure, container));
+    ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagStorageVersion), kStorageVersion));
+    ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagHead), head));
+    ReturnErrorOnFailure(writer.EndContainer(container));
+    ReturnErrorOnFailure(writer.Finalize());
+    return mStorage->SyncSetKeyValue(mKeyAllocator.BindingTable(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+}
+
+CHIP_ERROR BindingTable::LoadFromStorage()
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    uint8_t buffer[kListInfoStorageSize] = { 0 };
+    uint16_t size                        = sizeof(buffer);
+    CHIP_ERROR error;
+
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(mKeyAllocator.BindingTable(), buffer, size));
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer, size);
+
+    ReturnErrorOnFailure(reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag()));
+
+    chip::TLV::TLVType container;
+    ReturnErrorOnFailure(reader.EnterContainer(container));
+
+    ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagStorageVersion)));
+    uint32_t version;
+    ReturnErrorOnFailure(reader.Get(version));
+    VerifyOrReturnError(version == kStorageVersion, CHIP_ERROR_VERSION_MISMATCH);
+    ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagHead)));
+    uint8_t index;
+    ReturnErrorOnFailure(reader.Get(index));
+    mHead = index;
+    while (index != kNextNullIndex)
+    {
+        uint8_t nextIndex;
+        error = LoadEntryFromStorage(index, nextIndex);
+        if (error != CHIP_NO_ERROR)
+        {
+            mHead = kNextNullIndex;
+            mTail = kNextNullIndex;
+            return error;
+        }
+        mTail = index;
+        index = nextIndex;
+        mSize++;
+    }
+    error = reader.ExitContainer(container);
+    if (error != CHIP_NO_ERROR)
+    {
+        mHead = kNextNullIndex;
+        mTail = kNextNullIndex;
+    }
+    return error;
+}
+
+CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex)
+{
+    uint8_t buffer[kEntryStorageSize] = { 0 };
+    uint16_t size                     = sizeof(buffer);
+    EmberBindingTableEntry entry;
+
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(mKeyAllocator.BindingTableEntry(index), buffer, size));
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer, size);
+
+    ReturnErrorOnFailure(reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag()));
+
+    chip::TLV::TLVType container;
+    ReturnErrorOnFailure(reader.EnterContainer(container));
+    ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagFabricIndex)));
+    ReturnErrorOnFailure(reader.Get(entry.fabricIndex));
+    ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagLocalEndpoint)));
+    ReturnErrorOnFailure(reader.Get(entry.local));
+    ReturnErrorOnFailure(reader.Next());
+    if (reader.GetTag() == chip::TLV::ContextTag(kTagCluster))
+    {
+        uint16_t clusterId;
+        ReturnErrorOnFailure(reader.Get(clusterId));
+        entry.clusterId.SetValue(clusterId);
+        ReturnErrorOnFailure(reader.Next());
+    }
+    else
+    {
+        entry.clusterId = NullOptional;
+    }
+    if (reader.GetTag() == chip::TLV::ContextTag(kTagRemoteEndpoint))
+    {
+        entry.type = EMBER_UNICAST_BINDING;
+        ReturnErrorOnFailure(reader.Get(entry.remote));
+        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagNodeId)));
+        ReturnErrorOnFailure(reader.Get(entry.nodeId));
+    }
+    else
+    {
+        entry.type = EMBER_MULTICAST_BINDING;
+        ReturnErrorCodeIf(reader.GetTag() != chip::TLV::ContextTag(kTagGroupId), CHIP_ERROR_INVALID_TLV_TAG);
+        ReturnErrorOnFailure(reader.Get(entry.groupId));
+    }
+    ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagNextEntry)));
+    ReturnErrorOnFailure(reader.Get(nextIndex));
+    ReturnErrorOnFailure(reader.ExitContainer(container));
+    mBindingTable[index] = entry;
+    mNextIndex[index]    = nextIndex;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BindingTable::RemoveAt(Iterator & iter)
+{
+    CHIP_ERROR error;
+    if (iter.mTable != this || iter.mIndex == kNextNullIndex)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     if (iter.mIndex == mTail)
     {
@@ -74,24 +244,40 @@ BindingTable::Iterator BindingTable::RemoveAt(Iterator iter)
     uint8_t next = mNextIndex[iter.mIndex];
     if (iter.mIndex != mHead)
     {
-        mNextIndex[iter.mPrevIndex] = next;
+        error = SaveEntryToStorage(iter.mPrevIndex, next);
+        if (error == CHIP_NO_ERROR)
+        {
+            mNextIndex[iter.mPrevIndex] = next;
+        }
     }
     else
     {
-        mHead = next;
+        error = SaveListInfo(next);
+        if (error == CHIP_NO_ERROR)
+        {
+            mHead = next;
+        }
     }
-    mBindingTable[iter.mIndex].type = EMBER_UNUSED_BINDING;
-    mNextIndex[iter.mIndex]         = EMBER_BINDING_TABLE_SIZE;
-    mSize--;
+    if (error == CHIP_NO_ERROR)
+    {
+        // The remove is considered "submitted" once the change on prev node takes effect
+        if (mStorage->SyncDeleteKeyValue(mKeyAllocator.BindingTableEntry(iter.mIndex)) != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to remove binding table entry %u from storage", iter.mIndex);
+        }
+        mBindingTable[iter.mIndex].type = EMBER_UNUSED_BINDING;
+        mNextIndex[iter.mIndex]         = kNextNullIndex;
+        mSize--;
+    }
     iter.mIndex = next;
-    return iter;
+    return error;
 }
 
 BindingTable::Iterator BindingTable::begin()
 {
     Iterator iter;
     iter.mTable     = this;
-    iter.mPrevIndex = EMBER_BINDING_TABLE_SIZE;
+    iter.mPrevIndex = kNextNullIndex;
     iter.mIndex     = mHead;
     return iter;
 }
@@ -100,7 +286,7 @@ BindingTable::Iterator BindingTable::end()
 {
     Iterator iter;
     iter.mTable = this;
-    iter.mIndex = EMBER_BINDING_TABLE_SIZE;
+    iter.mIndex = kNextNullIndex;
     return iter;
 }
 
@@ -118,7 +304,7 @@ uint8_t BindingTable::GetNextAvaiableIndex()
 
 BindingTable::Iterator BindingTable::Iterator::operator++()
 {
-    if (mIndex != EMBER_BINDING_TABLE_SIZE)
+    if (mIndex != kNextNullIndex)
     {
         mPrevIndex = mIndex;
         mIndex     = mTable->mNextIndex[mIndex];
