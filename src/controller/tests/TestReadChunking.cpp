@@ -453,12 +453,7 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
 
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
-        for (int j = 0; j < 3 && !readCallback.mOnSubscriptionEstablished; j++)
-        {
-            ctx.DrainAndServiceIO();
-            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-            ctx.DrainAndServiceIO();
-        }
+        ctx.DrainAndServiceIO();
 
         // We should not receive any reports in initial reports, so check mOnSubscriptionEstablished instead.
         NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablished);
@@ -467,15 +462,10 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
         // Enable the new endpoint
         emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, 0, 0, Span<DataVersion>(dataVersionStorage));
 
-        for (int j = 0; j < 2 && !readCallback.mOnReportEnd; j++)
-        {
-            ctx.DrainAndServiceIO();
-            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-            ctx.DrainAndServiceIO();
-        }
+        ctx.DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
-        // ClientGeneratedCommandList / ServerGeneratedCommandList / AttributeList attribute are not include in
+        // ClientGeneratedCommandList / ServerGeneratedCommandList / AttributeList attribute are not included in
         // testClusterAttrsOnEndpoint4.
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
 
@@ -488,14 +478,9 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
         // Disable the new endpoint
         emberAfEndpointEnableDisable(kTestEndpointId4, false);
 
-        for (int j = 0; j < 2 && !readCallback.mOnReportEnd; j++)
-        {
-            ctx.DrainAndServiceIO();
-            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-            ctx.DrainAndServiceIO();
-        }
+        ctx.DrainAndServiceIO();
 
-        // We may receive some attribute reports for descriptor cluster, but we does not care about it for now.
+        // We may receive some attribute reports for descriptor cluster, but we do not care about it for now.
 
         // Enable the new endpoint
 
@@ -503,12 +488,7 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
         readCallback.mOnReportEnd    = false;
 
         emberAfEndpointEnableDisable(kTestEndpointId4, true);
-        for (int j = 0; j < 2 && !readCallback.mOnReportEnd; j++)
-        {
-            ctx.DrainAndServiceIO();
-            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-            ctx.DrainAndServiceIO();
-        }
+        ctx.DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
         // ClientGeneratedCommandList / ServerGeneratedCommandList / AttributeList attribute are not include in
@@ -521,13 +501,8 @@ void TestCommandInteraction::TestDynamicEndpoint(nlTestSuite * apSuite, void * a
 
     chip::test_utils::SleepMillis(secondsToMilliseconds(2));
 
-    // Destroy the read client will terminate the subscription transaction.
-    for (int j = 0; j < 2 && !readCallback.mOnReportEnd; j++)
-    {
-        ctx.DrainAndServiceIO();
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-        ctx.DrainAndServiceIO();
-    }
+    // Destroying the read client will terminate the subscription transaction.
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
