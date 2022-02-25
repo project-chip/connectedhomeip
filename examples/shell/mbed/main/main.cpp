@@ -72,10 +72,6 @@ int main()
     }
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    ConnectivityManagerImpl().StartWiFiManagement();
-#endif
-
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {

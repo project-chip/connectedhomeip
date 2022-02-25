@@ -61,13 +61,18 @@ class Server
 {
 public:
     CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
-                    uint16_t unsecureServicePort = CHIP_UDC_PORT);
+                    uint16_t unsecureServicePort = CHIP_UDC_PORT, Inet::InterfaceId interfaceId = Inet::InterfaceId::Null());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     CHIP_ERROR AddTestCommissioning();
+
+    /**
+     * @brief Call this function to rejoin existing groups found in the GroupDataProvider
+     */
+    void RejoinExistingMulticastGroups();
 
     FabricTable & GetFabricTable() { return mFabrics; }
 
@@ -94,6 +99,10 @@ public:
     void DispatchShutDownAndStopEventLoop();
 
     void Shutdown();
+
+    void ScheduleFactoryReset();
+
+    static void FactoryReset(intptr_t arg);
 
     static Server & GetInstance() { return sServer; }
 
@@ -206,6 +215,7 @@ private:
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;
     uint16_t mUnsecuredServicePort;
+    Inet::InterfaceId mInterfaceId;
 };
 
 } // namespace chip

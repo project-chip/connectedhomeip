@@ -225,6 +225,50 @@ public class ChipStructs {
     }
   }
 
+  public static class BindingClusterTargetStruct {
+    public Integer fabricIndex;
+    public Optional<Long> node;
+    public Optional<Integer> group;
+    public Optional<Integer> endpoint;
+    public Optional<Long> cluster;
+
+    public BindingClusterTargetStruct(
+        Integer fabricIndex,
+        Optional<Long> node,
+        Optional<Integer> group,
+        Optional<Integer> endpoint,
+        Optional<Long> cluster) {
+      this.fabricIndex = fabricIndex;
+      this.node = node;
+      this.group = group;
+      this.endpoint = endpoint;
+      this.cluster = cluster;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("BindingClusterTargetStruct {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("\tnode: ");
+      output.append(node);
+      output.append("\n");
+      output.append("\tgroup: ");
+      output.append(group);
+      output.append("\n");
+      output.append("\tendpoint: ");
+      output.append(endpoint);
+      output.append("\n");
+      output.append("\tcluster: ");
+      output.append(cluster);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class BridgedActionsClusterActionStruct {
     public Integer actionID;
     public String name;

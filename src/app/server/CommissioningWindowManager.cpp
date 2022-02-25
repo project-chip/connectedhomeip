@@ -54,7 +54,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        if (event->CommissioningComplete.status == CHIP_NO_ERROR)
+        if (event->CommissioningComplete.Status == CHIP_NO_ERROR)
         {
             ChipLogProgress(AppServer, "Commissioning completed successfully");
             Cleanup();
@@ -62,8 +62,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         else
         {
             ChipLogError(AppServer, "Commissioning failed with error %" CHIP_ERROR_FORMAT,
-                         event->CommissioningComplete.status.Format());
-            OnSessionEstablishmentError(event->CommissioningComplete.status);
+                         event->CommissioningComplete.Status.Format());
+            OnSessionEstablishmentError(event->CommissioningComplete.Status);
         }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
@@ -187,18 +187,18 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     }
     else
     {
-        uint32_t iterationCount                           = 0;
-        uint8_t salt[Crypto::kSpake2pPBKDFMaximumSaltLen] = { 0 };
-        size_t saltLen                                    = 0;
-        PASEVerifierSerialized serializedVerifier         = { 0 };
-        size_t serializedVerifierLen                      = 0;
-        PASEVerifier verifier;
+        uint32_t iterationCount                      = 0;
+        uint8_t salt[kSpake2p_Max_PBKDF_Salt_Length] = { 0 };
+        size_t saltLen                               = 0;
+        Spake2pVerifierSerialized serializedVerifier = { 0 };
+        size_t serializedVerifierLen                 = 0;
+        Spake2pVerifier verifier;
 
         ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pIterationCount(iterationCount));
         ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pSalt(salt, sizeof(salt), saltLen));
         ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pVerifier(
-            serializedVerifier, Crypto::kSpake2pSerializedVerifierSize, serializedVerifierLen));
-        VerifyOrReturnError(Crypto::kSpake2pSerializedVerifierSize == serializedVerifierLen, CHIP_ERROR_INVALID_ARGUMENT);
+            serializedVerifier, kSpake2p_VerifierSerialized_Length, serializedVerifierLen));
+        VerifyOrReturnError(kSpake2p_VerifierSerialized_Length == serializedVerifierLen, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
         ReturnErrorOnFailure(
@@ -239,8 +239,8 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t com
 }
 
 CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                                                       PASEVerifier & verifier, uint32_t iterations, ByteSpan salt,
-                                                                       PasscodeId passcodeID)
+                                                                       Spake2pVerifier & verifier, uint32_t iterations,
+                                                                       ByteSpan salt, PasscodeId passcodeID)
 {
     // Once a device is operational, it shall be commissioned into subsequent fabrics using
     // the operational network only.
@@ -258,7 +258,7 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
     mECMPasscodeID    = passcodeID;
     mECMIterations    = iterations;
 
-    memcpy(&mECMPASEVerifier, &verifier, sizeof(PASEVerifier));
+    memcpy(&mECMPASEVerifier, &verifier, sizeof(Spake2pVerifier));
 
     mUseECM = true;
 

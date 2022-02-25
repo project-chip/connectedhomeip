@@ -188,6 +188,7 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
                                      mHasMoreChunks ? Messaging::SendMessageFlags::kExpectResponse
                                                     : Messaging::SendMessageFlags::kNone);
@@ -393,9 +394,6 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
     reader.Init(std::move(aPayload));
 
-    err = reader.Next();
-    SuccessOrExit(err);
-
     err = writeRequestParser.Init(reader);
     SuccessOrExit(err);
 
@@ -448,6 +446,8 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     {
         err = ProcessAttributeDataIBs(AttributeDataIBsReader);
     }
+    SuccessOrExit(err);
+    SuccessOrExit(err = writeRequestParser.ExitContainer());
 
     if (err == CHIP_NO_ERROR)
     {

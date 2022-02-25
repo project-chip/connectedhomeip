@@ -43,6 +43,11 @@ class GeneratorStorage:
 
 
 class FileSystemGeneratorStorage(GeneratorStorage):
+    """
+    A storage generator which will physically write files to disk into
+    a given output folder.
+    """
+
     def __init__(self, output_dir: str):
         self.output_dir = output_dir
 
@@ -75,17 +80,30 @@ class FileSystemGeneratorStorage(GeneratorStorage):
 
 class CodeGenerator:
     """
-    Defines the general interface for things that can
-    generate code output.
+    Defines the general interface for things that can generate code output.
+
+    A CodeGenerator takes a AST as input (a `Idl` type) and generates files
+    as output (like java/cpp/mm/other).
+
+    Its public interface surface is reasonably small:
+      'storage' init argument specifies where generated code goes
+      'idl' is the input AST to generate
+      'render' will perform a rendering of all files.
+
+    As special optimizations, CodeGenerators generally will try to read
+    existing data and will not re-write content if not changed (so that 
+    write time of files do not change and rebuilds are not triggered).
     """
 
     def __init__(self, storage: GeneratorStorage, idl: Idl):
+        """
+        A code generator will render a parsed IDL (a AST) into a given storage.
+        """
         self.storage = storage
         self.idl = idl
         self.jinja_env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(searchpath=os.path.dirname(__file__)))
         self.dry_run = False
-        self.output_file_names = []
 
         RegisterCommonFilters(self.jinja_env.filters)
 
@@ -98,7 +116,6 @@ class CodeGenerator:
           dry_run: if true, outputs are not actually written to disk.
                    if false, outputs are actually written to disk.
         """
-        self.output_file_names = []
         self.dry_run = dry_run
         self.internal_render_all()
 
@@ -112,8 +129,8 @@ class CodeGenerator:
         """
         Method to be called by subclasses to mark that a template is to be generated.
 
-        File will either actually do a jinja2 generation or, if only output  file
-        names are desired, will only record the output.
+        File will either actually do a jinja2 generation or just log things
+        if dry-run was requested during `render`.
 
         NOTE: to make this method suitable for rebuilds, this file will NOT alter
               the timestamp of the output file if the file content would not 
@@ -126,7 +143,6 @@ class CodeGenerator:
           vars             - variables used for template generation
         """
         logging.info("File to be generated: %s" % output_file_name)
-        self.output_file_names.append(output_file_name)
         if self.dry_run:
             return
 

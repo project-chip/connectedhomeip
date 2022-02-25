@@ -23,8 +23,71 @@
 
 #include <app/util/af-types.h>
 
-EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result);
+namespace chip {
 
-EmberStatus emberSetBinding(uint8_t index, EmberBindingTableEntry * result);
+class BindingTable
+{
+    friend class Iterator;
 
-EmberStatus emberDeleteBinding(uint8_t index);
+public:
+    BindingTable();
+
+    class Iterator
+    {
+        friend class BindingTable;
+
+    public:
+        EmberBindingTableEntry & operator*() { return mTable->mBindingTable[mIndex]; }
+
+        const EmberBindingTableEntry & operator*() const { return mTable->mBindingTable[mIndex]; }
+
+        EmberBindingTableEntry * operator->() { return &(mTable->mBindingTable[mIndex]); }
+
+        const EmberBindingTableEntry * operator->() const { return &(mTable->mBindingTable[mIndex]); }
+
+        Iterator operator++();
+
+        bool operator==(const Iterator & rhs) { return mIndex == rhs.mIndex; }
+
+        bool operator!=(const Iterator & rhs) { return mIndex != rhs.mIndex; }
+
+        uint8_t GetIndex() { return mIndex; }
+
+    private:
+        BindingTable * mTable;
+        uint8_t mPrevIndex;
+        uint8_t mIndex;
+    };
+
+    CHIP_ERROR Add(const EmberBindingTableEntry & entry);
+
+    const EmberBindingTableEntry & GetAt(uint8_t index);
+
+    // The RemoveAt function shares the same sematics as the std::list::remove.
+    // It returns the next iterator after removal and the old iterator is no loger valid.
+    Iterator RemoveAt(Iterator iter);
+
+    // Returns the number of active entries in the binding table.
+    // *NOTE* The function does not return the capacity of the binding table.
+    uint8_t Size() { return mSize; }
+
+    Iterator begin();
+
+    Iterator end();
+
+    static BindingTable & GetInstance() { return sInstance; }
+
+private:
+    static BindingTable sInstance;
+
+    uint8_t GetNextAvaiableIndex();
+
+    EmberBindingTableEntry mBindingTable[EMBER_BINDING_TABLE_SIZE];
+    uint8_t mNextIndex[EMBER_BINDING_TABLE_SIZE];
+
+    uint8_t mHead = EMBER_BINDING_TABLE_SIZE;
+    uint8_t mTail = EMBER_BINDING_TABLE_SIZE;
+    uint8_t mSize = 0;
+};
+
+} // namespace chip

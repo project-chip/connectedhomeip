@@ -52,6 +52,12 @@ public:
     /// Gets the unsecure Matter port
     uint16_t GetUnsecuredPort() { return mUnsecuredPort; }
 
+    /// Sets the interface id used for advertising
+    void SetInterfaceId(Inet::InterfaceId interfaceId) { mInterfaceId = interfaceId; }
+
+    /// Gets the interface id used for advertising
+    Inet::InterfaceId GetInterfaceId() { return mInterfaceId; }
+
     /// Sets the factory-new state commissionable node discovery timeout
     void SetDiscoveryTimeoutSecs(int16_t secs) { mDiscoveryTimeoutSecs = secs; }
 
@@ -137,8 +143,9 @@ private:
     // Helper for StartServer.
     void StartServer(Optional<Dnssd::CommissioningMode> mode);
 
-    uint16_t mSecuredPort   = CHIP_PORT;
-    uint16_t mUnsecuredPort = CHIP_UDC_PORT;
+    uint16_t mSecuredPort          = CHIP_PORT;
+    uint16_t mUnsecuredPort        = CHIP_UDC_PORT;
+    Inet::InterfaceId mInterfaceId = Inet::InterfaceId::Null();
 
     /// schedule next discovery expiration
     CHIP_ERROR ScheduleDiscoveryExpiration();

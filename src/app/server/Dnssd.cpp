@@ -29,7 +29,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 #include <credentials/FabricTable.h>
@@ -270,6 +270,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                                  .SetPeerId(fabricInfo.GetPeerId())
                                                  .SetMac(mac)
                                                  .SetPort(GetSecuredPort())
+                                                 .SetInterfaceId(GetInterfaceId())
                                                  .SetMRPConfig(GetLocalMRPConfig())
                                                  .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
                                                  .EnableIpV4(true);
@@ -291,6 +292,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 {
     auto advertiseParameters = chip::Dnssd::CommissionAdvertisingParameters()
                                    .SetPort(commissionableNode ? GetSecuredPort() : GetUnsecuredPort())
+                                   .SetInterfaceId(GetInterfaceId())
                                    .EnableIpV4(true);
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Dnssd::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Dnssd::CommssionAdvertiseMode::kCommissioner);
@@ -347,7 +349,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
     }
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
     ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
     advertiseParameters.SetRotatingDeviceId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
@@ -507,18 +509,21 @@ void DnssdServer::StartServer(Optional<Dnssd::CommissioningMode> mode)
     }
 }
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
 {
-    char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
-    uint16_t lifetimeCounter               = 0;
+    AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
+    uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
     size_t rotatingDeviceIdValueOutputSize = 0;
 
-    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber)));
-    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
+    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan));
+    ReturnErrorOnFailure(
+        chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter));
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
+
     return AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
-        lifetimeCounter, serialNumber, strlen(serialNumber), rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
-        rotatingDeviceIdValueOutputSize);
+        additionalDataPayloadParams, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize, rotatingDeviceIdValueOutputSize);
 }
 #endif
 

@@ -48,7 +48,7 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager : public Dnssd::ResolverDelegate
+class CASESessionManager : public Dnssd::OperationalResolveDelegate
 {
 public:
     CASESessionManager() = delete;
@@ -60,18 +60,9 @@ public:
         mConfig = params;
     }
 
-    CHIP_ERROR Init()
-    {
-        if (mConfig.dnsResolver == nullptr)
-        {
-            ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
-            mDNSResolver.SetResolverDelegate(this);
-            mConfig.dnsResolver = &mDNSResolver;
-        }
-        return CHIP_NO_ERROR;
-    }
-
     virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
+
+    CHIP_ERROR Init();
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.
@@ -92,7 +83,7 @@ public:
      * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up
      * on the fabric that was configured for the CASESessionManager object.
      *
-     * The results of the DNS-SD resolution request is provided to the class via `ResolverDelegate`
+     * The results of the DNS-SD resolution request is provided to the class via `OperationalResolveDelegate`
      * implementation of CASESessionManager.
      */
     CHIP_ERROR ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId);
@@ -107,10 +98,9 @@ public:
      */
     CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
 
-    //////////// ResolverDelegate Implementation ///////////////
-    void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override;
-    void OnNodeDiscoveryComplete(const Dnssd::DiscoveredNodeData & nodeData) override {}
+    //////////// OperationalResolveDelegate Implementation ///////////////
+    void OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData) override;
+    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override;
 
 private:
     OperationalDeviceProxy * FindSession(const SessionHandle & session);

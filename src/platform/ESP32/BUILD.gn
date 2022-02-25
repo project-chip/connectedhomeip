@@ -74,8 +74,8 @@ static_library("ESP32") {
 
   if (chip_enable_openthread) {
     sources += [
+      "../OpenThread/DnssdImpl.cpp",
       "../OpenThread/OpenThreadUtils.cpp",
-      "ESPThreadConfig.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]

@@ -122,8 +122,9 @@ var endpointClusterWithInit = [
   'Thermostat',
 ];
 var endpointClusterWithAttributeChanged = [
-  'Identify',
+  'Bridged Device Basic',
   'Door Lock',
+  'Identify',
   'Pump Configuration and Control',
   'Window Covering',
 ];

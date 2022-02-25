@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -236,7 +236,7 @@ public:
     void Reset()
     {
         mOperationalId  = PeerId();
-        mVendorId       = kUndefinedVendorId;
+        mVendorId       = VendorId::NotSpecified;
         mFabricLabel[0] = '\0';
 
         if (mOperationalKey != nullptr)
@@ -260,7 +260,7 @@ private:
     PeerId mOperationalId;
 
     FabricIndex mFabric                                 = kUndefinedFabricIndex;
-    uint16_t mVendorId                                  = kUndefinedVendorId;
+    uint16_t mVendorId                                  = VendorId::NotSpecified;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY

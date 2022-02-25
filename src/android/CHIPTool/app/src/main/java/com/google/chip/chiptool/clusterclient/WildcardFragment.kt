@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import androidx.appcompat.widget.MenuItemHoverListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
@@ -16,6 +15,7 @@ import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.SubscriptionEstablishedCallback
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipPathId
+import chip.devicecontroller.model.NodeState
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import kotlinx.android.synthetic.main.wildcard_fragment.attributeIdEd
@@ -37,17 +37,13 @@ class WildcardFragment : Fragment() {
 
   private val reportCallback = object : ReportCallback {
     override fun onError(attributePath: ChipAttributePath, ex: Exception) {
-      Log.i(TAG, "Report error for $attributePath: $ex")
+      Log.e(TAG, "Report error for $attributePath: $ex")
     }
 
-    override fun onReport(values: Map<ChipAttributePath, Any?>) {
-      Log.i(TAG, "Received report with ${values.size} values")
-      val builder = StringBuilder()
-      values.forEach { builder.append("${it.key}: ${it.value}\n") }
-      val output = builder.toString()
-
-      Log.i(TAG, output)
-      requireActivity().runOnUiThread { outputTv.text = output }
+    override fun onReport(nodeData: NodeState) {
+      Log.i(TAG, "Received wildcard report")
+      Log.i(TAG, nodeData.toString())
+      requireActivity().runOnUiThread { outputTv.text = nodeData.toString() }
     }
   }
 
@@ -79,7 +75,7 @@ class WildcardFragment : Fragment() {
                                      reportCallback,
                                      ChipClient.getConnectedDevicePointer(requireContext(),
                                                                           addressUpdateFragment.deviceId),
-                                     attributePath,
+                                     listOf(attributePath),
                                      minInterval,
                                      maxInterval)
   }
@@ -93,7 +89,7 @@ class WildcardFragment : Fragment() {
     deviceController.readPath(reportCallback,
                               ChipClient.getConnectedDevicePointer(requireContext(),
                                                                    addressUpdateFragment.deviceId),
-                              attributePath)
+                              listOf(attributePath))
   }
 
   private fun showSubscribeDialog() {

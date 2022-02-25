@@ -49,6 +49,8 @@
 #endif
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
 #endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
@@ -61,6 +63,11 @@
 #define LOCK_STATE_LED &sl_led_led1
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LOCK_BUTTON &sl_button_btn1
+
+using namespace chip;
+using namespace chip::TLV;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 
 namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -75,6 +82,9 @@ LEDWidget sLockLED;
 bool sIsWiFiProvisioned = false;
 bool sIsWiFiEnabled     = false;
 bool sIsWiFiAttached    = false;
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -86,10 +96,6 @@ bool sHaveBLEConnections = false;
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 } // namespace
-
-using namespace chip::TLV;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
@@ -120,12 +126,14 @@ CHIP_ERROR AppTask::Init()
     }
     EFR32_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
-#endif
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
+    sWiFiNetworkCommissioningInstance.Init();
+#endif
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -156,7 +164,7 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
-    UpdateClusterState();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -355,7 +363,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -484,7 +492,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        UpdateClusterState();
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }
@@ -539,7 +547,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState(void)
+void AppTask::UpdateClusterState(intptr_t context)
 {
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 

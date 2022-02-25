@@ -59,3 +59,14 @@ using namespace ::chip;
         [value lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }
 @end
+
+@implementation CHIPReadParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _fabricFiltered = nil;
+    }
+    return self;
+}
+
+@end

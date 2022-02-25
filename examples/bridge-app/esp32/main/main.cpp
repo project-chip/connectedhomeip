@@ -146,6 +146,7 @@ CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t de
     {
         if (NULL == gDevices[index])
         {
+            dev->SetEndpointId(gCurrentEndpointId);
             gDevices[index] = dev;
             EmberAfStatus ret;
             ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT, dataVersionStorage);

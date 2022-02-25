@@ -1417,13 +1417,15 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
 } // namespace Breadcrumb
 
 namespace RegulatoryConfig {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType * value); // RegulatoryLocationType
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value);
 } // namespace RegulatoryConfig
 
 namespace LocationCapability {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType * value); // RegulatoryLocationType
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value);
 } // namespace LocationCapability
 
 namespace FeatureMap {
@@ -2078,8 +2080,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace VendorName
 
 namespace VendorID {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * value); // vendor_id
+EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value);
 } // namespace VendorID
 
 namespace ProductName {

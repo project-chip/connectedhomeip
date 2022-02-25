@@ -18,16 +18,21 @@
 #pragma once
 
 #include <app/clusters/channel-server/channel-server.h>
+#include <vector>
 
 using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using ChannelDelegate           = chip::app::Clusters::Channel::Delegate;
 using ChangeChannelResponseType = chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type;
+using ChannelInfoType           = chip::app::Clusters::Channel::Structs::ChannelInfo::Type;
+using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfo::Type;
 
 class ChannelManager : public ChannelDelegate
 {
 public:
+    ChannelManager();
+
     CHIP_ERROR HandleGetChannelList(AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetLineup(AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetCurrentChannel(AttributeValueEncoder & aEncoder) override;
@@ -35,4 +40,9 @@ public:
     void HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match) override;
     bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) override;
     bool HandleSkipChannel(const uint16_t & count) override;
+
+protected:
+    uint16_t mCurrentChannelIndex;
+    ChannelInfoType mCurrentChannel;
+    std::vector<ChannelInfoType> mChannels;
 };

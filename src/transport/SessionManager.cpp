@@ -244,15 +244,15 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!preparedMessage.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
+    Transport::PeerAddress multicastAddress; // Only used for the group case
     const Transport::PeerAddress * destination;
 
     switch (sessionHandle->GetSessionType())
     {
     case Transport::Session::SessionType::kGroup: {
         auto groupSession = sessionHandle->AsGroupSession();
-        Transport::PeerAddress multicastAddress =
-            Transport::PeerAddress::Multicast(groupSession->GetFabricIndex(), groupSession->GetGroupId());
-        destination = &multicastAddress; // XXX: this is dangling pointer, must be fixed
+        multicastAddress  = Transport::PeerAddress::Multicast(groupSession->GetFabricIndex(), groupSession->GetGroupId());
+        destination       = &multicastAddress;
         char addressStr[Transport::PeerAddress::kMaxToStringSize];
         multicastAddress.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
 
@@ -496,26 +496,30 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     unsecuredSession->SetPeerAddress(peerAddress);
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
 
-    // Verify message counter
-    CHIP_ERROR err = unsecuredSession->GetPeerMessageCounter().VerifyOrTrustFirst(packetHeader.GetMessageCounter());
-    if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
-    {
-        isDuplicate = SessionMessageDelegate::DuplicateMessage::Yes;
-        err         = CHIP_NO_ERROR;
-    }
-    VerifyOrDie(err == CHIP_NO_ERROR);
-
     unsecuredSession->MarkActive();
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
-    if (isDuplicate == SessionMessageDelegate::DuplicateMessage::Yes)
+    // Verify message counter
+    CHIP_ERROR err = unsecuredSession->GetPeerMessageCounter().VerifyOrTrustFirst(packetHeader.GetMessageCounter());
+    if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
         ChipLogDetail(Inet,
                       "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
                       " on exchange " ChipLogFormatExchangeId,
                       packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
+        isDuplicate = SessionMessageDelegate::DuplicateMessage::Yes;
+        err         = CHIP_NO_ERROR;
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Inet,
+                        "Received malformed unsecure packet with source 0x" ChipLogFormatX64 " destination 0x" ChipLogFormatX64
+                        " MessageCounter verify failed err = %" CHIP_ERROR_FORMAT,
+                        ChipLogValueX64(source.ValueOr(kUndefinedNodeId)), ChipLogValueX64(destination.ValueOr(kUndefinedNodeId)),
+                        err.Format());
+        return; // ephemeral node id is only assigned to the initiator, there should be one and only one node id exists.
     }
 
     unsecuredSession->GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
@@ -561,6 +565,10 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
     err = secureSession->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
     if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
+        ChipLogDetail(Inet,
+                      "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
+                      " on exchange " ChipLogFormatExchangeId,
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
         isDuplicate = SessionMessageDelegate::DuplicateMessage::Yes;
         err         = CHIP_NO_ERROR;
     }
@@ -574,16 +582,9 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
-        ChipLogDetail(Inet,
-                      "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
-                      " on exchange " ChipLogFormatExchangeId,
-                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
-        if (!payloadHeader.NeedsAck())
-        {
-            // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
-            // cycles on further message processing.
-            return;
-        }
+        // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
+        // cycles on further message processing.
+        return;
     }
 
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());

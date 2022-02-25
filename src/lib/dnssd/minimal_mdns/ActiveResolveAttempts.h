@@ -37,9 +37,47 @@ namespace Minimal {
 ///
 class ActiveResolveAttempts
 {
+private:
+    struct RetryEntry
+    {
+        // What peer id is pending resolution.
+        //
+        // Inactive entries are marked by having NodeId == kUndefinedNodeId
+        chip::PeerId peerId;
+
+        // First packet send is marked separately: minMDNS logic can choose
+        // to first send a unicast query followed by a multicast one.
+        bool firstSend = false;
+
+        // When a reply is expected for this item
+        chip::System::Clock::Timestamp queryDueTime;
+
+        // Next expected delay for sending if reply is not reached by
+        // 'queryDueTimeMs'
+        //
+        // Based on RFC 6762 expectations are:
+        //    - the interval between the first two queries MUST be at least
+        //      one second
+        //    - the intervals between successive queries MUST increase by at
+        //      least a factor of two
+        chip::System::Clock::Timeout nextRetryDelay = chip::System::Clock::Seconds16(1);
+    };
+
 public:
     static constexpr size_t kRetryQueueSize                      = 4;
     static constexpr chip::System::Clock::Timeout kMaxRetryDelay = chip::System::Clock::Seconds16(16);
+
+    struct ScheduledResolve
+    {
+        const chip::PeerId peerId;
+        const bool firstSend = false;
+
+        ScheduledResolve(const RetryEntry & entry) : peerId(entry.peerId), firstSend(entry.firstSend) {}
+        ScheduledResolve(const chip::PeerId & peer, bool first) : peerId(peer), firstSend(first) {}
+        ScheduledResolve(const ScheduledResolve &) = default;
+
+        bool operator==(const ScheduledResolve & other) const { return (peerId == other.peerId) && (firstSend == other.firstSend); }
+    };
 
     ActiveResolveAttempts(chip::System::Clock::ClockBase * clock) : mClock(clock) { Reset(); }
 
@@ -68,30 +106,9 @@ public:
     //    now'
     //  - there is NO sorting implied by this call. Returned value will be
     //    any peer that needs a new request sent
-    chip::Optional<chip::PeerId> NextScheduledPeer();
+    chip::Optional<ScheduledResolve> NextScheduledPeer();
 
 private:
-    struct RetryEntry
-    {
-        // What peer id is pending resolution.
-        //
-        // Inactive entries are marked by having NodeId == kUndefinedNodeId
-        chip::PeerId peerId;
-
-        // When a reply is expected for this item
-        chip::System::Clock::Timestamp queryDueTime;
-
-        // Next expected delay for sending if reply is not reached by
-        // 'queryDueTimeMs'
-        //
-        // Based on RFC 6762 expectations are:
-        //    - the interval between the first two queries MUST be at least
-        //      one second
-        //    - the intervals between successive queries MUST increase by at
-        //      least a factor of two
-        chip::System::Clock::Timeout nextRetryDelay = chip::System::Clock::Seconds16(1);
-    };
-
     chip::System::Clock::ClockBase * mClock;
     RetryEntry mRetryQueue[kRetryQueueSize];
 };

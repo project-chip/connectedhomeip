@@ -83,7 +83,13 @@ using namespace chip::app::Clusters;
 
 {{#chip_server_cluster_attributes}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
-- (void)read{{>attribute}}WithCompletionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
+- (void)read{{>attribute}}With
+{{~#if_is_fabric_scoped_struct type~}}
+  Params:(CHIPReadParams * _Nullable)params completionHandler:
+{{~else~}}
+  CompletionHandler:
+{{~/if_is_fabric_scoped_struct~}}
+(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIP{{>attribute_data_callback_name}}CallbackBridge(self.callbackQueue,
       {{! This treats completionHandler as taking an id for the data.  This is
@@ -93,7 +99,11 @@ using namespace chip::app::Clusters;
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+          return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall
+          {{~#if_is_fabric_scoped_struct type~}}
+          , params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]
+          {{~/if_is_fabric_scoped_struct~}}
+          );
       });
 }
 
@@ -126,7 +136,11 @@ using namespace chip::app::Clusters;
 
 {{/if}}
 {{#if isReportableAttribute}}
-- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
+- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
+{{#if_is_fabric_scoped_struct type}}
+params:(CHIPReadParams * _Nullable)params
+{{/if_is_fabric_scoped_struct}}
+subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge(self.callbackQueue,
       {{! This treats reportHandler as taking an id for the data.  This is
@@ -136,7 +150,11 @@ using namespace chip::app::Clusters;
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished);
+          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished
+          {{~#if_is_fabric_scoped_struct type~}}
+          , params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]
+          {{~/if_is_fabric_scoped_struct~}}
+          );
       }, subscriptionEstablishedHandler);
 }
 

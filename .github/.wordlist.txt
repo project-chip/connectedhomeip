@@ -1,4 +1,3 @@
-
 14
 15
 16
@@ -17,6 +16,7 @@ ABI
 ABIs
 ables
 AccessControl
+AccessControlEntry
 accessor
 AccountLogin
 acdbc
@@ -48,6 +48,7 @@ amebad
 amebaiot
 announcementReason
 AnnounceOTAProvider
+AnnounceOtaProviderRequest
 APIs
 apk
 AppConfig
@@ -58,6 +59,7 @@ ApplicationBasic
 ApplicationId
 ApplicationIdentifier
 ApplicationLauncher
+ApplyUpdate
 applyUpdateAction
 ApplyUpdateRequest
 ApplyUpdateResponse
@@ -74,6 +76,7 @@ armv
 ASAN
 asdk
 AssertionError
+AST
 ASYNC
 atomics
 att
@@ -89,6 +92,7 @@ ATW
 ATWC
 AudioOutput
 auth
+AuthMode
 autocompletion
 autoconnect
 autocrlf
@@ -226,6 +230,8 @@ CMVH
 cn
 codeaurora
 codebase
+codegen
+CodeGenerator
 CodeLab
 codelabs
 ColorControl
@@ -246,12 +252,14 @@ ConnectIP
 ConnectivityManager
 ConnectivityManagerImpl
 ConnectNetwork
+ConnectNetworkRequest
+ConnectNetworkResponse
 connstring
 conntype
 const
 ContentApp
-ContentApp's
 ContentAppPlatform
+ContentApp's
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -301,9 +309,11 @@ DCL
 DCMAKE
 DCONFIG
 debianutils
+debugText
 DEDEDEDE
 deepnote
 DefaultOTAProviders
+DefaultSuccess
 definedValue
 DehumidificationControl
 DelayedActionTime
@@ -331,6 +341,7 @@ DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 deviceSoftwareVersionModel
 DeviceTemperatureConfiguration
+deviceType
 DevKitC
 DevKitM
 devtype
@@ -413,8 +424,10 @@ endsWith
 eno
 entrypoint
 enum
+Enums
 env
 eq
+errorValue
 esd
 ESPPORT
 Espressif
@@ -434,6 +447,7 @@ exe
 ExecStart
 executables
 ExtendedPAN
+ExtensionEntry
 extern
 extpanid
 FabricId
@@ -496,7 +510,6 @@ getManualTests
 getstarted
 getTests
 GH
-gh
 ghp
 githubusercontent
 gitignore
@@ -518,6 +531,7 @@ gradlew
 GroupId
 GroupKeyManagement
 gtk
+GUA
 Gv
 gz
 HaloaceticAcidsConcentrationMeasurement
@@ -548,10 +562,14 @@ ibb
 ICA
 ICMP
 IDF
+IDL
+IDLs
 idx
 ifdef
 ifdefs
 IGMP
+ignoreApplyUpdate
+ignoreQueryImage
 ihex
 IlluminanceMeasurement
 IM
@@ -608,18 +626,24 @@ jre
 js
 json
 JTAG
-jupyter
 Jupyter
 jupyterlab
 KA
+kBusy
+kCase
 Kconfig
 KeypadInput
+kGroup
 kInvalidCommandId
 KitProg
 kNodeIdNotSpecified
 knownissues
+kPAKEParameterError
+kPase
 KVS
+kWindowNotOpen
 LabelList
+LabelStruct
 launchable
 LAUNCHXL
 ldflags
@@ -764,6 +788,7 @@ MX
 mydir
 MyPASSWORD
 MySSID
+namespacing
 nano
 natively
 navpad
@@ -794,6 +819,7 @@ nrfdks
 nrfutil
 nrfxlib
 NTAG
+nullable
 nullptr
 NUM
 nwk
@@ -852,6 +878,7 @@ PacketBuffer
 PAI
 PairDevice
 PAKE
+palletsprojects
 pankore
 param
 params
@@ -952,6 +979,7 @@ ReadConfigValue
 readelf
 readfds
 README
+readonly
 readthedocs
 Reag
 rebase
@@ -966,17 +994,17 @@ Rendez
 RendezvousInformation
 RendezvousParameters
 RendezVousTest
-repl
 REPL
 repo
 req
 Requestor
-Requestor's
 RequestorCanConsent
+Requestor's
 Requestors
 responder
 retargeting
 reusability
+reviwed
 rfid
 rfids
 RGB
@@ -1012,8 +1040,8 @@ ScriptBinding
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
+SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1071,6 +1099,7 @@ SSID
 startoffset
 StartScan
 startsWith
+StatusCode
 stderr
 stdout
 sterm
@@ -1117,6 +1146,7 @@ TCP
 teardown
 Telink
 TemperatureMeasurement
+templating
 testability
 TestArray
 TestCluster
@@ -1181,7 +1211,6 @@ TXD
 txt
 UART
 udc
-UDC
 udcport
 udhcpc
 UDP
@@ -1190,6 +1219,7 @@ udpPort
 ug
 ui
 uint
+ULA
 UNBLUR
 uncommissioned
 unfocus
@@ -1317,3 +1347,4 @@ zephyrproject
 Zigbee
 zigbeealliance
 zigbeethread
+libshell

@@ -42,7 +42,7 @@ namespace {
 static DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> sDnssdCache;
 #endif
 
-static void HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR error)
+static void HandleNodeResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & extraIPs, CHIP_ERROR error)
 {
     ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
 
@@ -57,16 +57,27 @@ static void HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR 
     Platform::CopyString(nodeData.hostName, result->mHostName);
     Platform::CopyString(nodeData.instanceName, result->mName);
 
+    size_t addressesFound = 0;
     if (result->mAddress.HasValue())
     {
-        nodeData.ipAddress[0] = result->mAddress.Value();
-        nodeData.interfaceId  = result->mInterface;
-        nodeData.numIPs       = 1;
+        nodeData.ipAddress[addressesFound] = result->mAddress.Value();
+        nodeData.interfaceId               = result->mInterface;
+        ++addressesFound;
     }
-    else
+
+    for (auto & ip : extraIPs)
     {
-        nodeData.numIPs = 0;
+        if (addressesFound == ArraySize(nodeData.ipAddress))
+        {
+            // Out of space.
+            ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
+            break;
+        }
+        nodeData.ipAddress[addressesFound] = ip;
+        ++addressesFound;
     }
+
+    nodeData.numIPs = addressesFound;
 
     nodeData.port = result->mPort;
 
@@ -81,7 +92,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR 
     proxy->Release();
 }
 
-static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERROR error)
+static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & extraIPs, CHIP_ERROR error)
 {
     ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
     if (CHIP_NO_ERROR != error)
@@ -116,14 +127,31 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     ResolvedNodeData nodeData;
     Platform::CopyString(nodeData.mHostName, result->mHostName);
     nodeData.mInterfaceId = result->mInterface;
-    nodeData.mAddress[0]  = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
-    nodeData.mNumIPs      = 1;
     nodeData.mPeerId      = peerId;
     // TODO: Use seconds?
     const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
     nodeData.mExpiryTime = currentTime + System::Clock::Seconds16(result->mTtlSeconds);
+
+    size_t addressesFound = 0;
+    if (result->mAddress.HasValue())
+    {
+        nodeData.mAddress[addressesFound] = result->mAddress.Value();
+        ++addressesFound;
+    }
+    for (auto & ip : extraIPs)
+    {
+        if (addressesFound == ArraySize(nodeData.mAddress))
+        {
+            // Out of space.
+            ChipLogProgress(Discovery, "Can't add more IPs to ResolvedNodeData");
+            break;
+        }
+        nodeData.mAddress[addressesFound] = ip;
+        ++addressesFound;
+    }
+    nodeData.mNumIPs = addressesFound;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
@@ -155,7 +183,7 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         }
         else
         {
-            HandleNodeResolve(context, &services[i], error);
+            HandleNodeResolve(context, &services[i], Span<Inet::IPAddress>(), error);
         }
     }
     proxy->Release();
@@ -345,6 +373,20 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
     {
         publisher->mDnssdInitialized = true;
 
+        // TODO: this is wrong, however we need resolverproxy initialized
+        // otherwise DiscoveryImplPlatform is not usable.
+        //
+        // We rely on the fact that resolverproxy does not use the endpoint
+        // nor does DiscoveryImplPlatform use it (since init will be called
+        // twice now)
+        //
+        // The problem is that:
+        //   - DiscoveryImplPlatform contains a ResolverProxy
+        //   - ResolverProxy::Init calls Dnssd::Resolver::Instance().Init
+        // which results in a recursive dependency (proxy initializes the
+        // class that it is contained in).
+        publisher->mResolverProxy.Init(nullptr);
+
 #if !CHIP_DEVICE_LAYER_NONE
         // Post an event that will start advertising
         chip::DeviceLayer::ChipDeviceEvent event;
@@ -419,21 +461,22 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                                                  const char ** subTypes, size_t subTypeSize,
                                                  const OperationalAdvertisingParameters & params)
 {
-    return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetMac(),
-                          DnssdServiceProtocol::kDnssdProtocolTcp, params.GetPeerId());
+    return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetInterfaceId(),
+                          params.GetMac(), DnssdServiceProtocol::kDnssdProtocolTcp, params.GetPeerId());
 }
 
 CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
                                                  const char ** subTypes, size_t subTypeSize,
                                                  const CommissionAdvertisingParameters & params)
 {
-    return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetMac(),
-                          DnssdServiceProtocol::kDnssdProtocolUdp, PeerId());
+    return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetInterfaceId(),
+                          params.GetMac(), DnssdServiceProtocol::kDnssdProtocolUdp, PeerId());
 }
 
 CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
                                                  const char ** subTypes, size_t subTypeSize, uint16_t port,
-                                                 const chip::ByteSpan & mac, DnssdServiceProtocol protocol, PeerId peerId)
+                                                 Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
+                                                 DnssdServiceProtocol protocol, PeerId peerId)
 {
     ReturnErrorCodeIf(mDnssdInitialized == false, CHIP_ERROR_INCORRECT_STATE);
 
@@ -444,7 +487,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                              : GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
     strncpy(service.mType, serviceType, sizeof(service.mType));
     service.mAddressType   = Inet::IPAddressType::kAny;
-    service.mInterface     = Inet::InterfaceId::Null();
+    service.mInterface     = interfaceId;
     service.mProtocol      = protocol;
     service.mPort          = port;
     service.mTextEntries   = textEntries;

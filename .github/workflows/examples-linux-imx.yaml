@@ -31,7 +31,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-imx:0.5.52
+            image: connectedhomeip/chip-build-imx:0.5.56
 
         steps:
             - name: Checkout

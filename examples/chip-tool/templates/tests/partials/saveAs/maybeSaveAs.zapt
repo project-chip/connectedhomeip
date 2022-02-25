@@ -1,0 +1,13 @@
+{{#if saveAs}}
+    {{#if (isString type)}}
+        if ({{saveAs}}Buffer != nullptr)
+        {
+            chip::Platform::MemoryFree({{saveAs}}Buffer);
+        }
+        {{saveAs}}Buffer = static_cast<{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} *>(chip::Platform::MemoryAlloc({{asPropertyValue}}.size()));
+        memcpy({{saveAs}}Buffer, {{asPropertyValue}}.data(), {{asPropertyValue}}.size());
+        {{saveAs}} = {{chipType}}({{saveAs}}Buffer, {{asPropertyValue}}.size());
+    {{else}}
+        {{saveAs}} = {{asPropertyValue}};
+    {{/if}}
+{{/if}}
