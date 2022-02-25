@@ -8,7 +8,7 @@ bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {ro
 bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-light lighting-app'
 
 # Generating ameba-amebad-pigweed
-bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-pigweed pigweed-app'
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh -r {root} ninja {out}/ameba-amebad-pigweed pigweed-app'
 
 # Generating JARs for Java build rules test
 python3 build/chip/java/tests/generate_jars_for_test.py
