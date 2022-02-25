@@ -26,6 +26,7 @@
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "lib/shell/Engine.h"
+#include "lib/shell/commands/Help.h"
 #endif // ENABLE_CHIP_SHELL
 
 using namespace chip;
@@ -36,6 +37,9 @@ using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;
 using Shell::streamer_printf;
+
+Engine sShellSwitchSubCommands;
+Engine sShellSwitchGroupsSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
 namespace {
@@ -104,33 +108,84 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, DevicePro
 }
 
 #ifdef ENABLE_CHIP_SHELL
+
+/********************************************************
+ * Switch shell functions
+ *********************************************************/
+
+CHIP_ERROR SwitchHelpHandler(int argc, char ** argv)
+{
+    sShellSwitchSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
+{
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchOnOffOn, 0);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
+{
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchOnOffOff, 0);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
+{
+    DeviceLayer::PlatformMgr().ScheduleWork(SwitchToggleOnOff, 0);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
 {
-    if (argc == 1 && strcmp(argv[0], "on") == 0)
+    if (argc == 0)
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(SwitchOnOffOn, 0);
+        return SwitchHelpHandler(argc, argv);
     }
-    else if (argc == 1 && strcmp(argv[0], "off") == 0)
-    {
-        DeviceLayer::PlatformMgr().ScheduleWork(SwitchOnOffOff, 0);
-    }
-    else if (argc == 1 && strcmp(argv[0], "toggle") == 0)
-    {
-        DeviceLayer::PlatformMgr().ScheduleWork(SwitchToggleOnOff, 0);
-    }
-    else
-    {
-        streamer_printf(streamer_get(), "Usage: switch [on|off|toggle]");
-    }
+
+    return sShellSwitchSubCommands.ExecCommand(argc, argv);
+}
+
+/********************************************************
+ * Groups switch shell functions
+ *********************************************************/
+
+CHIP_ERROR GroupsHelpHandler(int argc, char ** argv)
+{
+    sShellSwitchGroupsSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsSwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return GroupsHelpHandler(argc, argv);
+    }
+
+    return sShellSwitchGroupsSubCommands.ExecCommand(argc, argv);
 }
 
 static void RegisterSwitchCommands()
 {
-    static const shell_command_t sSwitchCommand = { SwitchCommandHandler, "switch",
-                                                    "Switch commands. Usage: switch [on|off|toggle]" };
+    static const shell_command_t sSwitchSubCommands[] = {
+        { &SwitchHelpHandler, "help", "Usage: switch <subcommand>" },
+        { &GroupsSwitchCommandHandler, "groups", "Usage: switch groups <subcommand>" },
+        { &OnSwitchCommandHandler, "on", "Sends on command to bound lighting app" },
+        { &OffSwitchCommandHandler, "off", "Sends off command to bound lighting app" },
+        { &ToggleSwitchCommandHandler, "toggle", "Sends toggle command to bound lighting app" }
+    };
+
+    static const shell_command_t sSwitchGroupsSubCommands[] = { { &GroupsHelpHandler, "help",
+                                                                  "Usage: switch groups <subcommand>" } };
+
+    static const shell_command_t sSwitchCommand = { &SwitchCommandHandler, "switch",
+                                                    "Light-switch commands. Usage: switch <subcommand>" };
+
+    sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
+    sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));
     Engine::Root().RegisterCommands(&sSwitchCommand, 1);
-    return;
 }
 #endif // ENABLE_CHIP_SHELL
 
