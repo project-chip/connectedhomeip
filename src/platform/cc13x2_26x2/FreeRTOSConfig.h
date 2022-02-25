@@ -168,7 +168,7 @@
 #define INCLUDE_xTaskResumeFromISR 0
 #define INCLUDE_xTaskGetCurrentTaskHandle 1
 #define INCLUDE_xTaskGetSchedulerState 1
-#define INCLUDE_xSemaphoreGetMutexHolder 0
+#define INCLUDE_xSemaphoreGetMutexHolder 1
 #define INCLUDE_xTimerPendFunctionCall 0
 
 /* Cortex-M3/4 interrupt priority configuration follows...................... */
