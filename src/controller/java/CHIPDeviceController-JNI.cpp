@@ -352,13 +352,13 @@ JNI_METHOD(jbyteArray, convertX509CertToMatterCert)
     VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
 
     {
-      MutableByteSpan outBytes(outBuf.Get(), allocatedCertLength);
+        MutableByteSpan outBytes(outBuf.Get(), allocatedCertLength);
 
-      err = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes.byteSpan(), outBytes);
-      SuccessOrExit(err);
+        err = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes.byteSpan(), outBytes);
+        SuccessOrExit(err);
 
-      err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), outBytes.size(), outJbytes);
-      SuccessOrExit(err);
+        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), outBytes.size(), outJbytes);
+        SuccessOrExit(err);
     }
 
 exit:
