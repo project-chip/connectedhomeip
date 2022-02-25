@@ -38,6 +38,8 @@ namespace chip {
  */
 using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
 
+using BindingChangedHandler = void (*)(const EmberBindingTableEntry & binding);
+
 /**
  *
  * The BindingManager class manages the connections for unicast bindings and notifies the application
@@ -60,6 +62,7 @@ public:
     {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
+    void RegisterBindingChangedHandler(BindingChangedHandler handler) { mBindingChangedHandler = handler; }
 
     void SetAppServer(Server * appServer);
 
@@ -96,7 +99,7 @@ public:
     /*
      * Notify the BoundDeviceChangedHandler that a binding has changed.
      */
-    CHIP_ERROR NotifyBindingChanged(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device, void * context);
+    CHIP_ERROR NotifyBindingChanged(const EmberBindingTableEntry & binding);
 
     static BindingManager & GetInstance() { return sBindingManager; }
 
@@ -113,6 +116,7 @@ private:
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
+    BindingChangedHandler mBindingChangedHandler;
     Server * mAppServer = nullptr;
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;

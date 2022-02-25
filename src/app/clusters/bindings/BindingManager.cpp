@@ -161,12 +161,11 @@ void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, Fabric
     mAppServer->GetCASESessionManager()->ReleaseSessionForFabric(compressedFabricId);
 }
 
-CHIP_ERROR BindingManager::NotifyBindingChanged(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device,
-                                                void * context)
+CHIP_ERROR BindingManager::NotifyBindingChanged(const EmberBindingTableEntry & binding)
 {
-    if (mBoundDeviceChangedHandler)
+    if (mBindingChangedHandler)
     {
-        mBoundDeviceChangedHandler(binding, peer_device, context);
+        mBindingChangedHandler(binding);
     }
     return CHIP_NO_ERROR;
 }

@@ -506,8 +506,8 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
 
     ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, entry, nullptr));
 
-    ChipLogProgress(Controller, "Attempting to create Binding list of size %ld", bindings.size());
-    BindingListTypeInfo bindingList(bindings.data(), bindings.size());
+    ChipLogProgress(Controller, "Attempting to create Binding list of size %lu", bindings.size());
+    BindingListType bindingList(bindings.data(), bindings.size());
     ReturnErrorOnFailure(
         CreateBindingWithCallback(targetDeviceProxy, kTargetBindingClusterEndpointId, bindingList, successCb, failureCb));
 
@@ -544,13 +544,13 @@ CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy 
             .cluster     = MakeOptional(bindingClusterId),
         };
     }
-    BindingListTypeInfo bindingList(entries);
+    BindingListType bindingList(entries);
 
     return CreateBindingWithCallback(device, deviceEndpointId, bindingList, successCb, failureCb);
 }
 
 CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId,
-                                                         BindingListTypeInfo bindingList,
+                                                         BindingListType bindingList,
                                                          Controller::WriteResponseSuccessCallback successCb,
                                                          Controller::WriteResponseFailureCallback failureCb)
 {

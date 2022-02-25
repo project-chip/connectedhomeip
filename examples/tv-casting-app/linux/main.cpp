@@ -115,7 +115,7 @@ HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
-static void OnBinding(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device, void * context)
+static void OnBindingChanged(const EmberBindingTableEntry & binding)
 {
     if (binding.type == EMBER_MULTICAST_BINDING)
     {
@@ -136,7 +136,7 @@ static void OnBinding(const EmberBindingTableEntry & binding, chip::DeviceProxy 
 CHIP_ERROR InitBindingHandlers()
 {
     chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(OnBinding);
+    chip::BindingManager::GetInstance().RegisterBindingChangedHandler(OnBindingChanged);
     return CHIP_NO_ERROR;
 }
 

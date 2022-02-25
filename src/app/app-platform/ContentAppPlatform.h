@@ -33,7 +33,7 @@ using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
 using chip::Controller::CommandResponseFailureCallback;
 using chip::Controller::CommandResponseSuccessCallback;
 
-using BindingListTypeInfo = chip::app::Clusters::Binding::Attributes::Binding::TypeInfo::Type;
+using BindingListType = chip::app::Clusters::Binding::Attributes::Binding::TypeInfo::Type;
 
 namespace chip {
 namespace AppPlatform {
@@ -156,8 +156,8 @@ public:
                                          Controller::WriteResponseSuccessCallback successCb,
                                          Controller::WriteResponseFailureCallback failureCb);
 
-    CHIP_ERROR CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId,
-                                         BindingListTypeInfo bindingList, Controller::WriteResponseSuccessCallback successCb,
+    CHIP_ERROR CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId, BindingListType bindingList,
+                                         Controller::WriteResponseSuccessCallback successCb,
                                          Controller::WriteResponseFailureCallback failureCb);
 
 protected:
