@@ -99,8 +99,7 @@ out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --sec
 -   `${KVS_STORE_LOCATION}` is a location where the KVS items will be stored. If
     none is supplied, the default is /tmp/chip_kvs. This must be different from
     the value used by the OTA Provider application.
--   `${TIME_IN_SECONDS}` is the imeout for querying providers on the default OTA
-    provider list. If none or zero is supplied the timeout is set to 24 hours
+-   `${TIME_IN_SECONDS}` is the periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours.
 
 #### Commission the OTA Requestor application
 
