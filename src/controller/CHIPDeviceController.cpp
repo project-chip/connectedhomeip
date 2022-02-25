@@ -773,6 +773,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         params.GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
     {
 #if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+        PrepareBleTransport();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
         if (!params.HasBleLayer())
         {
             params.SetPeerAddress(Transport::PeerAddress::BLE());
@@ -1327,6 +1330,17 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(Co
 }
 
 #if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+void DeviceCommissioner::PrepareBleTransport()
+{
+    Transport::BLEBase transport = mSystemState->TransportMgr()->GetTransport().template GetImplAtIndex<2>();
+    if (!transport.IsBleLayerTransportSetToSelf())
+    {
+        transport.SetBleLayerTransportToSelf();
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
 CHIP_ERROR DeviceCommissioner::CloseBleConnection()
 {
     // It is fine since we can only commission one device at the same time.

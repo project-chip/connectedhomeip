@@ -596,6 +596,15 @@ public:
                                CommissioningDelegate::CommissioningReport report = CommissioningDelegate::CommissioningReport());
 
 #if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    /**
+     * @brief
+     *   Prior to commissioning, the Controller should make sure the BleLayer transport
+     *   is set to the Commissioner transport and not the Server transport.
+     */
+    void PrepareBleTransport();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
     /**
      * @brief
      *   Once we have finished all commissioning work, the Controller should close the BLE
