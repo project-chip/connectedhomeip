@@ -17,10 +17,10 @@ scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug 
 In addition to the general options available to all Linux applications, the
 following command line options are available for the OTA Requestor application.
 
-| Directory                         | Description                                                                                                                                                                                                                                          |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -p/--periodicQueryTimeout <Time in seconds> | Periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours.  |
-| -c/--requestorCanConsent          | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.                                                                                                               |
+| Directory                                   | Description                                                                                                                                 |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| -p/--periodicQueryTimeout <Time in seconds> | Periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours. |
+| -c/--requestorCanConsent                    | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.      |
 
 ## Software Image Header
 
@@ -99,7 +99,9 @@ out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --sec
 -   `${KVS_STORE_LOCATION}` is a location where the KVS items will be stored. If
     none is supplied, the default is /tmp/chip_kvs. This must be different from
     the value used by the OTA Provider application.
--   `${TIME_IN_SECONDS}` is the periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours.
+-   `${TIME_IN_SECONDS}` is the periodic timeout for querying providers in the
+    default OTA provider list. If none or zero is supplied the timeout is set to
+    every 24 hours.
 
 #### Commission the OTA Requestor application
 
@@ -205,7 +207,7 @@ scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux/ out chip_
 **Run the OTA Requestor application**
 
 ```
-out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --periodicQueryTimeout 60 
+out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --periodicQueryTimeout 60
 ```
 
 #### In terminal 3:
@@ -223,7 +225,6 @@ out/chip-tool pairing onnetwork-long 0x1234567890 20202021 18
 ```
 
 **Write to the DefaultOTAProviders attribute**
-
 
 ```
 out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
