@@ -83,8 +83,6 @@ static void InitOTARequestor(void)
 
     gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    // Set the default providers timeout to one minute
     gRequestorUser.SetPeriodicQueryTimeout(gPeriodicQueryTimeout);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at

@@ -33,7 +33,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace {
 
-constexpr uint32_t kImmediateStartDelaySec = 1; // Start the timer with this value when starting OTA "immediately"
+constexpr uint32_t kImmediateStartDelaySec = 1; // Delay before sending a query in response to UrgentUpdateAvailable
 
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
@@ -197,7 +197,7 @@ void GenericOTARequestorDriver::UpdateCancelled()
 void GenericOTARequestorDriver::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
                                                       void * aAppState)
 {
-    SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState);
+    VerifyOrDie( SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState) == CHIP_NO_ERROR );
 }
 
 void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState)

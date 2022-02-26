@@ -44,6 +44,8 @@ using bdx::TransferSession;
 // Global instance of the OTARequestorInterface.
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
 
+constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query
+
 static void LogQueryImageResponse(const QueryImageResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "QueryImageResponse:");
@@ -777,12 +779,15 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
 // Invoked when the device becomes commissioned
 void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    ChipLogProgress(SoftwareUpdate, "Device commissioned, query the default provider");
+    ChipLogProgress(SoftwareUpdate, "Device commissioned, schedule a default provider query");
 
     // TODO: Should we also send UpdateApplied here?
 
-    // Query the default provider. At the end of this query/update process the Default Provider timer is started
-    (reinterpret_cast<OTARequestor *>(arg))->mOtaRequestorDriver->DriverSendQuery();
+    // Schedule a query. At the end of this query/update process the Default Provider timer is started
+    OTARequestorDriver *driver = (reinterpret_cast<OTARequestor *>(arg))->mOtaRequestorDriver;
+    driver->ScheduleDelayedAction(System::Clock::Seconds32(kDelayQueryUponCommissioningSec), 
+                                               [](System::Layer *, void * context) {  static_cast<OTARequestorDriver *>(context)->DriverSendQuery(); }, 
+                                               driver);
 }
 
 } // namespace chip
