@@ -44,7 +44,13 @@ public:
     }
 
     // Set the timeout (in seconds) for querying providers on the default OTA provider list; must be non-zero
-    void SetPeriodicQueryTimeout(uint32_t timeout) { if(timeout != 0) {mPeriodicQueryTimeInterval = timeout;} }
+    void SetPeriodicQueryTimeout(uint32_t timeout)
+    {
+        if (timeout != 0)
+        {
+            mPeriodicQueryTimeInterval = timeout;
+        }
+    }
 
     //// Virtual methods from OTARequestorDriver
     bool CanConsent() override;
@@ -76,7 +82,7 @@ protected:
 
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
-    uint32_t mOtaStartDelaySec                    = 0;
+    uint32_t mOtaStartDelaySec                   = 0;
     uint32_t mPeriodicQueryTimeInterval = (24 * 60 * 60); // Timeout for querying providers on the default OTA provider list
 
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;

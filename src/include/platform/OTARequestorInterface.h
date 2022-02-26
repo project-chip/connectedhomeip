@@ -161,16 +161,17 @@ public:
         kNotifyUpdateApplied,
     };
 
-    enum UpdateState {
-         kStateUnknown,
-         kStateIdle,
-         kStateQuerying,
-         kStateDelayedOnQuery,
-         kStateDownloading,
-         kStateApplying,
-         kStateDelayedOnApply,
-         kStateRollingBack,
-         kStateDelayedOnUserConsent,
+    enum UpdateState
+    {
+        kStateUnknown,
+        kStateIdle,
+        kStateQuerying,
+        kStateDelayedOnQuery,
+        kStateDownloading,
+        kStateApplying,
+        kStateDelayedOnApply,
+        kStateRollingBack,
+        kStateDelayedOnUserConsent,
     };
 
     virtual void ConnectToProvider(OnConnectedAction onConnectedAction) = 0;

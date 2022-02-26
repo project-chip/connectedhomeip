@@ -114,7 +114,8 @@ public:
         percent.SetNull();
         OtaRequestorServerSetUpdateStateProgress(percent);
 
-        return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor, reinterpret_cast<intptr_t>(this));
+        return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor,
+                                                                    reinterpret_cast<intptr_t>(this));
     }
 
     /**

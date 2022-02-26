@@ -54,8 +54,8 @@ OTAImageProcessorImpl gImageProcessor;
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
 
-constexpr uint16_t kOptionPeriodicQueryTimeout          = 'p';
-constexpr uint16_t kOptionRequestorCanConsent = 'c';
+constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
+constexpr uint16_t kOptionRequestorCanConsent  = 'c';
 
 uint32_t gPeriodicQueryTimeout = (24 * 60 * 60);
 chip::Optional<bool> gRequestorCanConsent;

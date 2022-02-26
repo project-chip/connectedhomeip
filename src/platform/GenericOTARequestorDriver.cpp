@@ -114,9 +114,12 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
     case UpdateNotFoundReason::NotAvailable:
         // IMPLEMENTATION CHOICE:
         // This implementation schedules a query only if a different provider is available
-        if ((DetermineProviderLocation(providerLocation) != true) || ProviderLocationsEqual(providerLocation, mLastUsedProvider)) {
-           willTryAnotherQuery = false;
-        } else {
+        if ((DetermineProviderLocation(providerLocation) != true) || ProviderLocationsEqual(providerLocation, mLastUsedProvider))
+        {
+            willTryAnotherQuery = false;
+        }
+        else
+        {
             willTryAnotherQuery = true;
         }
         mRequestor->SetCurrentProviderLocation(providerLocation);
@@ -132,10 +135,13 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
     {
         delay = kDefaultDelayedActionTime;
     }
-    if( willTryAnotherQuery == true) {
+    if (willTryAnotherQuery == true)
+    {
         ChipLogProgress(SoftwareUpdate, "UpdateNotFound, scheduling a retry");
         ScheduleDelayedAction(delay, StartDelayTimerHandler, this);
-    } else {
+    }
+    else
+    {
         ChipLogProgress(SoftwareUpdate, "UpdateNotFound, not scheduling further retries");
     }
 }
