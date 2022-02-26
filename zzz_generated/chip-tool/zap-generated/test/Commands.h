@@ -29112,7 +29112,7 @@ private:
 
     void OnSuccessResponse_6(uint32_t featureMap)
     {
-        VerifyOrReturn(CheckValue("featureMap", featureMap, 0UL));
+        VerifyOrReturn(CheckValue("featureMap", featureMap, 1UL));
 
         NextTest();
     }
@@ -29182,7 +29182,7 @@ private:
 
     void OnSuccessResponse_9(uint32_t featureMap)
     {
-        VerifyOrReturn(CheckValue("featureMap", featureMap, 0UL));
+        VerifyOrReturn(CheckValue("featureMap", featureMap, 1UL));
 
         NextTest();
     }
