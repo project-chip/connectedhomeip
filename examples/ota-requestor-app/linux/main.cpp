@@ -68,8 +68,8 @@ OptionDef cmdLineOptionsDef[] = {
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
                              "  -p/--periodicQueryTimeout <Time in seconds>\n"
-                             "        Timeout for querying providers on the default OTA provider list\n"
-                             "        If none or zero is supplied the timeout is set to 24 hours \n"
+                             "        Periodic timeout for querying providers in the default OTA provider list\n"
+                             "        If none or zero is supplied the timeout is set to every 24 hours. \n"
                              "  -c/--requestorCanConsent\n"
                              "        If supplied, the RequestorCanConsent field of the QueryImage command is set to true.\n"
                              "        Otherwise, the value is determined by the driver.\n " };

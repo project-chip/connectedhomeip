@@ -19,7 +19,7 @@ following command line options are available for the OTA Requestor application.
 
 | Directory                         | Description                                                                                                                                                                                                                                          |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -p/--periodicQueryTimeout <Time in seconds> | Timeout for querying providers on the default OTA provider list. If none or zero is supplied the timeout is set to 24 hours  |
+| -p/--periodicQueryTimeout <Time in seconds> | Periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours.  |
 | -c/--requestorCanConsent          | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.                                                                                                               |
 
 ## Software Image Header
@@ -99,8 +99,7 @@ out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --sec
 -   `${KVS_STORE_LOCATION}` is a location where the KVS items will be stored. If
     none is supplied, the default is /tmp/chip_kvs. This must be different from
     the value used by the OTA Provider application.
--   `${TIME_IN_SECONDS}` is the imeout for querying providers on the default OTA
-    provider list. If none or zero is supplied the timeout is set to 24 hours
+-   `${TIME_IN_SECONDS}` is the periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours.
 
 #### Commission the OTA Requestor application
 
