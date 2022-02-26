@@ -98,7 +98,7 @@ public:
      *   - Set the OTA requestor driver instance used to communicate download progress and errors
      *   - Set the BDX downloader instance used for initiating BDX downloads
      */
-    void Init(Server * server, OTARequestorDriver * driver, BDXDownloader * downloader)
+    CHIP_ERROR Init(Server * server, OTARequestorDriver * driver, BDXDownloader * downloader)
     {
         mServer             = server;
         mCASESessionManager = server->GetCASESessionManager();
@@ -106,7 +106,7 @@ public:
         mBdxDownloader      = downloader;
 
         uint32_t version;
-        ReturnOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
         mCurrentVersion = version;
 
         OtaRequestorServerSetUpdateState(mCurrentUpdateState);
@@ -114,7 +114,7 @@ public:
         percent.SetNull();
         OtaRequestorServerSetUpdateStateProgress(percent);
 
-        chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor, reinterpret_cast<intptr_t>(this));
+        return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor, reinterpret_cast<intptr_t>(this));
     }
 
     /**
@@ -126,7 +126,7 @@ public:
     void ConnectToProvider(OnConnectedAction onConnectedAction) override;
 
     // Getter for the value of the UpdateState cached by the object
-    app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
+    UpdateState GetCurrentUpdateState() override; 
 
     /**
      * Called to set optional requestorCanConsent value provided by Requestor.

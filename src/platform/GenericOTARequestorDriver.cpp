@@ -98,36 +98,46 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
     VerifyOrDie(mRequestor != nullptr);
 
     ProviderLocation::Type providerLocation;
+    bool willTryAnotherQuery = false;
 
     switch (reason)
     {
     case UpdateNotFoundReason::UpToDate:
-        return;
+        willTryAnotherQuery = false;
         break;
+
     case UpdateNotFoundReason::Busy:
-        // This will schedule a query with the same provider
+        willTryAnotherQuery = true;
         break;
+
     case UpdateNotFoundReason::ConnectionFailed:
     case UpdateNotFoundReason::NotAvailable:
         // IMPLEMENTATION CHOICE:
         // This implementation schedules a query only if a different provider is available
-        if ((DetermineProviderLocation(providerLocation) != true) || ProviderLocationsEqual(providerLocation, mLastUsedProvider))
-        {
-            return;
+        if ((DetermineProviderLocation(providerLocation) != true) || ProviderLocationsEqual(providerLocation, mLastUsedProvider)) {
+           willTryAnotherQuery = false;  
+        } else {
+            willTryAnotherQuery = true;
         }
         mRequestor->SetCurrentProviderLocation(providerLocation);
         mLastUsedProvider = providerLocation;
         break;
+
     default:
-        return;
+        willTryAnotherQuery = false;
+        break;
     }
 
     if (delay < kDefaultDelayedActionTime)
     {
         delay = kDefaultDelayedActionTime;
     }
-
-    ScheduleDelayedAction(delay, StartDelayTimerHandler, this);
+    if( willTryAnotherQuery == true) {
+        ChipLogProgress(SoftwareUpdate, "UpdateNotFound, scheduling a retry");
+        ScheduleDelayedAction(delay, StartDelayTimerHandler, this);
+    } else {
+        ChipLogProgress(SoftwareUpdate, "UpdateNotFound, not scheduling further retries");
+    }
 }
 
 void GenericOTARequestorDriver::UpdateDownloaded()
@@ -215,7 +225,7 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
     // This implementation of the OTARequestor driver ignores the announcement if an update is in progress,
     // otherwise it queries the provider passed in the announcement
 
-    if (mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle)
+    if (mRequestor->GetCurrentUpdateState() != OTARequestorInterface::kStateIdle)
     {
         ChipLogProgress(SoftwareUpdate, "State is not kIdle, ignoring the AnnounceOTAProviders. State: %d",
                         (int) mRequestor->GetCurrentUpdateState());

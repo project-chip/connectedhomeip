@@ -301,6 +301,47 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
     }
 }
 
+OTARequestorInterface::UpdateState OTARequestor::GetCurrentUpdateState()
+{ 
+    UpdateState state = kStateUnknown;
+    
+    switch (mCurrentUpdateState)
+        {
+            case OTAUpdateStateEnum::kUnknown:
+                state = kStateUnknown;
+                break;    
+            case OTAUpdateStateEnum::kIdle: 
+                state = kStateIdle;
+                break;                    
+            case OTAUpdateStateEnum::kQuerying:  
+                state = kStateQuerying;
+                break;               
+            case OTAUpdateStateEnum::kDelayedOnQuery:   
+                state = kStateDelayedOnQuery;
+                break;        
+            case OTAUpdateStateEnum::kDownloading:  
+                state = kStateDownloading;
+                break;            
+            case OTAUpdateStateEnum::kApplying:    
+                state = kStateApplying;
+                break;             
+            case OTAUpdateStateEnum::kDelayedOnApply:   
+                state = kStateDelayedOnApply;
+                break;        
+            case OTAUpdateStateEnum::kRollingBack:  
+                state = kStateRollingBack;
+                break;            
+            case OTAUpdateStateEnum::kDelayedOnUserConsent: 
+                state = kStateDelayedOnUserConsent;
+                break;    
+            default:
+                state = kStateUnknown;
+                break;
+        }
+
+    return state; 
+}
+
 // Requestor is directed to cancel image update in progress. All the Requestor state is
 // cleared, UpdateState is reset to Idle
 void OTARequestor::CancelImageUpdate()

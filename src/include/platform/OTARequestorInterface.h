@@ -161,6 +161,18 @@ public:
         kNotifyUpdateApplied,
     };
 
+    enum UpdateState {
+         kStateUnknown,      
+         kStateIdle,         
+         kStateQuerying,     
+         kStateDelayedOnQuery,
+         kStateDownloading,   
+         kStateApplying,      
+         kStateDelayedOnApply,
+         kStateRollingBack,     
+         kStateDelayedOnUserConsent, 
+    };
+
     virtual void ConnectToProvider(OnConnectedAction onConnectedAction) = 0;
 
     // Handler for the AnnounceOTAProvider command
@@ -199,7 +211,7 @@ public:
     virtual CHIP_ERROR GetState(EndpointId endpointId,
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
     // Getter for the value of the UpdateState cached by the object
-    virtual app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum GetCurrentUpdateState() = 0;
+    virtual UpdateState GetCurrentUpdateState() = 0;
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
