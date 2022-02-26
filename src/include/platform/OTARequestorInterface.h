@@ -162,15 +162,15 @@ public:
     };
 
     enum UpdateState {
-         kStateUnknown,      
-         kStateIdle,         
-         kStateQuerying,     
+         kStateUnknown,
+         kStateIdle,
+         kStateQuerying,
          kStateDelayedOnQuery,
-         kStateDownloading,   
-         kStateApplying,      
+         kStateDownloading,
+         kStateApplying,
          kStateDelayedOnApply,
-         kStateRollingBack,     
-         kStateDelayedOnUserConsent, 
+         kStateRollingBack,
+         kStateDelayedOnUserConsent,
     };
 
     virtual void ConnectToProvider(OnConnectedAction onConnectedAction) = 0;

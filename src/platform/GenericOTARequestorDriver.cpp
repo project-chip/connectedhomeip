@@ -115,7 +115,7 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
         // IMPLEMENTATION CHOICE:
         // This implementation schedules a query only if a different provider is available
         if ((DetermineProviderLocation(providerLocation) != true) || ProviderLocationsEqual(providerLocation, mLastUsedProvider)) {
-           willTryAnotherQuery = false;  
+           willTryAnotherQuery = false;
         } else {
             willTryAnotherQuery = true;
         }

@@ -126,7 +126,7 @@ public:
     void ConnectToProvider(OnConnectedAction onConnectedAction) override;
 
     // Getter for the value of the UpdateState cached by the object
-    UpdateState GetCurrentUpdateState() override; 
+    UpdateState GetCurrentUpdateState() override;
 
     /**
      * Called to set optional requestorCanConsent value provided by Requestor.
