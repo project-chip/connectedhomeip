@@ -115,13 +115,11 @@ HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
-static void OnBindingChanged(const EmberBindingTableEntry & binding)
+static void OnBindingAdded(const EmberBindingTableEntry & binding)
 {
     if (binding.type == EMBER_MULTICAST_BINDING)
     {
-        ChipLogError(NotSpecified,
-                     "Group binding received nodeId=0x" ChipLogFormatX64 " remote endpoint=%d cluster=" ChipLogFormatMEI,
-                     ChipLogValueX64(binding.nodeId), binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+        ChipLogError(NotSpecified, "Group binding received");
         return;
     }
 
@@ -130,13 +128,14 @@ static void OnBindingChanged(const EmberBindingTableEntry & binding)
         ChipLogError(NotSpecified,
                      "Unicast binding received nodeId=0x" ChipLogFormatX64 " remote endpoint=%d cluster=" ChipLogFormatMEI,
                      ChipLogValueX64(binding.nodeId), binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+        // TODO read descriptor cluster for endpoint and use this to construct command options for GUI
     }
 }
 
 CHIP_ERROR InitBindingHandlers()
 {
     chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
-    chip::BindingManager::GetInstance().RegisterBindingChangedHandler(OnBindingChanged);
+    chip::BindingManager::GetInstance().RegisterBindingChangedHandler(OnBindingAdded);
     return CHIP_NO_ERROR;
 }
 

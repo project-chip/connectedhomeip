@@ -38,7 +38,7 @@ namespace chip {
  */
 using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
 
-using BindingChangedHandler = void (*)(const EmberBindingTableEntry & binding);
+using BindingAddedHandler = void (*)(const EmberBindingTableEntry & binding);
 
 /**
  *
@@ -62,7 +62,7 @@ public:
     {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
-    void RegisterBindingChangedHandler(BindingChangedHandler handler) { mBindingChangedHandler = handler; }
+    void RegisterBindingAddedHandler(BindingAddedHandler handler) { mBindingAddedHandler = handler; }
 
     void SetAppServer(Server * appServer);
 
@@ -97,9 +97,9 @@ public:
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
     /*
-     * Notify the BoundDeviceChangedHandler that a binding has changed.
+     * Notify the BindingAddedHandler that a binding was added.
      */
-    CHIP_ERROR NotifyBindingChanged(const EmberBindingTableEntry & binding);
+    CHIP_ERROR NotifyBindingAdded(const EmberBindingTableEntry & binding);
 
     static BindingManager & GetInstance() { return sBindingManager; }
 
@@ -116,7 +116,7 @@ private:
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
-    BindingChangedHandler mBindingChangedHandler;
+    BindingAddedHandler mBindingAddedHandler;
     Server * mAppServer = nullptr;
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;

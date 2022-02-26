@@ -506,7 +506,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
 
     ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, entry, nullptr));
 
-    ChipLogProgress(Controller, "Attempting to create Binding list of size %lu", bindings.size());
+    ChipLogProgress(Controller, "Attempting to update Binding list");
     BindingListType bindingList(bindings.data(), bindings.size());
     ReturnErrorOnFailure(
         CreateBindingWithCallback(targetDeviceProxy, kTargetBindingClusterEndpointId, bindingList, successCb, failureCb));
