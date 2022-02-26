@@ -785,8 +785,8 @@ void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDevic
 
     // Schedule a query. At the end of this query/update process the Default Provider timer is started
     OTARequestorDriver *driver = (reinterpret_cast<OTARequestor *>(arg))->mOtaRequestorDriver;
-    driver->ScheduleDelayedAction(System::Clock::Seconds32(kDelayQueryUponCommissioningSec), 
-                                               [](System::Layer *, void * context) {  static_cast<OTARequestorDriver *>(context)->DriverSendQuery(); }, 
+    driver->ScheduleDelayedAction(System::Clock::Seconds32(kDelayQueryUponCommissioningSec),
+                                               [](System::Layer *, void * context) {  static_cast<OTARequestorDriver *>(context)->DriverSendQuery(); },
                                                driver);
 }
 
