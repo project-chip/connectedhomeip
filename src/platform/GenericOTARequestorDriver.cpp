@@ -197,7 +197,8 @@ void GenericOTARequestorDriver::UpdateCancelled()
 void GenericOTARequestorDriver::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
                                                       void * aAppState)
 {
-    VerifyOrDie( SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState) == CHIP_NO_ERROR );
+    VerifyOrDie(SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState) ==
+                CHIP_NO_ERROR);
 }
 
 void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState)
