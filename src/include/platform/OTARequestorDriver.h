@@ -60,13 +60,6 @@ enum class UpdateNotFoundReason
     ConnectionFailed,
 };
 
-enum class OTARequestorAction
-{
-    DoNotProceed,
-    CancelCurrentUpdateAndProceed,
-    Proceed,
-};
-
 // Interface class to abstract the OTA-related business logic. Each application
 // must implement this interface. All calls must be non-blocking unless stated otherwise
 class OTARequestorDriver

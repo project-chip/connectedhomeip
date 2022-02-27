@@ -15,19 +15,25 @@
  *    limitations under the License.
  */
 
-#include "GenericOTARequestorDriver.h"
-
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/OTAImageProcessor.h>
-#include <platform/OTARequestorInterface.h>
-
-// This implementation of the OTARequestorDriver operates according the following rules:
+// This file contains an implementation of the OTARequestorDriver interface class.
+// Individual platforms may supply their own implementations of OTARequestorDriver
+// or use this one. There are no requirements or assumptions on the implementation other
+// than adherence to the OTA Image Update Requestor part of the Matter specification; the
+// aspects of the functionality not mandated by the specification are considered implementation choices.
+//
+// This particular implementation of the OTARequestorDriver makes the following choices:
 // - Only a single timer can be active at any given moment
 // - The default provider timer is running if and only if there is no update in progress (the OTARequestor
 //   UpdateState is kIdle)
 // - AnnounceOTAProviders command is ignored if an update is in progress
 // - The provider location passed in AnnounceOTAProviders is used in a single query (possibly retried) and then discarded
 // - Explicitly triggering a query through TriggerImmediateQuery() or SendQuery() cancels any in-progress update
+
+#include "GenericOTARequestorDriver.h"
+
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/OTAImageProcessor.h>
+#include <platform/OTARequestorInterface.h>
 
 namespace chip {
 namespace DeviceLayer {
