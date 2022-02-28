@@ -133,10 +133,10 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     }
     else
     {
-        response.status       = chip::app::Clusters::Channel::StatusEnum::kSuccess;
-        response.data         = chip::MakeOptional(CharSpan::fromCharString("data response"));
-        mCurrentChannel       = matchedChannels[0];
-        mCurrentChannelIndex  = index;
+        response.status      = chip::app::Clusters::Channel::StatusEnum::kSuccess;
+        response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
+        mCurrentChannel      = matchedChannels[0];
+        mCurrentChannelIndex = index;
         helper.Success(response);
     }
 }
