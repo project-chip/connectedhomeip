@@ -29,7 +29,7 @@
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
-#if defined (CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/GenericOTARequestorDriver.h>
@@ -66,7 +66,7 @@ static Button_Handle sAppRightHandle;
 
 AppTask AppTask::sAppTask;
 
-#if defined (CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
 static OTARequestor sRequestorCore;
 static GenericOTARequestorDriver sRequestorUser;
 static BDXDownloader sDownloader;
