@@ -33548,8 +33548,8 @@ public:
 namespace ChangeChannelResponse {
 enum class Fields
 {
-    kChannelMatch = 0,
-    kStatus       = 1,
+    kStatus = 0,
+    kData   = 1,
 };
 
 struct Type
@@ -33559,8 +33559,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    Structs::ChannelInfo::Type channelMatch;
     StatusEnum status = static_cast<StatusEnum>(0);
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33575,8 +33575,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    Structs::ChannelInfo::DecodableType channelMatch;
     StatusEnum status = static_cast<StatusEnum>(0);
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannelResponse
@@ -34406,6 +34406,7 @@ namespace PlaybackResponse {
 enum class Fields
 {
     kStatus = 0,
+    kData   = 1,
 };
 
 struct Type
@@ -34416,6 +34417,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -34431,6 +34433,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PlaybackResponse

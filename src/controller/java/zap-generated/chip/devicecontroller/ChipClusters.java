@@ -3307,7 +3307,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ChangeChannelResponseCallback {
-      void onSuccess(ChipStructs.ChannelClusterChannelInfo channelMatch, Integer status);
+      void onSuccess(Integer status, Optional<String> data);
 
       void onError(Exception error);
     }
@@ -10761,7 +10761,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface PlaybackResponseCallback {
-      void onSuccess(Integer status);
+      void onSuccess(Integer status, Optional<String> data);
 
       void onError(Exception error);
     }
