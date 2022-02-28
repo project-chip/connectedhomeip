@@ -21,6 +21,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Channel;
+using namespace chip::Uint8;
 
 ChannelManager::ChannelManager()
 {
@@ -133,7 +134,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     else
     {
         response.status       = chip::app::Clusters::Channel::StatusEnum::kSuccess;
-        response.channelMatch = matchedChannels[0];
+        response.data         = chip::MakeOptional(CharSpan::fromCharString("data response"));
         mCurrentChannel       = matchedChannels[0];
         mCurrentChannelIndex  = index;
         helper.Success(response);
