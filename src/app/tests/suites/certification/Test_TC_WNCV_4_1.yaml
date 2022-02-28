@@ -103,8 +103,7 @@ tests:
                 value: fullMotionDuration
 
     ### Check for END OF MOVEMENTs
-    - label:
-          "3b: TH reads OperationalStatus attribute from DUT"
+    - label: "3b: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
@@ -175,8 +174,7 @@ tests:
                 value: fullMotionDuration
 
     ### Check for END OF MOVEMENTs
-    - label:
-          "5b: TH reads OperationalStatus attribute from DUT"
+    - label: "5b: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
