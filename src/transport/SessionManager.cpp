@@ -92,7 +92,7 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     (void) mGlobalEncryptedMessageCounter.Init();
     mGlobalUnencryptedMessageCounter.Init();
 
-    mGroupClientCounter.Init(storageDelegate);
+    ReturnErrorOnFailure(mGroupClientCounter.Init(storageDelegate));
 
     ScheduleExpiryTimer();
 
