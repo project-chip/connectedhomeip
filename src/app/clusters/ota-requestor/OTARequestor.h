@@ -79,10 +79,7 @@ public:
         mProviderLocation.SetValue(providerLocation);
     }
 
-    void ClearCurrentProviderLocation() override
-    {
-        mProviderLocation.ClearValue();
-    }
+    void ClearCurrentProviderLocation() override { mProviderLocation.ClearValue(); }
 
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(

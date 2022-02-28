@@ -116,8 +116,8 @@ public:
     virtual void SendQueryImage() = 0;
 
     // Returns the next available Provider location
-    virtual bool DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) = 0;
-
+    virtual bool
+    DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) = 0;
 };
 
 } // namespace chip

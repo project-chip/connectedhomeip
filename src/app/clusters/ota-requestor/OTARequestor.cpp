@@ -470,7 +470,8 @@ void OTARequestor::TriggerImmediateQueryInternal()
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
     ProviderLocation::Type providerLocation;
-    if(mOtaRequestorDriver->DetermineProviderLocation(providerLocation) != true) {
+    if (mOtaRequestorDriver->DetermineProviderLocation(providerLocation) != true)
+    {
         ChipLogError(SoftwareUpdate, "No OTA Providers available");
         return kNoProviderKnown;
     }

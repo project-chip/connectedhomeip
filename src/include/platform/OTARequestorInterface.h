@@ -174,7 +174,7 @@ public:
         kStateDelayedOnUserConsent,
     };
 
-    //virtual void ConnectToProvider(OnConnectedAction onConnectedAction) = 0;
+    // virtual void ConnectToProvider(OnConnectedAction onConnectedAction) = 0;
 
     // Handler for the AnnounceOTAProvider command
     virtual EmberAfStatus HandleAnnounceOTAProvider(

@@ -70,7 +70,8 @@ public:
     void SendQueryImage() override;
 
     // Returns the next available Provider location
-    bool DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) override;
+    bool DetermineProviderLocation(
+        app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) override;
 
 protected:
     void StartDefaultProviderTimer();
@@ -78,7 +79,6 @@ protected:
     void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
-
 
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
