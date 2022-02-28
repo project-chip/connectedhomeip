@@ -47,7 +47,7 @@ public:
     // Application API to send the QueryImage command and start the image update process with the next available Provider
     OTATriggerResult TriggerImmediateQuery() override;
 
-    // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process 
+    // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process
     // with the Provider currently set in the OTARequestor
     void TriggerImmediateQueryInternal() override;
 
@@ -234,7 +234,7 @@ private:
     CHIP_ERROR ExtractUpdateDescription(const QueryImageResponseDecodableType & response, UpdateDescription & update) const;
 
     /**
-     * Called to establish a session to mProviderLocation. 
+     * Called to establish a session to mProviderLocation.
      *
      * @param onConnectedAction  The action to take once session to provider has been established
      */
