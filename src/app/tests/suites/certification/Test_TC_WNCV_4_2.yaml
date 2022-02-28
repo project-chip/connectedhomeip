@@ -203,4 +203,3 @@ tests:
       attribute: "CurrentPositionTiltPercentage"
       response:
           value: 60
-
