@@ -460,32 +460,31 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
     requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::ConnectionFailed, chip::System::Clock::Seconds32(0));
 }
 
+// Sends the QueryImage command to the Provider currently set in the OTARequestor
+void OTARequestor::TriggerImmediateQueryInternal()
+{
+    ConnectToProvider(kQueryImage);
+}
+
 // Sends the QueryImage command to the next available Provider
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
-    mOtaRequestorDriver->DetermineAndSetProviderLocation();
-    return SendQuery();
-}
-
-// Sends the QueryImage command, requires that the Provider location is already set in OTARequestor
-OTARequestorInterface::OTATriggerResult OTARequestor::SendQuery()
-{
-    if (mProviderLocation.HasValue())
-    {
-        // We are now querying a provider, leave the kIdle state.
-        // No state matches this one fully but we can't be in kIdle.
-        RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
-
-        // Go through the driver as it has additional logic to execute
-        mOtaRequestorDriver->DriverSendQuery();
-
-        return kTriggerSuccessful;
-    }
-    else
-    {
+    ProviderLocation::Type providerLocation;
+    if(mOtaRequestorDriver->DetermineProviderLocation(providerLocation) != true) {
         ChipLogError(SoftwareUpdate, "No OTA Providers available");
         return kNoProviderKnown;
     }
+
+    SetCurrentProviderLocation(providerLocation);
+
+    // We are now querying a provider, leave the kIdle state.
+    // No state matches this one fully but we can't be in kIdle.
+    RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
+
+    // Go through the driver as it has additional logic to execute
+    mOtaRequestorDriver->SendQueryImage();
+
+    return kTriggerSuccessful;
 }
 
 void OTARequestor::DownloadUpdate()

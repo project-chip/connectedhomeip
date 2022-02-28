@@ -44,12 +44,12 @@ public:
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
         const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
 
-    // Application directs the Requestor to start the Image Query process
-    // and download the new image if available; requires that the Provider location is already set in OTARequestor
+    // Application API to send the QueryImage command and start the image update process with the next available Provider
     OTATriggerResult TriggerImmediateQuery() override;
 
-    // Send QueryImage command to the next available Provider
-    virtual OTATriggerResult SendQuery() override;
+    // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process 
+    // with the Provider currently set in the OTARequestor
+    void TriggerImmediateQueryInternal() override;
 
     // Initiate download of the new image
     void DownloadUpdate() override;
@@ -77,6 +77,11 @@ public:
     void SetCurrentProviderLocation(ProviderLocationType providerLocation) override
     {
         mProviderLocation.SetValue(providerLocation);
+    }
+
+    void ClearCurrentProviderLocation() override
+    {
+        mProviderLocation.ClearValue();
     }
 
     // Add a default OTA provider to the cached list
@@ -117,14 +122,6 @@ public:
         return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor,
                                                                     reinterpret_cast<intptr_t>(this));
     }
-
-    /**
-     * Called to establish a session to mProviderLocation. This must be called from the same externally
-     * synchronized context as any other Matter stack method.
-     *
-     * @param onConnectedAction  The action to take once session to provider has been established
-     */
-    void ConnectToProvider(OnConnectedAction onConnectedAction) override;
 
     // Getter for the value of the UpdateState cached by the object
     UpdateState GetCurrentUpdateState() override;
@@ -235,6 +232,13 @@ private:
      * Validate and extract mandatory information from QueryImageResponse
      */
     CHIP_ERROR ExtractUpdateDescription(const QueryImageResponseDecodableType & response, UpdateDescription & update) const;
+
+    /**
+     * Called to establish a session to mProviderLocation. 
+     *
+     * @param onConnectedAction  The action to take once session to provider has been established
+     */
+    void ConnectToProvider(OnConnectedAction onConnectedAction);
 
     /**
      * Start download of the software image returned in QueryImageResponse

@@ -174,8 +174,8 @@ public:
         kStateDelayedOnUserConsent,
     };
 
-    virtual void ConnectToProvider(OnConnectedAction onConnectedAction) = 0;
-
+    //virtual void ConnectToProvider(OnConnectedAction onConnectedAction) = 0;
+    
     // Handler for the AnnounceOTAProvider command
     virtual EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -190,11 +190,12 @@ public:
     // Destructor
     virtual ~OTARequestorInterface() = default;
 
-    // Send QueryImage command, requires that the Provider location is already set in OTARequestor
+    // Application API to send the QueryImage command and start the image update process with the next available Provider
     virtual OTATriggerResult TriggerImmediateQuery() = 0;
 
-    // Send QueryImage command to the next available Provider
-    virtual OTATriggerResult SendQuery() = 0;
+    // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process 
+    // with the Provider currently set in the OTARequestor
+    virtual void TriggerImmediateQueryInternal() = 0;
 
     // Download image
     virtual void DownloadUpdate() = 0;
@@ -222,7 +223,12 @@ public:
     virtual CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) = 0;
 
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    
+    // Set the provider location to be used in the update process 
     virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
+    
+    // Clear the provider location 
+    virtual void ClearCurrentProviderLocation() = 0;
 
     // Add a default OTA provider to the cached list
     virtual CHIP_ERROR

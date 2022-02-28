@@ -67,9 +67,10 @@ public:
     void OTACommissioningCallback() override;
     void ProcessAnnounceOTAProviders(const ProviderLocationType & providerLocation,
                                      app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
-    void DriverSendQuery() override;
-    // Determines the next available Provider location and sets it in the OTARequestor
-    void DetermineAndSetProviderLocation() override;
+    void SendQueryImage() override;
+    
+    // Returns the next available Provider location
+    bool DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) override;
 
 protected:
     void StartDefaultProviderTimer();
@@ -78,9 +79,7 @@ protected:
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
 
-    // Returns the next available Provider location
-    bool DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation);
-
+    
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
     uint32_t mOtaStartDelaySec                   = 0;

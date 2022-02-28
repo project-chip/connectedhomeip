@@ -105,13 +105,19 @@ public:
 
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     virtual void
+    /// Driver portion of the logic for processing the AnnounceOTAProviders command
     ProcessAnnounceOTAProviders(const ProviderLocationType & providerLocation,
                                 app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) = 0;
 
-    virtual void DriverSendQuery() = 0;
+    /// Direct the driver to trigger the QueryImage command. The driver may choose to execute some internal
+    /// logic and will then call an OTARequestor API to actually send the command. The purpose of this 
+    /// function is to allow implementation-specific logic (such as possibly cancelling an ongoing update) 
+    /// to be executed before triggering the image update process
+    virtual void SendQueryImage() = 0;
 
-    // Determines the next available Provider location and sets it in the OTARequestor
-    virtual void DetermineAndSetProviderLocation() = 0;
+    // Returns the next available Provider location
+    virtual bool DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) = 0;
+
 };
 
 } // namespace chip
