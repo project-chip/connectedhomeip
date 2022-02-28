@@ -58,7 +58,7 @@ extern "C" {
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 // for C3 (additional commissioning-related data); (spec: 4.16.3.2 BTP GATT Service)
-#define CHIPOBLEPROFILE_C3_CHAR_UUID128                                                                                             \
+#define CHIPOBLEPROFILE_C3_CHAR_UUID128                                                                                            \
     0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64
 #endif
 
@@ -84,14 +84,15 @@ typedef void (*chipOBleProfileChange_t)(uint8 paramID, uint16 len, uint16_t conn
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 /* Called when commissioner requests (optional) additional commissioning-related data from this device (commissionee) */
-typedef void (*chipOBLEProfileC3Read_t)(uint8_t *destBuf, uint16_t maxLen, uint16_t connHandle);
+typedef void (*chipOBLEProfileC3Read_t)(uint8_t * destBuf, uint16_t maxLen, uint16_t connHandle);
 #endif
 
 typedef struct
 {
     chipOBleProfileChange_t pfnchipOBleProfileChange; // Called when characteristic value changes
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    chipOBLEProfileC3Read_t pfnchipOBleC3Read;        // Called when commissioner requests (optional) additional commissioning-related data from this device (commissionee)
+    chipOBLEProfileC3Read_t pfnchipOBleC3Read; // Called when commissioner requests (optional) additional commissioning-related data
+                                               // from this device (commissionee)
 #endif
 } chipOBleProfileCBs_t;
 

@@ -149,8 +149,7 @@ int AppTask::Init()
         PLAT_LOG("ThreadStackMgr().StartThreadTask() failed");
         while (1)
             ;
-  }
-
+    }
 
     uint8_t EUI64[8];
     char stringEUI64[sizeof(EUI64) * 2 + 1]; // just big enough for string(EUI64)
@@ -161,8 +160,7 @@ int AppTask::Init()
     chip::Encoding::BytesToUppercaseHexString(EUI64, sizeof(EUI64), stringEUI64, sizeof(stringEUI64));
     ret = ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64));
     PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
-    VerifyOrDieWithMsg(ret == CHIP_NO_ERROR, NotSpecified,
-		       "StoreSerialNumber: failed (%" CHIP_ERROR_FORMAT ")", ret.Format());
+    VerifyOrDieWithMsg(ret == CHIP_NO_ERROR, NotSpecified, "StoreSerialNumber: failed (%" CHIP_ERROR_FORMAT ")", ret.Format());
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");

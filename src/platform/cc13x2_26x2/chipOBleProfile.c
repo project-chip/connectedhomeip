@@ -146,10 +146,10 @@ static gattAttribute_t chipoBleProfileAttrTbl[] = {
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     // CHIPoBLE C3 Characteristic Declaration
     { { ATT_BT_UUID_SIZE, characterUUID }, GATT_PERMIT_READ, 0, &chipOBleProfileC3CharProps },
-    
+
     // CHIPoBLE C3 Characteristic Value
     { { ATT_UUID_SIZE, chipOBleProfileC3CharUUID }, GATT_PERMIT_READ, 0, chipOBleProfileC3CharVal },
-    
+
     // CHIPoBLE C3 Characteristic User Description
     { { ATT_BT_UUID_SIZE, charUserDescUUID }, GATT_PERMIT_READ, 0, chipOBleProfileC3dDataUserDesp },
 #endif
@@ -343,7 +343,7 @@ static bStatus_t CHIPoBLEProfile_ReadAttrCB(uint16_t connHandle, gattAttribute_t
                                             uint16_t offset, uint16_t maxLen, uint8_t method)
 {
     bStatus_t status = SUCCESS;
-    uint16 len        = maxLen;
+    uint16 len       = maxLen;
 
     if (offset + maxLen > CHIPOBLEPROFILE_CHAR_LEN)
         len = CHIPOBLEPROFILE_CHAR_LEN - offset;
