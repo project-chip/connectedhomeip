@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
     android:
-        name: Run
+        name: Smoke Run - Android
         timeout-minutes: 60
 
         env:
