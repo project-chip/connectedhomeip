@@ -92,26 +92,26 @@ CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
 {
     EmberBindingTableEntry & entry    = mBindingTable[index];
     uint8_t buffer[kEntryStorageSize] = { 0 };
-    chip::TLV::TLVWriter writer;
+    TLV::TLVWriter writer;
     writer.Init(buffer);
-    chip::TLV::TLVType container;
-    ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::TLVType::kTLVType_Structure, container));
-    ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagFabricIndex), entry.fabricIndex));
-    ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagLocalEndpoint), entry.local));
+    TLV::TLVType container;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::TLVType::kTLVType_Structure, container));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagFabricIndex), entry.fabricIndex));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagLocalEndpoint), entry.local));
     if (entry.clusterId.HasValue())
     {
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagCluster), entry.clusterId.Value()));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagCluster), entry.clusterId.Value()));
     }
     if (entry.type == EMBER_UNICAST_BINDING)
     {
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagRemoteEndpoint), entry.remote));
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagNodeId), entry.nodeId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagRemoteEndpoint), entry.remote));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagNodeId), entry.nodeId));
     }
     else
     {
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagGroupId), entry.groupId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagGroupId), entry.groupId));
     }
-    ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagNextEntry), nextIndex));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagNextEntry), nextIndex));
     ReturnErrorOnFailure(writer.EndContainer(container));
     ReturnErrorOnFailure(writer.Finalize());
     return mStorage->SyncSetKeyValue(mKeyAllocator.BindingTableEntry(index), buffer,
@@ -121,12 +121,12 @@ CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
 CHIP_ERROR BindingTable::SaveListInfo(uint8_t head)
 {
     uint8_t buffer[kListInfoStorageSize] = { 0 };
-    chip::TLV::TLVWriter writer;
+    TLV::TLVWriter writer;
     writer.Init(buffer);
-    chip::TLV::TLVType container;
-    ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::TLVType::kTLVType_Structure, container));
-    ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagStorageVersion), kStorageVersion));
-    ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagHead), head));
+    TLV::TLVType container;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::TLVType::kTLVType_Structure, container));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagStorageVersion), kStorageVersion));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagHead), head));
     ReturnErrorOnFailure(writer.EndContainer(container));
     ReturnErrorOnFailure(writer.Finalize());
     return mStorage->SyncSetKeyValue(mKeyAllocator.BindingTable(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
@@ -140,19 +140,19 @@ CHIP_ERROR BindingTable::LoadFromStorage()
     CHIP_ERROR error;
 
     ReturnErrorOnFailure(mStorage->SyncGetKeyValue(mKeyAllocator.BindingTable(), buffer, size));
-    chip::TLV::TLVReader reader;
+    TLV::TLVReader reader;
     reader.Init(buffer, size);
 
-    ReturnErrorOnFailure(reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag()));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
-    chip::TLV::TLVType container;
+    TLV::TLVType container;
     ReturnErrorOnFailure(reader.EnterContainer(container));
 
-    ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagStorageVersion)));
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagStorageVersion)));
     uint32_t version;
     ReturnErrorOnFailure(reader.Get(version));
     VerifyOrReturnError(version == kStorageVersion, CHIP_ERROR_VERSION_MISMATCH);
-    ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagHead)));
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagHead)));
     uint8_t index;
     ReturnErrorOnFailure(reader.Get(index));
     mHead = index;
@@ -186,19 +186,19 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
     EmberBindingTableEntry entry;
 
     ReturnErrorOnFailure(mStorage->SyncGetKeyValue(mKeyAllocator.BindingTableEntry(index), buffer, size));
-    chip::TLV::TLVReader reader;
+    TLV::TLVReader reader;
     reader.Init(buffer, size);
 
-    ReturnErrorOnFailure(reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag()));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
-    chip::TLV::TLVType container;
+    TLV::TLVType container;
     ReturnErrorOnFailure(reader.EnterContainer(container));
-    ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagFabricIndex)));
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagFabricIndex)));
     ReturnErrorOnFailure(reader.Get(entry.fabricIndex));
-    ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagLocalEndpoint)));
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagLocalEndpoint)));
     ReturnErrorOnFailure(reader.Get(entry.local));
     ReturnErrorOnFailure(reader.Next());
-    if (reader.GetTag() == chip::TLV::ContextTag(kTagCluster))
+    if (reader.GetTag() == TLV::ContextTag(kTagCluster))
     {
         uint16_t clusterId;
         ReturnErrorOnFailure(reader.Get(clusterId));
@@ -209,20 +209,20 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
     {
         entry.clusterId = NullOptional;
     }
-    if (reader.GetTag() == chip::TLV::ContextTag(kTagRemoteEndpoint))
+    if (reader.GetTag() == TLV::ContextTag(kTagRemoteEndpoint))
     {
         entry.type = EMBER_UNICAST_BINDING;
         ReturnErrorOnFailure(reader.Get(entry.remote));
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagNodeId)));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagNodeId)));
         ReturnErrorOnFailure(reader.Get(entry.nodeId));
     }
     else
     {
         entry.type = EMBER_MULTICAST_BINDING;
-        ReturnErrorCodeIf(reader.GetTag() != chip::TLV::ContextTag(kTagGroupId), CHIP_ERROR_INVALID_TLV_TAG);
+        ReturnErrorCodeIf(reader.GetTag() != TLV::ContextTag(kTagGroupId), CHIP_ERROR_INVALID_TLV_TAG);
         ReturnErrorOnFailure(reader.Get(entry.groupId));
     }
-    ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagNextEntry)));
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagNextEntry)));
     ReturnErrorOnFailure(reader.Get(nextIndex));
     ReturnErrorOnFailure(reader.ExitContainer(container));
     mBindingTable[index] = entry;

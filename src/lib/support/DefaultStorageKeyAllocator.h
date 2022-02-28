@@ -69,7 +69,6 @@ public:
         return Format("a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
-    // Binding Table
     const char * BindingTable() { return Format("bt"); }
     const char * BindingTableEntry(uint8_t index) { return Format("bt/%x", index); }
 

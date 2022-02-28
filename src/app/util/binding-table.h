@@ -23,6 +23,7 @@
 
 #include <app/util/af-types.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {
@@ -84,19 +85,22 @@ public:
 
 private:
     static BindingTable sInstance;
-    static constexpr uint8_t kEntryStorageSize    = 64;
-    static constexpr uint8_t kListInfoStorageSize = 16;
-    static constexpr uint32_t kStorageVersion     = 1;
-    static constexpr uint8_t kTagStorageVersion   = 1;
-    static constexpr uint8_t kTagHead             = 2;
-    static constexpr uint8_t kTagFabricIndex      = 1;
-    static constexpr uint8_t kTagLocalEndpoint    = 2;
-    static constexpr uint8_t kTagCluster          = 3;
-    static constexpr uint8_t kTagRemoteEndpoint   = 4;
-    static constexpr uint8_t kTagNodeId           = 5;
-    static constexpr uint8_t kTagGroupId          = 6;
-    static constexpr uint8_t kTagNextEntry        = 7;
-    static constexpr uint8_t kNextNullIndex       = 255;
+
+    static constexpr uint32_t kStorageVersion  = 1;
+    static constexpr uint8_t kEntryStorageSize = TLV::EstimateStructOverhead(
+        sizeof(FabricIndex), sizeof(EndpointId), sizeof(ClusterId), sizeof(EndpointId), sizeof(NodeId), sizeof(uint8_t));
+    static constexpr uint8_t kListInfoStorageSize = TLV::EstimateStructOverhead(sizeof(kStorageVersion), sizeof(uint8_t));
+
+    static constexpr uint8_t kTagStorageVersion = 1;
+    static constexpr uint8_t kTagHead           = 2;
+    static constexpr uint8_t kTagFabricIndex    = 1;
+    static constexpr uint8_t kTagLocalEndpoint  = 2;
+    static constexpr uint8_t kTagCluster        = 3;
+    static constexpr uint8_t kTagRemoteEndpoint = 4;
+    static constexpr uint8_t kTagNodeId         = 5;
+    static constexpr uint8_t kTagGroupId        = 6;
+    static constexpr uint8_t kTagNextEntry      = 7;
+    static constexpr uint8_t kNextNullIndex     = 255;
 
     uint8_t GetNextAvaiableIndex();
 

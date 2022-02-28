@@ -116,6 +116,7 @@ CHIP_ERROR InitBindingHandlers()
     // The initialization of binding manager will try establishing connection with unicast peers
     // so it requires the Server instance to be correctly initialized. Post the init function to
     // the event queue so that everything is ready when initialization is conducted.
+    // TODO: Fix initialization order issue in Matter server.
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
 #if defined(ENABLE_CHIP_SHELL)
     RegisterSwitchCommands();
