@@ -214,8 +214,8 @@ void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallbac
 }
 
 // Device commissioning has completed, schedule a provider query
-void GenericOTARequestorDriver::OTACommissioningCallback() 
-{ 
+void GenericOTARequestorDriver::OTACommissioningCallback()
+{
     // Schedule a query. At the end of this query/update process the Default Provider timer is started
     ScheduleDelayedAction(
         System::Clock::Seconds32(kDelayQueryUponCommissioningSec),
