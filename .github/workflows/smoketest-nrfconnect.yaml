@@ -63,10 +63,10 @@ jobs:
             - name: Build example nRF Connect SDK Lock App on nRF52840 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840
+                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840 -DBUILD_WITH_DFU=1
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nrfconnect nrf52840dk_nrf52840 lock-app \
-                    examples/lock-app/nrfconnect/build/zephyr/zephyr.elf \
+                    nrfconnect nrf52840dk_nrf52840 all-clusters-app \
+                    examples/all-clusters-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
