@@ -154,6 +154,11 @@ void InitTestInetCommon()
     UseStdoutLineBuffering();
 }
 
+void ShutdownTestInetCommon()
+{
+    chip::Platform::MemoryShutdown();
+}
+
 void InitSystemLayer()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

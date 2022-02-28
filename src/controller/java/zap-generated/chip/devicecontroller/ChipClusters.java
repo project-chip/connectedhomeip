@@ -8724,7 +8724,7 @@ public class ChipClusters {
     }
 
     public interface GetGroupMembershipResponseCallback {
-      void onSuccess(Integer capacity, ArrayList<Integer> groupList);
+      void onSuccess(@Nullable Integer capacity, ArrayList<Integer> groupList);
 
       void onError(Exception error);
     }

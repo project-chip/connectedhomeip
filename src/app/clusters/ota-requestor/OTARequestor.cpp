@@ -239,7 +239,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
                                                 .providerNodeID = commandData.providerNodeId,
                                                 .endpoint       = commandData.endpoint };
 
-    SetDefaultProviderLocation(providerLocation);
+    SetCurrentProviderLocation(providerLocation);
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %u", providerLocation.fabricIndex);
@@ -484,7 +484,7 @@ CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocation::Type & pr
     iterator = mDefaultOtaProviderList.Begin();
     while (iterator.Next())
     {
-        SetDefaultProviderLocation(iterator.GetValue());
+        SetCurrentProviderLocation(iterator.GetValue());
         break;
     }
 
@@ -517,7 +517,7 @@ void OTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
     OtaRequestorServerSetUpdateStateProgress(percent);
 }
 
-bool OTARequestor::SetDefaultProviderLocation(const ProviderLocationType & providerLocation)
+bool OTARequestor::SetCurrentProviderLocation(const ProviderLocationType & providerLocation)
 {
     // Provider location cannot be modified if there is an OTA update in progress
     if (mCurrentUpdateState != OTAUpdateStateEnum::kIdle)
@@ -529,7 +529,7 @@ bool OTARequestor::SetDefaultProviderLocation(const ProviderLocationType & provi
     return true;
 }
 
-bool OTARequestor::ClearDefaultProviderLocation(void)
+bool OTARequestor::ClearCurrentProviderLocation(void)
 {
     // Provider location cannot be modified if there is an OTA update in progress
     if (mCurrentUpdateState != OTAUpdateStateEnum::kIdle)
@@ -568,7 +568,7 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     // Provider location should not exist if no OTA update in progress
     if (mCurrentUpdateState == OTAUpdateStateEnum::kIdle)
     {
-        ClearDefaultProviderLocation();
+        ClearCurrentProviderLocation();
     }
 }
 
