@@ -52978,7 +52978,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_8(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_8(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -52995,9 +52995,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_8(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53010,7 +53013,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_9(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_9(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53027,9 +53030,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_9(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53042,7 +53048,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_10(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_10(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53059,9 +53065,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_10(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53074,7 +53083,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_11(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_11(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53091,9 +53100,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_11(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53106,7 +53118,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_12(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_12(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53123,9 +53135,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_12(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53138,7 +53153,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_13(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_13(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53155,9 +53170,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_13(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53170,7 +53188,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_14(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_14(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53187,9 +53205,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_14(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53202,7 +53223,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_15(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_15(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53219,9 +53240,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_15(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53235,7 +53259,7 @@ private:
         request.deltaPositionMilliseconds = 500ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_16(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_16(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53252,9 +53276,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_16(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_16(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53297,7 +53324,7 @@ private:
         request.deltaPositionMilliseconds = 100ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_18(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_18(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53314,9 +53341,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_18(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_18(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53359,7 +53389,7 @@ private:
         request.position = 1000ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_20(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_20(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53376,9 +53406,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_20(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_20(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53705,7 +53738,7 @@ private:
         request.match = chip::Span<const char>("PBSgarbage: not in length on purpose", 3);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelClusterSuite *>(context))->OnSuccessResponse_4(data.channelMatch, data.status);
+            (static_cast<TV_ChannelClusterSuite *>(context))->OnSuccessResponse_4(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53722,21 +53755,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & channelMatch,
-                             chip::app::Clusters::Channel::StatusEnum status)
+    void OnSuccessResponse_4(chip::app::Clusters::Channel::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
-        VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 9U));
-        VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 1U));
-        VerifyOrReturn(CheckValuePresent("channelMatch.name", channelMatch.name));
-        VerifyOrReturn(CheckValueAsString("channelMatch.name.Value()", channelMatch.name.Value(), chip::CharSpan("PBS", 3)));
-        VerifyOrReturn(CheckValuePresent("channelMatch.callSign", channelMatch.callSign));
-        VerifyOrReturn(
-            CheckValueAsString("channelMatch.callSign.Value()", channelMatch.callSign.Value(), chip::CharSpan("KCTS-TV", 7)));
-        VerifyOrReturn(CheckValuePresent("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign));
-        VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign.Value()", channelMatch.affiliateCallSign.Value(),
-                                          chip::CharSpan("KCTS", 4)));
-
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }

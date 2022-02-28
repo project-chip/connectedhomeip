@@ -3241,9 +3241,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _channelMatch = [CHIPChannelClusterChannelInfo new];
-
         _status = @(0);
+
+        _data = nil;
     }
     return self;
 }
@@ -3327,6 +3327,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _status = @(0);
+
+        _data = nil;
     }
     return self;
 }
