@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
     esp32:
-        name: run
+        name: Smoke Run - ESP32
         timeout-minutes: 30
 
         runs-on: ubuntu-latest
