@@ -151,7 +151,8 @@ public:
             {
                 // update the temp attribute here for hardcoded endpoint 1
                 chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
-            }else if (name == "Color Current Level")
+            }
+            else if (name == "Color Current Level")
             {
                 // update the current level here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Brightness changed to : %d", (n * 100 / 255));
@@ -470,7 +471,6 @@ void SetupPretendDevices()
     AddCluster("Illuminance Measurement");
     AddAttribute("MeasuredValue", "1000");
     app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
-
 
     AddDevice("Color Light");
     AddEndpoint("1");
