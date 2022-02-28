@@ -100,11 +100,8 @@ public:
     /// Called when the current software update has been cancelled by the local application
     virtual void UpdateCancelled() = 0;
 
-    /// Platform-specific timer setting method
-    virtual void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState) = 0;
-
-    /// Platform-specific timer cancelling method
-    virtual void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) = 0;
+    /// Inform the driver that the device commissioning has completed
+    virtual void OTACommissioningCallback() = 0;
 
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     virtual void

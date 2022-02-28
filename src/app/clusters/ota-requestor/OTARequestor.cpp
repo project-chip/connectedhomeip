@@ -44,8 +44,6 @@ using bdx::TransferSession;
 // Global instance of the OTARequestorInterface.
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
 
-constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query
-
 static void LogQueryImageResponse(const QueryImageResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "QueryImageResponse:");
@@ -785,9 +783,7 @@ void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDevic
 
     // Schedule a query. At the end of this query/update process the Default Provider timer is started
     OTARequestorDriver * driver = (reinterpret_cast<OTARequestor *>(arg))->mOtaRequestorDriver;
-    driver->ScheduleDelayedAction(
-        System::Clock::Seconds32(kDelayQueryUponCommissioningSec),
-        [](System::Layer *, void * context) { static_cast<OTARequestorDriver *>(context)->DriverSendQuery(); }, driver);
+    driver->OTACommissioningCallback();
 }
 
 } // namespace chip
