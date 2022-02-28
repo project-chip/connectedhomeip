@@ -358,8 +358,8 @@ private:
 
 constexpr uint16_t AccessControlAttribute::ClusterRevision;
 
-CHIP_ERROR LogAccessControlEvent(const AccessControl::Entry & entry, const Access::SubjectDescriptor & subjectDescriptor,
-                                 AccessControlCluster::ChangeTypeEnum changeType)
+CHIP_ERROR LogEntryChangedEvent(const AccessControl::Entry & entry, const Access::SubjectDescriptor & subjectDescriptor,
+                                AccessControlCluster::ChangeTypeEnum changeType)
 {
     CHIP_ERROR err;
 
@@ -393,7 +393,10 @@ CHIP_ERROR LogAccessControlEvent(const AccessControl::Entry & entry, const Acces
     {
         for (size_t i = 0; i < subjectCount; ++i)
         {
-            ReturnErrorOnFailure(entry.GetSubject(i, subjectBuffer[i]));
+            Subject subject;
+            ReturnErrorOnFailure(entry.GetSubject(i, subject.nodeId));
+            ReturnErrorOnFailure(AccessControlEntryCodec::Convert(subject.nodeId, subject));
+            subjectBuffer[i] = subject.nodeId;
         }
         staging.subjects.SetNonNull(subjectBuffer, subjectCount);
     }
@@ -420,17 +423,16 @@ CHIP_ERROR LogAccessControlEvent(const AccessControl::Entry & entry, const Acces
     }
     else if (subjectDescriptor.authMode == Access::AuthMode::kPase)
     {
-        adminNodeID.SetNonNull(PAKEKeyIdFromNodeId(subjectDescriptor.subject));
+        adminPasscodeID.SetNonNull(PAKEKeyIdFromNodeId(subjectDescriptor.subject));
     }
 
     AccessControlCluster::Events::AccessControlEntryChanged::Type event{ subjectDescriptor.fabricIndex, adminNodeID,
                                                                          adminPasscodeID, changeType, latestValue };
 
-    // AccessControl event only occurs on endpoint 0.
     err = LogEvent(event, 0, eventNumber);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(DataManagement, "AccessControl: Failed to record AccessControlEntryChanged event");
+        ChipLogError(DataManagement, "AccessControlCluster: log event failed");
     }
 
     return err;
@@ -524,14 +526,14 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
             if (i < oldCount)
             {
                 ReturnErrorOnFailure(GetAccessControl().UpdateEntry(i, iterator.GetValue().entry, &accessingFabricIndex));
-                ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                                                           AccessControlCluster::ChangeTypeEnum::kChanged));
+                ReturnErrorOnFailure(LogEntryChangedEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                          AccessControlCluster::ChangeTypeEnum::kChanged));
             }
             else
             {
                 ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry, &accessingFabricIndex));
-                ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                                                           AccessControlCluster::ChangeTypeEnum::kAdded));
+                ReturnErrorOnFailure(LogEntryChangedEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                          AccessControlCluster::ChangeTypeEnum::kAdded));
             }
             ++i;
         }
@@ -544,7 +546,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
             --oldCount;
             ReturnErrorOnFailure(GetAccessControl().ReadEntry(oldCount, entry, &accessingFabricIndex));
             ReturnErrorOnFailure(
-                LogAccessControlEvent(entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
+                LogEntryChangedEvent(entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
             ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount, &accessingFabricIndex));
         }
     }
@@ -555,7 +557,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 
         ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, item.entry, &accessingFabricIndex));
         ReturnErrorOnFailure(
-            LogAccessControlEvent(item.entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
+            LogEntryChangedEvent(item.entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
     }
     else
     {
