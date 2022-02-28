@@ -60,18 +60,10 @@ public:
         mConfig = params;
     }
 
-    CHIP_ERROR Init()
-    {
-        if (mConfig.dnsResolver == nullptr)
-        {
-            ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
-            mDNSResolver.SetOperationalDelegate(this);
-            mConfig.dnsResolver = &mDNSResolver;
-        }
-        return CHIP_NO_ERROR;
-    }
-
     virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
+
+    CHIP_ERROR Init();
+    void Shutdown() { mDNSResolver.Shutdown(); }
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.

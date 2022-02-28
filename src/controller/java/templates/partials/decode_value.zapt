@@ -5,7 +5,9 @@ jobject {{target}};
 if (!{{source}}.HasValue()) {
   chip::JniReferences::GetInstance().CreateOptional(nullptr, {{target}});
 } else {
-  {{>decode_value target=target source=(concat source ".Value()") cluster=cluster depth=(incrementDepth depth) isOptional=false omitDeclaration=true earlyReturn=earlyReturn}}
+  jobject {{target}}InsideOptional;
+  {{>decode_value target=(concat target "InsideOptional") source=(concat source ".Value()") cluster=cluster depth=(incrementDepth depth) isOptional=false omitDeclaration=true earlyReturn=earlyReturn}}
+  chip::JniReferences::GetInstance().CreateOptional({{target}}InsideOptional, {{target}});
 }
 {{else if isNullable}}
 if ({{source}}.IsNull()) {

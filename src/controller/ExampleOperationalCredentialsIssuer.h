@@ -117,7 +117,7 @@ private:
     PersistentStorageDelegate * mStorage = nullptr;
 
     NodeId mNextRequestedNodeId = 1;
-    FabricId mNextFabricId      = 0;
+    FabricId mNextFabricId      = 1;
     bool mNodeIdRequested       = false;
     uint64_t mIndex             = 0;
 };

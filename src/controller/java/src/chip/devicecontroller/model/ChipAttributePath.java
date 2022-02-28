@@ -20,7 +20,7 @@ package chip.devicecontroller.model;
 import java.util.Locale;
 import java.util.Objects;
 
-/** An attribute path that could be used in a request, or received in a report. */
+/** An attribute path that should be used for requests. */
 public class ChipAttributePath {
   private ChipPathId endpointId, clusterId, attributeId;
 

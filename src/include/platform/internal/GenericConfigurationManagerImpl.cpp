@@ -43,6 +43,9 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
+// TODO : may be we can make it configurable
+#define BLE_ADVERTISEMENT_VERSION 0
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -650,6 +653,8 @@ GenericConfigurationManagerImpl<ConfigClass>::GetBLEDeviceIdentificationInfo(Ble
     err = GetSetupDiscriminator(discriminator);
     SuccessOrExit(err);
     deviceIdInfo.SetDeviceDiscriminator(discriminator);
+
+    deviceIdInfo.SetAdvertisementVersion(BLE_ADVERTISEMENT_VERSION);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     deviceIdInfo.SetAdditionalDataFlag(true);

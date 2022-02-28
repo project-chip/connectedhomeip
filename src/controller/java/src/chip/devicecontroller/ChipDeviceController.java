@@ -339,6 +339,14 @@ public class ChipDeviceController {
   }
 
   /**
+   * Converts a given X.509v3 certificate into a Matter certificate.
+   *
+   * @throws ChipDeviceControllerException if there was an issue during encoding (e.g. out of
+   *     memory, invalid certificate format)
+   */
+  public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
+
+  /**
    * Generates a new PASE verifier and passcode ID for the given setup PIN code.
    *
    * @param devicePtr a pointer to the device object for which to generate the PASE verifier

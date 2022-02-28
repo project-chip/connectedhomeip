@@ -289,21 +289,23 @@ combination with JLinkRTTClient as follows:
     through CLI commands on your OT BR
 
     The
-    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
+    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
     can now be used to send ZCL commands to the window covering device. For
     instance, to set the window covering lift by percentage:
 
-        $ sudo chip-device-ctrl
+    ```
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-        chip-device-ctrl > set-pairing-thread-credential 16 0x1234 00112233445566778899aabbccddeeff
+    chip-tool onoff on 1 1
 
-        chip-device-ctrl > connect -ble 3840 12345678 12344321
-
-        chip-device-ctrl > zcl WindowCovering WindowCoveringGoToLiftPercentage 12344321 1 1 percentageLiftValue=50
+    chip-tool windowcovering go-to-tilt-percentage 50 0 1 1
+    ```
 
     To see the supported window covering cluster commands, use:
 
-        chip-device-ctrl > zcl ? WindowCovering
+    ```
+    chip-tool windowcovering
+    ```
 
 ### Notes
 

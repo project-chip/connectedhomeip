@@ -18,11 +18,11 @@
 package chip.devicecontroller;
 
 import chip.devicecontroller.model.ChipAttributePath;
-import java.util.Map;
+import chip.devicecontroller.model.NodeState;
 
 /** An interface for receiving read/subscribe CHIP reports. */
 public interface ReportCallback {
   void onError(ChipAttributePath attributePath, Exception e);
 
-  void onReport(Map<ChipAttributePath, Object> values);
+  void onReport(NodeState nodeState);
 }

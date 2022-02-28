@@ -4312,7 +4312,7 @@ static void CheckCHIPTLVScopedBuffer(nlTestSuite * inSuite, void * inContext)
     {
         ScopedBufferTLVWriter writer(std::move(buf), 64);
 
-        NL_TEST_ASSERT(inSuite, buf.Get() == nullptr);
+        NL_TEST_ASSERT(inSuite, buf.Get() == nullptr); // // NOLINT(bugprone-use-after-move)
 
         err = writer.Put(TLV::AnonymousTag(), (uint8_t) 33);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

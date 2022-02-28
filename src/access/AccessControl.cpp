@@ -341,9 +341,6 @@ bool AccessControl::IsValid(const Entry & entry)
 
         // Privilege must not be administer.
         VerifyOrExit(privilege != Privilege::kAdminister, log = "invalid privilege");
-
-        // Subject must be present.
-        VerifyOrExit(subjectCount > 0, log = "invalid subject count");
     }
 
     for (size_t i = 0; i < subjectCount; ++i)

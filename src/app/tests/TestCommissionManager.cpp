@@ -17,6 +17,7 @@
 
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/tests/echo/common.h>
@@ -50,6 +51,27 @@ void InitializeChip(nlTestSuite * suite)
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+}
+
+void ShutdownChipTest()
+{
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+
+    auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
+    mdnsAdvertiser.RemoveServices();
+    mdnsAdvertiser.Shutdown();
+
+    // Server shudown will be called in TearDownTask
+
+    // TODO: At this point UDP endpoits still seem leaked and the sanitizer
+    // builds will attempt a memory free. As a result, we keep Memory initialized
+    // so that the global UDPManager can still be destructed without a coredump.
+    //
+    // This is likely either a missing shutdown or an actual UDP endpoint leak
+    // which I have not been able to track down yet.
+    //
+    // chip::Platform::MemoryShutdown();
 }
 
 void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
@@ -182,8 +204,7 @@ int TestCommissioningWindowManager()
     // TODO: The platform memory was intentionally left not deinitialized so that minimal mdns can destruct
     chip::DeviceLayer::PlatformMgr().ScheduleWork(TearDownTask, 0);
     sleep(kTestTaskWaitSeconds);
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
+    ShutdownChipTest();
 
     return (nlTestRunnerStats(&theSuite));
 }
