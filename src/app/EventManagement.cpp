@@ -631,28 +631,29 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
 
     Access::RequestPath requestPath{ .cluster = event.mClusterId, .endpoint = event.mEndpointId };
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
-    CHIP_ERROR aclError                = CHIP_NO_ERROR;
+    CHIP_ERROR accessControlError      = CHIP_NO_ERROR;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    switch (GetInstance().mBypassACL)
+    switch (GetInstance().mBypassAccessControl)
     {
-    case BypassACL::kAlwaysPass:
-        aclError = CHIP_NO_ERROR;
+    case BypassAccessControl::kAlwaysPass:
+        accessControlError = CHIP_NO_ERROR;
         break;
-    case BypassACL::kAlwaysFail:
-        aclError = CHIP_ERROR_ACCESS_DENIED;
+    case BypassAccessControl::kAlwaysFail:
+        accessControlError = CHIP_ERROR_ACCESS_DENIED;
         break;
-    case BypassACL::kNoBypass:
+    case BypassAccessControl::kNoBypass:
 #endif
-        aclError = Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
+        accessControlError =
+            Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
         break;
     }
 #endif
 
-    if (aclError != CHIP_NO_ERROR)
+    if (accessControlError != CHIP_NO_ERROR)
     {
-        ReturnErrorCodeIf(aclError != CHIP_ERROR_ACCESS_DENIED, aclError);
+        ReturnErrorCodeIf(accessControlError != CHIP_ERROR_ACCESS_DENIED, accessControlError);
         if (isPathInterestedByConcretePath)
         {
             ret = CHIP_ERROR_ACCESS_DENIED;

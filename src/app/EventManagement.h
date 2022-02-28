@@ -362,7 +362,7 @@ public:
      */
     void SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes);
 
-    enum class BypassACL : uint8_t
+    enum class BypassAccessControl : uint8_t
     {
         kNoBypass   = 0,
         kAlwaysPass = 1,
@@ -370,7 +370,7 @@ public:
     };
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    inline void SetBypassACL(BypassACL aConfig) { mBypassACL = aConfig; }
+    inline void SetBypassAccessControl(BypassAccessControl aConfig) { mBypassAccessControl = aConfig; }
 #endif
 
 private:
@@ -536,7 +536,7 @@ private:
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     /// Debug flag for bypassing ACL check when retrieving events
-    BypassACL mBypassACL = BypassACL::kNoBypass;
+    BypassAccessControl mBypassAccessControl = BypassAccessControl::kNoBypass;
 #endif
 };
 } // namespace app

@@ -1032,7 +1032,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
     err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    EventManagement::GetInstance().SetBypassACL(chip::app::EventManagement::BypassACL::kAlwaysFail);
+    EventManagement::GetInstance().SetBypassAccessControl(chip::app::EventManagement::BypassAccessControl::kAlwaysFail);
 
     // When read events with concrete paths without enough privilege, we will return EventStatusIB
     {
@@ -1065,7 +1065,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
 
     GenerateEvents(apSuite, apContext);
 
-    EventManagement::GetInstance().SetBypassACL(chip::app::EventManagement::BypassACL::kAlwaysFail);
+    EventManagement::GetInstance().SetBypassAccessControl(chip::app::EventManagement::BypassAccessControl::kAlwaysFail);
     // When reading events with withcard paths without enough privilege for reading one or more event, we will exclude the events
     // when generating the report.
     {
@@ -1093,7 +1093,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
     }
 
-    EventManagement::GetInstance().SetBypassACL(chip::app::EventManagement::BypassACL::kNoBypass);
+    EventManagement::GetInstance().SetBypassAccessControl(chip::app::EventManagement::BypassAccessControl::kNoBypass);
 
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
     engine->Shutdown();
