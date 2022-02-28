@@ -635,6 +635,7 @@ class TLVReader(object):
             (decoding["value"],) = struct.unpack(
                 "<f", tlv[self._bytesRead: self._bytesRead + 4]
             )
+            decoding["value"] = float32(decoding["value"])
             self._bytesRead += 4
         elif decoding["type"] == "Floating Point 8-byte value":
             (decoding["value"],) = struct.unpack(
