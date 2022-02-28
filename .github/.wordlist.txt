@@ -855,6 +855,7 @@ optionsOverride
 orgs
 OTA
 OTADownloader
+otaDownloadPath
 otaImageList
 OTAImageProcessorDriver
 OTAImageProcessorInterface
