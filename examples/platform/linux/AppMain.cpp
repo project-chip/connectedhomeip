@@ -26,8 +26,8 @@
 #include <lib/core/NodeId.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <lib/support/CHIPMem.h>
@@ -99,26 +99,26 @@ void OnSignalHandler(int signum)
     // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
     // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
     // running process to terminate with different reasons.
-    DiagnosticDataProvider::BootReasonType bootReason = DiagnosticDataProvider::BootReasonType::Unspecified;
+    BootReasonType bootReason = BootReasonType::Unspecified;
     switch (signum)
     {
     case SIGVTALRM:
-        bootReason = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
+        bootReason = BootReasonType::PowerOnReboot;
         break;
     case SIGALRM:
-        bootReason = DiagnosticDataProvider::BootReasonType::BrownOutReset;
+        bootReason = BootReasonType::BrownOutReset;
         break;
     case SIGILL:
-        bootReason = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
+        bootReason = BootReasonType::SoftwareWatchdogReset;
         break;
     case SIGTRAP:
-        bootReason = DiagnosticDataProvider::BootReasonType::HardwareWatchdogReset;
+        bootReason = BootReasonType::HardwareWatchdogReset;
         break;
     case SIGIO:
-        bootReason = DiagnosticDataProvider::BootReasonType::SoftwareUpdateCompleted;
+        bootReason = BootReasonType::SoftwareUpdateCompleted;
         break;
     case SIGINT:
-        bootReason = DiagnosticDataProvider::BootReasonType::SoftwareReset;
+        bootReason = BootReasonType::SoftwareReset;
         break;
     default:
         IgnoreUnusedVariable(bootReason);
@@ -339,8 +339,8 @@ CHIP_ERROR InitCommissioner()
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(
-        gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, ephemeralKey.Pubkey(),
+                                                                        rcacSpan, icacSpan, nocSpan));
 
     params.operationalKeypair = &ephemeralKey;
     params.controllerRCAC     = rcacSpan;

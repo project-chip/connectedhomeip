@@ -102,6 +102,7 @@ public:
     static constexpr Key kConfigKey_WiFiSEC            = EFR32ConfigKey(kChipConfig_KeyBase, 0x0E);
     static constexpr Key kConfigKey_GroupKeyBase       = EFR32ConfigKey(kChipConfig_KeyBase, 0x0F);
     static constexpr Key kConfigKey_GroupKeyMax = EFR32ConfigKey(kChipConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.
+    static constexpr Key kConfigKey_UniqueId    = EFR32ConfigKey(kChipFactory_KeyBase, 0x1F);
 
     // CHIP Counter Keys
     static constexpr Key kConfigKey_BootCount             = EFR32ConfigKey(kChipCounter_KeyBase, 0x00);

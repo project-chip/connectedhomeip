@@ -128,9 +128,16 @@ public:
      */
     void SetRequestorCanConsent(bool requestorCanConsent) { mRequestorCanConsent.SetValue(requestorCanConsent); }
 
-    // Application notifies the Requestor on the user consent action, TRUE if consent is given,
-    // FALSE otherwise
-    void OnUserConsent(bool result);
+    /**
+     * Set the OTA provider location to use for the next query
+     */
+    bool
+    SetCurrentProviderLocation(const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation);
+
+    /**
+     * Clear the OTA provider location to indicate no OTA update may be in progress
+     */
+    bool ClearCurrentProviderLocation(void);
 
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;

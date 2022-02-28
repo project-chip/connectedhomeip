@@ -219,7 +219,6 @@ public:
         return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
 
-    // TODO: implements group sessions
     Optional<SessionHandle> CreateGroupSession(GroupId group, chip::FabricIndex fabricIndex, NodeId sourceNodeId)
     {
         return mGroupSessions.AllocEntry(group, fabricIndex, sourceNodeId);

@@ -41,14 +41,14 @@ public:
         if (CHIP_NO_ERROR != error)
         {
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
-            SetCommandExitStatus(error);
+            mError = error;
             return;
         }
 
         if (data == nullptr)
         {
             ChipLogError(chipTool, "Response Failure: No Data");
-            SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            mError = CHIP_ERROR_INTERNAL;
             return;
         }
 
@@ -56,7 +56,7 @@ public:
         if (CHIP_NO_ERROR != error)
         {
             ChipLogError(chipTool, "Response Failure: Can not decode Data");
-            SetCommandExitStatus(error);
+            mError = error;
             return;
         }
     }
@@ -70,7 +70,7 @@ public:
             if (CHIP_NO_ERROR != error)
             {
                 ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
-                SetCommandExitStatus(error);
+                mError = error;
                 return;
             }
         }
@@ -78,7 +78,7 @@ public:
         if (data == nullptr)
         {
             ChipLogError(chipTool, "Response Failure: No Data");
-            SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            mError = CHIP_ERROR_INTERNAL;
             return;
         }
 
@@ -86,7 +86,7 @@ public:
         if (CHIP_NO_ERROR != error)
         {
             ChipLogError(chipTool, "Response Failure: Can not decode Data");
-            SetCommandExitStatus(error);
+            mError = error;
             return;
         }
     }
@@ -94,13 +94,13 @@ public:
     void OnError(CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
-        SetCommandExitStatus(error);
+        mError = error;
     }
 
     void OnDone() override
     {
         mReadClient.reset();
-        SetCommandExitStatus(CHIP_NO_ERROR);
+        SetCommandExitStatus(mError);
     }
 
     void OnSubscriptionEstablished(uint64_t subscriptionId) override { OnAttributeSubscription(); }
@@ -177,6 +177,8 @@ protected:
     // mFabricFiltered is really only used by the attribute commands, but we end
     // up needing it in our class's shared code.
     chip::Optional<bool> mFabricFiltered;
+
+    CHIP_ERROR mError = CHIP_NO_ERROR;
 };
 
 class ReadAttribute : public ReportCommand

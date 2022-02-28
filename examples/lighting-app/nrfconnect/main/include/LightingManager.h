@@ -43,17 +43,17 @@ public:
 
     using LightingCallback_fn = void (*)(Action_t, int32_t);
 
-    int Init(const device * pwmDevice, uint32_t pwmChannel);
+    int Init(const device * pwmDevice, uint32_t pwmChannel, uint8_t minLevel, uint8_t maxLevel);
     bool IsTurnedOn() const { return mState == kState_On; }
     uint8_t GetLevel() const { return mLevel; }
     bool InitiateAction(Action_t aAction, int32_t aActor, uint16_t size, uint8_t * value);
     void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
 
 private:
-    static constexpr uint8_t kMaxLevel = 255;
-
     friend LightingManager & LightingMgr();
     State_t mState;
+    uint8_t mMinLevel;
+    uint8_t mMaxLevel;
     uint8_t mLevel;
     const device * mPwmDevice;
     uint32_t mPwmChannel;

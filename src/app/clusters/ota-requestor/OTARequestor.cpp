@@ -593,21 +593,19 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
 
     // Log the StateTransition event
-    Nullable<OTAUpdateStateEnum> previousState;
-    previousState.SetNonNull(mCurrentUpdateState);
     Nullable<uint32_t> targetSoftwareVersion;
     if ((newState == OTAUpdateStateEnum::kDownloading) || (newState == OTAUpdateStateEnum::kApplying) ||
         (newState == OTAUpdateStateEnum::kRollingBack))
     {
         targetSoftwareVersion.SetNonNull(mTargetVersion);
     }
-    OtaRequestorServerOnStateTransition(previousState, newState, reason, targetSoftwareVersion);
+    OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
     // Inform the driver that the OTARequestor has entered the kIdle state. A driver implementation
     // may choose to restart the default provider timer in this case
     if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
     {
-        // SL TODO: Make this API a general state change
+        // TODO: Make this API a general state change
         mOtaRequestorDriver->HandleIdleState();
     }
 

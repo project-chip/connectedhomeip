@@ -30,14 +30,14 @@ jobs:
 
         strategy:
             matrix:
-                type: [main, clang, mbedtls]
+                type: [main, clang, mbedtls, rotating_device_id]
         env:
             BUILD_TYPE: ${{ matrix.type }}
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.56
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -75,6 +75,7 @@ jobs:
                      "main") GN_ARGS='';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
+                     "rotating_device_id") GN_ARGS='chip_enable_rotating_device_id=true';;
                      *) ;;
                   esac
 

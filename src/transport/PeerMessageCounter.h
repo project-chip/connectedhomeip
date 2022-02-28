@@ -113,9 +113,9 @@ public:
 
         // 2. Counter Window check
         uint32_t offset = mSynced.mMaxCounter - counter;
-        if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        if (offset <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
         {
-            if ((offset == 0) || mSynced.mWindow.test(offset))
+            if ((offset == 0) || mSynced.mWindow.test(offset - 1))
             {
                 return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
             }
@@ -199,9 +199,16 @@ public:
     void CommitWithRollOver(uint32_t counter)
     {
         uint32_t offset = mSynced.mMaxCounter - counter;
-        if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        if (offset <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
         {
-            mSynced.mWindow.set(offset);
+
+            // Make sure that offset is never 0.
+            // This should not happen but we cannot guarantee it
+            // since this class doesn't own the call to this function
+            if (offset != 0)
+            {
+                mSynced.mWindow.set(offset - 1);
+            }
         }
         else
         {
@@ -215,8 +222,8 @@ public:
             else
             {
                 mSynced.mWindow <<= shift;
+                mSynced.mWindow.set(shift - 1);
             }
-            mSynced.mWindow.set(0);
         }
     }
 
@@ -279,7 +286,7 @@ private:
     {
         /*
          *  Past <--                --> Future
-         *             MaxCounter
+         *          MaxCounter - 1
          *                 |
          *                 v
          *  | <-- mWindow -->|

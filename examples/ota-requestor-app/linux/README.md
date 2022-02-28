@@ -119,7 +119,13 @@ out/chip-tool pairing onnetwork-long ${REQUESTOR_NODE_ID} 20202021 ${REQUESTOR_L
 There are two methods for this reference application to connect to a device
 running OTA Provider server and download a software image.
 
-### AnnounceOTAProvider Command
+If the ACL entry on the provider has not been properly installed, the QueryImage
+command will be denied. Follow instructions
+[here](https://github.com/project-chip/connectedhomeip/tree/master/examples/ota-provider-app/linux#access-control-requirements)
+to install. Note that this only needs to be done once. There is no need to write
+this ACL entry again unless the KVS store has been removed.
+
+### Trigger using AnnounceOTAProvider Command
 
 When the `AnnounceOTAProvider` command is received, it will trigger a QueryImage
 command to the provider specified in the command and start the OTA process.
@@ -176,7 +182,7 @@ The OTA Requestor application with node ID 0x1234567890 will process this
 command and send a QueryImage command to the OTA Provider with node ID
 0xDEADBEEF, as specified in the `AnnounceOTAProvider` command.
 
-### DefaultOTAProviders attribute
+### Trigger using DefaultOTAProviders attribute
 
 If one or more provider locations have been written to the `DefaultOTAProviders`
 attribute, this can be used to trigger a QueryImage command to a provider in the

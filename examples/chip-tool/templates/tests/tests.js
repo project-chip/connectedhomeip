@@ -18,7 +18,6 @@
 function getManualTests()
 {
   const DeviceDiscovery = [
-    'TestDiscovery',
     'Test_TC_DD_1_5',
     'Test_TC_DD_1_6',
     'Test_TC_DD_1_7',
@@ -449,6 +448,7 @@ function getTests()
     'TestClusterComplexTypes',
     'TestConstraints',
     'TestDelayCommands',
+    'TestDiscovery',
     'TestLogCommands',
     'TestSaveAs',
     'TestConfigVariables',

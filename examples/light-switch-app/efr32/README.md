@@ -103,13 +103,17 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip/examples/light-switch-app/efr32
           $ rm -rf out/
 
+*   Build the example with Matter shell
+
+          ./scripts/examples/gn_efr32_example.sh examples/light-switch-app/efr32/ out/light-switch-app BRD4161A chip_build_libshell=true
+
 *   Build the example as Sleepy End Device (SED)
 
           $ ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/efr32/ ./out/light-switch-app_SED BRD4161A --sed
 
     or use gn as previously mentioned but adding the following arguments:
 
-          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
+          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false chip_build_libshell=true'
 
 *   Build the example with pigweed RCP
 
@@ -251,7 +255,15 @@ combination with JLinkRTTClient as follows:
 
     **Push Button 1**
 
-    -   Sends a Toggle command to bound light app
+        -   Sends a Toggle command to bound light app
+
+    **Matter shell**
+
+        -   'switch on'    : Sends On command to bound device
+
+        -   'switch off'   : Sends Off command to bound device
+
+        -   'switch toggle : Sends Toggle command to bound device
 
 *   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
@@ -261,9 +273,11 @@ combination with JLinkRTTClient as follows:
     Here is an example with the CHIPTool:
 
     ```
-    chip-tool pairing ble-thread 1 hex:<operationalDataset> 73141520 3840
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-    chip-tool binding bind <light nodeid> 0 1 6 1 1
+    chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": null }]' <lighting-node-id> 0
+
+    chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6}]' 1 1
     ```
 
 ### Notes

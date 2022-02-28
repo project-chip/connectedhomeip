@@ -768,11 +768,38 @@ function ensureIsArray(value, options)
   }
 }
 
+function chip_tests_item_has_list(options)
+{
+  function hasList(args)
+  {
+    for (let i = 0; i < args.length; i++) {
+      if (args[i].isArray) {
+        return true;
+      }
+
+      if (args[i].isStruct && hasList(args[i].items)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  return assertCommandOrAttributeOrEvent(this).then(item => {
+    if (this.isWriteAttribute || this.isCommand) {
+      return hasList(item.arguments);
+    }
+
+    return false;
+  });
+}
+
 //
 // Module exports
 //
 exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
+exports.chip_tests_item_has_list            = chip_tests_item_has_list;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.chip_tests_pics                     = chip_tests_pics;

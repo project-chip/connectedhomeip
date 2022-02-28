@@ -36,9 +36,11 @@ An example RPC command:
   rpcs.chip.rpc.DeviceCommon.GetDeviceInfo()
 """
 
+import json
 import argparse
 from collections import namedtuple
 import logging
+import functools
 import sys
 from typing import Any, BinaryIO
 import socket
@@ -56,6 +58,7 @@ from pw_rpc.console_tools.console import ClientInfo, flattened_rpc_completions
 # Protos
 from attributes_service import attributes_service_pb2
 from button_service import button_service_pb2
+from descriptor_service import descriptor_service_pb2
 from device_service import device_service_pb2
 from echo_service import echo_pb2
 from lighting_service import lighting_service_pb2
@@ -73,6 +76,7 @@ SOCKET_PORT = 33000
 
 PROTOS = [attributes_service_pb2,
           button_service_pb2,
+          descriptor_service_pb2,
           device_service_pb2,
           echo_pb2,
           lighting_service_pb2,

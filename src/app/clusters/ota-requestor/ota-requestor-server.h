@@ -27,11 +27,10 @@ EmberAfStatus OtaRequestorServerSetUpdateStateProgress(chip::app::DataModel::Nul
 EmberAfStatus OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpointId,
                                                        chip::app::DataModel::Nullable<uint8_t> & value);
 
-void OtaRequestorServerOnStateTransition(
-    chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> previousState,
-    chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum newState,
-    chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason,
-    chip::app::DataModel::Nullable<uint32_t> const & targetSoftwareVersion);
+void OtaRequestorServerOnStateTransition(chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum previousState,
+                                         chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum newState,
+                                         chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason,
+                                         chip::app::DataModel::Nullable<uint32_t> const & targetSoftwareVersion);
 void OtaRequestorServerOnVersionApplied(uint32_t softwareVersion, uint16_t productId);
 void OtaRequestorServerOnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
                                        chip::app::DataModel::Nullable<uint8_t> progressPercent,

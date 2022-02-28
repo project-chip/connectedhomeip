@@ -56,9 +56,6 @@ if (chip_device_platform != "none") {
     # Enable including the additional data in the advertisement packets
     chip_enable_additional_data_advertising = false
 
-    # Enable adding optional rotating device id to the additional data.
-    chip_enable_rotating_device_id = false
-
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
     chip_stack_lock_tracking = "auto"
 
@@ -109,7 +106,6 @@ if (chip_device_platform != "none") {
       "CHIP_STACK_LOCK_TRACKING_ENABLED=${chip_stack_lock_tracking_log}",
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
       "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
-      "CHIP_ENABLE_ROTATING_DEVICE_ID=${chip_enable_rotating_device_id}",
       "CHIP_DEVICE_CONFIG_RUN_AS_ROOT=${chip_device_config_run_as_root}",
     ]
 
@@ -257,6 +253,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/setup_payload:additional_data_payload",
       "${chip_root}/src/system",
     ]
 
@@ -274,6 +271,7 @@ if (chip_device_platform != "none") {
       "../include/platform/ConfigurationManager.h",
       "../include/platform/ConnectivityManager.h",
       "../include/platform/DeviceControlServer.h",
+      "../include/platform/FailSafeContext.h",
       "../include/platform/GeneralUtils.h",
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
@@ -299,6 +297,7 @@ if (chip_device_platform != "none") {
       "DeviceControlServer.cpp",
       "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
+      "FailSafeContext.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",
       "LockTracker.cpp",

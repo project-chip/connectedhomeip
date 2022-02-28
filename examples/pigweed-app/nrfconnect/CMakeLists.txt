@@ -89,4 +89,9 @@ target_link_libraries(app PUBLIC
   pw_rpc.server
 )
 
+# Workaround cyclic dependency between nrf_security libraries)
+target_link_libraries(mbedcrypto_base PUBLIC
+  mbedcrypto
+)
+
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

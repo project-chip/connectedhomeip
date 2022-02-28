@@ -39,6 +39,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 {
     mHeaderParser.Init();
+    mContentHeaderParser.Init();
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_mcuboot_set_buf(mBuffer, sizeof(mBuffer))));
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_reset()));
 
@@ -107,6 +108,18 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
         mParams.totalFileBytes = header.mPayloadSize;
         mHeaderParser.Clear();
+    }
+
+    if (mContentHeaderParser.IsInitialized() && !block.empty())
+    {
+        OTAImageContentHeader header = {};
+        CHIP_ERROR error             = mContentHeaderParser.AccumulateAndDecode(block, header);
+
+        // Needs more data to decode the header
+        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(error);
+
+        mContentHeaderParser.Clear();
     }
 
     return CHIP_NO_ERROR;

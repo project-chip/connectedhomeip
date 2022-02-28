@@ -30,6 +30,7 @@ if (CONFIG_CHIP)
 include(ExternalProject)
 include(../../zephyr/ota-image.cmake)
 include(../../zephyr/zephyr-util.cmake)
+include(ota-content-header.cmake)
 
 # ==============================================================================
 # Declare configuration variables and define constants
@@ -105,11 +106,15 @@ endif()
 
 if (CONFIG_NORDIC_SECURITY_BACKEND)
     zephyr_include_directories_raw($<TARGET_PROPERTY:mbedtls_external,INTERFACE_INCLUDE_DIRECTORIES>)
-    zephyr_include_directories_raw($<TARGET_PROPERTY:mbedcrypto_includes,INTERFACE_INCLUDE_DIRECTORIES>)
+    zephyr_include_directories_raw($<TARGET_PROPERTY:mbedcrypto_common,INTERFACE_INCLUDE_DIRECTORIES>)
     if(TARGET platform_cc3xx)
         zephyr_include_directories_raw($<TARGET_PROPERTY:platform_cc3xx,INTERFACE_INCLUDE_DIRECTORIES>)
     endif()
     list(APPEND CHIP_CFLAGS -DMBEDTLS_CONFIG_FILE=<nrf-config.h>)
+endif()
+
+if (CONFIG_NRF_802154_RADIO_DRIVER)
+    zephyr_include_directories_raw($<TARGET_PROPERTY:nrf-802154-driver-interface,INTERFACE_INCLUDE_DIRECTORIES>)
 endif()
 
 zephyr_get_compile_flags(CHIP_CFLAGS_C C)
@@ -304,11 +309,32 @@ add_dependencies(chip chip-gn)
 # ==============================================================================
 
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-    chip_ota_image(chip-ota-image
-        INPUT_FILES ${PROJECT_BINARY_DIR}/app_update.bin
-        OUTPUT_FILE ${PROJECT_BINARY_DIR}/matter_ota.bin
+    if (CONFIG_CHIP_OTA_IMAGE_INCLUDE_MCUBOOT)
+        list(APPEND CHIP_IMAGE_TYPES "mcuboot")
+        list(APPEND CHIP_IMAGE_PATHS "${APPLICATION_BINARY_DIR}/mcuboot/zephyr/zephyr.bin")
+    endif()
+
+    list(APPEND CHIP_IMAGE_TYPES "app_mcuboot")
+    list(APPEND CHIP_IMAGE_PATHS "${PROJECT_BINARY_DIR}/app_update.bin")
+
+    if (CONFIG_NRF53_UPGRADE_NETWORK_CORE)
+        list(APPEND CHIP_IMAGE_TYPES "net_mcuboot")
+        list(APPEND CHIP_IMAGE_PATHS "${PROJECT_BINARY_DIR}/net_core_app_update.bin")
+    endif()
+
+    chip_ota_content_header(chip-ota-content-header
+        FILE_TYPES ${CHIP_IMAGE_TYPES}
+        FILE_PATHS ${CHIP_IMAGE_PATHS}
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}.content
     )
-    add_dependencies(chip-ota-image mcuboot_sign_target)
+
+    chip_ota_image(chip-ota-image
+        INPUT_FILES ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}.content ${CHIP_IMAGE_PATHS}
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
+    )
+
+    add_dependencies(chip-ota-content-header mcuboot_sign_target)
+    add_dependencies(chip-ota-image chip-ota-content-header)
 endif()
 
 endif() # CONFIG_CHIP
