@@ -25,16 +25,14 @@ class BdxOtaSender : public chip::bdx::Responder
 public:
     BdxOtaSender();
 
-    void SetFilepath(const char * path);
-
 private:
     // Inherited from bdx::TransferFacilitator
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
 
     void Reset();
 
-    static constexpr size_t kFilepathMaxLength = 256;
-    char mFilepath[kFilepathMaxLength];
+    // Null-terminated string representing file designator
+    char mFileDesignator[chip::bdx::kMaxFileDesignatorLen];
 
     uint32_t mNumBytesSent = 0;
 };

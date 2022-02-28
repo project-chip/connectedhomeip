@@ -298,6 +298,11 @@ public:
     uint64_t GetTransferLength() const { return mTransferLength; }
     uint16_t GetTransferBlockSize() const { return mTransferMaxBlockSize; }
     size_t GetNumBytesProcessed() const { return mNumBytesProcessed; }
+    const uint8_t * GetFileDesignator(uint16_t & fileDesignatorLen) const
+    {
+        fileDesignatorLen = mTransferRequestData.FileDesLength;
+        return mTransferRequestData.FileDesignator;
+    }
 
     TransferSession();
 
