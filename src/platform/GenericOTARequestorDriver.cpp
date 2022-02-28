@@ -40,7 +40,7 @@ namespace DeviceLayer {
 namespace {
 
 constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
-constexpr uint32_t kImmediateStartDelaySec = 1; // Delay before sending a query in response to UrgentUpdateAvailable
+constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
@@ -220,10 +220,7 @@ void GenericOTARequestorDriver::OTACommissioningCallback()
     ScheduleDelayedAction(
         System::Clock::Seconds32(kDelayQueryUponCommissioningSec),
         [](System::Layer *, void * context) { static_cast<OTARequestorDriver *>(context)->DriverSendQuery(); }, this);
-
 }
-
-
 
 void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
     const ProviderLocationType & providerLocation,
