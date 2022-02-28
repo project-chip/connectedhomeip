@@ -46,8 +46,8 @@ limitations under the License.
 
     <command source="server" code="0x01" name="ChangeChannelResponse" optional="false">
       <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
-      <arg name="channelMatch" type="ChannelInfo"/>
-      <arg name="status"       type="StatusEnum"/>
+      <arg name="status" type="StatusEnum"/>
+      <arg name="data"   type="CHAR_STRING" optional="true"/>
     </command>
 
   </cluster>
