@@ -122,10 +122,11 @@ public:
 
     void StartWiFiManagement();
     bool IsWiFiManagementStarted();
+    uint32_t GetDisconnectReason();
     CHIP_ERROR GetWiFiBssId(ByteSpan & value);
     CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
     CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
-    CHIP_ERROR GetConnectedNetwork(NetworkCommissioning::Network & network);
+    CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
 #endif
 

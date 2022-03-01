@@ -176,6 +176,25 @@ public:
     virtual NetworkIterator * GetNetworks() = 0;
 
     /**
+     * @brief Returns the status of last network operations (i.e. scan and attach attempts.) If no such attempts are conducted,
+     * CHIP_ERROR_KEY_NOT_FOUND will be returned.
+     */
+    virtual CHIP_ERROR GetLastNetworkingStatus(Status & status) { return CHIP_ERROR_KEY_NOT_FOUND; }
+
+    /**
+     * @brief Returns the Network ID of the last attach attempts. If no such attempts are conducted, CHIP_ERROR_KEY_NOT_FOUND will
+     * be returned. The callee can assume netwokrIDLen equals to or larger than kMaxNetworkIDLen, and should set it to the actual
+     * length of the network id.
+     */
+    virtual CHIP_ERROR GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen) { return CHIP_ERROR_KEY_NOT_FOUND; }
+
+    /**
+     * @brief Returns the driver specific error value of the last attach attempt. If no such attempts are conducted, or last attach
+     * attempt successfully finished, CHIP_ERROR_KEY_NOT_FOUND will be returned.
+     */
+    virtual CHIP_ERROR GetLastConnectErrorValue(uint32_t & value) { return CHIP_ERROR_KEY_NOT_FOUND; }
+
+    /**
      * @brief Sets the status of the interface, this is an optional feature of a network driver.
      */
     virtual CHIP_ERROR SetEnabled(bool enabled) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }

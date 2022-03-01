@@ -82,6 +82,10 @@ public:
     CHIP_ERROR Init() override;
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; } // Nothing to do on linux for shutdown.
 
+    CHIP_ERROR GetLastNetworkingStatus(Status & status) override;
+    CHIP_ERROR GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen) override;
+    CHIP_ERROR GetLastConnectErrorValue(uint32_t & value) override;
+
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
     uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
@@ -134,6 +138,9 @@ public:
     uint8_t GetMaxNetworks() override { return 1; }
     uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
     uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
+    CHIP_ERROR GetLastNetworkingStatus(Status & status) override;
+    CHIP_ERROR GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen) override;
+    CHIP_ERROR GetLastConnectErrorValue(uint32_t & value) override;
 
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;

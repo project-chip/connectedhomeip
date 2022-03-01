@@ -86,6 +86,9 @@ public:
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
     CHIP_ERROR Init() override;
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; } // Nothing to do on EFR32 for shutdown.
+    CHIP_ERROR GetLastNetworkingStatus(Status & status) override;
+    CHIP_ERROR GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen) override;
+    CHIP_ERROR GetLastConnectErrorValue(uint32_t & value) override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }

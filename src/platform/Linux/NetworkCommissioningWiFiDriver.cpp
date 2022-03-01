@@ -97,6 +97,64 @@ bool LinuxWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan network
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
+CHIP_ERROR LinuxWiFiDriver::GetLastNetworkingStatus(Status & status)
+{
+    Network configuredNetwork;
+
+    // If WiFi is not enabled, then we won't trying to connect to the AP, so we return null to the client.
+    VerifyOrReturnError(DeviceLayer::ConnectivityMgrImpl().IsWiFiStationEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
+
+    // If the WiFi station is not configured, then we won't trying to connect to any network.
+    // GetConfiguredNetwork will return CHIP_ERROR_KEY_NOT_FOUND when no networks are configured.
+    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork));
+
+    // If we have already connected to the WiFi AP, then return null to indicate a success state.
+    if (DeviceLayer::ConnectivityMgrImpl().IsWiFiStationConnected())
+    {
+        status = Status::kSuccess;
+        return CHIP_NO_ERROR;
+    }
+
+    // If we are not connected to the network, then LastConnectErrorValue will indicate the actual error value.
+    status = Status::kUnknownError;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LinuxWiFiDriver::GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen)
+{
+    Network configuredNetwork;
+    VerifyOrReturnError(networkIDLen != nullptr && networkID != nullptr && (*networkIDLen) >= sizeof(configuredNetwork.networkID),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    // If the WiFi station is not configured, then we won't trying to connect to any network.
+    // GetConfiguredNetwork will return CHIP_ERROR_KEY_NOT_FOUND when no networks are configured.
+    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork));
+    VerifyOrReturnError(configuredNetwork.networkIDLen <= *networkIDLen, CHIP_ERROR_INTERNAL);
+    memcpy(networkID, configuredNetwork.networkID, configuredNetwork.networkIDLen);
+    *networkIDLen = configuredNetwork.networkIDLen;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LinuxWiFiDriver::GetLastConnectErrorValue(uint32_t & value)
+{
+    Network configuredNetwork;
+
+    // If WiFi is not enabled, then we won't trying to connect to the AP, so we return null to the client.
+    VerifyOrReturnError(DeviceLayer::ConnectivityMgrImpl().IsWiFiStationEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
+
+    // If the WiFi station is not configured, then we won't trying to connect to any network.
+    // GetConfiguredNetwork will return CHIP_ERROR_KEY_NOT_FOUND when no networks are configured.
+    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork));
+
+    // If we have already connected to the WiFi AP, then return null to indicate a success state.
+    VerifyOrReturnError(!DeviceLayer::ConnectivityMgrImpl().IsWiFiStationConnected(), CHIP_ERROR_KEY_NOT_FOUND);
+
+    // DisconnectReason records the last 802.11 error value of the disconnection.
+    value = DeviceLayer::ConnectivityMgrImpl().GetDisconnectReason();
+    return CHIP_NO_ERROR;
+}
+
 Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
 {
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
@@ -186,12 +244,12 @@ bool LinuxWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     item.connected    = false;
     exhausted         = true;
 
-    Network connectedNetwork;
-    CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().GetConnectedNetwork(connectedNetwork);
+    Network configuredNetwork;
+    CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork);
     if (err == CHIP_NO_ERROR)
     {
-        if (connectedNetwork.networkIDLen == item.networkIDLen &&
-            memcmp(connectedNetwork.networkID, item.networkID, item.networkIDLen) == 0)
+        if (DeviceLayer::ConnectivityMgrImpl().IsWiFiStationConnected() && configuredNetwork.networkIDLen == item.networkIDLen &&
+            memcmp(configuredNetwork.networkID, item.networkID, item.networkIDLen) == 0)
         {
             item.connected = true;
         }
