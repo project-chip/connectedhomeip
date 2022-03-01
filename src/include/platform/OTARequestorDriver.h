@@ -115,9 +115,9 @@ public:
     /// to be executed before triggering the image update process
     virtual void SendQueryImage() = 0;
 
-    // Driver picks the OTA Provider that should be used for the next query and update. The Provider is picked according to 
-    // the driver's internal logic such as, for example, traversing the default providers list. 
-    // Returns true if there is a Provider available for the next query, returns false otherwise. 
+    // Driver picks the OTA Provider that should be used for the next query and update. The Provider is picked according to
+    // the driver's internal logic such as, for example, traversing the default providers list.
+    // Returns true if there is a Provider available for the next query, returns false otherwise.
     virtual bool
     DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) = 0;
 };
