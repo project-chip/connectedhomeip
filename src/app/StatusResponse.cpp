@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelTimeout.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/StatusResponse.h>
 
@@ -36,6 +37,7 @@ CHIP_ERROR StatusResponse::Send(Protocols::InteractionModel::Status aStatus, Mes
     response.Status(aStatus);
     ReturnErrorOnFailure(response.GetError());
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
+    apExchangeContext->SetResponseTimeout(kImMessageTimeout);
     ReturnErrorOnFailure(apExchangeContext->SendMessage(Protocols::InteractionModel::MsgType::StatusResponse, std::move(msgBuf),
                                                         aExpectResponse ? Messaging::SendMessageFlags::kExpectResponse
                                                                         : Messaging::SendMessageFlags::kNone));
@@ -47,14 +49,14 @@ CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && a
     StatusResponseMessage::Parser response;
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
-    ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(response.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(response.CheckSchemaValidity());
 #endif
     StatusIB status;
     ReturnErrorOnFailure(response.GetStatus(status.mStatus));
-    ChipLogProgress(InteractionModel, "Received status response, status is %" PRIu8, to_underlying(status.mStatus));
+    ChipLogProgress(InteractionModel, "Received status response, status is %u", to_underlying(status.mStatus));
+    ReturnErrorOnFailure(response.ExitContainer());
 
     if (status.mStatus == Protocols::InteractionModel::Status::Success)
     {

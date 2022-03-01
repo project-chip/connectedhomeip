@@ -54,7 +54,7 @@ public:
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
     CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                               PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
+                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
                                                PasscodeId passcodeID);
 
     void CloseCommissioningWindow();
@@ -106,12 +106,12 @@ private:
     uint8_t mFailedCommissioningAttempts = 0;
 
     bool mUseECM = false;
-    PASEVerifier mECMPASEVerifier;
+    Spake2pVerifier mECMPASEVerifier;
     uint16_t mECMDiscriminator = 0;
     PasscodeId mECMPasscodeID  = kDefaultCommissioningPasscodeId;
     uint32_t mECMIterations    = 0;
     uint32_t mECMSaltLength    = 0;
-    uint8_t mECMSalt[kPBKDFMaximumSaltLen];
+    uint8_t mECMSalt[kSpake2p_Max_PBKDF_Salt_Length];
 };
 
 } // namespace chip

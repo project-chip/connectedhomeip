@@ -200,6 +200,13 @@ def HostTargets():
 
                 yield variant_target
 
+    # Without extra build variants
+    yield targets[0].Extend('chip-cert', app=HostApp.CERT_TOOL)
+    yield targets[0].Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
+    yield targets[0].Extend('address-resolve-tool-clang', app=HostApp.ADDRESS_RESOLVE, use_clang=True).GlobBlacklist("Reduce default build variants")
+    yield targets[0].Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
+    yield targets[0].Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
+
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     for board in [HostBoard.NATIVE, HostBoard.FAKE]:
         yield test_target.Extend(board.BoardName() + '-tests', board=board, app=HostApp.TESTS)
@@ -224,6 +231,7 @@ def Esp32Targets():
     yield devkitc.Extend('lock', app=Esp32App.LOCK)
     yield devkitc.Extend('bridge', app=Esp32App.BRIDGE)
     yield devkitc.Extend('temperature-measurement', app=Esp32App.TEMPERATURE_MEASUREMENT)
+    yield devkitc.Extend('temperature-measurement-rpc', app=Esp32App.TEMPERATURE_MEASUREMENT, enable_rpcs=True)
 
     yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
 
@@ -251,6 +259,7 @@ def Efr32Targets():
 
     for board_target in board_targets:
         yield board_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
+        yield board_target.Extend('switch', app=Efr32App.SWITCH)
         yield board_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
 
         rpc_aware_targets = [

@@ -48,7 +48,6 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/barrier-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/window-covering-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning-old"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/color-control-server"
@@ -161,6 +160,17 @@ pw_proto_library(button_service
     pw_protobuf.common_protos
 )
 
+pw_proto_library(descriptor_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/descriptor_service.proto
+  PREFIX
+    descriptor_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
 pw_proto_library(device_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/device_service.proto
@@ -198,20 +208,21 @@ pw_proto_library(locking_service
 
 pw_proto_library(wifi_service
   SOURCES
-    ${CHIP_ROOT}/examples/ipv6only-app/common/wifi_service/wifi_service.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/wifi_service.proto
   INPUTS
-    ${CHIP_ROOT}/examples/ipv6only-app/common/wifi_service/wifi_service.options
+    ${CHIP_ROOT}/examples/common/pigweed/protos/wifi_service.options
   PREFIX
     wifi_service
   DEPS
     pw_protobuf.common_protos
   STRIP_PREFIX
-    ${CHIP_ROOT}/examples/ipv6only-app/common/wifi_service
+    ${CHIP_ROOT}/examples/common/pigweed/protos
 )
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC
   attributes_service.nanopb_rpc
   button_service.nanopb_rpc
+  descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
   lighting_service.nanopb_rpc
   locking_service.nanopb_rpc
@@ -234,9 +245,11 @@ target_link_options(${COMPONENT_LIB}
 target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
                        "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
                        "-DPW_RPC_LOCKING_SERVICE=1"
-                       "-DPW_RPC_TRACING_SERVICE=1")
+                       "-DPW_RPC_TRACING_SERVICE=1"
+                       "-DPW_RPC_WIFI_SERVICE=1")
 
 endif (CONFIG_ENABLE_PW_RPC)

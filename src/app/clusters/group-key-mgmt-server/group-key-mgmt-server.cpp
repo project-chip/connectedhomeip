@@ -72,7 +72,7 @@ struct GroupTableCodec
 
     auto GetFabricIndex() const { return mFabric; }
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
     {
         TLV::TLVType outer;
         ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));

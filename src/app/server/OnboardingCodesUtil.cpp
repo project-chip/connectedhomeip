@@ -79,7 +79,8 @@ void PrintOnboardingCodes(const chip::SetupPayload & payload)
         ChipLogError(AppServer, "Getting manual pairing code failed!");
     }
 
-    if (GetLongManualPairingCode(manualPairingCode, payload) == CHIP_NO_ERROR)
+    // Hand a copy of the payload to GetLongManualPairingCode.
+    if (GetLongManualPairingCode(manualPairingCode, chip::SetupPayload(payload)) == CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "Long manual pairing code: [%s]", manualPairingCode.c_str());
     }
@@ -202,13 +203,14 @@ CHIP_ERROR GetLongManualPairingCode(std::string & aLongManualPairingCode, chip::
         ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
         return err;
     }
-    // TODO: Why is this being set to custom?
-    payload.commissioningFlow = chip::CommissioningFlow::kCustom;
-    return GetLongManualPairingCode(aLongManualPairingCode, payload);
+    return GetLongManualPairingCode(aLongManualPairingCode, std::move(payload));
 }
 
-CHIP_ERROR GetLongManualPairingCode(std::string & aLongManualPairingCode, const chip::SetupPayload & payload)
+CHIP_ERROR GetLongManualPairingCode(std::string & aLongManualPairingCode, chip::SetupPayload && payload)
 {
+    // To get payloadDecimalStringRepresentation to produce a long manual
+    // pairing code, the commissioning flow in the payload needs to be kCustom.
+    payload.commissioningFlow = chip::CommissioningFlow::kCustom;
 
     CHIP_ERROR err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aLongManualPairingCode);
     if (err != CHIP_NO_ERROR)

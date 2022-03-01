@@ -225,6 +225,50 @@ public class ChipStructs {
     }
   }
 
+  public static class BindingClusterTargetStruct {
+    public Integer fabricIndex;
+    public Optional<Long> node;
+    public Optional<Integer> group;
+    public Optional<Integer> endpoint;
+    public Optional<Long> cluster;
+
+    public BindingClusterTargetStruct(
+        Integer fabricIndex,
+        Optional<Long> node,
+        Optional<Integer> group,
+        Optional<Integer> endpoint,
+        Optional<Long> cluster) {
+      this.fabricIndex = fabricIndex;
+      this.node = node;
+      this.group = group;
+      this.endpoint = endpoint;
+      this.cluster = cluster;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("BindingClusterTargetStruct {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("\tnode: ");
+      output.append(node);
+      output.append("\n");
+      output.append("\tgroup: ");
+      output.append(group);
+      output.append("\n");
+      output.append("\tendpoint: ");
+      output.append(endpoint);
+      output.append("\n");
+      output.append("\tcluster: ");
+      output.append(cluster);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class BridgedActionsClusterActionStruct {
     public Integer actionID;
     public String name;
@@ -672,24 +716,30 @@ public class ChipStructs {
 
   public static class GeneralDiagnosticsClusterNetworkInterfaceType {
     public String name;
-    public Boolean fabricConnected;
+    public Boolean isOperational;
     public @Nullable Boolean offPremiseServicesReachableIPv4;
     public @Nullable Boolean offPremiseServicesReachableIPv6;
     public byte[] hardwareAddress;
+    public ArrayList<byte[]> IPv4Addresses;
+    public ArrayList<byte[]> IPv6Addresses;
     public Integer type;
 
     public GeneralDiagnosticsClusterNetworkInterfaceType(
         String name,
-        Boolean fabricConnected,
+        Boolean isOperational,
         @Nullable Boolean offPremiseServicesReachableIPv4,
         @Nullable Boolean offPremiseServicesReachableIPv6,
         byte[] hardwareAddress,
+        ArrayList<byte[]> IPv4Addresses,
+        ArrayList<byte[]> IPv6Addresses,
         Integer type) {
       this.name = name;
-      this.fabricConnected = fabricConnected;
+      this.isOperational = isOperational;
       this.offPremiseServicesReachableIPv4 = offPremiseServicesReachableIPv4;
       this.offPremiseServicesReachableIPv6 = offPremiseServicesReachableIPv6;
       this.hardwareAddress = hardwareAddress;
+      this.IPv4Addresses = IPv4Addresses;
+      this.IPv6Addresses = IPv6Addresses;
       this.type = type;
     }
 
@@ -700,8 +750,8 @@ public class ChipStructs {
       output.append("\tname: ");
       output.append(name);
       output.append("\n");
-      output.append("\tfabricConnected: ");
-      output.append(fabricConnected);
+      output.append("\tisOperational: ");
+      output.append(isOperational);
       output.append("\n");
       output.append("\toffPremiseServicesReachableIPv4: ");
       output.append(offPremiseServicesReachableIPv4);
@@ -711,6 +761,12 @@ public class ChipStructs {
       output.append("\n");
       output.append("\thardwareAddress: ");
       output.append(Arrays.toString(hardwareAddress));
+      output.append("\n");
+      output.append("\tIPv4Addresses: ");
+      output.append(IPv4Addresses);
+      output.append("\n");
+      output.append("\tIPv6Addresses: ");
+      output.append(IPv6Addresses);
       output.append("\n");
       output.append("\ttype: ");
       output.append(type);

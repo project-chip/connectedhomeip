@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,6 +66,26 @@ public:
     // Send NotifyUpdateApplied, update Basic cluster SoftwareVersion attribute, log the VersionApplied event
     void NotifyUpdateApplied(uint32_t version) override;
 
+    // Get image update progress in percents unit
+    CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
+
+    // Get requestor state
+    CHIP_ERROR GetState(EndpointId endpointId, app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) override;
+
+    // Application directs the Requestor to cancel image update in progress. All the Requestor state is
+    // cleared, UpdateState is reset to Idle
+    void CancelImageUpdate() override;
+
+    // Clear all entries with the specified fabric index in the default OTA provider list
+    CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
+
+    // Add a default OTA provider to the cached list
+    CHIP_ERROR AddDefaultOtaProvider(
+        const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) override;
+
+    // Retrieve an iterator to the cached default OTA provider list
+    ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
+
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
                                 app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason) override;
@@ -96,41 +116,33 @@ public:
     }
 
     /**
-     * Called to establish a session to mProviderNodeId on mProviderFabricIndex. This must be called from the same externally
+     * Called to establish a session to mProviderLocation. This must be called from the same externally
      * synchronized context as any other Matter stack method.
      *
      * @param onConnectedAction  The action to take once session to provider has been established
      */
     void ConnectToProvider(OnConnectedAction onConnectedAction);
 
-    // Get image update progress in percents unit
-    CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
-
-    // Get requestor state
-    CHIP_ERROR GetState(EndpointId endpointId, app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) override;
+    /**
+     * Called to set optional requestorCanConsent value provided by Requestor.
+     */
+    void SetRequestorCanConsent(bool requestorCanConsent) { mRequestorCanConsent.SetValue(requestorCanConsent); }
 
     /**
-     * Called to indicate test mode. This is when the Requestor is used as a test tool and the the provider parameters are supplied
-     * explicitly.
+     * Set the OTA provider location to use for the next query
      */
-    void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) override
-    {
-        mProviderNodeId      = nodeId;
-        mProviderFabricIndex = fabIndex;
-        mProviderEndpointId  = endpointId;
-    }
+    bool
+    SetCurrentProviderLocation(const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation);
 
-    // Application directs the Requestor to cancel image update in progress. All the Requestor state is
-    // cleared, UpdateState is reset to Idle
-    void CancelImageUpdate() override;
-
-    // Application notifies the Requestor on the user consent action, TRUE if consent is given,
-    // FALSE otherwise
-    void OnUserConsent(bool result);
+    /**
+     * Clear the OTA provider location to indicate no OTA update may be in progress
+     */
+    bool ClearCurrentProviderLocation(void);
 
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
+    using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     using OTAUpdateStateEnum               = app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
     using OTAChangeReasonEnum              = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
 
@@ -267,9 +279,6 @@ private:
     static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
-    NodeId mProviderNodeId                    = kUndefinedNodeId;      // Only valid for the current update in progress
-    FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex; // Only valid for the current update in progress
-    EndpointId mProviderEndpointId            = kRootEndpointId;       // Only valid for the current update in progress
     uint32_t mOtaStartDelayMs                 = 0;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;
@@ -282,6 +291,9 @@ private:
     uint32_t mTargetVersion                = 0;
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
     Server * mServer                       = nullptr;
+    chip::Optional<bool> mRequestorCanConsent;
+    ProviderLocationList mDefaultOtaProviderList;
+    Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current update in progress
 };
 
 } // namespace chip

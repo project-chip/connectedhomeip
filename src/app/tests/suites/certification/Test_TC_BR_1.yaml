@@ -1,0 +1,112 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 25.1.1. [TC-BR-1] Basics of bridging
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "1: check claimed device types"
+      disabled: true
+
+    - label:
+          "Read attribute DeviceTypeList of the Descriptor cluster on endpoint 0"
+      disabled: true
+
+    - label: "2: check present endpoints, and search bridged devices"
+      disabled: true
+
+    - label: "Read attribute PartsList of the Descriptor cluster on endpoint 0"
+      disabled: true
+
+    - label:
+          "For each of the endpoints found in this PartsList attribute, read the
+          DeviceTypeList attribute in the Descriptor cluster on such endpoint,
+          and select those endpoints which have (at least) a device type of
+          Bridged Node in their DeviceTypeList"
+      disabled: true
+
+    - label: "3: check Bridged Device Basic Information cluster"
+      disabled: true
+
+    - label:
+          "For each of the endpoints for the bridged devices found in step 2b,
+          perform the tests for Bridged Device Basic Information cluster"
+      disabled: true
+
+    - label: "4: check battery information for bridged devices"
+      disabled: true
+
+    - label:
+          "For each of the endpoints found in step 2b, if a Power Source
+          Configuration cluster is present on this endpoint, perform the tests
+          for this Power Source Configuration cluster plus the tests for the
+          Power Source clusters at the endpoint(s) which this Power Source
+          Configuration cluster refers to"
+      disabled: true
+
+    - label: "5: collect device types of bridged devices"
+      disabled: true
+
+    - label:
+          "For each of the endpoints found in step 2b, from the DeviceTypeList
+          attributute in their Descriptor cluster, derive the (application)
+          device type(s) of the bridged device"
+      disabled: true
+
+    - label: "6: Set the state of a bridged device (actuator)"
+      disabled: true
+
+    - label:
+          "From the list acquired in step 5, choose one of the bridged devices
+          which is an actuator (e.g. light, window covering)"
+      disabled: true
+
+    - label:
+          "Read the state of this bridged device (through Matter), e.g. on/off,
+          brightness"
+      disabled: true
+
+    - label:
+          "Change the state of this bridged device (through Matter), e.g. change
+          its brightness"
+      disabled: true
+
+    - label: "Read the state of this bridged device (through Matter), as in 6b"
+      disabled: true
+
+    - label: "7: Read the state of a bridged device (sensor)"
+      disabled: true
+
+    - label:
+          "From the list acquired in step 5, choose one of the bridged devices
+          which is a sensor (e.g. occupancy sensor, contact sensor, temperature
+          sensor)"
+      disabled: true
+
+    - label:
+          "Read the state of this bridged device (through Matter), e.g.
+          occupancy status, contact status, current temperature"
+      disabled: true
+
+    - label:
+          "Change the state of this sensor (e.g. cover the occupancy sensor,
+          open the contact sensor, heat the temperature sensor)"
+      disabled: true
+
+    - label: "Read the state of this bridged device again, as in 7b"
+      disabled: true

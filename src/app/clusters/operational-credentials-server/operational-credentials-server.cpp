@@ -47,6 +47,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceControlServer.h>
 #include <string.h>
 
 using namespace chip;
@@ -55,11 +56,13 @@ using namespace ::chip::Transport;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
+using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
 CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
                            uint8_t index, const CharSpan & debug_text);
+OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err);
 
 constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
@@ -74,7 +77,7 @@ CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(FabricIndex fabricI
     ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
     ReturnErrorOnFailure(Access::GetAccessControl().CreateEntry(nullptr, entry));
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: ACL entry created for Fabric %" PRIX8 " CASE Admin NodeId 0x" ChipLogFormatX64,
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: ACL entry created for Fabric %X CASE Admin NodeId 0x" ChipLogFormatX64,
                    fabricIndex, ChipLogValueX64(subject));
 
     // TODO: event notification for newly created ACL entry
@@ -209,7 +212,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePat
     case Attributes::CommissionedFabrics::Id: {
         return ReadCommissionedFabrics(aPath.mEndpointId, aEncoder);
     }
-    case Attributes::FabricsList::Id: {
+    case Attributes::Fabrics::Id: {
         return ReadFabricsList(aPath.mEndpointId, aEncoder);
     }
     case Attributes::TrustedRootCertificates::Id: {
@@ -270,7 +273,7 @@ void fabricListChanged()
 
     // Currently, we only manage FabricsList attribute in endpoint 0, OperationalCredentials cluster is always required to be on
     // EP0.
-    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::FabricsList::Id);
+    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
                                            OperationalCredentials::Attributes::CommissionedFabrics::Id);
 }
@@ -288,7 +291,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricId) override
     {
         printf("OpCredsFabricTableDelegate::OnFabricDeletedFromStorage\n");
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIu8 " was deleted from fabric storage.", fabricId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%u was deleted from fabric storage.", fabricId);
         fabricListChanged();
 
         // The Leave event SHOULD be emitted by a Node prior to permanently
@@ -310,7 +313,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     void OnFabricRetrievedFromStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric 0x%" PRIu8 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
+                       "OpCreds: Fabric 0x%u was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
@@ -321,8 +324,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     void OnFabricPersistedToStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric %" PRIX8 " was persisted to storage. FabricId " ChipLogFormatX64
-                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       "OpCreds: Fabric %X was persisted to storage. FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64
+                       ", VendorId 0x%04" PRIX16,
                        fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
@@ -419,28 +422,39 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
                                                                    const app::ConcreteCommandPath & commandPath,
                                                                    const Commands::UpdateFabricLabel::DecodableType & commandData)
 {
-    auto & Label = commandData.label;
+    auto & Label        = commandData.label;
+    auto ourFabricIndex = commandObj->GetAccessingFabricIndex();
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+    {
+        if (fabricInfo.GetFabricLabel().data_equal(Label) && fabricInfo.GetFabricIndex() != ourFabricIndex)
+        {
+            ChipLogError(Zcl, "Fabric label already in use");
+            SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kLabelConflict, ourFabricIndex, CharSpan());
+            return true;
+        }
+    }
+
     CHIP_ERROR err;
 
     // Fetch current fabric
     FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
-    VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_FABRIC_ID);
 
     // Set Label on fabric
     err = fabric->SetFabricLabel(Label);
-    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    SuccessOrExit(err);
 
     // Persist updated fabric
     err = Server::GetInstance().GetFabricTable().Store(fabric->GetFabricIndex());
-    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    SuccessOrExit(err);
 
 exit:
     fabricListChanged();
-    emberAfSendImmediateDefaultResponse(status);
+
+    SendNOCResponse(commandObj, commandPath, ConvertToNOCResponseStatus(err), ourFabricIndex, CharSpan());
     return true;
 }
 
@@ -515,6 +529,20 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
 
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+
+    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
+        return true;
+    }
+
+    if (failSafeContext.NocCommandHasBeenInvoked())
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::ConstraintError));
+        return true;
+    }
+
     err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
@@ -539,6 +567,10 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();
+
+    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
+    // Index just allocated.
+    failSafeContext.SetNocCommandInvoked(fabricIndex);
 
 exit:
 
@@ -571,6 +603,20 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: an administrator requested an update to the NOC");
 
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+
+    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
+        return true;
+    }
+
+    if (failSafeContext.NocCommandHasBeenInvoked())
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::ConstraintError));
+        return true;
+    }
+
     // Fetch current fabric
     FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
@@ -588,6 +634,10 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     // might be on the operational network already, in which case we are
     // expected to be live with our new identity at this point.
     app::DnssdServer::Instance().AdvertiseOperational();
+
+    // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
+    // Index associated with the UpdateNOC command being invoked.
+    failSafeContext.SetNocCommandInvoked(fabricIndex);
 
 exit:
 
@@ -723,6 +773,14 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
     MutableByteSpan nocsrElementsSpan;
 
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+
+    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
+        return true;
+    }
+
     auto & CSRNonce = commandData.CSRNonce;
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -802,6 +860,14 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
+
+    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+
+    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
+        return true;
+    }
 
     // TODO: Ensure we do not duplicate roots in storage, and detect "same key, different cert" errors
     // TODO: Validate cert signature prior to setting.

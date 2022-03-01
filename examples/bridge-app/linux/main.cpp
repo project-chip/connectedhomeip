@@ -211,6 +211,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceTyp
             EmberAfStatus ret;
             while (1)
             {
+                dev->SetEndpointId(gCurrentEndpointId);
                 ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT,
                                                 dataVersionStorage);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)

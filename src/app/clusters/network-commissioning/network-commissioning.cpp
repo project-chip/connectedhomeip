@@ -28,6 +28,11 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::NetworkCommissioning;
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -64,11 +69,11 @@ NetworkCommissioning::WiFiBand ToClusterObjectEnum(DeviceLayer::NetworkCommissio
     using ClusterObject     = NetworkCommissioning::WiFiBand;
     using PlatfromInterface = DeviceLayer::NetworkCommissioning::WiFiBand;
 
-    static_assert(to_underlying(ClusterObject::k2g4) == to_underlying(PlatfromInterface::k2g4), "k2g4 valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k3g65) == to_underlying(PlatfromInterface::k3g65), "k3g65 valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k5g) == to_underlying(PlatfromInterface::k5g), "k5g valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k6g) == to_underlying(PlatfromInterface::k6g), "k6g valus mismatch.");
-    static_assert(to_underlying(ClusterObject::k60g) == to_underlying(PlatfromInterface::k60g), "k60g valus mismatch.");
+    static_assert(to_underlying(ClusterObject::k2g4) == to_underlying(PlatfromInterface::k2g4), "k2g4 value mismatch.");
+    static_assert(to_underlying(ClusterObject::k3g65) == to_underlying(PlatfromInterface::k3g65), "k3g65 value mismatch.");
+    static_assert(to_underlying(ClusterObject::k5g) == to_underlying(PlatfromInterface::k5g), "k5g value mismatch.");
+    static_assert(to_underlying(ClusterObject::k6g) == to_underlying(PlatfromInterface::k6g), "k6g value mismatch.");
+    static_assert(to_underlying(ClusterObject::k60g) == to_underlying(PlatfromInterface::k60g), "k60g value mismatch.");
 
     return static_cast<ClusterObject>(to_underlying(band));
 }
@@ -82,6 +87,9 @@ CHIP_ERROR Instance::Init()
     ReturnErrorOnFailure(
         DeviceLayer::PlatformMgrImpl().AddEventHandler(_OnCommissioningComplete, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init());
+    mLastNetworkingStatusValue.SetNull();
+    mLastConnectErrorValue.SetNull();
+    mLastNetworkIDLen = 0;
     return CHIP_NO_ERROR;
 }
 
@@ -194,15 +202,21 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::InterfaceEnabled::Id:
         return aEncoder.Encode(mpBaseDriver->GetEnabled());
 
-    // TODO: Add support to the following attributes
     case Attributes::LastNetworkingStatus::Id:
-        return aEncoder.Encode(NetworkCommissioningStatus::kSuccess);
+        return aEncoder.Encode(mLastNetworkingStatusValue);
 
     case Attributes::LastNetworkID::Id:
-        return aEncoder.Encode(ByteSpan());
+        if (mLastNetworkIDLen == 0)
+        {
+            return aEncoder.EncodeNull();
+        }
+        else
+        {
+            return aEncoder.Encode(ByteSpan(mLastNetworkID, mLastNetworkIDLen));
+        }
 
     case Attributes::LastConnectErrorValue::Id:
-        return aEncoder.Encode(Attributes::LastConnectErrorValue::TypeInfo::Type(0));
+        return aEncoder.Encode(mLastConnectErrorValue);
 
     case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mFeatureFlags);
@@ -230,12 +244,12 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
 
     if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
     {
-        mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
+        mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(req.ssid, this);
     }
     else if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
     {
-        mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
+        mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<ThreadDriver *>()->ScanNetworks(this);
     }
     else
@@ -267,7 +281,16 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
-    mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
+    if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
+        return;
+    }
+
+    mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
+    memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
+
+    mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 }
 
@@ -294,6 +317,12 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
     response.debugText        = errorText;
     response.errorValue       = interfaceStatus;
     commandHandle->AddResponseData(mPath, response);
+
+    mLastNetworkIDLen = mConnectingNetworkIDLen;
+    memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(commissioningError));
+    mLastConnectErrorValue.SetNonNull(interfaceStatus);
+
     if (commissioningError == Status::kSuccess)
     {
         // TODO: Pass the actual network id to device control server.
@@ -312,6 +341,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
         // We may receive the callback after it and should make it noop.
         return;
     }
+
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(status));
+    mLastConnectErrorValue.SetNull();
+    mLastNetworkIDLen = 0;
 
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
@@ -367,6 +400,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
         return;
     }
 
+    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(status));
+    mLastConnectErrorValue.SetNull();
+    mLastNetworkIDLen = 0;
+
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
     WiFiScanResponse scanResponse;
@@ -414,7 +451,7 @@ void Instance::_OnCommissioningComplete(const DeviceLayer::ChipDeviceEvent * eve
 {
     Instance * this_ = reinterpret_cast<Instance *>(arg);
     VerifyOrReturn(event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete);
-    this_->OnCommissioningComplete(event->CommissioningComplete.status);
+    this_->OnCommissioningComplete(event->CommissioningComplete.Status);
 }
 
 void Instance::OnCommissioningComplete(CHIP_ERROR err)
@@ -433,7 +470,70 @@ void Instance::OnCommissioningComplete(CHIP_ERROR err)
     }
 }
 
+bool NullNetworkDriver::GetEnabled()
+{
+    // Disable the interface and it cannot be enabled since there are no physical interfaces.
+    return false;
+}
+
+uint8_t NullNetworkDriver::GetMaxNetworks()
+{
+    // The minimal value of MaxNetworks should be 1 per spec.
+    return 1;
+}
+
+DeviceLayer::NetworkCommissioning::NetworkIterator * NullNetworkDriver::GetNetworks()
+{
+    // Instance::Read accepts nullptr as an empty NetworkIterator.
+    return nullptr;
+}
+
 } // namespace NetworkCommissioning
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// These functions are ember interfaces, they should never be implemented since all network commissioning cluster functions are
+// implemented in NetworkCommissioning::Instance.
+bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::AddOrUpdateThreadNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::AddOrUpdateWiFiNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterConnectNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::ConnectNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                             const Commands::RemoveNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                            const Commands::ScanNetworks::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterReorderNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::ReorderNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+void MatterNetworkCommissioningPluginServerInitCallback()
+{
+    // Nothing to do, the server init routine will be done in Instance::Init()
+}

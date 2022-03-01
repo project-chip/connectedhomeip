@@ -376,7 +376,9 @@ void WindowAppImpl::UpdateLEDs()
         NPercent100ths current;
         LimitStatus liftLimit = LimitStatus::Intermediate;
 
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
         Attributes::CurrentPositionLiftPercent100ths::Get(cover.mEndpoint, current);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
         if (!current.IsNull())
         {
@@ -413,12 +415,16 @@ void WindowAppImpl::UpdateLCD()
     if (mState.isWiFiProvisioned)
 #endif
     {
-        Cover & cover      = GetCover();
-        EmberAfWcType type = TypeGet(cover.mEndpoint);
+        Cover & cover = GetCover();
         chip::app::DataModel::Nullable<uint16_t> lift;
         chip::app::DataModel::Nullable<uint16_t> tilt;
+
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        EmberAfWcType type = TypeGet(cover.mEndpoint);
+
         Attributes::CurrentPositionLift::Get(cover.mEndpoint, lift);
         Attributes::CurrentPositionTilt::Get(cover.mEndpoint, tilt);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
         if (!tilt.IsNull() && !lift.IsNull())
         {

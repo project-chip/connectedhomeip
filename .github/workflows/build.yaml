@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.56
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -70,7 +70,7 @@ jobs:
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
-              timeout-minutes: 2
+              timeout-minutes: 5
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
@@ -97,13 +97,13 @@ jobs:
               run: scripts/run_in_build_env.sh "ninja -C ./out"
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, mbedtls, simulated)
-        timeout-minutes: 90
+        timeout-minutes: 120 
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.56
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -154,7 +154,7 @@ jobs:
                       case $BUILD_TYPE in
                           "fake") GN_ARGS='chip_device_platform="fake"';;
                           "gcc_release") GN_ARGS='is_debug=false';;
-                          "clang") GN_ARGS='is_clang=true';;
+                          "clang") GN_ARGS='is_clang=true pw_command_launcher="`pwd`/../scripts/helpers/clang-tidy-launcher.py"';;
                           "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
                       esac
 
@@ -226,7 +226,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.56
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -317,7 +317,7 @@ jobs:
               run: |
                   for BUILD_TYPE  in clang python_lib; do
                       case $BUILD_TYPE in
-                          "clang") GN_ARGS='is_clang=true target_os="all" is_asan=true';;
+                          "clang") GN_ARGS='is_clang=true target_os="all" is_asan=true pw_command_launcher="`pwd`/../scripts/helpers/clang-tidy-launcher.py"';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
                       scripts/build/gn_gen.sh --args="$GN_ARGS"

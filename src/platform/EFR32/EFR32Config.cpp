@@ -536,11 +536,12 @@ CHIP_ERROR EFR32Config::FactoryResetConfig(void)
     err = ForEachRecord(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig, false,
                         [](const Key & nvm3Key, const size_t & length) -> CHIP_ERROR {
                             CHIP_ERROR err2;
-
-                            err2 = ClearConfigValue(nvm3Key);
+                            // Delete the nvm3 object with the given key id.
+                            err2 = MapNvm3Error(nvm3_deleteObject(&handle, nvm3Key));
                             SuccessOrExit(err2);
 
                         exit:
+                            nvm3_close(&handle);
                             return err2;
                         });
 

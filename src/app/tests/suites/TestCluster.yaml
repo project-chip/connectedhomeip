@@ -15,6 +15,7 @@
 name: Test Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Test Cluster"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Send Test Command"
       command: "test"
@@ -606,13 +611,13 @@ tests:
       command: "writeAttribute"
       attribute: "float_double"
       arguments:
-          value: 1.7e200
+          value: "1.7e+200"
 
     - label: "Read attribute DOUBLE large Value"
       command: "readAttribute"
       attribute: "float_double"
       response:
-          value: 1.7e200
+          value: "1.7e+200"
 
     - label: "Write attribute DOUBLE small Value"
       command: "writeAttribute"
@@ -2889,7 +2894,7 @@ tests:
       command: "subscribeAttribute"
       attribute: "list_int8u"
       minInterval: 2
-      maxInterval: 10
+      maxInterval: 5
       response:
           value: [1, 2, 3, 4]
 

@@ -210,14 +210,14 @@ void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 
 void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
 {
-    mReadHandlers.ReleaseObject(&apReadObj);
-
     //
     // Deleting an item can shift down the contents of the underlying pool storage,
-    // rendering any tracker using positional indexes invalid. Let's reset it and
-    // have it start from index 0.
+    // rendering any tracker using positional indexes invalid. Let's reset it,
+    // based on which readHandler we are getting rid of.
     //
-    mReportingEngine.ResetReadHandlerTracker();
+    mReportingEngine.ResetReadHandlerTracker(&apReadObj);
+
+    mReadHandlers.ReleaseObject(&apReadObj);
 }
 
 CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -257,7 +257,6 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         bool keepExistingSubscriptions = true;
 
         reader.Init(aPayload.Retain());
-        ReturnErrorOnFailure(reader.Next());
 
         SubscribeRequestMessage::Parser subscribeRequestParser;
         ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
@@ -274,7 +273,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
                 if (handler->IsFromSubscriber(*apExchangeContext))
                 {
                     ChipLogProgress(InteractionModel,
-                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %" PRIu8,
+                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
                                     ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
                                     apExchangeContext->GetSessionHandle()->GetFabricIndex());
                     mReadHandlers.ReleaseObject(handler);
@@ -371,13 +370,13 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
 {
     System::PacketBufferTLVReader reader;
     reader.Init(aPayload.Retain());
-    ReturnLogErrorOnFailure(reader.Next());
 
     ReportDataMessage::Parser report;
-    ReturnLogErrorOnFailure(report.Init(reader));
+    ReturnErrorOnFailure(report.Init(reader));
 
     uint64_t subscriptionId = 0;
-    ReturnLogErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
+    ReturnErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
+    ReturnErrorOnFailure(report.ExitContainer());
 
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {

@@ -2269,4 +2269,14 @@ limitations under the License.
             <include cluster="Temperature Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
+    <deviceType>
+        <name>MA-secondary-network-commissioning</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Secondary Network Commissioning Device Type</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0xF002</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
 </configurator>

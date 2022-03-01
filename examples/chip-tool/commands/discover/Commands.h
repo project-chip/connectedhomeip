@@ -22,56 +22,47 @@
 #include "DiscoverCommissionablesCommand.h"
 #include "DiscoverCommissionersCommand.h"
 #include <controller/DeviceAddressUpdateDelegate.h>
-#include <lib/dnssd/Resolver.h>
+#include <lib/address_resolve/AddressResolve.h>
 
-class Resolve : public DiscoverCommand, public chip::Dnssd::ResolverDelegate
+class Resolve : public DiscoverCommand, public chip::AddressResolve::NodeListener
 {
 public:
-    Resolve(CredentialIssuerCommands * credsIssuerConfig) : DiscoverCommand("resolve", credsIssuerConfig) {}
+    Resolve(CredentialIssuerCommands * credsIssuerConfig) : DiscoverCommand("resolve", credsIssuerConfig)
+    {
+        mNodeLookupHandle.SetListener(this);
+    }
 
     /////////// DiscoverCommand Interface /////////
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
-        ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager()));
-        chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
-        ChipLogProgress(chipTool, "Dnssd: Searching for NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
-        return chip::Dnssd::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetCompressedFabricId(fabricId),
-                                                               chip::Inet::IPAddressType::kAny,
-                                                               chip::Dnssd::Resolver::CacheBypass::On);
+        ReturnErrorOnFailure(chip::AddressResolve::Resolver::Instance().Init(&chip::DeviceLayer::SystemLayer()));
+
+        return chip::AddressResolve::Resolver::Instance().LookupNode(
+            chip::AddressResolve::NodeLookupRequest(chip::PeerId().SetNodeId(remoteId).SetCompressedFabricId(fabricId)),
+            mNodeLookupHandle);
     }
 
-    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override
+    void OnNodeAddressResolved(const PeerId & peerId, const chip::AddressResolve::ResolveResult & result) override
     {
         char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
 
-        ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Port: %" PRIu16, nodeData.mPeerId.GetNodeId(), nodeData.mPort);
-        ChipLogProgress(chipTool, "    Hostname: %s", nodeData.mHostName);
-        for (size_t i = 0; i < nodeData.mNumIPs; ++i)
-        {
-            nodeData.mAddress[i].ToString(addrBuffer);
-            ChipLogProgress(chipTool, "    addr %zu: %s", i, addrBuffer);
-        }
+        result.address.ToString(addrBuffer);
 
-        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
-
-        if (retryInterval.HasValue())
-            ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms", retryInterval.Value().count());
-
-        retryInterval = nodeData.GetMrpRetryIntervalActive();
-
-        if (retryInterval.HasValue())
-            ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms", retryInterval.Value().count());
-
-        ChipLogProgress(chipTool, "   Supports TCP: %s", nodeData.mSupportsTcp ? "yes" : "no");
+        ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " at %s", peerId.GetNodeId(), addrBuffer);
+        ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms", result.mrpConfig.mIdleRetransTimeout.count());
+        ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms", result.mrpConfig.mActiveRetransTimeout.count());
+        ChipLogProgress(chipTool, "   Supports TCP: %s", result.supportsTcp ? "yes" : "no");
         SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
+    void OnNodeAddressResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
     {
-        ChipLogProgress(chipTool, "NodeId Resolution: failed!");
+        ChipLogProgress(chipTool, "NodeId %" PRIu64 " Resolution: failed!", peerId.GetNodeId());
         SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     }
-    void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override {}
+
+private:
+    chip::AddressResolve::NodeLookupHandle mNodeLookupHandle;
 };
 
 class Update : public DiscoverCommand

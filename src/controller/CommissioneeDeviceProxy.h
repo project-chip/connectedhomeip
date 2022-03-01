@@ -156,8 +156,6 @@ public:
      *   Called when the associated session is released
      *
      *   The receiver should release all resources associated with the connection.
-     *
-     * @param session A handle to the secure session
      */
     void OnSessionReleased() override;
 
@@ -216,7 +214,7 @@ public:
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeMgr; }
 
-    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetSingleIPAddress(deviceAddr); }
+    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
     PASESession & GetPairing() { return mPairing; }
 

@@ -236,9 +236,11 @@ bool CheckForSuccess(GenericContext * context, const char * name, DNSServiceErro
         {
             switch (context->type)
             {
-            case ContextType::Register:
-                // Nothing special to do. Maybe ChipDnssdPublishService should take a callback ?
+            case ContextType::Register: {
+                RegisterContext * registerContext = reinterpret_cast<RegisterContext *>(context);
+                registerContext->callback(registerContext->context, nullptr, CHIP_ERROR_INTERNAL);
                 break;
+            }
             case ContextType::Browse: {
                 BrowseContext * browseContext = reinterpret_cast<BrowseContext *>(context);
                 browseContext->callback(browseContext->context, nullptr, 0, CHIP_ERROR_INTERNAL);
@@ -246,12 +248,12 @@ bool CheckForSuccess(GenericContext * context, const char * name, DNSServiceErro
             }
             case ContextType::Resolve: {
                 ResolveContext * resolveContext = reinterpret_cast<ResolveContext *>(context);
-                resolveContext->callback(resolveContext->context, nullptr, CHIP_ERROR_INTERNAL);
+                resolveContext->callback(resolveContext->context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 break;
             }
             case ContextType::GetAddrInfo: {
                 GetAddrInfoContext * resolveContext = reinterpret_cast<GetAddrInfoContext *>(context);
-                resolveContext->callback(resolveContext->context, nullptr, CHIP_ERROR_INTERNAL);
+                resolveContext->callback(resolveContext->context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 break;
             }
             }
@@ -275,9 +277,12 @@ static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErr
     VerifyOrReturn(CheckForSuccess(sdCtx, __func__, err));
 
     ChipLogDetail(DeviceLayer, "Mdns: %s name: %s, type: %s, domain: %s, flags: %d", __func__, name, type, domain, flags);
+
+    sdCtx->callback(sdCtx->context, type, CHIP_NO_ERROR);
 };
 
-CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, uint16_t port, TXTRecordRef * recordRef)
+CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t interfaceId, const char * type, const char * name,
+                    uint16_t port, TXTRecordRef * recordRef)
 {
     DNSServiceErrorType err;
     DNSServiceRef sdRef;
@@ -294,7 +299,7 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
         return CHIP_NO_ERROR;
     }
 
-    sdCtx = chip::Platform::New<RegisterContext>(type, nullptr);
+    sdCtx = chip::Platform::New<RegisterContext>(type, callback, context);
     err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, NULL, ntohs(port), recordLen,
                              recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
@@ -343,10 +348,13 @@ void OnBrowseRemove(BrowseContext * context, const char * name, const char * typ
 
     VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
 
-    std::remove_if(context->services.begin(), context->services.end(), [name, type, interfaceId](const DnssdService & service) {
-        return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol) &&
-            service.mInterface == interfaceId;
-    });
+    context->services.erase(std::remove_if(context->services.begin(), context->services.end(),
+                                           [name, type, interfaceId](const DnssdService & service) {
+                                               return strcmp(name, service.mName) == 0 &&
+                                                   type == GetFullType(service.mType, service.mProtocol) &&
+                                                   service.mInterface == interfaceId;
+                                           }),
+                            context->services.end());
 }
 
 static void OnBrowse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err, const char * name,
@@ -398,18 +406,35 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
 
     ChipLogDetail(DeviceLayer, "Mdns: %s hostname:%s", __func__, hostname);
 
+    chip::Inet::IPAddress ip;
+    CHIP_ERROR status = chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip);
+    if (status == CHIP_NO_ERROR)
+    {
+        sdCtx->addresses.push_back(ip);
+    }
+
+    if (flags & kDNSServiceFlagsMoreComing)
+    {
+        // Wait for that.
+        return;
+    }
+
     DnssdService service   = {};
     service.mPort          = sdCtx->port;
     service.mTextEntries   = sdCtx->textEntries.empty() ? nullptr : sdCtx->textEntries.data();
     service.mTextEntrySize = sdCtx->textEntries.empty() ? 0 : sdCtx->textEntries.size();
-    chip::Inet::IPAddress ip;
-    CHIP_ERROR status = chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip);
-    service.mAddress.SetValue(ip);
+    // Use the first IP we got for the DnssdService.
+    if (sdCtx->addresses.size() != 0)
+    {
+        service.mAddress.SetValue(sdCtx->addresses.front());
+        sdCtx->addresses.erase(sdCtx->addresses.begin());
+    }
     Platform::CopyString(service.mName, sdCtx->name);
     Platform::CopyString(service.mHostName, hostname);
     service.mInterface = Inet::InterfaceId(sdCtx->interfaceId);
 
-    sdCtx->callback(sdCtx->context, &service, status);
+    // TODO: Does it really make sense to pass in the status from our last "get the IP address" operation?
+    sdCtx->callback(sdCtx->context, &service, Span<Inet::IPAddress>(sdCtx->addresses.data(), sdCtx->addresses.size()), status);
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 
@@ -507,6 +532,9 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
 
     GetAddrInfo(sdCtx->context, sdCtx->callback, interfaceId, sdCtx->addressType, sdCtx->name, hostname, ntohs(port), txtLen,
                 txtRecord);
+
+    // TODO: If flags & kDNSServiceFlagsMoreComing should we keep waiting to see
+    // what else we resolve instead of calling Remove() here?
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 
@@ -541,10 +569,11 @@ CHIP_ERROR ChipDnssdShutdown()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (strcmp(service->mHostName, "") != 0)
     {
@@ -559,7 +588,7 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
 
     ChipLogProgress(DeviceLayer, "Publishing service %s on port %u with type: %s on interface id: %" PRIu32, service->mName,
                     service->mPort, regtype.c_str(), interfaceId);
-    return Register(interfaceId, regtype.c_str(), service->mName, service->mPort, &record);
+    return Register(context, callback, interfaceId, regtype.c_str(), service->mName, service->mPort, &record);
 }
 
 CHIP_ERROR ChipDnssdRemoveServices()

@@ -18,3 +18,9 @@ import("${chip_root}/src/platform/P6/args.gni")
 
 p6_target_project =
     get_label_info(":lighting_app_sdk_sources", "label_no_toolchain")
+
+declare_args() {
+  # Disable lock tracking, since our FreeRTOS configuration does not set
+  # INCLUDE_xSemaphoreGetMutexHolder
+  chip_stack_lock_tracking = "none"
+}

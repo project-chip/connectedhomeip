@@ -31,7 +31,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace chip {
 
@@ -70,6 +70,7 @@ struct FactoryInitParams
 {
     FabricStorage * fabricStorage                                 = nullptr;
     System::Layer * systemLayer                                   = nullptr;
+    PersistentStorageDelegate * fabricIndependentStorage          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -130,8 +131,9 @@ private:
     CHIP_ERROR InitSystemState();
 
     uint16_t mListenPort;
-    FabricStorage * mFabricStorage             = nullptr;
-    DeviceControllerSystemState * mSystemState = nullptr;
+    FabricStorage * mFabricStorage                        = nullptr;
+    DeviceControllerSystemState * mSystemState            = nullptr;
+    PersistentStorageDelegate * mFabricIndependentStorage = nullptr;
 };
 
 } // namespace Controller

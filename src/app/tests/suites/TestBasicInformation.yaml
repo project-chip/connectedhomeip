@@ -15,6 +15,7 @@
 name: Basic Information Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Read location"
       command: "readAttribute"
@@ -51,8 +56,7 @@ tests:
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value:
-              [
+          value: [
                   0,
                   1,
                   2,
@@ -72,6 +76,8 @@ tests:
                   16,
                   17,
                   18,
-                  0xFFFB,
-                  0xFFFD,
+                  0xFFF8, # ServerGeneratedCommandList
+                  0xFFF9, # ClientGeneratedCommandList
+                  0xFFFB, # AttributeList
+                  0xFFFD, # ClusterRevision
               ]

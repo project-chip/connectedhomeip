@@ -81,7 +81,7 @@ CHIP_ERROR ChipDnssdRemoveServices()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sResolverObject != nullptr && sPublishMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -220,7 +220,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
     const auto dispatch = [callbackHandle, contextHandle](CHIP_ERROR error, DnssdService * service = nullptr) {
         DeviceLayer::StackLock lock;
         DnssdResolveCallback callback = reinterpret_cast<DnssdResolveCallback>(callbackHandle);
-        callback(reinterpret_cast<void *>(contextHandle), service, error);
+        callback(reinterpret_cast<void *>(contextHandle), service, Span<Inet::IPAddress>(), error);
     };
 
     VerifyOrReturn(address != nullptr && port != 0, dispatch(CHIP_ERROR_UNKNOWN_RESOURCE_ID));

@@ -127,16 +127,15 @@ public:
      * @param[in] bindingGroupId     The GroupId for the binding that will be created.
      * @param[in] bindingEndpointId  The EndpointId for the binding that will be created.
      * @param[in] bindingClusterId   The ClusterId for the binding that will be created.
-     * @param[in] onSuccessCallback        The function to be called on success of adding the binding.
-     * @param[in] onFailureCallback        The function to be called on failure of adding the binding.
+     * @param[in] successCb          The function to be called on success of adding the binding.
+     * @param[in] failureCb          The function to be called on failure of adding the binding.
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR CreateBindingWithCallback(OperationalDeviceProxy * device, chip::EndpointId deviceEndpointId,
-                                         chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
-                                         chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
-                                         CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
-                                         CommandResponseFailureCallback failureCb);
+    CHIP_ERROR CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId, NodeId bindingNodeId,
+                                         GroupId bindingGroupId, EndpointId bindingEndpointId, ClusterId bindingClusterId,
+                                         Controller::WriteResponseSuccessCallback successCb,
+                                         Controller::WriteResponseFailureCallback failureCb);
 
 protected:
     // requires vendorApp to be in the catalog of the platform

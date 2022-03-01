@@ -1,0 +1,68 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.1.2. [TC-IDM-1.2] Invoke Response Action from DUT to TH.
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH sends the Invoke Request Message to the DUT with the path that
+          indicates a specific endpoint that is unsupported."
+      disabled: true
+
+    - label:
+          "TH sends the Invoke Request Message to the DUT with the path that
+          indicates a specific cluster that is unsupported."
+      disabled: true
+
+    - label:
+          "TH sends the Invoke Request Message to the DUT with the path that
+          indicates a specific command that is unsupported."
+      disabled: true
+
+    - label:
+          "Setup the TH such that it should not have the privilege for the
+          cluster in the path. TH sends the Invoke Request Message to the DUT
+          with a valid CommandDataIB"
+      disabled: true
+
+    - label:
+          "Setup the TH such that there is no accessing fabric TH sends the
+          Invoke Request Message to the DUT with a valid and fabric-scoped
+          CommandDataIB"
+      disabled: true
+
+    - label:
+          "TH sends the Invoke Request Message to the DUT with the path that is
+          a group path. One of the paths should be invalid."
+      disabled: true
+
+    - label:
+          "(OPTIONAL) TH sends the Invoke Request Message to the DUT with the
+          command which requires another command in response."
+      disabled: true
+
+    - label:
+          "TH sends the Invoke Request Message to the DUT with a valid
+          CommandDataIB and SuppressResponse set to True"
+      disabled: true
+
+    - label:
+          "TH sends the Invoke Request Message to the DUT with a valid
+          CommandDataIB which returns a response of data type list."
+      disabled: true

@@ -82,12 +82,9 @@ GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 AmebaOTAImageProcessor gImageProcessor;
 
-extern "C" void amebaQueryImageCmdHandler(uint32_t nodeId, uint32_t fabricId)
+extern "C" void amebaQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd
-    gRequestorCore.TestModeSetProviderParameters(nodeId, fabricId, chip::kRootEndpointId);
-
     static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
 
@@ -121,6 +118,18 @@ static void InitOTARequestor(void)
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 }
 
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model and CHIP App Server
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    NetWorkCommissioningInstInit();
+
+    InitOTARequestor();
+}
+
 extern "C" void ChipTest(void)
 {
     ChipLogProgress(SoftwareUpdate, "ota-requestor!");
@@ -139,18 +148,5 @@ extern "C" void ChipTest(void)
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
     }
 
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    NetWorkCommissioningInstInit();
-
-    InitOTARequestor();
-
-    while (true)
-        vTaskDelay(pdMS_TO_TICKS(50));
-
-exit:
-    ChipLogProgress(SoftwareUpdate, "Exited");
-    return;
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 }

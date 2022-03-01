@@ -361,10 +361,12 @@ typedef struct _NetworkInfo
 typedef struct _NetworkInterfaceType
 {
     chip::CharSpan Name;
-    bool FabricConnected;
+    bool IsOperational;
     bool OffPremiseServicesReachableIPv4;
     bool OffPremiseServicesReachableIPv6;
     chip::ByteSpan HardwareAddress;
+    /* TYPE WARNING: array array defaults to */ uint8_t * IPv4Addresses;
+    /* TYPE WARNING: array array defaults to */ uint8_t * IPv6Addresses;
     uint8_t Type;
 } NetworkInterfaceType;
 
@@ -506,6 +508,16 @@ typedef struct _TargetInfo
     uint8_t identifier;
     chip::CharSpan name;
 } TargetInfo;
+
+// Struct for TargetStruct
+typedef struct _TargetStruct
+{
+    chip::FabricIndex FabricIndex;
+    chip::NodeId Node;
+    chip::GroupId Group;
+    chip::EndpointId Endpoint;
+    chip::ClusterId Cluster;
+} TargetStruct;
 
 // Struct for TestFabricScoped
 typedef struct _TestFabricScoped

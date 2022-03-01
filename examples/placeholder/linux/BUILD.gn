@@ -41,6 +41,7 @@ executable("chip-${chip_tests_zap_config}") {
   deps = [
     ":configuration",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/tests/suites/commands/delay",
     "${chip_root}/src/app/tests/suites/commands/discovery",
     "${chip_root}/src/app/tests/suites/commands/log",
     "${chip_root}/src/app/tests/suites/pics",

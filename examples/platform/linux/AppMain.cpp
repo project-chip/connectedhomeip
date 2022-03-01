@@ -26,14 +26,16 @@
 #include <lib/core/NodeId.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+
+#include <platform/DiagnosticDataProvider.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
@@ -52,6 +54,8 @@
 #if defined(PW_RPC_ENABLED)
 #include <CommonRpc.h>
 #endif
+
+#include <signal.h>
 
 #include "AppMain.h"
 
@@ -86,6 +90,57 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     {
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
     }
+}
+
+void OnSignalHandler(int signum)
+{
+    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+
+    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
+    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
+    // running process to terminate with different reasons.
+    BootReasonType bootReason = BootReasonType::Unspecified;
+    switch (signum)
+    {
+    case SIGVTALRM:
+        bootReason = BootReasonType::PowerOnReboot;
+        break;
+    case SIGALRM:
+        bootReason = BootReasonType::BrownOutReset;
+        break;
+    case SIGILL:
+        bootReason = BootReasonType::SoftwareWatchdogReset;
+        break;
+    case SIGTRAP:
+        bootReason = BootReasonType::HardwareWatchdogReset;
+        break;
+    case SIGIO:
+        bootReason = BootReasonType::SoftwareUpdateCompleted;
+        break;
+    case SIGINT:
+        bootReason = BootReasonType::SoftwareReset;
+        break;
+    default:
+        IgnoreUnusedVariable(bootReason);
+        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
+        chipDie();
+        break;
+    }
+
+    Server::GetInstance().DispatchShutDownAndStopEventLoop();
+}
+
+void SetupSignalHandlers()
+{
+    // sigaction is not used here because Tsan interceptors seems to
+    // never dispatch the signals on darwin.
+    signal(SIGALRM, OnSignalHandler);
+    signal(SIGVTALRM, OnSignalHandler);
+    signal(SIGILL, OnSignalHandler);
+    signal(SIGTRAP, OnSignalHandler);
+    signal(SIGTERM, OnSignalHandler);
+    signal(SIGIO, OnSignalHandler);
+    signal(SIGINT, OnSignalHandler);
 }
 } // namespace
 
@@ -252,7 +307,9 @@ CHIP_ERROR InitCommissioner()
 
     factoryParams.fabricStorage = &gFabricStorage;
     // use a different listen port for the commissioner than the default used by chip-tool.
-    factoryParams.listenPort              = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
+    factoryParams.listenPort               = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
+    factoryParams.fabricIndependentStorage = &gServerStorage;
+
     params.storageDelegate                = &gServerStorage;
     params.deviceAddressUpdateDelegate    = nullptr;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
@@ -282,8 +339,8 @@ CHIP_ERROR InitCommissioner()
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(
-        gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, ephemeralKey.Pubkey(),
+                                                                        rcacSpan, icacSpan, nocSpan));
 
     params.operationalKeypair = &ephemeralKey;
     params.controllerRCAC     = rcacSpan;
@@ -515,8 +572,10 @@ void ChipLinuxAppMainLoop()
     unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+    Inet::InterfaceId interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
+
     // Init ZCL Data Model and CHIP App Server
-    Server::GetInstance().Init(nullptr, securePort, unsecurePort);
+    Server::GetInstance().Init(nullptr, securePort, unsecurePort, interfaceId);
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
@@ -529,11 +588,13 @@ void ChipLinuxAppMainLoop()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    InitCommissioner();
+    VerifyOrReturn(InitCommissioner() == CHIP_NO_ERROR);
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    SetupSignalHandlers();
 
     ApplicationInit();
 
@@ -546,4 +607,8 @@ void ChipLinuxAppMainLoop()
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif
+
+    Server::GetInstance().Shutdown();
+
+    DeviceLayer::PlatformMgr().Shutdown();
 }

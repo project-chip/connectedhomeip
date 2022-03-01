@@ -104,13 +104,13 @@ CHIP_ERROR DiscoveryCommands::SetupDiscoveryCommands()
         ReturnErrorOnFailure(mDNSResolver.Init(chip::DeviceLayer::UDPEndPointManager()));
         mReady = true;
     }
-    mDNSResolver.SetResolverDelegate(this);
+    mDNSResolver.SetCommissioningDelegate(this);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryCommands::TearDownDiscoveryCommands()
 {
-    mDNSResolver.SetResolverDelegate(nullptr);
+    mDNSResolver.SetCommissioningDelegate(nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -126,7 +126,7 @@ uint16_t DiscoveryCommands::GetUniqueDiscriminator()
     return mDiscriminatorUseForFiltering;
 }
 
-void DiscoveryCommands::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     // TODO: If multiple results are found for the same filter, then the test result depends
     //       on which result comes first. At the moment, the code assume that there is only

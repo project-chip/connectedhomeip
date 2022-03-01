@@ -38,12 +38,25 @@ const WaitForCommissioning = {
 
 const WaitForCommissionee = {
   name : 'WaitForCommissionee',
+  arguments : [ { type : 'NODE_ID', name : 'nodeId' } ],
+  response : { arguments : [] }
+};
+
+const WaitForCommissionableAdvertisement = {
+  name : 'WaitForCommissionableAdvertisement',
   arguments : [],
   response : { arguments : [] }
 };
 
-const name     = 'DelayCommands';
-const commands = [ WaitForMs, WaitForCommissioning, WaitForCommissionee ];
+const WaitForOperationalAdvertisement = {
+  name : 'WaitForOperationalAdvertisement',
+  arguments : [],
+  response : { arguments : [] }
+};
+
+const name = 'DelayCommands';
+const commands =
+    [ WaitForMs, WaitForCommissioning, WaitForCommissionee, WaitForCommissionableAdvertisement, WaitForOperationalAdvertisement ];
 
 const DelayCommands = {
   name,

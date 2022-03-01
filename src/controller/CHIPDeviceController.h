@@ -41,8 +41,8 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
-#include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/FabricTable.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -171,14 +171,15 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
 class DLL_EXPORT DeviceController : public SessionRecoveryDelegate
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     ,
-                                    public AbstractDnssdDiscoveryController
+                                    public AbstractDnssdDiscoveryController,
+                                    public Dnssd::OperationalResolveDelegate
 #endif
 {
 public:
     DeviceController();
     virtual ~DeviceController() {}
 
-    enum class CommissioningWindowOption
+    enum class CommissioningWindowOption : uint8_t
     {
         kOriginalSetupCode = 0,
         kTokenWithRandomPIN,
@@ -242,12 +243,12 @@ public:
      * @param[in] iterations      The number of iterations to use when generating the verifier
      * @param[in] setupPincode    The desired PIN code to use
      * @param[in] salt            The 16-byte salt for verifier computation
-     * @param[out] outVerifier    The PASEVerifier to be populated on success
+     * @param[out] outVerifier    The Spake2pVerifier to be populated on success
      * @param[out] outPasscodeId  The passcode ID to be populated on success
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
+    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, Spake2pVerifier & outVerifier,
                                    PasscodeId & outPasscodeId);
 
     /**
@@ -271,7 +272,7 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
-                                       uint8_t option, SetupPayload & payload)
+                                       CommissioningWindowOption option, SetupPayload & payload)
     {
         mSuggestedSetUpPINCode = payload.setUpPINCode;
         ReturnErrorOnFailure(OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr));
@@ -302,7 +303,8 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
-                                                   uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                                   CommissioningWindowOption option,
+                                                   Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                    bool readVIDPIDAttributes = false);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -364,8 +366,6 @@ protected:
     CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
 
-    void PersistNextKeyId();
-
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
     SessionIDAllocator mIDAllocator;
@@ -376,9 +376,9 @@ protected:
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    //////////// ResolverDelegate Implementation ///////////////
-    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    //////////// OperationalResolveDelegate Implementation ///////////////
+    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
+    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
@@ -573,18 +573,9 @@ public:
      * @brief
      *   This function validates the Attestation Information sent by the device.
      *
-     * @param[in] attestationElements Attestation Elements TLV.
-     * @param[in] signature           Attestation signature generated for all the above fields + Attestation Challenge.
-     * @param[in] attestationNonce    Attestation nonce
-     * @param[in] pai                 PAI certificate
-     * @param[in] dac                 DAC certificates
-     * @param[in] remoteVendorId      vendor ID read from the device Basic Information cluster
-     * @param[in] remoteProductId     product ID read from the device Basic Information cluster
-     * @param[in] proxy               device proxy that is being attested.
+     * @param[in] info Structure contatining all the required information for validating the device attestation.
      */
-    CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
-                                       const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
+    CHIP_ERROR ValidateAttestationInfo(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
 
     /**
      * @brief
@@ -631,8 +622,8 @@ public:
      */
     int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
 
-    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
+    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -662,7 +653,7 @@ public:
      * @param nodeData DNS-SD node information
      *
      */
-    void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 #endif
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
@@ -699,8 +690,6 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void SetupCluster(ClusterBase & base, DeviceProxy * proxy, EndpointId endpoint, Optional<System::Clock::Timeout> timeout);
-
-    void FreeRendezvousSession();
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 

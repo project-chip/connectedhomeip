@@ -15,6 +15,7 @@
 name: 42.1.1. [TC-TSTAT-1.1] Global attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Thermostat"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #issue #12190 as per spec default value is 5 but expecting 3
     - label: "read the global attribute: ClusterRevision"

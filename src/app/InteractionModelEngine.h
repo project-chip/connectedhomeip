@@ -340,5 +340,10 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
                                   const ConcreteDataAttributePath & aAttributePath, TLV::TLVReader & aReader,
                                   WriteHandler * apWriteHandler);
+
+/**
+ * Check if the given cluster has the given DataVersion.
+ */
+bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
 } // namespace app
 } // namespace chip

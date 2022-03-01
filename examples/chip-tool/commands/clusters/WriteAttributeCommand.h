@@ -32,6 +32,7 @@ public:
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         ModelCommand::AddArguments();
     }
 
@@ -41,6 +42,7 @@ public:
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         ModelCommand::AddArguments();
     }
 
@@ -48,6 +50,7 @@ public:
         ModelCommand("write", credsIssuerConfig)
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
     }
 
     ~WriteAttribute() {}
@@ -65,21 +68,20 @@ public:
         if (CHIP_NO_ERROR != error)
         {
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
-            SetCommandExitStatus(error);
-            return;
+            mError = error;
         }
     }
 
     void OnError(const chip::app::WriteClient * client, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
-        SetCommandExitStatus(error);
+        mError = error;
     }
 
     void OnDone(chip::app::WriteClient * client) override
     {
         mWriteClient.reset();
-        SetCommandExitStatus(CHIP_NO_ERROR);
+        SetCommandExitStatus(mError);
     }
 
     template <class T>
@@ -98,15 +100,17 @@ public:
 
         mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), this, mTimedInteractionTimeoutMs);
 
-        ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value));
+        ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, mDataVersion));
+
         return mWriteClient->SendWriteRequest(device->GetSecureSession().Value());
     }
 
 private:
     chip::ClusterId mClusterId;
     chip::AttributeId mAttributeId;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
-
+    chip::Optional<chip::DataVersion> mDataVersion = chip::NullOptional;
     CustomArgument mAttributeValue;
     std::unique_ptr<chip::app::WriteClient> mWriteClient;
 };

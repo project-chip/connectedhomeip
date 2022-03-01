@@ -71,5 +71,5 @@ CHIP_ERROR SystemCommands::FactoryReset()
 CHIP_ERROR SystemCommands::RunInternal(const char * command)
 {
     VerifyOrReturnError(system(command) == 0, CHIP_ERROR_INTERNAL);
-    return ContinueOnChipMainThread();
+    return ContinueOnChipMainThread(CHIP_NO_ERROR);
 }

@@ -122,8 +122,9 @@ var endpointClusterWithInit = [
   'Thermostat',
 ];
 var endpointClusterWithAttributeChanged = [
-  'Identify',
+  'Bridged Device Basic',
   'Door Lock',
+  'Identify',
   'Pump Configuration and Control',
   'Window Covering',
 ];
@@ -332,9 +333,9 @@ function asPrintFormat(type)
       case 'bool':
         return '%d';
       case 'int8_t':
-        return '%" PRId8 "';
+        return '%d';
       case 'uint8_t':
-        return '%" PRIu8 "';
+        return '%u';
       case 'int16_t':
         return '%" PRId16 "';
       case 'uint16_t':
@@ -424,7 +425,7 @@ function hasSpecificAttributes(options)
 function asLowerCamelCase(label)
 {
   let str = string.toCamelCase(label, true);
-  // Check for the case when were:
+  // Check for the case when we're:
   // 1. A single word (that's the regexp at the beginning, which matches the
   //    word-splitting regexp in string.toCamelCase).
   // 2. Starting with multiple capital letters in a row.
@@ -478,6 +479,11 @@ function nsValueToNamespace(ns)
  */
 async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
+  // Use the entryType as a type
+  if (type == 'array' && this.entryType) {
+    type = this.entryType;
+  }
+
   let passByReference = false;
   async function fn(pkgId)
   {
@@ -829,6 +835,25 @@ async function zcl_commands_that_need_timed_invoke(options)
   return templateUtil.collectBlocks(commands, options, this);
 }
 
+// Allows conditioning generation on whether the given type is a fabric-scoped
+// struct.
+async function if_is_fabric_scoped_struct(type, options)
+{
+  let packageId = await templateUtil.ensureZclPackageId(this);
+  let st        = await zclQuery.selectStructByName(this.global.db, type, packageId);
+
+  if (st) {
+    // TODO: Should know whether a struct is fabric-scoped without sniffing its
+    // members.
+    let fields = await zclQuery.selectAllStructItemsById(this.global.db, st.id);
+    if (fields.find((i) => i.type.toLowerCase() == "fabric_idx")) {
+      return options.fn(this);
+    }
+  }
+
+  return options.inverse(this);
+}
+
 //
 // Module exports
 //
@@ -852,3 +877,4 @@ exports.getPythonFieldDefault                 = getPythonFieldDefault;
 exports.incrementDepth                        = incrementDepth;
 exports.zcl_events_fields_by_event_name       = zcl_events_fields_by_event_name;
 exports.zcl_commands_that_need_timed_invoke   = zcl_commands_that_need_timed_invoke;
+exports.if_is_fabric_scoped_struct            = if_is_fabric_scoped_struct

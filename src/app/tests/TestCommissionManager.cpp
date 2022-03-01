@@ -17,6 +17,7 @@
 
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/tests/echo/common.h>
@@ -50,6 +51,27 @@ void InitializeChip(nlTestSuite * suite)
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+}
+
+void ShutdownChipTest()
+{
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+
+    auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
+    mdnsAdvertiser.RemoveServices();
+    mdnsAdvertiser.Shutdown();
+
+    // Server shudown will be called in TearDownTask
+
+    // TODO: At this point UDP endpoits still seem leaked and the sanitizer
+    // builds will attempt a memory free. As a result, we keep Memory initialized
+    // so that the global UDPManager can still be destructed without a coredump.
+    //
+    // This is likely either a missing shutdown or an actual UDP endpoint leak
+    // which I have not been able to track down yet.
+    //
+    // chip::Platform::MemoryShutdown();
 }
 
 void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
@@ -117,9 +139,9 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     CHIP_ERROR err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(originDiscriminator);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
-    chip::PASEVerifier verifier;
-    constexpr uint32_t kIterations = chip::kPBKDFMinimumIterations;
-    uint8_t salt[chip::kPBKDFMinimumSaltLen];
+    chip::Spake2pVerifier verifier;
+    constexpr uint32_t kIterations = chip::kSpake2p_Min_PBKDF_Iterations;
+    uint8_t salt[chip::kSpake2p_Min_PBKDF_Salt_Length];
     chip::ByteSpan saltData(salt);
     constexpr chip::PasscodeId kPasscodeID = 1;
     uint16_t currentDiscriminator;
@@ -182,8 +204,7 @@ int TestCommissioningWindowManager()
     // TODO: The platform memory was intentionally left not deinitialized so that minimal mdns can destruct
     chip::DeviceLayer::PlatformMgr().ScheduleWork(TearDownTask, 0);
     sleep(kTestTaskWaitSeconds);
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
+    ShutdownChipTest();
 
     return (nlTestRunnerStats(&theSuite));
 }

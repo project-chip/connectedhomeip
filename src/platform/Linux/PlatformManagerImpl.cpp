@@ -61,62 +61,27 @@ namespace {
 
 void SignalHandler(int signum)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
 
-    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
-    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
-    // running process to terminate with different reasons.
     switch (signum)
     {
-    case SIGINT:
-        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareReset);
-        err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
-        break;
-    case SIGHUP:
-        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::BrownOutReset);
-        err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
-        break;
-    case SIGTERM:
-        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::PowerOnReboot);
-        err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
-        break;
     case SIGUSR1:
-        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::HardwareWatchdogReset);
-        err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
-        break;
-    case SIGUSR2:
-        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset);
-        err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
-        break;
-    case SIGTSTP:
-        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareUpdateCompleted);
-        err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
-        break;
-    case SIGTRAP:
         PlatformMgrImpl().HandleSoftwareFault(SoftwareDiagnostics::Events::SoftwareFault::Id);
         break;
-    case SIGILL:
+    case SIGUSR2:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::HardwareFaultChange::Id);
         break;
-    case SIGALRM:
+    case SIGHUP:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::Id);
         break;
-    case SIGVTALRM:
+    case SIGTERM:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
         break;
-    case SIGIO:
+    case SIGTSTP:
         PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::Id);
         break;
     default:
         break;
-    }
-
-    if (err == CHIP_ERROR_REBOOT_SIGNAL_RECEIVED)
-    {
-        PlatformMgr().Shutdown();
-        exit(EXIT_FAILURE);
     }
 }
 
@@ -213,7 +178,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     memset(&action, 0, sizeof(action));
     action.sa_handler = SignalHandler;
-    sigaction(SIGINT, &action, NULL);
     sigaction(SIGHUP, &action, NULL);
     sigaction(SIGTERM, &action, NULL);
     sigaction(SIGUSR1, &action, NULL);

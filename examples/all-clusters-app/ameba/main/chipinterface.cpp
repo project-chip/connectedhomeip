@@ -97,12 +97,9 @@ AmebaOTAImageProcessor gImageProcessor;
 #endif
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-extern "C" void amebaQueryImageCmdHandler(uint32_t nodeId, uint32_t fabricId)
+extern "C" void amebaQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd
-    gRequestorCore.TestModeSetProviderParameters(nodeId, fabricId, chip::kRootEndpointId);
-
     static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
 
@@ -137,6 +134,26 @@ static void InitOTARequestor(void)
 }
 #endif // CONFIG_ENABLE_OTA_REQUESTOR
 
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model and CHIP App Server
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    NetWorkCommissioningInstInit();
+
+    if (RTW_SUCCESS != wifi_is_connected_to_ap())
+    {
+        // QR code will be used with CHIP Tool
+        PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    }
+
+#if CONFIG_ENABLE_OTA_REQUESTOR
+    InitOTARequestor();
+#endif
+}
+
 extern "C" void ChipTest(void)
 {
     ChipLogProgress(DeviceLayer, "All Clusters Demo!");
@@ -160,23 +177,9 @@ extern "C" void ChipTest(void)
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
     }
 
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    NetWorkCommissioningInstInit();
-
-    if (RTW_SUCCESS != wifi_is_connected_to_ap())
-    {
-        // QR code will be used with CHIP Tool
-        PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-    }
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    InitOTARequestor();
-#endif
 }
 
 bool lowPowerClusterSleep()

@@ -130,8 +130,8 @@ public:
             TransferSkipData bytesToSkip;
         };
 
-        OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kNone }; }
-        OutputEvent(OutputEventType type) : EventType(type) { statusData = { StatusCode::kNone }; }
+        OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kUnknown }; }
+        OutputEvent(OutputEventType type) : EventType(type) { statusData = { StatusCode::kUnknown }; }
 
         const char * ToString(OutputEventType outputEventType);
 

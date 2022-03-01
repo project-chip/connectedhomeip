@@ -35,6 +35,7 @@ struct UpdateDescription
 {
     CharSpan imageURI;
     uint32_t softwareVersion;
+    CharSpan softwareVersionStr;
     ByteSpan updateToken;
     bool userConsentNeeded;
     ByteSpan metadataForRequestor;

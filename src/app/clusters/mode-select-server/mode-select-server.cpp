@@ -91,7 +91,7 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
         ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %" PRIu8, newMode);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
         emberAfSendImmediateDefaultResponse(checkSupportedModeStatus);
         return false;
     }

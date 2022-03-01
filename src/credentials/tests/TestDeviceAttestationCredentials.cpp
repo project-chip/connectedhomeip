@@ -20,8 +20,8 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
@@ -208,10 +208,11 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
     Callback::Callback<OnAttestationInformationVerification> attestationInformationVerificationCallback(
         OnAttestationInformationVerificationCallback, &attestationResult);
 
-    default_verifier->VerifyAttestationInformation(
+    Credentials::DeviceAttestationVerifier::AttestationInfo info(
         ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
         TestCerts::sTestCert_PAI_FFF1_8000_Cert, TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert, ByteSpan(attestationNonceTestVector),
-        static_cast<VendorId>(0xFFF1), 0x8000, &attestationInformationVerificationCallback);
+        static_cast<VendorId>(0xFFF1), 0x8000);
+    default_verifier->VerifyAttestationInformation(info, &attestationInformationVerificationCallback);
 
     NL_TEST_ASSERT(inSuite, attestationResult == AttestationVerificationResult::kSuccess);
 }

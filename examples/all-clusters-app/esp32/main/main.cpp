@@ -27,6 +27,7 @@
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
 #include "ShellCommands.h"
+#include "StatusScreen.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -184,7 +185,35 @@ void AddDevice(std::string name)
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
-class EditAttributeListModel : public ListScreen::Model
+class TouchesMatterStackModel : public ListScreen::Model
+{
+    // We could override Action() and then hope focusIndex has not changed by
+    // the time our queued task runs, but it's cleaner to just capture its value
+    // now.
+    struct QueuedAction
+    {
+        QueuedAction(TouchesMatterStackModel * selfArg, int iArg) : self(selfArg), i(iArg) {}
+        TouchesMatterStackModel * self;
+        int i;
+    };
+
+    void ItemAction(int i) final
+    {
+        auto * action = chip::Platform::New<QueuedAction>(this, i);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(QueuedActionHandler, reinterpret_cast<intptr_t>(action));
+    }
+
+    static void QueuedActionHandler(intptr_t closure)
+    {
+        auto * queuedAction = reinterpret_cast<QueuedAction *>(closure);
+        queuedAction->self->DoAction(queuedAction->i);
+        chip::Platform::Delete(queuedAction);
+    }
+
+    virtual void DoAction(int i) = 0;
+};
+
+class EditAttributeListModel : public TouchesMatterStackModel
 {
     int deviceIndex;
     int endpointIndex;
@@ -223,7 +252,8 @@ public:
         }
         return i == 0 ? "+" : "-";
     }
-    virtual void ItemAction(int i)
+
+    void DoAction(int i) override
     {
         auto & attribute = this->attribute();
         auto & value     = std::get<1>(attribute);
@@ -240,6 +270,24 @@ public:
             {
                 // update the temp attribute here for hardcoded endpoint 1
                 chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+            }
+            else if (name == "Color Current Level")
+            {
+                // update the current level here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Brightness changed to : %d", (n * 100 / 255));
+                app::Clusters::LevelControl::Attributes::CurrentLevel::Set(1, n);
+            }
+            else if (name == "Current Hue")
+            {
+                // update the current hue here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Hue changed to : %d", n * 360 / 254);
+                app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, n);
+            }
+            else if (name == "Current Saturation")
+            {
+                // update the current saturation here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Saturation changed to : %d", n * 100 / 254);
+                app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, n);
             }
             value = buffer;
         }
@@ -397,7 +445,7 @@ private:
     }
 };
 
-class SetupListModel : public ListScreen::Model
+class SetupListModel : public TouchesMatterStackModel
 {
 public:
     SetupListModel()
@@ -412,7 +460,7 @@ public:
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
     virtual std::string GetItemText(int i) { return options.at(i); }
-    virtual void ItemAction(int i)
+    void DoAction(int i) override
     {
         ESP_LOGI(TAG, "Opening options %d: %s", i, GetItemText(i).c_str());
         if (i == 0)
@@ -423,7 +471,7 @@ public:
         }
         else if (i == 1)
         {
-            ConfigurationMgr().InitiateFactoryReset();
+            chip::Server::GetInstance().ScheduleFactoryReset();
         }
         else if (i == 2)
         {
@@ -546,6 +594,21 @@ void SetupPretendDevices()
     AddCluster("Illuminance Measurement");
     AddAttribute("MeasuredValue", "1000");
     app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
+
+    AddDevice("Color Light");
+    AddEndpoint("1");
+    AddCluster("OnOff");
+    AddAttribute("OnOff", "Off");
+    app::Clusters::OnOff::Attributes::OnOff::Set(1, false);
+    AddCluster("Level Control");
+    AddAttribute("Color Current Level", "255");
+    app::Clusters::LevelControl::Attributes::CurrentLevel::Set(1, 255);
+    AddEndpoint("2");
+    AddCluster("Color Control");
+    AddAttribute("Current Hue", "200");
+    app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, 200);
+    AddAttribute("Current Saturation", "150");
+    app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, 150);
 }
 
 WiFiWidget pairingWindowLED;
@@ -565,12 +628,17 @@ public:
 
 AppCallbacks sCallbacks;
 
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+
 } // namespace
 
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
     chip::Server::GetInstance().Init(&sCallbacks);
+
+    // We only have network commissioning on endpoint 0.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -705,6 +773,11 @@ extern "C" void app_main()
                    [=]() {
                        ESP_LOGI(TAG, "Opening Setup list");
                        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<SetupListModel>()));
+                   })
+            ->Item("Status",
+                   [=]() {
+                       ESP_LOGI(TAG, "Opening Status screen");
+                       ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
                    })
             ->Item("Custom",
                    []() {
