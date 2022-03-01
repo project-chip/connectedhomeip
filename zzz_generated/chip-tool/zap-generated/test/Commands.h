@@ -93489,8 +93489,8 @@ public:
             err = TestWriteGroupKeys_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Install ACLs for test\n");
-            err = TestInstallACLsForTest_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Install ACLs\n");
+            err = TestInstallACLs_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Group Write Attribute\n");
@@ -93517,6 +93517,10 @@ public:
                             " ***** Test Step 12 : Check on/off attribute value is true after on command for endpoint 1\n");
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommandForEndpoint1_12();
             break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Cleanup ACLs\n");
+            err = TestCleanupACLs_13();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -93528,7 +93532,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 13;
+    const uint16_t mTestCount = 14;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -93604,6 +93608,13 @@ private:
         (static_cast<TestGroupMessagingSuite *>(context))->OnSuccessResponse_12(onOff);
     }
 
+    static void OnFailureCallback_13(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupMessagingSuite *>(context))->OnFailureResponse_13(error);
+    }
+
+    static void OnSuccessCallback_13(void * context) { (static_cast<TestGroupMessagingSuite *>(context))->OnSuccessResponse_13(); }
+
     //
     // Tests methods
     //
@@ -93641,7 +93652,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_1(uint8_t status, chip::GroupId groupId)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
@@ -93677,7 +93688,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_2(uint8_t status, chip::GroupId groupId)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
@@ -93830,7 +93841,7 @@ private:
 
     void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestInstallACLsForTest_6()
+    CHIP_ERROR TestInstallACLs_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
@@ -93843,24 +93854,16 @@ private:
             auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
             listFreer.add(listHolder_0);
 
-            listHolder_0->mList[0].fabricIndex = 1;
+            listHolder_0->mList[0].fabricIndex = 0;
             listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
             listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
             listHolder_0->mList[0].subjects.SetNull();
             listHolder_0->mList[0].targets.SetNull();
 
-            listHolder_0->mList[1].fabricIndex = 1;
+            listHolder_0->mList[1].fabricIndex = 0;
             listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
             listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
-            listHolder_0->mList[1].subjects.SetNonNull();
-
-            {
-                auto * listHolder_3 = new ListHolder<uint64_t>(2);
-                listFreer.add(listHolder_3);
-                listHolder_3->mList[0]                  = 257ULL;
-                listHolder_3->mList[1]                  = 258ULL;
-                listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 2);
-            }
+            listHolder_0->mList[1].subjects.SetNull();
             listHolder_0->mList[1].targets.SetNull();
 
             aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
@@ -94031,6 +94034,42 @@ private:
 
         NextTest();
     }
+
+    CHIP_ERROR TestCleanupACLs_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(1);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 1);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13() { NextTest(); }
 };
 
 class TestGroupsClusterSuite : public TestCommand
@@ -94208,7 +94247,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_1(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 135));
 
@@ -94243,7 +94282,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_2(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
@@ -94279,7 +94318,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_3(uint8_t status, chip::GroupId groupId)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
@@ -94314,7 +94353,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_4(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
@@ -94351,7 +94390,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_5(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
@@ -94368,7 +94407,7 @@ private:
         ListFreer listFreer;
         RequestType request;
 
-        request.groupList = chip::app::DataModel::List<uint16_t>();
+        request.groupList = chip::app::DataModel::List<chip::GroupId>();
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupsClusterSuite *>(context))->OnSuccessResponse_6(data.capacity, data.groupList);
@@ -94388,9 +94427,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<uint8_t> & capacity,
+                             const chip::app::DataModel::DecodableList<chip::GroupId> & groupList)
     {
-        VerifyOrReturn(CheckValue("capacity", capacity, 255));
+        VerifyOrReturn(CheckValueNull("capacity", capacity));
 
         {
             auto iter_0 = groupList.begin();
@@ -94428,7 +94468,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_7(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
@@ -94463,7 +94503,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_8(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
@@ -94500,7 +94540,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_9(uint8_t status, chip::GroupId groupId)
     {
         VerifyOrReturn(CheckValue("status", status, 135));
 
@@ -94535,7 +94575,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_10(uint8_t status, chip::GroupId groupId)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
@@ -94570,7 +94610,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_11(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
@@ -94607,7 +94647,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_12(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
@@ -94625,13 +94665,13 @@ private:
         RequestType request;
 
         {
-            auto * listHolder_0 = new ListHolder<uint16_t>(4);
+            auto * listHolder_0 = new ListHolder<chip::GroupId>(4);
             listFreer.add(listHolder_0);
             listHolder_0->mList[0] = 1U;
             listHolder_0->mList[1] = 2U;
             listHolder_0->mList[2] = 4369U;
             listHolder_0->mList[3] = 3U;
-            request.groupList      = chip::app::DataModel::List<uint16_t>(listHolder_0->mList, 4);
+            request.groupList      = chip::app::DataModel::List<chip::GroupId>(listHolder_0->mList, 4);
         }
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -94652,9 +94692,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
+    void OnSuccessResponse_13(const chip::app::DataModel::Nullable<uint8_t> & capacity,
+                              const chip::app::DataModel::DecodableList<chip::GroupId> & groupList)
     {
-        VerifyOrReturn(CheckValue("capacity", capacity, 255));
+        VerifyOrReturn(CheckValueNull("capacity", capacity));
 
         {
             auto iter_0 = groupList.begin();
@@ -94719,7 +94760,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_15(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
@@ -94754,7 +94795,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_16(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_16(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
@@ -94789,7 +94830,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_17(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_17(uint8_t status, chip::GroupId groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
@@ -94807,14 +94848,14 @@ private:
         RequestType request;
 
         {
-            auto * listHolder_0 = new ListHolder<uint16_t>(5);
+            auto * listHolder_0 = new ListHolder<chip::GroupId>(5);
             listFreer.add(listHolder_0);
             listHolder_0->mList[0] = 1U;
             listHolder_0->mList[1] = 2U;
             listHolder_0->mList[2] = 4369U;
             listHolder_0->mList[3] = 3U;
             listHolder_0->mList[4] = 32767U;
-            request.groupList      = chip::app::DataModel::List<uint16_t>(listHolder_0->mList, 5);
+            request.groupList      = chip::app::DataModel::List<chip::GroupId>(listHolder_0->mList, 5);
         }
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -94835,9 +94876,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_18(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
+    void OnSuccessResponse_18(const chip::app::DataModel::Nullable<uint8_t> & capacity,
+                              const chip::app::DataModel::DecodableList<chip::GroupId> & groupList)
     {
-        VerifyOrReturn(CheckValue("capacity", capacity, 255));
+        VerifyOrReturn(CheckValueNull("capacity", capacity));
 
         {
             auto iter_0 = groupList.begin();
@@ -95121,7 +95163,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_3(uint8_t status, chip::GroupId groupId)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
@@ -95157,7 +95199,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_4(uint8_t status, chip::GroupId groupId)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
@@ -97430,7 +97472,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_1(uint8_t status, chip::GroupId groupId)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 

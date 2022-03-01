@@ -108,6 +108,14 @@ struct ControllerInitParams
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
 
+    //
+    // Controls enabling server cluster interactions on a controller. This in turn
+    // causes the following to get enabled:
+    //
+    //  - Advertisement of active controller operational identities.
+    //
+    bool enableServerInteractions = false;
+
     uint16_t controllerVendorId;
 };
 

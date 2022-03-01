@@ -138,7 +138,8 @@ try:
         'stringcase',
         'pyyaml',
         'ipdb',
-        'ipykernel'
+        'ipykernel',
+        'deprecation'
     ]
 
     if platform.system() == "Darwin":

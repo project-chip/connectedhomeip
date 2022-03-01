@@ -226,6 +226,7 @@ ChipError::StorageType pychip_DeviceController_StackInit()
     FactoryInitParams factoryParams;
     factoryParams.fabricStorage            = &sFabricStorage;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
+    factoryParams.enableServerInteractions = true;
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
 
@@ -239,10 +240,6 @@ ChipError::StorageType pychip_DeviceController_StackInit()
     // This retain call ensures the stack doesn't get de-initialized in the REPL.
     //
     DeviceControllerFactory::GetInstance().RetainSystemState();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-    chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     return CHIP_NO_ERROR.AsInteger();
 }

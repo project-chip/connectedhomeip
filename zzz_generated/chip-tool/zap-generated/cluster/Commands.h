@@ -1570,7 +1570,7 @@ public:
 
 private:
     chip::app::Clusters::Groups::Commands::GetGroupMembership::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const uint16_t>> mComplex_GroupList;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::GroupId>> mComplex_GroupList;
 };
 
 /*

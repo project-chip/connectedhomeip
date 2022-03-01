@@ -433,6 +433,17 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
 idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement reconfigure'
 
+# Generating esp32-devkitc-temperature-measurement-rpc
+mkdir -p {out}/esp32-devkitc-temperature-measurement-rpc
+
+cp examples/temperature-measurement-app/esp32/sdkconfig_rpc.defaults {out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
+
+rm -f examples/temperature-measurement-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
+idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement-rpc reconfigure'
+
 # Generating esp32-m5stack-all-clusters
 mkdir -p {out}/esp32-m5stack-all-clusters
 
@@ -1141,6 +1152,13 @@ rm -f examples/temperature-measurement-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
 idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement build'
+
+rm -f examples/temperature-measurement-app/esp32/sdkconfig
+
+# Building esp32-devkitc-temperature-measurement-rpc
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
+idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement-rpc build'
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 

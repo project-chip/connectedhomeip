@@ -37,10 +37,12 @@ To test the DFU over Matter, you need to complete the following steps:
 
         $ scripts/examples/gn_build_example.sh examples/chip-tool out/chiptool 'chip_mdns="platform"'
 
-4.  Run OTA Provider application with _app_update.bin_ replaced with the path to
-    the new firmware image which you wish to provide to the Matter device:
+4.  Run OTA Provider application with _matter.ota_ replaced with the path to the
+    Matter OTA image which you wish to provide to the Matter device. Note that
+    the Matter OTA image is, by default, generated at _zephyr/matter.ota_ in the
+    example's build directory:
 
-         $ out/provider/chip-ota-provider-app -f app_update.bin
+         $ out/provider/chip-ota-provider-app -f matter.ota
 
     Keep the application running and use another terminal for the remaining
     steps.
@@ -56,16 +58,28 @@ To test the DFU over Matter, you need to complete the following steps:
     Operational Dataset. It can be retrieved from the OTBR in case you have
     changed the default network settings when forming the network.
 
-         $ ./out/chiptool/chip-tool pairing ble-thread 2 hex:000300000f02081111111122222222051000112233445566778899aabbccddeeff01021234 20202021 3840
+        $ ./out/chiptool/chip-tool pairing ble-thread 2 hex:000300000f02081111111122222222051000112233445566778899aabbccddeeff01021234 20202021 3840
 
-8.  Initiate the DFU procedure in one of the following ways:
+8.  Configure the Matter device with the default OTA Provider by running the
+    following command. The last two arguments are Requestor Node Id and
+    Requestor Endpoint Id, respectively:
+
+        $ ./out/chiptool/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 1, "endpoint": 0}]' 2 0
+
+9.  Configure the OTA Provider with the access control list (ACL) that grants
+    _Operate_ privileges to all nodes in the fabric. This is necessary to allow
+    the nodes to send cluster commands to the OTA Provider:
+
+        $ ./out/chiptool/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
+
+10. Initiate the DFU procedure in one of the following ways:
+
 
     -   If you have built the device firmware with `-DCONFIG_CHIP_LIB_SHELL=y`
         option, which enables Matter shell commands, run the following command
-        on the device shell. The numeric arguments are Fabric Index, Provider
-        Node Id and Provider Endpoint Id, respectively.
+        on the device shell:
 
-               $ matter ota query 1 1 0
+               $ matter ota query
 
     -   Otherwise, use chip-tool to send the Announce OTA Provider command to
         the device. The numeric arguments are Provider Node Id, Provider Vendor
@@ -77,8 +91,8 @@ To test the DFU over Matter, you need to complete the following steps:
         Once the device is made aware of the OTA Provider node, it automatically
         queries the OTA Provider for a new firmware image.
 
-9.  When the firmware image download is complete, reboot the device to apply the
-    update.
+11. When the firmware image download is complete, the device is automatically
+    rebooted to apply the update.
 
 ## Device Firmware Upgrade over Bluetooth LE using smartphone
 

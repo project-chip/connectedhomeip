@@ -448,6 +448,15 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
     }
 
+    // We need to stop auto scan or it will block our network scan.
+    DeviceLayer::SystemLayer().ScheduleLambda([]() {
+        CHIP_ERROR errInner = StopAutoScan();
+        if (errInner != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %s", ErrorStr(errInner));
+        }
+    });
+
     if (err != nullptr)
         g_error_free(err);
 }
@@ -643,17 +652,6 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
                         err ? err->message : "unknown error");
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
     }
-
-    // We need to stop auto scan or it will block our network scan.
-    DeviceLayer::SystemLayer().ScheduleLambda([]() {
-        std::lock_guard<std::mutex> innerLock(mWpaSupplicantMutex);
-        ChipLogDetail(DeviceLayer, "Disabling auto scan");
-        CHIP_ERROR errInner = StopAutoScan();
-        if (errInner != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Failed to stop auto scan");
-        }
-    });
 
     if (err != nullptr)
         g_error_free(err);
@@ -1312,9 +1310,14 @@ CHIP_ERROR ConnectivityManagerImpl::GetConnectedNetwork(NetworkCommissioning::Ne
 
 CHIP_ERROR ConnectivityManagerImpl::StopAutoScan()
 {
-    std::unique_ptr<GError, GErrorDeleter> err;
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    VerifyOrReturnError(mWpaSupplicant.iface != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    std::unique_ptr<GError, GErrorDeleter> err;
     gboolean result;
+
+    ChipLogDetail(DeviceLayer, "wpa_supplicant: disabling auto scan");
+
     result = wpa_fi_w1_wpa_supplicant1_interface_call_auto_scan_sync(
         mWpaSupplicant.iface, "" /* empty string means disabling auto scan */, nullptr, &MakeUniquePointerReceiver(err).Get());
     if (!result)

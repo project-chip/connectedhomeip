@@ -1777,11 +1777,11 @@ class Groups(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="capacity", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="capacity", Tag=0, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="groupList", Tag=1, Type=typing.List[uint]),
                     ])
 
-            capacity: 'uint' = 0
+            capacity: 'typing.Union[Nullable, uint]' = NullValue
             groupList: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
@@ -10556,7 +10556,7 @@ class SoftwareDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="threadMetrics", Tag=0x00000000, Type=typing.Optional[typing.List[SoftwareDiagnostics.Structs.ThreadMetrics]]),
                 ClusterObjectFieldDescriptor(Label="currentHeapFree", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="currentHeapUsed", Tag=0x00000002, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="currentHeapHighWatermark", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="currentHeapHighWatermark", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="serverGeneratedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="clientGeneratedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -10567,7 +10567,7 @@ class SoftwareDiagnostics(Cluster):
     threadMetrics: 'typing.Optional[typing.List[SoftwareDiagnostics.Structs.ThreadMetrics]]' = None
     currentHeapFree: 'typing.Optional[uint]' = None
     currentHeapUsed: 'typing.Optional[uint]' = None
-    currentHeapHighWatermark: 'uint' = None
+    currentHeapHighWatermark: 'typing.Optional[uint]' = None
     serverGeneratedCommandList: 'typing.List[uint]' = None
     clientGeneratedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -10688,9 +10688,9 @@ class SoftwareDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class ServerGeneratedCommandList(ClusterAttributeDescriptor):
@@ -10808,7 +10808,7 @@ class ThreadNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="panId", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="extendedPanId", Tag=0x00000004, Type=uint),
                 ClusterObjectFieldDescriptor(Label="meshLocalPrefix", Tag=0x00000005, Type=bytes),
-                ClusterObjectFieldDescriptor(Label="overrunCount", Tag=0x00000006, Type=uint),
+                ClusterObjectFieldDescriptor(Label="overrunCount", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="neighborTableList", Tag=0x00000007, Type=typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]),
                 ClusterObjectFieldDescriptor(Label="routeTableList", Tag=0x00000008, Type=typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]),
                 ClusterObjectFieldDescriptor(Label="partitionId", Tag=0x00000009, Type=uint),
@@ -10816,48 +10816,48 @@ class ThreadNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="dataVersion", Tag=0x0000000B, Type=uint),
                 ClusterObjectFieldDescriptor(Label="stableDataVersion", Tag=0x0000000C, Type=uint),
                 ClusterObjectFieldDescriptor(Label="leaderRouterId", Tag=0x0000000D, Type=uint),
-                ClusterObjectFieldDescriptor(Label="detachedRoleCount", Tag=0x0000000E, Type=uint),
-                ClusterObjectFieldDescriptor(Label="childRoleCount", Tag=0x0000000F, Type=uint),
-                ClusterObjectFieldDescriptor(Label="routerRoleCount", Tag=0x00000010, Type=uint),
-                ClusterObjectFieldDescriptor(Label="leaderRoleCount", Tag=0x00000011, Type=uint),
-                ClusterObjectFieldDescriptor(Label="attachAttemptCount", Tag=0x00000012, Type=uint),
-                ClusterObjectFieldDescriptor(Label="partitionIdChangeCount", Tag=0x00000013, Type=uint),
-                ClusterObjectFieldDescriptor(Label="betterPartitionAttachAttemptCount", Tag=0x00000014, Type=uint),
-                ClusterObjectFieldDescriptor(Label="parentChangeCount", Tag=0x00000015, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txTotalCount", Tag=0x00000016, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txUnicastCount", Tag=0x00000017, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txBroadcastCount", Tag=0x00000018, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txAckRequestedCount", Tag=0x00000019, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txAckedCount", Tag=0x0000001A, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txNoAckRequestedCount", Tag=0x0000001B, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txDataCount", Tag=0x0000001C, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txDataPollCount", Tag=0x0000001D, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txBeaconCount", Tag=0x0000001E, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txBeaconRequestCount", Tag=0x0000001F, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txOtherCount", Tag=0x00000020, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txRetryCount", Tag=0x00000021, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txDirectMaxRetryExpiryCount", Tag=0x00000022, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txIndirectMaxRetryExpiryCount", Tag=0x00000023, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txErrCcaCount", Tag=0x00000024, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txErrAbortCount", Tag=0x00000025, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txErrBusyChannelCount", Tag=0x00000026, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxTotalCount", Tag=0x00000027, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxUnicastCount", Tag=0x00000028, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxBroadcastCount", Tag=0x00000029, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxDataCount", Tag=0x0000002A, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxDataPollCount", Tag=0x0000002B, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxBeaconCount", Tag=0x0000002C, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxBeaconRequestCount", Tag=0x0000002D, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxOtherCount", Tag=0x0000002E, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxAddressFilteredCount", Tag=0x0000002F, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxDestAddrFilteredCount", Tag=0x00000030, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxDuplicatedCount", Tag=0x00000031, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxErrNoFrameCount", Tag=0x00000032, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxErrUnknownNeighborCount", Tag=0x00000033, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxErrInvalidSrcAddrCount", Tag=0x00000034, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxErrSecCount", Tag=0x00000035, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxErrFcsCount", Tag=0x00000036, Type=uint),
-                ClusterObjectFieldDescriptor(Label="rxErrOtherCount", Tag=0x00000037, Type=uint),
+                ClusterObjectFieldDescriptor(Label="detachedRoleCount", Tag=0x0000000E, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="childRoleCount", Tag=0x0000000F, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="routerRoleCount", Tag=0x00000010, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="leaderRoleCount", Tag=0x00000011, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="attachAttemptCount", Tag=0x00000012, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="partitionIdChangeCount", Tag=0x00000013, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="betterPartitionAttachAttemptCount", Tag=0x00000014, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="parentChangeCount", Tag=0x00000015, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txTotalCount", Tag=0x00000016, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txUnicastCount", Tag=0x00000017, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txBroadcastCount", Tag=0x00000018, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txAckRequestedCount", Tag=0x00000019, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txAckedCount", Tag=0x0000001A, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txNoAckRequestedCount", Tag=0x0000001B, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txDataCount", Tag=0x0000001C, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txDataPollCount", Tag=0x0000001D, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txBeaconCount", Tag=0x0000001E, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txBeaconRequestCount", Tag=0x0000001F, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txOtherCount", Tag=0x00000020, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txRetryCount", Tag=0x00000021, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txDirectMaxRetryExpiryCount", Tag=0x00000022, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txIndirectMaxRetryExpiryCount", Tag=0x00000023, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txErrCcaCount", Tag=0x00000024, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txErrAbortCount", Tag=0x00000025, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txErrBusyChannelCount", Tag=0x00000026, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxTotalCount", Tag=0x00000027, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxUnicastCount", Tag=0x00000028, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxBroadcastCount", Tag=0x00000029, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxDataCount", Tag=0x0000002A, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxDataPollCount", Tag=0x0000002B, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxBeaconCount", Tag=0x0000002C, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxBeaconRequestCount", Tag=0x0000002D, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxOtherCount", Tag=0x0000002E, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxAddressFilteredCount", Tag=0x0000002F, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxDestAddrFilteredCount", Tag=0x00000030, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxDuplicatedCount", Tag=0x00000031, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxErrNoFrameCount", Tag=0x00000032, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxErrUnknownNeighborCount", Tag=0x00000033, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxErrInvalidSrcAddrCount", Tag=0x00000034, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxErrSecCount", Tag=0x00000035, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxErrFcsCount", Tag=0x00000036, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="rxErrOtherCount", Tag=0x00000037, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="activeTimestamp", Tag=0x00000038, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="pendingTimestamp", Tag=0x00000039, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="delay", Tag=0x0000003A, Type=typing.Optional[uint]),
@@ -10878,7 +10878,7 @@ class ThreadNetworkDiagnostics(Cluster):
     panId: 'uint' = None
     extendedPanId: 'uint' = None
     meshLocalPrefix: 'bytes' = None
-    overrunCount: 'uint' = None
+    overrunCount: 'typing.Optional[uint]' = None
     neighborTableList: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]' = None
     routeTableList: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]' = None
     partitionId: 'uint' = None
@@ -10886,48 +10886,48 @@ class ThreadNetworkDiagnostics(Cluster):
     dataVersion: 'uint' = None
     stableDataVersion: 'uint' = None
     leaderRouterId: 'uint' = None
-    detachedRoleCount: 'uint' = None
-    childRoleCount: 'uint' = None
-    routerRoleCount: 'uint' = None
-    leaderRoleCount: 'uint' = None
-    attachAttemptCount: 'uint' = None
-    partitionIdChangeCount: 'uint' = None
-    betterPartitionAttachAttemptCount: 'uint' = None
-    parentChangeCount: 'uint' = None
-    txTotalCount: 'uint' = None
-    txUnicastCount: 'uint' = None
-    txBroadcastCount: 'uint' = None
-    txAckRequestedCount: 'uint' = None
-    txAckedCount: 'uint' = None
-    txNoAckRequestedCount: 'uint' = None
-    txDataCount: 'uint' = None
-    txDataPollCount: 'uint' = None
-    txBeaconCount: 'uint' = None
-    txBeaconRequestCount: 'uint' = None
-    txOtherCount: 'uint' = None
-    txRetryCount: 'uint' = None
-    txDirectMaxRetryExpiryCount: 'uint' = None
-    txIndirectMaxRetryExpiryCount: 'uint' = None
-    txErrCcaCount: 'uint' = None
-    txErrAbortCount: 'uint' = None
-    txErrBusyChannelCount: 'uint' = None
-    rxTotalCount: 'uint' = None
-    rxUnicastCount: 'uint' = None
-    rxBroadcastCount: 'uint' = None
-    rxDataCount: 'uint' = None
-    rxDataPollCount: 'uint' = None
-    rxBeaconCount: 'uint' = None
-    rxBeaconRequestCount: 'uint' = None
-    rxOtherCount: 'uint' = None
-    rxAddressFilteredCount: 'uint' = None
-    rxDestAddrFilteredCount: 'uint' = None
-    rxDuplicatedCount: 'uint' = None
-    rxErrNoFrameCount: 'uint' = None
-    rxErrUnknownNeighborCount: 'uint' = None
-    rxErrInvalidSrcAddrCount: 'uint' = None
-    rxErrSecCount: 'uint' = None
-    rxErrFcsCount: 'uint' = None
-    rxErrOtherCount: 'uint' = None
+    detachedRoleCount: 'typing.Optional[uint]' = None
+    childRoleCount: 'typing.Optional[uint]' = None
+    routerRoleCount: 'typing.Optional[uint]' = None
+    leaderRoleCount: 'typing.Optional[uint]' = None
+    attachAttemptCount: 'typing.Optional[uint]' = None
+    partitionIdChangeCount: 'typing.Optional[uint]' = None
+    betterPartitionAttachAttemptCount: 'typing.Optional[uint]' = None
+    parentChangeCount: 'typing.Optional[uint]' = None
+    txTotalCount: 'typing.Optional[uint]' = None
+    txUnicastCount: 'typing.Optional[uint]' = None
+    txBroadcastCount: 'typing.Optional[uint]' = None
+    txAckRequestedCount: 'typing.Optional[uint]' = None
+    txAckedCount: 'typing.Optional[uint]' = None
+    txNoAckRequestedCount: 'typing.Optional[uint]' = None
+    txDataCount: 'typing.Optional[uint]' = None
+    txDataPollCount: 'typing.Optional[uint]' = None
+    txBeaconCount: 'typing.Optional[uint]' = None
+    txBeaconRequestCount: 'typing.Optional[uint]' = None
+    txOtherCount: 'typing.Optional[uint]' = None
+    txRetryCount: 'typing.Optional[uint]' = None
+    txDirectMaxRetryExpiryCount: 'typing.Optional[uint]' = None
+    txIndirectMaxRetryExpiryCount: 'typing.Optional[uint]' = None
+    txErrCcaCount: 'typing.Optional[uint]' = None
+    txErrAbortCount: 'typing.Optional[uint]' = None
+    txErrBusyChannelCount: 'typing.Optional[uint]' = None
+    rxTotalCount: 'typing.Optional[uint]' = None
+    rxUnicastCount: 'typing.Optional[uint]' = None
+    rxBroadcastCount: 'typing.Optional[uint]' = None
+    rxDataCount: 'typing.Optional[uint]' = None
+    rxDataPollCount: 'typing.Optional[uint]' = None
+    rxBeaconCount: 'typing.Optional[uint]' = None
+    rxBeaconRequestCount: 'typing.Optional[uint]' = None
+    rxOtherCount: 'typing.Optional[uint]' = None
+    rxAddressFilteredCount: 'typing.Optional[uint]' = None
+    rxDestAddrFilteredCount: 'typing.Optional[uint]' = None
+    rxDuplicatedCount: 'typing.Optional[uint]' = None
+    rxErrNoFrameCount: 'typing.Optional[uint]' = None
+    rxErrUnknownNeighborCount: 'typing.Optional[uint]' = None
+    rxErrInvalidSrcAddrCount: 'typing.Optional[uint]' = None
+    rxErrSecCount: 'typing.Optional[uint]' = None
+    rxErrFcsCount: 'typing.Optional[uint]' = None
+    rxErrOtherCount: 'typing.Optional[uint]' = None
     activeTimestamp: 'typing.Optional[uint]' = None
     pendingTimestamp: 'typing.Optional[uint]' = None
     delay: 'typing.Optional[uint]' = None
@@ -11201,9 +11201,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class NeighborTableList(ClusterAttributeDescriptor):
@@ -11329,9 +11329,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class ChildRoleCount(ClusterAttributeDescriptor):
@@ -11345,9 +11345,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RouterRoleCount(ClusterAttributeDescriptor):
@@ -11361,9 +11361,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class LeaderRoleCount(ClusterAttributeDescriptor):
@@ -11377,9 +11377,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class AttachAttemptCount(ClusterAttributeDescriptor):
@@ -11393,9 +11393,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class PartitionIdChangeCount(ClusterAttributeDescriptor):
@@ -11409,9 +11409,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class BetterPartitionAttachAttemptCount(ClusterAttributeDescriptor):
@@ -11425,9 +11425,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class ParentChangeCount(ClusterAttributeDescriptor):
@@ -11441,9 +11441,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxTotalCount(ClusterAttributeDescriptor):
@@ -11457,9 +11457,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxUnicastCount(ClusterAttributeDescriptor):
@@ -11473,9 +11473,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxBroadcastCount(ClusterAttributeDescriptor):
@@ -11489,9 +11489,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxAckRequestedCount(ClusterAttributeDescriptor):
@@ -11505,9 +11505,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxAckedCount(ClusterAttributeDescriptor):
@@ -11521,9 +11521,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxNoAckRequestedCount(ClusterAttributeDescriptor):
@@ -11537,9 +11537,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxDataCount(ClusterAttributeDescriptor):
@@ -11553,9 +11553,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxDataPollCount(ClusterAttributeDescriptor):
@@ -11569,9 +11569,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxBeaconCount(ClusterAttributeDescriptor):
@@ -11585,9 +11585,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxBeaconRequestCount(ClusterAttributeDescriptor):
@@ -11601,9 +11601,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxOtherCount(ClusterAttributeDescriptor):
@@ -11617,9 +11617,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxRetryCount(ClusterAttributeDescriptor):
@@ -11633,9 +11633,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxDirectMaxRetryExpiryCount(ClusterAttributeDescriptor):
@@ -11649,9 +11649,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxIndirectMaxRetryExpiryCount(ClusterAttributeDescriptor):
@@ -11665,9 +11665,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxErrCcaCount(ClusterAttributeDescriptor):
@@ -11681,9 +11681,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxErrAbortCount(ClusterAttributeDescriptor):
@@ -11697,9 +11697,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxErrBusyChannelCount(ClusterAttributeDescriptor):
@@ -11713,9 +11713,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxTotalCount(ClusterAttributeDescriptor):
@@ -11729,9 +11729,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxUnicastCount(ClusterAttributeDescriptor):
@@ -11745,9 +11745,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxBroadcastCount(ClusterAttributeDescriptor):
@@ -11761,9 +11761,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxDataCount(ClusterAttributeDescriptor):
@@ -11777,9 +11777,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxDataPollCount(ClusterAttributeDescriptor):
@@ -11793,9 +11793,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxBeaconCount(ClusterAttributeDescriptor):
@@ -11809,9 +11809,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxBeaconRequestCount(ClusterAttributeDescriptor):
@@ -11825,9 +11825,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxOtherCount(ClusterAttributeDescriptor):
@@ -11841,9 +11841,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxAddressFilteredCount(ClusterAttributeDescriptor):
@@ -11857,9 +11857,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxDestAddrFilteredCount(ClusterAttributeDescriptor):
@@ -11873,9 +11873,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxDuplicatedCount(ClusterAttributeDescriptor):
@@ -11889,9 +11889,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxErrNoFrameCount(ClusterAttributeDescriptor):
@@ -11905,9 +11905,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxErrUnknownNeighborCount(ClusterAttributeDescriptor):
@@ -11921,9 +11921,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxErrInvalidSrcAddrCount(ClusterAttributeDescriptor):
@@ -11937,9 +11937,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxErrSecCount(ClusterAttributeDescriptor):
@@ -11953,9 +11953,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxErrFcsCount(ClusterAttributeDescriptor):
@@ -11969,9 +11969,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class RxErrOtherCount(ClusterAttributeDescriptor):
@@ -11985,9 +11985,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class ActiveTimestamp(ClusterAttributeDescriptor):
@@ -12655,11 +12655,11 @@ class EthernetNetworkDiagnostics(Cluster):
             Fields = [
                 ClusterObjectFieldDescriptor(Label="PHYRate", Tag=0x00000000, Type=typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRateType]),
                 ClusterObjectFieldDescriptor(Label="fullDuplex", Tag=0x00000001, Type=typing.Union[None, Nullable, bool]),
-                ClusterObjectFieldDescriptor(Label="packetRxCount", Tag=0x00000002, Type=uint),
-                ClusterObjectFieldDescriptor(Label="packetTxCount", Tag=0x00000003, Type=uint),
-                ClusterObjectFieldDescriptor(Label="txErrCount", Tag=0x00000004, Type=uint),
-                ClusterObjectFieldDescriptor(Label="collisionCount", Tag=0x00000005, Type=uint),
-                ClusterObjectFieldDescriptor(Label="overrunCount", Tag=0x00000006, Type=uint),
+                ClusterObjectFieldDescriptor(Label="packetRxCount", Tag=0x00000002, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="packetTxCount", Tag=0x00000003, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="txErrCount", Tag=0x00000004, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="collisionCount", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="overrunCount", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="carrierDetect", Tag=0x00000007, Type=typing.Union[None, Nullable, bool]),
                 ClusterObjectFieldDescriptor(Label="timeSinceReset", Tag=0x00000008, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="serverGeneratedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -12671,11 +12671,11 @@ class EthernetNetworkDiagnostics(Cluster):
 
     PHYRate: 'typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRateType]' = None
     fullDuplex: 'typing.Union[None, Nullable, bool]' = None
-    packetRxCount: 'uint' = None
-    packetTxCount: 'uint' = None
-    txErrCount: 'uint' = None
-    collisionCount: 'uint' = None
-    overrunCount: 'uint' = None
+    packetRxCount: 'typing.Optional[uint]' = None
+    packetTxCount: 'typing.Optional[uint]' = None
+    txErrCount: 'typing.Optional[uint]' = None
+    collisionCount: 'typing.Optional[uint]' = None
+    overrunCount: 'typing.Optional[uint]' = None
     carrierDetect: 'typing.Union[None, Nullable, bool]' = None
     timeSinceReset: 'typing.Optional[uint]' = None
     serverGeneratedCommandList: 'typing.List[uint]' = None
@@ -12759,9 +12759,9 @@ class EthernetNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class PacketTxCount(ClusterAttributeDescriptor):
@@ -12775,9 +12775,9 @@ class EthernetNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TxErrCount(ClusterAttributeDescriptor):
@@ -12791,9 +12791,9 @@ class EthernetNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class CollisionCount(ClusterAttributeDescriptor):
@@ -12807,9 +12807,9 @@ class EthernetNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class OverrunCount(ClusterAttributeDescriptor):
@@ -12823,9 +12823,9 @@ class EthernetNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class CarrierDetect(ClusterAttributeDescriptor):

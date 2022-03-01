@@ -3148,7 +3148,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer capacity, ArrayList<Integer> groupList) {
+    public void onSuccess(@Nullable Integer capacity, ArrayList<Integer> groupList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo capacityResponseValue = new CommandResponseInfo("capacity", "Integer");
       responseValues.put(capacityResponseValue, capacity);

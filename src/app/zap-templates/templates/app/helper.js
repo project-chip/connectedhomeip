@@ -425,7 +425,7 @@ function hasSpecificAttributes(options)
 function asLowerCamelCase(label)
 {
   let str = string.toCamelCase(label, true);
-  // Check for the case when were:
+  // Check for the case when we're:
   // 1. A single word (that's the regexp at the beginning, which matches the
   //    word-splitting regexp in string.toCamelCase).
   // 2. Starting with multiple capital letters in a row.

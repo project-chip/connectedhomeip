@@ -51,9 +51,10 @@ nlTestSuite * gSuite     = nullptr;
 // already used in the fixed endpoint set of size 1. Consequently, let's use the next
 // number higher than that for our dynamic test endpoint.
 //
-constexpr EndpointId kTestEndpointId     = 2;
-constexpr AttributeId kTestListAttribute = 6;
-constexpr uint32_t kTestListLength       = 5;
+constexpr EndpointId kTestEndpointId      = 2;
+constexpr AttributeId kTestListAttribute  = 6;
+constexpr AttributeId kTestListAttribute2 = 7;
+constexpr uint32_t kTestListLength        = 5;
 
 // We don't really care about the content, we just need a buffer.
 uint8_t sByteSpanData[app::kMaxSecureSduLengthBytes];
@@ -64,13 +65,16 @@ public:
     TestWriteChunking() {}
     static void TestListChunking(nlTestSuite * apSuite, void * apContext);
     static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
+    static void TestConflictWrite(nlTestSuite * apSuite, void * apContext);
+    static void TestNonConflictWrite(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
 
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint)
-DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE),
+    DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute2, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
 DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
@@ -93,17 +97,23 @@ public:
         }
         else
         {
+            mLastErrorReason = status;
             mErrorCount++;
         }
     }
 
-    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override { mErrorCount++; }
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override
+    {
+        mLastErrorReason = app::StatusIB(aError);
+        mErrorCount++;
+    }
 
     void OnDone(app::WriteClient * apWriteClient) override { mOnDoneCount++; }
 
     uint32_t mSuccessCount = 0;
     uint32_t mErrorCount   = 0;
     uint32_t mOnDoneCount  = 0;
+    app::StatusIB mLastErrorReason;
 };
 
 class TestAttrAccess : public app::AttributeAccessInterface
@@ -219,6 +229,7 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
             break;
         }
     }
+    emberAfClearDynamicEndpoint(0);
 }
 
 // We encode a pretty large write payload to test the corner cases related to message layer and secure session overheads.
@@ -301,6 +312,146 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     }
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
     NL_TEST_ASSERT(apSuite, atLeastOneRequestSent && atLeastOneRequestFailed);
+    emberAfClearDynamicEndpoint(0);
+}
+
+/*
+ * When chunked write is enabled, it is dangerious to handle multiple write requests at the same time. In this case, we will reject
+ * the latter write requests to the same attribute.
+ */
+void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    // Register our fake dynamic endpoint.
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+
+    // Register our fake attribute access interface.
+    registerAttributeAccessOverride(&testServer);
+
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
+
+    TestWriteCallback writeCallback1;
+    app::WriteClient writeClient1(
+        &ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+
+    TestWriteCallback writeCallback2;
+    app::WriteClient writeClient2(
+        &ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+
+    ByteSpan list[kTestListLength];
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = writeClient1.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = writeClient2.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = writeClient1.SendWriteRequest(sessionHandle);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = writeClient2.SendWriteRequest(sessionHandle);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    {
+        const TestWriteCallback * writeCallbackRef1 = &writeCallback1;
+        const TestWriteCallback * writeCallbackRef2 = &writeCallback2;
+
+        // Exactly one of WriteClient1 and WriteClient2 should success, not both.
+
+        if (writeCallback1.mSuccessCount == 0)
+        {
+            writeCallbackRef2 = &writeCallback1;
+            writeCallbackRef1 = &writeCallback2;
+        }
+
+        NL_TEST_ASSERT(apSuite,
+                       writeCallbackRef1->mSuccessCount ==
+                           kTestListLength + 1 /* an extra item for the empty list at the beginning */);
+        NL_TEST_ASSERT(apSuite, writeCallbackRef1->mErrorCount == 0);
+        NL_TEST_ASSERT(apSuite, writeCallbackRef2->mSuccessCount == 0);
+        NL_TEST_ASSERT(apSuite, writeCallbackRef2->mErrorCount == kTestListLength + 1);
+        NL_TEST_ASSERT(apSuite, writeCallbackRef2->mLastErrorReason.mStatus == Protocols::InteractionModel::Status::Busy);
+
+        NL_TEST_ASSERT(apSuite, writeCallbackRef1->mOnDoneCount == 1);
+        NL_TEST_ASSERT(apSuite, writeCallbackRef2->mOnDoneCount == 1);
+    }
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(0);
+}
+
+/*
+ * When chunked write is enabled, it is dangerious to handle multiple write requests at the same time. However, we will allow such
+ * change when writing to different attributes in parallel.
+ */
+void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    // Register our fake dynamic endpoint.
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+
+    // Register our fake attribute access interface.
+    registerAttributeAccessOverride(&testServer);
+
+    app::AttributePathParams attributePath1(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
+    app::AttributePathParams attributePath2(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute2);
+
+    TestWriteCallback writeCallback1;
+    app::WriteClient writeClient1(
+        &ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+
+    TestWriteCallback writeCallback2;
+    app::WriteClient writeClient2(
+        &ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+
+    ByteSpan list[kTestListLength];
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = writeClient1.EncodeAttribute(attributePath1, app::DataModel::List<ByteSpan>(list, kTestListLength));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = writeClient2.EncodeAttribute(attributePath2, app::DataModel::List<ByteSpan>(list, kTestListLength));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = writeClient1.SendWriteRequest(sessionHandle);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = writeClient2.SendWriteRequest(sessionHandle);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    {
+        NL_TEST_ASSERT(apSuite, writeCallback1.mErrorCount == 0);
+        NL_TEST_ASSERT(apSuite, writeCallback1.mSuccessCount == kTestListLength + 1);
+        NL_TEST_ASSERT(apSuite, writeCallback2.mErrorCount == 0);
+        NL_TEST_ASSERT(apSuite, writeCallback2.mSuccessCount == kTestListLength + 1);
+
+        NL_TEST_ASSERT(apSuite, writeCallback1.mOnDoneCount == 1);
+        NL_TEST_ASSERT(apSuite, writeCallback2.mOnDoneCount == 1);
+    }
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(0);
 }
 
 // clang-format off
@@ -308,6 +459,8 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("TestListChunking", TestWriteChunking::TestListChunking),
     NL_TEST_DEF("TestBadChunking", TestWriteChunking::TestBadChunking),
+    NL_TEST_DEF("TestConflictWrite", TestWriteChunking::TestConflictWrite),
+    NL_TEST_DEF("TestNonConflictWrite", TestWriteChunking::TestNonConflictWrite),
     NL_TEST_SENTINEL()
 };
 
