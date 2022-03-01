@@ -117,25 +117,23 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
 static void OnBindingAdded(const EmberBindingTableEntry & binding)
 {
-    if (binding.type == EMBER_MULTICAST_BINDING)
-    {
-        ChipLogError(NotSpecified, "Group binding received");
-        return;
-    }
-
     if (binding.type == EMBER_UNICAST_BINDING)
     {
-        ChipLogError(NotSpecified,
-                     "Unicast binding received nodeId=0x" ChipLogFormatX64 " remote endpoint=%d cluster=" ChipLogFormatMEI,
-                     ChipLogValueX64(binding.nodeId), binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+        ChipLogProgress(NotSpecified,
+                        "Unicast binding received nodeId=0x" ChipLogFormatX64 " remote endpoint=%d cluster=" ChipLogFormatMEI,
+                        ChipLogValueX64(binding.nodeId), binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
         // TODO read descriptor cluster for endpoint and use this to construct command options for GUI
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Non-unicast binding received");
     }
 }
 
 CHIP_ERROR InitBindingHandlers()
 {
     chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
-    chip::BindingManager::GetInstance().RegisterBindingAddedHandler(OnBindingAdded);
+    ReturnErrorOnFailure(chip::BindingManager::GetInstance().RegisterBindingAddedHandler(OnBindingAdded));
     return CHIP_NO_ERROR;
 }
 
@@ -159,7 +157,7 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
 
     // Initialize binding handlers
-    InitBindingHandlers();
+    ReturnOnFailure(InitBindingHandlers());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (selectedCommissioner != nullptr)

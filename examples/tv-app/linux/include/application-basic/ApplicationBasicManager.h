@@ -41,10 +41,9 @@ public:
         CopyString(mVendorName, sizeof(mVendorName), szVendorName);
         mVendorId = vendorId;
         CopyString(mApplicationVersion, sizeof(mApplicationVersion), szApplicationVersion);
-        mProductId                    = productId;
-        static uint16_t kTestVendorId = 456;
+        mProductId = productId;
         mAllowedVendorList.push_back(vendorId);
-        mAllowedVendorList.push_back(kTestVendorId);
+        mAllowedVendorList.push_back(chip::VendorId::TestVendor1);
     };
     virtual ~ApplicationBasicManager(){};
 

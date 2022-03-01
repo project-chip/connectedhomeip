@@ -136,30 +136,6 @@ public:
                                   Controller::WriteResponseSuccessCallback successCb,
                                   Controller::WriteResponseFailureCallback failureCb);
 
-    /**
-     * @brief
-     *   Add a binding.
-     *
-     * @param[in] device             OperationalDeviceProxy for the target device.
-     * @param[in] deviceEndpointId   The endpoint on the device containing the binding cluster.
-     * @param[in] bindingNodeId      The NodeId for the binding that will be created.
-     * @param[in] bindingGroupId     The GroupId for the binding that will be created.
-     * @param[in] bindingEndpointId  The EndpointId for the binding that will be created.
-     * @param[in] bindingClusterId   The ClusterId for the binding that will be created.
-     * @param[in] successCb          The function to be called on success of adding the binding.
-     * @param[in] failureCb          The function to be called on failure of adding the binding.
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId, NodeId bindingNodeId,
-                                         GroupId bindingGroupId, EndpointId bindingEndpointId, ClusterId bindingClusterId,
-                                         Controller::WriteResponseSuccessCallback successCb,
-                                         Controller::WriteResponseFailureCallback failureCb);
-
-    CHIP_ERROR CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId, BindingListType bindingList,
-                                         Controller::WriteResponseSuccessCallback successCb,
-                                         Controller::WriteResponseFailureCallback failureCb);
-
 protected:
     // requires vendorApp to be in the catalog of the platform
     ContentApp * LoadContentAppInternal(const CatalogVendorApp & vendorApp);

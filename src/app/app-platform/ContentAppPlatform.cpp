@@ -392,7 +392,8 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
 constexpr EndpointId kTargetBindingClusterEndpointId = 0;
 constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
 constexpr EndpointId kLocalSpeakerEndpointId         = 2;
-// the fabric index can't be 0, but needs to be validated as 1
+// TODO: determine correct local fabric index
+// - the fabric index can't be 0, but needs to be validated as 1
 constexpr FabricIndex kLocalFabricIndex   = 1;
 constexpr ClusterId kNoClusterIdSpecified = kInvalidClusterId;
 constexpr ClusterId kClusterIdOnOff       = 0x0006;
@@ -412,12 +413,16 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
                                                   NodeId localNodeId, Controller::WriteResponseSuccessCallback successCb,
                                                   Controller::WriteResponseFailureCallback failureCb)
 {
+    VerifyOrReturnError(targetDeviceProxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(successCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(failureCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     Access::AccessControl::Entry entry;
     ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
-    entry.SetAuthMode(Access::AuthMode::kCase);
+    ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
     entry.SetFabricIndex(kLocalFabricIndex);
-    entry.SetPrivilege(Access::Privilege::kOperate);
-    entry.AddSubject(nullptr, targetDeviceProxy->GetDeviceId());
+    ReturnErrorOnFailure(entry.SetPrivilege(Access::Privilege::kOperate));
+    ReturnErrorOnFailure(entry.AddSubject(nullptr, targetDeviceProxy->GetDeviceId()));
 
     std::vector<Binding::Structs::TargetStruct::Type> bindings;
 
@@ -508,66 +513,16 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
 
     ChipLogProgress(Controller, "Attempting to update Binding list");
     BindingListType bindingList(bindings.data(), bindings.size());
+
+    chip::Controller::BindingCluster cluster;
+    ReturnErrorOnFailure(cluster.Associate(targetDeviceProxy, kTargetBindingClusterEndpointId));
+
     ReturnErrorOnFailure(
-        CreateBindingWithCallback(targetDeviceProxy, kTargetBindingClusterEndpointId, bindingList, successCb, failureCb));
+        cluster.WriteAttribute<Binding::Attributes::Binding::TypeInfo>(bindingList, nullptr, successCb, failureCb));
 
     ChipLogProgress(Controller, "Completed Bindings and ACLs");
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId,
-                                                         NodeId bindingNodeId, GroupId bindingGroupId, EndpointId bindingEndpointId,
-                                                         ClusterId bindingClusterId,
-                                                         Controller::WriteResponseSuccessCallback successCb,
-                                                         Controller::WriteResponseFailureCallback failureCb)
-{
-    Binding::Structs::TargetStruct::Type entries[1];
-
-    if (bindingNodeId != kUndefinedNodeId)
-    {
-        entries[0] = Binding::Structs::TargetStruct::Type{
-            .fabricIndex = kUndefinedFabricIndex,
-            .node        = MakeOptional(bindingNodeId),
-            .group       = NullOptional,
-            .endpoint    = MakeOptional(bindingEndpointId),
-            .cluster     = MakeOptional(bindingClusterId),
-        };
-    }
-    else
-    {
-        entries[0] = Binding::Structs::TargetStruct::Type{
-            .fabricIndex = kUndefinedFabricIndex,
-            .node        = NullOptional,
-            .group       = MakeOptional(bindingGroupId),
-            .endpoint    = NullOptional,
-            .cluster     = MakeOptional(bindingClusterId),
-        };
-    }
-    BindingListType bindingList(entries);
-
-    return CreateBindingWithCallback(device, deviceEndpointId, bindingList, successCb, failureCb);
-}
-
-CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId,
-                                                         BindingListType bindingList,
-                                                         Controller::WriteResponseSuccessCallback successCb,
-                                                         Controller::WriteResponseFailureCallback failureCb)
-{
-    chip::Controller::BindingCluster cluster;
-    cluster.Associate(device, deviceEndpointId);
-
-    CHIP_ERROR error = cluster.WriteAttribute<Binding::Attributes::Binding::TypeInfo>(bindingList, nullptr, successCb, failureCb);
-    if (error == CHIP_NO_ERROR)
-    {
-        ChipLogDetail(Controller, "CreateBindingWithCallback: Sent write request, waiting for response");
-    }
-    else
-    {
-        ChipLogError(Controller, "CreateBindingWithCallback: Failed to send write request: %" CHIP_ERROR_FORMAT, error.Format());
-    }
-
-    return error;
 }
 
 } // namespace AppPlatform

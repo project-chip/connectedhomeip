@@ -62,7 +62,15 @@ public:
     {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
-    void RegisterBindingAddedHandler(BindingAddedHandler handler) { mBindingAddedHandler = handler; }
+    CHIP_ERROR RegisterBindingAddedHandler(BindingAddedHandler handler)
+    {
+        if (mBindingAddedHandler == nullptr)
+        {
+            mBindingAddedHandler = handler;
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     void SetAppServer(Server * appServer);
 
