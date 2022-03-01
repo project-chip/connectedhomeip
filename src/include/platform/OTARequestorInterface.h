@@ -151,15 +151,6 @@ public:
         kWrongState        = 2
     };
 
-    // Various actions to take when OnConnected callback is called
-    enum OnConnectedAction
-    {
-        kQueryImage = 0,
-        kStartBDX,
-        kApplyUpdate,
-        kNotifyUpdateApplied,
-    };
-
     enum UpdateState
     {
         kStateUnknown,
@@ -172,8 +163,6 @@ public:
         kStateRollingBack,
         kStateDelayedOnUserConsent,
     };
-
-    // virtual void ConnectToProvider(OnConnectedAction onConnectedAction) = 0;
 
     // Handler for the AnnounceOTAProvider command
     virtual EmberAfStatus HandleAnnounceOTAProvider(

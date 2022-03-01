@@ -226,6 +226,15 @@ private:
      */
     CHIP_ERROR ExtractUpdateDescription(const QueryImageResponseDecodableType & response, UpdateDescription & update) const;
 
+    // Various actions to take when OnConnected callback is called
+    enum OnConnectedAction
+    {
+        kQueryImage = 0,
+        kStartBDX,
+        kApplyUpdate,
+        kNotifyUpdateApplied,
+    };
+
     /**
      * Called to establish a session to mProviderLocation.
      *

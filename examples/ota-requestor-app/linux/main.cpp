@@ -57,7 +57,7 @@ void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionRequestorCanConsent  = 'c';
 
-uint32_t gPeriodicQueryTimeout = (24 * 60 * 60);
+uint32_t gPeriodicQueryTimeoutSec = (24 * 60 * 60);
 chip::Optional<bool> gRequestorCanConsent;
 
 OptionDef cmdLineOptionsDef[] = {
@@ -83,7 +83,7 @@ static void InitOTARequestor(void)
 
     gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-    gRequestorUser.SetPeriodicQueryTimeout(gPeriodicQueryTimeout);
+    gRequestorUser.SetPeriodicQueryTimeout(gPeriodicQueryTimeoutSec);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
     // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
@@ -105,7 +105,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     switch (aIdentifier)
     {
     case kOptionPeriodicQueryTimeout:
-        gPeriodicQueryTimeout = static_cast<uint32_t>(strtol(aValue, NULL, 0));
+        gPeriodicQueryTimeoutSec = static_cast<uint32_t>(strtol(aValue, NULL, 0));
         break;
     case kOptionRequestorCanConsent:
         gRequestorCanConsent.SetValue(true);
