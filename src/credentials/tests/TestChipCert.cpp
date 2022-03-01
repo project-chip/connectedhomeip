@@ -892,7 +892,7 @@ static void TestChipCert_GenerateNOCRoot(nlTestSuite * inSuite, void * inContext
 
     NL_TEST_ASSERT(inSuite,
                    NewNodeOperationalX509Cert(noc_params, noc_keypair.Pubkey(), keypair, signed_cert_span1) ==
-                       CHIP_ERROR_WRONG_CERT_TYPE);
+                       CHIP_ERROR_WRONG_CERT_DN);
 
     // Test error case: issuer cert DN type is Node certificate
     noc_params.SubjectDN.Clear();
