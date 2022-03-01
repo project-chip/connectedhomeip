@@ -133,11 +133,11 @@ public:
             return CHIP_ERROR_NO_MEMORY;
         }
         CHIP_ERROR err = commandSender->SendGroupCommandRequest(session.Value());
-
-        commandSender.release();
         exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
+        ReturnErrorOnFailure(err);
+        commandSender.release();
 
-        return err;
+        return CHIP_NO_ERROR;
     }
 
 private:
