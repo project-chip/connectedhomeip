@@ -265,8 +265,16 @@ class MyServerStorageDelegate : public PersistentStorageDelegate
 {
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        ChipLogProgress(AppServer, "Retrieved value from server storage.");
-        return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        ChipLogProgress(AppServer, "Retrieving value from server storage.");
+        size_t bytesRead = 0;
+        CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(AppServer, "Retrieved value from server storage.");
+        }
+        size = static_cast<uint16_t>(bytesRead);
+        return err;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
