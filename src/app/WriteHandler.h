@@ -112,7 +112,7 @@ public:
         return mACLCheckCache.HasValue() && mACLCheckCache.Value() == aToken;
     }
 
-    bool IsConflictWrite(const ConcreteAttributePath & aPath)
+    bool IsCurrentlyProcessingWritePath(const ConcreteAttributePath & aPath)
     {
         return mProcessingAttributePath.HasValue() && mProcessingAttributePath.Value() == aPath;
     }

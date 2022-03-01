@@ -178,6 +178,10 @@ public:
      */
     size_t GetNumActiveReadClients();
 
+    /**
+     * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
+     * transaction is in the middle of processing the chunked value of the given path.)
+     */
     bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST

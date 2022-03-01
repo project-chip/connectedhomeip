@@ -533,7 +533,7 @@ bool InteractionModelEngine::HasConflictWriteRequests(const WriteHandler * apWri
         {
             continue;
         }
-        if (writeHandler.IsConflictWrite(aPath))
+        if (writeHandler.IsCurrentlyProcessingWritePath(aPath))
         {
             return true;
         }
