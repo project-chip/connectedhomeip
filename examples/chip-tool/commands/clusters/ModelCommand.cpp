@@ -30,8 +30,7 @@ CHIP_ERROR ModelCommand::RunCommand()
     {
         FabricIndex fabricIndex;
         ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
-        ChipLogProgress(chipTool, "Sending command to group 0x%" PRIx16 " on Fabric Index 0x%" PRIx8, GroupIdFromNodeId(mNodeId),
-                        fabricIndex);
+        ChipLogProgress(chipTool, "Sending command to group 0x%" PRIx16, GroupIdFromNodeId(mNodeId));
 
         return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex, CurrentCommissioner().GetNodeId());
     }
