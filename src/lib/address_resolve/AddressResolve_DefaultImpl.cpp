@@ -103,6 +103,11 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
 {
+#if CHIP_PROGRESS_LOGGING
+    char addr_string[Transport::PeerAddress::kMaxToStringSize];
+    result.address.ToString(addr_string);
+#endif
+
     unsigned newScore = ScoreValue(ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface()));
     if (newScore > mBestAddressScore)
     {
@@ -120,9 +125,11 @@ void NodeLookupHandle::LookupResult(const ResolveResult & result)
         }
 
 #if CHIP_PROGRESS_LOGGING
-        char addr_string[Transport::PeerAddress::kMaxToStringSize];
-        mBestResult.address.ToString(addr_string);
-        ChipLogProgress(Discovery, "Address %s is scored at %u", addr_string, mBestAddressScore);
+        ChipLogProgress(Discovery, "%s: new best score: %u", addr_string, mBestAddressScore);
+    }
+    else
+    {
+        ChipLogProgress(Discovery, "%s: score has not improved: %u", addr_string, newScore);
 #endif
     }
 }
