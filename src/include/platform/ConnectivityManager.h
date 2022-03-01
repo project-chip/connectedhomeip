@@ -154,6 +154,11 @@ public:
 
     struct SEDPollingConfig;
 
+    /**
+     * ConnectivityManager delegate object should have process lifetime, and can outlive shutdown process
+     * on all platforms. ConnectivityManager delegate object should be able to keep its state even after
+     * PlatformManager is shut down and restarted.
+     */
     void SetDelegate(ConnectivityManagerDelegate * delegate) { mDelegate = delegate; }
     ConnectivityManagerDelegate * GetDelegate() const { return mDelegate; }
 

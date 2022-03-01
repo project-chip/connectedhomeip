@@ -208,7 +208,8 @@ extern ConfigurationManager & ConfigurationMgr();
  * Sets a reference to a ConfigurationManager object.
  *
  * This must be called before any calls to ConfigurationMgr. If a nullptr is passed in,
- * no changes will be made.
+ * no changes will be made. ConfigurationManager object gets set only once during the
+ * lifetime of per process execution.
  */
 extern void SetConfigurationMgr(ConfigurationManager * configurationManager);
 

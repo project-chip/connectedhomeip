@@ -114,6 +114,12 @@ public:
     CHIP_ERROR InitChipStack();
     CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
+
+    /**
+     * PlatformManager delegate object should have process lifetime, and can outlive shutdown process
+     * on all platforms. PlatformManager delegate object should be able to keep its state even after
+     * PlatformManager is shut down and restarted.
+     */
     void SetDelegate(PlatformManagerDelegate * delegate) { mDelegate = delegate; }
     PlatformManagerDelegate * GetDelegate() const { return mDelegate; }
 

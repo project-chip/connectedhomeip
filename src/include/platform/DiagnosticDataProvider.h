@@ -153,6 +153,11 @@ public:
 class DiagnosticDataProvider
 {
 public:
+    /*
+     * DiagnosticDataProvider delegate objects should have process lifetime, and can outlive shutdown process
+     * on all platforms. DiagnosticDataProvider delegate objects should be able to keep their state even after
+     * PlatformManager is shut down and restarted.
+     */
     void SetGeneralDiagnosticsDelegate(GeneralDiagnosticsDelegate * delegate) { mGeneralDiagnosticsDelegate = delegate; }
     GeneralDiagnosticsDelegate * GetGeneralDiagnosticsDelegate() const { return mGeneralDiagnosticsDelegate; }
 
@@ -255,7 +260,8 @@ DiagnosticDataProvider & GetDiagnosticDataProvider();
  * Sets a reference to a DiagnosticDataProvider object.
  *
  * This must be called before any calls to GetDiagnosticDataProvider. If a nullptr is passed in,
- * no changes will be made.
+ * no changes will be made. DiagnosticDataProvider object gets set only once during the lifetime
+ * of per process execution.
  */
 void SetDiagnosticDataProvider(DiagnosticDataProvider * diagnosticDataProvider);
 
