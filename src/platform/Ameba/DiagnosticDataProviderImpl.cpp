@@ -162,14 +162,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 memcpy(ifp->Ipv4AddressesBuffer[0], &(ifa->ip_addr.u_addr.ip4.addr), kMaxIPv4AddrSize);
                 ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
-                ifp->IPv4Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
+                ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
             }
 
             if (ifa->ip6_addr->u_addr.ip6.addr != 0)
             {
                 memcpy(ifp->Ipv6AddressesBuffer[0], &(ifa->ip6_addr->u_addr.ip6.addr), kMaxIPv6AddrSize);
                 ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
-                ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, 1);
+                ifp->IPv6Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, 1);
             }
 
             ifp->Next = head;
