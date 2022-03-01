@@ -44,11 +44,7 @@ k32w0_sdk("sdk") {
     "${k32w0_platform_dir}/util/include",
   ]
 
-  defines = [
-    # shell app uses openthread but does not have the NETWORK_COMMISSIONING cluster or zap config.
-    "_NO_NETWORK_COMMISSIONING_DRIVER_",
-  ]
-
+  defines = []
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
   } else {

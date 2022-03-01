@@ -289,7 +289,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
     if (val)
     {
-        openthread_io_openthread_border_router_call_attach(mProxy.get(), nullptr, _OnThreadBrAttachFinished, this);
+        openthread_io_openthread_border_router_call_attach(mProxy.get(), nullptr, _OnThreadAttachFinished, this);
     }
     else
     {
@@ -311,7 +311,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     return CHIP_NO_ERROR;
 }
 
-void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data)
+void ThreadStackManagerImpl::_OnThreadAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     ThreadStackManagerImpl * this_ = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
     std::unique_ptr<GVariant, GVariantDeleter> attachRes;
@@ -507,7 +507,7 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(ThreadDriver::ScanCallback * callback)
+CHIP_ERROR ThreadStackManagerImpl::StartThreadScan(ThreadDriver::ScanCallback * callback)
 {
     // There is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -637,8 +637,8 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
 }
 
 CHIP_ERROR
-ThreadStackManagerImpl::_AttachToThreadNetwork(ByteSpan netInfo,
-                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+ThreadStackManagerImpl::AttachToThreadNetwork(ByteSpan netInfo,
+                                              NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
     // There is another ongoing connect request, reject the new one.
     VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);

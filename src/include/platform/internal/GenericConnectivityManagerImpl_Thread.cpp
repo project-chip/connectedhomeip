@@ -44,11 +44,6 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::_OnPlatformEvent(const Ch
         (event->Type == DeviceEventType::kThreadStateChange && event->ThreadStateChange.NetDataChanged);
     const bool fabricMembershipChanged = (event->Type == DeviceEventType::kFabricMembershipChange);
 
-    if (threadConnChanged && event->ThreadConnectivityChange.Result == kConnectivity_Established)
-    {
-        ThreadStackMgrImpl().OnThreadAttachFinished();
-    }
-
     // If any of the above events has occurred, assess whether there's been a change in
     // service connectivity via Thread.
     if (threadConnChanged || threadAddrChanged || threadNetDataChanged || fabricMembershipChanged)
