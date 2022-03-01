@@ -128,17 +128,6 @@ public:
      */
     void SetRequestorCanConsent(bool requestorCanConsent) { mRequestorCanConsent.SetValue(requestorCanConsent); }
 
-    /**
-     * Set the OTA provider location to use for the next query
-     */
-    bool
-    SetCurrentProviderLocation(const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation);
-
-    /**
-     * Clear the OTA provider location to indicate no OTA update may be in progress
-     */
-    bool ClearCurrentProviderLocation(void);
-
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;

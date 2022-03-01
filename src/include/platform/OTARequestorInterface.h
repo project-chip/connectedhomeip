@@ -217,10 +217,10 @@ public:
 
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
 
-    // Set the provider location to be used in the update process
+    // Set the provider location to be used in the next query and OTA update process
     virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
 
-    // Clear the provider location
+    // Clear the provider location to indicate that no OTA update may be in progress
     virtual void ClearCurrentProviderLocation() = 0;
 
     // Add a default OTA provider to the cached list
