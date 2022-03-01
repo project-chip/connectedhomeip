@@ -611,7 +611,7 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
     ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
     CHIP_ERROR ret = CHIP_ERROR_UNEXPECTED_EVENT;
 
-    bool isPathInterestedByConcretePath = false;
+    bool eventReadViaConcretePath = false;
 
     for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
          interestedPath        = interestedPath->mpNext)
@@ -621,7 +621,7 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
             ret = CHIP_NO_ERROR;
             if (!interestedPath->HasEventWildcard())
             {
-                isPathInterestedByConcretePath = true;
+                eventReadViaConcretePath = true;
                 break;
             }
         }
@@ -654,7 +654,7 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
     if (accessControlError != CHIP_NO_ERROR)
     {
         ReturnErrorCodeIf(accessControlError != CHIP_ERROR_ACCESS_DENIED, accessControlError);
-        if (isPathInterestedByConcretePath)
+        if (eventReadViaConcretePath)
         {
             ret = CHIP_ERROR_ACCESS_DENIED;
         }

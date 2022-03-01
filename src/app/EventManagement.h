@@ -487,12 +487,15 @@ private:
     };
 
     /**
-     * @brief checking if the given path is an interested path, this is a helper function for EventManagement::EventIterator
+     * @brief Check whether the event instance represented by the EventEnvelopeContext should be included in the report.
      *
      * @retval CHIP_ERROR_UNEXPECTED_EVENT This path should be excluded in the generated event report.
      * @retval CHIP_EVENT_ID_FOUND This path should be included in the generated event report.
      * @retval CHIP_ERROR_ACCESS_DENIED This path should be included in the generated event report, but the client does not have
      * .       enough privilege to access it.
+     *
+     * TODO: Consider using CHIP_NO_ERROR, CHIP_ERROR_SKIP_EVENT, CHIP_ERROR_ACCESS_DENINED or some enum to represent the checking
+     * result.
      */
     static CHIP_ERROR CheckEventContext(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
 

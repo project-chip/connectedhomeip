@@ -1037,7 +1037,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
 
     EventManagement::GetInstance().SetBypassAccessControl(chip::app::EventManagement::BypassAccessControl::kAlwaysFail);
 
-    // When read events with concrete paths without enough privilege, we will return EventStatusIB
+    // When reading events with concrete paths without enough privilege, we will get a EventStatusIB
     {
         chip::app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
