@@ -39,6 +39,7 @@ CHIP_ERROR WriteHandler::Init()
     MoveToState(State::Initialized);
 
     mACLCheckCache.ClearValue();
+    mProcessingAttributePath.ClearValue();
 
     return CHIP_NO_ERROR;
 }
@@ -244,7 +245,17 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         }
 
+        if (InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, dataAttributePath) ||
+            // Per chunking protocol, we are processing the list entries, but the initial empty list is not processed, so we reject
+            // it with Busy status code.
+            (dataAttributePath.IsListItemOperation() &&
+             (!mProcessingAttributePath.HasValue() || mProcessingAttributePath.Value() != dataAttributePath)))
         {
+            err = AddStatus(dataAttributePath, StatusIB(Protocols::InteractionModel::Status::Busy));
+        }
+        else
+        {
+            mProcessingAttributePath.SetValue(dataAttributePath);
             MatterPreAttributeWriteCallback(dataAttributePath);
             TLV::TLVWriter backup;
             DataVersion version = 0;
