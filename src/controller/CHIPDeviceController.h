@@ -335,6 +335,13 @@ public:
      */
     NodeId GetNodeId() const { return mLocalId.GetNodeId(); }
 
+    CHIP_ERROR GetFabricIndex(FabricIndex * value)
+    {
+        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr && value != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        *value = mFabricInfo->GetFabricIndex();
+        return CHIP_NO_ERROR;
+    }
+
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }

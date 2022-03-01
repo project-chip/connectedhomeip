@@ -96,7 +96,7 @@ public:
         ChipLogProgress(chipTool, "Sending WriteAttribute to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
                         ChipLogValueMEI(clusterId), endpointId);
         chip::app::AttributePathParams attributePathParams;
-        if (!device->GetSecureSession().Value()->IsGroupSession())
+        if (device->GetSecureSession().Value()->IsGroupSession())
         {
             attributePathParams.mEndpointId = endpointId;
         }
@@ -134,12 +134,12 @@ public:
         {
             return CHIP_ERROR_NO_MEMORY;
         }
-        ReturnErrorOnFailure(writeClient->SendWriteRequest(session.Value()));
+        CHIP_ERROR err = writeClient->SendWriteRequest(session.Value());
 
         writeClient.release();
         exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
 
-        return CHIP_NO_ERROR;
+        return err;
     }
 
 private:

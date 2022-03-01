@@ -35,7 +35,7 @@ public:
     void AddArguments()
     {
         AddArgument("node-id/group-id", 0, UINT64_MAX, &mNodeId);
-        AddArgument("endpoint-id/FabricIndex", 0, UINT16_MAX, &mEndPointId);
+        AddArgument("endpoint-id-ignored-for-group-commands", 0, UINT16_MAX, &mEndPointId);
     }
 
     /////////// CHIPCommand Interface /////////

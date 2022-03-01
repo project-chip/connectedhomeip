@@ -28,11 +28,12 @@ CHIP_ERROR ModelCommand::RunCommand()
 
     if (IsGroupId(mNodeId))
     {
+        FabricIndex fabricIndex;
+        ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
         ChipLogProgress(chipTool, "Sending command to group 0x%" PRIx16 " on Fabric Index 0x%" PRIx16, GroupIdFromNodeId(mNodeId),
-                        static_cast<FabricIndex>(mEndPointId));
+                        fabricIndex);
 
-        return SendGroupCommand(GroupIdFromNodeId(mNodeId), static_cast<FabricIndex>(mEndPointId),
-                                CurrentCommissioner().GetNodeId());
+        return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex, CurrentCommissioner().GetNodeId());
     }
 
     ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);

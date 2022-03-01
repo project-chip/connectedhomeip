@@ -121,12 +121,10 @@ public:
 
         chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
 
-        ChipLogDetail(chipTool, "Sending command to Group %u, on Fabric %x, for cluster %u with commandId %u", groupId, fabricIndex,
-                      clusterId, commandId);
-
-        auto commandSender = chip::Platform::MakeUnique<chip::app::CommandSender>(this, exchangeManager, false);
+        auto commandSender =
+            chip::Platform::MakeUnique<chip::app::CommandSender>(this, exchangeManager, mTimedInteractionTimeoutMs.HasValue());
         VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, chip::NullOptional));
+        ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
 
         chip::Optional<chip::SessionHandle> session =
             exchangeManager->GetSessionManager()->CreateGroupSession(groupId, fabricIndex, senderNodeId);
@@ -134,12 +132,12 @@ public:
         {
             return CHIP_ERROR_NO_MEMORY;
         }
-        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(session.Value()));
+        CHIP_ERROR err = commandSender->SendGroupCommandRequest(session.Value());
 
         commandSender.release();
         exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
 
-        return CHIP_NO_ERROR;
+        return err;
     }
 
 private:
