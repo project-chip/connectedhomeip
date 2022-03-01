@@ -11,7 +11,7 @@ scripts/examples/gn_build_example.sh examples/chip-tool out/
 
 touch my-firmware.bin
 
-echo "TEST" >> my-firmware.bin
+echo "TST" >> my-firmware.bin
 
 ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 my-firmware.bin my-firmware.ota
 
