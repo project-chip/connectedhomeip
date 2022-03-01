@@ -100,6 +100,7 @@ static_library("core") {
     "CHIPTLVUpdater.cpp",
     "CHIPTLVUtilities.cpp",
     "CHIPTLVWriter.cpp",
+    "ClusterEnums.h",
     "DataModelTypes.h",
     "GroupId.h",
     "NodeId.h",
@@ -107,6 +108,10 @@ static_library("core") {
     "OTAImageHeader.h",
     "PasscodeId.h",
     "PeerId.h",
+    # For now cluster enum/bitmap definitions are in zzz-generated.
+    # We should consider putting them directly in this directory
+    # instead.
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
   ]
 
   cflags = [ "-Wconversion" ]
