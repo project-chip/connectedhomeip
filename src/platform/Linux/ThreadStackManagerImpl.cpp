@@ -301,7 +301,7 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
 
     std::unique_ptr<GError, GErrorDeleter> err;
 
-    std::unique_ptr<GVariant, GVariantDeleter> value(
+    std::unique_ptr<GVariant, GVariantDeleter> response(
         g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
                                g_variant_new("(ss)", "io.openthread.BorderRouter", "DeviceRole"), G_DBUS_CALL_FLAGS_NONE, -1,
                                nullptr, &MakeUniquePointerReceiver(err).Get()));
@@ -312,12 +312,31 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
         return false;
     }
 
+    if (response == nullptr)
+    {
+        return false;
+    }
+
+    std::unique_ptr<GVariant, GVariantDeleter> tupleContent(g_variant_get_child_value(response.get(), 0));
+
+    if (tupleContent == nullptr)
+    {
+        return false;
+    }
+
+    std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_get_variant(tupleContent.get()));
+
     if (value == nullptr)
     {
         return false;
     }
 
     const gchar * role = g_variant_get_string(value.get(), nullptr);
+
+    if (role == nullptr)
+    {
+        return false;
+    }
 
     return (strcmp(role, kOpenthreadDeviceRoleDisabled) != 0);
 }
