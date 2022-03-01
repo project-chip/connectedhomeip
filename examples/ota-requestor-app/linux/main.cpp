@@ -52,7 +52,6 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
-void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
 
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionRequestorCanConsent  = 'c';
@@ -137,10 +136,4 @@ int main(int argc, char * argv[])
     VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
     ChipLinuxAppMainLoop();
     return 0;
-}
-
-// Test mode operation
-void OnStartDelayTimerHandler(Layer * systemLayer, void * appState)
-{
-    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
