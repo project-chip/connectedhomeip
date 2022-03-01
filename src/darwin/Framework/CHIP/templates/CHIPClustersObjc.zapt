@@ -62,6 +62,25 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 {{/chip_client_clusters}}
 
+{{#zcl_clusters}}
+{{#zcl_enums}}
+typedef NS_ENUM(NSInteger, {{objCEnumName ../name label}}) {
+   {{#zcl_enum_items}}
+   {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex value 2}},
+   {{/zcl_enum_items}}
+};
+
+{{/zcl_enums}}
+{{#zcl_bitmaps}}
+typedef NS_OPTIONS(NSUInteger, {{objCEnumName ../name label}}) {
+   {{#zcl_bitmap_items}}
+   {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex mask}},
+   {{/zcl_bitmap_items}}
+};
+
+{{/zcl_bitmaps}}
+{{/zcl_clusters}}
+
 NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_CLUSTERS_H */
