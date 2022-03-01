@@ -8245,6 +8245,10 @@ typedef NS_ENUM(NSInteger, CHIPIlluminanceMeasurementLightSensorType) {
     CHIPIlluminanceMeasurementLightSensorTypeCMOS = 0x01,
 };
 
+typedef NS_OPTIONS(NSUInteger, CHIPPressureMeasurementPressureFeature) {
+    CHIPPressureMeasurementPressureFeatureEXT = 0x1,
+};
+
 typedef NS_ENUM(NSInteger, CHIPIasZoneIasEnrollResponseCode) {
     CHIPIasZoneIasEnrollResponseCodeSuccess = 0x00,
     CHIPIasZoneIasEnrollResponseCodeNotSupported = 0x01,
