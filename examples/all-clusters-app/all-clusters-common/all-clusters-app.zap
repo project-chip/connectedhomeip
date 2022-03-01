@@ -906,7 +906,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "binding list",
+              "name": "Binding",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -915,7 +915,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1423,7 +1423,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -1574,7 +1574,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -1655,7 +1655,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -2186,7 +2186,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -2291,7 +2291,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -4522,7 +4522,7 @@
               "reportableChange": 0
             },
             {
-              "name": "fabrics list",
+              "name": "Fabrics",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -7311,7 +7311,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7326,7 +7326,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7341,7 +7341,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -8041,7 +8041,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0000",
+              "defaultValue": "0x0001",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -8390,7 +8390,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0xFE",
+              "defaultValue": "0xFF",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -8454,6 +8454,51 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "ServerGeneratedCommandList",
+              "code": 65528,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClientGeneratedCommandList",
+              "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -8733,7 +8778,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "binding list",
+              "name": "Binding",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8742,7 +8787,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -9474,7 +9519,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -9776,7 +9821,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -10060,7 +10105,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -10075,7 +10120,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -10142,7 +10187,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -11213,7 +11258,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14602,7 +14647,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "wake on lan mac address",
+              "name": "MACAddress",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -14642,7 +14687,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "ChangeChannelRequest",
+              "name": "ChangeChannel",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -14650,7 +14695,7 @@
               "outgoing": 1
             },
             {
-              "name": "ChangeChannelByNumberRequest",
+              "name": "ChangeChannelByNumber",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -14686,12 +14731,12 @@
           "commands": [],
           "attributes": [
             {
-              "name": "channel list",
+              "name": "ChannelList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14701,7 +14746,7 @@
               "reportableChange": 0
             },
             {
-              "name": "channel lineup",
+              "name": "Lineup",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -14716,7 +14761,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current channel",
+              "name": "CurrentChannel",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -14736,7 +14781,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14786,7 +14831,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "NavigateTargetRequest",
+              "name": "NavigateTarget",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -14822,12 +14867,12 @@
           "commands": [],
           "attributes": [
             {
-              "name": "target navigator list",
+              "name": "TargetList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14837,7 +14882,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current navigator target",
+              "name": "CurrentTarget",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -14857,7 +14902,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14907,7 +14952,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "PlayRequest",
+              "name": "Play",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -14915,7 +14960,7 @@
               "outgoing": 1
             },
             {
-              "name": "PauseRequest",
+              "name": "Pause",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -14923,7 +14968,7 @@
               "outgoing": 1
             },
             {
-              "name": "StopRequest",
+              "name": "StopPlayback",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -14931,7 +14976,7 @@
               "outgoing": 1
             },
             {
-              "name": "StartOverRequest",
+              "name": "StartOver",
               "code": 3,
               "mfgCode": null,
               "source": "client",
@@ -14939,7 +14984,7 @@
               "outgoing": 1
             },
             {
-              "name": "PreviousRequest",
+              "name": "Previous",
               "code": 4,
               "mfgCode": null,
               "source": "client",
@@ -14947,7 +14992,7 @@
               "outgoing": 1
             },
             {
-              "name": "NextRequest",
+              "name": "Next",
               "code": 5,
               "mfgCode": null,
               "source": "client",
@@ -14955,7 +15000,7 @@
               "outgoing": 1
             },
             {
-              "name": "RewindRequest",
+              "name": "Rewind",
               "code": 6,
               "mfgCode": null,
               "source": "client",
@@ -14963,7 +15008,7 @@
               "outgoing": 1
             },
             {
-              "name": "FastForwardRequest",
+              "name": "FastForward",
               "code": 7,
               "mfgCode": null,
               "source": "client",
@@ -14971,7 +15016,7 @@
               "outgoing": 1
             },
             {
-              "name": "SkipForwardRequest",
+              "name": "SkipForward",
               "code": 8,
               "mfgCode": null,
               "source": "client",
@@ -14979,7 +15024,7 @@
               "outgoing": 1
             },
             {
-              "name": "SkipBackwardRequest",
+              "name": "SkipBackward",
               "code": 9,
               "mfgCode": null,
               "source": "client",
@@ -15015,7 +15060,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "playback state",
+              "name": "CurrentState",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -15030,7 +15075,7 @@
               "reportableChange": 0
             },
             {
-              "name": "start time",
+              "name": "StartTime",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -15045,7 +15090,7 @@
               "reportableChange": 0
             },
             {
-              "name": "duration",
+              "name": "Duration",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -15060,7 +15105,7 @@
               "reportableChange": 0
             },
             {
-              "name": "position",
+              "name": "SampledPosition",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -15075,7 +15120,7 @@
               "reportableChange": 0
             },
             {
-              "name": "playback speed",
+              "name": "PlaybackSpeed",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -15090,7 +15135,7 @@
               "reportableChange": 0
             },
             {
-              "name": "seek range end",
+              "name": "SeekRangeEnd",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -15105,7 +15150,7 @@
               "reportableChange": 0
             },
             {
-              "name": "seek range start",
+              "name": "SeekRangeStart",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -15125,7 +15170,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -15175,7 +15220,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "SelectInputRequest",
+              "name": "SelectInput",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -15183,7 +15228,7 @@
               "outgoing": 1
             },
             {
-              "name": "ShowInputStatusRequest",
+              "name": "ShowInputStatus",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -15191,7 +15236,7 @@
               "outgoing": 1
             },
             {
-              "name": "HideInputStatusRequest",
+              "name": "HideInputStatus",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -15199,7 +15244,7 @@
               "outgoing": 1
             },
             {
-              "name": "RenameInputRequest",
+              "name": "RenameInput",
               "code": 3,
               "mfgCode": null,
               "source": "client",
@@ -15235,12 +15280,12 @@
           "commands": [],
           "attributes": [
             {
-              "name": "media input list",
+              "name": "InputList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -15250,7 +15295,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current media input",
+              "name": "CurrentInput",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -15270,7 +15315,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -15381,7 +15426,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "SendKeyRequest",
+              "name": "SendKey",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -15442,7 +15487,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "LaunchContentRequest",
+              "name": "LaunchContent",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -15450,7 +15495,7 @@
               "outgoing": 1
             },
             {
-              "name": "LaunchURLRequest",
+              "name": "LaunchURL",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -15486,12 +15531,12 @@
           "commands": [],
           "attributes": [
             {
-              "name": "accept header list",
+              "name": "AcceptHeader",
               "code": 0,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -15501,7 +15546,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported streaming protocols",
+              "name": "SupportedStreamingProtocols",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -15541,7 +15586,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "SelectOutputRequest",
+              "name": "SelectOutput",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -15549,7 +15594,7 @@
               "outgoing": 1
             },
             {
-              "name": "RenameOutputRequest",
+              "name": "RenameOutput",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -15585,12 +15630,12 @@
           "commands": [],
           "attributes": [
             {
-              "name": "audio output list",
+              "name": "OutputList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -15600,7 +15645,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current audio output",
+              "name": "CurrentOutput",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -15640,7 +15685,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "LaunchAppRequest",
+              "name": "LaunchApp",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -15676,12 +15721,12 @@
           "commands": [],
           "attributes": [
             {
-              "name": "application launcher list",
+              "name": "CatalogList",
               "code": 0,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -15691,7 +15736,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application launcher app",
+              "name": "CurrentApp",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -15758,7 +15803,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "vendor name",
+              "name": "VendorName",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -15773,7 +15818,7 @@
               "reportableChange": 0
             },
             {
-              "name": "vendor id",
+              "name": "VendorID",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -15788,7 +15833,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application name",
+              "name": "ApplicationName",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -15803,7 +15848,7 @@
               "reportableChange": 0
             },
             {
-              "name": "product id",
+              "name": "ProductID",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -15818,7 +15863,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application status",
+              "name": "Status",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -15833,7 +15878,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application version",
+              "name": "ApplicationVersion",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -15848,12 +15893,12 @@
               "reportableChange": 0
             },
             {
-              "name": "allowed vendor list",
+              "name": "AllowedVendorList",
               "code": 7,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -15888,7 +15933,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "GetSetupPINRequest",
+              "name": "GetSetupPIN",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -16821,7 +16866,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -17406,7 +17451,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",

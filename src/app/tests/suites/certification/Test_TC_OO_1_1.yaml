@@ -93,7 +93,7 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
+          value: 1
 
     - label: "Read the optional global attribute : FeatureMap"
       command: "readAttribute"
@@ -114,4 +114,4 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
+          value: 1

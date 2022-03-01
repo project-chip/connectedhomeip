@@ -2969,6 +2969,12 @@ enum class OnOffControl : uint8_t
     kAcceptOnlyWhenOn = 0x1,
 };
 
+// Bitmap for OnOffFeature
+enum class OnOffFeature : uint32_t
+{
+    kLighting = 0x1,
+};
+
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
