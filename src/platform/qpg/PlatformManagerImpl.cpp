@@ -23,10 +23,10 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
 #include <platform/qpg/DiagnosticDataProviderImpl.h>
-#include <platform/FreeRTOS/SystemTimeSupport.h>
 
 #include <lwip/tcpip.h>
 
