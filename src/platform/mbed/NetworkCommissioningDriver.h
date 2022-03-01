@@ -48,7 +48,7 @@ public:
 
         item.security = mScanResults[mIternum].get_security();
         item.ssidLen  = strnlen(reinterpret_cast<const char *>(mScanResults[mIternum].get_ssid()),
-                                chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+                               chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
         item.channel  = mScanResults[mIternum].get_channel();
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mScanResults[mIternum].get_rssi();
