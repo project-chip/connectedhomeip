@@ -96,6 +96,11 @@ public:
     CHIP_ERROR Init() override;
     CHIP_ERROR Shutdown() override;
 
+    // TODO: Implement this.
+    CHIP_ERROR GetLastNetworkingStatus(Status & status) override { return CHIP_ERROR_KEY_NOT_FOUND; }
+    CHIP_ERROR GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen) override { return CHIP_ERROR_KEY_NOT_FOUND; }
+    CHIP_ERROR GetLastConnectErrorValue(uint32_t & value) override { return CHIP_ERROR_KEY_NOT_FOUND; }
+
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return kMaxWiFiNetworks; }
     uint8_t GetScanNetworkTimeoutSeconds() override { return kWiFiScanNetworksTimeOutSeconds; }
