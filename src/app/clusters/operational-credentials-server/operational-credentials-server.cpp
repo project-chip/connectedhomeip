@@ -533,6 +533,12 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
 
+    if (nullptr == groups)
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::Failure));
+        return true;
+    }
+
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
     if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
@@ -570,12 +576,11 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->NewFabric(fabricIndex);
 
     // Set the Identity Protection Key (IPK)
-    VerifyOrExit(nullptr != groups, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INTERNAL));
-    VerifyOrExit(ipkValue.size() != Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
-                 nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INTERNAL));
-    keyset.keyset_id     = 0;
-    keyset.policy        = chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy::kStandard;
-    keyset.num_keys_used = 0;
+    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
+                 nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_ARGUMENT));
+    keyset.keyset_id     = 0; // The IPK SHALL be the operational group key under GroupKeySetID of 0
+    keyset.policy        = GroupKeyManagement::GroupKeySecurityPolicy::kTrustFirst;
+    keyset.num_keys_used = 1;
     memcpy(keyset.epoch_keys[0].key, ipkValue.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
     err = groups->SetKeySet(fabricIndex, keyset);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
