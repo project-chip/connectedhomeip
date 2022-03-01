@@ -255,13 +255,6 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
     // No state matching this one fully but we can't be in kIdle.
     RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
 
-    if (mOtaRequestorDriver == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "OTA requestor driver not set");
-        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
-
     if (mServer == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Server not set");
