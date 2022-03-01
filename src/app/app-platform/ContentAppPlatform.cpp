@@ -392,12 +392,9 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
 constexpr EndpointId kTargetBindingClusterEndpointId = 0;
 constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
 constexpr EndpointId kLocalSpeakerEndpointId         = 2;
-// TODO: determine correct local fabric index
-// - the fabric index can't be 0, but needs to be validated as 1
-constexpr FabricIndex kLocalFabricIndex   = 1;
-constexpr ClusterId kNoClusterIdSpecified = kInvalidClusterId;
-constexpr ClusterId kClusterIdOnOff       = 0x0006;
-constexpr ClusterId kClusterIdWakeOnLAN   = 0x0503;
+constexpr ClusterId kNoClusterIdSpecified            = kInvalidClusterId;
+constexpr ClusterId kClusterIdOnOff                  = 0x0006;
+constexpr ClusterId kClusterIdWakeOnLAN              = 0x0503;
 // constexpr ClusterId kClusterIdChannel             = 0x0504;
 // constexpr ClusterId kClusterIdTargetNavigator     = 0x0505;
 constexpr ClusterId kClusterIdMediaPlayback = 0x0506;
@@ -420,7 +417,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
     Access::AccessControl::Entry entry;
     ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
-    entry.SetFabricIndex(kLocalFabricIndex);
+    entry.SetFabricIndex(targetDeviceProxy->GetFabricIndex());
     ReturnErrorOnFailure(entry.SetPrivilege(Access::Privilege::kOperate));
     ReturnErrorOnFailure(entry.AddSubject(nullptr, targetDeviceProxy->GetDeviceId()));
 
