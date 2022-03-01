@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 PASSCODE=${1:-20202021}
 DISCRIMINATOR=${2:-42}
