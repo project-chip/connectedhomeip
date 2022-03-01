@@ -62,6 +62,53 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR GenericThreadDriver::GetLastNetworkingStatus(Status & status)
+{
+    // Thread is not enabled, then we are not trying to connect to the network.
+    VerifyOrReturnError(ThreadStackMgrImpl().IsThreadEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
+    // We have already connected to the network, thus return success.
+    if (ThreadStackMgrImpl().IsThreadAttached())
+    {
+        status = Status::kSuccess;
+    }
+    else
+    {
+        status = Status::kNetworkNotFound;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GenericThreadDriver::GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen)
+{
+    ByteSpan datasetTLV;
+    Thread::OperationalDataset dataset;
+    uint8_t extpanid[kSizeExtendedPanId];
+
+    VerifyOrReturnError(networkIDLen != nullptr && networkID != nullptr && (*networkIDLen) >= kSizeExtendedPanId);
+
+    // The Thread network is not actually enabled.
+    VerifyOrReturnError(ThreadStackMgrImpl().IsThreadEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
+    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(datasetTLV) == CHIP_NO_ERROR, CHIP_ERROR_KEY_NOT_FOUND);
+    VerifyOrReturnError(dataset.Init(datasetTLV) == CHIP_NO_ERROR, CHIP_ERROR_KEY_NOT_FOUND);
+    // The Thread network is not enabled, but has a different extended pan id.
+    VerifyOrReturnError(dataset.GetExtendedPanId(extpanid) == CHIP_NO_ERROR, CHIP_ERROR_KEY_NOT_FOUND);
+    memcpy(networkID, extpanid, kSizeExtendedPanId);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GenericThreadDriver::GetLastConnectErrorValue(uint32_t & value)
+{
+    // Thread is not enabled, then we are not trying to connect to the network.
+    VerifyOrReturnError(ThreadStackMgrImpl().IsThreadEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
+    // Thread is enabled, but is already attached, thus return null to indicate a success state.
+    VerifyOrReturnError(ThreadStackMgrImpl().IsThreadAttached(), CHIP_ERROR_KEY_NOT_FOUND);
+
+    // Then we tell the client that the network is detached.
+    value = OT_ERROR_DETACHED;
+    return CHIP_NO_ERROR;
+}
+
 Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
 {
     uint8_t extpanid[kSizeExtendedPanId];

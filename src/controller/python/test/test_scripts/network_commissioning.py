@@ -187,9 +187,9 @@ class NetworkCommissioningTests:
         # Verify Last* attributes
         logger.info(f"Read Last* attributes")
         res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
-        if (res.lastNetworkID == NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue == NullValue):
+        if (res.lastNetworkID == NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue != NullValue):
             raise AssertionError(
-                f"LastNetworkID, LastConnectErrorValue and LastNetworkingStatus should not be Null")
+                f"LastNetworkID, LastNetworkingStatus should not be Null, LastConnectErrorValue should be Null for a successful network provision.")
 
     async def test_thread(self, endpointId):
         logger.info(f"Get basic information of the endpoint")
@@ -275,9 +275,9 @@ class NetworkCommissioningTests:
         # Verify Last* attributes
         logger.info(f"Read Last* attributes")
         res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
-        if (res.lastNetworkID == NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue == NullValue):
+        if (res.lastNetworkID == NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue != NullValue):
             raise AssertionError(
-                f"LastNetworkID, LastConnectErrorValue and LastNetworkingStatus should not be Null")
+                f"LastNetworkID, LastNetworkingStatus should not be Null, LastConnectErrorValue should be Null for a successful network provision.")
 
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)

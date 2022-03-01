@@ -87,9 +87,6 @@ CHIP_ERROR Instance::Init()
     ReturnErrorOnFailure(
         DeviceLayer::PlatformMgrImpl().AddEventHandler(_OnCommissioningComplete, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init());
-    mLastNetworkingStatusValue.SetNull();
-    mLastConnectErrorValue.SetNull();
-    mLastNetworkIDLen = 0;
     return CHIP_NO_ERROR;
 }
 
@@ -202,21 +199,49 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::InterfaceEnabled::Id:
         return aEncoder.Encode(mpBaseDriver->GetEnabled());
 
-    case Attributes::LastNetworkingStatus::Id:
-        return aEncoder.Encode(mLastNetworkingStatusValue);
-
-    case Attributes::LastNetworkID::Id:
-        if (mLastNetworkIDLen == 0)
+    case Attributes::LastNetworkingStatus::Id: {
+        DeviceLayer::NetworkCommissioning::Status status;
+        CHIP_ERROR err = mpBaseDriver->GetLastNetworkingStatus(status);
+        if (err == CHIP_NO_ERROR)
+        {
+            return aEncoder.Encode(ToClusterObjectEnum(status));
+        }
+        else if (err == CHIP_ERROR_KEY_NOT_FOUND)
         {
             return aEncoder.EncodeNull();
         }
-        else
-        {
-            return aEncoder.Encode(ByteSpan(mLastNetworkID, mLastNetworkIDLen));
-        }
+        return err;
+    }
 
-    case Attributes::LastConnectErrorValue::Id:
-        return aEncoder.Encode(mLastConnectErrorValue);
+    case Attributes::LastNetworkID::Id: {
+        uint8_t networkID[kMaxNetworkIDLen];
+        size_t networkIDLen = kMaxNetworkIDLen;
+        CHIP_ERROR err      = mpBaseDriver->GetLastNetworkID(networkID, &networkIDLen);
+        VerifyOrReturnError(networkIDLen <= kMaxNetworkIDLen, CHIP_ERROR_INTERNAL);
+        if (err == CHIP_NO_ERROR)
+        {
+            return aEncoder.Encode(ByteSpan(networkID, networkIDLen));
+        }
+        else if (err == CHIP_ERROR_KEY_NOT_FOUND)
+        {
+            return aEncoder.EncodeNull();
+        }
+        return err;
+    }
+
+    case Attributes::LastConnectErrorValue::Id: {
+        uint32_t errorValue;
+        CHIP_ERROR err = mpBaseDriver->GetLastConnectErrorValue(errorValue);
+        if (err == CHIP_NO_ERROR)
+        {
+            return aEncoder.Encode(errorValue);
+        }
+        else if (err == CHIP_ERROR_KEY_NOT_FOUND)
+        {
+            return aEncoder.EncodeNull();
+        }
+        return err;
+    }
 
     case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mFeatureFlags);
@@ -287,9 +312,6 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
         return;
     }
 
-    mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
-    memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
-
     mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 }
@@ -318,11 +340,6 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
     response.errorValue       = interfaceStatus;
     commandHandle->AddResponseData(mPath, response);
 
-    mLastNetworkIDLen = mConnectingNetworkIDLen;
-    memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
-    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(commissioningError));
-    mLastConnectErrorValue.SetNonNull(interfaceStatus);
-
     if (commissioningError == Status::kSuccess)
     {
         // TODO: Pass the actual network id to device control server.
@@ -341,10 +358,6 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
         // We may receive the callback after it and should make it noop.
         return;
     }
-
-    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(status));
-    mLastConnectErrorValue.SetNull();
-    mLastNetworkIDLen = 0;
 
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
@@ -399,10 +412,6 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
         // We may receive the callback after it and should make it noop.
         return;
     }
-
-    mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(status));
-    mLastConnectErrorValue.SetNull();
-    mLastNetworkIDLen = 0;
 
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
