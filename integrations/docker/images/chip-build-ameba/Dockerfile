@@ -9,7 +9,7 @@ RUN set -x \
     && cd ${AMEBA_DIR} \
     && git clone --progress -b cmake_build https://github.com/pankore/ambd_sdk_with_chip_non_NDA.git \
     && cd ambd_sdk_with_chip_non_NDA \
-    && git reset --hard 4dc12dc \
+    && git reset --hard b647c19 \
     && git submodule update --depth 1 --init --progress \
     && cd project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/toolchain \
     && cat asdk/asdk-10.3.0-linux-newlib-build-3638-x86_64.tar.bz2.part* > asdk/asdk-10.3.0-linux-newlib-build-3638-x86_64.tar.bz2 \

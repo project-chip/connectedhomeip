@@ -124,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _capacity = @(0);
+        _capacity = nil;
 
         _groupList = [NSArray array];
     }
@@ -973,40 +973,6 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _warningEvent = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBindingClusterBindParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _nodeId = @(0);
-
-        _groupId = @(0);
-
-        _endpointId = @(0);
-
-        _clusterId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBindingClusterUnbindParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _nodeId = @(0);
-
-        _groupId = @(0);
-
-        _endpointId = @(0);
-
-        _clusterId = @(0);
     }
     return self;
 }
@@ -3277,7 +3243,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _channelMatch = [CHIPChannelClusterChannelInfo new];
 
-        _errorType = @(0);
+        _status = @(0);
     }
     return self;
 }

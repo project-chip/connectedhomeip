@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPGroupsClusterGetGroupMembershipResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull capacity;
+@property (strong, nonatomic) NSNumber * _Nullable capacity;
 @property (strong, nonatomic) NSArray * _Nonnull groupList;
 - (instancetype)init;
 @end
@@ -467,22 +467,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPApplianceControlClusterOverloadWarningParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull warningEvent;
-- (instancetype)init;
-@end
-
-@interface CHIPBindingClusterBindParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull nodeId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
-@property (strong, nonatomic) NSNumber * _Nonnull endpointId;
-@property (strong, nonatomic) NSNumber * _Nonnull clusterId;
-- (instancetype)init;
-@end
-
-@interface CHIPBindingClusterUnbindParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull nodeId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
-@property (strong, nonatomic) NSNumber * _Nonnull endpointId;
-@property (strong, nonatomic) NSNumber * _Nonnull clusterId;
 - (instancetype)init;
 @end
 
@@ -1542,7 +1526,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPChannelClusterChangeChannelResponseParams : NSObject
 @property (strong, nonatomic) CHIPChannelClusterChannelInfo * _Nonnull channelMatch;
-@property (strong, nonatomic) NSNumber * _Nonnull errorType;
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 - (instancetype)init;
 @end
 

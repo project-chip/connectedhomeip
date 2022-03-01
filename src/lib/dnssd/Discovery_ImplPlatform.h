@@ -49,7 +49,11 @@ public:
     CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
 
     // Members that implement Resolver interface.
-    void SetResolverDelegate(ResolverDelegate * delegate) override { mResolverProxy.SetResolverDelegate(delegate); }
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mResolverProxy.SetOperationalDelegate(delegate); }
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
+    {
+        mResolverProxy.SetCommissioningDelegate(delegate);
+    }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
@@ -64,8 +68,6 @@ private:
     DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
 
     CHIP_ERROR InitImpl();
-    CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
-    CHIP_ERROR PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
 
     static void HandleDnssdInit(void * context, CHIP_ERROR initError);
     static void HandleDnssdError(void * context, CHIP_ERROR initError);
@@ -76,8 +78,8 @@ private:
     CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
                               size_t subTypeSize, const CommissionAdvertisingParameters & params);
     CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
-                              size_t subTypeSize, uint16_t port, const chip::ByteSpan & mac, DnssdServiceProtocol procotol,
-                              PeerId peerId);
+                              size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
+                              DnssdServiceProtocol procotol, PeerId peerId);
 
     OperationalAdvertisingParameters mOperationalNodeAdvertisingParams;
     CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;

@@ -168,8 +168,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
     case 'i':
         if (!ParseInt(arg, gIterationCount) ||
-            !(gIterationCount >= chip::Crypto::kSpake2pPBKDFMinimumIterations &&
-              gIterationCount <= chip::Crypto::kSpake2pPBKDFMaximumIterations))
+            !(gIterationCount >= chip::kSpake2p_Min_PBKDF_Iterations && gIterationCount <= chip::kSpake2p_Max_PBKDF_Iterations))
         {
             PrintArgError("%s: Invalid value specified for the iteration-count parameter: %s\n", progName, arg);
             return false;
@@ -178,7 +177,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
     case 'l':
         if (!ParseInt(arg, gSaltLen) ||
-            !(gSaltLen >= chip::Crypto::kSpake2pPBKDFMinimumSaltLen && gSaltLen <= chip::Crypto::kSpake2pPBKDFMaximumSaltLen))
+            !(gSaltLen >= chip::kSpake2p_Min_PBKDF_Salt_Length && gSaltLen <= chip::kSpake2p_Max_PBKDF_Salt_Length))
         {
             PrintArgError("%s: Invalid value specified for salt length parameter: %s\n", progName, arg);
             return false;
@@ -187,8 +186,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
     case 's':
         gSalt = arg;
-        if (!(strlen(gSalt) >= chip::Crypto::kSpake2pPBKDFMinimumSaltLen &&
-              strlen(gSalt) <= chip::Crypto::kSpake2pPBKDFMaximumSaltLen))
+        if (!(strlen(gSalt) >= chip::kSpake2p_Min_PBKDF_Salt_Length && strlen(gSalt) <= chip::kSpake2p_Max_PBKDF_Salt_Length))
         {
             fprintf(stderr, "%s: Invalid legth of the specified salt parameter: %s\n", progName, arg);
             return false;
@@ -271,7 +269,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
 
     for (uint32_t i = 0; i < gCount; i++)
     {
-        uint8_t salt[chip::Crypto::kSpake2pPBKDFMaximumSaltLen];
+        uint8_t salt[chip::kSpake2p_Max_PBKDF_Salt_Length];
         if (gSalt == nullptr)
         {
             CHIP_ERROR err = chip::Crypto::DRBG_get_bytes(salt, gSaltLen);
@@ -286,7 +284,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             memcpy(salt, gSalt, gSaltLen);
         }
 
-        chip::PASEVerifier verifier;
+        chip::Spake2pVerifier verifier;
         CHIP_ERROR err = chip::PASESession::GeneratePASEVerifier(verifier, gIterationCount, chip::ByteSpan(salt, gSaltLen),
                                                                  (gPinCode == chip::kSetupPINCodeUndefinedValue), gPinCode);
         if (err != CHIP_NO_ERROR)
@@ -295,22 +293,21 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             return false;
         }
 
-        chip::PASEVerifierSerialized serializedVerifier;
+        chip::Spake2pVerifierSerialized serializedVerifier;
         chip::MutableByteSpan serializedVerifierSpan(serializedVerifier);
         err = verifier.Serialize(serializedVerifierSpan);
         if (err != CHIP_NO_ERROR)
         {
-            fprintf(stderr, "PASEVerifier::Serialize() failed.\n");
+            fprintf(stderr, "Spake2pVerifier::Serialize() failed.\n");
             return false;
         }
 
-        char saltB64[BASE64_ENCODED_LEN(chip::Crypto::kSpake2pPBKDFMaximumSaltLen) + 1];
+        char saltB64[BASE64_ENCODED_LEN(chip::kSpake2p_Max_PBKDF_Salt_Length) + 1];
         uint32_t saltB64Len = chip::Base64Encode32(salt, gSaltLen, saltB64);
         saltB64[saltB64Len] = '\0';
 
-        char verifierB64[BASE64_ENCODED_LEN(chip::Crypto::kSpake2pSerializedVerifierSize) + 1];
-        uint32_t verifierB64Len =
-            chip::Base64Encode32(serializedVerifier, chip::Crypto::kSpake2pSerializedVerifierSize, verifierB64);
+        char verifierB64[BASE64_ENCODED_LEN(chip::kSpake2p_VerifierSerialized_Length) + 1];
+        uint32_t verifierB64Len = chip::Base64Encode32(serializedVerifier, chip::kSpake2p_VerifierSerialized_Length, verifierB64);
         verifierB64[verifierB64Len] = '\0';
 
         if (fprintf(outFile, "%d,%08d,%d,%s,%s\n", i, gPinCode, gIterationCount, saltB64, verifierB64) < 0 || ferror(outFile))

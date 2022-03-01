@@ -97,8 +97,8 @@ void initNetworkCommissioningThreadDriver(void)
 #endif
 }
 
-NetworkCommissioning::ThreadScanResponse * scanResult;
-otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter(scanResult);
+NetworkCommissioning::ThreadScanResponse * sScanResult;
+otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter(sScanResult);
 } // namespace
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
@@ -367,6 +367,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan
     CHIP_ERROR err = MapOpenThreadError(otLinkActiveScan(mOTInst, 0, /* all channels */
                                                          0,          /* default value `kScanDurationDefault` = 300 ms. */
                                                          _OnNetworkScanFinished, this));
+    if (err != CHIP_NO_ERROR)
+    {
+        mpScanCallback = nullptr;
+    }
     return err;
 }
 
@@ -1578,7 +1582,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
     }
 
-#if !defined(__ZEPHYR__) && !defined(ENABLE_CHIP_SHELL) && !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     otAppCliInit(otInst);
 #endif
 
@@ -2283,7 +2287,8 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchResolve(intptr_t context)
 {
     auto * dnsResult = reinterpret_cast<DnsResult *>(context);
-    ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &(dnsResult->mMdnsService), dnsResult->error);
+    ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &(dnsResult->mMdnsService), Span<Inet::IPAddress>(),
+                                             dnsResult->error);
     Platform::Delete<DnsResult>(dnsResult);
 }
 

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,8 @@ public final class AndroidChipPlatform {
       KeyValueStoreManager kvm,
       ConfigurationManager cfg,
       ServiceResolver resolver,
-      ChipMdnsCallback chipMdnsCallback) {
+      ChipMdnsCallback chipMdnsCallback,
+      DiagnosticDataProvider dataProvider) {
     // Order is important here: initChipStack() initializes the BLEManagerImpl, which depends on the
     // BLEManager being set. setConfigurationManager() depends on the CHIP stack being initialized.
     setBLEManager(ble);
@@ -33,6 +34,7 @@ public final class AndroidChipPlatform {
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
     setServiceResolver(resolver, chipMdnsCallback);
+    setDiagnosticDataProviderManager(dataProvider);
   }
 
   // for BLEManager
@@ -87,4 +89,6 @@ public final class AndroidChipPlatform {
 
   private native void nativeSetServiceResolver(
       ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
+
+  private native void setDiagnosticDataProviderManager(DiagnosticDataProvider dataProviderCallback);
 }

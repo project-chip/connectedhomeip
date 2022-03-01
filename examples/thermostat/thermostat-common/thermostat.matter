@@ -142,24 +142,16 @@ server cluster Basic = 40 {
 }
 
 server cluster Binding = 30 {
+  struct TargetStruct {
+    FABRIC_IDX fabricIndex = 0;
+    optional NODE_ID node = 1;
+    optional GROUP_ID group = 2;
+    optional ENDPOINT_NO endpoint = 3;
+    optional CLUSTER_ID cluster = 4;
+  }
+
+  attribute TargetStruct binding[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
-
-  request struct BindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  request struct UnbindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  command Bind(BindRequest): DefaultSuccess = 0;
-  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 server cluster Descriptor = 29 {
@@ -242,7 +234,8 @@ server cluster GeneralCommissioning = 48 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
-    kNotCommissioning = 3;
+    kNoFailSafe = 3;
+    kBusyWithOtherAdmin = 4;
   }
 
   enum RegulatoryLocationType : ENUM8 {
@@ -257,8 +250,8 @@ server cluster GeneralCommissioning = 48 {
 
   attribute int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
-  readonly attribute enum8 regulatoryConfig = 2;
-  readonly attribute enum8 locationCapability = 3;
+  readonly attribute RegulatoryLocationType regulatoryConfig = 2;
+  readonly attribute RegulatoryLocationType locationCapability = 3;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -415,45 +408,45 @@ server cluster Groups = 4 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct GetGroupMembershipRequest {
-    INT16U groupList[] = 0;
+    group_id groupList[] = 0;
   }
 
   request struct RemoveGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   request struct ViewGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   response struct AddGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct GetGroupMembershipResponse {
-    INT8U capacity = 0;
-    INT16U groupList[] = 1;
+    nullable INT8U capacity = 0;
+    group_id groupList[] = 1;
   }
 
   response struct RemoveGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct ViewGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     CHAR_STRING groupName = 2;
   }
 

@@ -48,10 +48,9 @@ using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
-constexpr uint8_t kUpdateTokenLen            = 32;                      // must be between 8 and 32
-constexpr uint8_t kUpdateTokenStrLen         = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
-constexpr size_t kUriMaxLen                  = 256;
-constexpr uint32_t kMinimumDelayedActionTime = 120; // Spec mentions delayed action time should be at least 120 seconds
+constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
+constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
+constexpr size_t kUriMaxLen          = 256;
 
 // Arbitrary BDX Transfer Params
 constexpr uint32_t kMaxBdxBlockSize                 = 1024;
@@ -163,6 +162,13 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     bool requestorCanConsent              = commandData.requestorCanConsent.ValueOr(false);
     QueryImageResponse::Type response;
 
+    if (mIgnoreQueryImageCount > 0)
+    {
+        ChipLogDetail(SoftwareUpdate, "Skip HandleQueryImage response. mIgnoreQueryImageCount %" PRIu32, mIgnoreQueryImageCount);
+        mIgnoreQueryImageCount--;
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+
     switch (mQueryImageBehavior)
     {
     case kRespondWithUnknown:
@@ -209,14 +215,12 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
                 break;
 
             case UserConsentState::kObtaining:
-                queryStatus          = OTAQueryStatus::kBusy;
-                delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
+                queryStatus = OTAQueryStatus::kBusy;
                 break;
 
             case UserConsentState::kDenied:
             case UserConsentState::kUnknown:
-                queryStatus          = OTAQueryStatus::kNotAvailable;
-                delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
+                queryStatus = OTAQueryStatus::kNotAvailable;
                 break;
             }
         }
@@ -227,18 +231,15 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         break;
 
     case kRespondWithBusy:
-        queryStatus          = OTAQueryStatus::kBusy;
-        delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
+        queryStatus = OTAQueryStatus::kBusy;
         break;
 
     case kRespondWithNotAvailable:
-        queryStatus          = OTAQueryStatus::kNotAvailable;
-        delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
+        queryStatus = OTAQueryStatus::kNotAvailable;
         break;
 
     default:
-        queryStatus          = OTAQueryStatus::kNotAvailable;
-        delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
+        queryStatus = OTAQueryStatus::kNotAvailable;
         break;
     }
 
@@ -248,8 +249,8 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         GetUpdateTokenString(ByteSpan(updateToken), strBuf, kUpdateTokenStrLen);
         ChipLogDetail(SoftwareUpdate, "generated updateToken: %s", strBuf);
 
-        // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the provider
-        // supplying the response is not the provider supplying the OTA image.
+        // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the
+        // provider supplying the response is not the provider supplying the OTA image.
         FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
         FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
         NodeId nodeId           = fabricInfo->GetPeerId().GetNodeId();
@@ -294,6 +295,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     }
 
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
@@ -301,6 +303,14 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
                                                            const chip::app::ConcreteCommandPath & commandPath,
                                                            const ApplyUpdateRequest::DecodableType & commandData)
 {
+    if (mIgnoreApplyUpdateCount > 0)
+    {
+        ChipLogDetail(SoftwareUpdate, "Skip HandleApplyUpdateRequest response. mIgnoreApplyUpdateCount %" PRIu32,
+                      mIgnoreApplyUpdateCount);
+        mIgnoreApplyUpdateCount--;
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+
     // TODO: handle multiple transfers by tracking updateTokens
     char tokenBuf[kUpdateTokenStrLen] = { 0 };
 

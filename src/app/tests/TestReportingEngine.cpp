@@ -159,7 +159,7 @@ nlTestSuite sSuite =
 {
     "TestReportingEngine",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on

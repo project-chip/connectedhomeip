@@ -504,12 +504,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
         {
-            // Grace period until ACLs are in place
-            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
-            err = CHIP_NO_ERROR;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
             if (aPath.mExpanded)
             {
@@ -942,12 +936,6 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         }
         if (err != CHIP_NO_ERROR)
         {
-            // Grace period until ACLs are in place
-            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
-            err = CHIP_NO_ERROR;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
             return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
@@ -1040,14 +1028,23 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
 
     IncreaseClusterDataVersion(ConcreteClusterPath(endpoint, clusterId));
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
-
-    // Schedule work to run asynchronously on the CHIP thread. The scheduled work won't execute until the current execution context
-    // has completed. This ensures that we can 'gather up' multiple attribute changes that have occurred in the same execution
-    // context without requiring any explicit 'start' or 'end' change calls into the engine to book-end the change.
-    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
 {
     return MatterReportingAttributeChangeCallback(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+}
+
+void MatterReportingAttributeChangeCallback(EndpointId endpoint)
+{
+    // Attribute writes have asserted this already, but this assert should catch
+    // applications notifying about changes from their end.
+    assertChipStackLockedByCurrentThread();
+
+    ClusterInfo info;
+    info.mEndpointId = endpoint;
+
+    // We are adding or enabling a whole endpoint, in this case, we do not touch the cluster data version.
+
+    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
 }

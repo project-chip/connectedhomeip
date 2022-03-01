@@ -25,8 +25,8 @@
 #include <lib/support/JniReferences.h>
 
 #include <controller/CHIPDeviceControllerFactory.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
@@ -164,8 +164,8 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
         return nullptr;
     }
 
-    *errInfoOnFailure =
-        opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+    *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, /* fabricId = */ 1, ephemeralKey.Pubkey(), rcacSpan,
+                                                                       icacSpan, nocSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;

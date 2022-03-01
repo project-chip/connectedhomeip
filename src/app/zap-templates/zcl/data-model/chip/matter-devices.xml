@@ -41,7 +41,7 @@ limitations under the License.
                 <requireAttribute>EXTENSION</requireAttribute>
             </include>
             <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>INTERACTION_MODEL_VERSION</requireAttribute>
+                <requireAttribute>DATA_MODEL_REVISION</requireAttribute>
                 <requireAttribute>VENDOR_NAME</requireAttribute>
                 <requireAttribute>VENDOR_ID</requireAttribute>
                 <requireAttribute>PRODUCT_NAME</requireAttribute>
@@ -68,9 +68,14 @@ limitations under the License.
             <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="AdministratorCommissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Operational Credentials" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Localization Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Localization Time Format" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Localization Unit" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Localization Configuration" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>ACTIVE_LOCALE</requireAttribute>
+                <requireAttribute>SUPPORTED_LOCALES</requireAttribute>
+            </include>
+            <include cluster="Time Format Localization" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>HOUR_FORMAT</requireAttribute>
+            </include>
+            <include cluster="Unit Localization" client="false" server="true" clientLocked="true" serverLocked="false"></include>
             <include cluster="General Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Diagnostic Logs" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Software Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -208,7 +213,9 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Bridged Device Basic" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Bridged Device Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>REACHABLE</requireAttribute>
+            </include>
             <include cluster="Power Source Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>

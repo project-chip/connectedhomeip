@@ -5,7 +5,9 @@ jobject {{target}};
 if (!{{source}}.HasValue()) {
   chip::JniReferences::GetInstance().CreateOptional(nullptr, {{target}});
 } else {
-  {{>decode_value target=target source=(concat source ".Value()") cluster=cluster depth=(incrementDepth depth) isOptional=false omitDeclaration=true earlyReturn=earlyReturn}}
+  jobject {{target}}InsideOptional;
+  {{>decode_value target=(concat target "InsideOptional") source=(concat source ".Value()") cluster=cluster depth=(incrementDepth depth) isOptional=false omitDeclaration=true earlyReturn=earlyReturn}}
+  chip::JniReferences::GetInstance().CreateOptional({{target}}InsideOptional, {{target}});
 }
 {{else if isNullable}}
 if ({{source}}.IsNull()) {
@@ -21,7 +23,7 @@ if ({{source}}.IsNull()) {
   {
     auto & entry_{{depth}} = iter_{{target}}_{{depth}}.GetValue();
     {{>decode_value target=(concat "newElement_" depth) source=(concat "entry_" depth) cluster=cluster depth=(incrementDepth depth) isArray=false forceNotList=true omitDeclaration=false earlyReturn=earlyReturn}}
-    chip::JniReferences::GetInstance().AddToArrayList({{target}}, newElement_{{depth}});
+    chip::JniReferences::GetInstance().AddToList({{target}}, newElement_{{depth}});
   }
 {{else}}
   {{#if_is_struct type}}

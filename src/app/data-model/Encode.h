@@ -18,8 +18,10 @@
 
 #pragma once
 
+#include <app/data-model/FabricScoped.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -71,7 +73,7 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, Span<const char>
 /*
  * @brief
  *
- * This specific variant that encodes cluster objects (like structs, commands, events) to TLV
+ * This specific variant that encodes cluster objects (like non fabric-scoped structs, commands, events) to TLV
  * depends on the presence of an Encode method on the object. The signature of that method
  * is as follows:
  *
@@ -88,6 +90,44 @@ template <typename X,
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
 {
     return x.Encode(writer, tag);
+}
+
+/*
+ * @brief
+ *
+ * A way to encode fabric-scoped structs for a write that omits encoding the containing fabric index field.
+ */
+template <typename X,
+          typename std::enable_if_t<std::is_class<X>::value &&
+                                        std::is_same<decltype(std::declval<X>().EncodeForWrite(std::declval<TLV::TLVWriter &>(),
+                                                                                               std::declval<TLV::Tag>())),
+                                                     CHIP_ERROR>::value &&
+                                        DataModel::IsFabricScoped<X>::value,
+                                    X> * = nullptr>
+CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
+{
+    return x.EncodeForWrite(writer, tag);
+}
+
+/*
+ * @brief
+ *
+ * A way to encode fabric-scoped structs for a read that always encodes the containing fabric index field.
+ *
+ * An accessing fabric index must be passed in to permit including/omitting sensitive fields based on a match with the fabric index
+ * associated with the scoped struct.
+ */
+template <typename X,
+          typename std::enable_if_t<
+              std::is_class<X>::value &&
+                  std::is_same<decltype(std::declval<X>().EncodeForRead(std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>(),
+                                                                        std::declval<FabricIndex>())),
+                               CHIP_ERROR>::value &&
+                  DataModel::IsFabricScoped<X>::value,
+              X> * = nullptr>
+CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, const X & x)
+{
+    return x.EncodeForRead(writer, tag, accessingFabricIndex);
 }
 
 /*
@@ -137,6 +177,54 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const Nullable<X> & x)
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif // !defined(__clang__)
     return Encode(writer, tag, x.Value());
+#pragma GCC diagnostic pop
+}
+
+/*
+ * @brief
+ *
+ * Encodes a nullable fabric-scoped struct for a write.
+ */
+template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, bool> = true>
+CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, const Nullable<X> & x)
+{
+    if (x.IsNull())
+    {
+        return writer.PutNull(tag);
+    }
+
+    // The -Wmaybe-uninitialized warning gets confused about the fact
+    // that x.mValue is always initialized if x.IsNull() is not
+    // true, so suppress it for our access to x.Value().
+#pragma GCC diagnostic push
+#if !defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif // !defined(__clang__)
+    return EncodeForWrite(writer, tag, x.Value());
+#pragma GCC diagnostic pop
+}
+
+/*
+ * @brief
+ *
+ * Encodes a nullable fabric-scoped struct for a read.
+ */
+template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, bool> = true>
+CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, const Nullable<X> & x)
+{
+    if (x.IsNull())
+    {
+        return writer.PutNull(tag);
+    }
+
+    // The -Wmaybe-uninitialized warning gets confused about the fact
+    // that x.mValue is always initialized if x.IsNull() is not
+    // true, so suppress it for our access to x.Value().
+#pragma GCC diagnostic push
+#if !defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif // !defined(__clang__)
+    return EncodeForRead(writer, tag, accessingFabricIndex, x.Value());
 #pragma GCC diagnostic pop
 }
 

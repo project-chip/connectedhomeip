@@ -8,4 +8,4 @@ To learn more about the tool, how to build it and use its commands and advanced
 features, read the following guides:
 
 -   [Working with Python CHIP Controller](../../../docs/guides/python_chip_controller_building.md)
--   [Using Python CHIP Controller advanced features](../../../docs/guides/ADVANCED_USAGE.md)
+-   [Using Python CHIP Controller advanced features](../../../docs/guides/python_chip_controller_advanced_usage.md)

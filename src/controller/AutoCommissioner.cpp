@@ -323,8 +323,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             {
                 mParams.SetFailsafeTimerSeconds(mDeviceCommissioningInfo.general.recommendedFailsafe);
             }
-            mParams.SetRemoteVendorId(report.Get<ReadCommissioningInfo>().basic.vendorId);
-            mParams.SetRemoteProductId(report.Get<ReadCommissioningInfo>().basic.productId);
+            mParams.SetRemoteVendorId(mDeviceCommissioningInfo.basic.vendorId)
+                .SetRemoteProductId(mDeviceCommissioningInfo.basic.productId)
+                .SetDefaultRegulatoryLocation(mDeviceCommissioningInfo.general.currentRegulatoryLocation)
+                .SetLocationCapability(mDeviceCommissioningInfo.general.locationCapability);
             break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);

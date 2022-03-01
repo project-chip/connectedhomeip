@@ -39,18 +39,47 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#chip_server_cluster_attributes}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
-- (void)read{{>attribute}}WithCompletionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)read{{>attribute}}With
+{{~#if_is_fabric_scoped_struct type~}}
+  Params:(CHIPReadParams * _Nullable)params completionHandler:
+{{~else~}}
+  CompletionHandler:
+{{~/if_is_fabric_scoped_struct~}}
+(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler;
 {{#if isWritableAttribute}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler;
 {{/if}}
 {{#if isReportableAttribute}}
-- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
+{{#if_is_fabric_scoped_struct type}}
+params:(CHIPReadParams * _Nullable)params
+{{/if_is_fabric_scoped_struct}}
+subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler;
 {{/if}}
 {{/chip_server_cluster_attributes}}
 
 @end
 
 {{/chip_client_clusters}}
+
+{{#zcl_clusters}}
+{{#zcl_enums}}
+typedef NS_ENUM(NSInteger, {{objCEnumName ../name label}}) {
+   {{#zcl_enum_items}}
+   {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex value 2}},
+   {{/zcl_enum_items}}
+};
+
+{{/zcl_enums}}
+{{#zcl_bitmaps}}
+typedef NS_OPTIONS(NSUInteger, {{objCEnumName ../name label}}) {
+   {{#zcl_bitmap_items}}
+   {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex mask}},
+   {{/zcl_bitmap_items}}
+};
+
+{{/zcl_bitmaps}}
+{{/zcl_clusters}}
 
 NS_ASSUME_NONNULL_END
 

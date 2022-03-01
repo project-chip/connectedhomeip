@@ -156,7 +156,7 @@ public:
 
     CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
-    CHIP_ERROR FinishCommand(bool aStartDataStruct = true);
+    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
     CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();

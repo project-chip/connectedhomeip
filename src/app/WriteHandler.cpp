@@ -39,6 +39,7 @@ CHIP_ERROR WriteHandler::Init()
     MoveToState(State::Initialized);
 
     mACLCheckCache.ClearValue();
+    mProcessingAttributePath.ClearValue();
 
     return CHIP_NO_ERROR;
 }
@@ -188,6 +189,7 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
                                      mHasMoreChunks ? Messaging::SendMessageFlags::kExpectResponse
                                                     : Messaging::SendMessageFlags::kNone);
@@ -243,7 +245,17 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         }
 
+        if (InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, dataAttributePath) ||
+            // Per chunking protocol, we are processing the list entries, but the initial empty list is not processed, so we reject
+            // it with Busy status code.
+            (dataAttributePath.IsListItemOperation() &&
+             (!mProcessingAttributePath.HasValue() || mProcessingAttributePath.Value() != dataAttributePath)))
         {
+            err = AddStatus(dataAttributePath, StatusIB(Protocols::InteractionModel::Status::Busy));
+        }
+        else
+        {
+            mProcessingAttributePath.SetValue(dataAttributePath);
             MatterPreAttributeWriteCallback(dataAttributePath);
             TLV::TLVWriter backup;
             DataVersion version = 0;
@@ -393,9 +405,6 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
     reader.Init(std::move(aPayload));
 
-    err = reader.Next();
-    SuccessOrExit(err);
-
     err = writeRequestParser.Init(reader);
     SuccessOrExit(err);
 
@@ -448,6 +457,8 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     {
         err = ProcessAttributeDataIBs(AttributeDataIBsReader);
     }
+    SuccessOrExit(err);
+    SuccessOrExit(err = writeRequestParser.ExitContainer());
 
     if (err == CHIP_NO_ERROR)
     {

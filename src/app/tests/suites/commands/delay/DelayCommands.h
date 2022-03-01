@@ -37,6 +37,9 @@ public:
     CHIP_ERROR WaitForCommissionableAdvertisement();
     CHIP_ERROR WaitForOperationalAdvertisement();
 
+    // Busy-wait for a given duration in milliseconds
+    CHIP_ERROR BusyWaitFor(chip::System::Clock::Milliseconds32 durationInMs);
+
 private:
     static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
     CHIP_ERROR RunInternal(const char * command);

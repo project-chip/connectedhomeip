@@ -267,6 +267,22 @@ struct DiscoveredNodeData
             ChipLogDetail(Discovery, "\tPort: %u", port);
         }
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
+        if (mrpRetryIntervalIdle.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval idle: %" PRIu32 " ms", mrpRetryIntervalIdle.Value().count());
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval idle: not present");
+        }
+        if (mrpRetryIntervalActive.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval active: %" PRIu32 " ms", mrpRetryIntervalActive.Value().count());
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval active: not present");
+        }
     }
 };
 
@@ -299,20 +315,43 @@ enum class DiscoveryType
     kCommissionableNode,
     kCommissionerNode
 };
-/// Groups callbacks for CHIP service resolution requests
-class ResolverDelegate
+
+/// Callbacks for resolving operational node resolution
+class OperationalResolveDelegate
 {
 public:
-    virtual ~ResolverDelegate() = default;
+    virtual ~OperationalResolveDelegate() = default;
 
-    /// Called when a requested CHIP node ID has been successfully resolved
-    virtual void OnNodeIdResolved(const ResolvedNodeData & nodeData) = 0;
+    /// Called within the CHIP event loop after a successful node resolution.
+    ///
+    /// May be called multiple times: implementations may call this once per
+    /// received packet and MDNS packets may arrive over different interfaces
+    /// which will make nodeData have different content.
+    virtual void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) = 0;
 
-    /// Called when a CHIP node ID resolution has failed
-    virtual void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
+    /// Notify a final failure for a node operational resolution.
+    ///
+    /// Called within the chip event loop if node resolution could not be performed.
+    /// This may be due to internal errors or timeouts.
+    ///
+    /// This will be called only if 'OnOperationalNodeResolved' is never called.
+    virtual void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
+};
 
-    // Called when a CHIP Node acting as Commissioner or in commissioning mode is found
-    virtual void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) = 0;
+/// Callbacks for discovering nodes advertising non-operational status:
+///   - Commissioners
+///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
+///     connected to thread/wifi or devices with a commissioning window open)
+class CommissioningResolveDelegate
+{
+public:
+    virtual ~CommissioningResolveDelegate() = default;
+
+    /// Called within the CHIP event loop once a node is discovered.
+    ///
+    /// May be called multiple times as more nodes send their answer to a
+    /// multicast discovery query
+    virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
 };
 
 /**
@@ -337,10 +376,14 @@ public:
     virtual void Shutdown() = 0;
 
     /**
-     * Registers a resolver delegate. If nullptr is passed, the previously registered delegate
-     * is unregistered.
+     * If nullptr is passed, the previously registered delegate is unregistered.
      */
-    virtual void SetResolverDelegate(ResolverDelegate * delegate) = 0;
+    virtual void SetOperationalDelegate(OperationalResolveDelegate * delegate) = 0;
+
+    /**
+     * If nullptr is passed, the previously registered delegate is unregistered.
+     */
+    virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
 
     /**
      * Requests resolution of the given operational node service.

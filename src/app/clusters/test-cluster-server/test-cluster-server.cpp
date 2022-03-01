@@ -546,9 +546,6 @@ CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder &
             ReturnErrorOnFailure(encoder.Encode(val));
         }
 
-        // Always append a fake fabric index so we can test fabric filter even when there is only one fabric provisioned.
-        val.fabricIndex = kUndefinedFabricIndex;
-        ReturnErrorOnFailure(encoder.Encode(val));
         return CHIP_NO_ERROR;
     });
 }

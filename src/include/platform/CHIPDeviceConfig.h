@@ -269,6 +269,27 @@
 #define CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC 30
 #endif // CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
 
+/**
+ * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+ *
+ * Enables the use of a hard-coded default unique ID utilized for the rotating device ID calculation.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID                                                                            \
+    {                                                                                                                              \
+        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff                             \
+    }
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+ *
+ * Unique ID length in bytes. The value should be 16-bytes or longer.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 16
+#endif
+
 // -------------------- WiFi Station Configuration --------------------
 
 /**

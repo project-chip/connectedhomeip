@@ -20,6 +20,7 @@
 #include <lib/core/OTAImageHeader.h>
 #include <lib/support/Span.h>
 #include <platform/OTAImageProcessor.h>
+#include <platform/nrfconnect/OTAImageContentHeader.h>
 
 namespace chip {
 
@@ -46,6 +47,7 @@ private:
 
     OTADownloader * mDownloader = nullptr;
     OTAImageHeaderParser mHeaderParser;
+    OTAImageContentHeaderParser mContentHeaderParser;
     uint8_t mBuffer[kBufferSize];
 };
 

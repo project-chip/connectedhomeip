@@ -88,7 +88,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReason(DiagnosticDataProvider::BootReasonType::Unspecified);
+        err = StoreBootReason(BootReasonType::Unspecified);
         SuccessOrExit(err);
     }
 
