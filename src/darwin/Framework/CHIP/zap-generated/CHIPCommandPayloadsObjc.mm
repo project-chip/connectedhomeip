@@ -124,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _capacity = @(0);
+        _capacity = nil;
 
         _groupList = [NSArray array];
     }

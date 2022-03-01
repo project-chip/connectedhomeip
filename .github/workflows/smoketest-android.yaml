@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Android
+name: Smoke test - Android
 
 on:
-    push:
     pull_request:
+    workflow_dispatch:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group: smoke-${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 jobs:
     android:
-        name: Build Android
-        timeout-minutes: 75
+        name: Smoke Run - Android
+        timeout-minutes: 60
 
         env:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
@@ -54,23 +54,11 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build Android CHIPTool and CHIPTest (ARM)
-              run: |
-                ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm-chip-*' build"
-            - name: Clean out build output
-              run: rm -rf ./out
             - name: Build Android CHIPTool and CHIPTest (ARM64)
               run: |
                 ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm64-chip-*' build"
+                  "./scripts/build/build_examples.py --no-log-timestamps --target android-arm64-chip-tool build"
             - name: Run Android build rule tests
               run: |
                 ./scripts/run_in_build_env.sh \
                   "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test.tests"
-            - name: Clean out build output
-              run: rm -rf ./out
-            # - name: Build Android Studio build (arm64 only)
-            #   run: |
-            #     ./scripts/run_in_build_env.sh \
-            #       "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-androidstudio-arm64-chip-tool' build"

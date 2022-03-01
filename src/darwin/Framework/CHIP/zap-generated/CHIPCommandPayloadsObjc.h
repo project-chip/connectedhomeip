@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPGroupsClusterGetGroupMembershipResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull capacity;
+@property (strong, nonatomic) NSNumber * _Nullable capacity;
 @property (strong, nonatomic) NSArray * _Nonnull groupList;
 - (instancetype)init;
 @end

@@ -109,6 +109,16 @@ void NodeLookupHandle::LookupResult(const ResolveResult & result)
         mBestResult       = result;
         mBestAddressScore = newScore;
 
+        if (!mBestResult.address.GetIPAddress().IsIPv6LinkLocal())
+        {
+            // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
+            // For all other addresses, we should rely on the device's routing table to route messages sent.
+            // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
+            // mDNS advertisements are not usually received on the same interface the peer is reachable on.
+            mBestResult.address.SetInterface(Inet::InterfaceId::Null());
+            ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
+        }
+
 #if CHIP_PROGRESS_LOGGING
         char addr_string[Transport::PeerAddress::kMaxToStringSize];
         mBestResult.address.ToString(addr_string);
