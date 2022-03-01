@@ -102,7 +102,7 @@ jobs:
                   mkdir -p /tmp/ota/
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug chip_config_network_layer_ble=false
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug chip_config_network_layer_ble=false
-                  sudo scripts/tests/ota_test.sh
+                  bash scripts/tests/ota_test.sh
             - name: Uploading OTA logs
               if: always()
               uses: actions/upload-artifact@v2
@@ -208,7 +208,7 @@ jobs:
                   mkdir -p /tmp/ota/
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug chip_config_network_layer_ble=false
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug chip_config_network_layer_ble=false
-                  sudo scripts/tests/ota_test.sh
+                  bash scripts/tests/ota_test.sh
             - name: Uploading OTA logs
               if: always()
               uses: actions/upload-artifact@v2
