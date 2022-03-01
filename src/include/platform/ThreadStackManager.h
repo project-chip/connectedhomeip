@@ -27,7 +27,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
-#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 
@@ -89,9 +88,6 @@ public:
     bool TryLockThreadStack();
     void UnlockThreadStack();
     bool HaveRouteToAddress(const chip::Inet::IPAddress & destAddr);
-    bool IsThreadEnabled();
-    bool IsThreadProvisioned();
-    bool IsThreadAttached();
     CHIP_ERROR GetThreadProvision(ByteSpan & netInfo);
     CHIP_ERROR GetAndLogThreadStatsCounters();
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
@@ -103,9 +99,6 @@ public:
     CHIP_ERROR JoinerStart();
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
-    CHIP_ERROR AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
-    CHIP_ERROR StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
-    void OnThreadAttachFinished(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
@@ -152,6 +145,9 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_FreeRTOS;
 
     void OnPlatformEvent(const ChipDeviceEvent * event);
+    bool IsThreadEnabled();
+    bool IsThreadProvisioned();
+    bool IsThreadAttached();
     void ErasePersistentInfo();
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
@@ -349,23 +345,6 @@ inline CHIP_ERROR ThreadStackManager::GetThreadProvision(ByteSpan & netInfo)
 inline CHIP_ERROR ThreadStackManager::SetThreadProvision(ByteSpan netInfo)
 {
     return static_cast<ImplClass *>(this)->_SetThreadProvision(netInfo);
-}
-
-inline CHIP_ERROR
-ThreadStackManager::AttachToThreadNetwork(ByteSpan netInfo,
-                                          NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
-{
-    return static_cast<ImplClass *>(this)->_AttachToThreadNetwork(netInfo, callback);
-}
-
-inline void ThreadStackManager::OnThreadAttachFinished(void)
-{
-    static_cast<ImplClass *>(this)->_OnThreadAttachFinished();
-}
-
-inline CHIP_ERROR ThreadStackManager::StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
-{
-    return static_cast<ImplClass *>(this)->_StartThreadScan(callback);
 }
 
 inline void ThreadStackManager::ErasePersistentInfo()

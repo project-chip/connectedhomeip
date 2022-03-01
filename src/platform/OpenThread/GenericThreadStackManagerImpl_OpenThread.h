@@ -26,7 +26,6 @@
 #pragma once
 
 #include <openthread/instance.h>
-#include <openthread/link.h>
 #include <openthread/netdata.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -40,7 +39,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/platform/Dnssd.h>
-#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -84,14 +82,9 @@ protected:
     bool _IsThreadAttached(void);
     CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
-    CHIP_ERROR _AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
-    void _OnThreadAttachFinished(void);
     void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
-    CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
-    static void _OnNetworkScanFinished(otActiveScanResult * aResult, void * aContext);
-    void _OnNetworkScanFinished(otActiveScanResult * aResult);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
@@ -143,11 +136,7 @@ private:
     // ===== Private members for use by this class only.
 
     otInstance * mOTInst;
-    uint64_t mOverrunCount                    = 0;
-    Thread::OperationalDataset mActiveDataset = {};
-
-    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
-    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    uint64_t mOverrunCount = 0;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ConnectivityManager::SEDPollingConfig mPollingConfig;

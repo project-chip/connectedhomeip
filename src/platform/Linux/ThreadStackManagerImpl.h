@@ -65,13 +65,10 @@ public:
 
     bool _IsThreadAttached();
 
-    CHIP_ERROR _AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    CHIP_ERROR AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
 
     CHIP_ERROR _SetThreadEnabled(bool val);
-
-    void _OnThreadAttachFinished(void);
-
-    static void _OnThreadBrAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data);
+    static void _OnThreadAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data);
 
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
 
@@ -103,7 +100,7 @@ public:
 
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
-    CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
+    CHIP_ERROR StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
 
     ~ThreadStackManagerImpl() = default;
 
@@ -147,11 +144,6 @@ private:
 
     bool mAttached;
 };
-
-inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)
-{
-    // stub for ThreadStackManager.h
-}
 
 } // namespace DeviceLayer
 } // namespace chip
