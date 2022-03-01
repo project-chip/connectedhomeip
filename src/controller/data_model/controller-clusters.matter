@@ -1823,7 +1823,7 @@ client cluster GeneralDiagnostics = 51 {
 client cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicy : ENUM8 {
     kStandard = 0;
-    kLowLatency = 1;
+    kTrustFirst = 1;
   }
 
   struct GroupKeyMapStruct {

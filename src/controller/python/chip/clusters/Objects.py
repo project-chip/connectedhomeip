@@ -14547,7 +14547,7 @@ class GroupKeyManagement(Cluster):
     class Enums:
         class GroupKeySecurityPolicy(IntEnum):
             kStandard = 0x00
-            kLowLatency = 0x01
+            kTrustFirst = 0x01
 
 
     class Structs:
