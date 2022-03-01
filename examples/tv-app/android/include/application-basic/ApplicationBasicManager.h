@@ -33,5 +33,9 @@ public:
     CHIP_ERROR HandleGetApplicationVersion(AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetAllowedVendorList(AttributeValueEncoder & aEncoder) override;
 
-    std::list<uint16_t> GetAllowedVendorList() override { return { HandleGetVendorId(), chip::VendorId::TestVendor1 }; };
+    std::list<uint16_t> GetAllowedVendorList() override
+    {
+        static const uint16_t kTestVendorId = 456; // CI test cases require this vendor id
+        return { HandleGetVendorId(), kTestVendorId };
+    };
 };

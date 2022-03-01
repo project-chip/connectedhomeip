@@ -41,9 +41,10 @@ public:
         CopyString(mVendorName, sizeof(mVendorName), szVendorName);
         mVendorId = vendorId;
         CopyString(mApplicationVersion, sizeof(mApplicationVersion), szApplicationVersion);
-        mProductId = productId;
+        mProductId                          = productId;
+        static const uint16_t kTestVendorId = 456; // CI test cases require this vendor id
         mAllowedVendorList.push_back(vendorId);
-        mAllowedVendorList.push_back(chip::VendorId::TestVendor1);
+        mAllowedVendorList.push_back(kTestVendorId);
     };
     virtual ~ApplicationBasicManager(){};
 
