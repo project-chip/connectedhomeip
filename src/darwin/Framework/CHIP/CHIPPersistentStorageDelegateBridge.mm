@@ -93,11 +93,12 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key
 
             if (decoded.length() > UINT16_MAX) {
                 error = CHIP_ERROR_BUFFER_TOO_SMALL;
+                size = 0;
             } else {
                 if (buffer != nullptr) {
                     memcpy(buffer, decoded.data(), std::min<size_t>(decoded.length(), size));
                     if (size < decoded.length()) {
-                        error = CHIP_ERROR_NO_MEMORY;
+                        error = CHIP_ERROR_BUFFER_TOO_SMALL;
                     }
                 } else {
                     error = CHIP_ERROR_NO_MEMORY;
@@ -105,7 +106,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key
                 size = static_cast<uint16_t>(decoded.length());
             }
         } else {
-            error = CHIP_ERROR_KEY_NOT_FOUND;
+            error = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
         }
     });
     return error;
