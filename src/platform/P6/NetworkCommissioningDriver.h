@@ -49,7 +49,7 @@ public:
         item.wiFiBand = (mpScanResults[mIternum].band == CY_WCM_WIFI_BAND_2_4GHZ)
             ? chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4
             : chip::DeviceLayer::NetworkCommissioning::WiFiBand::k5g;
-        item.rssi = mpScanResults[mIternum].signal_strength;
+        item.rssi     = mpScanResults[mIternum].signal_strength;
         memcpy(item.ssid, mpScanResults[mIternum].SSID, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].BSSID, 6);
 
@@ -93,6 +93,11 @@ public:
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init() override;
     CHIP_ERROR Shutdown() override;
+
+    // TODO: Implement this
+    CHIP_ERROR GetLastNetworkingStatus(Status & status) override { return CHIP_ERROR_KEY_NOT_FOUND; }
+    CHIP_ERROR GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen) override { return CHIP_ERROR_KEY_NOT_FOUND; }
+    CHIP_ERROR GetLastConnectErrorValue(uint32_t & value) override { return CHIP_ERROR_KEY_NOT_FOUND; }
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return kMaxWiFiNetworks; }

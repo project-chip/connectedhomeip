@@ -48,7 +48,7 @@ public:
 
         item.security = mScanResults[mIternum].get_security();
         item.ssidLen  = strnlen(reinterpret_cast<const char *>(mScanResults[mIternum].get_ssid()),
-                               chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+                                chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
         item.channel  = mScanResults[mIternum].get_channel();
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mScanResults[mIternum].get_rssi();
@@ -95,6 +95,11 @@ public:
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init() override;
     CHIP_ERROR Shutdown() override;
+
+    // TODO: Implement this.
+    CHIP_ERROR GetLastNetworkingStatus(Status & status) override { return CHIP_ERROR_KEY_NOT_FOUND; }
+    CHIP_ERROR GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen) override { return CHIP_ERROR_KEY_NOT_FOUND; }
+    CHIP_ERROR GetLastConnectErrorValue(uint32_t & value) override { return CHIP_ERROR_KEY_NOT_FOUND; }
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return kMaxWiFiNetworks; }
