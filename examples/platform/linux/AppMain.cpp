@@ -267,7 +267,7 @@ class MyServerStorageDelegate : public PersistentStorageDelegate
     {
         ChipLogProgress(AppServer, "Retrieving value from server storage.");
         size_t bytesRead = 0;
-        CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+        CHIP_ERROR err   = PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
 
         if (err == CHIP_NO_ERROR)
         {
