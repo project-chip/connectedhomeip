@@ -252,8 +252,8 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
     // We are now connecting to a provider, leave the kIdle state.
-    // No state matching this one fully but we can't be in kIdle.
-    RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
+    // No state matches this one fully but we can't be in kIdle.
+    RecordNewUpdateState(OTAUpdateStateEnum::kUnknown, OTAChangeReasonEnum::kSuccess);
 
     if (mServer == nullptr)
     {
