@@ -7265,6 +7265,10 @@ typedef NS_OPTIONS(NSUInteger, CHIPOnOffControl) {
     CHIPOnOffControlAcceptOnlyWhenOn = 0x1,
 };
 
+typedef NS_OPTIONS(NSUInteger, CHIPOnOffFeature) {
+    CHIPOnOffFeatureLighting = 0x1,
+};
+
 typedef NS_ENUM(NSInteger, CHIPLevelControlMoveMode) {
     CHIPLevelControlMoveModeUp = 0x00,
     CHIPLevelControlMoveModeDown = 0x01,
