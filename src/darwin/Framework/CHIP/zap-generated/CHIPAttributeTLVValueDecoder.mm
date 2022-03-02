@@ -7296,12 +7296,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nullable value;
-            if (cppValue.IsNull()) {
-                value = nil;
-            } else {
-                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
-            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::OffWaitTime::Id: {
@@ -7311,12 +7307,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nullable value;
-            if (cppValue.IsNull()) {
-                value = nil;
-            } else {
-                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
-            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::StartUpOnOff::Id: {
@@ -7326,12 +7318,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nullable value;
-            if (cppValue.IsNull()) {
-                value = nil;
-            } else {
-                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
-            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {

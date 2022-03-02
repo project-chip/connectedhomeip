@@ -3227,9 +3227,9 @@ struct TypeInfo
 namespace OnTime {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnTime::Id; }
@@ -3239,9 +3239,9 @@ struct TypeInfo
 namespace OffWaitTime {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OffWaitTime::Id; }
@@ -3251,9 +3251,9 @@ struct TypeInfo
 namespace StartUpOnOff {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpOnOff::Id; }
@@ -3331,9 +3331,9 @@ struct TypeInfo
 
         Attributes::OnOff::TypeInfo::DecodableType onOff                           = static_cast<bool>(0);
         Attributes::GlobalSceneControl::TypeInfo::DecodableType globalSceneControl = static_cast<bool>(0);
-        Attributes::OnTime::TypeInfo::DecodableType onTime;
-        Attributes::OffWaitTime::TypeInfo::DecodableType offWaitTime;
-        Attributes::StartUpOnOff::TypeInfo::DecodableType startUpOnOff;
+        Attributes::OnTime::TypeInfo::DecodableType onTime                         = static_cast<uint16_t>(0);
+        Attributes::OffWaitTime::TypeInfo::DecodableType offWaitTime               = static_cast<uint16_t>(0);
+        Attributes::StartUpOnOff::TypeInfo::DecodableType startUpOnOff             = static_cast<uint8_t>(0);
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

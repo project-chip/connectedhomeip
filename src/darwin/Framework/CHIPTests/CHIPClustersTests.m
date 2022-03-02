@@ -16286,7 +16286,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -16311,7 +16310,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -16336,7 +16334,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedCharValue], 0);
         }
 
@@ -16474,7 +16471,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -16499,7 +16495,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -16524,7 +16519,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedCharValue], 0);
         }
 
@@ -17095,7 +17089,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17120,7 +17113,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17188,7 +17180,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17213,7 +17204,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17281,7 +17271,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17330,7 +17319,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17355,7 +17343,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17399,7 +17386,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17424,7 +17410,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17492,7 +17477,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17541,7 +17525,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17609,7 +17592,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17634,7 +17616,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17702,7 +17683,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17751,7 +17731,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17776,7 +17755,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17825,7 +17803,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 
@@ -17850,7 +17827,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedShortValue], 0U);
         }
 

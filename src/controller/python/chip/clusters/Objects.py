@@ -2560,9 +2560,9 @@ class OnOff(Cluster):
             Fields = [
                 ClusterObjectFieldDescriptor(Label="onOff", Tag=0x00000000, Type=bool),
                 ClusterObjectFieldDescriptor(Label="globalSceneControl", Tag=0x00004000, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="onTime", Tag=0x00004001, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="offWaitTime", Tag=0x00004002, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="startUpOnOff", Tag=0x00004003, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="onTime", Tag=0x00004001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="offWaitTime", Tag=0x00004002, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="startUpOnOff", Tag=0x00004003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="serverGeneratedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="clientGeneratedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -2572,9 +2572,9 @@ class OnOff(Cluster):
 
     onOff: 'bool' = None
     globalSceneControl: 'typing.Optional[bool]' = None
-    onTime: 'typing.Union[None, Nullable, uint]' = None
-    offWaitTime: 'typing.Union[None, Nullable, uint]' = None
-    startUpOnOff: 'typing.Union[None, Nullable, uint]' = None
+    onTime: 'typing.Optional[uint]' = None
+    offWaitTime: 'typing.Optional[uint]' = None
+    startUpOnOff: 'typing.Optional[uint]' = None
     serverGeneratedCommandList: 'typing.List[uint]' = None
     clientGeneratedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -2731,9 +2731,9 @@ class OnOff(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Union[None, Nullable, uint]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class OffWaitTime(ClusterAttributeDescriptor):
@@ -2747,9 +2747,9 @@ class OnOff(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Union[None, Nullable, uint]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class StartUpOnOff(ClusterAttributeDescriptor):
@@ -2763,9 +2763,9 @@ class OnOff(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Union[None, Nullable, uint]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class ServerGeneratedCommandList(ClusterAttributeDescriptor):

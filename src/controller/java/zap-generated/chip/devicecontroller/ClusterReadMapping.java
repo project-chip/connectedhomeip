@@ -5658,8 +5658,7 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OnOffCluster) cluster)
-                  .readOnTimeAttribute(
-                      (ChipClusters.OnOffCluster.OnTimeAttributeCallback) callback);
+                  .readOnTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOnOffOnTimeCommandParams);
@@ -5670,8 +5669,7 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OnOffCluster) cluster)
-                  .readOffWaitTimeAttribute(
-                      (ChipClusters.OnOffCluster.OffWaitTimeAttributeCallback) callback);
+                  .readOffWaitTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOnOffOffWaitTimeCommandParams);
@@ -5683,8 +5681,7 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OnOffCluster) cluster)
-                  .readStartUpOnOffAttribute(
-                      (ChipClusters.OnOffCluster.StartUpOnOffAttributeCallback) callback);
+                  .readStartUpOnOffAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOnOffStartUpOnOffCommandParams);

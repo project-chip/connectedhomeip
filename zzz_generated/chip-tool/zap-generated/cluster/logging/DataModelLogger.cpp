@@ -7458,17 +7458,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("GlobalSceneControl", 1, value);
         }
         case OnOff::Attributes::OnTime::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
+            uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OnTime", 1, value);
         }
         case OnOff::Attributes::OffWaitTime::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
+            uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OffWaitTime", 1, value);
         }
         case OnOff::Attributes::StartUpOnOff::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpOnOff", 1, value);
         }
