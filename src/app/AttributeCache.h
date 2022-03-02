@@ -306,6 +306,7 @@ public:
                 ReturnErrorOnFailure(func(clusterIter.first));
             }
         }
+        return CHIP_NO_ERROR;
     }
 
 private:
