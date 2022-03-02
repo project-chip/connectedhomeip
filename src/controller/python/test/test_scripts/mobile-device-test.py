@@ -18,10 +18,14 @@
 #
 
 # Commissioning test.
+from logging import disable
 import os
 import sys
-from optparse import OptionParser
-from base import TestFail, TestTimeout, BaseTestHelper, FailIfNot, logger
+import click
+import coloredlogs
+import chip.logging
+import logging
+from base import TestFail, TestTimeout, BaseTestHelper, FailIfNot, logger, TestIsEnabled, SetTestSet
 from cluster_objects import NODE_ID, ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests
 import asyncio
@@ -40,53 +44,30 @@ TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
 # Network id, for the thread network, current a const value, will be changed to XPANID of the thread network.
 TEST_THREAD_NETWORK_ID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
+TEST_SETUPPIN = 20202021
 
 ENDPOINT_ID = 0
 LIGHTING_ENDPOINT_ID = 1
 GROUP_ID = 0
 
+TEST_CONTROLLER_NODE_ID = 112233
+TEST_DEVICE_NODE_ID = 1
 
-def main():
-    optParser = OptionParser()
-    optParser.add_option(
-        "-t",
-        "--timeout",
-        action="store",
-        dest="testTimeout",
-        default=75,
-        type='int',
-        help="The program will return with timeout after specified seconds.",
-        metavar="<timeout-second>",
-    )
-    optParser.add_option(
-        "-a",
-        "--address",
-        action="store",
-        dest="deviceAddress",
-        default='',
-        type='str',
-        help="Address of the device",
-        metavar="<device-addr>",
-    )
+ALL_TESTS = ['nwprov', 'datamodel']
 
-    (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 
-    timeoutTicker = TestTimeout(options.testTimeout)
-    timeoutTicker.start()
-
-    test = BaseTestHelper(nodeid=112233)
-
+def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, device_nodeid):
     logger.info("Testing discovery")
-    FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
-              "Failed to discover any devices.")
+    address = test.TestDiscovery(discriminator=discriminator)
+    FailIfNot(address, "Failed to discover any devices.")
 
     # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
     #           "Failed to finish network commissioning")
 
     logger.info("Testing key exchange")
-    FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
-                                   setuppin=20202021,
-                                   nodeid=1),
+    FailIfNot(test.TestKeyExchange(ip=address.decode("utf-8"),
+                                   setuppin=setup_pin,
+                                   nodeid=device_nodeid),
               "Failed to finish key exchange")
 
     #
@@ -95,35 +76,53 @@ def main():
     #
     # Issue: #15688
     #
-    # asyncio.run(test.TestMultiFabric(ip=options.deviceAddress,
+    # asyncio.run(test.TestMultiFabric(ip=address.decode("utf-8"),
     #                                  setuppin=20202021,
     #                                  nodeid=1))
 
     logger.info("Testing closing sessions")
-    FailIfNot(test.TestCloseSession(nodeid=1), "Failed to close sessions")
+    FailIfNot(test.TestCloseSession(nodeid=device_nodeid),
+              "Failed to close sessions")
 
-    logger.info("Testing resolve")
-    FailIfNot(test.TestResolve(nodeid=1),
-              "Failed to resolve nodeid")
 
-    # Still test network commissioning
-    logger.info("Testing network commissioning")
-    FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=1).run()),
-              "Failed to finish network commissioning")
+@click.command()
+@click.option("--controller-nodeid", default=TEST_CONTROLLER_NODE_ID, type=int, help="NodeId of the controller.")
+@click.option("--device-nodeid", default=TEST_DEVICE_NODE_ID, type=int, help="NodeId of the device.")
+@click.option("--timeout", "-t", default=240, type=int, help="The program will return with timeout after specified seconds.")
+@click.option("--discriminator", default=TEST_DISCRIMINATOR, type=int, help="Discriminator of the device.")
+@click.option("--setup-pin", default=TEST_SETUPPIN, type=int, help="Setup pincode of the device.")
+@click.option("--commissioning", default='eth', type=click.Choice(['eth'], case_sensitive=False), help="The network type of the device, used during commissioning test.")
+@click.option('--enable-test', default=['all'], multiple=True, help='The tests to be executed.')
+@click.option('--disable-test', default=[], multiple=True, help='The tests to be excluded.')
+@click.option('--log-level', default='WARN', type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']), help="The log level of the test.")
+def main(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, commissioning, enable_test, disable_test, log_level):
+    logger.info("Test Parameters:")
+    logger.info(f"\tController NodeId: {controller_nodeid}")
+    logger.info(f"\tDevice NodeId:     {device_nodeid}")
+    logger.info(f"\tTest Timeout:      {timeout}s")
+    logger.info(f"\tCommission Over:   {commissioning}")
+    logger.info(f"\tDiscriminator:     {discriminator}")
+    logger.info(f"\tEnabled Tests:     {enable_test}")
+    logger.info(f"\tDisabled Tests:    {disable_test}")
+    SetTestSet(enable_test, disable_test)
+    do_tests(controller_nodeid, device_nodeid, timeout,
+             discriminator, setup_pin, commissioning, log_level)
 
+
+def test_datamodel(test: BaseTestHelper, device_nodeid: int):
     logger.info("Testing on off cluster")
-    FailIfNot(test.TestOnOffCluster(nodeid=1,
+    FailIfNot(test.TestOnOffCluster(nodeid=device_nodeid,
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
 
     logger.info("Testing level control cluster")
-    FailIfNot(test.TestLevelControlCluster(nodeid=1,
+    FailIfNot(test.TestLevelControlCluster(nodeid=device_nodeid,
                                            endpoint=LIGHTING_ENDPOINT_ID,
                                            group=GROUP_ID),
               "Failed to test level control cluster")
 
     logger.info("Testing sending commands to non exist endpoint")
-    FailIfNot(not test.TestOnOffCluster(nodeid=1,
+    FailIfNot(not test.TestOnOffCluster(nodeid=device_nodeid,
                                         endpoint=233,
                                         group=GROUP_ID), "Failed to test on off cluster on non-exist endpoint")
 
@@ -133,13 +132,13 @@ def main():
               "Failed when testing Python Cluster Object APIs")
 
     logger.info("Testing attribute reading")
-    FailIfNot(test.TestReadBasicAttributes(nodeid=1,
+    FailIfNot(test.TestReadBasicAttributes(nodeid=device_nodeid,
                                            endpoint=ENDPOINT_ID,
                                            group=GROUP_ID),
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing attribute writing")
-    FailIfNot(test.TestWriteBasicAttributes(nodeid=1,
+    FailIfNot(test.TestWriteBasicAttributes(nodeid=device_nodeid,
                                             endpoint=ENDPOINT_ID,
                                             group=GROUP_ID),
               "Failed to test Write Basic Attributes")
@@ -151,17 +150,57 @@ def main():
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing subscription")
-    FailIfNot(test.TestSubscription(nodeid=1, endpoint=LIGHTING_ENDPOINT_ID),
+    FailIfNot(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
               "Failed to subscribe attributes.")
 
     logger.info("Testing another subscription that kills previous subscriptions")
-    FailIfNot(test.TestSubscription(nodeid=1, endpoint=LIGHTING_ENDPOINT_ID),
+    FailIfNot(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
               "Failed to subscribe attributes.")
 
     logger.info("Testing on off cluster over resolved connection")
-    FailIfNot(test.TestOnOffCluster(nodeid=1,
+    FailIfNot(test.TestOnOffCluster(nodeid=device_nodeid,
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
+
+
+def do_tests(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, commissioning, log_level):
+    timeoutTicker = TestTimeout(timeout)
+    timeoutTicker.start()
+
+    test = BaseTestHelper(nodeid=controller_nodeid)
+
+    coloredlogs.install(level='DEBUG')
+    chip.logging.RedirectToPythonLogging()
+
+    # logging.getLogger().setLevel(logging.DEBUG)
+    logging.getLogger().setLevel(log_level)
+
+    commissioning_method = None
+
+    if commissioning == 'eth':
+        commissioning_method = ethernet_commissioning
+    else:
+        TestFail(f"Unknown commissioning method: {commissioning}")
+
+    commissioning_method(test, discriminator, setup_pin,
+                         device_nodeid)
+
+    logger.info("Testing resolve")
+    FailIfNot(test.TestResolve(nodeid=device_nodeid),
+              "Failed to resolve nodeid")
+
+    # Still test network commissioning
+    if TestIsEnabled('nwprov'):
+        logger.info("Testing network commissioning")
+        FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=device_nodeid).run()),
+                  "Failed to finish network commissioning")
+
+    if TestIsEnabled('datamodel'):
+        logger.info("Testing datamodel functions")
+        test_datamodel(test, device_nodeid)
+
+    logger.info("Testing non-controller APIs")
+    FailIfNot(test.TestNonControllerAPIs(), "Non controller API test failed")
 
     timeoutTicker.stop()
 

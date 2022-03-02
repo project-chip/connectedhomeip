@@ -54,6 +54,35 @@ def FailIfNot(cond, message):
         TestFail(message)
 
 
+_enabled_tests = []
+_disabled_tests = []
+
+
+def SetTestSet(enabled_tests, disabled_tests):
+    global _enabled_tests, _disabled_tests
+    _enabled_tests = enabled_tests[:]
+    _disabled_tests = disabled_tests[:]
+
+
+def TestIsEnabled(test_name: str):
+    enabled_len = -1
+    disabled_len = -1
+    if 'all' in _enabled_tests:
+        enabled_len = 0
+    if 'all' in _disabled_tests:
+        disabled_len = 0
+
+    for test_item in _enabled_tests:
+        if test_name.startswith(test_item) and (len(test_item) > enabled_len):
+            enabled_len = len(test_item)
+
+    for test_item in _disabled_tests:
+        if test_name.startswith(test_item) and (len(test_item) > disabled_len):
+            disabled_len = len(test_item)
+
+    return enabled_len > disabled_len
+
+
 class TestTimeout(threading.Thread):
     def __init__(self, timeout: int):
         threading.Thread.__init__(self)
@@ -134,6 +163,16 @@ class BaseTestHelper:
             return False
         self.logger.info(f"Found device at {res}")
         return res
+
+    def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
+        self.logger.info(
+            "Conducting key exchange with device {}".format(discriminator))
+        if not self.devCtrl.ConnectBLE(discriminator, setuppin, nodeid):
+            self.logger.info(
+                "Failed to finish key exchange with device {}".format(discriminator))
+            return False
+        self.logger.info("Device finished key exchange.")
+        return True
 
     def TestKeyExchange(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Conducting key exchange with device {}".format(ip))

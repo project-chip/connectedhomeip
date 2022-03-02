@@ -24,6 +24,8 @@ import chip.interaction_model
 import asyncio
 import time
 
+from base import TestIsEnabled
+
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
 
@@ -319,6 +321,9 @@ class ClusterObjectTests:
 
     @classmethod
     async def TestTimedRequest(cls, devCtrl):
+        if not TestIsEnabled("datamodel.timedrequest"):
+            logger.info("*: TimedRequest is skipped")
+
         logger.info("1: Send Timed Command Request")
         req = Clusters.TestCluster.Commands.TimedInvokeRequest()
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req, timedRequestTimeoutMs=1000)
@@ -331,26 +336,29 @@ class ClusterObjectTests:
                                      ],
                                      timedRequestTimeoutMs=1000)
 
-        logger.info("3: Send Timed Command Request -- Timeout")
-        try:
-            req = Clusters.TestCluster.Commands.TimedInvokeRequest()
-            # 10ms is a pretty short timeout, RTT is 400ms in simulated network on CI, so this test should fail.
-            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req, timedRequestTimeoutMs=10)
-            raise AssertionError("Timeout expected!")
-        except chip.exceptions.ChipStackException:
-            pass
+        if not TestIsEnabled("datamodel.timedrequest.timeout"):
+            logger.info("*: Timeout in timed request is skipped")
+        else:
+            logger.info("3: Send Timed Command Request -- Timeout")
+            try:
+                req = Clusters.TestCluster.Commands.TimedInvokeRequest()
+                # 10ms is a pretty short timeout, RTT is 400ms in simulated network on CI, so this test should fail.
+                await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req, timedRequestTimeoutMs=10)
+                raise AssertionError("Timeout expected!")
+            except chip.exceptions.ChipStackException:
+                pass
 
-        logger.info("4: Send Timed Write Request -- Timeout")
-        try:
-            await devCtrl.WriteAttribute(nodeid=NODE_ID,
-                                         attributes=[
-                                             (1, Clusters.TestCluster.Attributes.TimedWriteBoolean(
-                                                 True)),
-                                         ],
-                                         timedRequestTimeoutMs=10)
-            raise AssertionError("Timeout expected!")
-        except chip.exceptions.ChipStackException:
-            pass
+            logger.info("4: Send Timed Write Request -- Timeout")
+            try:
+                await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                             attributes=[
+                                                 (1, Clusters.TestCluster.Attributes.TimedWriteBoolean(
+                                                     True)),
+                                             ],
+                                             timedRequestTimeoutMs=10)
+                raise AssertionError("Timeout expected!")
+            except chip.exceptions.ChipStackException:
+                pass
 
         logger.info(
             "5: Sending TestCluster-TimedInvokeRequest without timedRequestTimeoutMs should be rejected")

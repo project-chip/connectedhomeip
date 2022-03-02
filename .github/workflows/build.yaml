@@ -260,6 +260,21 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl'
                   scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
+            - name: Build all clusters app for test
+              timeout-minutes: 50
+              run: |
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug chip_enable_wifi=false
+            - name: Run Python REPL API Tests
+              timeout-minutes: 5
+              run: |
+                  scripts/run_in_build_env.sh '
+                      rm -rf /tmp/chip*
+                      ./out/all_clusters_debug/chip-all-clusters-app &
+                      ./src/controller/python/test/test_scripts/mobile-device-test.py -t 90 --disable-test datamodel.timedrequest.timeout
+                      res=$?
+                      killall -s SIGINT chip-all-clusters-app || true
+                      exit $res
+                      '
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
         timeout-minutes: 200
