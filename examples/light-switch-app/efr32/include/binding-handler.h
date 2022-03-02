@@ -21,12 +21,12 @@
 #include "lib/core/CHIPError.h"
 
 CHIP_ERROR InitBindingHandler();
-void SwitchToggleOnOff(intptr_t context);
-void SwitchOnOffOn(intptr_t context);
-void SwitchOnOffOff(intptr_t context);
+void SwitchWorkerFunction(intptr_t context);
 
 struct BindingCommandData
 {
+    chip::EndpointId endpointId = 1;
     chip::CommandId commandId;
     chip::ClusterId clusterId;
+    bool isGroup = false;
 };
