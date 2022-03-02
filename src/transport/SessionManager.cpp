@@ -502,8 +502,8 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
     // Verify message counter
-    CHIP_ERROR err = unsecuredSession->GetPeerMessageCounter().VerifyOrTrustFirst(packetHeader.GetMessageCounter());
-    if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED || err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW)
+    CHIP_ERROR err = unsecuredSession->GetPeerMessageCounter().VerifyUnencrypted(packetHeader.GetMessageCounter());
+    if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
         ChipLogDetail(Inet,
                       "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
@@ -514,9 +514,9 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     }
     else
     {
-        // VerifyOrTrustFirst always returns one of CHIP_NO_ERROR,
-        // CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED, or CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW
-        unsecuredSession->GetPeerMessageCounter().CommitWithRollOver(packetHeader.GetMessageCounter());
+        // VerifyUnencrypted always returns one of CHIP_NO_ERROR or
+        // CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED.
+        unsecuredSession->GetPeerMessageCounter().CommitUnencrypted(packetHeader.GetMessageCounter());
     }
 
     if (mCB != nullptr)
@@ -557,8 +557,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         return;
     }
 
-    err = secureSession->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
-    if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED || err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW)
+    err = secureSession->GetSessionMessageCounter().GetPeerMessageCounter().VerifyEncryptedUnicast(packetHeader.GetMessageCounter());
+    if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
         ChipLogDetail(Inet,
                       "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
@@ -584,7 +584,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::No)
     {
-        secureSession->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
+        secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
     }
 
     // TODO: once mDNS address resolution is available reconsider if this is required
@@ -692,7 +692,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
         if (Credentials::GroupDataProvider::SecurityPolicy::kLowLatency == groupContext.security_policy)
         {
-            err = counter->VerifyOrTrustFirst(packetHeader.GetMessageCounter(), true);
+            err = counter->VerifyOrTrustFirstGroup(packetHeader.GetMessageCounter());
         }
         else
         {
@@ -702,7 +702,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
             return;
 
             // cache and sync
-            // err = counter->Verify(packetHeader.GetMessageCounter(), true);
+            // err = counter->VerifyGroup(packetHeader.GetMessageCounter());
         }
 
         if (err != CHIP_NO_ERROR)
@@ -719,7 +719,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return;
     }
 
-    counter->CommitWithRollOver(packetHeader.GetMessageCounter());
+    counter->CommitGroup(packetHeader.GetMessageCounter());
 
     if (mCB != nullptr)
     {
