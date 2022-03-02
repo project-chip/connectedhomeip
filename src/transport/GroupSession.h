@@ -36,6 +36,9 @@ public:
 
 class IncomingGroupSession : public Session
 #ifndef NDEBUG
+    // The group session is ephemeral, its lifespan is controller by who using it. To prevent the object being destroyed while there
+    // are still SessionHandle or SessionHolder pointing to it, we enforce a reference counter check at its destruction in debug
+    // build.
     ,
                              public ReferenceCounted<IncomingGroupSession, GroupSessionDeleter, 0>
 #endif
@@ -98,6 +101,9 @@ private:
 
 class OutgoingGroupSession : public Session
 #ifndef NDEBUG
+    // The group session is ephemeral, its lifespan is controller by who using it. To prevent the object being destroyed while there
+    // are still SessionHandle or SessionHolder pointing to it, we enforce a reference counter check at its destruction in debug
+    // build.
     ,
                              public ReferenceCounted<OutgoingGroupSession, GroupSessionDeleter, 0>
 #endif
