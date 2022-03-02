@@ -254,7 +254,7 @@ void AppTask::StartBleAdvButtonEventHandler(void)
 }
 
 void AppTask::StartBleAdvHandler(AppEvent * aEvent)
-{  
+{
     LOG_INF("BLE advertising start button pressed");
 
     // Don't allow on starting Matter service BLE advertising after Thread provisioning.
