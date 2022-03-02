@@ -19,6 +19,7 @@
 #pragma once
 
 #include "DiscoverCommand.h"
+#include "AdvertiseCommissionerCommand.h"
 #include "DiscoverCommissionablesCommand.h"
 #include "DiscoverCommissionersCommand.h"
 #include <lib/address_resolve/AddressResolve.h>
@@ -70,6 +71,7 @@ void registerCommandsDiscover(Commands & commands, CredentialIssuerCommands * cr
 
     commands_list clusterCommands = {
         make_unique<Resolve>(credsIssuerConfig),
+        make_unique<AdvertiseCommissionerCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionablesCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionersCommand>(credsIssuerConfig),
     };

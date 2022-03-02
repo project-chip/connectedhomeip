@@ -667,6 +667,16 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         snprintf(txtDeviceName, sizeof(txtDeviceName), "DN=%s", params.GetDeviceName().Value());
         txtFields[numTxtFields++] = txtDeviceName;
     }
+
+#ifdef CHIP_CONFIG_TEST
+    char txtUnsupported[chip::Dnssd::kKeyUnsupportedMaxLength + 3];
+    if (params.GetUnsupported().HasValue())
+    {
+        snprintf(txtUnsupported, sizeof(txtUnsupported), "U=%s", params.GetUnsupported().Value());
+        txtFields[numTxtFields++] = txtUnsupported;
+    }
+#endif // CHIP_CONFIG_TEST
+
     CommonTxtEntryStorage commonStorage;
     AddCommonTxtEntries<CommissionAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
 

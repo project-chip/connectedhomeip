@@ -47,6 +47,10 @@ static constexpr size_t kKeyRotatingDeviceIdMaxLength        = 100;
 static constexpr size_t kKeyPairingInstructionMaxLength      = 128;
 static constexpr size_t kKeyPairingHintMaxLength             = 10;
 
+#ifdef CHIP_CONFIG_TEST
+static constexpr size_t kKeyUnsupportedMaxLength = 32;
+#endif
+
 enum class TxtKeyUse : uint8_t
 {
     kNone,
@@ -69,6 +73,9 @@ enum class TxtFieldKey : uint8_t
     kMrpRetryIntervalIdle,
     kMrpRetryIntervalActive,
     kTcpSupported,
+#ifdef CHIP_CONFIG_TEST
+    kUnsupported,
+#endif
     kCount,
 };
 
@@ -95,6 +102,9 @@ constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCoun
     { TxtFieldKey::kMrpRetryIntervalIdle, kKeyMrpRetryIntervalIdleMaxLength, "CRI", TxtKeyUse::kCommon },
     { TxtFieldKey::kMrpRetryIntervalActive, kKeyMrpRetryIntervalActiveMaxLength, "CRA", TxtKeyUse::kCommon },
     { TxtFieldKey::kTcpSupported, kKeyTcpSupportedMaxLength, "T", TxtKeyUse::kCommon },
+#ifdef CHIP_CONFIG_TEST
+    { TxtFieldKey::kUnsupported, kKeyUnsupportedMaxLength, "U", TxtKeyUse::kCommon },
+#endif
 };
 #ifdef CHIP_CONFIG_TEST
 

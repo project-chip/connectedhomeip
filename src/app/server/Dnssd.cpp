@@ -65,7 +65,10 @@ constexpr System::Clock::Timestamp DnssdServer::kTimeoutCleared;
 
 bool DnssdServer::HaveOperationalCredentials()
 {
-    VerifyOrDie(mFabricTable != nullptr);
+    if (mFabricTable == nullptr)
+    {
+        return false;
+    }
 
     // Look for any fabric info that has a useful operational identity.
     for (const FabricInfo & fabricInfo : *mFabricTable)
@@ -252,7 +255,7 @@ CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t buff
 /// Set MDNS operational advertisement
 CHIP_ERROR DnssdServer::AdvertiseOperational()
 {
-    VerifyOrDie(mFabricTable != nullptr);
+    VerifyOrReturnError(mFabricTable != nullptr, CHIP_NO_ERROR);
 
     for (const FabricInfo & fabricInfo : *mFabricTable)
     {
@@ -266,14 +269,18 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                 Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
             }
 
-            const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
-                                                 .SetPeerId(fabricInfo.GetPeerId())
-                                                 .SetMac(mac)
-                                                 .SetPort(GetSecuredPort())
-                                                 .SetInterfaceId(GetInterfaceId())
-                                                 .SetMRPConfig(GetLocalMRPConfig())
-                                                 .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
-                                                 .EnableIpV4(true);
+            auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
+                                           .SetPeerId(fabricInfo.GetPeerId())
+                                           .SetMac(mac)
+                                           .SetPort(GetSecuredPort())
+                                           .SetInterfaceId(GetInterfaceId())
+                                           .SetMRPConfig(GetLocalMRPConfig())
+                                           .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
+                                           .EnableIpV4(true);
+
+#ifdef CHIP_CONFIG_TEST
+            advertiseParameters.SetUnsupported(GetUnsupportedTxtRecord());
+#endif // CHIP_CONFIG_TEST
 
             auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
@@ -294,6 +301,11 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
                                    .SetPort(commissionableNode ? GetSecuredPort() : GetUnsecuredPort())
                                    .SetInterfaceId(GetInterfaceId())
                                    .EnableIpV4(true);
+
+#ifdef CHIP_CONFIG_TEST
+    advertiseParameters.SetUnsupported(GetUnsupportedTxtRecord());
+#endif // CHIP_CONFIG_TEST
+
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Dnssd::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Dnssd::CommssionAdvertiseMode::kCommissioner);
 

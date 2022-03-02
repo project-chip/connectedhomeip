@@ -59,6 +59,15 @@ public:
     /// Gets the interface id used for advertising
     Inet::InterfaceId GetInterfaceId() { return mInterfaceId; }
 
+#ifdef CHIP_CONFIG_TEST
+    /// Sets a custom value for the unsupported txt record
+    /// This function does not copy the string until StartServer is called.
+    void SetUnsupportedTxtRecord(const char * value) { mUnsupportedTxtRecord = value; }
+
+    /// Gets the interface id used for advertising
+    const char * GetUnsupportedTxtRecord() { return mUnsupportedTxtRecord; }
+#endif // CHIP_CONFIG_TEST
+
     /// Sets the factory-new state commissionable node discovery timeout
     void SetDiscoveryTimeoutSecs(int16_t secs) { mDiscoveryTimeoutSecs = secs; }
 
@@ -148,6 +157,9 @@ private:
     uint16_t mSecuredPort          = CHIP_PORT;
     uint16_t mUnsecuredPort        = CHIP_UDC_PORT;
     Inet::InterfaceId mInterfaceId = Inet::InterfaceId::Null();
+#ifdef CHIP_CONFIG_TEST
+    const char * mUnsupportedTxtRecord   = nullptr;
+#endif // CHIP_CONFIG_TEST
 
     /// schedule next discovery expiration
     CHIP_ERROR ScheduleDiscoveryExpiration();
