@@ -201,15 +201,21 @@
             if (chipDevice) {
                 CHIPTemperatureMeasurement * cluster =
                     [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
-                CHIPSubscribeParams *params = [[CHIPSubscribeParams alloc] init];
+                CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
                 params.keepPreviousSubscriptions = @YES;
-                [cluster subscribeAttributeMeasuredValueWithMinInterval:@(minIntervalSeconds) maxInterval:@(maxIntervalSeconds) params:params subscriptionEstablished:nil reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                    if (error) {
-                        NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
-                        return;
-                    }
-                    [self updateTempInUI:value.shortValue];
-                }];
+                [cluster subscribeAttributeMeasuredValueWithMinInterval:@(minIntervalSeconds)
+                                                            maxInterval:@(maxIntervalSeconds)
+                                                                 params:params
+                                                subscriptionEstablished:nil
+                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                              if (error) {
+                                                                  NSLog(@"Status: update reportAttributeMeasuredValue completed "
+                                                                        @"with error %@",
+                                                                      [error description]);
+                                                                  return;
+                                                              }
+                                                              [self updateTempInUI:value.shortValue];
+                                                          }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
