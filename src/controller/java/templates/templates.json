@@ -80,6 +80,11 @@
             "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipClusters.java"
         },
         {
+            "path": "ChipIdLookup-java.zapt",
+            "name": "Generate utilities for looking up cluster/attribute IDs",
+            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipIdLookup.java"
+        },
+        {
             "path": "ClusterInfo-java.zapt",
             "name": "Cluster information mapping for Java",
             "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfoMapping.java"
