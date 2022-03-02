@@ -115,6 +115,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
 CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
 {
     currentFilter.type = Dnssd::DiscoveryFilterType::kNone;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverSoftAP(SetupPayload & payload)
