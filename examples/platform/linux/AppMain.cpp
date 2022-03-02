@@ -376,7 +376,7 @@ CHIP_ERROR ShutdownCommissioner()
     return CHIP_NO_ERROR;
 }
 
-class PairingCommand : public Controller::DevicePairingDelegate, public Controller::DeviceAddressUpdateDelegate
+class PairingCommand : public Controller::DevicePairingDelegate
 {
 public:
     PairingCommand() :
