@@ -897,10 +897,6 @@ class ChipDeviceController():
                 c_void_p, _DevicePairingDelegate_OnCommissioningCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = c_uint32
 
-            self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.argtypes = [
-                _DeviceAddressUpdateDelegate_OnUpdateComplete]
-            self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.restype = None
-
             self._dmLib.pychip_DeviceController_UpdateDevice.argtypes = [
                 c_void_p, c_uint64]
             self._dmLib.pychip_DeviceController_UpdateDevice.restype = c_uint32
