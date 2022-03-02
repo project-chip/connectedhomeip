@@ -66,13 +66,13 @@ void GroupRollOverTest(nlTestSuite * inSuite, void * inContext)
             // 4. A counter value of N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE comes in, is treated as valid.
             if (k != CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
-                NL_TEST_ASSERT(
-                    inSuite, counter.VerifyOrTrustFirstGroup(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite,
+                               counter.VerifyOrTrustFirstGroup(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) == CHIP_NO_ERROR);
             }
             else
             {
-                NL_TEST_ASSERT(
-                    inSuite, counter.VerifyOrTrustFirstGroup(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite,
+                               counter.VerifyOrTrustFirstGroup(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) != CHIP_NO_ERROR);
             }
         }
     }
@@ -239,13 +239,13 @@ void UnicastSmallStepTest(nlTestSuite * inSuite, void * inContext)
             {
                 if ((k != CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) && (n + k != CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE))
                 {
-                    NL_TEST_ASSERT(inSuite,
-                                   counter.VerifyEncryptedUnicast(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) == CHIP_NO_ERROR);
+                    NL_TEST_ASSERT(
+                        inSuite, counter.VerifyEncryptedUnicast(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) == CHIP_NO_ERROR);
                 }
                 else
                 {
-                    NL_TEST_ASSERT(inSuite,
-                                   counter.VerifyEncryptedUnicast(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) != CHIP_NO_ERROR);
+                    NL_TEST_ASSERT(
+                        inSuite, counter.VerifyEncryptedUnicast(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) != CHIP_NO_ERROR);
                 }
             }
         }
@@ -303,7 +303,8 @@ void UnicastLargeStepTest(nlTestSuite * inSuite, void * inContext)
             // n - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE will be smaller than the current allowed counter values.
             if (n >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
-                NL_TEST_ASSERT(inSuite, counter.VerifyEncryptedUnicast(n - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite,
+                               counter.VerifyEncryptedUnicast(n - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) != CHIP_NO_ERROR);
             }
 
             for (auto it : testValues)
@@ -312,7 +313,8 @@ void UnicastLargeStepTest(nlTestSuite * inSuite, void * inContext)
             }
 
             // 4. A counter value of N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE comes in, is treated as valid.
-            NL_TEST_ASSERT(inSuite, counter.VerifyEncryptedUnicast(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite,
+                           counter.VerifyEncryptedUnicast(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) == CHIP_NO_ERROR);
         }
     }
 }
@@ -347,13 +349,13 @@ void UnencryptedRollOverTest(nlTestSuite * inSuite, void * inContext)
             // 4. A counter value of N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE comes in, is treated as valid.
             if (k != CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
-                NL_TEST_ASSERT(
-                    inSuite, counter.VerifyUnencrypted(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite,
+                               counter.VerifyUnencrypted(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) == CHIP_NO_ERROR);
             }
             else
             {
-                NL_TEST_ASSERT(
-                    inSuite, counter.VerifyUnencrypted(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite,
+                               counter.VerifyUnencrypted(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) != CHIP_NO_ERROR);
             }
         }
     }
@@ -443,8 +445,7 @@ void UnencryptedBigLeapTest(nlTestSuite * inSuite, void * inContext)
             }
 
             // 4. A counter value of N + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE comes in, is treated as valid.
-            NL_TEST_ASSERT(inSuite,
-                           counter.VerifyUnencrypted(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, counter.VerifyUnencrypted(n + k - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) == CHIP_NO_ERROR);
         }
     }
 }

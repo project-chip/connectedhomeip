@@ -109,7 +109,8 @@ public:
 
     CHIP_ERROR VerifyOrTrustFirstGroup(uint32_t counter)
     {
-        switch (mStatus) {
+        switch (mStatus)
+        {
         case Status::NotSynced: {
             // Trust and set the counter when not synced
             SetCounter(counter);
@@ -131,10 +132,7 @@ public:
      *
      * @pre counter has been verified via VerifyGroup or VerifyOrTrustFirstGroup
      */
-    void CommitGroup(uint32_t counter)
-    {
-        CommitWithRollover(counter);
-    }
+    void CommitGroup(uint32_t counter) { CommitWithRollover(counter); }
 
     CHIP_ERROR VerifyEncryptedUnicast(uint32_t counter) const
     {
@@ -154,14 +152,12 @@ public:
      *
      * @pre counter has been verified via VerifyEncryptedUnicast
      */
-    void CommitEncryptedUnicast(uint32_t counter)
-    {
-        CommitWithoutRollover(counter);
-    }
+    void CommitEncryptedUnicast(uint32_t counter) { CommitWithoutRollover(counter); }
 
     CHIP_ERROR VerifyUnencrypted(uint32_t counter)
     {
-        switch (mStatus) {
+        switch (mStatus)
+        {
         case Status::NotSynced: {
             // Trust and set the counter when not synced
             SetCounter(counter);
@@ -185,10 +181,7 @@ public:
      *
      * @pre counter has been verified via VerifyUnencrypted
      */
-    void CommitUnencrypted(uint32_t counter)
-    {
-        CommitWithRollover(counter);
-    }
+    void CommitUnencrypted(uint32_t counter) { CommitWithRollover(counter); }
 
     void SetCounter(uint32_t value)
     {
@@ -204,17 +197,20 @@ public:
 private:
     // Counter position indicator with respect to our current
     // mSynced.mMaxCounter.
-    enum class Position {
-      BeforeWindow,
-      InWindow,
-      MaxCounter,
-      FutureCounter,
+    enum class Position
+    {
+        BeforeWindow,
+        InWindow,
+        MaxCounter,
+        FutureCounter,
     };
 
     // Classify an incoming counter value's position.  Must be used only if
     // mStatus is Status::Synced.
-    Position ClassifyWithoutRollover(uint32_t counter) const {
-        if (counter > mSynced.mMaxCounter) {
+    Position ClassifyWithoutRollover(uint32_t counter) const
+    {
+        if (counter > mSynced.mMaxCounter)
+        {
             return Position::FutureCounter;
         }
 
@@ -236,11 +232,13 @@ private:
      * 32) SHALL be considered duplicate. Message counters within the range of the bitmap SHALL be
      * considered duplicate if the corresponding bit offset is set to true.
      */
-    Position ClassifyWithRollover(uint32_t counter) const {
-        uint32_t counterIncrease = counter - mSynced.mMaxCounter;
+    Position ClassifyWithRollover(uint32_t counter) const
+    {
+        uint32_t counterIncrease               = counter - mSynced.mMaxCounter;
         constexpr uint32_t futureCounterWindow = (static_cast<uint32_t>(1 << 31)) - 1;
 
-        if (counterIncrease >= 1 && counterIncrease <= futureCounterWindow) {
+        if (counterIncrease >= 1 && counterIncrease <= futureCounterWindow)
+        {
             return Position::FutureCounter;
         }
 
@@ -251,13 +249,16 @@ private:
      * Classify a counter that's known to not be future counter.  This works
      * identically whether we are doing rollover or not.
      */
-    Position ClassifyNonFutureCounter(uint32_t counter) const {
-        if (counter == mSynced.mMaxCounter) {
+    Position ClassifyNonFutureCounter(uint32_t counter) const
+    {
+        if (counter == mSynced.mMaxCounter)
+        {
             return Position::MaxCounter;
         }
 
         uint32_t offset = mSynced.mMaxCounter - counter;
-        if (offset <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE) {
+        if (offset <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        {
             return Position::InWindow;
         }
 
@@ -270,12 +271,14 @@ private:
      */
     CHIP_ERROR VerifyPositionEncrypted(Position position, uint32_t counter) const
     {
-        switch (position) {
+        switch (position)
+        {
         case Position::FutureCounter:
             return CHIP_NO_ERROR;
         case Position::InWindow: {
             uint32_t offset = mSynced.mMaxCounter - counter;
-            if (mSynced.mWindow.test(offset - 1)) {
+            if (mSynced.mWindow.test(offset - 1))
+            {
                 return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
             }
             return CHIP_NO_ERROR;
@@ -293,12 +296,14 @@ private:
      */
     CHIP_ERROR VerifyPositionUnencrypted(Position position, uint32_t counter) const
     {
-        switch (position) {
+        switch (position)
+        {
         case Position::MaxCounter:
             return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
         case Position::InWindow: {
             uint32_t offset = mSynced.mMaxCounter - counter;
-            if (mSynced.mWindow.test(offset - 1)) {
+            if (mSynced.mWindow.test(offset - 1))
+            {
                 return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
             }
             return CHIP_NO_ERROR;
@@ -330,7 +335,8 @@ private:
      */
     void CommitWithPosition(Position position, uint32_t counter)
     {
-        switch (position) {
+        switch (position)
+        {
         case Position::InWindow: {
             uint32_t offset = mSynced.mMaxCounter - counter;
             mSynced.mWindow.set(offset - 1);
@@ -342,7 +348,7 @@ private:
         }
         default: {
             // Since we are committing, this becomes a new max-counter value.
-            uint32_t shift = counter - mSynced.mMaxCounter;
+            uint32_t shift      = counter - mSynced.mMaxCounter;
             mSynced.mMaxCounter = counter;
             if (shift > CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
