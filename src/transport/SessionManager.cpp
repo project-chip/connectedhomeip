@@ -132,8 +132,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
     switch (sessionHandle->GetSessionType())
     {
-    case Transport::Session::SessionType::kGroup: {
-        auto groupSession = sessionHandle->AsGroupSession();
+    case Transport::Session::SessionType::kGroupOutgoing: {
+        auto groupSession = sessionHandle->AsOutgoingGroupSession();
         auto * groups     = Credentials::GetGroupDataProvider();
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
@@ -249,8 +249,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
     switch (sessionHandle->GetSessionType())
     {
-    case Transport::Session::SessionType::kGroup: {
-        auto groupSession = sessionHandle->AsGroupSession();
+    case Transport::Session::SessionType::kGroupOutgoing: {
+        auto groupSession = sessionHandle->AsOutgoingGroupSession();
         multicastAddress  = Transport::PeerAddress::Multicast(groupSession->GetFabricIndex(), groupSession->GetGroupId());
         destination       = &multicastAddress;
         char addressStr[Transport::PeerAddress::kMaxToStringSize];
@@ -725,17 +725,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     if (mCB != nullptr)
     {
         // TODO : When MCSP is done, clean up session creation logic
-        Optional<SessionHandle> session =
-            CreateGroupSession(groupContext.group_id, groupContext.fabric_index, packetHeader.GetSourceNodeId().Value());
-
-        VerifyOrReturn(session.HasValue(), ChipLogError(Inet, "Error when creating group session handle."));
-        Transport::GroupSession * groupSession = session.Value()->AsGroupSession();
-
+        Transport::IncomingGroupSession groupSession(groupContext.group_id, groupContext.fabric_index,
+                                                     packetHeader.GetSourceNodeId().Value());
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, groupSession, peerAddress, msg->Start(), msg->TotalLength());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), peerAddress,
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(groupSession), peerAddress,
                                SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
-
-        RemoveGroupSession(groupSession);
     }
 }
 

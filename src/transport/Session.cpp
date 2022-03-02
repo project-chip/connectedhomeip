@@ -34,10 +34,16 @@ UnauthenticatedSession * Session::AsUnauthenticatedSession()
     return static_cast<UnauthenticatedSession *>(this);
 }
 
-GroupSession * Session::AsGroupSession()
+IncomingGroupSession * Session::AsIncomingGroupSession()
 {
-    VerifyOrDie(GetSessionType() == SessionType::kGroup);
-    return static_cast<GroupSession *>(this);
+    VerifyOrDie(GetSessionType() == SessionType::kGroupIncoming);
+    return static_cast<IncomingGroupSession *>(this);
+}
+
+OutgoingGroupSession * Session::AsOutgoingGroupSession()
+{
+    VerifyOrDie(GetSessionType() == SessionType::kGroupOutgoing);
+    return static_cast<OutgoingGroupSession *>(this);
 }
 
 } // namespace Transport

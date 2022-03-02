@@ -160,7 +160,7 @@ private:
     SecurePairingUsingTestSecret mPairingBobToAlice;
     SessionHolder mSessionAliceToBob;
     SessionHolder mSessionBobToAlice;
-    SessionHolder mSessionBobToFriends;
+    Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
     FabricIndex mSrcFabricIndex  = 1;
     FabricIndex mDestFabricIndex = 1;
 };

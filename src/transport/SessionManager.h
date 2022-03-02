@@ -27,6 +27,7 @@
 
 #include <utility>
 
+#include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPCore.h>
@@ -219,16 +220,6 @@ public:
         return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
 
-    Optional<SessionHandle> CreateGroupSession(GroupId group, chip::FabricIndex fabricIndex, NodeId sourceNodeId)
-    {
-        return mGroupSessions.AllocEntry(group, fabricIndex, sourceNodeId);
-    }
-    Optional<SessionHandle> FindGroupSession(GroupId group, chip::FabricIndex fabricIndex)
-    {
-        return mGroupSessions.FindEntry(group, fabricIndex);
-    }
-    void RemoveGroupSession(Transport::GroupSession * session) { mGroupSessions.DeleteEntry(session); }
-
     // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
     // and tv-casting-app that uses the TV's node ID to find the associated secure session
     SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
@@ -255,7 +246,6 @@ private:
     System::Layer * mSystemLayer = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
     Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions;
-    Transport::GroupSessionTable<CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE> mGroupSessions;
     State mState; // < Initialization state of the object
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
 

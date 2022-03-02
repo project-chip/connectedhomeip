@@ -295,7 +295,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorCodeIf(mpExchangeCtx == nullptr, CHIP_ERROR_INTERNAL);
-    const Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetSubjectDescriptor();
+    const Access::SubjectDescriptor subjectDescriptor =
+        mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetSubjectDescriptor();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
     {
@@ -329,7 +330,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         err = attributePath.GetListIndex(dataAttributePath);
         SuccessOrExit(err);
 
-        groupId = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetGroupId();
+        groupId = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
         fabric  = GetAccessingFabricIndex();
 
         err = element.GetData(&dataReader);
