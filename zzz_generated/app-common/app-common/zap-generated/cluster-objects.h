@@ -16529,7 +16529,7 @@ namespace GroupKeyManagement {
 enum class GroupKeySecurityPolicy : uint8_t
 {
     kStandard   = 0x00,
-    kLowLatency = 0x01,
+    kTrustFirst = 0x01,
 };
 
 namespace Structs {

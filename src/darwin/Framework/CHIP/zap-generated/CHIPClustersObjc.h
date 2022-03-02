@@ -7745,7 +7745,7 @@ typedef NS_ENUM(NSInteger, CHIPOperationalCredentialsOperationalCertStatus) {
 
 typedef NS_ENUM(NSInteger, CHIPGroupKeyManagementGroupKeySecurityPolicy) {
     CHIPGroupKeyManagementGroupKeySecurityPolicyStandard = 0x00,
-    CHIPGroupKeyManagementGroupKeySecurityPolicyLowLatency = 0x01,
+    CHIPGroupKeyManagementGroupKeySecurityPolicyTrustFirst = 0x01,
 };
 
 typedef NS_ENUM(NSInteger, CHIPDoorLockDlAlarmCode) {
