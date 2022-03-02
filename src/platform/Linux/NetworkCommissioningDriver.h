@@ -108,11 +108,15 @@ private:
     WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
+    Optional<Status> mScanStatus;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-class LinuxThreadDriver final : public ThreadDriver
+class LinuxThreadDriver final
+    : public ThreadDriver,
+      public ThreadDriver::ScanCallback /* bridge the scan status, NOTE: we could refactor this to merge the ThreadStackManager and
+                                           ThreadDriver to save some extra calls. */
 {
 public:
     class ThreadNetworkIterator final : public NetworkIterator
@@ -132,7 +136,11 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
     CHIP_ERROR Init() override;
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; } // Nothing to do on linux for shutdown.
+    CHIP_ERROR Shutdown() override
+    {
+        mpScanCallback = nullptr;
+        return CHIP_NO_ERROR;
+    } // Nothing to do on linux for shutdown.
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
@@ -151,12 +159,19 @@ public:
 
     // ThreadDriver
     Status AddOrUpdateNetwork(ByteSpan operationalDataset) override;
-    void ScanNetworks(ScanCallback * callback) override;
+    void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
+
+    void OnFinished(Status err, CharSpan debugText, ThreadScanResponseIterator * networks) override;
 
 private:
     ThreadNetworkIterator mThreadIterator = ThreadNetworkIterator(this);
     Thread::OperationalDataset mSavedNetwork;
     Thread::OperationalDataset mStagingNetwork;
+
+    // We bridge the scan status, NOTE: we could refactor this by merging the ThreadStackManager and ThreadDriver to save some extra
+    // calls.
+    ThreadDriver::ScanCallback * mpScanCallback = nullptr;
+    Optional<Status> mScanStatus;
 };
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

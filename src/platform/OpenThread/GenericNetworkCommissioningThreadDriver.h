@@ -104,12 +104,13 @@ public:
 
     // ThreadDriver
     Status AddOrUpdateNetwork(ByteSpan operationalDataset) override;
-    void ScanNetworks(ScanCallback * callback) override;
+    void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
 
 private:
     ThreadNetworkIterator mThreadIterator      = ThreadNetworkIterator(this);
     Thread::OperationalDataset mSavedNetwork   = {};
     Thread::OperationalDataset mStagingNetwork = {};
+    Optional<Status> mScanStatus;
 };
 
 } // namespace NetworkCommissioning

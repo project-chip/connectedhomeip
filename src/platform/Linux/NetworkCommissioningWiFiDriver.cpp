@@ -106,7 +106,18 @@ CHIP_ERROR LinuxWiFiDriver::GetLastNetworkingStatus(Status & status)
 
     // If the WiFi station is not configured, then we won't trying to connect to any network.
     // GetConfiguredNetwork will return CHIP_ERROR_KEY_NOT_FOUND when no networks are configured.
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork));
+    // If we have not provisioned any WiFi network, return the status from last network scan,
+    // If we have provisioned a network, we assume the wpa_supplicant is activitely connecting to that network.
+    CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    {
+        if (mScanStatus.HasValue())
+        {
+            status = mScanStatus.Value();
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
 
     // If we have already connected to the WiFi AP, then return null to indicate a success state.
     if (DeviceLayer::ConnectivityMgrImpl().IsWiFiStationConnected())
@@ -224,7 +235,13 @@ void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
     CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().StartWiFiScan(ssid, callback);
     if (err != CHIP_NO_ERROR)
     {
+        mScanStatus.SetValue(Status::kUnknownError);
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+    }
+    else
+    {
+        // On linux platform, once "scan" is started, we can say the result will always be success.
+        mScanStatus.SetValue(Status::kSuccess);
     }
 }
 

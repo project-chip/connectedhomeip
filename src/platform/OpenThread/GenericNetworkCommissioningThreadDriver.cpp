@@ -66,6 +66,25 @@ CHIP_ERROR GenericThreadDriver::GetLastNetworkingStatus(Status & status)
 {
     // Thread is not enabled, then we are not trying to connect to the network.
     VerifyOrReturnError(ThreadStackMgrImpl().IsThreadEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
+
+    ByteSpan datasetTLV;
+    // If we have not provisioned any Thread network, return the status from last network scan,
+    // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
+    CHIP_ERROR err = ThreadStackMgrImpl().GetThreadProvision(datasetTLV);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND || datasetTLV.size() == 0)
+    {
+        if (mScanStatus.HasValue())
+        {
+            status = mScanStatus.Value();
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
     // We have already connected to the network, thus return success.
     if (ThreadStackMgrImpl().IsThreadAttached())
     {
@@ -198,7 +217,13 @@ void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
     CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback);
     if (err != CHIP_NO_ERROR)
     {
+        mScanStatus.SetValue(Status::kUnknownError);
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+    }
+    else
+    {
+        // OpenThread's "scan" will always success once started, so we can set the value of scan result here.
+        mScanStatus.SetValue(Status::kSuccess);
     }
 }
 
