@@ -92,8 +92,8 @@ public:
         chip::TLV::TLVType dataContainerType;
         ReturnErrorOnFailure(aWriter.StartContainer(chip::TLV::ContextTag(chip::to_underlying(chip::app::EventDataIB::Tag::kData)),
                                                     chip::TLV::kTLVType_Structure, dataContainerType));
-        ReturnErrorOnFailure(aWriter.Put(chip::TLV::ContextTag(1), 1));
-        ReturnErrorOnFailure(aWriter.Put(chip::TLV::ContextTag(2), 2));
+        ReturnErrorOnFailure(aWriter.Put(chip::TLV::ContextTag(1), static_cast<uint32_t>(1)));
+        ReturnErrorOnFailure(aWriter.Put(chip::TLV::ContextTag(2), static_cast<uint32_t>(2)));
         return aWriter.EndContainer(dataContainerType);
     }
 };
