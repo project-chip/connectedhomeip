@@ -36768,8 +36768,11 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     uint16_t minIntervalArgument = 2U;
     uint16_t maxIntervalArgument = 5U;
+    CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
     [cluster subscribeAttributeListInt8uWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
+        params:params
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTestCluster_000366_WaitForReport_Fulfilled, true);
             [expectation fulfill];
@@ -45205,8 +45208,11 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
 
     uint16_t minIntervalArgument = 2U;
     uint16_t maxIntervalArgument = 5U;
+    CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
     [cluster subscribeAttributeOnOffWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
+        params:params
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled, true);
             [expectation fulfill];
