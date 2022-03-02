@@ -21,6 +21,7 @@ following command line options are available for the OTA Requestor application.
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | -q/--delayQuery <Time in seconds> | From boot up, the amount of time to wait before triggering the QueryImage command. If none or zero is supplied, QueryImage will not be triggered automatically. At least one provider location must be written to the DefaultOTAProviders attribute. |
 | -c/--requestorCanConsent          | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.                                                                                                               |
+| -f/--otaDownloadPath <file path>  | If supplied, the OTA image is downloaded to the given fully-qualified file-path. Otherwise, the value defaults to /tmp/test.bin.                                                                                                                     |
 
 ## Software Image Header
 
@@ -86,7 +87,7 @@ Follow instructions
 #### Run the OTA Requestor application:
 
 ```
-out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --delayQuery ${TIME_IN_SECONDS}
+out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --delayQuery ${TIME_IN_SECONDS} --otaDownloadPath ${OTA_FILE_PATH}
 ```
 
 -   `${REQUESTOR_LONG_DISCRIMINATOR}` is the long discriminator specified for
@@ -101,6 +102,8 @@ out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --sec
     the value used by the OTA Provider application.
 -   `${TIME_IN_SECONDS}` is the amount of time to wait before triggering the
     QueryImage command specified by the DefaultOTAProviders attribute
+-   `${OTA_FILE_PATH}` is the fully-qualified path for the OTA file download
+    location
 
 #### Commission the OTA Requestor application
 
@@ -212,7 +215,7 @@ scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux/ out chip_
 **Run the OTA Requestor application**
 
 ```
-out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --delayQuery 30
+out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --delayQuery 30 --otaDownloadPath /tmp/test.bin
 ```
 
 #### In terminal 3:
@@ -257,7 +260,7 @@ specified below:
 
 ```
 scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux/ out chip_config_network_layer_ble=false
-out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor
+out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --otaDownloadPath /tmp/test.bin
 ```
 
 **Commission to the first fabric**
@@ -297,6 +300,3 @@ out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --co
 ```
 
 ## Limitations
-
--   Stores the downloaded file in the directory this reference app is launched
-    from
