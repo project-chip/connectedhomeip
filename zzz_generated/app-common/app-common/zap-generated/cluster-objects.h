@@ -2969,6 +2969,12 @@ enum class OnOffControl : uint8_t
     kAcceptOnlyWhenOn = 0x1,
 };
 
+// Bitmap for OnOffFeature
+enum class OnOffFeature : uint32_t
+{
+    kLighting = 0x1,
+};
+
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
@@ -16523,7 +16529,7 @@ namespace GroupKeyManagement {
 enum class GroupKeySecurityPolicy : uint8_t
 {
     kStandard   = 0x00,
-    kLowLatency = 0x01,
+    kTrustFirst = 0x01,
 };
 
 namespace Structs {
@@ -26865,6 +26871,12 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace TemperatureMeasurement
 namespace PressureMeasurement {
+
+// Bitmap for PressureFeature
+enum class PressureFeature : uint32_t
+{
+    kExt = 0x1,
+};
 
 namespace Attributes {
 

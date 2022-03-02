@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Advertiser.h>
@@ -62,6 +63,16 @@ public:
 
     /// Gets the factory-new state commissionable node discovery timeout
     int16_t GetDiscoveryTimeoutSecs() { return mDiscoveryTimeoutSecs; }
+
+    //
+    // Override the referenced fabric table from the default that is present
+    // in Server::GetInstance().GetFabricTable() to something else.
+    //
+    void SetFabricTable(FabricTable * table)
+    {
+        VerifyOrDie(table != nullptr);
+        mFabricTable = table;
+    }
 
     /// Callback from Discovery Expiration timer
     /// Checks if discovery has expired and if so,
@@ -111,6 +122,12 @@ private:
     /// Set MDNS commissionable node advertisement
     CHIP_ERROR AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode mode);
 
+    //
+    // Check if we have any valid operational credentials present in the fabric table and return true
+    // if we do.
+    //
+    bool HaveOperationalCredentials();
+
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
 
     void ClearTimeouts()
@@ -120,6 +137,8 @@ private:
         mExtendedDiscoveryExpiration = kTimeoutCleared;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
+
+    FabricTable * mFabricTable = nullptr;
 
     // Helper for StartServer.
     void StartServer(Optional<Dnssd::CommissioningMode> mode);

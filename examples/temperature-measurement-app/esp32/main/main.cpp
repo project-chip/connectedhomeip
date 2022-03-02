@@ -40,6 +40,10 @@
 
 #include <lib/support/ErrorStr.h>
 
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
@@ -64,6 +68,10 @@ static void InitServer(intptr_t context)
 
 extern "C" void app_main()
 {
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
+
     ESP_LOGI(TAG, "Temperature sensor!");
 
     /* Print chip information */
