@@ -207,13 +207,13 @@ tests:
       command: "writeAttribute"
       attribute: "bitmap64"
       arguments:
-          value: "18446744073709551615"
+          value: "18446744073709551615U"
 
     - label: "Read attribute BITMAP64 Max Value"
       command: "readAttribute"
       attribute: "bitmap64"
       response:
-          value: "18446744073709551615"
+          value: "18446744073709551615U"
 
     - label: "Write attribute BITMAP64 Min Value"
       command: "writeAttribute"

@@ -21,6 +21,7 @@
 #include <lib/support/TypeTraits.h>
 
 #include <limits>
+#include <type_traits>
 
 namespace chip {
 namespace app {
@@ -123,6 +124,46 @@ public:
     // Utility that lets consumers treat a StorageType instance as a uint8_t*
     // for writing to the attribute store.
     static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return reinterpret_cast<uint8_t *>(&value); }
+};
+
+template <typename T>
+struct NumericAttributeTraits<BitFlags<T>>
+{
+    using StorageType = T;
+    using WorkingType = BitFlags<T>;
+
+    static constexpr void WorkingToStorage(WorkingType workingValue, StorageType & storageValue) { storageValue = static_cast<StorageType>(workingValue.Raw()); }
+
+    static constexpr WorkingType StorageToWorking(StorageType storageValue) { return WorkingType(storageValue); }
+
+    static constexpr bool IsNullValue(StorageType value) { return value == kNullValue; }
+    static constexpr void SetNull(StorageType & value) { value = kNullValue; }
+    static constexpr bool CanRepresentValue(bool isNullable, StorageType value)
+    {
+        // This treats all nonzero values (except the null value) as true.
+        return !IsNullValue(value);
+    }
+    static constexpr bool CanRepresentValue(bool isNullable, bool value) { return true; }
+
+    static CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, StorageType value)
+    {
+        return writer.Put(tag, static_cast<bool>(value));
+    }
+
+    static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return reinterpret_cast<uint8_t *>(&value); }
+
+    static constexpr StorageType GetNullValue()
+    {
+        static_assert(!std::is_signed<std::underlying_type_t<T>>::value, "Bitmasks must be unsigned");
+
+        //
+        // For bitmaps, the most significant bit is reserved to represent a null value (see 7.18.1.2 in the Matter spec).
+        //
+        return static_cast<StorageType>(std::underlying_type_t<T>(1) << (std::numeric_limits<std::underlying_type_t<T>>::digits - 1));
+    }
+
+private:
+    static constexpr StorageType kNullValue = NumericAttributeTraits::GetNullValue();
 };
 
 template <>

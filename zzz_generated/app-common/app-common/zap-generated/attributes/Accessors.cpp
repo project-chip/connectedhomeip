@@ -31560,9 +31560,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 namespace Bitmap8 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
@@ -31574,9 +31574,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -31591,9 +31591,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 namespace Bitmap16 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> * value)
 {
-    using Traits = NumericAttributeTraits<uint16_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
@@ -31605,9 +31605,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<uint16_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -31622,9 +31622,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace Bitmap32 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> * value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
@@ -31636,9 +31636,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -31653,9 +31653,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 
 namespace Bitmap64 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> * value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
@@ -31667,9 +31667,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -32849,9 +32849,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace NullableBitmap8 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
@@ -32866,9 +32867,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -32881,14 +32882,15 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
     return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
 {
     if (value.IsNull())
     {
@@ -32902,9 +32904,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace NullableBitmap16 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
 {
-    using Traits = NumericAttributeTraits<uint16_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
@@ -32919,9 +32922,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<uint16_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -32934,14 +32937,15 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<uint16_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
     return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
 {
     if (value.IsNull())
     {
@@ -32955,9 +32959,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace NullableBitmap32 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
@@ -32972,9 +32977,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -32987,14 +32992,15 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
     return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
 {
     if (value.IsNull())
     {
@@ -33008,9 +33014,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace NullableBitmap64 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value)
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
@@ -33025,9 +33032,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -33040,14 +33047,15 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
     return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
 {
     if (value.IsNull())
     {

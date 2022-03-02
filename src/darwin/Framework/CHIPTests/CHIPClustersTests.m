@@ -27893,7 +27893,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
     XCTAssertNotNil(cluster);
 
     id bitmap64Argument;
-    bitmap64Argument = [NSNumber numberWithUnsignedLongLong:18446744073709551615ULL];
+    bitmap64Argument = [NSNumber numberWithUnsignedLongLong:18446744073709551615U];
     [cluster writeAttributeBitmap64WithValue:bitmap64Argument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute BITMAP64 Max Value Error: %@", err);
@@ -27921,7 +27921,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedLongLongValue], 18446744073709551615ULL);
+            XCTAssertEqual([actualValue unsignedLongLongValue], 18446744073709551615U);
         }
 
         [expectation fulfill];

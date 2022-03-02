@@ -56772,7 +56772,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_11(error);
     }
 
-    static void OnSuccessCallback_11(void * context, uint8_t bitmap8)
+    static void OnSuccessCallback_11(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_11(bitmap8);
     }
@@ -56789,7 +56789,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_13(error);
     }
 
-    static void OnSuccessCallback_13(void * context, uint8_t bitmap8)
+    static void OnSuccessCallback_13(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_13(bitmap8);
     }
@@ -56806,7 +56806,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_15(error);
     }
 
-    static void OnSuccessCallback_15(void * context, uint8_t bitmap8)
+    static void OnSuccessCallback_15(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_15(bitmap8);
     }
@@ -56816,7 +56816,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_16(error);
     }
 
-    static void OnSuccessCallback_16(void * context, uint16_t bitmap16)
+    static void OnSuccessCallback_16(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_16(bitmap16);
     }
@@ -56833,7 +56833,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_18(error);
     }
 
-    static void OnSuccessCallback_18(void * context, uint16_t bitmap16)
+    static void OnSuccessCallback_18(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_18(bitmap16);
     }
@@ -56850,7 +56850,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_20(error);
     }
 
-    static void OnSuccessCallback_20(void * context, uint16_t bitmap16)
+    static void OnSuccessCallback_20(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_20(bitmap16);
     }
@@ -56860,7 +56860,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_21(error);
     }
 
-    static void OnSuccessCallback_21(void * context, uint32_t bitmap32)
+    static void OnSuccessCallback_21(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_21(bitmap32);
     }
@@ -56877,7 +56877,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_23(error);
     }
 
-    static void OnSuccessCallback_23(void * context, uint32_t bitmap32)
+    static void OnSuccessCallback_23(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_23(bitmap32);
     }
@@ -56894,7 +56894,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_25(error);
     }
 
-    static void OnSuccessCallback_25(void * context, uint32_t bitmap32)
+    static void OnSuccessCallback_25(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_25(bitmap32);
     }
@@ -56904,7 +56904,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_26(error);
     }
 
-    static void OnSuccessCallback_26(void * context, uint64_t bitmap64)
+    static void OnSuccessCallback_26(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_26(bitmap64);
     }
@@ -56921,7 +56921,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_28(error);
     }
 
-    static void OnSuccessCallback_28(void * context, uint64_t bitmap64)
+    static void OnSuccessCallback_28(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_28(bitmap64);
     }
@@ -56938,7 +56938,7 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_30(error);
     }
 
-    static void OnSuccessCallback_30(void * context, uint64_t bitmap64)
+    static void OnSuccessCallback_30(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_30(bitmap64);
     }
@@ -58112,7 +58112,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_184(error);
     }
 
-    static void OnSuccessCallback_184(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
+    static void OnSuccessCallback_184(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & nullableBitmap8)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_184(nullableBitmap8);
     }
@@ -58129,7 +58131,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_186(error);
     }
 
-    static void OnSuccessCallback_186(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
+    static void OnSuccessCallback_186(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & nullableBitmap8)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_186(nullableBitmap8);
     }
@@ -58146,7 +58150,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_188(error);
     }
 
-    static void OnSuccessCallback_188(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
+    static void OnSuccessCallback_188(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & nullableBitmap8)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_188(nullableBitmap8);
     }
@@ -58163,7 +58169,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_190(error);
     }
 
-    static void OnSuccessCallback_190(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
+    static void OnSuccessCallback_190(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & nullableBitmap16)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_190(nullableBitmap16);
     }
@@ -58180,7 +58188,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_192(error);
     }
 
-    static void OnSuccessCallback_192(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
+    static void OnSuccessCallback_192(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & nullableBitmap16)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_192(nullableBitmap16);
     }
@@ -58197,7 +58207,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_194(error);
     }
 
-    static void OnSuccessCallback_194(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
+    static void OnSuccessCallback_194(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & nullableBitmap16)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_194(nullableBitmap16);
     }
@@ -58214,7 +58226,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_196(error);
     }
 
-    static void OnSuccessCallback_196(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
+    static void OnSuccessCallback_196(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & nullableBitmap32)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_196(nullableBitmap32);
     }
@@ -58231,7 +58245,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_198(error);
     }
 
-    static void OnSuccessCallback_198(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
+    static void OnSuccessCallback_198(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & nullableBitmap32)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_198(nullableBitmap32);
     }
@@ -58248,7 +58264,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_200(error);
     }
 
-    static void OnSuccessCallback_200(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
+    static void OnSuccessCallback_200(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & nullableBitmap32)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_200(nullableBitmap32);
     }
@@ -58265,7 +58283,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_202(error);
     }
 
-    static void OnSuccessCallback_202(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    static void OnSuccessCallback_202(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & nullableBitmap64)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_202(nullableBitmap64);
     }
@@ -58282,7 +58302,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_204(error);
     }
 
-    static void OnSuccessCallback_204(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    static void OnSuccessCallback_204(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & nullableBitmap64)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_204(nullableBitmap64);
     }
@@ -58299,7 +58321,9 @@ private:
         (static_cast<TestClusterSuite *>(context))->OnFailureResponse_206(error);
     }
 
-    static void OnSuccessCallback_206(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    static void OnSuccessCallback_206(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & nullableBitmap64)
     {
         (static_cast<TestClusterSuite *>(context))->OnSuccessResponse_206(nullableBitmap64);
     }
@@ -60970,7 +60994,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11(uint8_t bitmap8)
+    void OnSuccessResponse_11(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         VerifyOrReturn(CheckValue("bitmap8", bitmap8, 0));
 
@@ -60983,8 +61007,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint8_t bitmap8Argument;
-        bitmap8Argument = 255;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8Argument;
+        bitmap8Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
             bitmap8Argument, this, OnSuccessCallback_12, OnFailureCallback_12));
@@ -61016,7 +61040,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13(uint8_t bitmap8)
+    void OnSuccessResponse_13(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         VerifyOrReturn(CheckValue("bitmap8", bitmap8, 255));
 
@@ -61029,8 +61053,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint8_t bitmap8Argument;
-        bitmap8Argument = 0;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8Argument;
+        bitmap8Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(0);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
             bitmap8Argument, this, OnSuccessCallback_14, OnFailureCallback_14));
@@ -61062,7 +61086,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15(uint8_t bitmap8)
+    void OnSuccessResponse_15(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         VerifyOrReturn(CheckValue("bitmap8", bitmap8, 0));
 
@@ -61086,7 +61110,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_16(uint16_t bitmap16)
+    void OnSuccessResponse_16(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         VerifyOrReturn(CheckValue("bitmap16", bitmap16, 0U));
 
@@ -61099,8 +61123,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t bitmap16Argument;
-        bitmap16Argument = 65535U;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16Argument;
+        bitmap16Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65535);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
             bitmap16Argument, this, OnSuccessCallback_17, OnFailureCallback_17));
@@ -61132,7 +61156,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_18(uint16_t bitmap16)
+    void OnSuccessResponse_18(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         VerifyOrReturn(CheckValue("bitmap16", bitmap16, 65535U));
 
@@ -61145,8 +61169,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t bitmap16Argument;
-        bitmap16Argument = 0U;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16Argument;
+        bitmap16Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(0);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
             bitmap16Argument, this, OnSuccessCallback_19, OnFailureCallback_19));
@@ -61178,7 +61202,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_20(uint16_t bitmap16)
+    void OnSuccessResponse_20(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         VerifyOrReturn(CheckValue("bitmap16", bitmap16, 0U));
 
@@ -61202,7 +61226,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_21(uint32_t bitmap32)
+    void OnSuccessResponse_21(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         VerifyOrReturn(CheckValue("bitmap32", bitmap32, 0UL));
 
@@ -61215,8 +61239,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint32_t bitmap32Argument;
-        bitmap32Argument = 4294967295UL;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32Argument;
+        bitmap32Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967295);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
             bitmap32Argument, this, OnSuccessCallback_22, OnFailureCallback_22));
@@ -61248,7 +61272,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_23(uint32_t bitmap32)
+    void OnSuccessResponse_23(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         VerifyOrReturn(CheckValue("bitmap32", bitmap32, 4294967295UL));
 
@@ -61261,8 +61285,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint32_t bitmap32Argument;
-        bitmap32Argument = 0UL;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32Argument;
+        bitmap32Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(0);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
             bitmap32Argument, this, OnSuccessCallback_24, OnFailureCallback_24));
@@ -61294,7 +61318,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_25(uint32_t bitmap32)
+    void OnSuccessResponse_25(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         VerifyOrReturn(CheckValue("bitmap32", bitmap32, 0UL));
 
@@ -61318,7 +61342,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_26(uint64_t bitmap64)
+    void OnSuccessResponse_26(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         VerifyOrReturn(CheckValue("bitmap64", bitmap64, 0ULL));
 
@@ -61331,8 +61355,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint64_t bitmap64Argument;
-        bitmap64Argument = 18446744073709551615ULL;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64Argument;
+        bitmap64Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551615U);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
             bitmap64Argument, this, OnSuccessCallback_27, OnFailureCallback_27));
@@ -61364,9 +61388,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_28(uint64_t bitmap64)
+    void OnSuccessResponse_28(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
-        VerifyOrReturn(CheckValue("bitmap64", bitmap64, 18446744073709551615ULL));
+        VerifyOrReturn(CheckValue("bitmap64", bitmap64, 18446744073709551615U));
 
         NextTest();
     }
@@ -61377,8 +61401,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint64_t bitmap64Argument;
-        bitmap64Argument = 0ULL;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64Argument;
+        bitmap64Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(0);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
             bitmap64Argument, this, OnSuccessCallback_29, OnFailureCallback_29));
@@ -61410,7 +61434,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_30(uint64_t bitmap64)
+    void OnSuccessResponse_30(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         VerifyOrReturn(CheckValue("bitmap64", bitmap64, 0ULL));
 
@@ -65957,9 +65981,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> nullableBitmap8Argument;
         nullableBitmap8Argument.SetNonNull();
-        nullableBitmap8Argument.Value() = 254;
+        nullableBitmap8Argument.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(254);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
             nullableBitmap8Argument, this, OnSuccessCallback_183, OnFailureCallback_183));
@@ -65991,7 +66015,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_184(const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
+    void OnSuccessResponse_184(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & nullableBitmap8)
     {
         VerifyOrReturn(CheckValueNonNull("nullableBitmap8", nullableBitmap8));
         VerifyOrReturn(CheckValue("nullableBitmap8.Value()", nullableBitmap8.Value(), 254));
@@ -66005,9 +66030,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> nullableBitmap8Argument;
         nullableBitmap8Argument.SetNonNull();
-        nullableBitmap8Argument.Value() = 255;
+        nullableBitmap8Argument.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
             nullableBitmap8Argument, this, OnSuccessCallback_185, OnFailureCallback_185));
@@ -66040,7 +66065,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_186(const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
+    void OnSuccessResponse_186(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & nullableBitmap8)
     {
         VerifyOrReturn(CheckValueNonNull("nullableBitmap8", nullableBitmap8));
         VerifyOrReturn(CheckValue("nullableBitmap8.Value()", nullableBitmap8.Value(), 254));
@@ -66054,7 +66080,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> nullableBitmap8Argument;
         nullableBitmap8Argument.SetNull();
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
@@ -66087,7 +66113,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_188(const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
+    void OnSuccessResponse_188(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & nullableBitmap8)
     {
         VerifyOrReturn(CheckValueNull("nullableBitmap8", nullableBitmap8));
 
@@ -66100,9 +66127,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> nullableBitmap16Argument;
         nullableBitmap16Argument.SetNonNull();
-        nullableBitmap16Argument.Value() = 65534U;
+        nullableBitmap16Argument.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65534);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
             nullableBitmap16Argument, this, OnSuccessCallback_189, OnFailureCallback_189));
@@ -66134,7 +66161,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_190(const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
+    void OnSuccessResponse_190(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & nullableBitmap16)
     {
         VerifyOrReturn(CheckValueNonNull("nullableBitmap16", nullableBitmap16));
         VerifyOrReturn(CheckValue("nullableBitmap16.Value()", nullableBitmap16.Value(), 65534U));
@@ -66148,9 +66176,9 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> nullableBitmap16Argument;
         nullableBitmap16Argument.SetNonNull();
-        nullableBitmap16Argument.Value() = 65535U;
+        nullableBitmap16Argument.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65535);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
             nullableBitmap16Argument, this, OnSuccessCallback_191, OnFailureCallback_191));
@@ -66183,7 +66211,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_192(const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
+    void OnSuccessResponse_192(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & nullableBitmap16)
     {
         VerifyOrReturn(CheckValueNonNull("nullableBitmap16", nullableBitmap16));
         VerifyOrReturn(CheckValue("nullableBitmap16.Value()", nullableBitmap16.Value(), 65534U));
@@ -66197,7 +66226,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> nullableBitmap16Argument;
         nullableBitmap16Argument.SetNull();
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
@@ -66230,7 +66259,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_194(const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
+    void OnSuccessResponse_194(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & nullableBitmap16)
     {
         VerifyOrReturn(CheckValueNull("nullableBitmap16", nullableBitmap16));
 
@@ -66243,9 +66273,10 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> nullableBitmap32Argument;
         nullableBitmap32Argument.SetNonNull();
-        nullableBitmap32Argument.Value() = 4294967294UL;
+        nullableBitmap32Argument.Value() =
+            static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967294);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
             nullableBitmap32Argument, this, OnSuccessCallback_195, OnFailureCallback_195));
@@ -66277,7 +66308,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_196(const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
+    void OnSuccessResponse_196(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & nullableBitmap32)
     {
         VerifyOrReturn(CheckValueNonNull("nullableBitmap32", nullableBitmap32));
         VerifyOrReturn(CheckValue("nullableBitmap32.Value()", nullableBitmap32.Value(), 4294967294UL));
@@ -66291,9 +66323,10 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> nullableBitmap32Argument;
         nullableBitmap32Argument.SetNonNull();
-        nullableBitmap32Argument.Value() = 4294967295UL;
+        nullableBitmap32Argument.Value() =
+            static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967295);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
             nullableBitmap32Argument, this, OnSuccessCallback_197, OnFailureCallback_197));
@@ -66326,7 +66359,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_198(const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
+    void OnSuccessResponse_198(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & nullableBitmap32)
     {
         VerifyOrReturn(CheckValueNonNull("nullableBitmap32", nullableBitmap32));
         VerifyOrReturn(CheckValue("nullableBitmap32.Value()", nullableBitmap32.Value(), 4294967294UL));
@@ -66340,7 +66374,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> nullableBitmap32Argument;
         nullableBitmap32Argument.SetNull();
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
@@ -66373,7 +66407,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_200(const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
+    void OnSuccessResponse_200(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & nullableBitmap32)
     {
         VerifyOrReturn(CheckValueNull("nullableBitmap32", nullableBitmap32));
 
@@ -66386,9 +66421,10 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> nullableBitmap64Argument;
         nullableBitmap64Argument.SetNonNull();
-        nullableBitmap64Argument.Value() = 18446744073709551614ULL;
+        nullableBitmap64Argument.Value() =
+            static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551614);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
             nullableBitmap64Argument, this, OnSuccessCallback_201, OnFailureCallback_201));
@@ -66420,7 +66456,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_202(const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    void OnSuccessResponse_202(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & nullableBitmap64)
     {
         VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
         VerifyOrReturn(CheckValue("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
@@ -66434,9 +66471,10 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> nullableBitmap64Argument;
         nullableBitmap64Argument.SetNonNull();
-        nullableBitmap64Argument.Value() = 18446744073709551615ULL;
+        nullableBitmap64Argument.Value() =
+            static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551615);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
             nullableBitmap64Argument, this, OnSuccessCallback_203, OnFailureCallback_203));
@@ -66469,7 +66507,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_204(const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    void OnSuccessResponse_204(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & nullableBitmap64)
     {
         VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
         VerifyOrReturn(CheckValue("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
@@ -66483,7 +66522,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
+        chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> nullableBitmap64Argument;
         nullableBitmap64Argument.SetNull();
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
@@ -66516,7 +66555,8 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_206(const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    void OnSuccessResponse_206(
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & nullableBitmap64)
     {
         VerifyOrReturn(CheckValueNull("nullableBitmap64", nullableBitmap64));
 
@@ -76114,10 +76154,10 @@ private:
 
     uint8_t TestAddArgumentDefaultValue;
     bool readAttributeBooleanDefaultValue;
-    uint8_t readAttributeBitmap8DefaultValue;
-    uint16_t readAttributeBitmap16DefaultValue;
-    uint32_t readAttributeBitmap32DefaultValue;
-    uint64_t readAttributeBitmap64DefaultValue;
+    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> readAttributeBitmap8DefaultValue;
+    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> readAttributeBitmap16DefaultValue;
+    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> readAttributeBitmap32DefaultValue;
+    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> readAttributeBitmap64DefaultValue;
     uint8_t readAttributeInt8uDefaultValue;
     uint16_t readAttributeInt16uDefaultValue;
     uint32_t readAttributeInt32uDefaultValue;
@@ -76197,7 +76237,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context, uint8_t bitmap8)
+    static void OnSuccessCallback_9(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_9(bitmap8);
     }
@@ -76214,7 +76254,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_11(error);
     }
 
-    static void OnSuccessCallback_11(void * context, uint8_t bitmap8)
+    static void OnSuccessCallback_11(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_11(bitmap8);
     }
@@ -76231,7 +76271,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_13(error);
     }
 
-    static void OnSuccessCallback_13(void * context, uint8_t bitmap8)
+    static void OnSuccessCallback_13(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_13(bitmap8);
     }
@@ -76241,7 +76281,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_14(error);
     }
 
-    static void OnSuccessCallback_14(void * context, uint16_t bitmap16)
+    static void OnSuccessCallback_14(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_14(bitmap16);
     }
@@ -76258,7 +76298,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_16(error);
     }
 
-    static void OnSuccessCallback_16(void * context, uint16_t bitmap16)
+    static void OnSuccessCallback_16(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_16(bitmap16);
     }
@@ -76275,7 +76315,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_18(error);
     }
 
-    static void OnSuccessCallback_18(void * context, uint16_t bitmap16)
+    static void OnSuccessCallback_18(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_18(bitmap16);
     }
@@ -76285,7 +76325,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_19(error);
     }
 
-    static void OnSuccessCallback_19(void * context, uint32_t bitmap32)
+    static void OnSuccessCallback_19(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_19(bitmap32);
     }
@@ -76302,7 +76342,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_21(error);
     }
 
-    static void OnSuccessCallback_21(void * context, uint32_t bitmap32)
+    static void OnSuccessCallback_21(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_21(bitmap32);
     }
@@ -76319,7 +76359,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_23(error);
     }
 
-    static void OnSuccessCallback_23(void * context, uint32_t bitmap32)
+    static void OnSuccessCallback_23(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_23(bitmap32);
     }
@@ -76329,7 +76369,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_24(error);
     }
 
-    static void OnSuccessCallback_24(void * context, uint64_t bitmap64)
+    static void OnSuccessCallback_24(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_24(bitmap64);
     }
@@ -76346,7 +76386,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_26(error);
     }
 
-    static void OnSuccessCallback_26(void * context, uint64_t bitmap64)
+    static void OnSuccessCallback_26(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_26(bitmap64);
     }
@@ -76363,7 +76403,7 @@ private:
         (static_cast<TestSaveAsSuite *>(context))->OnFailureResponse_28(error);
     }
 
-    static void OnSuccessCallback_28(void * context, uint64_t bitmap64)
+    static void OnSuccessCallback_28(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         (static_cast<TestSaveAsSuite *>(context))->OnSuccessResponse_28(bitmap64);
     }
@@ -77329,7 +77369,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9(uint8_t bitmap8)
+    void OnSuccessResponse_9(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         VerifyOrReturn(CheckValue("bitmap8", bitmap8, 0));
 
@@ -77343,8 +77383,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint8_t bitmap8Argument;
-        bitmap8Argument = 1;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8Argument;
+        bitmap8Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(1);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
             bitmap8Argument, this, OnSuccessCallback_10, OnFailureCallback_10));
@@ -77376,7 +77416,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11(uint8_t bitmap8)
+    void OnSuccessResponse_11(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         VerifyOrReturn(CheckConstraintNotValue("bitmap8", bitmap8, readAttributeBitmap8DefaultValue));
 
@@ -77389,7 +77429,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint8_t bitmap8Argument;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8Argument;
         bitmap8Argument = readAttributeBitmap8DefaultValue;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
@@ -77422,7 +77462,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13(uint8_t bitmap8)
+    void OnSuccessResponse_13(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> bitmap8)
     {
         VerifyOrReturn(CheckValue("bitmap8", bitmap8, readAttributeBitmap8DefaultValue));
 
@@ -77446,7 +77486,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14(uint16_t bitmap16)
+    void OnSuccessResponse_14(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         VerifyOrReturn(CheckValue("bitmap16", bitmap16, 0U));
 
@@ -77460,8 +77500,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t bitmap16Argument;
-        bitmap16Argument = 1U;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16Argument;
+        bitmap16Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(1);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
             bitmap16Argument, this, OnSuccessCallback_15, OnFailureCallback_15));
@@ -77493,7 +77533,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_16(uint16_t bitmap16)
+    void OnSuccessResponse_16(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         VerifyOrReturn(CheckConstraintNotValue("bitmap16", bitmap16, readAttributeBitmap16DefaultValue));
 
@@ -77506,7 +77546,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t bitmap16Argument;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16Argument;
         bitmap16Argument = readAttributeBitmap16DefaultValue;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
@@ -77539,7 +77579,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_18(uint16_t bitmap16)
+    void OnSuccessResponse_18(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> bitmap16)
     {
         VerifyOrReturn(CheckValue("bitmap16", bitmap16, readAttributeBitmap16DefaultValue));
 
@@ -77563,7 +77603,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_19(uint32_t bitmap32)
+    void OnSuccessResponse_19(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         VerifyOrReturn(CheckValue("bitmap32", bitmap32, 0UL));
 
@@ -77577,8 +77617,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint32_t bitmap32Argument;
-        bitmap32Argument = 1UL;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32Argument;
+        bitmap32Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(1);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
             bitmap32Argument, this, OnSuccessCallback_20, OnFailureCallback_20));
@@ -77610,7 +77650,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_21(uint32_t bitmap32)
+    void OnSuccessResponse_21(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         VerifyOrReturn(CheckConstraintNotValue("bitmap32", bitmap32, readAttributeBitmap32DefaultValue));
 
@@ -77623,7 +77663,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint32_t bitmap32Argument;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32Argument;
         bitmap32Argument = readAttributeBitmap32DefaultValue;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
@@ -77656,7 +77696,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_23(uint32_t bitmap32)
+    void OnSuccessResponse_23(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> bitmap32)
     {
         VerifyOrReturn(CheckValue("bitmap32", bitmap32, readAttributeBitmap32DefaultValue));
 
@@ -77680,7 +77720,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_24(uint64_t bitmap64)
+    void OnSuccessResponse_24(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         VerifyOrReturn(CheckValue("bitmap64", bitmap64, 0ULL));
 
@@ -77694,8 +77734,8 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint64_t bitmap64Argument;
-        bitmap64Argument = 1ULL;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64Argument;
+        bitmap64Argument = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(1);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
             bitmap64Argument, this, OnSuccessCallback_25, OnFailureCallback_25));
@@ -77727,7 +77767,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_26(uint64_t bitmap64)
+    void OnSuccessResponse_26(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         VerifyOrReturn(CheckConstraintNotValue("bitmap64", bitmap64, readAttributeBitmap64DefaultValue));
 
@@ -77740,7 +77780,7 @@ private:
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint64_t bitmap64Argument;
+        chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64Argument;
         bitmap64Argument = readAttributeBitmap64DefaultValue;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
@@ -77773,7 +77813,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_28(uint64_t bitmap64)
+    void OnSuccessResponse_28(chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> bitmap64)
     {
         VerifyOrReturn(CheckValue("bitmap64", bitmap64, readAttributeBitmap64DefaultValue));
 
