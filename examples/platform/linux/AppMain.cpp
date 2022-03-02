@@ -389,9 +389,6 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
-    /////////// DeviceAddressUpdateDelegate Interface /////////
-    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
-
     CHIP_ERROR UpdateNetworkAddress();
 
 private:
@@ -411,11 +408,6 @@ CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
     ChipLogProgress(AppServer, "Mdns: Updating NodeId: %" PRIx64 " ...", gRemoteId);
     return gCommissioner.UpdateDevice(gRemoteId);
-}
-
-void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
-{
-    ChipLogProgress(AppServer, "OnAddressUpdateComplete: %s", ErrorStr(err));
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -527,7 +519,6 @@ CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, Transport:
 {
     RendezvousParameters params = RendezvousParameters().SetSetupPINCode(pincode).SetDiscriminator(disc).SetPeerAddress(address);
 
-    gCommissioner.RegisterDeviceAddressUpdateDelegate(&gPairingCommand);
     gCommissioner.RegisterPairingDelegate(&gPairingCommand);
     gCommissioner.PairDevice(gRemoteId, params);
 
