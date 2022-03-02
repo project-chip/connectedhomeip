@@ -53,7 +53,7 @@ public:
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode);
 
-// Called by the DeviceCommissioner to notify that we have discovered a new device.
+    // Called by the DeviceCommissioner to notify that we have discovered a new device.
     void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData);
 
 #if CONFIG_NETWORK_LAYER_BLE

@@ -89,10 +89,10 @@ void OnBasicFailure(void * context, CHIP_ERROR err);
 
 struct ControllerInitParams
 {
-    PersistentStorageDelegate * storageDelegate = nullptr;
-    DeviceControllerSystemState * systemState   = nullptr;
-    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate = nullptr;
-    DeviceDiscoveryDelegate * deviceDiscoveryDelegate         = nullptr;
+    PersistentStorageDelegate * storageDelegate                     = nullptr;
+    DeviceControllerSystemState * systemState                       = nullptr;
+    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate       = nullptr;
+    DeviceDiscoveryDelegate * deviceDiscoveryDelegate               = nullptr;
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
     /* The following keypair must correspond to the public key used for generating
@@ -352,7 +352,7 @@ protected:
     FabricId mFabricId       = kUndefinedFabricId;
     FabricInfo * mFabricInfo = nullptr;
 
-    PersistentStorageDelegate * mStorageDelegate = nullptr;
+    PersistentStorageDelegate * mStorageDelegate               = nullptr;
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
