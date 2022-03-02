@@ -362,17 +362,6 @@ public:
      */
     void SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes);
 
-    enum class BypassAccessControl : uint8_t
-    {
-        kNoBypass   = 0,
-        kAlwaysPass = 1,
-        kAlwaysFail = 2,
-    };
-
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    inline void SetBypassAccessControl(BypassAccessControl aConfig) { mBypassAccessControl = aConfig; }
-#endif
-
 private:
     /**
      * @brief
@@ -536,11 +525,6 @@ private:
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended for this priority
     Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
-
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    /// Debug flag for bypassing ACL check when retrieving events
-    BypassAccessControl mBypassAccessControl = BypassAccessControl::kNoBypass;
-#endif
 };
 } // namespace app
 } // namespace chip

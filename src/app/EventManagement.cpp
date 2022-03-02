@@ -631,25 +631,8 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
 
     Access::RequestPath requestPath{ .cluster = event.mClusterId, .endpoint = event.mEndpointId };
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
-    CHIP_ERROR accessControlError      = CHIP_NO_ERROR;
-
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    switch (GetInstance().mBypassAccessControl)
-    {
-    case BypassAccessControl::kAlwaysPass:
-        accessControlError = CHIP_NO_ERROR;
-        break;
-    case BypassAccessControl::kAlwaysFail:
-        accessControlError = CHIP_ERROR_ACCESS_DENIED;
-        break;
-    case BypassAccessControl::kNoBypass:
-#endif
-        accessControlError =
-            Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-        break;
-    }
-#endif
+    CHIP_ERROR accessControlError =
+        Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
 
     if (accessControlError != CHIP_NO_ERROR)
     {
