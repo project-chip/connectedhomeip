@@ -104,7 +104,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     switch (aIdentifier)
     {
     case kOptionPeriodicQueryTimeout:
-        gPeriodicQueryTimeoutSec = static_cast<uint32_t>(strtol(aValue, NULL, 0));
+        gPeriodicQueryTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionRequestorCanConsent:
         gRequestorCanConsent.SetValue(true);

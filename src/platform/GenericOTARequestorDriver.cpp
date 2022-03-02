@@ -150,6 +150,7 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
     else
     {
         ChipLogProgress(SoftwareUpdate, "UpdateNotFound, not scheduling further retries");
+        mRequestor->ClearCurrentProviderLocation();
     }
 }
 

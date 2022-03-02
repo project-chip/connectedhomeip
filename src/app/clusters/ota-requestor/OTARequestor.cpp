@@ -768,6 +768,8 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
 // Invoked when the device becomes commissioned
 void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
+    VerifyOrReturn(event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete);
+
     ChipLogProgress(SoftwareUpdate, "Device commissioned, schedule a default provider query");
 
     // TODO: Should we also send UpdateApplied here?
