@@ -8,7 +8,7 @@ bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {ro
 bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-light lighting-app'
 
 # Generating ameba-amebad-pigweed
-bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-pigweed pigweed-app'
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh -r {root} ninja {out}/ameba-amebad-pigweed pigweed-app'
 
 # Generating JARs for Java build rules test
 python3 build/chip/java/tests/generate_jars_for_test.py
@@ -432,6 +432,17 @@ rm -f examples/temperature-measurement-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
 idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement reconfigure'
+
+# Generating esp32-devkitc-temperature-measurement-rpc
+mkdir -p {out}/esp32-devkitc-temperature-measurement-rpc
+
+cp examples/temperature-measurement-app/esp32/sdkconfig_rpc.defaults {out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
+
+rm -f examples/temperature-measurement-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
+idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement-rpc reconfigure'
 
 # Generating esp32-m5stack-all-clusters
 mkdir -p {out}/esp32-m5stack-all-clusters
@@ -1141,6 +1152,13 @@ rm -f examples/temperature-measurement-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
 idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement build'
+
+rm -f examples/temperature-measurement-app/esp32/sdkconfig
+
+# Building esp32-devkitc-temperature-measurement-rpc
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
+idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement-rpc build'
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 

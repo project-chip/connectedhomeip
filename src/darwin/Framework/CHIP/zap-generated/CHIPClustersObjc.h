@@ -7220,6 +7220,1557 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+typedef NS_ENUM(NSInteger, CHIPIdentifyEffectIdentifier) {
+    CHIPIdentifyEffectIdentifierBlink = 0x00,
+    CHIPIdentifyEffectIdentifierBreathe = 0x01,
+    CHIPIdentifyEffectIdentifierOkay = 0x02,
+    CHIPIdentifyEffectIdentifierChannelChange = 0x0B,
+    CHIPIdentifyEffectIdentifierFinishEffect = 0xFE,
+    CHIPIdentifyEffectIdentifierStopEffect = 0xFF,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIdentifyEffectVariant) {
+    CHIPIdentifyEffectVariantDefault = 0x00,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIdentifyType) {
+    CHIPIdentifyTypeNone = 0x00,
+    CHIPIdentifyTypeVisibleLight = 0x01,
+    CHIPIdentifyTypeVisibleLED = 0x02,
+    CHIPIdentifyTypeAudibleBeep = 0x03,
+    CHIPIdentifyTypeDisplay = 0x04,
+    CHIPIdentifyTypeActuator = 0x05,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPScenesCopyMode) {
+    CHIPScenesCopyModeCopyAllScenes = 0x1,
+};
+
+typedef NS_ENUM(NSInteger, CHIPOnOffDelayedAllOffEffectVariant) {
+    CHIPOnOffDelayedAllOffEffectVariantFadeToOffIn0p8Seconds = 0x00,
+    CHIPOnOffDelayedAllOffEffectVariantNoFade = 0x01,
+    CHIPOnOffDelayedAllOffEffectVariant50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPOnOffDyingLightEffectVariant) {
+    CHIPOnOffDyingLightEffectVariant20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00,
+};
+
+typedef NS_ENUM(NSInteger, CHIPOnOffEffectIdentifier) {
+    CHIPOnOffEffectIdentifierDelayedAllOff = 0x00,
+    CHIPOnOffEffectIdentifierDyingLight = 0x01,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPOnOffControl) {
+    CHIPOnOffControlAcceptOnlyWhenOn = 0x1,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPOnOffFeature) {
+    CHIPOnOffFeatureLighting = 0x1,
+};
+
+typedef NS_ENUM(NSInteger, CHIPLevelControlMoveMode) {
+    CHIPLevelControlMoveModeUp = 0x00,
+    CHIPLevelControlMoveModeDown = 0x01,
+};
+
+typedef NS_ENUM(NSInteger, CHIPLevelControlStepMode) {
+    CHIPLevelControlStepModeUp = 0x00,
+    CHIPLevelControlStepModeDown = 0x01,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPLevelControlFeature) {
+    CHIPLevelControlFeatureOnOff = 0x1,
+    CHIPLevelControlFeatureLighting = 0x2,
+    CHIPLevelControlFeatureFrequency = 0x4,
+};
+
+typedef NS_ENUM(NSInteger, CHIPApplianceControlApplianceStatus) {
+    CHIPApplianceControlApplianceStatusOff = 0x01,
+    CHIPApplianceControlApplianceStatusStandBy = 0x02,
+    CHIPApplianceControlApplianceStatusProgrammed = 0x03,
+    CHIPApplianceControlApplianceStatusProgrammedWaitingToStart = 0x04,
+    CHIPApplianceControlApplianceStatusRunning = 0x05,
+    CHIPApplianceControlApplianceStatusPause = 0x06,
+    CHIPApplianceControlApplianceStatusEndProgrammed = 0x07,
+    CHIPApplianceControlApplianceStatusFailure = 0x08,
+    CHIPApplianceControlApplianceStatusProgrammeInterrupted = 0x09,
+    CHIPApplianceControlApplianceStatusIdle = 0x0A,
+    CHIPApplianceControlApplianceStatusRinseHold = 0x0B,
+    CHIPApplianceControlApplianceStatusService = 0x0C,
+    CHIPApplianceControlApplianceStatusSuperfreezing = 0x0D,
+    CHIPApplianceControlApplianceStatusSupercooling = 0x0E,
+    CHIPApplianceControlApplianceStatusSuperheating = 0x0F,
+};
+
+typedef NS_ENUM(NSInteger, CHIPApplianceControlCommandIdentification) {
+    CHIPApplianceControlCommandIdentificationStart = 0x01,
+    CHIPApplianceControlCommandIdentificationStop = 0x02,
+    CHIPApplianceControlCommandIdentificationPause = 0x03,
+    CHIPApplianceControlCommandIdentificationStartSuperfreezing = 0x04,
+    CHIPApplianceControlCommandIdentificationStopSuperfreezing = 0x05,
+    CHIPApplianceControlCommandIdentificationStartSupercooling = 0x06,
+    CHIPApplianceControlCommandIdentificationStopSupercooling = 0x07,
+    CHIPApplianceControlCommandIdentificationDisableGas = 0x08,
+    CHIPApplianceControlCommandIdentificationEnableGas = 0x09,
+    CHIPApplianceControlCommandIdentificationEnableEnergyControl = 0x0A,
+    CHIPApplianceControlCommandIdentificationDisableEnergyControl = 0x0B,
+};
+
+typedef NS_ENUM(NSInteger, CHIPApplianceControlWarningEvent) {
+    CHIPApplianceControlWarningEventWarning1OverallPowerAboveAvailablePowerLevel = 0x00,
+    CHIPApplianceControlWarningEventWarning2OverallPowerAbovePowerThresholdLevel = 0x01,
+    CHIPApplianceControlWarningEventWarning3OverallPowerBackBelowTheAvailablePowerLevel = 0x02,
+    CHIPApplianceControlWarningEventWarning4OverallPowerBackBelowThePowerThresholdLevel = 0x03,
+    CHIPApplianceControlWarningEventWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 0x04,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPApplianceControlRemoteEnableFlagsAndDeviceStatus2) {
+    CHIPApplianceControlRemoteEnableFlagsAndDeviceStatus2RemoteEnableFlags = 0xF,
+    CHIPApplianceControlRemoteEnableFlagsAndDeviceStatus2DeviceStatus2Structure = 0xF0,
+};
+
+typedef NS_ENUM(NSInteger, CHIPAccessControlAuthMode) {
+    CHIPAccessControlAuthModePASE = 0x01,
+    CHIPAccessControlAuthModeCASE = 0x02,
+    CHIPAccessControlAuthModeGroup = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPAccessControlChangeType) {
+    CHIPAccessControlChangeTypeChanged = 0x00,
+    CHIPAccessControlChangeTypeAdded = 0x01,
+    CHIPAccessControlChangeTypeRemoved = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPAccessControlPrivilege) {
+    CHIPAccessControlPrivilegeView = 0x01,
+    CHIPAccessControlPrivilegeProxyView = 0x02,
+    CHIPAccessControlPrivilegeOperate = 0x03,
+    CHIPAccessControlPrivilegeManage = 0x04,
+    CHIPAccessControlPrivilegeAdminister = 0x05,
+};
+
+typedef NS_ENUM(NSInteger, CHIPBridgedActionsActionError) {
+    CHIPBridgedActionsActionErrorUnknown = 0x00,
+    CHIPBridgedActionsActionErrorInterrupted = 0x01,
+};
+
+typedef NS_ENUM(NSInteger, CHIPBridgedActionsActionState) {
+    CHIPBridgedActionsActionStateInactive = 0x00,
+    CHIPBridgedActionsActionStateActive = 0x01,
+    CHIPBridgedActionsActionStatePaused = 0x02,
+    CHIPBridgedActionsActionStateDisabled = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPBridgedActionsActionType) {
+    CHIPBridgedActionsActionTypeOther = 0x00,
+    CHIPBridgedActionsActionTypeScene = 0x01,
+    CHIPBridgedActionsActionTypeSequence = 0x02,
+    CHIPBridgedActionsActionTypeAutomation = 0x03,
+    CHIPBridgedActionsActionTypeException = 0x04,
+    CHIPBridgedActionsActionTypeNotification = 0x05,
+    CHIPBridgedActionsActionTypeAlarm = 0x06,
+};
+
+typedef NS_ENUM(NSInteger, CHIPBridgedActionsEndpointListType) {
+    CHIPBridgedActionsEndpointListTypeOther = 0x00,
+    CHIPBridgedActionsEndpointListTypeRoom = 0x01,
+    CHIPBridgedActionsEndpointListTypeZone = 0x02,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPBridgedActionsCommandBits) {
+    CHIPBridgedActionsCommandBitsInstantAction = 0x1,
+    CHIPBridgedActionsCommandBitsInstantActionWithTransition = 0x2,
+    CHIPBridgedActionsCommandBitsStartAction = 0x4,
+    CHIPBridgedActionsCommandBitsStartActionWithDuration = 0x8,
+    CHIPBridgedActionsCommandBitsStopAction = 0x10,
+    CHIPBridgedActionsCommandBitsPauseAction = 0x20,
+    CHIPBridgedActionsCommandBitsPauseActionWithDuration = 0x40,
+    CHIPBridgedActionsCommandBitsResumeAction = 0x80,
+    CHIPBridgedActionsCommandBitsEnableAction = 0x100,
+    CHIPBridgedActionsCommandBitsEnableActionWithDuration = 0x200,
+    CHIPBridgedActionsCommandBitsDisableAction = 0x400,
+    CHIPBridgedActionsCommandBitsDisableActionWithDuration = 0x800,
+};
+
+typedef NS_ENUM(NSInteger, CHIPOtaSoftwareUpdateProviderOTAApplyUpdateAction) {
+    CHIPOtaSoftwareUpdateProviderOTAApplyUpdateActionProceed = 0x00,
+    CHIPOtaSoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction = 0x01,
+    CHIPOtaSoftwareUpdateProviderOTAApplyUpdateActionDiscontinue = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPOtaSoftwareUpdateProviderOTADownloadProtocol) {
+    CHIPOtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous = 0x00,
+    CHIPOtaSoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous = 0x01,
+    CHIPOtaSoftwareUpdateProviderOTADownloadProtocolHTTPS = 0x02,
+    CHIPOtaSoftwareUpdateProviderOTADownloadProtocolVendorSpecific = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPOtaSoftwareUpdateProviderOTAQueryStatus) {
+    CHIPOtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable = 0x00,
+    CHIPOtaSoftwareUpdateProviderOTAQueryStatusBusy = 0x01,
+    CHIPOtaSoftwareUpdateProviderOTAQueryStatusNotAvailable = 0x02,
+    CHIPOtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPOtaSoftwareUpdateRequestorOTAAnnouncementReason) {
+    CHIPOtaSoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement = 0x00,
+    CHIPOtaSoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable = 0x01,
+    CHIPOtaSoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPOtaSoftwareUpdateRequestorOTAChangeReason) {
+    CHIPOtaSoftwareUpdateRequestorOTAChangeReasonUnknown = 0x00,
+    CHIPOtaSoftwareUpdateRequestorOTAChangeReasonSuccess = 0x01,
+    CHIPOtaSoftwareUpdateRequestorOTAChangeReasonFailure = 0x02,
+    CHIPOtaSoftwareUpdateRequestorOTAChangeReasonTimeOut = 0x03,
+    CHIPOtaSoftwareUpdateRequestorOTAChangeReasonDelayByProvider = 0x04,
+};
+
+typedef NS_ENUM(NSInteger, CHIPOtaSoftwareUpdateRequestorOTAUpdateState) {
+    CHIPOtaSoftwareUpdateRequestorOTAUpdateStateUnknown = 0x00,
+    CHIPOtaSoftwareUpdateRequestorOTAUpdateStateIdle = 0x01,
+    CHIPOtaSoftwareUpdateRequestorOTAUpdateStateQuerying = 0x02,
+    CHIPOtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery = 0x03,
+    CHIPOtaSoftwareUpdateRequestorOTAUpdateStateDownloading = 0x04,
+    CHIPOtaSoftwareUpdateRequestorOTAUpdateStateApplying = 0x05,
+    CHIPOtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnApply = 0x06,
+    CHIPOtaSoftwareUpdateRequestorOTAUpdateStateRollingBack = 0x07,
+    CHIPOtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent = 0x08,
+};
+
+typedef NS_ENUM(NSInteger, CHIPTimeFormatLocalizationCalendarType) {
+    CHIPTimeFormatLocalizationCalendarTypeBuddhist = 0x00,
+    CHIPTimeFormatLocalizationCalendarTypeChinese = 0x01,
+    CHIPTimeFormatLocalizationCalendarTypeCoptic = 0x02,
+    CHIPTimeFormatLocalizationCalendarTypeEthiopian = 0x03,
+    CHIPTimeFormatLocalizationCalendarTypeGregorian = 0x04,
+    CHIPTimeFormatLocalizationCalendarTypeHebrew = 0x05,
+    CHIPTimeFormatLocalizationCalendarTypeIndian = 0x06,
+    CHIPTimeFormatLocalizationCalendarTypeIslamic = 0x07,
+    CHIPTimeFormatLocalizationCalendarTypeJapanese = 0x08,
+    CHIPTimeFormatLocalizationCalendarTypeKorean = 0x09,
+    CHIPTimeFormatLocalizationCalendarTypePersian = 0x0A,
+    CHIPTimeFormatLocalizationCalendarTypeTaiwanese = 0x0B,
+};
+
+typedef NS_ENUM(NSInteger, CHIPTimeFormatLocalizationHourFormat) {
+    CHIPTimeFormatLocalizationHourFormat12hr = 0x00,
+    CHIPTimeFormatLocalizationHourFormat24hr = 0x01,
+};
+
+typedef NS_ENUM(NSInteger, CHIPUnitLocalizationTempUnit) {
+    CHIPUnitLocalizationTempUnitFahrenheit = 0x00,
+    CHIPUnitLocalizationTempUnitCelsius = 0x01,
+    CHIPUnitLocalizationTempUnitKelvin = 0x02,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPUnitLocalizationFeature) {
+    CHIPUnitLocalizationFeatureTemperatureUnit = 0x1,
+};
+
+typedef NS_ENUM(NSInteger, CHIPPowerSourceBatChargeFaultType) {
+    CHIPPowerSourceBatChargeFaultTypeUnspecfied = 0x00,
+    CHIPPowerSourceBatChargeFaultTypeAmbientTooHot = 0x01,
+    CHIPPowerSourceBatChargeFaultTypeAmbientTooCold = 0x02,
+    CHIPPowerSourceBatChargeFaultTypeBatteryTooHot = 0x03,
+    CHIPPowerSourceBatChargeFaultTypeBatteryTooCold = 0x04,
+    CHIPPowerSourceBatChargeFaultTypeBatteryAbsent = 0x05,
+    CHIPPowerSourceBatChargeFaultTypeBatteryOverVoltage = 0x06,
+    CHIPPowerSourceBatChargeFaultTypeBatteryUnderVoltage = 0x07,
+    CHIPPowerSourceBatChargeFaultTypeChargerOverVoltage = 0x08,
+    CHIPPowerSourceBatChargeFaultTypeChargerUnderVoltage = 0x09,
+    CHIPPowerSourceBatChargeFaultTypeSafetyTimeout = 0x0A,
+};
+
+typedef NS_ENUM(NSInteger, CHIPPowerSourceBatChargeLevel) {
+    CHIPPowerSourceBatChargeLevelOk = 0x00,
+    CHIPPowerSourceBatChargeLevelWarning = 0x01,
+    CHIPPowerSourceBatChargeLevelCritical = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPPowerSourceBatChargeState) {
+    CHIPPowerSourceBatChargeStateUnknown = 0x00,
+    CHIPPowerSourceBatChargeStateIsCharging = 0x01,
+    CHIPPowerSourceBatChargeStateIsAtFullCharge = 0x02,
+    CHIPPowerSourceBatChargeStateIsNotCharging = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPPowerSourceBatFaultType) {
+    CHIPPowerSourceBatFaultTypeUnspecfied = 0x00,
+    CHIPPowerSourceBatFaultTypeOverTemp = 0x01,
+    CHIPPowerSourceBatFaultTypeUnderTemp = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPPowerSourceBatReplaceability) {
+    CHIPPowerSourceBatReplaceabilityUnspecified = 0x00,
+    CHIPPowerSourceBatReplaceabilityNotReplaceable = 0x01,
+    CHIPPowerSourceBatReplaceabilityUserReplaceable = 0x02,
+    CHIPPowerSourceBatReplaceabilityFactoryReplaceable = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPPowerSourceStatus) {
+    CHIPPowerSourceStatusUnspecfied = 0x00,
+    CHIPPowerSourceStatusActive = 0x01,
+    CHIPPowerSourceStatusStandby = 0x02,
+    CHIPPowerSourceStatusUnavailable = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPPowerSourceWiredCurrentType) {
+    CHIPPowerSourceWiredCurrentTypeAC = 0x00,
+    CHIPPowerSourceWiredCurrentTypeDC = 0x01,
+};
+
+typedef NS_ENUM(NSInteger, CHIPPowerSourceWiredFaultType) {
+    CHIPPowerSourceWiredFaultTypeUnspecfied = 0x00,
+    CHIPPowerSourceWiredFaultTypeOverVoltage = 0x01,
+    CHIPPowerSourceWiredFaultTypeUnderVoltage = 0x02,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPPowerSourceFeature) {
+    CHIPPowerSourceFeatureWired = 0x1,
+    CHIPPowerSourceFeatureBattery = 0x2,
+    CHIPPowerSourceFeatureRechargeable = 0x4,
+    CHIPPowerSourceFeatureReplaceable = 0x8,
+};
+
+typedef NS_ENUM(NSInteger, CHIPGeneralCommissioningCommissioningError) {
+    CHIPGeneralCommissioningCommissioningErrorOk = 0x00,
+    CHIPGeneralCommissioningCommissioningErrorValueOutsideRange = 0x01,
+    CHIPGeneralCommissioningCommissioningErrorInvalidAuthentication = 0x02,
+    CHIPGeneralCommissioningCommissioningErrorNoFailSafe = 0x03,
+    CHIPGeneralCommissioningCommissioningErrorBusyWithOtherAdmin = 0x04,
+};
+
+typedef NS_ENUM(NSInteger, CHIPGeneralCommissioningRegulatoryLocationType) {
+    CHIPGeneralCommissioningRegulatoryLocationTypeIndoor = 0x00,
+    CHIPGeneralCommissioningRegulatoryLocationTypeOutdoor = 0x01,
+    CHIPGeneralCommissioningRegulatoryLocationTypeIndoorOutdoor = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPNetworkCommissioningStatus) {
+    CHIPNetworkCommissioningStatusSuccess = 0x00,
+    CHIPNetworkCommissioningStatusOutOfRange = 0x01,
+    CHIPNetworkCommissioningStatusBoundsExceeded = 0x02,
+    CHIPNetworkCommissioningStatusNetworkIDNotFound = 0x03,
+    CHIPNetworkCommissioningStatusDuplicateNetworkID = 0x04,
+    CHIPNetworkCommissioningStatusNetworkNotFound = 0x05,
+    CHIPNetworkCommissioningStatusRegulatoryError = 0x06,
+    CHIPNetworkCommissioningStatusAuthFailure = 0x07,
+    CHIPNetworkCommissioningStatusUnsupportedSecurity = 0x08,
+    CHIPNetworkCommissioningStatusOtherConnectionFailure = 0x09,
+    CHIPNetworkCommissioningStatusIPV6Failed = 0x0A,
+    CHIPNetworkCommissioningStatusIPBindFailed = 0x0B,
+    CHIPNetworkCommissioningStatusUnknownError = 0x0C,
+};
+
+typedef NS_ENUM(NSInteger, CHIPNetworkCommissioningWiFiBand) {
+    CHIPNetworkCommissioningWiFiBand2G4 = 0x00,
+    CHIPNetworkCommissioningWiFiBand3G65 = 0x01,
+    CHIPNetworkCommissioningWiFiBand5G = 0x02,
+    CHIPNetworkCommissioningWiFiBand6G = 0x03,
+    CHIPNetworkCommissioningWiFiBand60G = 0x04,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPNetworkCommissioningFeature) {
+    CHIPNetworkCommissioningFeatureWiFiNetworkInterface = 0x1,
+    CHIPNetworkCommissioningFeatureThreadNetworkInterface = 0x2,
+    CHIPNetworkCommissioningFeatureEthernetNetworkInterface = 0x4,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDiagnosticLogsLogsIntent) {
+    CHIPDiagnosticLogsLogsIntentEndUserSupport = 0x00,
+    CHIPDiagnosticLogsLogsIntentNetworkDiag = 0x01,
+    CHIPDiagnosticLogsLogsIntentCrashLogs = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDiagnosticLogsLogsStatus) {
+    CHIPDiagnosticLogsLogsStatusSuccess = 0x00,
+    CHIPDiagnosticLogsLogsStatusExhausted = 0x01,
+    CHIPDiagnosticLogsLogsStatusNoLogs = 0x02,
+    CHIPDiagnosticLogsLogsStatusBusy = 0x03,
+    CHIPDiagnosticLogsLogsStatusDenied = 0x04,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDiagnosticLogsLogsTransferProtocol) {
+    CHIPDiagnosticLogsLogsTransferProtocolResponsePayload = 0x00,
+    CHIPDiagnosticLogsLogsTransferProtocolBDX = 0x01,
+};
+
+typedef NS_ENUM(NSInteger, CHIPGeneralDiagnosticsBootReasonType) {
+    CHIPGeneralDiagnosticsBootReasonTypeUnspecified = 0x00,
+    CHIPGeneralDiagnosticsBootReasonTypePowerOnReboot = 0x01,
+    CHIPGeneralDiagnosticsBootReasonTypeBrownOutReset = 0x02,
+    CHIPGeneralDiagnosticsBootReasonTypeSoftwareWatchdogReset = 0x03,
+    CHIPGeneralDiagnosticsBootReasonTypeHardwareWatchdogReset = 0x04,
+    CHIPGeneralDiagnosticsBootReasonTypeSoftwareUpdateCompleted = 0x05,
+    CHIPGeneralDiagnosticsBootReasonTypeSoftwareReset = 0x06,
+};
+
+typedef NS_ENUM(NSInteger, CHIPGeneralDiagnosticsHardwareFaultType) {
+    CHIPGeneralDiagnosticsHardwareFaultTypeUnspecified = 0x00,
+    CHIPGeneralDiagnosticsHardwareFaultTypeRadio = 0x01,
+    CHIPGeneralDiagnosticsHardwareFaultTypeSensor = 0x02,
+    CHIPGeneralDiagnosticsHardwareFaultTypeResettableOverTemp = 0x03,
+    CHIPGeneralDiagnosticsHardwareFaultTypeNonResettableOverTemp = 0x04,
+    CHIPGeneralDiagnosticsHardwareFaultTypePowerSource = 0x05,
+    CHIPGeneralDiagnosticsHardwareFaultTypeVisualDisplayFault = 0x06,
+    CHIPGeneralDiagnosticsHardwareFaultTypeAudioOutputFault = 0x07,
+    CHIPGeneralDiagnosticsHardwareFaultTypeUserInterfaceFault = 0x08,
+    CHIPGeneralDiagnosticsHardwareFaultTypeNonVolatileMemoryError = 0x09,
+    CHIPGeneralDiagnosticsHardwareFaultTypeTamperDetected = 0x0A,
+};
+
+typedef NS_ENUM(NSInteger, CHIPGeneralDiagnosticsInterfaceType) {
+    CHIPGeneralDiagnosticsInterfaceTypeUnspecified = 0x00,
+    CHIPGeneralDiagnosticsInterfaceTypeWiFi = 0x01,
+    CHIPGeneralDiagnosticsInterfaceTypeEthernet = 0x02,
+    CHIPGeneralDiagnosticsInterfaceTypeCellular = 0x03,
+    CHIPGeneralDiagnosticsInterfaceTypeThread = 0x04,
+};
+
+typedef NS_ENUM(NSInteger, CHIPGeneralDiagnosticsNetworkFaultType) {
+    CHIPGeneralDiagnosticsNetworkFaultTypeUnspecified = 0x00,
+    CHIPGeneralDiagnosticsNetworkFaultTypeHardwareFailure = 0x01,
+    CHIPGeneralDiagnosticsNetworkFaultTypeNetworkJammed = 0x02,
+    CHIPGeneralDiagnosticsNetworkFaultTypeConnectionFailed = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPGeneralDiagnosticsRadioFaultType) {
+    CHIPGeneralDiagnosticsRadioFaultTypeUnspecified = 0x00,
+    CHIPGeneralDiagnosticsRadioFaultTypeWiFiFault = 0x01,
+    CHIPGeneralDiagnosticsRadioFaultTypeCellularFault = 0x02,
+    CHIPGeneralDiagnosticsRadioFaultTypeThreadFault = 0x03,
+    CHIPGeneralDiagnosticsRadioFaultTypeNFCFault = 0x04,
+    CHIPGeneralDiagnosticsRadioFaultTypeBLEFault = 0x05,
+    CHIPGeneralDiagnosticsRadioFaultTypeEthernetFault = 0x06,
+};
+
+typedef NS_ENUM(NSInteger, CHIPThreadNetworkDiagnosticsNetworkFault) {
+    CHIPThreadNetworkDiagnosticsNetworkFaultUnspecified = 0x00,
+    CHIPThreadNetworkDiagnosticsNetworkFaultLinkDown = 0x01,
+    CHIPThreadNetworkDiagnosticsNetworkFaultHardwareFailure = 0x02,
+    CHIPThreadNetworkDiagnosticsNetworkFaultNetworkJammed = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPThreadNetworkDiagnosticsRoutingRole) {
+    CHIPThreadNetworkDiagnosticsRoutingRoleUnspecified = 0x00,
+    CHIPThreadNetworkDiagnosticsRoutingRoleUnassigned = 0x01,
+    CHIPThreadNetworkDiagnosticsRoutingRoleSleepyEndDevice = 0x02,
+    CHIPThreadNetworkDiagnosticsRoutingRoleEndDevice = 0x03,
+    CHIPThreadNetworkDiagnosticsRoutingRoleREED = 0x04,
+    CHIPThreadNetworkDiagnosticsRoutingRoleRouter = 0x05,
+    CHIPThreadNetworkDiagnosticsRoutingRoleLeader = 0x06,
+};
+
+typedef NS_ENUM(NSInteger, CHIPThreadNetworkDiagnosticsThreadConnectionStatus) {
+    CHIPThreadNetworkDiagnosticsThreadConnectionStatusConnected = 0x00,
+    CHIPThreadNetworkDiagnosticsThreadConnectionStatusNotConnected = 0x01,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPThreadNetworkDiagnosticsFeature) {
+    CHIPThreadNetworkDiagnosticsFeaturePacketCounts = 0x1,
+    CHIPThreadNetworkDiagnosticsFeatureErrorCounts = 0x2,
+    CHIPThreadNetworkDiagnosticsFeatureMLECounts = 0x4,
+    CHIPThreadNetworkDiagnosticsFeatureMACCounts = 0x8,
+};
+
+typedef NS_ENUM(NSInteger, CHIPWiFiNetworkDiagnosticsAssociationFailureCause) {
+    CHIPWiFiNetworkDiagnosticsAssociationFailureCauseUnknown = 0x00,
+    CHIPWiFiNetworkDiagnosticsAssociationFailureCauseAssociationFailed = 0x01,
+    CHIPWiFiNetworkDiagnosticsAssociationFailureCauseAuthenticationFailed = 0x02,
+    CHIPWiFiNetworkDiagnosticsAssociationFailureCauseSsidNotFound = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPWiFiNetworkDiagnosticsSecurityType) {
+    CHIPWiFiNetworkDiagnosticsSecurityTypeUnspecified = 0x00,
+    CHIPWiFiNetworkDiagnosticsSecurityTypeNone = 0x01,
+    CHIPWiFiNetworkDiagnosticsSecurityTypeWEP = 0x02,
+    CHIPWiFiNetworkDiagnosticsSecurityTypeWPA = 0x03,
+    CHIPWiFiNetworkDiagnosticsSecurityTypeWPA2 = 0x04,
+    CHIPWiFiNetworkDiagnosticsSecurityTypeWPA3 = 0x05,
+};
+
+typedef NS_ENUM(NSInteger, CHIPWiFiNetworkDiagnosticsWiFiConnectionStatus) {
+    CHIPWiFiNetworkDiagnosticsWiFiConnectionStatusConnected = 0x00,
+    CHIPWiFiNetworkDiagnosticsWiFiConnectionStatusNotConnected = 0x01,
+};
+
+typedef NS_ENUM(NSInteger, CHIPWiFiNetworkDiagnosticsWiFiVersionType) {
+    CHIPWiFiNetworkDiagnosticsWiFiVersionType80211a = 0x00,
+    CHIPWiFiNetworkDiagnosticsWiFiVersionType80211b = 0x01,
+    CHIPWiFiNetworkDiagnosticsWiFiVersionType80211g = 0x02,
+    CHIPWiFiNetworkDiagnosticsWiFiVersionType80211n = 0x03,
+    CHIPWiFiNetworkDiagnosticsWiFiVersionType80211ac = 0x04,
+    CHIPWiFiNetworkDiagnosticsWiFiVersionType80211ax = 0x05,
+};
+
+typedef NS_ENUM(NSInteger, CHIPEthernetNetworkDiagnosticsPHYRateType) {
+    CHIPEthernetNetworkDiagnosticsPHYRateType10M = 0x00,
+    CHIPEthernetNetworkDiagnosticsPHYRateType100M = 0x01,
+    CHIPEthernetNetworkDiagnosticsPHYRateType1000M = 0x02,
+    CHIPEthernetNetworkDiagnosticsPHYRateType25G = 0x03,
+    CHIPEthernetNetworkDiagnosticsPHYRateType5G = 0x04,
+    CHIPEthernetNetworkDiagnosticsPHYRateType10G = 0x05,
+    CHIPEthernetNetworkDiagnosticsPHYRateType40G = 0x06,
+    CHIPEthernetNetworkDiagnosticsPHYRateType100G = 0x07,
+    CHIPEthernetNetworkDiagnosticsPHYRateType200G = 0x08,
+    CHIPEthernetNetworkDiagnosticsPHYRateType400G = 0x09,
+};
+
+typedef NS_ENUM(NSInteger, CHIPAdministratorCommissioningCommissioningWindowStatus) {
+    CHIPAdministratorCommissioningCommissioningWindowStatusWindowNotOpen = 0x00,
+    CHIPAdministratorCommissioningCommissioningWindowStatusEnhancedWindowOpen = 0x01,
+    CHIPAdministratorCommissioningCommissioningWindowStatusBasicWindowOpen = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPAdministratorCommissioningStatusCode) {
+    CHIPAdministratorCommissioningStatusCodeBusy = 0x01,
+    CHIPAdministratorCommissioningStatusCodePAKEParameterError = 0x02,
+    CHIPAdministratorCommissioningStatusCodeWindowNotOpen = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPOperationalCredentialsOperationalCertStatus) {
+    CHIPOperationalCredentialsOperationalCertStatusSUCCESS = 0x00,
+    CHIPOperationalCredentialsOperationalCertStatusInvalidPublicKey = 0x01,
+    CHIPOperationalCredentialsOperationalCertStatusInvalidNodeOpId = 0x02,
+    CHIPOperationalCredentialsOperationalCertStatusInvalidNOC = 0x03,
+    CHIPOperationalCredentialsOperationalCertStatusMissingCsr = 0x04,
+    CHIPOperationalCredentialsOperationalCertStatusTableFull = 0x05,
+    CHIPOperationalCredentialsOperationalCertStatusInsufficientPrivilege = 0x08,
+    CHIPOperationalCredentialsOperationalCertStatusFabricConflict = 0x09,
+    CHIPOperationalCredentialsOperationalCertStatusLabelConflict = 0x0A,
+    CHIPOperationalCredentialsOperationalCertStatusInvalidFabricIndex = 0x0B,
+};
+
+typedef NS_ENUM(NSInteger, CHIPGroupKeyManagementGroupKeySecurityPolicy) {
+    CHIPGroupKeyManagementGroupKeySecurityPolicyStandard = 0x00,
+    CHIPGroupKeyManagementGroupKeySecurityPolicyTrustFirst = 0x01,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlAlarmCode) {
+    CHIPDoorLockDlAlarmCodeLockJammed = 0x00,
+    CHIPDoorLockDlAlarmCodeLockFactoryReset = 0x01,
+    CHIPDoorLockDlAlarmCodeLockRadioPowerCycled = 0x03,
+    CHIPDoorLockDlAlarmCodeWrongCodeEntryLimit = 0x04,
+    CHIPDoorLockDlAlarmCodeFrontEsceutcheonRemoved = 0x05,
+    CHIPDoorLockDlAlarmCodeDoorForcedOpen = 0x06,
+    CHIPDoorLockDlAlarmCodeDoorAjar = 0x07,
+    CHIPDoorLockDlAlarmCodeForcedUser = 0x08,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlCredentialRule) {
+    CHIPDoorLockDlCredentialRuleSingle = 0x00,
+    CHIPDoorLockDlCredentialRuleDouble = 0x01,
+    CHIPDoorLockDlCredentialRuleTri = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlCredentialType) {
+    CHIPDoorLockDlCredentialTypeProgrammingPIN = 0x00,
+    CHIPDoorLockDlCredentialTypePIN = 0x01,
+    CHIPDoorLockDlCredentialTypeRFID = 0x02,
+    CHIPDoorLockDlCredentialTypeFingerprint = 0x03,
+    CHIPDoorLockDlCredentialTypeFingerVein = 0x04,
+    CHIPDoorLockDlCredentialTypeFace = 0x05,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlDataOperationType) {
+    CHIPDoorLockDlDataOperationTypeAdd = 0x00,
+    CHIPDoorLockDlDataOperationTypeClear = 0x01,
+    CHIPDoorLockDlDataOperationTypeModify = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlDoorState) {
+    CHIPDoorLockDlDoorStateDoorOpen = 0x00,
+    CHIPDoorLockDlDoorStateDoorClosed = 0x01,
+    CHIPDoorLockDlDoorStateDoorJammed = 0x02,
+    CHIPDoorLockDlDoorStateDoorForcedOpen = 0x03,
+    CHIPDoorLockDlDoorStateDoorUnspecifiedError = 0x04,
+    CHIPDoorLockDlDoorStateDoorAjar = 0x05,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlLockDataType) {
+    CHIPDoorLockDlLockDataTypeUnspecified = 0x00,
+    CHIPDoorLockDlLockDataTypeProgrammingCode = 0x01,
+    CHIPDoorLockDlLockDataTypeUserIndex = 0x02,
+    CHIPDoorLockDlLockDataTypeWeekDaySchedule = 0x03,
+    CHIPDoorLockDlLockDataTypeYearDaySchedule = 0x04,
+    CHIPDoorLockDlLockDataTypeHolidaySchedule = 0x05,
+    CHIPDoorLockDlLockDataTypePIN = 0x06,
+    CHIPDoorLockDlLockDataTypeRFID = 0x07,
+    CHIPDoorLockDlLockDataTypeFingerprint = 0x08,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlLockOperationType) {
+    CHIPDoorLockDlLockOperationTypeLock = 0x00,
+    CHIPDoorLockDlLockOperationTypeUnlock = 0x01,
+    CHIPDoorLockDlLockOperationTypeNonAccessUserEvent = 0x02,
+    CHIPDoorLockDlLockOperationTypeForcedUserEvent = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlLockState) {
+    CHIPDoorLockDlLockStateNotFullyLocked = 0x00,
+    CHIPDoorLockDlLockStateLocked = 0x01,
+    CHIPDoorLockDlLockStateUnlocked = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlLockType) {
+    CHIPDoorLockDlLockTypeDeadBolt = 0x00,
+    CHIPDoorLockDlLockTypeMagnetic = 0x01,
+    CHIPDoorLockDlLockTypeOther = 0x02,
+    CHIPDoorLockDlLockTypeMortise = 0x03,
+    CHIPDoorLockDlLockTypeRim = 0x04,
+    CHIPDoorLockDlLockTypeLatchBolt = 0x05,
+    CHIPDoorLockDlLockTypeCylindricalLock = 0x06,
+    CHIPDoorLockDlLockTypeTubularLock = 0x07,
+    CHIPDoorLockDlLockTypeInterconnectedLock = 0x08,
+    CHIPDoorLockDlLockTypeDeadLatch = 0x09,
+    CHIPDoorLockDlLockTypeDoorFurniture = 0x0A,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlOperatingMode) {
+    CHIPDoorLockDlOperatingModeNormal = 0x00,
+    CHIPDoorLockDlOperatingModeVacation = 0x01,
+    CHIPDoorLockDlOperatingModePrivacy = 0x02,
+    CHIPDoorLockDlOperatingModeNoRemoteLockUnlock = 0x03,
+    CHIPDoorLockDlOperatingModePassage = 0x04,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlOperationError) {
+    CHIPDoorLockDlOperationErrorUnspecified = 0x00,
+    CHIPDoorLockDlOperationErrorInvalidCredential = 0x01,
+    CHIPDoorLockDlOperationErrorDisabledUserDenied = 0x02,
+    CHIPDoorLockDlOperationErrorRestricted = 0x03,
+    CHIPDoorLockDlOperationErrorInsufficientBattery = 0x04,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlOperationSource) {
+    CHIPDoorLockDlOperationSourceUnspecified = 0x00,
+    CHIPDoorLockDlOperationSourceManual = 0x01,
+    CHIPDoorLockDlOperationSourceProprietaryRemote = 0x02,
+    CHIPDoorLockDlOperationSourceKeypad = 0x03,
+    CHIPDoorLockDlOperationSourceAuto = 0x04,
+    CHIPDoorLockDlOperationSourceButton = 0x05,
+    CHIPDoorLockDlOperationSourceSchedule = 0x06,
+    CHIPDoorLockDlOperationSourceRemote = 0x07,
+    CHIPDoorLockDlOperationSourceRFID = 0x08,
+    CHIPDoorLockDlOperationSourceBiometric = 0x09,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlStatus) {
+    CHIPDoorLockDlStatusSuccess = 0x00,
+    CHIPDoorLockDlStatusFailure = 0x01,
+    CHIPDoorLockDlStatusDuplicate = 0x02,
+    CHIPDoorLockDlStatusOccupied = 0x03,
+    CHIPDoorLockDlStatusInvalidField = 0x85,
+    CHIPDoorLockDlStatusNotFound = 0x8B,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlUserStatus) {
+    CHIPDoorLockDlUserStatusAvailable = 0x00,
+    CHIPDoorLockDlUserStatusOccupiedEnabled = 0x01,
+    CHIPDoorLockDlUserStatusOccupiedDisabled = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockDlUserType) {
+    CHIPDoorLockDlUserTypeUnrestrictedUser = 0x00,
+    CHIPDoorLockDlUserTypeYearDayScheduleUser = 0x01,
+    CHIPDoorLockDlUserTypeWeekDayScheduleUser = 0x02,
+    CHIPDoorLockDlUserTypeProgrammingUser = 0x03,
+    CHIPDoorLockDlUserTypeNonAccessUser = 0x04,
+    CHIPDoorLockDlUserTypeForcedUser = 0x05,
+    CHIPDoorLockDlUserTypeDisposableUser = 0x06,
+    CHIPDoorLockDlUserTypeExpiringUser = 0x07,
+    CHIPDoorLockDlUserTypeScheduleRestrictedUser = 0x08,
+    CHIPDoorLockDlUserTypeRemoteOnlyUser = 0x09,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockOperationEventCode) {
+    CHIPDoorLockOperationEventCodeUnknownOrMfgSpecific = 0x00,
+    CHIPDoorLockOperationEventCodeLock = 0x01,
+    CHIPDoorLockOperationEventCodeUnlock = 0x02,
+    CHIPDoorLockOperationEventCodeLockInvalidPinOrId = 0x03,
+    CHIPDoorLockOperationEventCodeLockInvalidSchedule = 0x04,
+    CHIPDoorLockOperationEventCodeUnlockInvalidPinOrId = 0x05,
+    CHIPDoorLockOperationEventCodeUnlockInvalidSchedule = 0x06,
+    CHIPDoorLockOperationEventCodeOneTouchLock = 0x07,
+    CHIPDoorLockOperationEventCodeKeyLock = 0x08,
+    CHIPDoorLockOperationEventCodeKeyUnlock = 0x09,
+    CHIPDoorLockOperationEventCodeAutoLock = 0x0A,
+    CHIPDoorLockOperationEventCodeScheduleLock = 0x0B,
+    CHIPDoorLockOperationEventCodeScheduleUnlock = 0x0C,
+    CHIPDoorLockOperationEventCodeManualLock = 0x0D,
+    CHIPDoorLockOperationEventCodeManualUnlock = 0x0E,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockProgrammingEventCode) {
+    CHIPDoorLockProgrammingEventCodeUnknownOrMfgSpecific = 0x00,
+    CHIPDoorLockProgrammingEventCodeMasterCodeChanged = 0x01,
+    CHIPDoorLockProgrammingEventCodePinAdded = 0x02,
+    CHIPDoorLockProgrammingEventCodePinDeleted = 0x03,
+    CHIPDoorLockProgrammingEventCodePinChanged = 0x04,
+    CHIPDoorLockProgrammingEventCodeIdAdded = 0x05,
+    CHIPDoorLockProgrammingEventCodeIdDeleted = 0x06,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockSetPinOrIdStatus) {
+    CHIPDoorLockSetPinOrIdStatusSuccess = 0x00,
+    CHIPDoorLockSetPinOrIdStatusGeneralFailure = 0x01,
+    CHIPDoorLockSetPinOrIdStatusMemoryFull = 0x02,
+    CHIPDoorLockSetPinOrIdStatusDuplicateCodeError = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockUserStatus) {
+    CHIPDoorLockUserStatusAvailable = 0x00,
+    CHIPDoorLockUserStatusOccupiedEnabled = 0x01,
+    CHIPDoorLockUserStatusOccupiedDisabled = 0x03,
+    CHIPDoorLockUserStatusNotSupported = 0xFF,
+};
+
+typedef NS_ENUM(NSInteger, CHIPDoorLockUserType) {
+    CHIPDoorLockUserTypeUnrestricted = 0x00,
+    CHIPDoorLockUserTypeYearDayScheduleUser = 0x01,
+    CHIPDoorLockUserTypeWeekDayScheduleUser = 0x02,
+    CHIPDoorLockUserTypeMasterUser = 0x03,
+    CHIPDoorLockUserTypeNonAccessUser = 0x04,
+    CHIPDoorLockUserTypeNotSupported = 0xFF,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlAlarmMask) {
+    CHIPDoorLockDlAlarmMaskLockingMechanismJammed = 0x1,
+    CHIPDoorLockDlAlarmMaskLockResetToFactoryDefaults = 0x2,
+    CHIPDoorLockDlAlarmMaskReserved = 0x4,
+    CHIPDoorLockDlAlarmMaskRFModulePowerCycled = 0x8,
+    CHIPDoorLockDlAlarmMaskWrongCodeEntryLimit = 0x10,
+    CHIPDoorLockDlAlarmMaskFrontEscutcheonRemovedFromMain = 0x20,
+    CHIPDoorLockDlAlarmMaskForcedDoorOpenUnderDoorLockedCondition = 0x40,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlCredentialRulesSupport) {
+    CHIPDoorLockDlCredentialRulesSupportSingle = 0x1,
+    CHIPDoorLockDlCredentialRulesSupportDual = 0x2,
+    CHIPDoorLockDlCredentialRulesSupportTri = 0x4,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlDaysMaskMap) {
+    CHIPDoorLockDlDaysMaskMapSunday = 0x1,
+    CHIPDoorLockDlDaysMaskMapMonday = 0x2,
+    CHIPDoorLockDlDaysMaskMapTuesday = 0x4,
+    CHIPDoorLockDlDaysMaskMapWednesday = 0x8,
+    CHIPDoorLockDlDaysMaskMapThursday = 0x10,
+    CHIPDoorLockDlDaysMaskMapFriday = 0x20,
+    CHIPDoorLockDlDaysMaskMapSaturday = 0x40,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlDefaultConfigurationRegister) {
+    CHIPDoorLockDlDefaultConfigurationRegisterEnableLocalProgrammingEnabled = 0x1,
+    CHIPDoorLockDlDefaultConfigurationRegisterKeypadInterfaceDefaultAccessEnabled = 0x2,
+    CHIPDoorLockDlDefaultConfigurationRegisterRemoteInterfaceDefaultAccessIsEnabled = 0x4,
+    CHIPDoorLockDlDefaultConfigurationRegisterSoundEnabled = 0x20,
+    CHIPDoorLockDlDefaultConfigurationRegisterAutoRelockTimeSet = 0x40,
+    CHIPDoorLockDlDefaultConfigurationRegisterLEDSettingsSet = 0x80,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlKeypadOperationEventMask) {
+    CHIPDoorLockDlKeypadOperationEventMaskUnknown = 0x1,
+    CHIPDoorLockDlKeypadOperationEventMaskLock = 0x2,
+    CHIPDoorLockDlKeypadOperationEventMaskUnlock = 0x4,
+    CHIPDoorLockDlKeypadOperationEventMaskLockInvalidPIN = 0x8,
+    CHIPDoorLockDlKeypadOperationEventMaskLockInvalidSchedule = 0x10,
+    CHIPDoorLockDlKeypadOperationEventMaskUnlockInvalidCode = 0x20,
+    CHIPDoorLockDlKeypadOperationEventMaskUnlockInvalidSchedule = 0x40,
+    CHIPDoorLockDlKeypadOperationEventMaskNonAccessUserOpEvent = 0x80,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlKeypadProgrammingEventMask) {
+    CHIPDoorLockDlKeypadProgrammingEventMaskUnknown = 0x1,
+    CHIPDoorLockDlKeypadProgrammingEventMaskProgrammingPINChanged = 0x2,
+    CHIPDoorLockDlKeypadProgrammingEventMaskPINAdded = 0x4,
+    CHIPDoorLockDlKeypadProgrammingEventMaskPINCleared = 0x8,
+    CHIPDoorLockDlKeypadProgrammingEventMaskPINChanged = 0x10,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlLocalProgrammingFeatures) {
+    CHIPDoorLockDlLocalProgrammingFeaturesAddUsersCredentialsSchedulesLocally = 0x1,
+    CHIPDoorLockDlLocalProgrammingFeaturesModifyUsersCredentialsSchedulesLocally = 0x2,
+    CHIPDoorLockDlLocalProgrammingFeaturesClearUsersCredentialsSchedulesLocally = 0x4,
+    CHIPDoorLockDlLocalProgrammingFeaturesAdjustLockSettingsLocally = 0x8,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlManualOperationEventMask) {
+    CHIPDoorLockDlManualOperationEventMaskUnknown = 0x1,
+    CHIPDoorLockDlManualOperationEventMaskThumbturnLock = 0x2,
+    CHIPDoorLockDlManualOperationEventMaskThumbturnUnlock = 0x4,
+    CHIPDoorLockDlManualOperationEventMaskOneTouchLock = 0x8,
+    CHIPDoorLockDlManualOperationEventMaskKeyLock = 0x10,
+    CHIPDoorLockDlManualOperationEventMaskKeyUnlock = 0x20,
+    CHIPDoorLockDlManualOperationEventMaskAutoLock = 0x40,
+    CHIPDoorLockDlManualOperationEventMaskScheduleLock = 0x80,
+    CHIPDoorLockDlManualOperationEventMaskScheduleUnlock = 0x100,
+    CHIPDoorLockDlManualOperationEventMaskManualLock = 0x200,
+    CHIPDoorLockDlManualOperationEventMaskManualUnlock = 0x400,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlRFIDOperationEventMask) {
+    CHIPDoorLockDlRFIDOperationEventMaskUnknown = 0x1,
+    CHIPDoorLockDlRFIDOperationEventMaskLock = 0x2,
+    CHIPDoorLockDlRFIDOperationEventMaskUnlock = 0x4,
+    CHIPDoorLockDlRFIDOperationEventMaskLockInvalidRFID = 0x8,
+    CHIPDoorLockDlRFIDOperationEventMaskLockInvalidSchedule = 0x10,
+    CHIPDoorLockDlRFIDOperationEventMaskUnlockInvalidRFID = 0x20,
+    CHIPDoorLockDlRFIDOperationEventMaskUnlockInvalidSchedule = 0x40,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlRFIDProgrammingEventMask) {
+    CHIPDoorLockDlRFIDProgrammingEventMaskUnknown = 0x1,
+    CHIPDoorLockDlRFIDProgrammingEventMaskRFIDCodeAdded = 0x20,
+    CHIPDoorLockDlRFIDProgrammingEventMaskRFIDCodeCleared = 0x40,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlRemoteOperationEventMask) {
+    CHIPDoorLockDlRemoteOperationEventMaskUnknown = 0x1,
+    CHIPDoorLockDlRemoteOperationEventMaskLock = 0x2,
+    CHIPDoorLockDlRemoteOperationEventMaskUnlock = 0x4,
+    CHIPDoorLockDlRemoteOperationEventMaskLockInvalidCode = 0x8,
+    CHIPDoorLockDlRemoteOperationEventMaskLockInvalidSchedule = 0x10,
+    CHIPDoorLockDlRemoteOperationEventMaskUnlockInvalidCode = 0x20,
+    CHIPDoorLockDlRemoteOperationEventMaskUnlockInvalidSchedule = 0x40,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlRemoteProgrammingEventMask) {
+    CHIPDoorLockDlRemoteProgrammingEventMaskUnknown = 0x1,
+    CHIPDoorLockDlRemoteProgrammingEventMaskProgrammingPINChanged = 0x2,
+    CHIPDoorLockDlRemoteProgrammingEventMaskPINAdded = 0x4,
+    CHIPDoorLockDlRemoteProgrammingEventMaskPINCleared = 0x8,
+    CHIPDoorLockDlRemoteProgrammingEventMaskPINChanged = 0x10,
+    CHIPDoorLockDlRemoteProgrammingEventMaskRFIDCodeAdded = 0x20,
+    CHIPDoorLockDlRemoteProgrammingEventMaskRFIDCodeCleared = 0x40,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDlSupportedOperatingModes) {
+    CHIPDoorLockDlSupportedOperatingModesNormal = 0x1,
+    CHIPDoorLockDlSupportedOperatingModesVacation = 0x2,
+    CHIPDoorLockDlSupportedOperatingModesPrivacy = 0x4,
+    CHIPDoorLockDlSupportedOperatingModesNoRemoteLockUnlock = 0x8,
+    CHIPDoorLockDlSupportedOperatingModesPassage = 0x10,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockDayOfWeek) {
+    CHIPDoorLockDayOfWeekSunday = 0x1,
+    CHIPDoorLockDayOfWeekMonday = 0x2,
+    CHIPDoorLockDayOfWeekTuesday = 0x4,
+    CHIPDoorLockDayOfWeekWednesday = 0x8,
+    CHIPDoorLockDayOfWeekThursday = 0x10,
+    CHIPDoorLockDayOfWeekFriday = 0x20,
+    CHIPDoorLockDayOfWeekSaturday = 0x40,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPDoorLockFeature) {
+    CHIPDoorLockFeaturePINCredentials = 0x1,
+    CHIPDoorLockFeatureRFIDCredentials = 0x2,
+    CHIPDoorLockFeatureFingerCredentials = 0x4,
+    CHIPDoorLockFeatureLogging = 0x8,
+    CHIPDoorLockFeatureAccessSchedules = 0x10,
+    CHIPDoorLockFeatureDoorPositionSensor = 0x20,
+    CHIPDoorLockFeatureFaceCredentials = 0x40,
+    CHIPDoorLockFeatureCredentialsOTA = 0x80,
+    CHIPDoorLockFeatureUsersManagement = 0x100,
+    CHIPDoorLockFeatureNotifications = 0x200,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPWindowCoveringWcConfigStatus) {
+    CHIPWindowCoveringWcConfigStatusOperational = 0x1,
+    CHIPWindowCoveringWcConfigStatusOnline = 0x2,
+    CHIPWindowCoveringWcConfigStatusOpenAndUpCommandsReversed = 0x4,
+    CHIPWindowCoveringWcConfigStatusLiftPositionAware = 0x8,
+    CHIPWindowCoveringWcConfigStatusTiltPositionAware = 0x10,
+    CHIPWindowCoveringWcConfigStatusLiftEncoderControlled = 0x20,
+    CHIPWindowCoveringWcConfigStatusTiltEncoderControlled = 0x40,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPWindowCoveringWcFeature) {
+    CHIPWindowCoveringWcFeatureLift = 0x1,
+    CHIPWindowCoveringWcFeatureTilt = 0x2,
+    CHIPWindowCoveringWcFeaturePositionAwareLift = 0x4,
+    CHIPWindowCoveringWcFeatureAbsolutePosition = 0x8,
+    CHIPWindowCoveringWcFeaturePositionAwareTilt = 0x10,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPWindowCoveringWcMode) {
+    CHIPWindowCoveringWcModeMotorDirectionReversed = 0x1,
+    CHIPWindowCoveringWcModeCalibrationMode = 0x2,
+    CHIPWindowCoveringWcModeMaintenanceMode = 0x4,
+    CHIPWindowCoveringWcModeLEDFeedback = 0x8,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPWindowCoveringWcOperationalStatus) {
+    CHIPWindowCoveringWcOperationalStatusGlobal = 0x3,
+    CHIPWindowCoveringWcOperationalStatusLift = 0xC,
+    CHIPWindowCoveringWcOperationalStatusTilt = 0x30,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPWindowCoveringWcSafetyStatus) {
+    CHIPWindowCoveringWcSafetyStatusRemoteLockout = 0x1,
+    CHIPWindowCoveringWcSafetyStatusTamperDetection = 0x2,
+    CHIPWindowCoveringWcSafetyStatusFailedCommunication = 0x4,
+    CHIPWindowCoveringWcSafetyStatusPositionFailure = 0x8,
+    CHIPWindowCoveringWcSafetyStatusThermalProtection = 0x10,
+    CHIPWindowCoveringWcSafetyStatusObstacleDetected = 0x20,
+    CHIPWindowCoveringWcSafetyStatusPower = 0x40,
+    CHIPWindowCoveringWcSafetyStatusStopInput = 0x80,
+    CHIPWindowCoveringWcSafetyStatusMotorJammed = 0x100,
+    CHIPWindowCoveringWcSafetyStatusHardwareFailure = 0x200,
+    CHIPWindowCoveringWcSafetyStatusManualOperation = 0x400,
+    CHIPWindowCoveringWcSafetyStatusProtection = 0x800,
+};
+
+typedef NS_ENUM(NSInteger, CHIPPumpConfigurationAndControlPumpControlMode) {
+    CHIPPumpConfigurationAndControlPumpControlModeConstantSpeed = 0x00,
+    CHIPPumpConfigurationAndControlPumpControlModeConstantPressure = 0x01,
+    CHIPPumpConfigurationAndControlPumpControlModeProportionalPressure = 0x02,
+    CHIPPumpConfigurationAndControlPumpControlModeConstantFlow = 0x03,
+    CHIPPumpConfigurationAndControlPumpControlModeConstantTemperature = 0x05,
+    CHIPPumpConfigurationAndControlPumpControlModeAutomatic = 0x07,
+};
+
+typedef NS_ENUM(NSInteger, CHIPPumpConfigurationAndControlPumpOperationMode) {
+    CHIPPumpConfigurationAndControlPumpOperationModeNormal = 0x00,
+    CHIPPumpConfigurationAndControlPumpOperationModeMinimum = 0x01,
+    CHIPPumpConfigurationAndControlPumpOperationModeMaximum = 0x02,
+    CHIPPumpConfigurationAndControlPumpOperationModeLocal = 0x03,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPPumpConfigurationAndControlPumpStatus) {
+    CHIPPumpConfigurationAndControlPumpStatusDeviceFault = 0x1,
+    CHIPPumpConfigurationAndControlPumpStatusSupplyfault = 0x2,
+    CHIPPumpConfigurationAndControlPumpStatusSpeedLow = 0x4,
+    CHIPPumpConfigurationAndControlPumpStatusSpeedHigh = 0x8,
+    CHIPPumpConfigurationAndControlPumpStatusLocalOverride = 0x10,
+    CHIPPumpConfigurationAndControlPumpStatusRunning = 0x20,
+    CHIPPumpConfigurationAndControlPumpStatusRemotePressure = 0x40,
+    CHIPPumpConfigurationAndControlPumpStatusRemoteFlow = 0x80,
+    CHIPPumpConfigurationAndControlPumpStatusRemoteTemperature = 0x100,
+};
+
+typedef NS_ENUM(NSInteger, CHIPThermostatSetpointAdjustMode) {
+    CHIPThermostatSetpointAdjustModeHeatSetpoint = 0x00,
+    CHIPThermostatSetpointAdjustModeCoolSetpoint = 0x01,
+    CHIPThermostatSetpointAdjustModeHeatAndCoolSetpoints = 0x02,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPThermostatDayOfWeek) {
+    CHIPThermostatDayOfWeekSunday = 0x1,
+    CHIPThermostatDayOfWeekMonday = 0x2,
+    CHIPThermostatDayOfWeekTuesday = 0x4,
+    CHIPThermostatDayOfWeekWednesday = 0x8,
+    CHIPThermostatDayOfWeekThursday = 0x10,
+    CHIPThermostatDayOfWeekFriday = 0x20,
+    CHIPThermostatDayOfWeekSaturday = 0x40,
+    CHIPThermostatDayOfWeekAwayOrVacation = 0x80,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPThermostatModeForSequence) {
+    CHIPThermostatModeForSequenceHeatSetpointFieldPresent = 0x1,
+    CHIPThermostatModeForSequenceCoolSetpointFieldPresent = 0x2,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPThermostatFeature) {
+    CHIPThermostatFeatureHeating = 0x1,
+    CHIPThermostatFeatureCooling = 0x2,
+    CHIPThermostatFeatureOccupancy = 0x4,
+    CHIPThermostatFeatureSchedule = 0x8,
+    CHIPThermostatFeatureSetback = 0x10,
+    CHIPThermostatFeatureAutomode = 0x20,
+};
+
+typedef NS_ENUM(NSInteger, CHIPColorControlColorLoopAction) {
+    CHIPColorControlColorLoopActionDeactivate = 0x00,
+    CHIPColorControlColorLoopActionActivateFromColorLoopStartEnhancedHue = 0x01,
+    CHIPColorControlColorLoopActionActivateFromEnhancedCurrentHue = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPColorControlColorLoopDirection) {
+    CHIPColorControlColorLoopDirectionDecrementHue = 0x00,
+    CHIPColorControlColorLoopDirectionIncrementHue = 0x01,
+};
+
+typedef NS_ENUM(NSInteger, CHIPColorControlColorMode) {
+    CHIPColorControlColorModeCurrentHueAndCurrentSaturation = 0x00,
+    CHIPColorControlColorModeCurrentXAndCurrentY = 0x01,
+    CHIPColorControlColorModeColorTemperature = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPColorControlHueDirection) {
+    CHIPColorControlHueDirectionShortestDistance = 0x00,
+    CHIPColorControlHueDirectionLongestDistance = 0x01,
+    CHIPColorControlHueDirectionUp = 0x02,
+    CHIPColorControlHueDirectionDown = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPColorControlHueMoveMode) {
+    CHIPColorControlHueMoveModeStop = 0x00,
+    CHIPColorControlHueMoveModeUp = 0x01,
+    CHIPColorControlHueMoveModeDown = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPColorControlHueStepMode) {
+    CHIPColorControlHueStepModeUp = 0x01,
+    CHIPColorControlHueStepModeDown = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPColorControlSaturationMoveMode) {
+    CHIPColorControlSaturationMoveModeStop = 0x00,
+    CHIPColorControlSaturationMoveModeUp = 0x01,
+    CHIPColorControlSaturationMoveModeDown = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPColorControlSaturationStepMode) {
+    CHIPColorControlSaturationStepModeUp = 0x01,
+    CHIPColorControlSaturationStepModeDown = 0x03,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPColorControlColorCapabilities) {
+    CHIPColorControlColorCapabilitiesHueSaturationSupported = 0x1,
+    CHIPColorControlColorCapabilitiesEnhancedHueSupported = 0x2,
+    CHIPColorControlColorCapabilitiesColorLoopSupported = 0x4,
+    CHIPColorControlColorCapabilitiesXYAttributesSupported = 0x8,
+    CHIPColorControlColorCapabilitiesColorTemperatureSupported = 0x10,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPColorControlColorLoopUpdateFlags) {
+    CHIPColorControlColorLoopUpdateFlagsUpdateAction = 0x1,
+    CHIPColorControlColorLoopUpdateFlagsUpdateDirection = 0x2,
+    CHIPColorControlColorLoopUpdateFlagsUpdateTime = 0x4,
+    CHIPColorControlColorLoopUpdateFlagsUpdateStartHue = 0x8,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIlluminanceMeasurementLightSensorType) {
+    CHIPIlluminanceMeasurementLightSensorTypePhotodiode = 0x00,
+    CHIPIlluminanceMeasurementLightSensorTypeCMOS = 0x01,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPPressureMeasurementPressureFeature) {
+    CHIPPressureMeasurementPressureFeatureEXT = 0x1,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIasZoneIasEnrollResponseCode) {
+    CHIPIasZoneIasEnrollResponseCodeSuccess = 0x00,
+    CHIPIasZoneIasEnrollResponseCodeNotSupported = 0x01,
+    CHIPIasZoneIasEnrollResponseCodeNoEnrollPermit = 0x02,
+    CHIPIasZoneIasEnrollResponseCodeTooManyZones = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIasZoneType) {
+    CHIPIasZoneTypeStandardCie = 0x00,
+    CHIPIasZoneTypeMotionSensor = 0x0D,
+    CHIPIasZoneTypeContactSwitch = 0x15,
+    CHIPIasZoneTypeFireSensor = 0x28,
+    CHIPIasZoneTypeWaterSensor = 0x2A,
+    CHIPIasZoneTypeGasSensor = 0x2B,
+    CHIPIasZoneTypePersonalEmergencyDevice = 0x2C,
+    CHIPIasZoneTypeVibrationMovementSensor = 0x2D,
+    CHIPIasZoneTypeRemoteControl = 0x10F,
+    CHIPIasZoneTypeKeyFob = 0x115,
+    CHIPIasZoneTypeKeypad = 0x21D,
+    CHIPIasZoneTypeStandardWarningDevice = 0x225,
+    CHIPIasZoneTypeGlassBreakSensor = 0x226,
+    CHIPIasZoneTypeCarbonMonoxideSensor = 0x227,
+    CHIPIasZoneTypeSecurityRepeater = 0x229,
+    CHIPIasZoneTypeInvalidZoneType = 0xFFFF,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPIasZoneStatus) {
+    CHIPIasZoneStatusAlarm1 = 0x1,
+    CHIPIasZoneStatusAlarm2 = 0x2,
+    CHIPIasZoneStatusTamper = 0x4,
+    CHIPIasZoneStatusBattery = 0x8,
+    CHIPIasZoneStatusSupervisionReports = 0x10,
+    CHIPIasZoneStatusRestoreReports = 0x20,
+    CHIPIasZoneStatusTrouble = 0x40,
+    CHIPIasZoneStatusAC = 0x80,
+    CHIPIasZoneStatusTest = 0x100,
+    CHIPIasZoneStatusBatteryDefect = 0x200,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIasAceAlarmStatus) {
+    CHIPIasAceAlarmStatusNoAlarm = 0x00,
+    CHIPIasAceAlarmStatusBurglar = 0x01,
+    CHIPIasAceAlarmStatusFire = 0x02,
+    CHIPIasAceAlarmStatusEmergency = 0x03,
+    CHIPIasAceAlarmStatusPolicePanic = 0x04,
+    CHIPIasAceAlarmStatusFirePanic = 0x05,
+    CHIPIasAceAlarmStatusEmergencyPanic = 0x06,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIasAceArmMode) {
+    CHIPIasAceArmModeDisarm = 0x00,
+    CHIPIasAceArmModeArmDayHomeZonesOnly = 0x01,
+    CHIPIasAceArmModeArmNightSleepZonesOnly = 0x02,
+    CHIPIasAceArmModeArmAllZones = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIasAceArmNotification) {
+    CHIPIasAceArmNotificationAllZonesDisarmed = 0x00,
+    CHIPIasAceArmNotificationOnlyDayHomeZonesArmed = 0x01,
+    CHIPIasAceArmNotificationOnlyNightSleepZonesArmed = 0x02,
+    CHIPIasAceArmNotificationAllZonesArmed = 0x03,
+    CHIPIasAceArmNotificationInvalidArmDisarmCode = 0x04,
+    CHIPIasAceArmNotificationNotReadyToArm = 0x05,
+    CHIPIasAceArmNotificationAlreadyDisarmed = 0x06,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIasAceAudibleNotification) {
+    CHIPIasAceAudibleNotificationMute = 0x00,
+    CHIPIasAceAudibleNotificationDefaultSound = 0x01,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIasAceBypassResult) {
+    CHIPIasAceBypassResultZoneBypassed = 0x00,
+    CHIPIasAceBypassResultZoneNotBypassed = 0x01,
+    CHIPIasAceBypassResultNotAllowed = 0x02,
+    CHIPIasAceBypassResultInvalidZoneId = 0x03,
+    CHIPIasAceBypassResultUnknownZoneId = 0x04,
+    CHIPIasAceBypassResultInvalidArmDisarmCode = 0x05,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIasAcePanelStatus) {
+    CHIPIasAcePanelStatusPanelDisarmed = 0x00,
+    CHIPIasAcePanelStatusArmedStay = 0x01,
+    CHIPIasAcePanelStatusArmedNight = 0x02,
+    CHIPIasAcePanelStatusArmedAway = 0x03,
+    CHIPIasAcePanelStatusExitDelay = 0x04,
+    CHIPIasAcePanelStatusEntryDelay = 0x05,
+    CHIPIasAcePanelStatusNotReadyToArm = 0x06,
+    CHIPIasAcePanelStatusInAlarm = 0x07,
+    CHIPIasAcePanelStatusArmingStay = 0x08,
+    CHIPIasAcePanelStatusArmingNight = 0x09,
+    CHIPIasAcePanelStatusArmingAway = 0x0A,
+};
+
+typedef NS_ENUM(NSInteger, CHIPIasAceIasZoneType) {
+    CHIPIasAceIasZoneTypeStandardCie = 0x00,
+    CHIPIasAceIasZoneTypeMotionSensor = 0x0D,
+    CHIPIasAceIasZoneTypeContactSwitch = 0x15,
+    CHIPIasAceIasZoneTypeFireSensor = 0x28,
+    CHIPIasAceIasZoneTypeWaterSensor = 0x2A,
+    CHIPIasAceIasZoneTypeGasSensor = 0x2B,
+    CHIPIasAceIasZoneTypePersonalEmergencyDevice = 0x2C,
+    CHIPIasAceIasZoneTypeVibrationMovementSensor = 0x2D,
+    CHIPIasAceIasZoneTypeRemoteControl = 0x10F,
+    CHIPIasAceIasZoneTypeKeyFob = 0x115,
+    CHIPIasAceIasZoneTypeKeypad = 0x21D,
+    CHIPIasAceIasZoneTypeStandardWarningDevice = 0x225,
+    CHIPIasAceIasZoneTypeGlassBreakSensor = 0x226,
+    CHIPIasAceIasZoneTypeCarbonMonoxideSensor = 0x227,
+    CHIPIasAceIasZoneTypeSecurityRepeater = 0x229,
+    CHIPIasAceIasZoneTypeInvalidZoneType = 0xFFFF,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPIasAceIasZoneStatus) {
+    CHIPIasAceIasZoneStatusAlarm1 = 0x1,
+    CHIPIasAceIasZoneStatusAlarm2 = 0x2,
+    CHIPIasAceIasZoneStatusTamper = 0x4,
+    CHIPIasAceIasZoneStatusBattery = 0x8,
+    CHIPIasAceIasZoneStatusSupervisionReports = 0x10,
+    CHIPIasAceIasZoneStatusRestoreReports = 0x20,
+    CHIPIasAceIasZoneStatusTrouble = 0x40,
+    CHIPIasAceIasZoneStatusAC = 0x80,
+    CHIPIasAceIasZoneStatusTest = 0x100,
+    CHIPIasAceIasZoneStatusBatteryDefect = 0x200,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPIasWdSquawkInfo) {
+    CHIPIasWdSquawkInfoMode = 0xF0,
+    CHIPIasWdSquawkInfoStrobe = 0x8,
+    CHIPIasWdSquawkInfoLevel = 0x3,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPIasWdWarningInfo) {
+    CHIPIasWdWarningInfoMode = 0xF0,
+    CHIPIasWdWarningInfoStrobe = 0xC,
+    CHIPIasWdWarningInfoSirenLevel = 0x3,
+};
+
+typedef NS_ENUM(NSInteger, CHIPChannelLineupInfoType) {
+    CHIPChannelLineupInfoTypeMso = 0x00,
+};
+
+typedef NS_ENUM(NSInteger, CHIPChannelStatus) {
+    CHIPChannelStatusSuccess = 0x00,
+    CHIPChannelStatusMultipleMatches = 0x01,
+    CHIPChannelStatusNoMatches = 0x02,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPChannelFeature) {
+    CHIPChannelFeatureChannelList = 0x1,
+    CHIPChannelFeatureLineupInfo = 0x2,
+};
+
+typedef NS_ENUM(NSInteger, CHIPTargetNavigatorStatus) {
+    CHIPTargetNavigatorStatusSuccess = 0x00,
+    CHIPTargetNavigatorStatusTargetNotFound = 0x01,
+    CHIPTargetNavigatorStatusNotAllowed = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPMediaPlaybackPlaybackState) {
+    CHIPMediaPlaybackPlaybackStatePlaying = 0x00,
+    CHIPMediaPlaybackPlaybackStatePaused = 0x01,
+    CHIPMediaPlaybackPlaybackStateNotPlaying = 0x02,
+    CHIPMediaPlaybackPlaybackStateBuffering = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPMediaPlaybackStatus) {
+    CHIPMediaPlaybackStatusSuccess = 0x00,
+    CHIPMediaPlaybackStatusInvalidStateForCommand = 0x01,
+    CHIPMediaPlaybackStatusNotAllowed = 0x02,
+    CHIPMediaPlaybackStatusNotActive = 0x03,
+    CHIPMediaPlaybackStatusSpeedOutOfRange = 0x04,
+    CHIPMediaPlaybackStatusSeekOutOfRange = 0x05,
+};
+
+typedef NS_ENUM(NSInteger, CHIPMediaInputInputType) {
+    CHIPMediaInputInputTypeInternal = 0x00,
+    CHIPMediaInputInputTypeAux = 0x01,
+    CHIPMediaInputInputTypeCoax = 0x02,
+    CHIPMediaInputInputTypeComposite = 0x03,
+    CHIPMediaInputInputTypeHdmi = 0x04,
+    CHIPMediaInputInputTypeInput = 0x05,
+    CHIPMediaInputInputTypeLine = 0x06,
+    CHIPMediaInputInputTypeOptical = 0x07,
+    CHIPMediaInputInputTypeVideo = 0x08,
+    CHIPMediaInputInputTypeScart = 0x09,
+    CHIPMediaInputInputTypeUsb = 0x0A,
+    CHIPMediaInputInputTypeOther = 0x0B,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPMediaInputFeature) {
+    CHIPMediaInputFeatureNameUpdates = 0x1,
+};
+
+typedef NS_ENUM(NSInteger, CHIPKeypadInputCecKeyCode) {
+    CHIPKeypadInputCecKeyCodeSelect = 0x00,
+    CHIPKeypadInputCecKeyCodeUp = 0x01,
+    CHIPKeypadInputCecKeyCodeDown = 0x02,
+    CHIPKeypadInputCecKeyCodeLeft = 0x03,
+    CHIPKeypadInputCecKeyCodeRight = 0x04,
+    CHIPKeypadInputCecKeyCodeRightUp = 0x05,
+    CHIPKeypadInputCecKeyCodeRightDown = 0x06,
+    CHIPKeypadInputCecKeyCodeLeftUp = 0x07,
+    CHIPKeypadInputCecKeyCodeLeftDown = 0x08,
+    CHIPKeypadInputCecKeyCodeRootMenu = 0x09,
+    CHIPKeypadInputCecKeyCodeSetupMenu = 0x0A,
+    CHIPKeypadInputCecKeyCodeContentsMenu = 0x0B,
+    CHIPKeypadInputCecKeyCodeFavoriteMenu = 0x0C,
+    CHIPKeypadInputCecKeyCodeExit = 0x0D,
+    CHIPKeypadInputCecKeyCodeMediaTopMenu = 0x10,
+    CHIPKeypadInputCecKeyCodeMediaContextSensitiveMenu = 0x11,
+    CHIPKeypadInputCecKeyCodeNumberEntryMode = 0x1D,
+    CHIPKeypadInputCecKeyCodeNumber11 = 0x1E,
+    CHIPKeypadInputCecKeyCodeNumber12 = 0x1F,
+    CHIPKeypadInputCecKeyCodeNumber0OrNumber10 = 0x20,
+    CHIPKeypadInputCecKeyCodeNumbers1 = 0x21,
+    CHIPKeypadInputCecKeyCodeNumbers2 = 0x22,
+    CHIPKeypadInputCecKeyCodeNumbers3 = 0x23,
+    CHIPKeypadInputCecKeyCodeNumbers4 = 0x24,
+    CHIPKeypadInputCecKeyCodeNumbers5 = 0x25,
+    CHIPKeypadInputCecKeyCodeNumbers6 = 0x26,
+    CHIPKeypadInputCecKeyCodeNumbers7 = 0x27,
+    CHIPKeypadInputCecKeyCodeNumbers8 = 0x28,
+    CHIPKeypadInputCecKeyCodeNumbers9 = 0x29,
+    CHIPKeypadInputCecKeyCodeDot = 0x2A,
+    CHIPKeypadInputCecKeyCodeEnter = 0x2B,
+    CHIPKeypadInputCecKeyCodeClear = 0x2C,
+    CHIPKeypadInputCecKeyCodeNextFavorite = 0x2F,
+    CHIPKeypadInputCecKeyCodeChannelUp = 0x30,
+    CHIPKeypadInputCecKeyCodeChannelDown = 0x31,
+    CHIPKeypadInputCecKeyCodePreviousChannel = 0x32,
+    CHIPKeypadInputCecKeyCodeSoundSelect = 0x33,
+    CHIPKeypadInputCecKeyCodeInputSelect = 0x34,
+    CHIPKeypadInputCecKeyCodeDisplayInformation = 0x35,
+    CHIPKeypadInputCecKeyCodeHelp = 0x36,
+    CHIPKeypadInputCecKeyCodePageUp = 0x37,
+    CHIPKeypadInputCecKeyCodePageDown = 0x38,
+    CHIPKeypadInputCecKeyCodePower = 0x40,
+    CHIPKeypadInputCecKeyCodeVolumeUp = 0x41,
+    CHIPKeypadInputCecKeyCodeVolumeDown = 0x42,
+    CHIPKeypadInputCecKeyCodeMute = 0x43,
+    CHIPKeypadInputCecKeyCodePlay = 0x44,
+    CHIPKeypadInputCecKeyCodeStop = 0x45,
+    CHIPKeypadInputCecKeyCodePause = 0x46,
+    CHIPKeypadInputCecKeyCodeRecord = 0x47,
+    CHIPKeypadInputCecKeyCodeRewind = 0x48,
+    CHIPKeypadInputCecKeyCodeFastForward = 0x49,
+    CHIPKeypadInputCecKeyCodeEject = 0x4A,
+    CHIPKeypadInputCecKeyCodeForward = 0x4B,
+    CHIPKeypadInputCecKeyCodeBackward = 0x4C,
+    CHIPKeypadInputCecKeyCodeStopRecord = 0x4D,
+    CHIPKeypadInputCecKeyCodePauseRecord = 0x4E,
+    CHIPKeypadInputCecKeyCodeReserved = 0x4F,
+    CHIPKeypadInputCecKeyCodeAngle = 0x50,
+    CHIPKeypadInputCecKeyCodeSubPicture = 0x51,
+    CHIPKeypadInputCecKeyCodeVideoOnDemand = 0x52,
+    CHIPKeypadInputCecKeyCodeElectronicProgramGuide = 0x53,
+    CHIPKeypadInputCecKeyCodeTimerProgramming = 0x54,
+    CHIPKeypadInputCecKeyCodeInitialConfiguration = 0x55,
+    CHIPKeypadInputCecKeyCodeSelectBroadcastType = 0x56,
+    CHIPKeypadInputCecKeyCodeSelectSoundPresentation = 0x57,
+    CHIPKeypadInputCecKeyCodePlayFunction = 0x60,
+    CHIPKeypadInputCecKeyCodePausePlayFunction = 0x61,
+    CHIPKeypadInputCecKeyCodeRecordFunction = 0x62,
+    CHIPKeypadInputCecKeyCodePauseRecordFunction = 0x63,
+    CHIPKeypadInputCecKeyCodeStopFunction = 0x64,
+    CHIPKeypadInputCecKeyCodeMuteFunction = 0x65,
+    CHIPKeypadInputCecKeyCodeRestoreVolumeFunction = 0x66,
+    CHIPKeypadInputCecKeyCodeTuneFunction = 0x67,
+    CHIPKeypadInputCecKeyCodeSelectMediaFunction = 0x68,
+    CHIPKeypadInputCecKeyCodeSelectAvInputFunction = 0x69,
+    CHIPKeypadInputCecKeyCodeSelectAudioInputFunction = 0x6A,
+    CHIPKeypadInputCecKeyCodePowerToggleFunction = 0x6B,
+    CHIPKeypadInputCecKeyCodePowerOffFunction = 0x6C,
+    CHIPKeypadInputCecKeyCodePowerOnFunction = 0x6D,
+    CHIPKeypadInputCecKeyCodeF1Blue = 0x71,
+    CHIPKeypadInputCecKeyCodeF2Red = 0x72,
+    CHIPKeypadInputCecKeyCodeF3Green = 0x73,
+    CHIPKeypadInputCecKeyCodeF4Yellow = 0x74,
+    CHIPKeypadInputCecKeyCodeF5 = 0x75,
+    CHIPKeypadInputCecKeyCodeData = 0x76,
+};
+
+typedef NS_ENUM(NSInteger, CHIPKeypadInputStatus) {
+    CHIPKeypadInputStatusSuccess = 0x00,
+    CHIPKeypadInputStatusUnsupportedKey = 0x01,
+    CHIPKeypadInputStatusInvalidKeyInCurrentState = 0x02,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPKeypadInputFeature) {
+    CHIPKeypadInputFeatureNavigationKeyCodes = 0x1,
+    CHIPKeypadInputFeatureLocationKeys = 0x2,
+    CHIPKeypadInputFeatureNumberKeys = 0x4,
+};
+
+typedef NS_ENUM(NSInteger, CHIPContentLauncherMetricType) {
+    CHIPContentLauncherMetricTypePIXELS = 0x00,
+    CHIPContentLauncherMetricTypePERCENTAGE = 0x01,
+};
+
+typedef NS_ENUM(NSInteger, CHIPContentLauncherParameter) {
+    CHIPContentLauncherParameterActor = 0x00,
+    CHIPContentLauncherParameterChannel = 0x01,
+    CHIPContentLauncherParameterCharacter = 0x02,
+    CHIPContentLauncherParameterDirector = 0x03,
+    CHIPContentLauncherParameterEvent = 0x04,
+    CHIPContentLauncherParameterFranchise = 0x05,
+    CHIPContentLauncherParameterGenre = 0x06,
+    CHIPContentLauncherParameterLeague = 0x07,
+    CHIPContentLauncherParameterPopularity = 0x08,
+    CHIPContentLauncherParameterProvider = 0x09,
+    CHIPContentLauncherParameterSport = 0x0A,
+    CHIPContentLauncherParameterSportsTeam = 0x0B,
+    CHIPContentLauncherParameterType = 0x0C,
+};
+
+typedef NS_ENUM(NSInteger, CHIPContentLauncherStatus) {
+    CHIPContentLauncherStatusSuccess = 0x00,
+    CHIPContentLauncherStatusUrlNotAvailable = 0x01,
+    CHIPContentLauncherStatusAuthFailed = 0x02,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPContentLauncherFeature) {
+    CHIPContentLauncherFeatureContentSearch = 0x1,
+    CHIPContentLauncherFeatureURLPlayback = 0x2,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPContentLauncherSupportedStreamingProtocol) {
+    CHIPContentLauncherSupportedStreamingProtocolDASH = 0x1,
+    CHIPContentLauncherSupportedStreamingProtocolHLS = 0x2,
+};
+
+typedef NS_ENUM(NSInteger, CHIPAudioOutputOutputType) {
+    CHIPAudioOutputOutputTypeHdmi = 0x00,
+    CHIPAudioOutputOutputTypeBt = 0x01,
+    CHIPAudioOutputOutputTypeOptical = 0x02,
+    CHIPAudioOutputOutputTypeHeadphone = 0x03,
+    CHIPAudioOutputOutputTypeInternal = 0x04,
+    CHIPAudioOutputOutputTypeOther = 0x05,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPAudioOutputAudiouOutputFeature) {
+    CHIPAudioOutputAudiouOutputFeatureNameUpdates = 0x1,
+};
+
+typedef NS_ENUM(NSInteger, CHIPApplicationLauncherStatus) {
+    CHIPApplicationLauncherStatusSuccess = 0x00,
+    CHIPApplicationLauncherStatusAppNotAvailable = 0x01,
+    CHIPApplicationLauncherStatusSystemBusy = 0x02,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPApplicationLauncherFeature) {
+    CHIPApplicationLauncherFeatureApplicationPlatform = 0x1,
+};
+
+typedef NS_ENUM(NSInteger, CHIPApplicationBasicApplicationStatus) {
+    CHIPApplicationBasicApplicationStatusStopped = 0x00,
+    CHIPApplicationBasicApplicationStatusActiveVisibleFocus = 0x01,
+    CHIPApplicationBasicApplicationStatusActiveHidden = 0x02,
+    CHIPApplicationBasicApplicationStatusActiveVisibleNotFocus = 0x03,
+};
+
+typedef NS_ENUM(NSInteger, CHIPTestClusterSimple) {
+    CHIPTestClusterSimpleUnspecified = 0x00,
+    CHIPTestClusterSimpleValueA = 0x01,
+    CHIPTestClusterSimpleValueB = 0x02,
+    CHIPTestClusterSimpleValueC = 0x03,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPTestClusterSimpleBitmap) {
+    CHIPTestClusterSimpleBitmapValueA = 0x1,
+    CHIPTestClusterSimpleBitmapValueB = 0x2,
+    CHIPTestClusterSimpleBitmapValueC = 0x4,
+};
+
+typedef NS_ENUM(NSInteger, CHIPMessagingEventId) {
+    CHIPMessagingEventIdMeterCoverRemoved = 0x00,
+    CHIPMessagingEventIdMeterCoverClosed = 0x01,
+    CHIPMessagingEventIdStrongMagneticField = 0x02,
+    CHIPMessagingEventIdNoStrongMagneticField = 0x03,
+    CHIPMessagingEventIdBatteryFailure = 0x04,
+    CHIPMessagingEventIdLowBattery = 0x05,
+    CHIPMessagingEventIdProgramMemoryError = 0x06,
+    CHIPMessagingEventIdRamError = 0x07,
+    CHIPMessagingEventIdNvMemoryError = 0x08,
+    CHIPMessagingEventIdMeasurementSystemError = 0x09,
+    CHIPMessagingEventIdWatchdogError = 0x0A,
+    CHIPMessagingEventIdSupplyDisconnectFailure = 0x0B,
+    CHIPMessagingEventIdSupplyConnectFailure = 0x0C,
+    CHIPMessagingEventIdMeasurmentSoftwareChanged = 0x0D,
+    CHIPMessagingEventIdDstEnabled = 0x0E,
+    CHIPMessagingEventIdDstDisabled = 0x0F,
+    CHIPMessagingEventIdClockAdjBackward = 0x10,
+    CHIPMessagingEventIdClockAdjForward = 0x11,
+    CHIPMessagingEventIdClockInvalid = 0x12,
+    CHIPMessagingEventIdCommsErrorHan = 0x13,
+    CHIPMessagingEventIdCommsOkHan = 0x14,
+    CHIPMessagingEventIdFraudAttempt = 0x15,
+    CHIPMessagingEventIdPowerLoss = 0x16,
+    CHIPMessagingEventIdIncorrectProtocol = 0x17,
+    CHIPMessagingEventIdUnusualHanTraffic = 0x18,
+    CHIPMessagingEventIdUnexpectedClockChange = 0x19,
+    CHIPMessagingEventIdCommsUsingUnauthenticatedComponent = 0x1A,
+    CHIPMessagingEventIdErrorRegClear = 0x1B,
+    CHIPMessagingEventIdAlarmRegClear = 0x1C,
+    CHIPMessagingEventIdUnexpectedHwReset = 0x1D,
+    CHIPMessagingEventIdUnexpectedProgramExecution = 0x1E,
+    CHIPMessagingEventIdEventLogCleared = 0x1F,
+    CHIPMessagingEventIdManualDisconnect = 0x20,
+    CHIPMessagingEventIdManualConnect = 0x21,
+    CHIPMessagingEventIdRemoteDisconnection = 0x22,
+    CHIPMessagingEventIdLocalDisconnection = 0x23,
+    CHIPMessagingEventIdLimitThresholdExceeded = 0x24,
+    CHIPMessagingEventIdLimitThresholdOk = 0x25,
+    CHIPMessagingEventIdLimitThresholdChanged = 0x26,
+    CHIPMessagingEventIdMaximumDemandExceeded = 0x27,
+    CHIPMessagingEventIdProfileCleared = 0x28,
+    CHIPMessagingEventIdFirmwareReadyForActivation = 0x29,
+    CHIPMessagingEventIdFirmwareActivated = 0x2A,
+    CHIPMessagingEventIdPatchFailure = 0x2B,
+    CHIPMessagingEventIdTouTariffActivation = 0x2C,
+    CHIPMessagingEventId8x8Tariffactivated = 0x2D,
+    CHIPMessagingEventIdSingleTariffRateActivated = 0x2E,
+    CHIPMessagingEventIdAsynchronousBillingOccurred = 0x2F,
+    CHIPMessagingEventIdSynchronousBillingOccurred = 0x30,
+    CHIPMessagingEventIdIncorrectPolarity = 0x80,
+    CHIPMessagingEventIdCurrentNoVoltage = 0x81,
+    CHIPMessagingEventIdUnderVoltage = 0x82,
+    CHIPMessagingEventIdOverVoltage = 0x83,
+    CHIPMessagingEventIdNormalVoltage = 0x84,
+    CHIPMessagingEventIdPfBelowThreshold = 0x85,
+    CHIPMessagingEventIdPfAboveThreshold = 0x86,
+    CHIPMessagingEventIdTerminalCoverRemoved = 0x87,
+    CHIPMessagingEventIdTerminalCoverClosed = 0x88,
+    CHIPMessagingEventIdReverseFlow = 0xA0,
+    CHIPMessagingEventIdTiltTamper = 0xA1,
+    CHIPMessagingEventIdBatteryCoverRemoved = 0xA2,
+    CHIPMessagingEventIdBatteryCoverClosed = 0xA3,
+    CHIPMessagingEventIdExcessFlow = 0xA4,
+    CHIPMessagingEventIdCreditOk = 0xC0,
+    CHIPMessagingEventIdLowCredit = 0xC1,
+    CHIPMessagingEventIdEmergencyCreditInUse = 0xC0,
+    CHIPMessagingEventIdEmergencyCreditExhausted = 0xC1,
+    CHIPMessagingEventIdZeroCreditEcNotSelected = 0xC2,
+    CHIPMessagingEventIdSupplyOn = 0xC3,
+    CHIPMessagingEventIdSupplyOffAarmed = 0xC4,
+    CHIPMessagingEventIdSupplyOff = 0xC5,
+    CHIPMessagingEventIdDiscountApplied = 0xC6,
+    CHIPMessagingEventIdManufacturerSpecificA = 0xE0,
+    CHIPMessagingEventIdManufacturerSpecificB = 0xE1,
+    CHIPMessagingEventIdManufacturerSpecificC = 0xE2,
+    CHIPMessagingEventIdManufacturerSpecificD = 0xE3,
+    CHIPMessagingEventIdManufacturerSpecificE = 0xE4,
+    CHIPMessagingEventIdManufacturerSpecificF = 0xE5,
+    CHIPMessagingEventIdManufacturerSpecificG = 0xE6,
+    CHIPMessagingEventIdManufacturerSpecificH = 0xE7,
+    CHIPMessagingEventIdManufacturerSpecificI = 0xE8,
+};
+
+typedef NS_ENUM(NSInteger, CHIPMessagingControlConfirmation) {
+    CHIPMessagingControlConfirmationNotRequired = 0x00,
+    CHIPMessagingControlConfirmationRequired = 0x80,
+};
+
+typedef NS_ENUM(NSInteger, CHIPMessagingControlEnhancedConfirmation) {
+    CHIPMessagingControlEnhancedConfirmationNotRequired = 0x00,
+    CHIPMessagingControlEnhancedConfirmationRequired = 0x20,
+};
+
+typedef NS_ENUM(NSInteger, CHIPMessagingControlImportance) {
+    CHIPMessagingControlImportanceLow = 0x00,
+    CHIPMessagingControlImportanceMedium = 0x04,
+    CHIPMessagingControlImportanceHigh = 0x08,
+    CHIPMessagingControlImportanceCritical = 0x0C,
+};
+
+typedef NS_ENUM(NSInteger, CHIPMessagingControlTransmission) {
+    CHIPMessagingControlTransmissionNormal = 0x00,
+    CHIPMessagingControlTransmissionNormalAndAnonymous = 0x01,
+    CHIPMessagingControlTransmissionAnonymous = 0x02,
+    CHIPMessagingControlTransmissionReserved = 0x03,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPMessagingConfirmationControl) {
+    CHIPMessagingConfirmationControlNoReturned = 0x1,
+    CHIPMessagingConfirmationControlYesReturned = 0x2,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPMessagingControlMask) {
+    CHIPMessagingControlMaskTransMechanism = 0x3,
+    CHIPMessagingControlMaskMessageUrgency = 0xC,
+    CHIPMessagingControlMaskEnhancedConfirmationRequest = 0x20,
+    CHIPMessagingControlMaskMessageConfirmation = 0x80,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPMessagingExtendedControlMask) {
+    CHIPMessagingExtendedControlMaskMessageConfirmationStatus = 0x1,
+};
+
+typedef NS_ENUM(NSInteger, CHIPApplianceEventsAndAlertEventIdentification) {
+    CHIPApplianceEventsAndAlertEventIdentificationEndOfCycle = 0x01,
+    CHIPApplianceEventsAndAlertEventIdentificationTemperatureReached = 0x04,
+    CHIPApplianceEventsAndAlertEventIdentificationEndOfCooking = 0x05,
+    CHIPApplianceEventsAndAlertEventIdentificationSwitchingOff = 0x06,
+    CHIPApplianceEventsAndAlertEventIdentificationWrongData = 0x07,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPApplianceEventsAndAlertAlertCount) {
+    CHIPApplianceEventsAndAlertAlertCountNumberOfAlerts = 0xF,
+    CHIPApplianceEventsAndAlertAlertCountTypeOfAlert = 0xF0,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPApplianceEventsAndAlertAlertStructure) {
+    CHIPApplianceEventsAndAlertAlertStructureAlertId = 0xFF,
+    CHIPApplianceEventsAndAlertAlertStructureCategory = 0xF00,
+    CHIPApplianceEventsAndAlertAlertStructurePresenceRecovery = 0x3000,
+};
+
 NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_CLUSTERS_H */

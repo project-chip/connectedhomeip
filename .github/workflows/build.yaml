@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.56
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -103,7 +103,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.56
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -154,7 +154,7 @@ jobs:
                       case $BUILD_TYPE in
                           "fake") GN_ARGS='chip_device_platform="fake"';;
                           "gcc_release") GN_ARGS='is_debug=false';;
-                          "clang") GN_ARGS='is_clang=true';;
+                          "clang") GN_ARGS='is_clang=true pw_command_launcher="`pwd`/../scripts/helpers/clang-tidy-launcher.py"';;
                           "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
                       esac
 
@@ -226,7 +226,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
+            image: connectedhomeip/chip-build:0.5.56
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -317,7 +317,7 @@ jobs:
               run: |
                   for BUILD_TYPE  in clang python_lib; do
                       case $BUILD_TYPE in
-                          "clang") GN_ARGS='is_clang=true target_os="all" is_asan=true';;
+                          "clang") GN_ARGS='is_clang=true target_os="all" is_asan=true pw_command_launcher="`pwd`/../scripts/helpers/clang-tidy-launcher.py"';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
                       scripts/build/gn_gen.sh --args="$GN_ARGS"

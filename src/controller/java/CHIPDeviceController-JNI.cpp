@@ -36,6 +36,7 @@
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/java/AndroidClusterExceptions.h>
+#include <credentials/CHIPCert.h>
 #include <jni.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -334,6 +335,40 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
         ChipLogError(Controller, "Failed to establish PASE connection.");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
+}
+
+JNI_METHOD(jbyteArray, convertX509CertToMatterCert)
+(JNIEnv * env, jobject self, jbyteArray x509Cert)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    uint32_t allocatedCertLength = chip::Credentials::kMaxCHIPCertLength;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> outBuf;
+    jbyteArray outJbytes = nullptr;
+    JniByteArray x509CertBytes(env, x509Cert);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
+
+    {
+        MutableByteSpan outBytes(outBuf.Get(), allocatedCertLength);
+
+        err = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes.byteSpan(), outBytes);
+        SuccessOrExit(err);
+
+        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), outBytes.size(), outJbytes);
+        SuccessOrExit(err);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to convert X509 cert to CHIP cert. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    return outJbytes;
 }
 
 JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)

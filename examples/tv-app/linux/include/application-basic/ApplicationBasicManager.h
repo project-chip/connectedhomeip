@@ -41,7 +41,10 @@ public:
         CopyString(mVendorName, sizeof(mVendorName), szVendorName);
         mVendorId = vendorId;
         CopyString(mApplicationVersion, sizeof(mApplicationVersion), szApplicationVersion);
-        mProductId = productId;
+        mProductId                          = productId;
+        static const uint16_t kTestVendorId = 456; // CI test cases require this vendor id
+        mAllowedVendorList.push_back(vendorId);
+        mAllowedVendorList.push_back(kTestVendorId);
     };
     virtual ~ApplicationBasicManager(){};
 
@@ -51,6 +54,8 @@ public:
     uint16_t HandleGetProductId() override;
     CHIP_ERROR HandleGetApplicationVersion(AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetAllowedVendorList(AttributeValueEncoder & aEncoder) override;
+
+    std::list<uint16_t> GetAllowedVendorList() override { return mAllowedVendorList; };
 
 protected:
     static const int kVendorNameSize         = 32;
@@ -62,4 +67,5 @@ protected:
     char mApplicationName[kApplicationNameSize];
     uint16_t mProductId;
     char mApplicationVersion[kApplicationVersionSize];
+    std::list<uint16_t> mAllowedVendorList = {};
 };

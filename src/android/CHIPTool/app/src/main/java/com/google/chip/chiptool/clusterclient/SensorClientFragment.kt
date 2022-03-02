@@ -92,15 +92,17 @@ class SensorClientFragment : Fragment() {
     sensorGraph.viewport.isXAxisBoundsManual = true
     sensorGraph.viewport.setMinX(currentTime.toDouble())
     sensorGraph.viewport.setMaxX(currentTime.toDouble() + MIN_REFRESH_PERIOD_S * 1000 * MAX_DATA_POINTS)
-    sensorGraph.gridLabelRenderer.padding = 20
+    sensorGraph.gridLabelRenderer.padding = 30
     sensorGraph.gridLabelRenderer.numHorizontalLabels = 4
     sensorGraph.gridLabelRenderer.setHorizontalLabelsAngle(150)
     sensorGraph.gridLabelRenderer.labelFormatter = object : LabelFormatter {
       override fun setViewport(viewport: Viewport?) = Unit
       override fun formatLabel(value: Double, isValueX: Boolean): String {
-        if (!isValueX)
-          return "%.2f".format(value)
-        return SimpleDateFormat("H:mm:ss").format(Date(value.toLong())).toString()
+        if (isValueX)
+          return SimpleDateFormat("H:mm:ss").format(Date(value.toLong())).toString()
+        if (value >= 100.0)
+          return "%.1f".format(value)
+        return "%.2f".format(value)
       }
     }
   }

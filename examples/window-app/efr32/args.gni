@@ -26,3 +26,4 @@ declare_args() {
 pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
 pw_assert_BACKEND = "$dir_pw_assert_log"
 chip_enable_openthread = true
+chip_system_config_use_open_thread_udp = true

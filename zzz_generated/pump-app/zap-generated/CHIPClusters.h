@@ -37,6 +37,20 @@ public:
     ~FlowMeasurementCluster() {}
 };
 
+class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
+{
+public:
+    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    ~OtaSoftwareUpdateProviderCluster() {}
+};
+
+class DLL_EXPORT OccupancySensingCluster : public ClusterBase
+{
+public:
+    OccupancySensingCluster() : ClusterBase(app::Clusters::OccupancySensing::Id) {}
+    ~OccupancySensingCluster() {}
+};
+
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
 {
 public:

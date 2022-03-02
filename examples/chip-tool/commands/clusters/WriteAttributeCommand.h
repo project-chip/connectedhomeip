@@ -68,21 +68,20 @@ public:
         if (CHIP_NO_ERROR != error)
         {
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
-            SetCommandExitStatus(error);
-            return;
+            mError = error;
         }
     }
 
     void OnError(const chip::app::WriteClient * client, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
-        SetCommandExitStatus(error);
+        mError = error;
     }
 
     void OnDone(chip::app::WriteClient * client) override
     {
         mWriteClient.reset();
-        SetCommandExitStatus(CHIP_NO_ERROR);
+        SetCommandExitStatus(mError);
     }
 
     template <class T>
@@ -109,6 +108,7 @@ public:
 private:
     chip::ClusterId mClusterId;
     chip::AttributeId mAttributeId;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
     chip::Optional<chip::DataVersion> mDataVersion = chip::NullOptional;
     CustomArgument mAttributeValue;

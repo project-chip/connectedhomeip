@@ -70,4 +70,9 @@ constexpr CASEAuthTag CASEAuthTagFromNodeId(NodeId aNodeId)
     return aNodeId & kMaskCASEAuthTag;
 }
 
+constexpr CASEAuthTag IsValidCASEAuthTag(CASEAuthTag aCAT)
+{
+    return (aCAT & kTagVersionMask) > 0;
+}
+
 } // namespace chip

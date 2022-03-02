@@ -26,7 +26,7 @@ static_library("discovery") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
   ]
 }

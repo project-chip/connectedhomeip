@@ -18,6 +18,7 @@
 
 #include <lib/core/PeerId.h>
 #include <lib/support/IntrusiveList.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
@@ -25,7 +26,19 @@
 namespace chip {
 namespace AddressResolve {
 
-/// Represents an object intersted in callbacks for a resolve operation.
+/// Contains resolve information received from nodes. Contains all information
+/// bits that are considered useful but does not contain a full DNSSD data
+/// structure since not all DNSSD data is useful during operational processing.
+struct ResolveResult
+{
+    Transport::PeerAddress address;
+    ReliableMessageProtocolConfig mrpConfig;
+    bool supportsTcp = false;
+
+    ResolveResult() : address(Transport::Type::kUdp), mrpConfig(GetLocalMRPConfig()) {}
+};
+
+/// Represents an object interested in callbacks for a resolve operation.
 class NodeListener
 {
 public:
@@ -33,17 +46,17 @@ public:
     virtual ~NodeListener() = default;
 
     /// Callback executed once only for a lookup, when the final address of a
-    /// node is considered  to be the best choice for reachability.
+    /// node is considered to be the best choice for reachability.
     ///
-    /// The callback is expected to be executed within the chip event loop
+    /// The callback is expected to be executed within the CHIP event loop
     /// thread.
-    virtual void OnNodeAddressResolved(const PeerId & peerId, const Transport::PeerAddress & address) = 0;
+    virtual void OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result) = 0;
 
     /// Node resolution failure - occurs only once for a lookup, when an address
     /// could not be resolved - generally due to a timeout or due to DNSSD
     /// infrastructure returning an error.
     ///
-    /// The callback is expected to be executed within the chip event loop
+    /// The callback is expected to be executed within the CHIP event loop
     /// thread.
     virtual void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) = 0;
 };
@@ -59,7 +72,7 @@ public:
     NodeLookupHandleBase() {}
     virtual ~NodeLookupHandleBase() {}
 
-    // While active, resolve handles are maintain in an internal list
+    // While active, resolve handles are maintained in an internal list
     // to be processed, so copying their values (i.e. pointers) is not
     // allowed.
     NodeLookupHandleBase(const NodeLookupHandleBase &) = delete;
@@ -92,7 +105,7 @@ public:
     /// queries even if a reply has already been received or to allow for
     /// additional heuristics regarding node choice to succeed.
     /// Example heuristics and considerations:
-    ///   - ping/ping6 could be used as an indicator of reacability. NOTE that
+    ///   - ping/ping6 could be used as an indicator of reachability. NOTE that
     ///     not all devices may respond to ping, so this would only be an
     ///     additional signal to accept/increase suitability score of an address
     ///     and should NOT be used as a reject if no ping response
@@ -143,8 +156,8 @@ namespace Impl {
 // lookup metadata, so that resolvers do not need to maintain a likely unused
 // pool of 'active lookup' metadata.
 //
-// The sideffect of this is that the ImplNodeLookupHandle is exposed to clients
-// for sizeof() memory purposes.
+// The side-effect of this is that the Impl::NodeLookupHandle is exposed to
+// clients for sizeof() memory purposes.
 //
 // Clients MUST only use the interface in NodeLookupHandleBase and assume all
 // other methods/content is implementation defined.
@@ -184,7 +197,7 @@ public:
 // outside the open space, include the required platform headers for the
 // actual implementation.
 // Expectations of this include:
-//   - define the `Impl::NodeLookupHandle` deriving from NodeLookupHandle
+//   - define the `Impl::NodeLookupHandle` deriving from NodeLookupHandleBase
 //   - corresponding CPP file should provide a valid Resolver::Instance()
 //     implementation
 #include CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER

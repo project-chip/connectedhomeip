@@ -36,7 +36,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   declare_args() {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
-        (host_cpu == "x64" || host_cpu == "arm64")
+        (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
     enable_pylib = false
   }
 

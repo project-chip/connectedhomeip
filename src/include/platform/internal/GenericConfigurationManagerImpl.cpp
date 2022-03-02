@@ -43,6 +43,9 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
+// TODO : may be we can make it configurable
+#define BLE_ADVERTISEMENT_VERSION 0
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -89,6 +92,12 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersion(uint
 {
     softwareVer = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVersion(uint32_t softwareVer)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ConfigClass>
@@ -650,6 +659,8 @@ GenericConfigurationManagerImpl<ConfigClass>::GetBLEDeviceIdentificationInfo(Ble
     err = GetSetupDiscriminator(discriminator);
     SuccessOrExit(err);
     deviceIdInfo.SetDeviceDiscriminator(discriminator);
+
+    deviceIdInfo.SetAdvertisementVersion(BLE_ADVERTISEMENT_VERSION);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     deviceIdInfo.SetAdditionalDataFlag(true);

@@ -69,7 +69,8 @@ if (chip_device_platform != "none") {
 
   if (chip_stack_lock_tracking == "auto") {
     if (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
-        chip_device_platform == "android" || current_os == "freertos") {
+        chip_device_platform == "android" || current_os == "freertos" ||
+        chip_device_platform == "webos") {
       # TODO: should be fatal for development. Change once bugs are fixed
       chip_stack_lock_tracking = "fatal"
     } else {
@@ -223,6 +224,14 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_CYW30739=1",
         "CHIP_DEVICE_LAYER_TARGET=CYW30739",
       ]
+    } else if (chip_device_platform == "webos") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_WEBOS=1",
+        "CHIP_DEVICE_LAYER_TARGET=Linux",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+      defines -=
+          [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
     }
   }
 } else {
@@ -253,6 +262,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/setup_payload:additional_data_payload",
       "${chip_root}/src/system",
     ]
 
@@ -270,6 +280,7 @@ if (chip_device_platform != "none") {
       "../include/platform/ConfigurationManager.h",
       "../include/platform/ConnectivityManager.h",
       "../include/platform/DeviceControlServer.h",
+      "../include/platform/FailSafeContext.h",
       "../include/platform/GeneralUtils.h",
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
@@ -295,6 +306,7 @@ if (chip_device_platform != "none") {
       "DeviceControlServer.cpp",
       "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
+      "FailSafeContext.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",
       "LockTracker.cpp",
@@ -325,7 +337,6 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
-      "${chip_root}/src/setup_payload:additional_data_payload",
     ]
 
     if (chip_device_platform == "cc13x2_26x2") {
@@ -358,6 +369,8 @@ if (chip_device_platform != "none") {
       _platform_target = "P6"
     } else if (chip_device_platform == "ameba") {
       _platform_target = "Ameba"
+    } else if (chip_device_platform == "webos") {
+      _platform_target = "webos"
     } else if (chip_device_platform == "fake") {
       _platform_target = "fake"
     } else if (chip_device_platform == "cyw30739") {

@@ -82,6 +82,10 @@ limitations under the License.
       <arg name="OnTime" type="int16u"/><!-- min:0 max:0xfe -->
       <arg name="OffWaitTime" type="int16u"/><!-- min:0 max:0xfe -->
     </command>
-
   </cluster>
+
+  <bitmap name="OnOffFeature" type="BITMAP32">
+    <cluster code="0x0006" />
+    <field name="Lighting" mask="0x01" />
+  </bitmap>
 </configurator>

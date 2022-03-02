@@ -1062,6 +1062,23 @@ void TestAclValidateAuthModeSubject(nlTestSuite * inSuite, void * inContext)
     // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
 
+    // CASE and group may have empty subjects list
+    {
+        NL_TEST_ASSERT(inSuite, entry.RemoveSubject(0) == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+
+        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+
+        NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
+    }
+
     NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
     for (auto subject : validCaseSubjects)
     {
@@ -1195,17 +1212,9 @@ void TestAclValidateAuthModeSubject(nlTestSuite * inSuite, void * inContext)
     // Next cases have no subject
     NL_TEST_ASSERT(inSuite, entry.RemoveSubject(0) == CHIP_NO_ERROR);
 
-    // Group must have subject
-    {
-        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
-    }
-
     // PASE must have subject
     {
-        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kPase) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);

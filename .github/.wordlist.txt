@@ -59,6 +59,7 @@ ApplicationBasic
 ApplicationId
 ApplicationIdentifier
 ApplicationLauncher
+ApplyUpdate
 applyUpdateAction
 ApplyUpdateRequest
 ApplyUpdateResponse
@@ -293,6 +294,7 @@ CY
 CYW
 DAC
 DAP
+DAPLINK
 DataFrame
 DataModelRevision
 dataset
@@ -567,6 +569,7 @@ idx
 ifdef
 ifdefs
 IGMP
+ignoreApplyUpdate
 ignoreQueryImage
 ihex
 IlluminanceMeasurement
@@ -1345,3 +1348,4 @@ zephyrproject
 Zigbee
 zigbeealliance
 zigbeethread
+libshell

@@ -54,7 +54,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        if (event->CommissioningComplete.status == CHIP_NO_ERROR)
+        if (event->CommissioningComplete.Status == CHIP_NO_ERROR)
         {
             ChipLogProgress(AppServer, "Commissioning completed successfully");
             Cleanup();
@@ -62,8 +62,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         else
         {
             ChipLogError(AppServer, "Commissioning failed with error %" CHIP_ERROR_FORMAT,
-                         event->CommissioningComplete.status.Format());
-            OnSessionEstablishmentError(event->CommissioningComplete.status);
+                         event->CommissioningComplete.Status.Format());
+            OnSessionEstablishmentError(event->CommissioningComplete.Status);
         }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)

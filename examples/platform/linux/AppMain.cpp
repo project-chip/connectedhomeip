@@ -339,8 +339,8 @@ CHIP_ERROR InitCommissioner()
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(
-        gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, ephemeralKey.Pubkey(),
+                                                                        rcacSpan, icacSpan, nocSpan));
 
     params.operationalKeypair = &ephemeralKey;
     params.controllerRCAC     = rcacSpan;
@@ -588,7 +588,9 @@ void ChipLinuxAppMainLoop()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    ChipLogProgress(AppServer, "Starting commissioner");
     VerifyOrReturn(InitCommissioner() == CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Started commissioner");
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
