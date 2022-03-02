@@ -97,6 +97,8 @@ CHIP_ERROR LocalizationConfigurationAttrAccess::Read(const ConcreteReadAttribute
 // Pre-change callbacks for cluster attributes
 // =============================================================================
 
+using imcode = Protocols::InteractionModel::Status;
+
 static Protocols::InteractionModel::Status emberAfPluginLocalizationConfigurationOnActiveLocaleChange(EndpointId EndpointId,
                                                                                                       CharSpan newLangtag)
 {
@@ -108,19 +110,12 @@ static Protocols::InteractionModel::Status emberAfPluginLocalizationConfiguratio
         {
             if (locale.data_equal(newLangtag))
             {
-                return Protocols::InteractionModel::Status::Success;
+                return imcode::Success;
             }
         }
     }
 
-    return Protocols::InteractionModel::Status::InvalidValue;
-}
-
-static Protocols::InteractionModel::Status
-emberAfPluginLocalizationConfigurationOnUnhandledAttributeChange(EndpointId EndpointId, EmberAfAttributeType attrType,
-                                                                 uint16_t attrSize, uint8_t * attrValue)
-{
-    return Protocols::InteractionModel::Status::Success;
+    return imcode::InvalidValue;
 }
 
 Protocols::InteractionModel::Status MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback(
@@ -134,12 +129,10 @@ Protocols::InteractionModel::Status MatterLocalizationConfigurationClusterServer
         // TODO:: allow fromZclString for CharSpan as well and use that here
         auto langtag = CharSpan(Uint8::to_char(&value[1]), static_cast<size_t>(value[0]));
         res          = emberAfPluginLocalizationConfigurationOnActiveLocaleChange(attributePath.mEndpointId, langtag);
+        break;
     }
-    break;
-
     default:
-        res =
-            emberAfPluginLocalizationConfigurationOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, size, value);
+        res = imcode::Success;
         break;
     }
 
