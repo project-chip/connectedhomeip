@@ -69,12 +69,7 @@ public:
     /////////// CommissioningDelegate Interface /////////
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
-protected:
-    // This function initialize a random discriminator once and returns it all the time afterwards
-    uint16_t GetUniqueDiscriminator();
-
 private:
     bool mReady = false;
     chip::Dnssd::ResolverProxy mDNSResolver;
-    uint16_t mDiscriminatorUseForFiltering = 0;
 };
