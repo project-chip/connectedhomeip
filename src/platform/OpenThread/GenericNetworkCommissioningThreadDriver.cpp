@@ -84,7 +84,8 @@ CHIP_ERROR GenericThreadDriver::GetLastNetworkID(uint8_t * networkID, size_t * n
     Thread::OperationalDataset dataset;
     uint8_t extpanid[kSizeExtendedPanId];
 
-    VerifyOrReturnError(networkIDLen != nullptr && networkID != nullptr && (*networkIDLen) >= kSizeExtendedPanId);
+    VerifyOrReturnError(networkIDLen != nullptr && networkID != nullptr && (*networkIDLen) >= kSizeExtendedPanId,
+                        CHIP_ERROR_INTERNAL);
 
     // The Thread network is not actually enabled.
     VerifyOrReturnError(ThreadStackMgrImpl().IsThreadEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
@@ -102,7 +103,7 @@ CHIP_ERROR GenericThreadDriver::GetLastConnectErrorValue(uint32_t & value)
     // Thread is not enabled, then we are not trying to connect to the network.
     VerifyOrReturnError(ThreadStackMgrImpl().IsThreadEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
     // Thread is enabled, but is already attached, thus return null to indicate a success state.
-    VerifyOrReturnError(ThreadStackMgrImpl().IsThreadAttached(), CHIP_ERROR_KEY_NOT_FOUND);
+    ReturnErrorCodeIf(ThreadStackMgrImpl().IsThreadAttached(), CHIP_ERROR_KEY_NOT_FOUND);
 
     // Then we tell the client that the network is detached.
     value = OT_ERROR_DETACHED;
