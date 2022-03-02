@@ -74,7 +74,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'SOFTWARE_DIAGNOSTICS_CLUSTER': ['software-diagnostics-server'],
     'SWITCH_CLUSTER': ['switch-server'],
     'TARGET_NAVIGATOR_CLUSTER': ['target-navigator-server'],
-    'TEMP_MEASUREMENT_CLUSTER': [],
+    'TEMP_MEASUREMENT_CLUSTER': ['temperature-measurement-server'],
     'TEST_CLUSTER': ['test-cluster-server'],
     'THERMOSTAT_CLUSTER': ['thermostat-server'],
     'THERMOSTAT_UI_CONFIG_CLUSTER': ['thermostat-user-interface-configuration-server'],

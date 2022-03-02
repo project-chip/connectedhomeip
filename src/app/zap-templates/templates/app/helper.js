@@ -129,7 +129,8 @@ var endpointClusterWithAttributeChanged = [
   'Window Covering',
 ];
 var endpointClusterWithPreAttribute = [
-  'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration', 'Time Format Localization', 'Localization Configuration'
+  'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration', 'Time Format Localization', 'Localization Configuration',
+  'Temperature Measurement'
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 
