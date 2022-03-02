@@ -49,7 +49,7 @@ CHIP_ERROR ApplicationBasicManager::HandleGetApplicationVersion(AttributeValueEn
 
 CHIP_ERROR ApplicationBasicManager::HandleGetAllowedVendorList(AttributeValueEncoder & aEncoder)
 {
-    std::list<uint16_t> allowedVendorList = { mVendorId, 456 };
+    std::list<uint16_t> allowedVendorList = GetAllowedVendorList();
     return aEncoder.EncodeList([allowedVendorList](const auto & encoder) -> CHIP_ERROR {
         for (const auto & allowedVendor : allowedVendorList)
         {

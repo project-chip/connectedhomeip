@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -141,10 +141,6 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                         err = ParseChipAttribute(reader, chipAttr);
                         SuccessOrExit(err);
 
-                        // Write the CHIP attribute value into the TLV.
-                        err = writer.Put(ContextTag(tlvTagNum), chipAttr);
-                        SuccessOrExit(err);
-
                         // Certificates use a combination of OIDs for Issuer and Subject.
                         // NOC: Issuer  = kOID_AttributeType_ChipRootId or kOID_AttributeType_ChipICAId
                         //      Subject = kOID_AttributeType_ChipNodeId
@@ -160,12 +156,26 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                             attrOID == chip::ASN1::kOID_AttributeType_ChipICAId ||
                             attrOID == chip::ASN1::kOID_AttributeType_ChipRootId)
                         {
+                            if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId)
+                            {
+                                VerifyOrReturnError(IsOperationalNodeId(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
+                            }
                             subjectOrIssuer = chipAttr;
                         }
                         else if (attrOID == chip::ASN1::kOID_AttributeType_ChipFabricId)
                         {
+                            VerifyOrReturnError(IsValidFabricId(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
                             fabric.SetValue(chipAttr);
                         }
+                        else if (attrOID == chip::ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag)
+                        {
+                            VerifyOrReturnError(CanCastTo<CASEAuthTag>(chipAttr), CHIP_ERROR_WRONG_CERT_DN);
+                            VerifyOrReturnError(IsValidCASEAuthTag(static_cast<CASEAuthTag>(chipAttr)), CHIP_ERROR_WRONG_CERT_DN);
+                        }
+
+                        // Write the CHIP attribute value into the TLV.
+                        err = writer.Put(ContextTag(tlvTagNum), chipAttr);
+                        SuccessOrExit(err);
                     }
 
                     //

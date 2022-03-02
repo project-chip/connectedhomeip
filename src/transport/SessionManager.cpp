@@ -692,7 +692,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
                                            packetHeader.IsSecureSessionControlMsg(), counter))
     {
 
-        if (Credentials::GroupDataProvider::SecurityPolicy::kLowLatency == groupContext.security_policy)
+        if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)
         {
             err = counter->VerifyOrTrustFirst(packetHeader.GetMessageCounter(), true);
         }

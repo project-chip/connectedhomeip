@@ -28,6 +28,11 @@ constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
 
 constexpr FabricId kUndefinedFabricId = 0ULL;
 
+constexpr bool IsValidFabricId(FabricId aFabricId)
+{
+    return aFabricId != kUndefinedFabricId;
+}
+
 /// A peer is identified by a node id within a compressed fabric ID
 class PeerId
 {

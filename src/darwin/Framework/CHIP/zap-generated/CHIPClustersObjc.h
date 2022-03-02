@@ -7265,6 +7265,10 @@ typedef NS_OPTIONS(NSUInteger, CHIPOnOffControl) {
     CHIPOnOffControlAcceptOnlyWhenOn = 0x1,
 };
 
+typedef NS_OPTIONS(NSUInteger, CHIPOnOffFeature) {
+    CHIPOnOffFeatureLighting = 0x1,
+};
+
 typedef NS_ENUM(NSInteger, CHIPLevelControlMoveMode) {
     CHIPLevelControlMoveModeUp = 0x00,
     CHIPLevelControlMoveModeDown = 0x01,
@@ -7741,7 +7745,7 @@ typedef NS_ENUM(NSInteger, CHIPOperationalCredentialsOperationalCertStatus) {
 
 typedef NS_ENUM(NSInteger, CHIPGroupKeyManagementGroupKeySecurityPolicy) {
     CHIPGroupKeyManagementGroupKeySecurityPolicyStandard = 0x00,
-    CHIPGroupKeyManagementGroupKeySecurityPolicyLowLatency = 0x01,
+    CHIPGroupKeyManagementGroupKeySecurityPolicyTrustFirst = 0x01,
 };
 
 typedef NS_ENUM(NSInteger, CHIPDoorLockDlAlarmCode) {
@@ -8243,6 +8247,10 @@ typedef NS_OPTIONS(NSUInteger, CHIPColorControlColorLoopUpdateFlags) {
 typedef NS_ENUM(NSInteger, CHIPIlluminanceMeasurementLightSensorType) {
     CHIPIlluminanceMeasurementLightSensorTypePhotodiode = 0x00,
     CHIPIlluminanceMeasurementLightSensorTypeCMOS = 0x01,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPPressureMeasurementPressureFeature) {
+    CHIPPressureMeasurementPressureFeatureEXT = 0x1,
 };
 
 typedef NS_ENUM(NSInteger, CHIPIasZoneIasEnrollResponseCode) {

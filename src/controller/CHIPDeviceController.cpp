@@ -45,6 +45,8 @@
 #include <platform/ConfigurationManager.h>
 #endif
 
+#include <app/server/Dnssd.h>
+
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/util/error-mapping.h>
@@ -139,6 +141,15 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     if (params.operationalKeypair != nullptr || !params.controllerNOC.empty() || !params.controllerRCAC.empty())
     {
         ReturnErrorOnFailure(ProcessControllerNOCChain(params));
+
+        if (params.enableServerInteractions)
+        {
+            //
+            // Advertise our operational identity on the network to facilitate discovery by clients that look to
+            // establish CASE with a controller that is also offering server-side capabilities (e.g an OTA provider).
+            //
+            app::DnssdServer::Instance().AdvertiseOperational();
+        }
     }
 
     DeviceProxyInitParams deviceInitParams = {
