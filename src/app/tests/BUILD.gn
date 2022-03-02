@@ -66,6 +66,7 @@ chip_test_suite("tests") {
     "TestCommandPathParams.cpp",
     "TestDataModelSerialization.cpp",
     "TestEventLogging.cpp",
+    "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",

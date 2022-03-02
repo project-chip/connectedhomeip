@@ -379,7 +379,7 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
 
     ReturnErrorOnFailure(pairing->DeriveSecureSession(secureSession->GetCryptoContext(), direction));
 
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(pairing->GetPeerCounter());
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
     return CHIP_NO_ERROR;
 }
@@ -502,7 +502,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
     // Verify message counter
-    CHIP_ERROR err = unsecuredSession->GetPeerMessageCounter().VerifyOrTrustFirst(packetHeader.GetMessageCounter());
+    CHIP_ERROR err = unsecuredSession->GetPeerMessageCounter().VerifyUnencrypted(packetHeader.GetMessageCounter());
     if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
         ChipLogDetail(Inet,
@@ -512,17 +512,12 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetH
         isDuplicate = SessionMessageDelegate::DuplicateMessage::Yes;
         err         = CHIP_NO_ERROR;
     }
-    if (err != CHIP_NO_ERROR)
+    else
     {
-        ChipLogProgress(Inet,
-                        "Received malformed unsecure packet with source 0x" ChipLogFormatX64 " destination 0x" ChipLogFormatX64
-                        " MessageCounter verify failed err = %" CHIP_ERROR_FORMAT,
-                        ChipLogValueX64(source.ValueOr(kUndefinedNodeId)), ChipLogValueX64(destination.ValueOr(kUndefinedNodeId)),
-                        err.Format());
-        return; // ephemeral node id is only assigned to the initiator, there should be one and only one node id exists.
+        // VerifyUnencrypted always returns one of CHIP_NO_ERROR or
+        // CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED.
+        unsecuredSession->GetPeerMessageCounter().CommitUnencrypted(packetHeader.GetMessageCounter());
     }
-
-    unsecuredSession->GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
 
     if (mCB != nullptr)
     {
@@ -562,7 +557,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         return;
     }
 
-    err = secureSession->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
+    err =
+        secureSession->GetSessionMessageCounter().GetPeerMessageCounter().VerifyEncryptedUnicast(packetHeader.GetMessageCounter());
     if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
         ChipLogDetail(Inet,
@@ -587,7 +583,10 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         return;
     }
 
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
+    if (isDuplicate == SessionMessageDelegate::DuplicateMessage::No)
+    {
+        secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
+    }
 
     // TODO: once mDNS address resolution is available reconsider if this is required
     // This updates the peer address once a packet is received from a new address
@@ -692,9 +691,9 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
                                            packetHeader.IsSecureSessionControlMsg(), counter))
     {
 
-        if (Credentials::GroupDataProvider::SecurityPolicy::kLowLatency == groupContext.security_policy)
+        if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)
         {
-            err = counter->VerifyOrTrustFirst(packetHeader.GetMessageCounter(), true);
+            err = counter->VerifyOrTrustFirstGroup(packetHeader.GetMessageCounter());
         }
         else
         {
@@ -704,7 +703,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
             return;
 
             // cache and sync
-            // err = counter->Verify(packetHeader.GetMessageCounter(), true);
+            // err = counter->VerifyGroup(packetHeader.GetMessageCounter());
         }
 
         if (err != CHIP_NO_ERROR)
@@ -721,7 +720,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return;
     }
 
-    counter->CommitWithRollOver(packetHeader.GetMessageCounter());
+    counter->CommitGroup(packetHeader.GetMessageCounter());
 
     if (mCB != nullptr)
     {
