@@ -255,7 +255,7 @@ class ClusterObjectTests:
 
         logger.info("8: Read without fabric filter")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        if len(res[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) <= 1:
+        if len(res[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
             raise AssertionError("Expect more elements in the response")
 
         logger.info("9: Read with fabric filter")

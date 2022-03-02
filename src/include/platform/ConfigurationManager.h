@@ -118,6 +118,7 @@ public:
     virtual CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf)                 = 0;
     virtual CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf)               = 0;
     virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
+    virtual CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer)                      = 0;
     virtual CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer)                      = 0;
     virtual CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode)                        = 0;
     virtual CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator)            = 0;

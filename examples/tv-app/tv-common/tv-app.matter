@@ -535,7 +535,8 @@ client cluster GeneralCommissioning = 48 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
-    kNotCommissioning = 3;
+    kNoFailSafe = 3;
+    kBusyWithOtherAdmin = 4;
   }
 
   enum RegulatoryLocationType : ENUM8 {
@@ -593,7 +594,8 @@ server cluster GeneralCommissioning = 48 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
-    kNotCommissioning = 3;
+    kNoFailSafe = 3;
+    kBusyWithOtherAdmin = 4;
   }
 
   enum RegulatoryLocationType : ENUM8 {
@@ -740,7 +742,7 @@ server cluster GeneralDiagnostics = 51 {
 server cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicy : ENUM8 {
     kStandard = 0;
-    kLowLatency = 1;
+    kTrustFirst = 1;
   }
 
   struct GroupKeyMapStruct {
@@ -1410,6 +1412,10 @@ server cluster OnOff = 6 {
 
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
+  }
+
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
   }
 
   readonly attribute boolean onOff = 0;

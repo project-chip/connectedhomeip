@@ -185,6 +185,15 @@ void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, Fabric
     mInitParams.mCASESessionManager->ReleaseSessionForFabric(compressedFabricId);
 }
 
+CHIP_ERROR BindingManager::NotifyBindingAdded(const EmberBindingTableEntry & binding)
+{
+    if (mBindingAddedHandler)
+    {
+        mBindingAddedHandler(binding);
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);

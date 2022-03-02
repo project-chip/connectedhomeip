@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -350,8 +350,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INVALID_ACCESS_TOKEN.AsInteger():
         desc = "Invalid access token";
         break;
-    case CHIP_ERROR_WRONG_CERT_SUBJECT.AsInteger():
-        desc = "Wrong certificate subject";
+    case CHIP_ERROR_WRONG_CERT_DN.AsInteger():
+        desc = "Wrong certificate distinguished name";
         break;
     case CHIP_ERROR_INVALID_PROVISIONING_BUNDLE.AsInteger():
         desc = "Invalid provisioning bundle";

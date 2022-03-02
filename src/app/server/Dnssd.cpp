@@ -41,21 +41,6 @@ namespace chip {
 namespace app {
 namespace {
 
-bool HaveOperationalCredentials()
-{
-    // Look for any fabric info that has a useful operational identity.
-    for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
-    {
-        if (fabricInfo.IsInitialized())
-        {
-            return true;
-        }
-    }
-
-    ChipLogProgress(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
-    return false;
-}
-
 void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kDnssdPlatformInitialized
@@ -77,6 +62,23 @@ void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t
 } // namespace
 
 constexpr System::Clock::Timestamp DnssdServer::kTimeoutCleared;
+
+bool DnssdServer::HaveOperationalCredentials()
+{
+    VerifyOrDie(mFabricTable != nullptr);
+
+    // Look for any fabric info that has a useful operational identity.
+    for (const FabricInfo & fabricInfo : *mFabricTable)
+    {
+        if (fabricInfo.IsInitialized())
+        {
+            return true;
+        }
+    }
+
+    ChipLogProgress(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
+    return false;
+}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
@@ -250,7 +252,9 @@ CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t buff
 /// Set MDNS operational advertisement
 CHIP_ERROR DnssdServer::AdvertiseOperational()
 {
-    for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
+    VerifyOrDie(mFabricTable != nullptr);
+
+    for (const FabricInfo & fabricInfo : *mFabricTable)
     {
         if (fabricInfo.IsInitialized())
         {

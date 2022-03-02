@@ -1473,7 +1473,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AddGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint16_t groupId = static_cast<uint16_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1489,7 +1489,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AddGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint16_t groupId = static_cast<uint16_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1508,8 +1508,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AddGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t status   = static_cast<uint8_t>(0);
-    uint16_t groupId = static_cast<uint16_t>(0);
+    uint8_t status        = static_cast<uint8_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -1524,8 +1524,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AddGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t status   = static_cast<uint8_t>(0);
-    uint16_t groupId = static_cast<uint16_t>(0);
+    uint8_t status        = static_cast<uint8_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddGroupResponse
@@ -1542,7 +1542,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ViewGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint16_t groupId = static_cast<uint16_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -1557,7 +1557,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ViewGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint16_t groupId = static_cast<uint16_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ViewGroup
@@ -1576,8 +1576,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ViewGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t status   = static_cast<uint8_t>(0);
-    uint16_t groupId = static_cast<uint16_t>(0);
+    uint8_t status        = static_cast<uint8_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1593,8 +1593,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ViewGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t status   = static_cast<uint8_t>(0);
-    uint16_t groupId = static_cast<uint16_t>(0);
+    uint8_t status        = static_cast<uint8_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1612,7 +1612,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    DataModel::List<const uint16_t> groupList;
+    DataModel::List<const chip::GroupId> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -1627,7 +1627,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    DataModel::DecodableList<uint16_t> groupList;
+    DataModel::DecodableList<chip::GroupId> groupList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetGroupMembership
@@ -1645,8 +1645,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t capacity = static_cast<uint8_t>(0);
-    DataModel::List<const uint16_t> groupList;
+    DataModel::Nullable<uint8_t> capacity;
+    DataModel::List<const chip::GroupId> groupList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -1661,8 +1661,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t capacity = static_cast<uint8_t>(0);
-    DataModel::DecodableList<uint16_t> groupList;
+    DataModel::Nullable<uint8_t> capacity;
+    DataModel::DecodableList<chip::GroupId> groupList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetGroupMembershipResponse
@@ -1679,7 +1679,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint16_t groupId = static_cast<uint16_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -1694,7 +1694,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint16_t groupId = static_cast<uint16_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveGroup
@@ -1712,8 +1712,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t status   = static_cast<uint8_t>(0);
-    uint16_t groupId = static_cast<uint16_t>(0);
+    uint8_t status        = static_cast<uint8_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -1728,8 +1728,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint8_t status   = static_cast<uint8_t>(0);
-    uint16_t groupId = static_cast<uint16_t>(0);
+    uint8_t status        = static_cast<uint8_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveGroupResponse
@@ -1775,7 +1775,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AddGroupIfIdentifying::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint16_t groupId = static_cast<uint16_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1791,7 +1791,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AddGroupIfIdentifying::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
 
-    uint16_t groupId = static_cast<uint16_t>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -2967,6 +2967,12 @@ using OnOffEffectIdentifier           = EmberAfOnOffEffectIdentifier;
 enum class OnOffControl : uint8_t
 {
     kAcceptOnlyWhenOn = 0x1,
+};
+
+// Bitmap for OnOffFeature
+enum class OnOffFeature : uint32_t
+{
+    kLighting = 0x1,
 };
 
 namespace Commands {
@@ -10681,7 +10687,8 @@ enum class CommissioningError : uint8_t
     kOk                    = 0x00,
     kValueOutsideRange     = 0x01,
     kInvalidAuthentication = 0x02,
-    kNotCommissioning      = 0x03,
+    kNoFailSafe            = 0x03,
+    kBusyWithOtherAdmin    = 0x04,
 };
 // Enum for RegulatoryLocationType
 enum class RegulatoryLocationType : uint8_t
@@ -16522,7 +16529,7 @@ namespace GroupKeyManagement {
 enum class GroupKeySecurityPolicy : uint8_t
 {
     kStandard   = 0x00,
-    kLowLatency = 0x01,
+    kTrustFirst = 0x01,
 };
 
 namespace Structs {
@@ -26864,6 +26871,12 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace TemperatureMeasurement
 namespace PressureMeasurement {
+
+// Bitmap for PressureFeature
+enum class PressureFeature : uint32_t
+{
+    kExt = 0x1,
+};
 
 namespace Attributes {
 

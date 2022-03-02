@@ -63,6 +63,7 @@ public:
     virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
 
     CHIP_ERROR Init();
+    void Shutdown() { mDNSResolver.Shutdown(); }
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.

@@ -112,6 +112,11 @@ public:
         return mACLCheckCache.HasValue() && mACLCheckCache.Value() == aToken;
     }
 
+    bool IsCurrentlyProcessingWritePath(const ConcreteAttributePath & aPath)
+    {
+        return mProcessingAttributePath.HasValue() && mProcessingAttributePath.Value() == aPath;
+    }
+
 private:
     enum class State
     {
@@ -143,9 +148,10 @@ private: // ExchangeDelegate
 private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
-    State mState                                  = State::Uninitialized;
-    bool mIsTimedRequest                          = false;
-    bool mHasMoreChunks                           = false;
+    State mState         = State::Uninitialized;
+    bool mIsTimedRequest = false;
+    bool mHasMoreChunks  = false;
+    Optional<ConcreteAttributePath> mProcessingAttributePath;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 };
 } // namespace app

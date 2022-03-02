@@ -354,12 +354,22 @@ const nlTest sTests[] = {
     NL_TEST_SENTINEL() //
 };
 
+int TestSetup(void * inContext)
+{
+    return chip::Platform::MemoryInit() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+}
+
+int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 } // namespace
 
 int TestResponseSender(void)
 {
-    chip::Platform::MemoryInit();
-    nlTestSuite theSuite = { "RecordData", sTests, nullptr, nullptr };
+    nlTestSuite theSuite = { "RecordData", sTests, &TestSetup, &TestTeardown };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

@@ -63,6 +63,7 @@ public:
     CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
+    CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;

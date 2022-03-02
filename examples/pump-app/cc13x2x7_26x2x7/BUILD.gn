@@ -94,9 +94,9 @@ ti_simplelink_executable("pump_app") {
   ]
 
   if (chip_openthread_ftd) {
-    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd" ]
+    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
   } else {
-    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd" ]
+    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
   }
 
   include_dirs = [

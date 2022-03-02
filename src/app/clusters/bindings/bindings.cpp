@@ -108,6 +108,8 @@ void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
         }
     }
     BindingTable::GetInstance().Add(bindingEntry);
+
+    BindingManager::GetInstance().NotifyBindingAdded(bindingEntry);
 }
 
 CHIP_ERROR BindingTableAccess::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)

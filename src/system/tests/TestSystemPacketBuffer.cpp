@@ -235,6 +235,8 @@ int PacketBufferTest::TestTeardown(void * inContext)
     if (err != CHIP_NO_ERROR && err != CHIP_ERROR_NOT_IMPLEMENTED)
         return FAILURE;
 
+    chip::Platform::MemoryShutdown();
+
     return SUCCESS;
 }
 

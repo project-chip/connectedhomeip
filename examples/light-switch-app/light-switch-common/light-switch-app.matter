@@ -464,7 +464,8 @@ server cluster GeneralCommissioning = 48 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
-    kNotCommissioning = 3;
+    kNoFailSafe = 3;
+    kBusyWithOtherAdmin = 4;
   }
 
   enum RegulatoryLocationType : ENUM8 {
@@ -614,25 +615,25 @@ client cluster Groups = 4 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct GetGroupMembershipRequest {
-    INT16U groupList[] = 0;
+    group_id groupList[] = 0;
   }
 
   request struct RemoveGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   request struct ViewGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   command AddGroup(AddGroupRequest): AddGroupResponse = 0;
@@ -1000,6 +1001,10 @@ client cluster OnOff = 6 {
 
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
+  }
+
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
   }
 
   readonly attribute boolean onOff = 0;

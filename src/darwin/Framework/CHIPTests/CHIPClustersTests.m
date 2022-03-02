@@ -16095,7 +16095,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+            XCTAssertEqual([actualValue unsignedIntValue], 1UL);
         }
 
         [expectation fulfill];
@@ -16160,7 +16160,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+            XCTAssertEqual([actualValue unsignedIntValue], 1UL);
         }
 
         [expectation fulfill];
@@ -43378,7 +43378,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
                             {
                                 id actualValue = values.capacity;
-                                XCTAssertEqual([actualValue unsignedCharValue], 255);
+                                XCTAssertTrue(actualValue == nil);
                             }
                             {
                                 id actualValue = values.groupList;
@@ -43612,7 +43612,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
                             {
                                 id actualValue = values.capacity;
-                                XCTAssertEqual([actualValue unsignedCharValue], 255);
+                                XCTAssertTrue(actualValue == nil);
                             }
                             {
                                 id actualValue = values.groupList;
@@ -43765,7 +43765,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
                             {
                                 id actualValue = values.capacity;
-                                XCTAssertEqual([actualValue unsignedCharValue], 255);
+                                XCTAssertTrue(actualValue == nil);
                             }
                             {
                                 id actualValue = values.groupList;

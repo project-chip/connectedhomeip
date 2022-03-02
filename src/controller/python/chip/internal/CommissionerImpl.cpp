@@ -140,8 +140,8 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, 0, ephemeralKey.Pubkey(), rcacSpan,
-                                                                                icacSpan, nocSpan);
+            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, /* fabricId = */ 1,
+                                                                                ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
             SuccessOrExit(err);
 
             commissionerParams.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
