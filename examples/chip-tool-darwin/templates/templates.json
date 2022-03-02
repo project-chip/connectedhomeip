@@ -29,11 +29,6 @@
             "path": "commands.zapt",
             "name": "Cluster Commands header",
             "output": "cluster/Commands.h"
-        },
-        {
-            "path": "README.zapt",
-            "name": "Tests Commands header",
-            "output": "README_CLUSTER_COMMANDS.md"
         }
     ]
 }
