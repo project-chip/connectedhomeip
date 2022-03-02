@@ -1333,13 +1333,7 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(Co
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 void DeviceCommissioner::ConnectBleTransportToSelf()
 {
-#if INET_CONFIG_ENABLE_IPV4
-    static const size_t kBleTupleIndex = 2;
-#else  // INET_CONFIG_ENABLE_IPV4
-    static const size_t kBleTupleIndex = 1;
-#endif // INET_CONFIG_ENABLE_IPV4
-
-    Transport::BLEBase & transport = mSystemState->TransportMgr()->GetTransport().GetImplAtIndex<kBleTupleIndex>();
+    Transport::BLEBase & transport = std::get<Transport::BLE<1>>(mSystemState->TransportMgr()->GetTransport().GetTransports());
     if (!transport.IsBleLayerTransportSetToSelf())
     {
         transport.SetBleLayerTransportToSelf();
