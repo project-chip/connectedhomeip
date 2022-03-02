@@ -112,8 +112,8 @@ Server::Server() :
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
-    }), mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage),
-    mAttributePersister(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
+    }), mCommissioningWindowManager(this), mGroupsProvider(GetPersistentStorageDelegate()),
+    mAttributePersister(GetPersistentStorageDelegate()), mAccessControl(Access::Examples::GetAccessControlDelegate(&GetPersistentStorageDelegate()))
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
@@ -136,19 +136,19 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     InitDataModelHandler(&mExchangeMgr);
 
-    err = mFabrics.Init(&mDeviceStorage);
+    err = mFabrics.Init(&GetFabricStorage());
     SuccessOrExit(err);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
-    // Group data provider must be initialized after mDeviceStorage
+    // Group data provider must be initialized after PersistedStorage
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
     SetGroupDataProvider(&mGroupsProvider);
 
-    // Access control must be initialized after mDeviceStorage.
+    // Access control must be initialized after PersistedStorage.
     err = mAccessControl.Init();
     SuccessOrExit(err);
     Access::SetAccessControl(mAccessControl);
@@ -182,7 +182,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     SuccessOrExit(err);
 
-    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, &mDeviceStorage);
+    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, &GetPersistentStorageDelegate());
     SuccessOrExit(err);
 
     err = mExchangeMgr.Init(&mSessions);

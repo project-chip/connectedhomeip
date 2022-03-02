@@ -39,6 +39,8 @@ static_library("server") {
   sources = [
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",
+    "DefaultFabricStorage.cpp",
+    "DefaultPersistentStorageDelegate.cpp",
     "Dnssd.cpp",
     "Dnssd.h",
     "EchoHandler.cpp",

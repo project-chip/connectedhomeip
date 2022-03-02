@@ -30,7 +30,6 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
-#include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -92,6 +91,9 @@ public:
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
+    PersistentStorageDelegate & GetPersistentStorageDelegate();
+    FabricStorage & GetFabricStorage();
+
     /**
      * This function send the ShutDown event before stopping
      * the event loop.
@@ -110,44 +112,6 @@ private:
     Server();
 
     static Server sServer;
-
-    class DeviceStorageDelegate : public PersistentStorageDelegate, public FabricStorage
-    {
-        CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
-        {
-            size_t bytesRead = 0;
-            CHIP_ERROR err   = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
-
-            if (err == CHIP_NO_ERROR)
-            {
-                ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
-            }
-            size = static_cast<uint16_t>(bytesRead);
-            return err;
-        }
-
-        CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
-        {
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
-        }
-
-        CHIP_ERROR SyncDeleteKeyValue(const char * key) override
-        {
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
-        }
-
-        CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
-        {
-            return SyncSetKeyValue(key, buffer, size);
-        };
-
-        CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override
-        {
-            return SyncGetKeyValue(key, buffer, size);
-        };
-
-        CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
-    };
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
     {
@@ -202,9 +166,7 @@ private:
     SecurePairingUsingTestSecret mTestPairing;
     CommissioningWindowManager mCommissioningWindowManager;
 
-    // Both PersistentStorageDelegate, and GroupDataProvider should be injected by the applications
-    // See: https://github.com/project-chip/connectedhomeip/issues/12276
-    DeviceStorageDelegate mDeviceStorage;
+    // GroupDataProvider should be injected by the applications See: https://github.com/project-chip/connectedhomeip/issues/12276
     Credentials::GroupDataProviderImpl mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
