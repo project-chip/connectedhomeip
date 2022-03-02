@@ -156,9 +156,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr));
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     if (params.enableServerInteractions)
     {
@@ -205,9 +203,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    controllerParams.deviceAddressUpdateDelegate = params.deviceAddressUpdateDelegate;
-#endif
+    controllerParams.deviceAddressUpdateDelegate    = params.deviceAddressUpdateDelegate;
     controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;
     controllerParams.operationalKeypair             = params.operationalKeypair;
     controllerParams.controllerNOC                  = params.controllerNOC;
@@ -287,9 +283,7 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mCASEServer = nullptr;
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     Dnssd::Resolver::Instance().Shutdown();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     // Shut down the interaction model
     app::InteractionModelEngine::GetInstance()->Shutdown();

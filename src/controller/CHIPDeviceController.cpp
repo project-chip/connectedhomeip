@@ -126,13 +126,11 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     VerifyOrReturnError(params.systemState->TransportMgr() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     ReturnErrorOnFailure(mDNSResolver.Init(params.systemState->UDPEndPointManager()));
     mDNSResolver.SetOperationalDelegate(this);
     mDNSResolver.SetCommissioningDelegate(this);
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
@@ -165,11 +163,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .sessionInitParams = deviceInitParams,
         .dnsCache          = &mDNSCache,
         .devicePool        = &mDevicePool,
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-        .dnsResolver = &mDNSResolver,
-#else
-        .dnsResolver = nullptr,
-#endif
+        .dnsResolver       = &mDNSResolver,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
@@ -255,11 +249,9 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemState->Release();
     mSystemState = nullptr;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     mDNSResolver.Shutdown();
     mDeviceAddressUpdateDelegate = nullptr;
     mDeviceDiscoveryDelegate     = nullptr;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     chip::Platform::Delete(mCASESessionManager);
     mCASESessionManager = nullptr;
@@ -554,8 +546,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-
 void DeviceController::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
     VerifyOrReturn(mState == State::Initialized,
@@ -565,7 +555,7 @@ void DeviceController::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNode
     {
         mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), CHIP_NO_ERROR);
     }
-};
+}
 
 void DeviceController::OnOperationalNodeResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
 {
@@ -578,9 +568,7 @@ void DeviceController::OnOperationalNodeResolutionFailed(const chip::PeerId & pe
     {
         mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
     }
-};
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+}
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
@@ -1355,7 +1343,6 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
     static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
@@ -1366,8 +1353,6 @@ const Dnssd::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int id
 {
     return GetDiscoveredNode(idx);
 }
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
 
@@ -1390,8 +1375,6 @@ void DeviceCommissioner::FindCommissionableNode(char * instanceName)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-
 void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
@@ -1403,7 +1386,6 @@ void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData 
     AbstractDnssdDiscoveryController::OnNodeDiscovered(nodeData);
     mSetUpCodePairer.NotifyCommissionableDeviceDiscovered(nodeData);
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 void OnBasicFailure(void * context, CHIP_ERROR error)
 {
@@ -1431,7 +1413,6 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     }
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 void DeviceCommissioner::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
     ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID 0x" ChipLogFormatX64,
@@ -1456,8 +1437,6 @@ void DeviceCommissioner::OnOperationalNodeResolutionFailed(const chip::PeerId & 
     }
     DeviceController::OnOperationalNodeResolutionFailed(peer, error);
 }
-
-#endif
 
 void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
 {
