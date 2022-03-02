@@ -604,32 +604,36 @@ class AsyncReadTransaction:
     def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
         self._handleAttributeData(path, dataVersion, status, data)
 
-    def _handleEventData(self, header: EventHeader, path: EventPath, data: bytes):
+    def _handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
         try:
             eventType = _EventIndex.get(str(path), None)
             eventValue = None
-            tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
-            if eventType is None:
-                eventValue = ValueDecodeFailure(
-                    tlvData, LookupError("event schema not found"))
-            else:
-                try:
-                    eventValue = eventType.FromTLV(data)
-                except Exception as ex:
-                    logging.error(
-                        f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Event = {path.EventId}")
-                    logging.error(
-                        f"Failed Cluster Object: {str(eventType)}")
-                    logging.error(ex)
-                    eventValue = ValueDecodeFailure(
-                        tlvData, ex)
 
-                    # If we're in debug mode, raise the exception so that we can better debug what's happening.
-                    if (builtins.enableDebugMode):
-                        raise
+            if data:
+                # data will be an empty buffer when we received an EventStatusIB instead of an EventDataIB.
+                tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
+
+                if eventType is None:
+                    eventValue = ValueDecodeFailure(
+                        tlvData, LookupError("event schema not found"))
+                else:
+                    try:
+                        eventValue = eventType.FromTLV(data)
+                    except Exception as ex:
+                        logging.error(
+                            f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Event = {path.EventId}")
+                        logging.error(
+                            f"Failed Cluster Object: {str(eventType)}")
+                        logging.error(ex)
+                        eventValue = ValueDecodeFailure(
+                            tlvData, ex)
+
+                        # If we're in debug mode, raise the exception so that we can better debug what's happening.
+                        if (builtins.enableDebugMode):
+                            raise
 
             eventResult = EventReadResult(
-                Header=header, Data=eventValue, Status=chip.interaction_model.Status.Success)
+                Header=header, Data=eventValue, Status=chip.interaction_model.Status(status))
             self._events.append(eventResult)
 
             if (self._subscription_handler is not None):
@@ -639,8 +643,8 @@ class AsyncReadTransaction:
         except Exception as ex:
             logging.exception(ex)
 
-    def handleEventData(self, header: EventHeader, path: EventPath, data: bytes):
-        self._handleEventData(header, path, data)
+    def handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
+        self._handleEventData(header, path, data, status)
 
     def _handleError(self, chipError: int):
         self._future.set_exception(
@@ -730,10 +734,10 @@ class AsyncWriteTransaction:
 
 
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint32, c_uint16, c_uint32, c_uint32, c_uint32, c_void_p, c_size_t)
+    None, py_object, c_uint32, c_uint16, c_uint32, c_uint32, c_uint8, c_void_p, c_size_t)
 _OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint64)
 _OnReadEventDataCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint16, c_uint32, c_uint32, c_uint32, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t)
+    None, py_object, c_uint16, c_uint32, c_uint32, c_uint32, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t, c_uint8)
 _OnReadErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32)
 _OnReadDoneCallbackFunct = CFUNCTYPE(
@@ -752,11 +756,11 @@ def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, clust
 
 
 @_OnReadEventDataCallbackFunct
-def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: int, number: int, priority: int, timestamp: int, timestampType: int, data, len):
+def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: int, number: int, priority: int, timestamp: int, timestampType: int, data, len, status):
     dataBytes = ctypes.string_at(data, len)
     path = EventPath(ClusterId=cluster, EventId=event)
     closure.handleEventData(EventHeader(
-        EndpointId=endpoint, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), path, dataBytes[:])
+        EndpointId=endpoint, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), path, dataBytes[:], status)
 
 
 @_OnSubscriptionEstablishedCallbackFunct
