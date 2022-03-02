@@ -156,7 +156,7 @@ namespace DeviceLayer {
             ReturnErrorCodeIf(filepath == nil, CHIP_ERROR_INVALID_ARGUMENT);
 
             // relative paths are relative to Documents folder
-            if ([filepath hasPrefix:@"/"]) {
+            if (![filepath hasPrefix:@"/"]) {
                 NSURL * documentsDirectory = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory
                                                                                   inDomain:NSUserDomainMask
                                                                          appropriateForURL:nil
