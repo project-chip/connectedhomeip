@@ -132,7 +132,10 @@ struct NumericAttributeTraits<BitFlags<T>>
     using StorageType = T;
     using WorkingType = BitFlags<T>;
 
-    static constexpr void WorkingToStorage(WorkingType workingValue, StorageType & storageValue) { storageValue = static_cast<StorageType>(workingValue.Raw()); }
+    static constexpr void WorkingToStorage(WorkingType workingValue, StorageType & storageValue)
+    {
+        storageValue = static_cast<StorageType>(workingValue.Raw());
+    }
 
     static constexpr WorkingType StorageToWorking(StorageType storageValue) { return WorkingType(storageValue); }
 
@@ -159,7 +162,8 @@ struct NumericAttributeTraits<BitFlags<T>>
         //
         // For bitmaps, the most significant bit is reserved to represent a null value (see 7.18.1.2 in the Matter spec).
         //
-        return static_cast<StorageType>(std::underlying_type_t<T>(1) << (std::numeric_limits<std::underlying_type_t<T>>::digits - 1));
+        return static_cast<StorageType>(std::underlying_type_t<T>(1)
+                                        << (std::numeric_limits<std::underlying_type_t<T>>::digits - 1));
     }
 
 private:
