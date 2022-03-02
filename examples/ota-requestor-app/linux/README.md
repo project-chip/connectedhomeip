@@ -278,7 +278,7 @@ out/chip-tool administratorcommissioning open-basic-commissioning-window 600 0x1
 **Commission to the second fabric**
 
 ```
-out/chip-tool pairing onnetwork-long 0x858 20202021 10 --commissioner-name beta
+out/chip-tool pairing onnetwork-long 0x858 20202021 18 --commissioner-name beta
 ```
 
 For all operations, specify which fabric to use by passing in
@@ -295,8 +295,6 @@ out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890
 **Write/Read DefaultOTAProviders on second fabric**
 
 ```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x858 0 --commissioner-name beta
+out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
 out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
 ```
-
-## Limitations
