@@ -104,12 +104,14 @@ CHIP_ERROR DiscoveryCommands::SetupDiscoveryCommands()
         ReturnErrorOnFailure(mDNSResolver.Init(chip::DeviceLayer::UDPEndPointManager()));
         mReady = true;
     }
+    mDNSResolver.SetOperationalDelegate(this);
     mDNSResolver.SetCommissioningDelegate(this);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryCommands::TearDownDiscoveryCommands()
 {
+    mDNSResolver.SetOperationalDelegate(nullptr);
     mDNSResolver.SetCommissioningDelegate(nullptr);
     return CHIP_NO_ERROR;
 }
