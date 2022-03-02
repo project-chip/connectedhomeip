@@ -1,8 +1,5 @@
 {
-    "cipd_package_files": [
-        "scripts/pigweed.json",
-        "scripts/python.json"
-    ],
+    "cipd_package_files": ["scripts/pigweed.json", "scripts/python.json"],
     "virtualenv": {
         "gn_root": ".",
         "gn_targets": [":python_packages.install"]
