@@ -49,7 +49,7 @@ pw::stream::SysIoWriter sysIoWriter;
 ::chip::rpc::Mutex * uart_mutex;
 
 template <size_t buffer_size>
-class ChipRpcChannelOutput: public pw::rpc::ChannelOutput
+class ChipRpcChannelOutput : public pw::rpc::ChannelOutput
 {
 public:
     constexpr ChipRpcChannelOutput(pw::stream::Writer & writer, uint8_t address, const char * channel_name) :
