@@ -25,9 +25,9 @@ declare_args() {
 }
 
 group("telink") {
-  deps = [ 
+  deps = [
     "${chip_root}/src/lib",
-    "${telink_sdk_build_root}"
+    "${telink_sdk_build_root}",
   ]
 
   if (chip_build_tests) {
