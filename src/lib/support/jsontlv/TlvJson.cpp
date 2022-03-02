@@ -55,8 +55,8 @@ struct KeyContext
         key     = listIndex;
     }
 
-    KeyType keyType = kRoot;
-    uint32_t key    = 0;
+    KeyType keyType  = kRoot;
+    unsigned int key = 0;
 };
 } // namespace
 
@@ -180,6 +180,13 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
     case TLV::kTLVType_Structure:
         isStruct = true;
 
+        //
+        // Fall-through to the case below since
+        // arrays and structs are handled similarly with
+        // just a small difference in terms of handling of field IDs vs.
+        // list indices of the elements in the respective collections.
+        //
+
     case TLV::kTLVType_Array: {
         TLV::TLVType containerType;
 
@@ -193,8 +200,8 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
         {
             if (isStruct)
             {
-                KeyContext context2(static_cast<chip::FieldId>(TLV::TagNumFromTag(reader.GetTag())));
                 VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+                KeyContext context2(static_cast<chip::FieldId>(TLV::TagNumFromTag(reader.GetTag())));
 
                 //
                 // Recursively convert to JSON the encompassing item within the struct.
