@@ -1333,11 +1333,13 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(Co
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 void DeviceCommissioner::ConnectBleTransportToSelf()
 {
-    // The following returns error on Linux builds:
-    // /usr/include/c++/9/tuple:1303:25: error: static assertion failed: tuple index is in range
-    // static_assert(__i < tuple_size<tuple<>>::value,
-    // Transport::BLEBase transport = mSystemState->TransportMgr()->GetTransport().template GetImplAtIndex<2>();
-    Transport::BLEBase transport = mSystemState->TransportMgr()->GetTransport().GetImplAtIndex<2>();
+#if INET_CONFIG_ENABLE_IPV4
+    static const size_t kBleTupleIndex = 2;
+#else  // INET_CONFIG_ENABLE_IPV4
+    static const size_t kBleTupleIndex = 1;
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    Transport::BLEBase & transport = mSystemState->TransportMgr()->GetTransport().GetImplAtIndex<kBleTupleIndex>();
     if (!transport.IsBleLayerTransportSetToSelf())
     {
         transport.SetBleLayerTransportToSelf();
