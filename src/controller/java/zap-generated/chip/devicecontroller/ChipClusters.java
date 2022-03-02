@@ -12286,6 +12286,30 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    public interface OnTimeAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface OffWaitTimeAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface StartUpOnOffAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface ServerGeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -12328,7 +12352,7 @@ public class ChipClusters {
       subscribeGlobalSceneControlAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readOnTimeAttribute(IntegerAttributeCallback callback) {
+    public void readOnTimeAttribute(OnTimeAttributeCallback callback) {
       readOnTimeAttribute(chipClusterPtr, callback);
     }
 
@@ -12342,11 +12366,11 @@ public class ChipClusters {
     }
 
     public void subscribeOnTimeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        OnTimeAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeOnTimeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readOffWaitTimeAttribute(IntegerAttributeCallback callback) {
+    public void readOffWaitTimeAttribute(OffWaitTimeAttributeCallback callback) {
       readOffWaitTimeAttribute(chipClusterPtr, callback);
     }
 
@@ -12360,11 +12384,11 @@ public class ChipClusters {
     }
 
     public void subscribeOffWaitTimeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        OffWaitTimeAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeOffWaitTimeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readStartUpOnOffAttribute(IntegerAttributeCallback callback) {
+    public void readStartUpOnOffAttribute(StartUpOnOffAttributeCallback callback) {
       readStartUpOnOffAttribute(chipClusterPtr, callback);
     }
 
@@ -12378,7 +12402,7 @@ public class ChipClusters {
     }
 
     public void subscribeStartUpOnOffAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        StartUpOnOffAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeStartUpOnOffAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -12442,7 +12466,7 @@ public class ChipClusters {
     private native void subscribeGlobalSceneControlAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readOnTimeAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+    private native void readOnTimeAttribute(long chipClusterPtr, OnTimeAttributeCallback callback);
 
     private native void writeOnTimeAttribute(
         long chipClusterPtr,
@@ -12451,10 +12475,10 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeOnTimeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, OnTimeAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readOffWaitTimeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, OffWaitTimeAttributeCallback callback);
 
     private native void writeOffWaitTimeAttribute(
         long chipClusterPtr,
@@ -12463,10 +12487,13 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeOffWaitTimeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        OffWaitTimeAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readStartUpOnOffAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, StartUpOnOffAttributeCallback callback);
 
     private native void writeStartUpOnOffAttribute(
         long chipClusterPtr,
@@ -12475,7 +12502,10 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeStartUpOnOffAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        StartUpOnOffAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readServerGeneratedCommandListAttribute(
         long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);

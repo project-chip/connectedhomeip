@@ -2267,9 +2267,9 @@ server cluster OnOff = 6 {
 
   readonly attribute boolean onOff = 0;
   readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute enum8 startUpOnOff = 16387;
+  attribute nullable int16u onTime = 16385;
+  attribute nullable int16u offWaitTime = 16386;
+  attribute nullable enum8 startUpOnOff = 16387;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 

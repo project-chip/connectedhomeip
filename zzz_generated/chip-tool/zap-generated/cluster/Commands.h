@@ -2111,7 +2111,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::DataModel::Nullable<uint16_t> mValue;
 };
 
 class WriteOnOffOffWaitTime : public WriteAttribute
@@ -2132,7 +2132,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::DataModel::Nullable<uint16_t> mValue;
 };
 
 class WriteOnOffStartUpOnOff : public WriteAttribute
@@ -2153,7 +2153,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 /*----------------------------------------------------------------------------*\

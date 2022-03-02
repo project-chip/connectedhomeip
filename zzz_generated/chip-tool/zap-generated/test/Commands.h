@@ -29357,7 +29357,7 @@ private:
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context, uint16_t onTime)
+    static void OnSuccessCallback_5(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnSuccessResponse_5(onTime);
     }
@@ -29367,7 +29367,7 @@ private:
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnSuccessResponse_6(offWaitTime);
     }
@@ -29377,7 +29377,7 @@ private:
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context, uint8_t startUpOnOff)
+    static void OnSuccessCallback_7(void * context, const chip::app::DataModel::Nullable<uint8_t> & startUpOnOff)
     {
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnSuccessResponse_7(startUpOnOff);
     }
@@ -29425,7 +29425,7 @@ private:
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnFailureResponse_13(error);
     }
 
-    static void OnSuccessCallback_13(void * context, uint16_t onTime)
+    static void OnSuccessCallback_13(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnSuccessResponse_13(onTime);
     }
@@ -29435,7 +29435,7 @@ private:
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnFailureResponse_14(error);
     }
 
-    static void OnSuccessCallback_14(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_14(void * context, const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnSuccessResponse_14(offWaitTime);
     }
@@ -29445,7 +29445,7 @@ private:
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnFailureResponse_15(error);
     }
 
-    static void OnSuccessCallback_15(void * context, uint8_t startUpOnOff)
+    static void OnSuccessCallback_15(void * context, const chip::app::DataModel::Nullable<uint8_t> & startUpOnOff)
     {
         (static_cast<Test_TC_OO_2_1Suite *>(context))->OnSuccessResponse_15(startUpOnOff);
     }
@@ -29572,9 +29572,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5(uint16_t onTime)
+    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -29596,9 +29597,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(uint16_t offWaitTime)
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("offWaitTime", offWaitTime));
+        VerifyOrReturn(CheckValue("offWaitTime.Value()", offWaitTime.Value(), 0U));
 
         NextTest();
     }
@@ -29620,9 +29622,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(uint8_t startUpOnOff)
+    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<uint8_t> & startUpOnOff)
     {
-        VerifyOrReturn(CheckValue("startUpOnOff", startUpOnOff, 0));
+        VerifyOrReturn(CheckValueNonNull("startUpOnOff", startUpOnOff));
+        VerifyOrReturn(CheckValue("startUpOnOff.Value()", startUpOnOff.Value(), 0));
 
         NextTest();
     }
@@ -29656,8 +29659,9 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t onTimeArgument;
-        onTimeArgument = 0U;
+        chip::app::DataModel::Nullable<uint16_t> onTimeArgument;
+        onTimeArgument.SetNonNull();
+        onTimeArgument.Value() = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
             onTimeArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
@@ -29678,8 +29682,9 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t offWaitTimeArgument;
-        offWaitTimeArgument = 0U;
+        chip::app::DataModel::Nullable<uint16_t> offWaitTimeArgument;
+        offWaitTimeArgument.SetNonNull();
+        offWaitTimeArgument.Value() = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
             offWaitTimeArgument, this, OnSuccessCallback_10, OnFailureCallback_10));
@@ -29700,8 +29705,9 @@ private:
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint8_t startUpOnOffArgument;
-        startUpOnOffArgument = 0;
+        chip::app::DataModel::Nullable<uint8_t> startUpOnOffArgument;
+        startUpOnOffArgument.SetNonNull();
+        startUpOnOffArgument.Value() = 0;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
             startUpOnOffArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
@@ -29757,9 +29763,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13(uint16_t onTime)
+    void OnSuccessResponse_13(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -29781,9 +29788,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14(uint16_t offWaitTime)
+    void OnSuccessResponse_14(const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("offWaitTime", offWaitTime));
+        VerifyOrReturn(CheckValue("offWaitTime.Value()", offWaitTime.Value(), 0U));
 
         NextTest();
     }
@@ -29805,9 +29813,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15(uint8_t startUpOnOff)
+    void OnSuccessResponse_15(const chip::app::DataModel::Nullable<uint8_t> & startUpOnOff)
     {
-        VerifyOrReturn(CheckValue("startUpOnOff", startUpOnOff, 0));
+        VerifyOrReturn(CheckValueNonNull("startUpOnOff", startUpOnOff));
+        VerifyOrReturn(CheckValue("startUpOnOff.Value()", startUpOnOff.Value(), 0));
 
         NextTest();
     }
@@ -30905,7 +30914,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_13(error);
     }
 
-    static void OnSuccessCallback_13(void * context, uint16_t onTime)
+    static void OnSuccessCallback_13(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_13(onTime);
     }
@@ -30915,7 +30924,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_14(error);
     }
 
-    static void OnSuccessCallback_14(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_14(void * context, const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_14(offWaitTime);
     }
@@ -30935,7 +30944,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_17(error);
     }
 
-    static void OnSuccessCallback_17(void * context, uint16_t onTime)
+    static void OnSuccessCallback_17(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_17(onTime);
     }
@@ -30945,7 +30954,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_18(error);
     }
 
-    static void OnSuccessCallback_18(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_18(void * context, const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_18(offWaitTime);
     }
@@ -30965,7 +30974,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_21(error);
     }
 
-    static void OnSuccessCallback_21(void * context, uint16_t onTime)
+    static void OnSuccessCallback_21(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_21(onTime);
     }
@@ -30985,7 +30994,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_23(error);
     }
 
-    static void OnSuccessCallback_23(void * context, uint16_t onTime)
+    static void OnSuccessCallback_23(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_23(onTime);
     }
@@ -30995,7 +31004,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_24(error);
     }
 
-    static void OnSuccessCallback_24(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_24(void * context, const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_24(offWaitTime);
     }
@@ -31005,7 +31014,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_26(error);
     }
 
-    static void OnSuccessCallback_26(void * context, uint16_t onTime)
+    static void OnSuccessCallback_26(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_26(onTime);
     }
@@ -31015,7 +31024,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_27(error);
     }
 
-    static void OnSuccessCallback_27(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_27(void * context, const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_27(offWaitTime);
     }
@@ -31035,7 +31044,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_30(error);
     }
 
-    static void OnSuccessCallback_30(void * context, uint16_t onTime)
+    static void OnSuccessCallback_30(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_30(onTime);
     }
@@ -31055,7 +31064,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_32(error);
     }
 
-    static void OnSuccessCallback_32(void * context, uint16_t onTime)
+    static void OnSuccessCallback_32(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_32(onTime);
     }
@@ -31075,7 +31084,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_35(error);
     }
 
-    static void OnSuccessCallback_35(void * context, uint16_t onTime)
+    static void OnSuccessCallback_35(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_35(onTime);
     }
@@ -31085,7 +31094,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_36(error);
     }
 
-    static void OnSuccessCallback_36(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_36(void * context, const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_36(offWaitTime);
     }
@@ -31105,7 +31114,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_39(error);
     }
 
-    static void OnSuccessCallback_39(void * context, uint16_t onTime)
+    static void OnSuccessCallback_39(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_39(onTime);
     }
@@ -31125,7 +31134,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_41(error);
     }
 
-    static void OnSuccessCallback_41(void * context, uint16_t onTime)
+    static void OnSuccessCallback_41(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_41(onTime);
     }
@@ -31135,7 +31144,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_42(error);
     }
 
-    static void OnSuccessCallback_42(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_42(void * context, const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_42(offWaitTime);
     }
@@ -31155,7 +31164,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_44(error);
     }
 
-    static void OnSuccessCallback_44(void * context, uint16_t onTime)
+    static void OnSuccessCallback_44(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_44(onTime);
     }
@@ -31165,7 +31174,7 @@ private:
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnFailureResponse_45(error);
     }
 
-    static void OnSuccessCallback_45(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_45(void * context, const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
         (static_cast<Test_TC_OO_2_3Suite *>(context))->OnSuccessResponse_45(offWaitTime);
     }
@@ -31440,9 +31449,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13(uint16_t onTime)
+    void OnSuccessResponse_13(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -31464,9 +31474,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14(uint16_t offWaitTime)
+    void OnSuccessResponse_14(const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("offWaitTime", offWaitTime));
+        VerifyOrReturn(CheckValue("offWaitTime.Value()", offWaitTime.Value(), 0U));
 
         NextTest();
     }
@@ -31539,9 +31550,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_17(uint16_t onTime)
+    void OnSuccessResponse_17(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -31563,9 +31575,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_18(uint16_t offWaitTime)
+    void OnSuccessResponse_18(const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("offWaitTime", offWaitTime));
+        VerifyOrReturn(CheckValue("offWaitTime.Value()", offWaitTime.Value(), 0U));
 
         NextTest();
     }
@@ -31638,9 +31651,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_21(uint16_t onTime)
+    void OnSuccessResponse_21(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -31686,9 +31700,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_23(uint16_t onTime)
+    void OnSuccessResponse_23(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -31710,9 +31725,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_24(uint16_t offWaitTime)
+    void OnSuccessResponse_24(const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("offWaitTime", offWaitTime));
+        VerifyOrReturn(CheckValue("offWaitTime.Value()", offWaitTime.Value(), 0U));
 
         NextTest();
     }
@@ -31761,9 +31777,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_26(uint16_t onTime)
+    void OnSuccessResponse_26(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -31785,9 +31802,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_27(uint16_t offWaitTime)
+    void OnSuccessResponse_27(const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("offWaitTime", offWaitTime));
+        VerifyOrReturn(CheckValue("offWaitTime.Value()", offWaitTime.Value(), 0U));
 
         NextTest();
     }
@@ -31860,9 +31878,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_30(uint16_t onTime)
+    void OnSuccessResponse_30(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -31908,9 +31927,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_32(uint16_t onTime)
+    void OnSuccessResponse_32(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -31983,9 +32003,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_35(uint16_t onTime)
+    void OnSuccessResponse_35(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -32007,9 +32028,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_36(uint16_t offWaitTime)
+    void OnSuccessResponse_36(const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("offWaitTime", offWaitTime));
+        VerifyOrReturn(CheckValue("offWaitTime.Value()", offWaitTime.Value(), 0U));
 
         NextTest();
     }
@@ -32082,9 +32104,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_39(uint16_t onTime)
+    void OnSuccessResponse_39(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -32130,9 +32153,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_41(uint16_t onTime)
+    void OnSuccessResponse_41(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -32154,9 +32178,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_42(uint16_t offWaitTime)
+    void OnSuccessResponse_42(const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("offWaitTime", offWaitTime));
+        VerifyOrReturn(CheckValue("offWaitTime.Value()", offWaitTime.Value(), 0U));
 
         NextTest();
     }
@@ -32202,9 +32227,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_44(uint16_t onTime)
+    void OnSuccessResponse_44(const chip::app::DataModel::Nullable<uint16_t> & onTime)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTime", onTime));
+        VerifyOrReturn(CheckValue("onTime.Value()", onTime.Value(), 0U));
 
         NextTest();
     }
@@ -32226,9 +32252,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_45(uint16_t offWaitTime)
+    void OnSuccessResponse_45(const chip::app::DataModel::Nullable<uint16_t> & offWaitTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("offWaitTime", offWaitTime));
+        VerifyOrReturn(CheckValue("offWaitTime.Value()", offWaitTime.Value(), 0U));
 
         NextTest();
     }
