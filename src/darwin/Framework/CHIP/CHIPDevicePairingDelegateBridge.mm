@@ -109,4 +109,3 @@ void CHIPDevicePairingDelegateBridge::OnCommissioningComplete(chip::NodeId nodeI
         }
     }
 }
-
