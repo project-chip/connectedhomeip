@@ -135,7 +135,7 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
 
         prev = current;
 
-        current->mProcessEvictedElement = AlwaysFail;
+        current->mProcessEvictedElement = nullptr;
         current->mAppData               = nullptr;
     }
 
@@ -272,8 +272,7 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
         }
     }
 
-    // On exit, configure the top-level s.t. it will always fail to evict an element
-    mpEventBuffer->mProcessEvictedElement = AlwaysFail;
+    mpEventBuffer->mProcessEvictedElement = nullptr;
     mpEventBuffer->mAppData               = nullptr;
 
 exit:
@@ -311,9 +310,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     VerifyOrReturnError(apOptions != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     EventReportIB::Builder eventReportBuilder;
-    eventReportBuilder.Init(&(apContext->mWriter));
-    // TODO: Update IsUrgent, issue 11386
-    // TODO: Update statusIB, issue 11388
+    ReturnErrorOnFailure(eventReportBuilder.Init(&(apContext->mWriter)));
     EventDataIB::Builder & eventDataIBBuilder = eventReportBuilder.CreateEventData();
     ReturnErrorOnFailure(eventReportBuilder.GetError());
     EventPathIB::Builder & eventPathBuilder = eventDataIBBuilder.CreatePath();
@@ -322,7 +319,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     eventPathBuilder.Endpoint(apOptions->mPath.mEndpointId)
         .Cluster(apOptions->mPath.mClusterId)
         .Event(apOptions->mPath.mEventId)
-        .IsUrgent(false)
+        .IsUrgent(apOptions->mUrgent == EventOptions::Type::kUrgent)
         .EndOfEventPathIB();
     ReturnErrorOnFailure(eventPathBuilder.GetError());
     eventDataIBBuilder.EventNumber(apContext->mCurrentEventNumber).Priority(chip::to_underlying(apContext->mPriority));
