@@ -93,8 +93,8 @@ private:
         kAdvertising              = 0x0008, /**< The system is currently CHIPoBLE advertising. */
         kAdvertisingRefreshNeeded = 0x0010, /**< The advertising state/configuration state in the BLE layer needs to be updated. */
         kDeviceNameSet            = 0x0020, /**< The device name has been set. */
-        kRestartAdvertising       = 0x0040, /**< The advertising will be restarted when stop advertising confirmation is received and this
-                                            flag is set*/
+        kRestartAdvertising = 0x0040, /**< The advertising will be restarted when stop advertising confirmation is received and this
+                                      flag is set*/
     };
 
     enum
@@ -127,8 +127,8 @@ private:
     CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
     CHIP_ERROR HandleGAPDisconnect(const ChipDeviceEvent * event);
     CHIP_ERROR HandleDisconnectRequest(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent *event);
-    CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent *event);
+    CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent * event);
     CHIP_ERROR HandleTXCharComplete(const ChipDeviceEvent * event);
     CHIP_ERROR HandleBleConnectionClosed(const ChipDeviceEvent * event);
 
@@ -155,11 +155,11 @@ private:
     CHIP_ERROR _InitGap(void);
 
 public:
-    static int RxWriteCallback(uint16_t connHandle, void *p);
-    static int TxCccWriteCallback(uint16_t connHandle, void *p);
-    static void ConnectCallback(uint8_t event, uint8_t *data, int len);
-    static void DisconnectCallback(uint8_t event, uint8_t *data, int len);
-    static int GapEventHandler(uint32_t event, uint8_t *data, int size);
+    static int RxWriteCallback(uint16_t connHandle, void * p);
+    static int TxCccWriteCallback(uint16_t connHandle, void * p);
+    static void ConnectCallback(uint8_t event, uint8_t * data, int len);
+    static void DisconnectCallback(uint8_t event, uint8_t * data, int len);
+    static int GapEventHandler(uint32_t event, uint8_t * data, int size);
 
     /* Switch to IEEE802154 interface. @todo: remove to other module? */
     void SwitchToIeee802154(void);

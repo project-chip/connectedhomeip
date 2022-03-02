@@ -21,7 +21,6 @@ assert(chip_device_platform == "telink")
 
 static_library("telink") {
   sources = [
-    "BLEManagerImpl.cpp",
     "../SingletonConfigurationManager.cpp",
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
@@ -32,6 +31,7 @@ static_library("telink") {
     "../Zephyr/SystemTimeSupport.cpp",
     "../Zephyr/ZephyrConfig.cpp",
     "../Zephyr/ZephyrConfig.h",
+    "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
@@ -50,10 +50,10 @@ static_library("telink") {
 
   deps = []
 
-  public_deps = [ 
-    "${chip_root}/src/platform:platform_base",
+  public_deps = [
     "${chip_root}/src/crypto",
-    "${telink_sdk_build_root}"
+    "${chip_root}/src/platform:platform_base",
+    "${telink_sdk_build_root}",
   ]
 
   if (chip_enable_openthread) {
