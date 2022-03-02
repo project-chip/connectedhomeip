@@ -142,15 +142,14 @@
                                                     message:@"QRCode scanner to pair a matter device requires iOS >= 15.4"
                                              preferredStyle:UIAlertControllerStyleAlert];
             __weak typeof(self) weakSelf = self;
-            [alertController
-                addAction:[UIAlertAction actionWithTitle:@"I understand"
-                                                   style:UIAlertActionStyleDefault
-                                                 handler:^(UIAlertAction * action) {
-                                                     typeof(self) strongSelf = weakSelf;
-                                                     if (strongSelf) {
-                                                         [strongSelf pushQRCodeScannerWithSkipCheck:YES];
-                                                     }
-                                                 }]];
+            [alertController addAction:[UIAlertAction actionWithTitle:@"I understand"
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * action) {
+                                                                  typeof(self) strongSelf = weakSelf;
+                                                                  if (strongSelf) {
+                                                                      [strongSelf pushQRCodeScannerWithSkipCheck:YES];
+                                                                  }
+                                                              }]];
             [self presentViewController:alertController animated:YES completion:nil];
         }
     }
