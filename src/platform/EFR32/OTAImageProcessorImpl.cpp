@@ -128,6 +128,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     mSlotId      = 0; // Single slot until we support multiple images
     mWriteOffset = 0;
 
+    imageProcessor->mHeaderParser.Init();
+
     // Not calling bootloader_eraseStorageSlot(mSlotId) here because we erase during each write
 
     imageProcessor->mDownloader->OnPreparedForDownload(err == SL_BOOTLOADER_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
@@ -173,7 +175,15 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    // TODO: Process block header if any
+    ByteSpan block   = imageProcessor->mBlock;
+    CHIP_ERROR chip_error = imageProcessor->ProcessHeader(block);
+
+    if (chip_error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Matter image header parser error %s", chip::ErrorStr(chip_error));
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+        return;
+    }
 
     err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, reinterpret_cast<uint8_t *>(imageProcessor->mBlock.data()),
                                        imageProcessor->mBlock.size());
@@ -189,6 +199,26 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     mWriteOffset += imageProcessor->mBlock.size(); // Keep our own track of how far we've written
     imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
     imageProcessor->mDownloader->FetchNextData();
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
+{
+    if (mHeaderParser.IsInitialized())
+    {
+        OTAImageHeader header;
+        CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(block, header);
+
+        // Needs more data to decode the header
+        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(error);
+
+        // SL TODO -- store version somewhere
+        ChipLogProgress(SoftwareUpdate, "Image Header software version: %ld ", header.mSoftwareVersion);
+
+        mParams.totalFileBytes = header.mPayloadSize;
+        mHeaderParser.Clear();
+    }
+    return CHIP_NO_ERROR;
 }
 
 // Store block data for HandleProcessBlock to access
