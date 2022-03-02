@@ -101,6 +101,26 @@ public:
     }
     Optional<bool> GetTcpSupported() const { return mTcpSupported; }
 
+#ifdef CHIP_CONFIG_TEST
+    Derived & SetUnsupported(const char * unsupported)
+    {
+        if (unsupported == nullptr)
+        {
+            mUnsupportedHasValue = false;
+        }
+        else
+        {
+            Platform::CopyString(mUnsupported, sizeof(mUnsupported), unsupported);
+            mUnsupportedHasValue = true;
+        }
+        return *reinterpret_cast<Derived *>(this);
+    }
+    Optional<const char *> GetUnsupported() const
+    {
+        return mUnsupportedHasValue ? Optional<const char *>::Value(mUnsupported) : Optional<const char *>::Missing();
+    }
+#endif
+
 private:
     uint16_t mPort                   = CHIP_PORT;
     Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();
@@ -109,6 +129,10 @@ private:
     size_t mMacLength                = 0;
     Optional<ReliableMessageProtocolConfig> mMRPConfig;
     Optional<bool> mTcpSupported;
+#ifdef CHIP_CONFIG_TEST
+    char mUnsupported[kKeyUnsupportedMaxLength + 1];
+    bool mUnsupportedHasValue = false;
+#endif
 };
 
 /// Defines parameters required for advertising a CHIP node
