@@ -53,7 +53,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
     effectiveTime.Day   = 1;
     ReturnErrorOnFailure(ASN1ToChipEpochTime(effectiveTime, mNow));
 
-    
+
     uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
     PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsRootCertificateStorage, key,
@@ -72,7 +72,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsRootCertificateStorage, key,
                           ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(), keySize)));
     }
-    
+
     if (![mController startup:storage vendorId:0 nocSigner:mIssuer]) {
         ChipLogError(chipTool, "Controller startup failure.");
         return CHIP_ERROR_INTERNAL;
