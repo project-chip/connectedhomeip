@@ -110,14 +110,18 @@ void CASESession::Clear()
 
     mState = kInitialized;
 
-    CloseExchange();
+    AbortExchange();
 }
 
-void CASESession::CloseExchange()
+void CASESession::AbortExchange()
 {
     if (mExchangeCtxt != nullptr)
     {
-        mExchangeCtxt->Close();
+        // The only time we reach this is if we are getting destroyed in the
+        // middle of our handshake.  In that case, there is no point trying to
+        // do MRP resends of the last message we sent, so abort the exchange
+        // instead of just closing it.
+        mExchangeCtxt->Abort();
         mExchangeCtxt = nullptr;
     }
 }
