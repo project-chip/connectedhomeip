@@ -141,6 +141,18 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             requestorCore->mTargetVersion = update.softwareVersion;
             requestorCore->mUpdateToken   = updateToken;
 
+            // Store file designator needed for BDX transfers
+            MutableCharSpan fileDesignator(requestorCore->mFileDesignatorBuffer);
+            if (update.fileDesignator.size() > fileDesignator.size())
+            {
+                ChipLogError(SoftwareUpdate, "File designator size %zu is too large to store", update.fileDesignator.size());
+                requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, err);
+                return;
+            }
+            memcpy(fileDesignator.data(), update.fileDesignator.data(), update.fileDesignator.size());
+            fileDesignator.reduce_size(update.fileDesignator.size());
+            requestorCore->mFileDesignator = fileDesignator;
+
             requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
                                                                 System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
@@ -656,7 +668,9 @@ CHIP_ERROR OTARequestor::ExtractUpdateDescription(const QueryImageResponseDecoda
 
     VerifyOrReturnError(response.imageURI.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(bdx::ParseURI(response.imageURI.Value(), nodeId, fileDesignator));
-    update.imageURI = response.imageURI.Value();
+    VerifyOrReturnError(IsSpanUsable(fileDesignator), CHIP_ERROR_INVALID_ARGUMENT);
+    update.nodeId         = nodeId;
+    update.fileDesignator = fileDesignator;
 
     VerifyOrReturnError(response.softwareVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(response.softwareVersionString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -681,9 +695,8 @@ CHIP_ERROR OTARequestor::StartDownload(OperationalDeviceProxy & deviceProxy)
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = bdx::TransferControlFlags::kReceiverDrive;
     initOptions.MaxBlockSize     = mOtaRequestorDriver->GetMaxDownloadBlockSize();
-    char testFileDes[9]          = { "test.txt" };
-    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
-    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.FileDesLength    = static_cast<uint16_t>(mFileDesignator.size());
+    initOptions.FileDesignator   = reinterpret_cast<const uint8_t *>(mFileDesignator.data());
 
     chip::Messaging::ExchangeManager * exchangeMgr = deviceProxy.GetExchangeManager();
     VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);

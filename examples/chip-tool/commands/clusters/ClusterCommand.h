@@ -57,6 +57,11 @@ public:
         return ClusterCommand::SendCommand(device, endpointId, mClusterId, mCommandId, mPayload);
     }
 
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    {
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, mClusterId, mCommandId, mPayload);
+    }
+
     /////////// CommandSender Callback Interface /////////
     virtual void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
                             const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
@@ -104,6 +109,34 @@ public:
         VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(mCommandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
         ReturnErrorOnFailure(mCommandSender->SendCommandRequest(device->GetSecureSession().Value()));
+        return CHIP_NO_ERROR;
+    }
+
+    template <class T>
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId,
+                                chip::ClusterId clusterId, chip::CommandId commandId, const T & value)
+    {
+        chip::app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, clusterId, commandId,
+                                                     (chip::app::CommandPathFlags::kGroupIdValid) };
+
+        chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
+
+        auto commandSender =
+            chip::Platform::MakeUnique<chip::app::CommandSender>(this, exchangeManager, mTimedInteractionTimeoutMs.HasValue());
+        VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
+
+        chip::Optional<chip::SessionHandle> session =
+            exchangeManager->GetSessionManager()->CreateGroupSession(groupId, fabricIndex, senderNodeId);
+        if (!session.HasValue())
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        CHIP_ERROR err = commandSender->SendGroupCommandRequest(session.Value());
+        exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
+        ReturnErrorOnFailure(err);
+        commandSender.release();
+
         return CHIP_NO_ERROR;
     }
 

@@ -119,18 +119,6 @@ class ChipDeviceController():
             self.state = DCState.IDLE
             self._ChipStack.completeEvent.set()
 
-        def HandleAddressUpdateComplete(nodeid, err):
-            if err != 0:
-                print("Failed to update node address: {}".format(err))
-                # Failed update address, don't wait for HandleCommissioningComplete
-                self.state = DCState.IDLE
-                self._ChipStack.callbackRes = err
-                self._ChipStack.completeEvent.set()
-            else:
-                print("Node address has been updated")
-                # Wait for HandleCommissioningComplete before setting
-                # self._ChipStack.callbackRes; we're not done until that happens.
-
         def HandleCommissioningComplete(nodeid, err):
             if err != 0:
                 print("Failed to commission: {}".format(err))
@@ -151,11 +139,6 @@ class ChipDeviceController():
             HandleCommissioningComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.devCtrl, self.cbHandleCommissioningCompleteFunct)
-
-        self.cbOnAddressUpdateComplete = _DeviceAddressUpdateDelegate_OnUpdateComplete(
-            HandleAddressUpdateComplete)
-        self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
-            self.cbOnAddressUpdateComplete)
 
         self.state = DCState.IDLE
         self.isActive = True
@@ -913,10 +896,6 @@ class ChipDeviceController():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnCommissioningCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = c_uint32
-
-            self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.argtypes = [
-                _DeviceAddressUpdateDelegate_OnUpdateComplete]
-            self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.restype = None
 
             self._dmLib.pychip_DeviceController_UpdateDevice.argtypes = [
                 c_void_p, c_uint64]

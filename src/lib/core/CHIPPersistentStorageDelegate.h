@@ -45,6 +45,18 @@ public:
      *                 The output length could be larger than input value. In
      *                 such cases, the user should allocate the buffer large
      *                 enough (>= output length), and call the API again.
+     *
+     * @return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND the key is unknown.
+     * @return CHIP_ERROR_BUFFER_TOO_SMALL the provided buffer is not big
+     *                                     enough.  In this case "size" will
+     *                                     indicate the needed buffer size.
+     *                                     Some data may or may not be placed
+     *                                     in "buffer" in this case; consumers
+     *                                     should not rely on that behavior.
+     *                                     CHIP_ERROR_BUFFER_TOO_SMALL combined
+     *                                     with setting "size" to 0 means the
+     *                                     actual size was too large to fit in
+     *                                     uint16_t.
      */
     virtual CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) = 0;
 
@@ -63,6 +75,8 @@ public:
      *   Deletes the value for the key
      *
      * @param[in] key Key to be deleted
+     *
+     * @return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND the key is unknown.
      */
     virtual CHIP_ERROR SyncDeleteKeyValue(const char * key) = 0;
 };

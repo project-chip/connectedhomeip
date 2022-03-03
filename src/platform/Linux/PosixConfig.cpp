@@ -103,8 +103,7 @@ ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 
 CHIP_ERROR PosixConfig::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    return err;
+    return PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)

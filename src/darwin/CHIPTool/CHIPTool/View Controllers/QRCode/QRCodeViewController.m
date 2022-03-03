@@ -788,10 +788,21 @@
     return peripheralFullName;
 }
 
+- (void)_restartMatterStack
+{
+    NSLog(@"Shutting down the stack");
+    [self.chipController shutdown];
+    NSLog(@"Starting up the stack");
+    [self.chipController startup:nil vendorId:0 nocSigner:nil];
+}
+
 - (void)handleRendezVousDefault:(NSString *)payload
 {
     NSError * error;
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
+
+    // restart the Matter Stack before pairing (for reliability + testing restarts)
+    [self _restartMatterStack];
 
     if ([self.chipController pairDevice:deviceID onboardingPayload:payload error:&error]) {
         deviceID++;

@@ -40,7 +40,10 @@ public:
     CHIP_ERROR
     SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        size_t bytesRead = 0;
+        CHIP_ERROR err   = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+        size             = static_cast<uint16_t>(bytesRead);
+        return err;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override

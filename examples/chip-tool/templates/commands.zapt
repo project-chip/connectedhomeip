@@ -45,6 +45,13 @@ public:
         return ClusterCommand::SendCommand(device, endpointId, {{asHex parent.code 8}}, {{asHex code 8}}, mRequest);
     }
 
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on Group %" PRIu16, groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, {{asHex parent.code 8}}, {{asHex code 8}}, mRequest);
+    }
+
 private:
     chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
     {{#zcl_command_arguments}}
@@ -79,6 +86,11 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
         return WriteAttribute::SendCommand(device, endpointId, {{asHex parent.code 8}}, {{asHex code 8}}, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, {{asHex parent.code 8}}, {{asHex code 8}}, mValue);
     }
 
 private:

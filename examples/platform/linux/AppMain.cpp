@@ -265,8 +265,16 @@ class MyServerStorageDelegate : public PersistentStorageDelegate
 {
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        ChipLogProgress(AppServer, "Retrieved value from server storage.");
-        return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        ChipLogProgress(AppServer, "Retrieving value from server storage.");
+        size_t bytesRead = 0;
+        CHIP_ERROR err   = PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(AppServer, "Retrieved value from server storage.");
+        }
+        size = static_cast<uint16_t>(bytesRead);
+        return err;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -368,7 +376,7 @@ CHIP_ERROR ShutdownCommissioner()
     return CHIP_NO_ERROR;
 }
 
-class PairingCommand : public Controller::DevicePairingDelegate, public Controller::DeviceAddressUpdateDelegate
+class PairingCommand : public Controller::DevicePairingDelegate
 {
 public:
     PairingCommand() :
@@ -380,9 +388,6 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
-
-    /////////// DeviceAddressUpdateDelegate Interface /////////
-    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
 
     CHIP_ERROR UpdateNetworkAddress();
 
@@ -403,11 +408,6 @@ CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
     ChipLogProgress(AppServer, "Mdns: Updating NodeId: %" PRIx64 " ...", gRemoteId);
     return gCommissioner.UpdateDevice(gRemoteId);
-}
-
-void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
-{
-    ChipLogProgress(AppServer, "OnAddressUpdateComplete: %s", ErrorStr(err));
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -519,7 +519,6 @@ CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, Transport:
 {
     RendezvousParameters params = RendezvousParameters().SetSetupPINCode(pincode).SetDiscriminator(disc).SetPeerAddress(address);
 
-    gCommissioner.RegisterDeviceAddressUpdateDelegate(&gPairingCommand);
     gCommissioner.RegisterPairingDelegate(&gPairingCommand);
     gCommissioner.PairDevice(gRemoteId, params);
 

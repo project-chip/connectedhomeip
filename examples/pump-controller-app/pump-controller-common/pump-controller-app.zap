@@ -2020,7 +2020,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
