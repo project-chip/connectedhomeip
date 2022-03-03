@@ -87,11 +87,8 @@ Follow instructions
 #### Run the OTA Requestor application:
 
 ```
-<<<<<<< HEAD
 out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS}
-=======
-out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --delayQuery ${TIME_IN_SECONDS} --otaDownloadPath ${OTA_FILE_PATH}
->>>>>>> e03e5d3dba3c7336854611c6e9bacb69031a184f
+
 ```
 
 -   `${REQUESTOR_LONG_DISCRIMINATOR}` is the long discriminator specified for
@@ -103,16 +100,10 @@ out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --sec
     This must be different from the value used by the OTA Provider application.
 -   `${KVS_STORE_LOCATION}` is a location where the KVS items will be stored. If
     none is supplied, the default is /tmp/chip_kvs. This must be different from
-    the value used by the OTA Provider application. <<<<<<< HEAD
+    the value used by the OTA Provider application.
 -   `${TIME_IN_SECONDS}` is the periodic timeout for querying providers in the
     default OTA provider list. If none or zero is supplied the timeout is set to
-    every 24 hours. =======
--   `${TIME_IN_SECONDS}` is the amount of time to wait before triggering the
-    QueryImage command specified by the DefaultOTAProviders attribute
--   `${OTA_FILE_PATH}` is the fully-qualified path for the OTA file download
-    location
-    > > > > > > > e03e5d3dba3c7336854611c6e9bacb69031a184f
-
+    every 24 hours.
 #### Commission the OTA Requestor application
 
 ```
@@ -223,11 +214,7 @@ scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux/ out chip_
 **Run the OTA Requestor application**
 
 ```
-<<<<<<< HEAD
-out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --periodicQueryTimeout 60
-=======
-out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --delayQuery 30 --otaDownloadPath /tmp/test.bin
->>>>>>> e03e5d3dba3c7336854611c6e9bacb69031a184f
+out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --periodicQueryTimeout 60 --otaDownloadPath /tmp/test.bin
 ```
 
 #### In terminal 3:
