@@ -187,6 +187,8 @@ function objCEnumItemLabel(itemLabel)
   }
 
   return appHelper.asUpperCamelCase(itemLabel);
+}
+
 function hasArguments()
 {
   return !!this.arguments.length

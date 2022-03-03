@@ -46,7 +46,7 @@ public:
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase clusterName}} * cluster = [[CHIP{{asUpperCamelCase clusterName}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
         {{#chip_cluster_command_arguments}}
         {{#first}}
         __auto_type * params = [[CHIP{{asUpperCamelCase parent.clusterName}}Cluster{{asUpperCamelCase parent.name}}Params alloc] init];
@@ -72,10 +72,11 @@ public:
         {{else}}
             ^(NSError * _Nullable error) {
         {{/if}}
-            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+            ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
             }];
-
-        return CHIP_NO_ERROR;
+        return err;
     }
 
 private:
@@ -117,24 +118,34 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReadAttribute ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
 
-        {{! TODO: Various types (structs) not supported here. }}
-        {{#if (isStrEqual chipCallback.name "Unsupported")}}
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-        {{else}}
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-
-        [cluster readAttribute{{asUpperCamelCase name}}WithCompletionHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        {{#if_is_fabric_scoped_struct type}}
+        CHIPReadParams * params = [[CHIPReadParams alloc] init];
+        {{/if_is_fabric_scoped_struct}}
+        [cluster readAttribute{{asUpperCamelCase name}}With
+        {{~#if_is_fabric_scoped_struct type~}}
+        Params:params completionHandler:
+        {{~else~}}
+        CompletionHandler:
+        {{~/if_is_fabric_scoped_struct~}}
+        ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
-        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+        err = [CHIPError errorToCHIPErrorCode:error];
+
+        ChipLogError(chipTool, "{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %s", chip::ErrorStr(err));
+        SetCommandExitStatus(err);
          }];
-        return CHIP_NO_ERROR;
-        {{/if}}
+        return err;
     }
 
 };
 
 {{#if isWritableAttribute}}
+{{! No list support for writing yet.  Need to figure out how to represent the
+    values. }}
+{{#unless isArray}}
 class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
@@ -144,7 +155,6 @@ public:
         {{#if isArray}}
         // {{label}} Array parsing is not supported yet
         {{else if isStruct}}
-        // {{label}} Struct parsing is not supported yet
         {{else if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
@@ -160,29 +170,28 @@ public:
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) WriteAttribute ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
-
-        {{#if isArray}}
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-        {{else if isStruct}}
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-        {{else}}
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
 
-        {{asObjectiveCType type parent.name}} value =
-        {{#if (isOctetString type)}}
-        [[NSData alloc] initWithBytes:mValue.data() length:mValue.size()];
+        {{#if isArray}}
+        // {{label}} Array parsing is not supported yet
+        {{else if isStruct}}
+        CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase type}} * value = [[CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase type}} alloc] init];
+        {{else if (isOctetString type)}}
+        {{asObjectiveCType type parent.name}} value = [[NSData alloc] initWithBytes:mValue.data() length:mValue.size()];
         {{else if (isString type)}}
-        [[NSString alloc] initWithBytes:mValue.data() length:mValue.size() encoding:NSUTF8StringEncoding];
+        {{asObjectiveCType type parent.name}} value = [[NSString alloc] initWithBytes:mValue.data() length:mValue.size() encoding:NSUTF8StringEncoding];
         {{else}}
-        [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue];
+        {{asObjectiveCType type parent.name}} value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue];
         {{/if}}
 
         [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value completionHandler:^(NSError * _Nullable error) {
-            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+            ChipLogError(chipTool, "{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
             }];
-        return CHIP_NO_ERROR;
-        {{/if}}
+        return err;
     }
 
 private:
@@ -191,12 +200,13 @@ private:
     {{else if (isOctetString type)}}
     chip::ByteSpan mValue;
     {{else if (isCharString type)}}
-    chip::CharSpan mValue;
+    chip::ByteSpan mValue;
     {{else}}
     {{chipType}} mValue;
     {{/if}}
 };
 
+{{/unless}}
 {{/if}}
 {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#if isReportableAttribute}}
@@ -221,7 +231,11 @@ public:
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReportAttribute ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribe{{>attribute}}WithMinInterval: [NSNumber numberWithUnsignedShort:mMinInterval] maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval] subscriptionEstablished: NULL reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribe{{>attribute}}WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval] 
+                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval] 
+                                            params:params
+                                subscriptionEstablished: NULL reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
          }];
@@ -258,11 +272,16 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
         {{/chip_cluster_commands}}
         {{#chip_server_cluster_attributes}}
+        {{! TODO: Various types (floats, structs) not supported here. }}
+        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{#if isWritableAttribute}}
+        {{! No list support for writing yet.  Need to figure out how to
+            represent the values. }}
+        {{#unless isArray}}
         make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{/if}}
-        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
         {{#if isReportableAttribute}}
         make_unique<SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
