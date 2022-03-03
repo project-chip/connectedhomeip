@@ -133,12 +133,12 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
         if (mNeedsNetworkSetup)
         {
-            if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi != kInvalidEndpointId)
+            if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
             {
                 return CommissioningStage::kWiFiNetworkSetup;
             }
             else if (mParams.GetThreadOperationalDataset().HasValue() &&
-                     mDeviceCommissioningInfo.network.thread != kInvalidEndpointId)
+                     mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
             {
                 return CommissioningStage::kThreadNetworkSetup;
             }
@@ -149,8 +149,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
                              mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
                              mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
                 ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
-                             mDeviceCommissioningInfo.network.wifi == kInvalidEndpointId ? "no" : "yes",
-                             mDeviceCommissioningInfo.network.thread == kInvalidEndpointId ? "no" : "yes");
+                             mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
+                             mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
                 lastErr = CHIP_ERROR_INVALID_ARGUMENT;
                 return CommissioningStage::kCleanup;
             }
@@ -165,7 +165,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 #endif
         }
     case CommissioningStage::kWiFiNetworkSetup:
-        if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioningInfo.network.thread != kInvalidEndpointId)
+        if (mParams.GetThreadOperationalDataset().HasValue() &&
+            mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
         {
             return CommissioningStage::kThreadNetworkSetup;
         }
@@ -174,7 +175,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kWiFiNetworkEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
-        if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi != kInvalidEndpointId)
+        if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
         {
             return CommissioningStage::kWiFiNetworkEnable;
         }
@@ -184,7 +185,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         }
 
     case CommissioningStage::kWiFiNetworkEnable:
-        if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioningInfo.network.thread != kInvalidEndpointId)
+        if (mParams.GetThreadOperationalDataset().HasValue() &&
+            mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
@@ -221,10 +223,10 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage)
     {
     case CommissioningStage::kWiFiNetworkSetup:
     case CommissioningStage::kWiFiNetworkEnable:
-        return mDeviceCommissioningInfo.network.wifi;
+        return mDeviceCommissioningInfo.network.wifi.endpoint;
     case CommissioningStage::kThreadNetworkSetup:
     case CommissioningStage::kThreadNetworkEnable:
-        return mDeviceCommissioningInfo.network.thread;
+        return mDeviceCommissioningInfo.network.thread.endpoint;
     default:
         return kRootEndpointId;
     }
@@ -258,10 +260,22 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
 
 Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)
 {
-    // Per spec, all commands that are sent with the arm failsafe held need at least a 30s timeout. Using 30s everywhere for
-    // simplicity. 30s appears to be sufficient for long-running network commands (enable wifi and enable thread), but we may wish
-    // to increase the timeout for those commissioning stages at a later time.
-    return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(30)));
+    // Per spec, all commands that are sent with the arm failsafe held need at least a 30s timeout.
+    // Network clusters can indicate the time required to connect, so if we are connecting, use that time as long as it is > 30s.
+    uint8_t seconds = 30;
+    switch (stage)
+    {
+    case CommissioningStage::kWiFiNetworkEnable:
+        ChipLogError(Controller, "Setting wifi connection time min = %u", mDeviceCommissioningInfo.network.wifi.minConnectionTime);
+        seconds = std::max(mDeviceCommissioningInfo.network.wifi.minConnectionTime, seconds);
+        break;
+    case CommissioningStage::kThreadNetworkEnable:
+        seconds = std::max(mDeviceCommissioningInfo.network.thread.minConnectionTime, seconds);
+        break;
+    default:
+        break;
+    }
+    return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(seconds)));
 }
 
 CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk,
