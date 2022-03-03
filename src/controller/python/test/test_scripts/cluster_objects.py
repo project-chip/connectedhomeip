@@ -46,7 +46,7 @@ def _IgnoreAttributeDecodeFailure(path):
 
 
 def VerifyDecodeSuccess(values):
-    pprint(values)
+    pprint.pprint(values)
     for endpoint in values[0]:
         for cluster in values[0][endpoint]:
             for attribute in values[0][endpoint][cluster]:
@@ -321,9 +321,6 @@ class ClusterObjectTests:
 
     @classmethod
     async def TestTimedRequest(cls, devCtrl):
-        if not TestIsEnabled("datamodel.timedrequest"):
-            logger.info("*: TimedRequest is skipped")
-
         logger.info("1: Send Timed Command Request")
         req = Clusters.TestCluster.Commands.TimedInvokeRequest()
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req, timedRequestTimeoutMs=1000)
@@ -336,32 +333,8 @@ class ClusterObjectTests:
                                      ],
                                      timedRequestTimeoutMs=1000)
 
-        if not TestIsEnabled("datamodel.timedrequest.timeout"):
-            logger.info("*: Timeout in timed request is skipped")
-        else:
-            logger.info("3: Send Timed Command Request -- Timeout")
-            try:
-                req = Clusters.TestCluster.Commands.TimedInvokeRequest()
-                # 10ms is a pretty short timeout, RTT is 400ms in simulated network on CI, so this test should fail.
-                await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req, timedRequestTimeoutMs=10)
-                raise AssertionError("Timeout expected!")
-            except chip.exceptions.ChipStackException:
-                pass
-
-            logger.info("4: Send Timed Write Request -- Timeout")
-            try:
-                await devCtrl.WriteAttribute(nodeid=NODE_ID,
-                                             attributes=[
-                                                 (1, Clusters.TestCluster.Attributes.TimedWriteBoolean(
-                                                     True)),
-                                             ],
-                                             timedRequestTimeoutMs=10)
-                raise AssertionError("Timeout expected!")
-            except chip.exceptions.ChipStackException:
-                pass
-
         logger.info(
-            "5: Sending TestCluster-TimedInvokeRequest without timedRequestTimeoutMs should be rejected")
+            "3: Sending TestCluster-TimedInvokeRequest without timedRequestTimeoutMs should be rejected")
         try:
             req = Clusters.TestCluster.Commands.TimedInvokeRequest()
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
@@ -370,7 +343,7 @@ class ClusterObjectTests:
             pass
 
         logger.info(
-            "6: Writing TestCluster-TimedWriteBoolean without timedRequestTimeoutMs should be rejected")
+            "4: Writing TestCluster-TimedWriteBoolean without timedRequestTimeoutMs should be rejected")
         try:
             await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                          attributes=[
@@ -379,6 +352,32 @@ class ClusterObjectTests:
                                          ])
             raise AssertionError("The write request should be rejected.")
         except ValueError:
+            pass
+
+    @classmethod
+    async def TestTimedRequestTimeout(cls, devCtrl):
+        if not TestIsEnabled("ClusterObjectTests.TestTimedRequestTimeout"):
+            logger.info("*: Timeout in timed request is skipped")
+            return
+        logger.info("1: Send Timed Command Request -- Timeout")
+        try:
+            req = Clusters.TestCluster.Commands.TimedInvokeRequest()
+            # 10ms is a pretty short timeout, RTT is 400ms in simulated network on CI, so this test should fail.
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req, timedRequestTimeoutMs=1)
+            raise AssertionError("Timeout expected!")
+        except chip.exceptions.ChipStackException:
+            pass
+
+        logger.info("2: Send Timed Write Request -- Timeout")
+        try:
+            await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                         attributes=[
+                                             (1, Clusters.TestCluster.Attributes.TimedWriteBoolean(
+                                                 True)),
+                                         ],
+                                         timedRequestTimeoutMs=1)
+            raise AssertionError("Timeout expected!")
+        except chip.exceptions.ChipStackException:
             pass
 
     @classmethod
@@ -470,6 +469,7 @@ class ClusterObjectTests:
             # Note: Write will change some attribute values, always put it after read tests
             await cls.SendWriteRequest(devCtrl)
             await cls.TestTimedRequest(devCtrl)
+            await cls.TestTimedRequestTimeout(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")

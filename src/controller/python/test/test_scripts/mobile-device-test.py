@@ -53,7 +53,7 @@ GROUP_ID = 0
 TEST_CONTROLLER_NODE_ID = 112233
 TEST_DEVICE_NODE_ID = 1
 
-ALL_TESTS = ['nwprov', 'datamodel']
+ALL_TESTS = ['network_commissioning', 'datamodel']
 
 
 def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, device_nodeid):
@@ -94,7 +94,9 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, devic
 @click.option('--enable-test', default=['all'], multiple=True, help='The tests to be executed.')
 @click.option('--disable-test', default=[], multiple=True, help='The tests to be excluded.')
 @click.option('--log-level', default='WARN', type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']), help="The log level of the test.")
-def main(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, enable_test, disable_test, log_level):
+@click.option('--log-format', default=None, type=str, help="Override logging format")
+def main(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, enable_test, disable_test, log_level, log_format):
+    coloredlogs.install(level=log_level, fmt=log_format)
     logger.info("Test Parameters:")
     logger.info(f"\tController NodeId: {controller_nodeid}")
     logger.info(f"\tDevice NodeId:     {device_nodeid}")
@@ -104,7 +106,7 @@ def main(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, en
     logger.info(f"\tDisabled Tests:    {disable_test}")
     SetTestSet(enable_test, disable_test)
     do_tests(controller_nodeid, device_nodeid, timeout,
-             discriminator, setup_pin, log_level)
+             discriminator, setup_pin)
 
 
 def test_datamodel(test: BaseTestHelper, device_nodeid: int):
@@ -161,17 +163,13 @@ def test_datamodel(test: BaseTestHelper, device_nodeid: int):
                                     group=GROUP_ID), "Failed to test on off cluster")
 
 
-def do_tests(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, commissioning, log_level):
+def do_tests(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin):
     timeoutTicker = TestTimeout(timeout)
     timeoutTicker.start()
 
     test = BaseTestHelper(nodeid=controller_nodeid)
 
-    coloredlogs.install(level='DEBUG')
     chip.logging.RedirectToPythonLogging()
-
-    # logging.getLogger().setLevel(logging.DEBUG)
-    logging.getLogger().setLevel(log_level)
 
     commissioning_method = ethernet_commissioning
 
@@ -183,7 +181,7 @@ def do_tests(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin
               "Failed to resolve nodeid")
 
     # Still test network commissioning
-    if TestIsEnabled('nwprov'):
+    if TestIsEnabled('network_commissioning'):
         logger.info("Testing network commissioning")
         FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=device_nodeid).run()),
                   "Failed to finish network commissioning")

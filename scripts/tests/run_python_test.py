@@ -22,6 +22,8 @@ import typing
 import queue
 import threading
 import sys
+import time
+import datetime
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -40,7 +42,15 @@ def FindBinaryPath(name: str):
 
 def EnqueueLogOutput(fp, tag, q):
     for line in iter(fp.readline, b''):
-        q.put((tag, line))
+        timestamp = time.time()
+        if len(line) > len('[1646290606.901990]') and line[0:1] == b'[':
+            try:
+                timestamp = float(line[1:18].decode())
+                line = line[19:]
+            except Exception as ex:
+                pass
+        q.put((tag, line, datetime.datetime.fromtimestamp(
+            timestamp).isoformat(sep=" ")))
     fp.close()
 
 
@@ -54,16 +64,18 @@ def RedirectQueueThread(fp, tag, queue):
 def DumpLogOutput(q):
     while True:
         line = q.get_nowait()
-        sys.stdout.buffer.write(line[0] + line[1])
+        sys.stdout.buffer.write(
+            (f"[{line[2]}]").encode() + line[0] + line[1])
         sys.stdout.flush()
 
 
 @click.command()
-@click.option("--app", type=click.Path(exists=True), default=None, help='Local application to use, omit to use external apps.')
+@click.option("--app", type=str, default=None, help='Local application to use, omit to use external apps.')
 @click.option("--factoryreset", is_flag=True, help='Remove /tmp/chip* before running the tests.')
+@click.option("--wait-before-test", type=int, default=3, help='Time for the device to start before running the tests.')
 @click.option("--script", type=click.Path(exists=True), default=FindBinaryPath("mobile-device-test.py"), help='Test script to use.')
 @click.argument("script-args", nargs=-1, type=str)
-def main(app: str, factoryreset: bool, script: str, script_args: typing.List[str]):
+def main(app: str, factoryreset: bool, wait_before_test: int, script: str, script_args: typing.List[str]):
     if factoryreset:
         retcode = subprocess.call("rm -rf /tmp/chip*", shell=True)
         if retcode != 0:
@@ -73,15 +85,25 @@ def main(app: str, factoryreset: bool, script: str, script_args: typing.List[str
 
     app_process = None
     if app:
+        app = FindBinaryPath(app)
+        if app is None:
+            raise FileNotFoundError(f"{app} not found")
         app_process = subprocess.Popen(
             [app], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         RedirectQueueThread(app_process.stdout,
-                            b"[\33[34mAPP\33[0m][\33[33mSTDOUT\33[0m]", log_queue)
+                            b"[\33[34mAPP \33[0m][\33[33mSTDOUT\33[0m]", log_queue)
         RedirectQueueThread(app_process.stderr,
-                            b"[\33[34mAPP\33[0m][\33[31mSTDERR\33[0m]", log_queue)
+                            b"[\33[34mAPP \33[0m][\33[31mSTDERR\33[0m]", log_queue)
+
+    try:
+        DumpLogOutput(log_queue)
+    except queue.Empty:
+        pass
+
+    time.sleep(wait_before_test)
 
     test_script_process = subprocess.Popen(
-        ["/usr/bin/env", "python3", script] + [v for v in script_args], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ["/usr/bin/env", "python3", script, '--log-format', '%(message)s'] + [v for v in script_args], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     RedirectQueueThread(test_script_process.stdout,
                         b"[\33[32mTEST\33[0m][\33[33mSTDOUT\33[0m]", log_queue)
     RedirectQueueThread(test_script_process.stderr,
@@ -95,15 +117,28 @@ def main(app: str, factoryreset: bool, script: str, script_args: typing.List[str
             pass
         test_script_exit_code = test_script_process.poll()
 
+    test_app_exit_code = 0
     if app_process:
         app_process.send_signal(2)
+
+        test_app_exit_code = app_process.poll()
+        while test_app_exit_code is None:
+            try:
+                DumpLogOutput(log_queue)
+            except queue.Empty:
+                pass
+            test_app_exit_code = app_process.poll()
 
     try:
         DumpLogOutput(log_queue)
     except queue.Empty:
         pass
 
-    sys.exit(test_script_exit_code)
+    if test_script_exit_code != 0:
+        sys.exit(test_script_exit_code)
+    else:
+        # We expect both app and test script should exit with 0
+        sys.exit(test_app_exit_code)
 
 
 if __name__ == '__main__':
