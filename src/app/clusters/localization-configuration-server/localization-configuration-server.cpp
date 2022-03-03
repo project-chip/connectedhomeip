@@ -97,7 +97,7 @@ CHIP_ERROR LocalizationConfigurationAttrAccess::Read(const ConcreteReadAttribute
 // Pre-change callbacks for cluster attributes
 // =============================================================================
 
-using imcode = Protocols::InteractionModel::Status;
+using Status = Protocols::InteractionModel::Status;
 
 static Protocols::InteractionModel::Status emberAfPluginLocalizationConfigurationOnActiveLocaleChange(EndpointId EndpointId,
                                                                                                       CharSpan newLangtag)
@@ -110,12 +110,12 @@ static Protocols::InteractionModel::Status emberAfPluginLocalizationConfiguratio
         {
             if (locale.data_equal(newLangtag))
             {
-                return imcode::Success;
+                return Status::Success;
             }
         }
     }
 
-    return imcode::InvalidValue;
+    return Status::InvalidValue;
 }
 
 Protocols::InteractionModel::Status MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback(
@@ -132,7 +132,7 @@ Protocols::InteractionModel::Status MatterLocalizationConfigurationClusterServer
         break;
     }
     default:
-        res = imcode::Success;
+        res = Status::Success;
         break;
     }
 
