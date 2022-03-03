@@ -193,6 +193,48 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         return CHIP_NO_ERROR == customArgument->Parse(arg.name, argValue);
     }
 
+    case ArgumentType::Vector16:
+    case ArgumentType::Vector32: {
+        std::vector<uint64_t> values;
+        uint64_t min = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
+        uint64_t max = arg.max;
+
+        std::stringstream ss(argValue);
+        while (ss.good())
+        {
+            std::string valueAsString;
+            getline(ss, valueAsString, ',');
+            isHexNotation = strncmp(valueAsString.c_str(), "0x", 2) == 0 || strncmp(valueAsString.c_str(), "0X", 2) == 0;
+
+            std::stringstream subss;
+            isHexNotation ? subss << std::hex << valueAsString : subss << valueAsString;
+
+            uint64_t value;
+            subss >> value;
+            VerifyOrReturnError(!subss.fail() && subss.eof() && value >= min && value <= max, false);
+            values.push_back(value);
+        }
+
+        if (arg.type == ArgumentType::Vector16)
+        {
+            auto vectorArgument = static_cast<std::vector<uint16_t> *>(arg.value);
+            for (uint64_t v : values)
+            {
+                vectorArgument->push_back(static_cast<uint16_t>(v));
+            }
+        }
+        else
+        {
+            auto vectorArgument = static_cast<std::vector<uint32_t> *>(arg.value);
+            for (uint64_t v : values)
+            {
+                vectorArgument->push_back(static_cast<uint32_t>(v));
+            }
+        }
+
+        return true;
+    }
+
     case ArgumentType::Attribute: {
         if (arg.isOptional() || arg.isNullable())
         {
@@ -485,6 +527,32 @@ size_t Command::AddArgument(const char * name, AddressWithInterface * out, uint8
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(out);
     arg.flags = flags;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint16_t> * value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Vector16;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.min   = min;
+    arg.max   = max;
+    arg.flags = 0;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint32_t> * value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Vector32;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.min   = min;
+    arg.max   = max;
+    arg.flags = 0;
 
     return AddArgumentToList(std::move(arg));
 }
