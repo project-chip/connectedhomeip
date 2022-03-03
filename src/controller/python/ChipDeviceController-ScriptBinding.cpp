@@ -40,7 +40,6 @@
 #include <inttypes.h>
 #include <net/if.h>
 
-#include "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h"
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
@@ -93,7 +92,6 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 } // namespace
 
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
-chip::Controller::ScriptDeviceAddressUpdateDelegate sDeviceAddressUpdateDelegate;
 chip::Controller::Python::StorageAdapter * sStorageAdapter = nullptr;
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -160,9 +158,6 @@ pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::Devi
 
 ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
     chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback);
-
-void pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
-    chip::Controller::DeviceAddressUpdateDelegate_OnUpdateComplete callback);
 
 // BLE
 ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
@@ -521,12 +516,6 @@ ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningComple
 {
     sPairingDelegate.SetCommissioningCompleteCallback(callback);
     return CHIP_NO_ERROR.AsInteger();
-}
-
-void pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
-    chip::Controller::DeviceAddressUpdateDelegate_OnUpdateComplete callback)
-{
-    sDeviceAddressUpdateDelegate.SetOnAddressUpdateComplete(callback);
 }
 
 ChipError::StorageType pychip_DeviceController_UpdateDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)

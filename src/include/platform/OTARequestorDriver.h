@@ -33,7 +33,8 @@ namespace chip {
 // The set of parameters needed for starting a BDX download.
 struct UpdateDescription
 {
-    CharSpan imageURI;
+    NodeId nodeId;
+    CharSpan fileDesignator;
     uint32_t softwareVersion;
     CharSpan softwareVersionStr;
     ByteSpan updateToken;

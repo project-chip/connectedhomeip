@@ -117,16 +117,15 @@ private:
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
-            size_t bytesRead;
-            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead));
-            if (!CanCastTo<uint16_t>(bytesRead))
+            size_t bytesRead = 0;
+            CHIP_ERROR err   = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+
+            if (err == CHIP_NO_ERROR)
             {
-                ChipLogDetail(AppServer, "0x%" PRIx32 " is too big to fit in uint16_t", static_cast<uint32_t>(bytesRead));
-                return CHIP_ERROR_BUFFER_TOO_SMALL;
+                ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
             }
-            ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
             size = static_cast<uint16_t>(bytesRead);
-            return CHIP_NO_ERROR;
+            return err;
         }
 
         CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override

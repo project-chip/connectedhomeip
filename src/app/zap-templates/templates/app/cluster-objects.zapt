@@ -10,6 +10,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
+#include <lib/core/ClusterEnums.h>
 #include <lib/support/BitFlags.h>
 #include <protocols/interaction_model/Constants.h>
 #include <app-common/zap-generated/enums.h>
@@ -35,35 +36,6 @@ namespace Structs {
 
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
-{{#zcl_enums}}
-{{#if (isWeaklyTypedEnum label)}}
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-{{/if}}
-// Enum for {{label}}
-enum class {{asType label}} : {{asUnderlyingZclType type}} {
-{{#zcl_enum_items}}
-k{{asUpperCamelCase label}} = {{asHex value 2}},
-{{/zcl_enum_items}}
-};
-{{#if (isWeaklyTypedEnum label)}}
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using {{asType label}} = EmberAf{{asType label}};
-#endif
-{{/if}}
-{{/zcl_enums}}
-
-{{#zcl_bitmaps}}
-
-// Bitmap for {{label}}
-enum class {{asType label}} : {{asUnderlyingZclType type}} {
-{{#zcl_bitmap_items}}
-k{{asUpperCamelCase label}} = {{asHex mask}},
-{{/zcl_bitmap_items}}
-};
-{{/zcl_bitmaps}}
-
 {{#zcl_structs}}
 {{#first}}
 namespace Structs {

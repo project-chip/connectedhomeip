@@ -70,6 +70,8 @@ public:
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
+        bool contains = mStorage.find(key) != mStorage.end();
+        VerifyOrReturnError(contains, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         mStorage.erase(key);
         return CHIP_NO_ERROR;
     }

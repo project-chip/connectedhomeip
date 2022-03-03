@@ -24,6 +24,7 @@ into an existing Matter network and can be controlled by this network.
 -   [Overview](#overview)
     -   [Bluetooth LE advertising](#bluetooth-le-advertising)
     -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
+    -   [Device Firmware Upgrade](#device-firmware-upgrade)
 -   [Requirements](#requirements)
     -   [Supported devices](#supported_devices)
 -   [Device UI](#device-ui)
@@ -60,6 +61,9 @@ default settings by pressing button manually. However, this mode does not
 guarantee that the device will be able to communicate with the Matter controller
 and other devices.
 
+The example can be configured to use the secure bootloader and utilize it for
+performing over-the-air Device Firmware Upgrade using Bluetooth LE.
+
 ### Bluetooth LE advertising
 
 In this example, to commission the device onto a Matter network, it must be
@@ -84,6 +88,63 @@ Last part of the rendezvous procedure, the provisioning operation involves
 sending the Thread network credentials from the Matter controller to the Matter
 device. As a result, device is able to join the Thread network and communicate
 with other Thread devices in the network.
+
+### Device Firmware Upgrade
+
+The example supports over-the-air (OTA) device firmware upgrade (DFU) using one
+of the two available methods:
+
+-   Matter OTA update that is mandatory for Matter-compliant devices and enabled
+    by default
+-   [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt)
+    over Bluetooth LE, an optional proprietary method that can be enabled to
+    work alongside the default Matter OTA update. Note that this protocol is not
+    a part of the Matter specification.
+
+For both methods, the
+[MCUboot](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/mcuboot/index.html)
+bootloader solution is used to replace the old firmware image with the new one.
+
+#### Matter Over-the-Air Update
+
+The Matter over-the-air update distinguishes two types of nodes: OTA Provider
+and OTA Requestor.
+
+An OTA Provider is a node that hosts a new firmware image and is able to respond
+on an OTA Requestor's queries regarding availability of new firmware images or
+requests to start sending the update packages.
+
+An OTA Requestor is a node that wants to download a new firmware image and sends
+requests to an OTA Provider to start the update process.
+
+#### Simple Management Protocol
+
+Simple Management Protocol (SMP) is a basic transfer encoding that is used for
+device management purposes, including application image management. SMP supports
+using different transports, such as Bluetooth LE, UDP, or serial USB/UART.
+
+In this example, the Matter device runs the SMP Server to download the
+application update image using the Bluetooth LE transport.
+
+See the
+[Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+section to learn how to enable SMP and use it for the DFU purpose in this
+example.
+
+#### Bootloader
+
+MCUboot is a secure bootloader used for swapping firmware images of different
+versions and generating proper build output files that can be used in the device
+firmware upgrade process.
+
+The bootloader solution requires an area of flash memory to swap application
+images during the firmware upgrade. Nordic Semiconductor devices use an external
+memory chip for this purpose. The memory chip communicates with the
+microcontroller through the QSPI bus.
+
+See the
+[Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+section to learn how to change MCUboot and flash configuration in this example.
 
 <hr>
 
@@ -312,6 +373,76 @@ features like logs and command-line interface, run the following command:
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
 
+### Building with Device Firmware Upgrade support
+
+Support for DFU using Matter OTA is enabled by default.
+
+To enable DFU over Bluetooth LE, run the following command with _build-target_
+replaced with the build target name of the Nordic Semiconductor kit you are
+using (for example `nrf52840dk_nrf52840`):
+
+    $ west build -b build-target -- -DBUILD_WITH_DFU=BLE
+
+To completely disable support for both DFU methods, run the following command
+with _build-target_ replaced with the build target name of the Nordic
+Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
+
+    $ west build -b build-target -- -DBUILD_WITH_DFU=OFF
+
+> **Note**:
+>
+> There are two types of Device Firmware Upgrade modes: single-image DFU and
+> multi-image DFU. Single-image mode supports upgrading only one firmware image,
+> the application image, and should be used for single-core nRF52840 DK devices.
+> Multi-image mode allows to upgrade more firmware images and is suitable for
+> upgrading the application core and network core firmware in two-core nRF5340
+> DK devices.
+>
+> Currently the multi-image mode is only available for the DFU over Bluetooth LE
+> method.
+
+#### Changing Device Firmware Upgrade configuration
+
+To change the default DFU configuration, edit the following overlay files
+corresponding to the selected configuration:
+
+-   `overlay-mcuboot_qspi_nor_support.conf` - general file enabling MCUboot and
+    QSPI NOR support, used by all DFU configurations
+-   `overlay-single_image_smp_dfu_support.conf` - file enabling single-image DFU
+    over Bluetooth LE using SMP
+-   `overlay-multi_image_smp_dfu_support.conf` - file enabling multi-image DFU
+    over Bluetooth LE using SMP
+-   `overlay-ota_requestor.conf` - file enabling Matter OTA Requestor support.
+
+The files are located in the `config/nrfconnect/app` directory. You can also
+define the desired options in your example's `prj.conf` file.
+
+#### Changing bootloader configuration
+
+To change the default MCUboot configuration, edit the
+`mcuboot_single_image_dfu.conf` or `mcuboot_multi_image_dfu.conf` overlay files
+depending on whether the build target device supports multi-image DFU (nRF5340
+DK) or single-image DFU (nRF52840 DK). The files are located in the
+`configuration` directory.
+
+Make sure to keep the configuration consistent with changes made to the
+application configuration. This is necessary for the configuration to work, as
+the bootloader image is a separate application from the user application and it
+has its own configuration file.
+
+#### Changing flash memory settings
+
+In the default configuration, the MCUboot uses the
+[Partition Manager](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/scripts/partition_manager/partition_manager.html#partition-manager)
+to configure flash partitions used for the bootloader application image slot
+purposes. You can change these settings by defining
+[static partitions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/scripts/partition_manager/partition_manager.html#ug-pm-static).
+This example uses this option to define using an external flash.
+
+To modify the flash settings of your board (that is, your _build-target_, for
+example `nrf52840dk_nrf52840`), edit the `pm_static.yml` file located in the
+`configuration/build-target/` directory.
+
 <hr>
 
 <a name="configuring"></a>
@@ -344,7 +475,7 @@ page.
 To flash the application to the device, use the west tool and run the following
 command from the example directory:
 
-        $ west flash
+        $ west flash --erase
 
 If you have multiple development kits connected, west will prompt you to pick
 the correct one.

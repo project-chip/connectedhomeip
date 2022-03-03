@@ -261,7 +261,6 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         ChipLogDetail(SoftwareUpdate, "Generated URI: %.*s", static_cast<int>(uri.size()), uri.data());
 
         // Initialize the transfer session in prepartion for a BDX transfer
-        mBdxOtaSender.SetFilepath(otaFilePath);
         BitFlags<TransferControlFlags> bdxFlags;
         bdxFlags.Set(TransferControlFlags::kReceiverDrive);
         CHIP_ERROR err = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,

@@ -44,6 +44,13 @@ public:
     ~LevelControlCluster() {}
 };
 
+class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
+{
+public:
+    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    ~OtaSoftwareUpdateProviderCluster() {}
+};
+
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:

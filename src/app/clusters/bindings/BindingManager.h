@@ -135,7 +135,6 @@ private:
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
     BindingManagerInitParams mInitParams;
     BindingAddedHandler mBindingAddedHandler;
-    Server * mAppServer = nullptr;
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
