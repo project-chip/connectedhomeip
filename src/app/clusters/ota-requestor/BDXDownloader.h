@@ -92,7 +92,7 @@ private:
     // Timeout value in seconds to abort the download if there's no progress in the transfer session.
     System::Clock::Timeout mTimeout = System::Clock::kZero;
     // Tracks the percentage of transfer session complete from as of the previous check.
-    uint8_t prevPercentageComplete = 0;
+    uint8_t mPrevPercentageComplete = 0;
 };
 
 } // namespace chip

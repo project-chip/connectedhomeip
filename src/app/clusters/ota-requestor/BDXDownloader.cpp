@@ -60,7 +60,7 @@ System::Clock::Timeout BDXDownloader::GetTimeout()
 
 void BDXDownloader::Reset()
 {
-    prevPercentageComplete = 0;
+    mPrevPercentageComplete = 0;
     DeviceLayer::SystemLayer().StartTimer(mTimeout, TransferTimeoutCheckHandler, this);
 }
 
@@ -69,9 +69,9 @@ bool BDXDownloader::CheckTransferTimeout()
     uint8_t curPercentageComplete =
         mImageProcessor->GetPercentComplete().IsNull() ? 0 : mImageProcessor->GetPercentComplete().Value();
 
-    if (curPercentageComplete > prevPercentageComplete)
+    if (curPercentageComplete > mPrevPercentageComplete)
     {
-        prevPercentageComplete = curPercentageComplete;
+        mPrevPercentageComplete = curPercentageComplete;
         return false;
     }
     else
@@ -118,7 +118,7 @@ CHIP_ERROR BDXDownloader::BeginPrepareDownload()
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    prevPercentageComplete = 0;
+    mPrevPercentageComplete = 0;
     DeviceLayer::SystemLayer().StartTimer(mTimeout, TransferTimeoutCheckHandler, this);
 
     ReturnErrorOnFailure(mImageProcessor->PrepareDownload());
