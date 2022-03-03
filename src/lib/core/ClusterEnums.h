@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,16 +15,14 @@
  *    limitations under the License.
  */
 
-#include "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h"
+#pragma once
 
-namespace chip {
-namespace Controller {
+/**
+ * Enum and bitmap definitions from cluster specifications.
+ */
 
-void ScriptDeviceAddressUpdateDelegate::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error)
-{
-    if (mOnAddressUpdateComplete != nullptr)
-        mOnAddressUpdateComplete(nodeId, error.AsInteger());
-}
+// For now, include the generated enum file, since we are still working on
+// converting our enums to enum classes.  Once that is complete and things are
+// more stable, we can consider other options here.
 
-} // namespace Controller
-} // namespace chip
+#include <app-common/zap-generated/cluster-enums.h>

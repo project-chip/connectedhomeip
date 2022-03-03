@@ -54,14 +54,18 @@ OTAImageProcessorImpl gImageProcessor;
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
-constexpr uint16_t kOptionRequestorCanConsent  = 'c';
+constexpr uint16_t kOptionRequestorCanConsent = 'c';
+constexpr uint16_t kOptionOtaDownloadPath     = 'f';
+constexpr size_t kMaxFilePathSize             = 256;
 
 uint32_t gPeriodicQueryTimeoutSec = (24 * 60 * 60);
 chip::Optional<bool> gRequestorCanConsent;
+static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
 
 OptionDef cmdLineOptionsDef[] = {
     { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "requestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
+    { "otaDownloadPath", chip::ArgParser::kArgumentRequired, kOptionOtaDownloadPath },
     {},
 };
 
@@ -71,7 +75,10 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        If none or zero is supplied the timeout is set to every 24 hours. \n"
                              "  -c/--requestorCanConsent\n"
                              "        If supplied, the RequestorCanConsent field of the QueryImage command is set to true.\n"
-                             "        Otherwise, the value is determined by the driver.\n " };
+                             "        Otherwise, the value is determined by the driver.\n "
+                             "  -f/--otaDownloadPath <file path>\n"
+                             "        If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
+                             "        Otherwise, the value defaults to /tmp/test.bin.\n " };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
@@ -86,10 +93,8 @@ static void InitOTARequestor(void)
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
     // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
-    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
-    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
     OTAImageProcessorParams ipParams;
-    ipParams.imageFile = CharSpan("test.txt");
+    ipParams.imageFile = CharSpan::fromCharString(gOtaDownloadPath);
     gImageProcessor.SetOTAImageProcessorParams(ipParams);
     gImageProcessor.SetOTADownloader(&gDownloader);
 
@@ -108,6 +113,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         break;
     case kOptionRequestorCanConsent:
         gRequestorCanConsent.SetValue(true);
+        break;
+    case kOptionOtaDownloadPath:
+        chip::Platform::CopyString(gOtaDownloadPath, aValue);
         break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);

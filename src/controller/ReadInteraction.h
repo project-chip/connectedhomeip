@@ -186,7 +186,7 @@ namespace detail {
 template <typename DecodableEventType>
 struct ReportEventParams : public app::ReadPrepareParams
 {
-    ReportEventParams(const SessionHandle & sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
+    ReportEventParams(const SessionHandle & sessionHandle) : app::ReadPrepareParams(sessionHandle) {}
     typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType mOnReportCb;
     typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType mOnErrorCb;
     typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablishedCb =
@@ -275,7 +275,8 @@ CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const Sessio
                           typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb,
                           uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                           typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType
-                              onSubscriptionEstablishedCb = nullptr)
+                              onSubscriptionEstablishedCb = nullptr,
+                          bool keepPreviousSubscriptions  = false)
 {
     detail::ReportEventParams<DecodableEventType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
@@ -283,6 +284,7 @@ CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const Sessio
     params.mOnSubscriptionEstablishedCb = onSubscriptionEstablishedCb;
     params.mMinIntervalFloorSeconds     = minIntervalFloorSeconds;
     params.mMaxIntervalCeilingSeconds   = maxIntervalCeilingSeconds;
+    params.mKeepSubscriptions           = keepPreviousSubscriptions;
     params.mReportType                  = app::ReadClient::InteractionType::Subscribe;
     return detail::ReportEvent(exchangeMgr, endpointId, std::move(params));
 }

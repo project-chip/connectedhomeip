@@ -34,8 +34,8 @@ public:
 
     void AddArguments()
     {
-        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
-        AddArgument("endpoint-id", 0, UINT16_MAX, &mEndPointId);
+        AddArgument("node-id/group-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("endpoint-id-ignored-for-group-commands", 0, UINT16_MAX, &mEndPointId);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -43,6 +43,11 @@ public:
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
     virtual CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endPointId) = 0;
+
+    virtual CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId)
+    {
+        return CHIP_ERROR_BAD_REQUEST;
+    };
 
 private:
     chip::NodeId mNodeId;
