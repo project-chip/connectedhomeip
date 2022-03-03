@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-
+import pprint
 import chip.clusters as Clusters
 import chip.exceptions
 import logging
@@ -46,7 +46,7 @@ def _IgnoreAttributeDecodeFailure(path):
 
 
 def VerifyDecodeSuccess(values):
-    print(f"{values}")
+    pprint(values)
     for endpoint in values[0]:
         for cluster in values[0][endpoint]:
             for attribute in values[0][endpoint][cluster]:

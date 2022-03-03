@@ -267,14 +267,8 @@ jobs:
             - name: Run Python REPL API Tests
               timeout-minutes: 5
               run: |
-                  scripts/run_in_build_env.sh '
-                      rm -rf /tmp/chip*
-                      ./out/all_clusters_debug/chip-all-clusters-app &
-                      ./src/controller/python/test/test_scripts/mobile-device-test.py -t 90 --disable-test datamodel.timedrequest.timeout
-                      res=$?
-                      killall -s SIGINT chip-all-clusters-app || true
-                      exit $res
-                      '
+                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app chip-all-clusters-app --factoryreset -- -t 90 --disable-test datamodel.timedrequest.timeout'
+
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
         timeout-minutes: 200

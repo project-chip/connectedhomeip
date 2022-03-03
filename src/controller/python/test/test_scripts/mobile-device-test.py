@@ -91,22 +91,20 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, devic
 @click.option("--timeout", "-t", default=240, type=int, help="The program will return with timeout after specified seconds.")
 @click.option("--discriminator", default=TEST_DISCRIMINATOR, type=int, help="Discriminator of the device.")
 @click.option("--setup-pin", default=TEST_SETUPPIN, type=int, help="Setup pincode of the device.")
-@click.option("--commissioning", default='eth', type=click.Choice(['eth'], case_sensitive=False), help="The network type of the device, used during commissioning test.")
 @click.option('--enable-test', default=['all'], multiple=True, help='The tests to be executed.')
 @click.option('--disable-test', default=[], multiple=True, help='The tests to be excluded.')
 @click.option('--log-level', default='WARN', type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']), help="The log level of the test.")
-def main(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, commissioning, enable_test, disable_test, log_level):
+def main(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, enable_test, disable_test, log_level):
     logger.info("Test Parameters:")
     logger.info(f"\tController NodeId: {controller_nodeid}")
     logger.info(f"\tDevice NodeId:     {device_nodeid}")
     logger.info(f"\tTest Timeout:      {timeout}s")
-    logger.info(f"\tCommission Over:   {commissioning}")
     logger.info(f"\tDiscriminator:     {discriminator}")
     logger.info(f"\tEnabled Tests:     {enable_test}")
     logger.info(f"\tDisabled Tests:    {disable_test}")
     SetTestSet(enable_test, disable_test)
     do_tests(controller_nodeid, device_nodeid, timeout,
-             discriminator, setup_pin, commissioning, log_level)
+             discriminator, setup_pin, log_level)
 
 
 def test_datamodel(test: BaseTestHelper, device_nodeid: int):
@@ -175,12 +173,7 @@ def do_tests(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin
     # logging.getLogger().setLevel(logging.DEBUG)
     logging.getLogger().setLevel(log_level)
 
-    commissioning_method = None
-
-    if commissioning == 'eth':
-        commissioning_method = ethernet_commissioning
-    else:
-        TestFail(f"Unknown commissioning method: {commissioning}")
+    commissioning_method = ethernet_commissioning
 
     commissioning_method(test, discriminator, setup_pin,
                          device_nodeid)
