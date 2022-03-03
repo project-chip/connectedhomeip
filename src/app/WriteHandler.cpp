@@ -46,6 +46,7 @@ CHIP_ERROR WriteHandler::Init()
 
 void WriteHandler::Close()
 {
+    mSuppressResponse = false;
     VerifyOrReturn(mState != State::Uninitialized);
 
     if (mpExchangeCtx != nullptr)
@@ -394,7 +395,6 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     WriteRequestMessage::Parser writeRequestParser;
     AttributeDataIBs::Parser AttributeDataIBsParser;
     TLV::TLVReader AttributeDataIBsReader;
-    bool needSuppressResponse = false;
     // Default to InvalidAction for our status; that's what we want if any of
     // the parsing of our overall structure or paths fails.  Once we have a
     // successfully parsed path, the only way we will get a failure return is if
@@ -413,7 +413,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     err = writeRequestParser.CheckSchemaValidity();
     SuccessOrExit(err);
 #endif
-    err = writeRequestParser.GetSuppressResponse(&needSuppressResponse);
+    err = writeRequestParser.GetSuppressResponse(&mSuppressResponse);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
