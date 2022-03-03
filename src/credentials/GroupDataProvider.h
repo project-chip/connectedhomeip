@@ -139,7 +139,7 @@ public:
         // Logical id provided by the Administrator that configured the entry
         uint16_t keyset_id = 0;
         // Security policy to use for groups that use this keyset
-        SecurityPolicy policy = SecurityPolicy::kStandard;
+        SecurityPolicy policy = SecurityPolicy::kCacheAndSync;
         // Number of keys present
         uint8_t num_keys_used = 0;
 
