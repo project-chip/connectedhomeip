@@ -38,7 +38,12 @@ constexpr const char kIdentityAlpha[] = "";
 constexpr const char kIdentityBeta[]  = "";
 constexpr const char kIdentityGamma[] = "";
 
-class TestCommand : public PICSChecker, public LogCommands, public DiscoveryCommands, public DelayCommands, public ValueChecker, public ConstraintsChecker
+class TestCommand : public PICSChecker,
+                    public LogCommands,
+                    public DiscoveryCommands,
+                    public DelayCommands,
+                    public ValueChecker,
+                    public ConstraintsChecker
 {
 public:
     TestCommand(const char * commandName) : mCommandPath(0, 0, 0), mAttributePath(0, 0, 0) {}
