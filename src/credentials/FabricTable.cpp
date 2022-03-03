@@ -629,6 +629,7 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
             mFabricCount--;
         }
         ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", index);
+
         FabricTableDelegate * delegate = mDelegate;
         while (delegate)
         {
@@ -648,9 +649,14 @@ void FabricTable::DeleteAllFabrics()
     }
 }
 
-CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
+CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage, FabricTableDelegate * fabricTableDelegate)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    if (fabricTableDelegate != nullptr)
+    {
+        ReturnErrorOnFailure(AddFabricDelegate(fabricTableDelegate));
+    }
+
     mStorage = storage;
     ChipLogDetail(Discovery, "Init fabric pairing table with server storage");
 

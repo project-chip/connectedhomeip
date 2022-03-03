@@ -117,6 +117,11 @@ void SessionManager::Shutdown()
     mCB           = nullptr;
 }
 
+void SessionManager::SyncRemovalFabricIndex(FabricIndex fabricIndex)
+{
+    mGroupPeerMsgCounter.RemoveFabricIndex(fabricIndex);
+}
+
 CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {

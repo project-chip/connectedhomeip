@@ -144,7 +144,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
-    ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+    ReturnErrorOnFailure(
+        stateParams.fabricTable->Init(params.fabricIndependentStorage, chip::Platform::New<ControllerFabricDelegate>(stateParams.sessionMgr)));
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
                                                       stateParams.messageCounterManager, params.fabricIndependentStorage,

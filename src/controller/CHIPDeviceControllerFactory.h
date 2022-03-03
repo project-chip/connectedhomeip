@@ -31,6 +31,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace chip {
@@ -136,6 +137,41 @@ public:
     // This should only be invoked if a matching call to RetainSystemState() was called prior.
     //
     void ReleaseSystemState() { mSystemState->Release(); }
+
+    class ControllerFabricDelegate final : public FabricTableDelegate
+    {
+    public:
+        ControllerFabricDelegate() {}
+        ControllerFabricDelegate(SessionManager * sessionManager) : FabricTableDelegate(true), mSessionManager(sessionManager) {}
+
+        CHIP_ERROR Init(SessionManager * sessionManager)
+        {
+            VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+            mSessionManager = sessionManager;
+            return CHIP_NO_ERROR;
+        };
+
+        void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
+        {
+            if (mSessionManager != nullptr)
+            {
+                mSessionManager->SyncRemovalFabricIndex(fabricIndex);
+            }
+            Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+            if (groupDataProvider != nullptr)
+            {
+                groupDataProvider->RemoveFabric(fabricIndex);
+            }
+        };
+
+        void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+
+        void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+
+    private:
+        SessionManager * mSessionManager = nullptr;
+    };
 
 private:
     DeviceControllerFactory(){};

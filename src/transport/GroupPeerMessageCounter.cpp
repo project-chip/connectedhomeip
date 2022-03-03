@@ -172,6 +172,29 @@ CHIP_ERROR GroupPeerTable::RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bo
     return err;
 }
 
+CHIP_ERROR GroupPeerTable::RemoveFabricIndex(FabricIndex fabricIndex)
+{
+    CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
+
+    if (fabricIndex == kUndefinedFabricIndex)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    for (uint32_t it = 0; it < CHIP_CONFIG_MAX_FABRICS; it++)
+    {
+        if (fabricIndex == mGroupFabrics[it].mFabricIndex)
+        {
+            new (&mGroupFabrics[it]) GroupFabric();
+            err = CHIP_NO_ERROR;
+            break;
+        }
+    }
+
+    // Cannot find Fabric to remove
+    return err;
+}
+
 bool GroupPeerTable::RemoveSpecificPeer(GroupSender * list, NodeId nodeId, uint32_t size)
 {
     bool removed = false;

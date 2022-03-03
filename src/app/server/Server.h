@@ -170,6 +170,40 @@ private:
         ServerTransportMgr * mTransports;
     };
 
+    class ServerFabricDelegate final : public FabricTableDelegate
+    {
+    public:
+        ServerFabricDelegate() {}
+
+        CHIP_ERROR Init(SessionManager * sessionManager)
+        {
+            VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+            mSessionManager = sessionManager;
+            return CHIP_NO_ERROR;
+        };
+
+        void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
+        {
+            (void) compressedId;
+            if (mSessionManager != nullptr)
+            {
+                mSessionManager->SyncRemovalFabricIndex(fabricIndex);
+            }
+            Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+            if (groupDataProvider != nullptr)
+            {
+                groupDataProvider->RemoveFabric(fabricIndex);
+            }
+        };
+        void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+
+        void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+
+    private:
+        SessionManager * mSessionManager = nullptr;
+    };
+
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
@@ -198,6 +232,7 @@ private:
     Credentials::GroupDataProviderImpl mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
+    ServerFabricDelegate mFabricDelegate;
 
     Access::AccessControl mAccessControl;
 

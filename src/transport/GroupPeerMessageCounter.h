@@ -62,6 +62,8 @@ public:
     // Used in case of MCSP failure
     CHIP_ERROR RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bool isControl);
 
+    CHIP_ERROR RemoveFabricIndex(FabricIndex fabricIndex);
+
     // Protected for Unit Tests inheritance
 protected:
     bool RemoveSpecificPeer(GroupSender * list, NodeId nodeId, uint32_t size);

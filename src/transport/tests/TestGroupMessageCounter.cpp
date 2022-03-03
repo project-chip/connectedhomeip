@@ -165,6 +165,16 @@ void RemovePeerTest(nlTestSuite * inSuite, void * inContext)
     // Try re-adding the previous peer without any error
     err = mGroupPeerMsgCounter.FindOrAddPeer(99, 99, true, counter);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Fabric removal test
+    err = mGroupPeerMsgCounter.RemoveFabricIndex(123);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+
+    err = mGroupPeerMsgCounter.RemoveFabricIndex(99);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = mGroupPeerMsgCounter.RemoveFabricIndex(99);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
 }
 
 void PeerRetrievalTest(nlTestSuite * inSuite, void * inContext)

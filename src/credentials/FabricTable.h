@@ -274,6 +274,7 @@ class DLL_EXPORT FabricTableDelegate
     friend class FabricTable;
 
 public:
+    FabricTableDelegate(bool selfOwned = false) : mSelfOwned(selfOwned) {}
     virtual ~FabricTableDelegate() {}
     /**
      * Gets called when a fabric is deleted from KVS store.
@@ -292,6 +293,7 @@ public:
 
 private:
     FabricTableDelegate * mNext = nullptr;
+    bool mSelfOwned             = false;
 };
 
 /**
@@ -365,6 +367,19 @@ class DLL_EXPORT FabricTable
 {
 public:
     FabricTable() { Reset(); }
+    ~FabricTable()
+    {
+        FabricTableDelegate * delegate = mDelegate;
+        while (delegate)
+        {
+            FabricTableDelegate * temp = delegate->mNext;
+            if (delegate->mSelfOwned)
+            {
+                chip::Platform::Delete(delegate);
+            }
+            delegate = temp;
+        }
+    }
     CHIP_ERROR Store(FabricIndex index);
     CHIP_ERROR LoadFromStorage(FabricInfo * info);
 
@@ -394,7 +409,7 @@ public:
 
     void Reset();
 
-    CHIP_ERROR Init(PersistentStorageDelegate * storage);
+    CHIP_ERROR Init(PersistentStorageDelegate * storage, FabricTableDelegate * fabricTableDelegate);
     CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
 
     uint8_t FabricCount() const { return mFabricCount; }

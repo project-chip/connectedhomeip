@@ -665,8 +665,8 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ctx.SetAliceKeyId(0);
     ctx.SetFabricIndex(kUndefinedFabricIndex);
 
-    gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
-    gDeviceFabrics.Init(&gDeviceStorageDelegate);
+    gCommissionerFabrics.Init(&gCommissionerStorageDelegate, nullptr);
+    gDeviceFabrics.Init(&gDeviceStorageDelegate, nullptr);
 
     return InitCredentialSets();
 }
