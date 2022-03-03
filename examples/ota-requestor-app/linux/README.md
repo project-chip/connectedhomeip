@@ -17,11 +17,11 @@ scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug 
 In addition to the general options available to all Linux applications, the
 following command line options are available for the OTA Requestor application.
 
-| Directory                         | Description                                                                                                                                                                                                                                          |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -p/--periodicQueryTimeout <Time in seconds> | Periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours.
-| -c/--requestorCanConsent          | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.                                                                                                               |
-| -f/--otaDownloadPath <file path>  | If supplied, the OTA image is downloaded to the given fully-qualified file-path. Otherwise, the value defaults to /tmp/test.bin.                                                                                                                     |
+| Directory                                   | Description                                                                                                                                 |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| -p/--periodicQueryTimeout <Time in seconds> | Periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours. |
+| -c/--requestorCanConsent                    | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.      |
+| -f/--otaDownloadPath <file path>            | If supplied, the OTA image is downloaded to the given fully-qualified file-path. Otherwise, the value defaults to /tmp/test.bin.            |
 
 ## Software Image Header
 
@@ -103,17 +103,15 @@ out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --sec
     This must be different from the value used by the OTA Provider application.
 -   `${KVS_STORE_LOCATION}` is a location where the KVS items will be stored. If
     none is supplied, the default is /tmp/chip_kvs. This must be different from
-    the value used by the OTA Provider application.
-<<<<<<< HEAD
+    the value used by the OTA Provider application. <<<<<<< HEAD
 -   `${TIME_IN_SECONDS}` is the periodic timeout for querying providers in the
     default OTA provider list. If none or zero is supplied the timeout is set to
-    every 24 hours.
-=======
+    every 24 hours. =======
 -   `${TIME_IN_SECONDS}` is the amount of time to wait before triggering the
     QueryImage command specified by the DefaultOTAProviders attribute
 -   `${OTA_FILE_PATH}` is the fully-qualified path for the OTA file download
     location
->>>>>>> e03e5d3dba3c7336854611c6e9bacb69031a184f
+    > > > > > > > e03e5d3dba3c7336854611c6e9bacb69031a184f
 
 #### Commission the OTA Requestor application
 
