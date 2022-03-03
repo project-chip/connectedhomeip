@@ -15,7 +15,11 @@ RUN scripts/examples/gn_build_example.sh examples/ota-provider-app/linux example
 RUN scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux examples/ota-requestor-app/linux/out/host 'chip_config_network_layer_ble=false'
 RUN scripts/examples/gn_build_example.sh examples/door-lock-app/linux/ out/door-lock-app
 
-FROM connectedhomeip/chip-build
+FROM ubuntu:21.10
+ENV TZ=America/Los_Angeles
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apt-get update -y
+RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2
 WORKDIR /root/
 COPY --from=chip-build /root/connectedhomeip/out/debug/chip-tool chip-tool
 COPY --from=chip-build /root/connectedhomeip/out/debug/chip-shell chip-shell
