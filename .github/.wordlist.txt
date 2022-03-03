@@ -117,6 +117,7 @@ BDX
 BDXDownloader
 BeagleBone
 befc
+betaprogram
 BinaryInputBasic
 bitbake
 bld
