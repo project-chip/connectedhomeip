@@ -250,10 +250,11 @@ struct AccessControlEntryCodec
         {
             for (size_t i = 0; i < subjectCount; ++i)
             {
-                Subject subject;
-                ReturnErrorOnFailure(entry.GetSubject(i, subject.nodeId));
-                ReturnErrorOnFailure(Convert(subject.nodeId, subject));
-                subjectBuffer[i] = subject.nodeId;
+                NodeId subject;
+                ReturnErrorOnFailure(entry.GetSubject(i, subject));
+                Subject tmp;
+                ReturnErrorOnFailure(AccessControlEntryCodec::Convert(subject, tmp));
+                subjectBuffer[i] = tmp.nodeId;
             }
             staging.subjects.SetNonNull(subjectBuffer, subjectCount);
         }
@@ -302,9 +303,10 @@ struct AccessControlEntryCodec
             auto iterator = staging.subjects.Value().begin();
             while (iterator.Next())
             {
-                Subject subject = { .nodeId = iterator.GetValue(), .authMode = staging.authMode };
-                ReturnErrorOnFailure(Convert(subject, subject.nodeId));
-                ReturnErrorOnFailure(entry.AddSubject(nullptr, subject.nodeId));
+                Subject tmp = { .nodeId = iterator.GetValue(), .authMode = staging.authMode };
+                NodeId subject;
+                ReturnErrorOnFailure(Convert(tmp, subject));
+                ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
             }
             ReturnErrorOnFailure(iterator.GetStatus());
         }
@@ -393,10 +395,11 @@ CHIP_ERROR LogEntryChangedEvent(const AccessControl::Entry & entry, const Access
     {
         for (size_t i = 0; i < subjectCount; ++i)
         {
-            Subject subject;
-            ReturnErrorOnFailure(entry.GetSubject(i, subject.nodeId));
-            ReturnErrorOnFailure(AccessControlEntryCodec::Convert(subject.nodeId, subject));
-            subjectBuffer[i] = subject.nodeId;
+            NodeId subject;
+            ReturnErrorOnFailure(entry.GetSubject(i, subject));
+            Subject tmp;
+            ReturnErrorOnFailure(AccessControlEntryCodec::Convert(subject, tmp));
+            subjectBuffer[i] = tmp.nodeId;
         }
         staging.subjects.SetNonNull(subjectBuffer, subjectCount);
     }
