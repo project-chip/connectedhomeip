@@ -54,9 +54,9 @@ OTAImageProcessorImpl gImageProcessor;
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
-constexpr uint16_t kOptionRequestorCanConsent = 'c';
-constexpr uint16_t kOptionOtaDownloadPath     = 'f';
-constexpr size_t kMaxFilePathSize             = 256;
+constexpr uint16_t kOptionRequestorCanConsent  = 'c';
+constexpr uint16_t kOptionOtaDownloadPath      = 'f';
+constexpr size_t kMaxFilePathSize              = 256;
 
 uint32_t gPeriodicQueryTimeoutSec = (24 * 60 * 60);
 chip::Optional<bool> gRequestorCanConsent;
