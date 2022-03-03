@@ -790,10 +790,7 @@
 
 - (void)_restartMatterStack
 {
-    NSLog(@"Shutting down the stack");
-    [self.chipController shutdown];
-    NSLog(@"Starting up the stack");
-    [self.chipController startup:nil vendorId:0 nocSigner:nil];
+    CHIPRestartController(self.chipController);
 }
 
 - (void)handleRendezVousDefault:(NSString *)payload
