@@ -75,6 +75,9 @@ public:
     CHIP_ERROR FetchNextData() override;
     // TODO: override SkipData
 
+    System::Clock::Timeout GetTimeout();
+    // If True, there's been a timeout in the transfer as measured by no download progress after 'mTimeout' seconds.
+    // If False, there's been progress in the transfer.
     bool CheckTransferTimeout();
 
 private:
@@ -85,6 +88,10 @@ private:
     chip::bdx::TransferSession mBdxTransfer;
     MessagingDelegate * mMsgDelegate = nullptr;
     StateDelegate * mStateDelegate   = nullptr;
+    // Timeout value in seconds to abort the download if there's no progress in the transfer session.
+    System::Clock::Timeout mTimeout = System::Clock::kZero;
+    // Tracks the percentage of transfer session complete from as of the previous check.
+    uint8_t prevPercentageComplete = 0;
 };
 
 } // namespace chip
