@@ -246,6 +246,21 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mState = State::NotInitialized;
 
+    if (mFabricInfo != nullptr)
+    {
+        // Shut down any ongoing CASE session activity we have.  Note that we
+        // own the mCASESessionManager, so shutting down everything on it is
+        // fine.  If we ever end up sharing the CASE session manager with other
+        // DeviceController instances we may need to be more targeted here.
+        mCASESessionManager->ReleaseAllSessions();
+
+        // TODO: The CASE session manager does not shut down existing CASE
+        // sessions.  It just shuts down any ongoing CASE session establishment
+        // we're in the middle of as initiator.  Maybe it should shut down
+        // existing sessions too?
+        mSystemState->SessionMgr()->ExpireAllPairingsForFabric(mFabricInfo->GetFabricIndex());
+    }
+
     mStorageDelegate = nullptr;
 
     if (mFabricInfo != nullptr)
@@ -1451,6 +1466,16 @@ void DeviceCommissioner::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNo
     ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID 0x" ChipLogFormatX64,
                     ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
     VerifyOrReturn(mState == State::Initialized);
+
+    // TODO: minimal mdns is buggy and violates the API contract for the
+    // resolver proxy by handing us results for all sorts of things we did not
+    // ask it to resolve, including results that don't even match our fabric.
+    // Reject at least those mis-matching results, since we can detect those
+    // easily.
+    if (nodeData.mPeerId.GetCompressedFabricId() != GetCompressedFabricId())
+    {
+        return;
+    }
 
     mDNSCache.Insert(nodeData);
 
