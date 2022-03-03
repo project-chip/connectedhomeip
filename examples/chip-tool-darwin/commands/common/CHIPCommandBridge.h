@@ -72,6 +72,8 @@ private:
     CHIP_ERROR StartWaiting(chip::System::Clock::Timeout seconds);
     void StopWaiting();
     CHIPDeviceController * mController;
+    chip::Crypto::P256Keypair mIssuer;
+    uint64_t mIndex = 0;
 
 #if CONFIG_USE_SEPARATE_EVENTLOOP
     std::condition_variable cvWaitingForResponse;
