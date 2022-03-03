@@ -93,7 +93,6 @@ if (chip_device_platform != "none") {
 
     chip_with_gio = chip_enable_wifi
     chip_device_config_enable_wpa = chip_enable_wifi
-    chip_device_config_enable_dnssd = chip_mdns != "none"
     chip_stack_lock_tracking_log = chip_stack_lock_tracking != "none"
     chip_stack_lock_tracking_fatal = chip_stack_lock_tracking == "fatal"
     defines = [
@@ -102,7 +101,6 @@ if (chip_device_platform != "none") {
       "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_device_config_thread_ftd}",
       "CHIP_WITH_GIO=${chip_with_gio}",
       "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
-      "CHIP_DEVICE_CONFIG_ENABLE_DNSSD=${chip_device_config_enable_dnssd}",
       "CHIP_BYPASS_RENDEZVOUS=${chip_bypass_rendezvous}",
       "CHIP_STACK_LOCK_TRACKING_ENABLED=${chip_stack_lock_tracking_log}",
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
@@ -245,11 +243,7 @@ if (chip_device_platform != "none") {
     ]
 
     if (current_os == "android") {
-      chip_device_config_enable_dnssd = chip_mdns != "none"
-      defines += [
-        "CHIP_DEVICE_CONFIG_ENABLE_DNSSD=${chip_device_config_enable_dnssd}",
-        "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"",
-      ]
+      defines += [ "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"" ]
     }
   }
 }

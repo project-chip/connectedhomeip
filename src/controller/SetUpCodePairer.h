@@ -38,9 +38,7 @@
 #include <ble/BleLayer.h>
 #endif // CONFIG_NETWORK_BLE
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 #include <controller/DeviceDiscoveryDelegate.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 namespace chip {
 namespace Controller {
@@ -55,10 +53,8 @@ public:
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode);
 
-// Called by the DeviceCommissioner to notify that we have discovered a new device.
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    // Called by the DeviceCommissioner to notify that we have discovered a new device.
     void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 #if CONFIG_NETWORK_LAYER_BLE
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
@@ -83,10 +79,8 @@ private:
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData);
     Dnssd::DiscoveryFilter currentFilter;
-#endif
 
     DeviceCommissioner * mCommissioner = nullptr;
     chip::NodeId mRemoteId;

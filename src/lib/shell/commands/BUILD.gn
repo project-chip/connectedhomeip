@@ -47,7 +47,7 @@ source_set("commands") {
     sources += [ "NFC.cpp" ]
   }
 
-  if (chip_mdns != "none" && chip_device_platform != "none") {
+  if (chip_device_platform != "none") {
     sources += [ "Dns.cpp" ]
   }
 

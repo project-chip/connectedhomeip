@@ -157,12 +157,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         }
         else
         {
-            // TODO: I dont think this is to spec - not sure where we'd have a commissioner that doesn't have dnssd.
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
             return CommissioningStage::kFindOperational;
-#else
-            return CommissioningStage::kSendComplete;
-#endif
         }
     case CommissioningStage::kWiFiNetworkSetup:
         if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioningInfo.network.thread != kInvalidEndpointId)
@@ -193,12 +188,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kThreadNetworkEnable:
-        // TODO: I dont think this is to spec - not sure where we'd have a commissioner that doesn't have dnssd.
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
         return CommissioningStage::kFindOperational;
-#else
-        return CommissioningStage::kSendComplete;
-#endif
     case CommissioningStage::kFindOperational:
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:

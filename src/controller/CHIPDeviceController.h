@@ -70,12 +70,10 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <controller/DeviceDiscoveryDelegate.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/ResolverProxy.h>
-#endif
 
 namespace chip {
 
@@ -91,12 +89,10 @@ void OnBasicFailure(void * context, CHIP_ERROR err);
 
 struct ControllerInitParams
 {
-    PersistentStorageDelegate * storageDelegate = nullptr;
-    DeviceControllerSystemState * systemState   = nullptr;
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate = nullptr;
-    DeviceDiscoveryDelegate * deviceDiscoveryDelegate         = nullptr;
-#endif
+    PersistentStorageDelegate * storageDelegate                     = nullptr;
+    DeviceControllerSystemState * systemState                       = nullptr;
+    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate       = nullptr;
+    DeviceDiscoveryDelegate * deviceDiscoveryDelegate               = nullptr;
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
     /* The following keypair must correspond to the public key used for generating
@@ -176,12 +172,9 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SessionRecoveryDelegate
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    ,
+class DLL_EXPORT DeviceController : public SessionRecoveryDelegate,
                                     public AbstractDnssdDiscoveryController,
                                     public Dnssd::OperationalResolveDelegate
-#endif
 {
 public:
     DeviceController();
@@ -315,10 +308,8 @@ public:
                                                    Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                    bool readVIDPIDAttributes = false);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
     void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
-#endif
 
     /**
      * @brief Get the Compressed Fabric ID assigned to the device.
@@ -368,13 +359,11 @@ protected:
     FabricId mFabricId       = kUndefinedFabricId;
     FabricInfo * mFabricInfo = nullptr;
 
-    PersistentStorageDelegate * mStorageDelegate = nullptr;
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    PersistentStorageDelegate * mStorageDelegate               = nullptr;
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
-#endif
     DeviceControllerSystemState * mSystemState = nullptr;
 
     CHIP_ERROR InitializePairedDeviceList();
@@ -390,12 +379,10 @@ protected:
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     //////////// OperationalResolveDelegate Implementation ///////////////
     void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
     void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 private:
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
@@ -621,7 +608,6 @@ public:
      */
     CHIP_ERROR CloseBleConnection();
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     /**
      * @brief
      *   Discover all devices advertising as commissionable.
@@ -648,7 +634,7 @@ public:
 
     void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
     void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
      * @brief
@@ -669,7 +655,6 @@ public:
     UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     /**
      * @brief
      *   Overrides method from AbstractDnssdDiscoveryController
@@ -678,7 +663,6 @@ public:
      *
      */
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
-#endif
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
