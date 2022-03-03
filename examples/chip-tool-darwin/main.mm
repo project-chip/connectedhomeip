@@ -19,12 +19,15 @@
 #include "commands/common/Commands.h"
 
 #include "commands/pairing/Commands.h"
+
 #include <zap-generated/cluster/Commands.h>
+#include <zap-generated/test/Commands.h>
 
 int main(int argc, const char * argv[])
 {
     Commands commands;
     registerCommandsPairing(commands);
+    registerCommandsTests(commands);
     registerClusters(commands);
     return commands.Run(argc, (char **) argv);
 }
