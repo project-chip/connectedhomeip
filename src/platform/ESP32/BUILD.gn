@@ -70,6 +70,11 @@ static_library("ESP32") {
       "ConnectivityManagerImpl_WiFi.cpp",
       "NetworkCommissioningWiFiDriver.cpp",
     ]
+    if (chip_mdns == "platform") {
+      sources += [
+        "DnssdImpl.cpp",
+      ]
+    }
   }
 
   if (chip_enable_openthread) {
