@@ -39,7 +39,6 @@ namespace Controller {
 
 struct SetupParams
 {
-    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate       = nullptr;
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
     PersistentStorageDelegate * storageDelegate = nullptr;

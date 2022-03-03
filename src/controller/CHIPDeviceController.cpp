@@ -129,7 +129,6 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     ReturnErrorOnFailure(mDNSResolver.Init(params.systemState->UDPEndPointManager()));
     mDNSResolver.SetOperationalDelegate(this);
     mDNSResolver.SetCommissioningDelegate(this);
-    RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
 
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

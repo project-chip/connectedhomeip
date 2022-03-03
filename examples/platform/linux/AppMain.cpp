@@ -327,7 +327,6 @@ CHIP_ERROR InitCommissioner()
     factoryParams.fabricIndependentStorage = &gServerStorage;
 
     params.storageDelegate                = &gServerStorage;
-    params.deviceAddressUpdateDelegate    = nullptr;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));

@@ -91,7 +91,6 @@ struct ControllerInitParams
 {
     PersistentStorageDelegate * storageDelegate                     = nullptr;
     DeviceControllerSystemState * systemState                       = nullptr;
-    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate       = nullptr;
     DeviceDiscoveryDelegate * deviceDiscoveryDelegate               = nullptr;
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
