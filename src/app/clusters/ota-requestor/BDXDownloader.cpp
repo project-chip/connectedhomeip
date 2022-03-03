@@ -18,12 +18,12 @@
 
 #include "BDXDownloader.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <system/SystemClock.h> /* TODO:(#12520) remove */
 #include <system/SystemPacketBuffer.h>
@@ -37,29 +37,30 @@ using chip::bdx::TransferSession;
 namespace chip {
 
 // Timeout value in seconds to abort the download if there's no progress in the transfer session.
-System::Clock::Timeout mTimeout           = System::Clock::kZero;
+System::Clock::Timeout mTimeout = System::Clock::kZero;
 
 static uint8_t prevPercentageComplete = 0;
 
 void StartTimeoutTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    if( static_cast<BDXDownloader *>(appState)->CheckTransferTimeout() )
+    if (static_cast<BDXDownloader *>(appState)->CheckTransferTimeout())
     {
-        //End download if transfer timeout has been detected
-        static_cast<BDXDownloader *>(appState)->OnDownloadTimeout();  
+        // End download if transfer timeout has been detected
+        static_cast<BDXDownloader *>(appState)->OnDownloadTimeout();
     }
     else
     {
-       //Else restart the timer
-       systemLayer->StartTimer(mTimeout, StartTimeoutTimerHandler, appState);  
+        // Else restart the timer
+        systemLayer->StartTimer(mTimeout, StartTimeoutTimerHandler, appState);
     }
 }
 
 bool BDXDownloader::CheckTransferTimeout()
 {
-    uint8_t curPercentageComplete = mImageProcessor->GetPercentComplete().IsNull() ? 0 : mImageProcessor->GetPercentComplete().Value();
+    uint8_t curPercentageComplete =
+        mImageProcessor->GetPercentComplete().IsNull() ? 0 : mImageProcessor->GetPercentComplete().Value();
 
-    if( curPercentageComplete > prevPercentageComplete )
+    if (curPercentageComplete > prevPercentageComplete)
     {
         prevPercentageComplete = curPercentageComplete;
         return false;
@@ -86,10 +87,11 @@ void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader,
     PollTransferSession();
 }
 
-CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData, System::Clock::Timeout timeout)
+CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData,
+                                       System::Clock::Timeout timeout)
 {
     mTimeout = timeout;
-    mState = State::kIdle;
+    mState   = State::kIdle;
     mBdxTransfer.Reset();
 
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
@@ -150,7 +152,7 @@ CHIP_ERROR BDXDownloader::FetchNextData()
 void BDXDownloader::OnDownloadTimeout()
 {
     prevPercentageComplete = 0;
-    DeviceLayer::SystemLayer().CancelTimer(StartTimeoutTimerHandler, this); 
+    DeviceLayer::SystemLayer().CancelTimer(StartTimeoutTimerHandler, this);
 
     if (mState == State::kInProgress)
     {
