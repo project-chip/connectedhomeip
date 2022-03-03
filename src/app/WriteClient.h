@@ -122,8 +122,8 @@ public:
      *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
      *  @param[in]    aSuppressResponse If provided, set SuppressResponse field to the provided value
      */
-    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback,
-                const Optional<uint16_t> & aTimedWriteTimeoutMs, const Optional<bool> & aSuppressResponse = NullOptional) :
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
+                const Optional<bool> & aSuppressResponse = NullOptional) :
         mpExchangeMgr(apExchangeMgr),
         mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs)
     {

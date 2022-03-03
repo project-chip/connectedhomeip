@@ -179,7 +179,8 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs, const Optional<bool> & aSuppressResponse = NullOptional)
+                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                                          const Optional<bool> & aSuppressResponse = NullOptional)
     {
         if (aSuppressResponse.HasValue())
         {
