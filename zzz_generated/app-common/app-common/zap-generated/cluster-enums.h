@@ -917,8 +917,8 @@ namespace GroupKeyManagement {
 // Enum for GroupKeySecurityPolicy
 enum class GroupKeySecurityPolicy : uint8_t
 {
-    kStandard   = 0x00,
-    kTrustFirst = 0x01,
+    kTrustFirst   = 0x00,
+    kCacheAndSync = 0x01,
 };
 } // namespace GroupKeyManagement
 
