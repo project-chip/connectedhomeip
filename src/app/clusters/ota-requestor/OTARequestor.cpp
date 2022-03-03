@@ -251,10 +251,6 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
-    // We are now connecting to a provider, leave the kIdle state.
-    // No state matches this one fully but we can't be in kIdle.
-    RecordNewUpdateState(OTAUpdateStateEnum::kUnknown, OTAChangeReasonEnum::kSuccess);
-
     if (mServer == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Server not set");
@@ -378,7 +374,7 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
             return;
         }
 
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
+        // The kQuerying state is set in TriggerImmediateQueryInternal(), do not set it here
         break;
     }
     case kStartBDX: {
@@ -456,6 +452,10 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
 // Sends the QueryImage command to the Provider currently set in the OTARequestor
 void OTARequestor::TriggerImmediateQueryInternal()
 {
+    // We are now connecting to a provider for the purpose of sending a QueryImage,
+    // treat this as a move to the Querying state
+    RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
+
     ConnectToProvider(kQueryImage);
 }
 
