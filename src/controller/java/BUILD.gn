@@ -98,6 +98,7 @@ android_library("java") {
     "src/chip/devicecontroller/model/EndpointState.java",
     "src/chip/devicecontroller/model/NodeState.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
+    "zap-generated/chip/devicecontroller/ChipIdLookup.java",
     "zap-generated/chip/devicecontroller/ChipStructs.java",
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
     "zap-generated/chip/devicecontroller/ClusterReadMapping.java",
