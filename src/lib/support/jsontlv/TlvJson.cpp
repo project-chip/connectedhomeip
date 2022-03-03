@@ -55,8 +55,8 @@ struct KeyContext
         key     = listIndex;
     }
 
-    KeyType keyType  = kRoot;
-    unsigned int key = 0;
+    KeyType keyType = kRoot;
+    uint32_t key    = 0;
 };
 } // namespace
 
