@@ -759,7 +759,7 @@ class ChipDeviceController():
             nodeid, [(endpoint, attributeType)]))
         path = ClusterAttribute.AttributePath(
             EndpointId=endpoint, Attribute=attributeType)
-        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[0][endpoint][clusterType][attributeType])
+        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[endpoint][clusterType][attributeType])
 
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, dataVersion=0, blocking=True):
         req = None
