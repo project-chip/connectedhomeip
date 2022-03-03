@@ -1205,17 +1205,6 @@
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 
 /**
- * @def CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
- *
- * @brief Define the size of the pool used for tracking CHIP groups.
- *        Given the ephemeral nature of groups session, no need to support
- *        a large pool size.
- */
-#ifndef CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
-#define CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE 4
-#endif // CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
-
-/**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking CHIP

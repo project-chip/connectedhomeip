@@ -118,7 +118,6 @@ public:
                               const Optional<uint16_t> & aTimedWriteTimeoutMs, WriteResponseDoneCallback doneCb = nullptr,
                               const Optional<DataVersion> & aDataVersion = NullOptional)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & aPath) {
@@ -142,21 +141,21 @@ public:
             }
         };
 
-        if (mGroupSession)
+        if (mGroupId.HasValue())
         {
-            err =
-                chip::Controller::WriteAttribute<AttrType>(mGroupSession.Get(), mEndpoint, clusterId, attributeId, requestData,
-                                                           onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb, aDataVersion);
-            mDevice->GetExchangeManager()->GetSessionManager()->RemoveGroupSession(mGroupSession->AsGroupSession());
+            VerifyOrReturnError(mDevice->GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
+            Transport::OutgoingGroupSession groupSession(mGroupId.Value(), mDevice->GetSecureSession().Value()->GetFabricIndex(),
+                                                         mDevice->GetDeviceId());
+            return chip::Controller::WriteAttribute<AttrType>(SessionHandle(groupSession), mEndpoint, clusterId, attributeId,
+                                                              requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb,
+                                                              aDataVersion);
         }
         else
         {
-            err = chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId,
-                                                             requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb,
-                                                             aDataVersion);
+            return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId,
+                                                              attributeId, requestData, onSuccessCb, onFailureCb,
+                                                              aTimedWriteTimeoutMs, onDoneCb, aDataVersion);
         }
-
-        return err;
     }
 
     template <typename AttributeInfo>
@@ -346,7 +345,7 @@ protected:
     const ClusterId mClusterId;
     DeviceProxy * mDevice;
     EndpointId mEndpoint;
-    SessionHolder mGroupSession;
+    Optional<GroupId> mGroupId;
     Optional<System::Clock::Timeout> mTimeout;
 };
 
