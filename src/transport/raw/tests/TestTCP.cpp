@@ -112,7 +112,7 @@ public:
         // retry a few times in case the port is somehow in use.
         // this is a WORKAROUND for flaky testing if we run tests very fast after each other.
         // in that case, a port could be in a WAIT state.
-        // 
+        //
         // What may be happening:
         //   - We call InitializeMessageTest several times in this unit test
         //   - closing sockets takes a while (FIN-wait or similar)
