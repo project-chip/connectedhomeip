@@ -249,7 +249,7 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
     // This implementation of the OTARequestor driver ignores the announcement if an update is in progress,
     // otherwise it queries the provider passed in the announcement
 
-    if (mRequestor->GetCurrentUpdateState() != OTARequestorInterface::kStateIdle)
+    if (mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle)
     {
         ChipLogProgress(SoftwareUpdate, "State is not kIdle, ignoring the AnnounceOTAProviders. State: %d",
                         (int) mRequestor->GetCurrentUpdateState());

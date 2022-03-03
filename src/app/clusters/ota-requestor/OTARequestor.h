@@ -64,7 +64,10 @@ public:
     CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
 
     // Get requestor state
-    CHIP_ERROR GetState(EndpointId endpointId, app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) override;
+    CHIP_ERROR GetState(EndpointId endpointId, OTAUpdateStateEnum & state) override;
+
+    // Get the current state of the OTA update
+    OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
@@ -120,9 +123,6 @@ public:
                                                                     reinterpret_cast<intptr_t>(this));
     }
 
-    // Getter for the value of the UpdateState cached by the object
-    UpdateState GetCurrentUpdateState() override;
-
     /**
      * Called to set optional requestorCanConsent value provided by Requestor.
      */
@@ -132,7 +132,6 @@ private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 
-    using OTAUpdateStateEnum  = app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
     using OTAChangeReasonEnum = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
 
     static constexpr size_t kMaxUpdateTokenLen = 32;
