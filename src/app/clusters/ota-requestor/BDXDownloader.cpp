@@ -46,12 +46,12 @@ void StartTimeoutTimerHandler(System::Layer * systemLayer, void * appState)
     if( static_cast<BDXDownloader *>(appState)->CheckTransferTimeout() )
     {
         //End download if transfer timeout has been detected
-        static_cast<BDXDownloader *>(appState)->OnDownloadTimeout();  
+        static_cast<BDXDownloader *>(appState)->OnDownloadTimeout();
     }
     else
     {
        //Else restart the timer
-       systemLayer->StartTimer(mTimeout, StartTimeoutTimerHandler, appState);  
+       systemLayer->StartTimer(mTimeout, StartTimeoutTimerHandler, appState);
     }
 }
 
@@ -150,7 +150,7 @@ CHIP_ERROR BDXDownloader::FetchNextData()
 void BDXDownloader::OnDownloadTimeout()
 {
     prevPercentageComplete = 0;
-    DeviceLayer::SystemLayer().CancelTimer(StartTimeoutTimerHandler, this); 
+    DeviceLayer::SystemLayer().CancelTimer(StartTimeoutTimerHandler, this);
 
     if (mState == State::kInProgress)
     {
