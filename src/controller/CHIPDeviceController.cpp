@@ -246,6 +246,19 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mState = State::NotInitialized;
 
+    if (mFabricInfo != nullptr) {
+        // Shut down any ongoing CASE session activity we have.
+        // https://github.com/project-chip/connectedhomeip/issues/15808 tracks
+        // the weird use of compressed fabric id as a key here.
+        mCASESessionManager->ReleaseSessionForFabric(GetCompressedFabricId());
+
+        // TODO: The CASE session manager does not shut down existing CASE
+        // sessions.  It just shuts down any ongoing CASE session establishment
+        // we're in the middle of as initiator.  Maybe it should shut down
+        // existing sessions too?
+        mSystemState->SessionMgr()->ExpireAllPairingsForFabric(mFabricInfo->GetFabricIndex());
+    }
+
     mStorageDelegate = nullptr;
 
     if (mFabricInfo != nullptr)
