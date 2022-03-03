@@ -104,6 +104,7 @@ out/chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --sec
 -   `${TIME_IN_SECONDS}` is the periodic timeout for querying providers in the
     default OTA provider list. If none or zero is supplied the timeout is set to
     every 24 hours.
+
 #### Commission the OTA Requestor application
 
 ```
