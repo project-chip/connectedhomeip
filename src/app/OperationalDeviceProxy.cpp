@@ -302,7 +302,8 @@ CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
     return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricInfo->GetFabricIndex(), GetDeviceId());
 }
 
-OperationalDeviceProxy::~OperationalDeviceProxy() {
+OperationalDeviceProxy::~OperationalDeviceProxy()
+{
     if (mCASEClient)
     {
         // Make sure we don't leak it.

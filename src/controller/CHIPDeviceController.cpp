@@ -246,7 +246,8 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mState = State::NotInitialized;
 
-    if (mFabricInfo != nullptr) {
+    if (mFabricInfo != nullptr)
+    {
         // Shut down any ongoing CASE session activity we have.
         // https://github.com/project-chip/connectedhomeip/issues/15808 tracks
         // the weird use of compressed fabric id as a key here.
