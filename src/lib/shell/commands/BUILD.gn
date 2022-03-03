@@ -49,7 +49,7 @@ source_set("commands") {
 
   if (chip_device_platform != "none") {
     sources += [ "Dns.cpp" ]
-  } 
+  }
 
   if (chip_enable_ota_requestor && chip_device_platform != "none" &&
       chip_device_platform != "linux" && chip_device_platform != "darwin") {
