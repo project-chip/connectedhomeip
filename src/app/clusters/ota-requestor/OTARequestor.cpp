@@ -711,7 +711,7 @@ CHIP_ERROR OTARequestor::StartDownload(OperationalDeviceProxy & deviceProxy)
     mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
     mBdxDownloader->SetStateDelegate(this);
 
-    ReturnErrorOnFailure(mBdxDownloader->SetBDXParams(initOptions));
+    ReturnErrorOnFailure(mBdxDownloader->SetBDXParams(initOptions, mTimeoutSec));
     return mBdxDownloader->BeginPrepareDownload();
 }
 

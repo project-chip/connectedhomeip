@@ -63,7 +63,7 @@ public:
     void SetStateDelegate(StateDelegate * delegate) { mStateDelegate = delegate; }
 
     // Initialize a BDX transfer session but will not proceed until OnPreparedForDownload() is called.
-    CHIP_ERROR SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData);
+    CHIP_ERROR SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData, System::Clock::Timeout timeout);
 
     // OTADownloader Overrides
     CHIP_ERROR BeginPrepareDownload() override;
@@ -74,6 +74,8 @@ public:
     void EndDownload(CHIP_ERROR reason = CHIP_NO_ERROR) override;
     CHIP_ERROR FetchNextData() override;
     // TODO: override SkipData
+
+    bool CheckTransferTimeout();
 
 private:
     void PollTransferSession();
