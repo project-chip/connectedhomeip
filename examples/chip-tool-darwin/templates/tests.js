@@ -218,8 +218,6 @@ function getTests()
     //'Test_TC_WNCV_3_3',
     'Test_TC_WNCV_3_4',
     'Test_TC_WNCV_3_5',
-    'Test_TC_WNCV_4_1',
-    'Test_TC_WNCV_4_2',
     'Test_TC_WNCV_4_3',
     'Test_TC_WNCV_4_4',
   ];

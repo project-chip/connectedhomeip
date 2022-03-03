@@ -1,7 +1,4 @@
-{{#if (chip_tests_config_has expected)}}
-  {{! Just replace the value's name with the actual value in the rest of the processing~}}
-  {{>check_test_value target=target expected=(chip_tests_config_get_default_value expected) cluster=cluster depth=depth}}
-{{else if isOptional}}
+{{#if isOptional}}
   {{! This just means we expect a non-nil value.  Go ahead and check the value,
       stripping the optionality off. }}
   {{>check_test_value actual=actual expected=expected cluster=cluster isOptional=false}}

@@ -21,6 +21,7 @@ assert(chip_build_tools)
 
 executable("chip-tool-darwin") {
   sources = [
+    "${chip_root}/zzz_generated/chip-tool-darwin/zap-generated/cluster/CHIPTestClustersObjc.mm",
     "commands/clusters/ModelCommandBridge.mm",
     "commands/common/CHIPCommandBridge.mm",
     "commands/pairing/Commands.h",
