@@ -97,17 +97,10 @@ tests:
                 value: "PBS"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
-              - name: "channelMatch"
-                value:
-                    {
-                        majorNumber: 9,
-                        minorNumber: 1,
-                        name: "PBS",
-                        callSign: "KCTS-TV",
-                        affiliateCallSign: "KCTS",
-                    }
 
     - label: "Change Channel By Number Command"
       command: "changeChannelByNumber"

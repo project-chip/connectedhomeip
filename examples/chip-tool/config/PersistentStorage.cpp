@@ -104,7 +104,7 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 
     auto section = mConfig.sections[kDefaultSectionName];
     auto it      = section.find(key);
-    ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_KEY_NOT_FOUND);
+    ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     ReturnErrorCodeIf(!inipp::extract(section[key], iniValue), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -135,6 +135,9 @@ CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * val
 CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
 {
     auto section = mConfig.sections[kDefaultSectionName];
+    auto it      = section.find(key);
+    ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
     section.erase(key);
 
     mConfig.sections[kDefaultSectionName] = section;

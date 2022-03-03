@@ -48,8 +48,6 @@ shared_library("ChipDeviceCtrl") {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
       "ChipDeviceController-ScriptBinding.cpp",
-      "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
-      "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
       "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
       "ChipDeviceController-ScriptDevicePairingDelegate.h",
       "ChipDeviceController-StorageDelegate.cpp",

@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeAclWithMinInterval:(NSNumber * _Nonnull)minInterval
                                  maxInterval:(NSNumber * _Nonnull)maxInterval
-                                      params:(CHIPReadParams * _Nullable)params
+                                      params:(CHIPSubscribeParams * _Nullable)params
                      subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeExtensionWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeExtensionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                            params:(CHIPReadParams * _Nullable)params
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -59,6 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -68,6 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -77,6 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -85,6 +88,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -107,6 +111,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -116,6 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -125,6 +131,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -133,6 +140,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -155,6 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeWindowStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -163,6 +172,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAdminFabricIndexWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -171,6 +181,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAdminVendorIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -179,6 +190,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -188,6 +200,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -197,6 +210,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -205,6 +219,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -221,6 +236,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeVendorNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -228,6 +244,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeVendorIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -235,6 +252,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeApplicationNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -243,6 +261,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -251,6 +270,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeApplicationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:
                                            (void (^)(CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
@@ -259,6 +279,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -266,6 +287,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeApplicationVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -274,6 +296,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAllowedVendorListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -282,6 +305,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -291,6 +315,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -300,6 +325,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -308,6 +334,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -334,6 +361,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCatalogListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -343,6 +371,7 @@ NS_ASSUME_NONNULL_BEGIN
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeCurrentAppWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
                                                         NSError * _Nullable error))reportHandler;
@@ -351,6 +380,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -360,6 +390,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -369,6 +400,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -377,6 +409,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -398,6 +431,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOutputListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -405,6 +439,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentOutputWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -413,6 +448,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -422,6 +458,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -431,6 +468,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -439,6 +477,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -459,6 +498,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBarrierMovingStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -467,6 +507,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBarrierSafetyStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -476,6 +517,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBarrierCapabilitiesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -485,6 +527,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBarrierPositionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -493,6 +536,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -502,6 +546,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -511,6 +556,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -519,6 +565,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -535,6 +582,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDataModelRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -543,6 +591,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeVendorNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -550,6 +599,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeVendorIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -557,6 +607,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -564,6 +615,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -572,6 +624,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNodeLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -580,6 +633,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLocationWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLocationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -587,6 +641,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeHardwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -595,6 +650,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeHardwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -604,6 +660,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSoftwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -612,6 +669,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSoftwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -621,6 +679,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeManufacturingDateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -629,6 +688,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePartNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -636,6 +696,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductURLWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -643,6 +704,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -651,6 +713,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSerialNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -660,6 +723,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLocalConfigDisabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLocalConfigDisabledWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -669,6 +733,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeReachableWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -676,6 +741,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeUniqueIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -683,6 +749,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -692,6 +759,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -701,6 +769,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -709,6 +778,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -726,6 +796,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOutOfServiceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOutOfServiceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -735,6 +806,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributePresentValueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributePresentValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -743,6 +815,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStatusFlagsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -750,6 +823,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -759,6 +833,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -768,6 +843,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -776,6 +852,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -793,7 +870,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeBindingWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBindingWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
-                                          params:(CHIPReadParams * _Nullable)params
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -801,6 +878,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -810,6 +888,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -819,6 +898,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -827,6 +907,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -843,6 +924,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStateValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -850,6 +932,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -859,6 +942,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -868,6 +952,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -876,6 +961,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -917,6 +1003,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActionListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -924,6 +1011,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEndpointListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -931,6 +1019,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSetupUrlWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -938,6 +1027,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -947,6 +1037,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -956,6 +1047,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -964,6 +1056,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -980,6 +1073,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeVendorNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -987,6 +1081,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeVendorIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -994,6 +1089,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1002,6 +1098,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNodeLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1009,6 +1106,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeHardwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1017,6 +1115,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeHardwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -1026,6 +1125,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSoftwareVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1034,6 +1134,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSoftwareVersionStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -1043,6 +1144,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeManufacturingDateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1051,6 +1153,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePartNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1058,6 +1161,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductURLWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1065,6 +1169,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeProductLabelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1073,6 +1178,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSerialNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1081,6 +1187,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeReachableWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1088,6 +1195,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeUniqueIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1095,6 +1203,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1104,6 +1213,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1113,6 +1223,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1121,6 +1232,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1144,6 +1256,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeChannelListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1151,6 +1264,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLineupWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
                                                     NSError * _Nullable error))reportHandler;
@@ -1159,6 +1273,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentChannelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:(void (^)(CHIPChannelClusterChannelInfo * _Nullable value,
                                                             NSError * _Nullable error))reportHandler;
@@ -1167,6 +1282,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1176,6 +1292,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1185,6 +1302,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1193,6 +1311,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1243,6 +1362,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentHueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1250,6 +1370,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentSaturationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1258,6 +1379,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRemainingTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1266,6 +1388,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentXWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1273,6 +1396,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentYWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1280,6 +1404,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDriftCompensationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1288,6 +1413,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCompensationTextWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1296,6 +1422,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorTemperatureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1304,6 +1431,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1312,6 +1440,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeColorControlOptionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorControlOptionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -1321,6 +1450,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfPrimariesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1329,6 +1459,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary1XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1336,6 +1467,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary1YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1343,6 +1475,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary1IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1351,6 +1484,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary2XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1358,6 +1492,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary2YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1365,6 +1500,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary2IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1373,6 +1509,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary3XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1380,6 +1517,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary3YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1387,6 +1525,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary3IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1395,6 +1534,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary4XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1402,6 +1542,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary4YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1409,6 +1550,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary4IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1417,6 +1559,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary5XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1424,6 +1567,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary5YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1431,6 +1575,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary5IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1439,6 +1584,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary6XWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1446,6 +1592,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary6YWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1453,6 +1600,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePrimary6IntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1462,6 +1610,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeWhitePointXWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1470,6 +1619,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeWhitePointYWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1478,6 +1628,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointRXWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1487,6 +1638,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointRYWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1497,6 +1649,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointRIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -1507,6 +1660,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointGXWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1516,6 +1670,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointGYWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1526,6 +1681,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointGIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -1536,6 +1692,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointBXWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1545,6 +1702,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointBYWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1555,6 +1713,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeColorPointBIntensityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -1564,6 +1723,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEnhancedCurrentHueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1572,6 +1732,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEnhancedColorModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1580,6 +1741,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorLoopActiveWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1588,6 +1750,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorLoopDirectionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1596,6 +1759,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorLoopTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1604,6 +1768,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                         NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorLoopStartEnhancedHueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                            params:(CHIPSubscribeParams * _Nullable)params
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1613,6 +1778,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorLoopStoredEnhancedHueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1622,6 +1788,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorCapabilitiesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1630,6 +1797,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorTempPhysicalMinWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -1639,6 +1807,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeColorTempPhysicalMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -1648,6 +1817,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCoupleColorTempToLevelMinMiredsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                  params:(CHIPSubscribeParams * _Nullable)params
                                                  subscriptionEstablished:
                                                      (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1659,6 +1829,7 @@ NS_ASSUME_NONNULL_BEGIN
                                            completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeStartUpColorTemperatureMiredsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1668,6 +1839,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1677,6 +1849,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1686,6 +1859,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1694,6 +1868,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1717,6 +1892,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAcceptHeaderWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1726,6 +1902,7 @@ NS_ASSUME_NONNULL_BEGIN
                                          completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeSupportedStreamingProtocolsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                              params:(CHIPSubscribeParams * _Nullable)params
                                              subscriptionEstablished:
                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1735,6 +1912,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1744,6 +1922,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1753,6 +1932,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1761,6 +1941,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1777,6 +1958,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDeviceListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1784,6 +1966,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1791,6 +1974,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1798,6 +1982,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePartsListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1805,6 +1990,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1814,6 +2000,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1823,6 +2010,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1831,6 +2019,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1851,6 +2040,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1860,6 +2050,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1869,6 +2060,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1919,6 +2111,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLockStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1926,6 +2119,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLockTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1933,6 +2127,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActuatorEnabledWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -1941,6 +2136,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDoorStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -1948,6 +2144,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                           NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfTotalUsersSupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                              params:(CHIPSubscribeParams * _Nullable)params
                                              subscriptionEstablished:
                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1957,6 +2154,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                         NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfPINUsersSupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                            params:(CHIPSubscribeParams * _Nullable)params
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1966,6 +2164,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfRFIDUsersSupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1975,6 +2174,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfWeekDaySchedulesSupportedPerUserWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                           params:(CHIPSubscribeParams * _Nullable)params
                                                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)
                                                                                       subscriptionEstablishedHandler
                                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1984,6 +2184,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfYearDaySchedulesSupportedPerUserWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                           params:(CHIPSubscribeParams * _Nullable)params
                                                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)
                                                                                       subscriptionEstablishedHandler
                                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1993,6 +2194,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxPINCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2001,6 +2203,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinPINCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2009,6 +2212,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxRFIDCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2017,6 +2221,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinRFIDCodeLengthWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2026,6 +2231,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLanguageWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLanguageWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2034,6 +2240,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeAutoRelockTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeAutoRelockTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2043,6 +2250,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeSoundVolumeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeSoundVolumeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2051,6 +2259,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOperatingModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOperatingModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2059,6 +2268,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSupportedOperatingModesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -2070,6 +2280,7 @@ NS_ASSUME_NONNULL_BEGIN
                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEnableOneTouchLockingWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -2081,6 +2292,7 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEnablePrivacyModeButtonWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -2091,6 +2303,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeWrongCodeEntryLimitWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeWrongCodeEntryLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -2100,6 +2313,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2109,6 +2323,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2118,6 +2333,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2126,6 +2342,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2142,6 +2359,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasurementTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2150,6 +2368,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTotalActivePowerWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2158,6 +2377,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsVoltageWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2165,6 +2385,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsVoltageMinWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2173,6 +2394,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsVoltageMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2181,6 +2403,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsCurrentWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2188,6 +2411,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsCurrentMinWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2196,6 +2420,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRmsCurrentMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2204,6 +2429,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActivePowerWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2211,6 +2437,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActivePowerMinWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2219,6 +2446,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActivePowerMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2227,6 +2455,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2236,6 +2465,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2245,6 +2475,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2253,6 +2484,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2271,6 +2503,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePHYRateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2278,6 +2511,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFullDuplexWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2285,6 +2519,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2293,6 +2528,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketTxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2301,6 +2537,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxErrCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2308,6 +2545,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCollisionCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2316,6 +2554,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOverrunCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2324,6 +2563,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCarrierDetectWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2332,6 +2572,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTimeSinceResetWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2340,6 +2581,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2349,6 +2591,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2358,6 +2601,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2366,6 +2610,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2373,6 +2618,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2389,6 +2635,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLabelListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2396,6 +2643,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2405,6 +2653,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2414,6 +2663,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2422,6 +2672,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2438,6 +2689,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2446,6 +2698,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2454,6 +2707,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2462,6 +2716,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2469,6 +2724,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2478,6 +2734,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2487,6 +2744,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2495,6 +2753,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2522,6 +2781,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeBreadcrumbWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBreadcrumbWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2530,6 +2790,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)
     subscribeAttributeBasicCommissioningInfoWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nullable value,
@@ -2539,6 +2800,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRegulatoryConfigWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2547,6 +2809,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLocationCapabilityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2555,6 +2818,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2564,6 +2828,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2573,6 +2838,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2581,6 +2847,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2597,6 +2864,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNetworkInterfacesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2605,12 +2873,14 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRebootCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeUpTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeUpTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2618,6 +2888,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTotalOperationalHoursWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -2627,6 +2898,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBootReasonsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2634,6 +2906,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActiveHardwareFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -2643,6 +2916,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActiveRadioFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2651,6 +2925,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActiveNetworkFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -2660,6 +2935,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2669,6 +2945,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2678,6 +2955,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2686,6 +2964,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2714,7 +2993,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeGroupKeyMapWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeGroupKeyMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
-                                              params:(CHIPReadParams * _Nullable)params
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2722,7 +3001,7 @@ NS_ASSUME_NONNULL_BEGIN
                         completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeGroupTableWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
-                                             params:(CHIPReadParams * _Nullable)params
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2730,6 +3009,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxGroupsPerFabricWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2738,6 +3018,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxGroupKeysPerFabricWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -2747,6 +3028,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2756,6 +3038,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2765,6 +3048,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2773,6 +3057,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2805,6 +3090,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNameSupportWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2812,6 +3098,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2821,6 +3108,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2830,6 +3118,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2838,6 +3127,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2861,6 +3151,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeIdentifyTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeIdentifyTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2869,6 +3160,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeIdentifyTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2877,6 +3169,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2886,6 +3179,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2895,6 +3189,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2903,6 +3198,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2919,6 +3215,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2927,6 +3224,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2935,6 +3233,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2943,6 +3242,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -2950,6 +3250,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLightSensorTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2958,6 +3259,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2967,6 +3269,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2976,6 +3279,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -2984,6 +3288,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3004,6 +3309,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3013,6 +3319,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3022,6 +3329,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3030,6 +3338,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3059,6 +3368,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3067,6 +3377,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRemainingTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3075,6 +3386,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3082,6 +3394,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3089,6 +3402,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentFrequencyWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3097,6 +3411,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinFrequencyWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3105,6 +3420,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxFrequencyWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3114,6 +3430,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOptionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOptionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3122,6 +3439,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOnOffTransitionTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnOffTransitionTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -3132,6 +3450,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOnLevelWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3140,6 +3459,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnTransitionTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3149,6 +3469,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOffTransitionTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3158,6 +3479,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeDefaultMoveRateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3168,6 +3490,7 @@ NS_ASSUME_NONNULL_BEGIN
                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeStartUpCurrentLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -3177,6 +3500,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3186,6 +3510,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3195,6 +3520,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3203,6 +3529,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3210,6 +3537,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3227,6 +3555,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeActiveLocaleWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeActiveLocaleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3235,6 +3564,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSupportedLocalesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3243,6 +3573,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3252,6 +3583,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3261,6 +3593,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3279,6 +3612,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3288,6 +3622,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3297,6 +3632,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3305,6 +3641,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3328,6 +3665,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInputListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3335,6 +3673,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentInputWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3343,6 +3682,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3352,6 +3692,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3361,6 +3702,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3369,6 +3711,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3411,6 +3754,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3419,6 +3763,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStartTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3426,6 +3771,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDurationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3433,6 +3779,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSampledPositionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
                                                              NSError * _Nullable error))reportHandler;
@@ -3441,6 +3788,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePlaybackSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3449,6 +3797,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSeekRangeEndWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3457,6 +3806,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSeekRangeStartWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3465,6 +3815,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3474,6 +3825,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3483,6 +3835,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3491,6 +3844,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3510,6 +3864,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3517,6 +3872,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSupportedModesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3525,6 +3881,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOnModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3532,6 +3889,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStartUpModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3539,6 +3897,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3546,6 +3905,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3555,6 +3915,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3564,6 +3925,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3572,6 +3934,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3607,6 +3970,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxNetworksWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3614,6 +3978,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNetworksWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3621,6 +3986,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeScanMaxTimeSecondsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3629,6 +3995,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeConnectMaxTimeSecondsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -3639,6 +4006,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInterfaceEnabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInterfaceEnabledWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3647,6 +4015,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLastNetworkingStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -3656,6 +4025,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLastNetworkIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3663,6 +4033,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLastConnectErrorValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -3672,6 +4043,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3681,6 +4053,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3690,6 +4063,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3697,6 +4071,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3722,6 +4097,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3730,6 +4106,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3751,7 +4128,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeDefaultOtaProvidersWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeDefaultOtaProvidersWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                      params:(CHIPReadParams * _Nullable)params
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -3761,6 +4138,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeUpdatePossibleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3769,6 +4147,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeUpdateStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3776,6 +4155,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeUpdateStateProgressWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -3785,6 +4165,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3793,6 +4174,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3809,6 +4191,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOccupancyWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3816,6 +4199,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOccupancySensorTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -3825,6 +4209,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                         NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOccupancySensorTypeBitmapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                            params:(CHIPSubscribeParams * _Nullable)params
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3834,6 +4219,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3843,6 +4229,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3852,6 +4239,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3860,6 +4248,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3883,6 +4272,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOnOffWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOnOffWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3890,6 +4280,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeGlobalSceneControlWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3898,6 +4289,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOnTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3906,6 +4298,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOffWaitTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOffWaitTimeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3914,6 +4307,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeStartUpOnOffWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeStartUpOnOffWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3922,6 +4316,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3931,6 +4326,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3940,6 +4336,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3948,6 +4345,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3955,6 +4353,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3971,6 +4370,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSwitchTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -3979,6 +4379,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeSwitchActionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeSwitchActionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -3987,6 +4388,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3996,6 +4398,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4005,6 +4408,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4013,6 +4417,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4056,7 +4461,7 @@ NS_ASSUME_NONNULL_BEGIN
                   completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNOCsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                   maxInterval:(NSNumber * _Nonnull)maxInterval
-                                       params:(CHIPReadParams * _Nullable)params
+                                       params:(CHIPSubscribeParams * _Nullable)params
                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4064,7 +4469,7 @@ NS_ASSUME_NONNULL_BEGIN
                      completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
-                                          params:(CHIPReadParams * _Nullable)params
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4072,6 +4477,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSupportedFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4080,6 +4486,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCommissionedFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -4089,6 +4496,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTrustedRootCertificatesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4098,6 +4506,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentFabricIndexWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4106,6 +4515,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4115,6 +4525,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4124,6 +4535,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4132,6 +4544,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4147,12 +4560,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeOrderWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOrderWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4160,6 +4575,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4167,6 +4583,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBatteryVoltageWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4175,6 +4592,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBatteryPercentRemainingWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4184,6 +4602,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBatteryTimeRemainingWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -4193,6 +4612,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBatteryChargeLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4201,6 +4621,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActiveBatteryFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -4210,6 +4631,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBatteryChargeStateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4218,6 +4640,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4227,6 +4650,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4236,6 +4660,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4244,6 +4669,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4251,6 +4677,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4266,6 +4693,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSourcesWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSourcesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4273,6 +4701,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4282,6 +4711,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4291,6 +4721,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4299,6 +4730,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4315,6 +4747,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4323,6 +4756,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4331,6 +4765,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4339,6 +4774,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4347,6 +4783,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4363,6 +4800,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4370,6 +4808,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4377,6 +4816,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxFlowWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4384,6 +4824,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinConstPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4392,6 +4833,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxConstPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4400,6 +4842,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinCompPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4408,6 +4851,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxCompPressureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4416,6 +4860,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinConstSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4424,6 +4869,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxConstSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4432,6 +4878,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinConstFlowWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4440,6 +4887,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxConstFlowWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4448,6 +4896,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinConstTempWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4456,6 +4905,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxConstTempWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4464,6 +4914,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePumpStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4471,6 +4922,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEffectiveOperationModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4480,6 +4932,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEffectiveControlModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -4489,12 +4942,14 @@ NS_ASSUME_NONNULL_BEGIN
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCapacityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSpeedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4504,6 +4959,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLifetimeRunningHoursWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -4512,6 +4968,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributePowerWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePowerWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4521,6 +4978,7 @@ NS_ASSUME_NONNULL_BEGIN
                                     completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLifetimeEnergyConsumedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4531,6 +4989,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOperationModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOperationModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4540,6 +4999,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeControlModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeControlModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4547,6 +5007,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAlarmMaskWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4554,6 +5015,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4563,6 +5025,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4572,6 +5035,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4580,6 +5044,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4587,6 +5052,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4603,6 +5069,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4611,6 +5078,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4619,6 +5087,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4627,6 +5096,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4634,6 +5104,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4643,6 +5114,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4652,6 +5124,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4660,6 +5133,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4696,6 +5170,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSceneCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4703,6 +5178,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentSceneWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4711,6 +5187,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentGroupWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4719,6 +5196,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSceneValidWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4726,6 +5204,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNameSupportWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4733,6 +5212,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4742,6 +5222,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4751,6 +5232,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4759,6 +5241,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4777,6 +5260,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeThreadMetricsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4785,6 +5269,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentHeapFreeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4793,6 +5278,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentHeapUsedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4801,6 +5287,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentHeapHighWatermarkWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
                                           subscriptionEstablished:
                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4810,6 +5297,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4819,6 +5307,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4828,6 +5317,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4836,6 +5326,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4843,6 +5334,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4859,6 +5351,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfPositionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4867,6 +5360,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4875,6 +5369,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMultiPressMaxWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4883,6 +5378,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4892,6 +5388,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4901,6 +5398,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4909,6 +5407,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4916,6 +5415,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4936,6 +5436,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTargetListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -4943,6 +5444,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentTargetWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4951,6 +5453,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4960,6 +5463,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4969,6 +5473,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4977,6 +5482,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -4993,6 +5499,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5001,6 +5508,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMinMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5009,6 +5517,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMaxMeasuredValueWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5017,6 +5526,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5024,6 +5534,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5032,6 +5543,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5096,6 +5608,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5104,6 +5617,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeBitmap8WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBitmap8WithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5112,6 +5626,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeBitmap16WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBitmap16WithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5120,6 +5635,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeBitmap32WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBitmap32WithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5128,6 +5644,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeBitmap64WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeBitmap64WithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5135,6 +5652,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt8uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5142,6 +5660,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt16uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5149,6 +5668,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt24uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt24uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5156,6 +5676,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt32uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt32uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5163,6 +5684,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt40uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt40uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5170,6 +5692,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt48uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt48uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5177,6 +5700,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt56uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt56uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5184,6 +5708,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt64uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt64uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5191,6 +5716,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt8sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5198,6 +5724,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt16sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5205,6 +5732,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt24sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt24sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5212,6 +5740,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt32sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt32sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5219,6 +5748,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt40sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt40sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5226,6 +5756,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt48sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt48sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5233,6 +5764,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt56sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt56sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5240,6 +5772,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInt64sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt64sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5247,6 +5780,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeEnum8WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEnum8WithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5254,6 +5788,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeEnum16WithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEnum16WithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5262,6 +5797,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeFloatSingleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeFloatSingleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5270,6 +5806,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeFloatDoubleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeFloatDoubleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5278,6 +5815,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOctetStringWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5286,6 +5824,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeListInt8uWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeListInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5294,6 +5833,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeListOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeListOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5304,6 +5844,7 @@ NS_ASSUME_NONNULL_BEGIN
                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeListStructOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -5314,6 +5855,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLongOctetStringWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLongOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5323,6 +5865,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeCharStringWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeCharStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5331,6 +5874,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLongCharStringWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLongCharStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5340,6 +5884,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeEpochUsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEpochUsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5347,6 +5892,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeEpochSWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEpochSWithMinInterval:(NSNumber * _Nonnull)minInterval
                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5355,6 +5901,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeVendorIdWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeVendorIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5364,6 +5911,7 @@ NS_ASSUME_NONNULL_BEGIN
                                              completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeListNullablesAndOptionalsStructWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                  params:(CHIPSubscribeParams * _Nullable)params
                                                  subscriptionEstablished:
                                                      (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -5374,6 +5922,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeEnumAttrWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeEnumAttrWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                           params:(CHIPSubscribeParams * _Nullable)params
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5383,6 +5932,7 @@ NS_ASSUME_NONNULL_BEGIN
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeStructAttrWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(CHIPTestClusterClusterSimpleStruct * _Nullable value,
                                                         NSError * _Nullable error))reportHandler;
@@ -5393,6 +5943,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeRangeRestrictedInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -5404,6 +5955,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeRangeRestrictedInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -5415,6 +5967,7 @@ NS_ASSUME_NONNULL_BEGIN
                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeRangeRestrictedInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -5426,6 +5979,7 @@ NS_ASSUME_NONNULL_BEGIN
                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeRangeRestrictedInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -5436,6 +5990,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeListLongOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeListLongOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -5446,6 +6001,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeTimedWriteBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeTimedWriteBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5455,6 +6011,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeGeneralErrorBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeGeneralErrorBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -5465,6 +6022,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeClusterErrorBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeClusterErrorBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -5475,6 +6033,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeUnsupportedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5483,6 +6042,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableBooleanWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableBooleanWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5492,6 +6052,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableBitmap8WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableBitmap8WithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5501,6 +6062,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableBitmap16WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableBitmap16WithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5510,6 +6072,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableBitmap32WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableBitmap32WithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5519,6 +6082,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableBitmap64WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableBitmap64WithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5528,6 +6092,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt8uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5537,6 +6102,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt16uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5546,6 +6112,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt24uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt24uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5555,6 +6122,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt32uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt32uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5564,6 +6132,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt40uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt40uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5573,6 +6142,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt48uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt48uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5582,6 +6152,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt56uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt56uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5591,6 +6162,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt64uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt64uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5600,6 +6172,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt8sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5609,6 +6182,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt16sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5618,6 +6192,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt24sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt24sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5627,6 +6202,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt32sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt32sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5636,6 +6212,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt40sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt40sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5645,6 +6222,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt48sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt48sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5654,6 +6232,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt56sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt56sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5663,6 +6242,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableInt64sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableInt64sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5672,6 +6252,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableEnum8WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableEnum8WithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5681,6 +6262,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableEnum16WithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableEnum16WithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5691,6 +6273,7 @@ NS_ASSUME_NONNULL_BEGIN
                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableFloatSingleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -5702,6 +6285,7 @@ NS_ASSUME_NONNULL_BEGIN
                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableFloatDoubleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -5712,6 +6296,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableOctetStringWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableOctetStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -5722,6 +6307,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableCharStringWithValue:(NSString * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableCharStringWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5731,6 +6317,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNullableEnumAttrWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableEnumAttrWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5741,6 +6328,7 @@ NS_ASSUME_NONNULL_BEGIN
                             completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableStructWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:(void (^)(CHIPTestClusterClusterSimpleStruct * _Nullable value,
                                                             NSError * _Nullable error))reportHandler;
@@ -5751,6 +6339,7 @@ NS_ASSUME_NONNULL_BEGIN
                                           completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableRangeRestrictedInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                               params:(CHIPSubscribeParams * _Nullable)params
                                               subscriptionEstablished:
                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                         reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5762,6 +6351,7 @@ NS_ASSUME_NONNULL_BEGIN
                                           completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableRangeRestrictedInt8sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                               params:(CHIPSubscribeParams * _Nullable)params
                                               subscriptionEstablished:
                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                         reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5773,6 +6363,7 @@ NS_ASSUME_NONNULL_BEGIN
                                            completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableRangeRestrictedInt16uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5784,6 +6375,7 @@ NS_ASSUME_NONNULL_BEGIN
                                            completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeNullableRangeRestrictedInt16sWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5793,6 +6385,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -5802,6 +6395,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -5811,6 +6405,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5819,6 +6414,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5846,6 +6442,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLocalTemperatureWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -5854,6 +6451,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAbsMinHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5863,6 +6461,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAbsMaxHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5872,6 +6471,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAbsMinCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5881,6 +6481,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAbsMaxCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5892,6 +6493,7 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOccupiedCoolingSetpointWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5903,6 +6505,7 @@ NS_ASSUME_NONNULL_BEGIN
                                      completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOccupiedHeatingSetpointWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5914,6 +6517,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeMinHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -5925,6 +6529,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeMaxHeatSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -5936,6 +6541,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeMinCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -5947,6 +6553,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeMaxCoolSetpointLimitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -5957,6 +6564,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeMinSetpointDeadBandWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeMinSetpointDeadBandWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -5968,6 +6576,7 @@ NS_ASSUME_NONNULL_BEGIN
                                         completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeControlSequenceOfOperationWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5978,6 +6587,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeSystemModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeSystemModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5985,6 +6595,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStartOfWeekWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -5992,6 +6603,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                         NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfWeeklyTransitionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                            params:(CHIPSubscribeParams * _Nullable)params
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6001,6 +6613,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNumberOfDailyTransitionsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
                                           subscriptionEstablished:
                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6010,6 +6623,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6018,6 +6632,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6025,6 +6640,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6043,6 +6659,7 @@ NS_ASSUME_NONNULL_BEGIN
                                     completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeTemperatureDisplayModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6053,6 +6670,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeKeypadLockoutWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeKeypadLockoutWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6063,6 +6681,7 @@ NS_ASSUME_NONNULL_BEGIN
                                            completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6072,6 +6691,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6081,6 +6701,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6090,6 +6711,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6098,6 +6720,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6116,6 +6739,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeChannelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6123,6 +6747,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRoutingRoleWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6130,12 +6755,14 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNetworkNameWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePanIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePanIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6143,6 +6770,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeExtendedPanIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6151,6 +6779,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMeshLocalPrefixWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6159,6 +6788,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOverrunCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6167,6 +6797,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeNeighborTableListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6175,6 +6806,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRouteTableListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6183,6 +6815,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePartitionIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6190,6 +6823,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeWeightingWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6197,6 +6831,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDataVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6204,6 +6839,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeStableDataVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6212,6 +6848,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLeaderRouterIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6220,6 +6857,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDetachedRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6228,6 +6866,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeChildRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6236,6 +6875,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRouterRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6244,6 +6884,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeLeaderRoleCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6252,6 +6893,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                  NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttachAttemptCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6260,6 +6902,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePartitionIdChangeCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6269,6 +6912,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                    params:(CHIPSubscribeParams * _Nullable)params
                                                    subscriptionEstablished:
                                                        (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6278,6 +6922,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeParentChangeCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6286,6 +6931,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxTotalCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6294,6 +6940,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxUnicastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6302,6 +6949,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxBroadcastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6310,6 +6958,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxAckRequestedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -6319,6 +6968,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxAckedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6327,6 +6977,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxNoAckRequestedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -6336,6 +6987,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxDataCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6343,6 +6995,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxDataPollCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6351,6 +7004,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxBeaconCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6359,6 +7013,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxBeaconRequestCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -6368,6 +7023,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxOtherCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6376,6 +7032,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxRetryCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6384,6 +7041,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                           NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxDirectMaxRetryExpiryCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                              params:(CHIPSubscribeParams * _Nullable)params
                                              subscriptionEstablished:
                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6393,6 +7051,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6402,6 +7061,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxErrCcaCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6410,6 +7070,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxErrAbortCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6418,6 +7079,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                     NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTxErrBusyChannelCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
                                        subscriptionEstablished:
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
@@ -6427,6 +7089,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxTotalCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6435,6 +7098,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxUnicastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6443,6 +7107,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxBroadcastCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6451,6 +7116,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxDataCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6458,6 +7124,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxDataPollCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6466,6 +7133,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxBeaconCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6474,6 +7142,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxBeaconRequestCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -6483,6 +7152,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxOtherCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6491,6 +7161,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxAddressFilteredCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6500,6 +7171,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxDestAddrFilteredCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6509,6 +7181,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxDuplicatedCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6517,6 +7190,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrNoFrameCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6525,6 +7199,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                         NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrUnknownNeighborCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                            params:(CHIPSubscribeParams * _Nullable)params
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6534,6 +7209,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrInvalidSrcAddrCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
                                           subscriptionEstablished:
                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6543,6 +7219,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrSecCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6551,6 +7228,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrFcsCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6559,6 +7237,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRxErrOtherCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6567,6 +7246,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActiveTimestampWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6575,6 +7255,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePendingTimestampWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6582,6 +7263,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeDelayWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeDelayWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6589,6 +7271,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSecurityPolicyWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6597,6 +7280,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeChannelMaskWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6604,6 +7288,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                            NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOperationalDatasetComponentsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                               params:(CHIPSubscribeParams * _Nullable)params
                                               subscriptionEstablished:
                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                         reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6613,6 +7298,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeActiveNetworkFaultsListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
                                          subscriptionEstablished:
                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                    reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6622,6 +7308,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6631,6 +7318,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6640,6 +7328,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6648,6 +7337,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6655,6 +7345,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6672,6 +7363,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeHourFormatWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeHourFormatWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6680,6 +7372,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeActiveCalendarTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeActiveCalendarTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(CHIPSubscribeParams * _Nullable)params
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6688,6 +7381,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSupportedCalendarTypesWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:
@@ -6697,6 +7391,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6706,6 +7401,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6715,6 +7411,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6732,6 +7429,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeTemperatureUnitWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeTemperatureUnitWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6740,6 +7438,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6748,6 +7447,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6755,6 +7455,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6772,6 +7473,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLabelListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6779,6 +7481,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6788,6 +7491,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6797,6 +7501,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6813,6 +7518,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMACAddressWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6820,6 +7526,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6829,6 +7536,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6838,6 +7546,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6846,6 +7555,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6863,6 +7573,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBssidWithCompletionHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBssidWithMinInterval:(NSNumber * _Nonnull)minInterval
                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                  reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6870,6 +7581,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSecurityTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6878,6 +7590,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeWiFiVersionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6885,6 +7598,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeChannelNumberWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6892,6 +7606,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeRssiWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeRssiWithMinInterval:(NSNumber * _Nonnull)minInterval
                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                       params:(CHIPSubscribeParams * _Nullable)params
                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -6899,6 +7614,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBeaconLostCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6907,6 +7623,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeBeaconRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6915,6 +7632,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketMulticastRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6924,6 +7642,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketMulticastTxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6933,6 +7652,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketUnicastRxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -6942,6 +7662,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePacketUnicastTxCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
@@ -6951,6 +7672,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentMaxRateWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6959,6 +7681,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOverrunCountWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6967,6 +7690,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6976,6 +7700,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6985,6 +7710,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -6993,6 +7719,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -7000,6 +7727,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -7027,6 +7755,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                       params:(CHIPSubscribeParams * _Nullable)params
                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -7034,6 +7763,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionLiftWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -7043,6 +7773,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionTiltWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
                                      subscriptionEstablished:
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
@@ -7052,6 +7783,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeConfigStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -7060,6 +7792,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionLiftPercentageWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7069,6 +7802,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionTiltPercentageWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
                                                subscriptionEstablished:
                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7078,6 +7812,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                 NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeOperationalStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -7086,6 +7821,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTargetPositionLiftPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                  params:(CHIPSubscribeParams * _Nullable)params
                                                  subscriptionEstablished:
                                                      (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7095,6 +7831,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTargetPositionTiltPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                  params:(CHIPSubscribeParams * _Nullable)params
                                                  subscriptionEstablished:
                                                      (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7104,6 +7841,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeEndProductTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -7112,6 +7850,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionLiftPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                   params:(CHIPSubscribeParams * _Nullable)params
                                                   subscriptionEstablished:
                                                       (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7121,6 +7860,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeCurrentPositionTiltPercent100thsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                   params:(CHIPSubscribeParams * _Nullable)params
                                                   subscriptionEstablished:
                                                       (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7130,6 +7870,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInstalledOpenLimitLiftWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7139,6 +7880,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInstalledClosedLimitLiftWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
                                           subscriptionEstablished:
                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7148,6 +7890,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                      NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInstalledOpenLimitTiltWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
                                         subscriptionEstablished:
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7157,6 +7900,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeInstalledClosedLimitTiltWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
                                           subscriptionEstablished:
                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7166,6 +7910,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeModeWithMinInterval:(NSNumber * _Nonnull)minInterval
                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                       params:(CHIPSubscribeParams * _Nullable)params
                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -7173,6 +7918,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeSafetyStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:
                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -7181,6 +7927,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7190,6 +7937,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
                                             subscriptionEstablished:
                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                       reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7199,6 +7947,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -7207,6 +7956,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -7214,6 +7964,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
@@ -7745,7 +8496,7 @@ typedef NS_ENUM(NSInteger, CHIPOperationalCredentialsOperationalCertStatus) {
 
 typedef NS_ENUM(NSInteger, CHIPGroupKeyManagementGroupKeySecurityPolicy) {
     CHIPGroupKeyManagementGroupKeySecurityPolicyStandard = 0x00,
-    CHIPGroupKeyManagementGroupKeySecurityPolicyLowLatency = 0x01,
+    CHIPGroupKeyManagementGroupKeySecurityPolicyTrustFirst = 0x01,
 };
 
 typedef NS_ENUM(NSInteger, CHIPDoorLockDlAlarmCode) {

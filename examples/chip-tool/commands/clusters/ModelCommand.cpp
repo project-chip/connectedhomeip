@@ -25,6 +25,16 @@ using namespace ::chip;
 
 CHIP_ERROR ModelCommand::RunCommand()
 {
+
+    if (IsGroupId(mNodeId))
+    {
+        FabricIndex fabricIndex;
+        ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
+        ChipLogProgress(chipTool, "Sending command to group 0x%" PRIx16, GroupIdFromNodeId(mNodeId));
+
+        return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex, CurrentCommissioner().GetNodeId());
+    }
+
     ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
     return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }

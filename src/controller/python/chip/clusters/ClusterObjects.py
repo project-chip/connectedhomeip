@@ -219,10 +219,16 @@ class ClusterCommand(ClusterObject):
 
 
 class Cluster(ClusterObject):
-    ''' This class does nothing, but a convenient class that generated clusters can inherit from.
-    This gives the ability that the users can use issubclass(X, Cluster) to determine if the class represnents a Cluster.
     '''
-    pass
+    When send read requests with returnClusterObject=True, we will set the dataVersion property of the object.
+    Otherwise the [endpoint][cluster][Clusters.DataVersion] will be set to the DataVersion of the cluster.
+    '''
+    @ChipUtility.classproperty
+    def dataVersion(self) -> int:
+        return self._dataVersion
+
+    def SetDataVersion(self, version: int) -> None:
+        self._dataVersion = version
 
 
 class ClusterAttributeDescriptor:
