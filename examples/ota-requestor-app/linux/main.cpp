@@ -52,29 +52,27 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
-void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
 
-constexpr uint16_t kOptionDelayQuery          = 'q';
-constexpr uint16_t kOptionRequestorCanConsent = 'c';
-constexpr uint16_t kOptionOtaDownloadPath     = 'f';
-constexpr size_t kMaxFilePathSize             = 256;
+constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
+constexpr uint16_t kOptionRequestorCanConsent  = 'c';
+constexpr uint16_t kOptionOtaDownloadPath      = 'f';
+constexpr size_t kMaxFilePathSize              = 256;
 
-uint16_t delayQueryTimeInSec = 0;
+uint32_t gPeriodicQueryTimeoutSec = (24 * 60 * 60);
 chip::Optional<bool> gRequestorCanConsent;
 static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
 
 OptionDef cmdLineOptionsDef[] = {
-    { "delayQuery", chip::ArgParser::kArgumentRequired, kOptionDelayQuery },
+    { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "requestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
     { "otaDownloadPath", chip::ArgParser::kArgumentRequired, kOptionOtaDownloadPath },
     {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -q/--delayQuery <Time in seconds>\n"
-                             "        From boot up, the amount of time to wait before triggering the QueryImage\n"
-                             "        command. If none or zero is supplied, QueryImage will not be triggered automatically. At "
-                             "least one provider location must be written to the DefaultOTAProviders attribute.\n"
+                             "  -p/--periodicQueryTimeout <Time in seconds>\n"
+                             "        Periodic timeout for querying providers in the default OTA provider list\n"
+                             "        If none or zero is supplied the timeout is set to every 24 hours. \n"
                              "  -c/--requestorCanConsent\n"
                              "        If supplied, the RequestorCanConsent field of the QueryImage command is set to true.\n"
                              "        Otherwise, the value is determined by the driver.\n "
@@ -91,6 +89,7 @@ static void InitOTARequestor(void)
 
     gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+    gRequestorUser.SetPeriodicQueryTimeout(gPeriodicQueryTimeoutSec);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
     // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
@@ -109,8 +108,8 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
     switch (aIdentifier)
     {
-    case kOptionDelayQuery:
-        delayQueryTimeInSec = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+    case kOptionPeriodicQueryTimeout:
+        gPeriodicQueryTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionRequestorCanConsent:
         gRequestorCanConsent.SetValue(true);
@@ -138,13 +137,6 @@ void ApplicationInit()
 
     // Initialize all OTA download components
     InitOTARequestor();
-
-    // If a delay is provided, after the timer expires, QueryImage from default OTA provider
-    if (delayQueryTimeInSec > 0)
-    {
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
-                                                    OnStartDelayTimerHandler, nullptr);
-    }
 }
 
 int main(int argc, char * argv[])
@@ -152,10 +144,4 @@ int main(int argc, char * argv[])
     VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
     ChipLinuxAppMainLoop();
     return 0;
-}
-
-// Test mode operation
-void OnStartDelayTimerHandler(Layer * systemLayer, void * appState)
-{
-    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }

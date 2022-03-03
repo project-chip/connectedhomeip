@@ -903,6 +903,7 @@ peerNodeId
 peerSessionId
 pem
 percentageLiftValue
+periodicQueryTimeout
 pexpect
 pickString
 PID
