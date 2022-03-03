@@ -35,16 +35,13 @@ namespace NetworkCommissioning {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-// From openthread/error.h, which is not a dependency of Linux platform.
-constexpr uint32_t OT_ERROR_DETACHED = 16;
-
 // NOTE: For ThreadDriver, we uses two network configs, one is mSavedNetwork, and another is mStagingNetwork, during init, it will
 // load the network config from otbr-agent, and loads it into both mSavedNetwork and mStagingNetwork. When updating the networks,
 // all changed are made on the staging network.
 // TODO: The otbr-posix does not actually maintains its own networking states, it will always persist the last network connected.
 // This should not be an issue for most cases, but we should implement the code for maintaining the states by ourselves.
 
-CHIP_ERROR LinuxThreadDriver::Init()
+CHIP_ERROR LinuxThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     ByteSpan currentProvision;
     VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
@@ -53,6 +50,14 @@ CHIP_ERROR LinuxThreadDriver::Init()
     mSavedNetwork.Init(currentProvision);
     mStagingNetwork.Init(currentProvision);
 
+    ThreadStackMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LinuxThreadDriver::Shutdown()
+{
+    ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -67,74 +72,6 @@ CHIP_ERROR LinuxThreadDriver::CommitConfiguration()
 CHIP_ERROR LinuxThreadDriver::RevertConfiguration()
 {
     mStagingNetwork = mSavedNetwork;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LinuxThreadDriver::GetLastNetworkingStatus(Status & status)
-{
-    // Thread is not enabled, then we are not trying to connect to the network.
-    VerifyOrReturnError(ThreadStackMgrImpl().IsThreadEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
-
-    ByteSpan datasetTLV;
-    // If we have not provisioned any Thread network, return the status from last network scan,
-    // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
-    CHIP_ERROR err = ThreadStackMgrImpl().GetThreadProvision(datasetTLV);
-    if (err == CHIP_ERROR_KEY_NOT_FOUND || datasetTLV.size() == 0)
-    {
-        if (mScanStatus.HasValue())
-        {
-            status = mScanStatus.Value();
-            return CHIP_NO_ERROR;
-        }
-        return CHIP_ERROR_KEY_NOT_FOUND;
-    }
-    else if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-
-    // We have already connected to the network, thus return success.
-    if (ThreadStackMgrImpl().IsThreadAttached())
-    {
-        status = Status::kSuccess;
-    }
-    else
-    {
-        status = Status::kNetworkNotFound;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LinuxThreadDriver::GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen)
-{
-    ByteSpan datasetTLV;
-    Thread::OperationalDataset dataset;
-    uint8_t extpanid[kSizeExtendedPanId];
-
-    VerifyOrReturnError(networkIDLen != nullptr && networkID != nullptr && (*networkIDLen) >= kSizeExtendedPanId,
-                        CHIP_ERROR_INTERNAL);
-
-    // The Thread network is not actually enabled.
-    VerifyOrReturnError(ThreadStackMgrImpl().IsThreadEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
-    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(datasetTLV) == CHIP_NO_ERROR, CHIP_ERROR_KEY_NOT_FOUND);
-    VerifyOrReturnError(dataset.Init(datasetTLV) == CHIP_NO_ERROR, CHIP_ERROR_KEY_NOT_FOUND);
-    // The Thread network is not enabled, but has a different extended pan id.
-    VerifyOrReturnError(dataset.GetExtendedPanId(extpanid) == CHIP_NO_ERROR, CHIP_ERROR_KEY_NOT_FOUND);
-    memcpy(networkID, extpanid, kSizeExtendedPanId);
-    *networkIDLen = kSizeExtendedPanId;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LinuxThreadDriver::GetLastConnectErrorValue(uint32_t & value)
-{
-    // Thread is not enabled, then we are not trying to connect to the network.
-    VerifyOrReturnError(ThreadStackMgrImpl().IsThreadEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
-    // Thread is enabled, but is already attached, thus return null to indicate a success state.
-    ReturnErrorCodeIf(ThreadStackMgrImpl().IsThreadAttached(), CHIP_ERROR_KEY_NOT_FOUND);
-
-    // Then we tell the client that the network is detached.
-    value = OT_ERROR_DETACHED;
     return CHIP_NO_ERROR;
 }
 
@@ -218,23 +155,12 @@ exit:
 
 void LinuxThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
 {
-    CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().StartThreadScan(this);
+    CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback);
     // The ThreadScan callback will always be invoked in CHIP mainloop, which is strictly after this function
     if (err != CHIP_NO_ERROR)
     {
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
     }
-    else
-    {
-        mpScanCallback = callback;
-    }
-}
-
-void LinuxThreadDriver::OnFinished(Status err, CharSpan debugText, ThreadScanResponseIterator * networks)
-{
-    mScanStatus.SetValue(err);
-    mpScanCallback->OnFinished(err, debugText, networks);
-    mpScanCallback = nullptr;
 }
 
 size_t LinuxThreadDriver::ThreadNetworkIterator::Count()

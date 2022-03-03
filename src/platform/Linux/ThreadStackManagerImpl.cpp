@@ -94,6 +94,8 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
             if (key == nullptr || value == nullptr)
                 continue;
             // ownership of key and value is still holding by the iter
+            DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
+
             if (strcmp(key, kPropertyDeviceRole) == 0)
             {
                 const gchar * value_str = g_variant_get_string(value, nullptr);
@@ -709,6 +711,39 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(ByteSpan netInfo,
     ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
     mpConnectCallback = callback;
     return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::_UpdateNetworkStatus()
+{
+    // Thread is not enabled, then we are not trying to connect to the network.
+    VerifyOrReturn(IsThreadEnabled() && mpStatusChangeCallback != nullptr);
+
+    ByteSpan datasetTLV;
+    Thread::OperationalDataset dataset;
+    uint8_t extpanid[Thread::kSizeExtendedPanId];
+
+    // If we have not provisioned any Thread network, return the status from last network scan,
+    // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
+    CHIP_ERROR err = ThreadStackMgrImpl().GetThreadProvision(datasetTLV);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+
+    VerifyOrReturn(dataset.Init(datasetTLV) == CHIP_NO_ERROR);
+    // The Thread network is not enabled, but has a different extended pan id.
+    VerifyOrReturn(dataset.GetExtendedPanId(extpanid) == CHIP_NO_ERROR);
+
+    // We have already connected to the network, thus return success.
+    if (ThreadStackMgrImpl().IsThreadAttached())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(extpanid)), NullOptional);
+    }
+    else
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(ByteSpan(extpanid)), NullOptional);
+    }
 }
 
 ThreadStackManager & ThreadStackMgr()

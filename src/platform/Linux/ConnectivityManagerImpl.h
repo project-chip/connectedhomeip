@@ -114,6 +114,11 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
+    void
+    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
+    {
+        mpStatusChangeCallback = statusChangeCallback;
+    }
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
     void PostNetworkConnect();
@@ -122,7 +127,7 @@ public:
 
     void StartWiFiManagement();
     bool IsWiFiManagementStarted();
-    uint32_t GetDisconnectReason();
+    int32_t GetDisconnectReason();
     CHIP_ERROR GetWiFiBssId(ByteSpan & value);
     CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
     CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
@@ -175,6 +180,7 @@ private:
     void _MaintainOnDemandWiFiAP();
     System::Clock::Timeout _GetWiFiAPIdleTimeout();
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    void UpdateNetworkStatus();
     static CHIP_ERROR StopAutoScan();
 
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
@@ -194,6 +200,8 @@ private:
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
     static struct GDBusWpaSupplicant mWpaSupplicant;
     static std::mutex mWpaSupplicantMutex;
+
+    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 #endif
 
     // ==================== ConnectivityManager Private Methods ====================

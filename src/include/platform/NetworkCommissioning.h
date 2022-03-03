@@ -25,6 +25,7 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/Optional.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -154,10 +155,26 @@ namespace Internal {
 class BaseDriver
 {
 public:
+    class NetworkStatusChangeCallback
+    {
+    public:
+        /**
+         * @brief Callback for the network driver pushing the event of network status change to the network commissioning cluster.
+         * The platforms is explected to push the status from operations such as autonomous connection after loss of connectivity or
+         * during initial establishment.
+         *
+         * This function must be called in a thread-safe manner with CHIP stack.
+         */
+        virtual void OnNetworkingStatusChange(Status commissioningError, Optional<ByteSpan> networkId,
+                                              Optional<int32_t> connectStatus) = 0;
+
+        virtual ~NetworkStatusChangeCallback() = default;
+    };
+
     /**
      * @brief Initializes the driver, this function will be called when initializing the network commissioning cluster.
      */
-    virtual CHIP_ERROR Init() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) { return CHIP_NO_ERROR; }
 
     /**
      * @brief Shuts down the driver, this function will be called when shutting down the network commissioning cluster.
@@ -174,25 +191,6 @@ public:
      * be consumed in the same context as calling GetNetworks(). Users must call Release() when the iterator goes out of scope.
      */
     virtual NetworkIterator * GetNetworks() = 0;
-
-    /**
-     * @brief Returns the status of last network operations (i.e. scan and attach attempts.) If no such attempts are conducted,
-     * CHIP_ERROR_KEY_NOT_FOUND will be returned.
-     */
-    virtual CHIP_ERROR GetLastNetworkingStatus(Status & status) = 0;
-
-    /**
-     * @brief Returns the Network ID of the last attach attempts. If no such attempts are conducted, CHIP_ERROR_KEY_NOT_FOUND will
-     * be returned. The callee can assume netwokrIDLen equals to or larger than kMaxNetworkIDLen, and should set it to the actual
-     * length of the network id.
-     */
-    virtual CHIP_ERROR GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen) = 0;
-
-    /**
-     * @brief Returns the driver specific error value of the last attach attempt. If no such attempts are conducted, or last attach
-     * attempt successfully finished, CHIP_ERROR_KEY_NOT_FOUND will be returned.
-     */
-    virtual CHIP_ERROR GetLastConnectErrorValue(uint32_t & value) = 0;
 
     /**
      * @brief Sets the status of the interface, this is an optional feature of a network driver.
@@ -309,14 +307,7 @@ public:
 
 class EthernetDriver : public Internal::BaseDriver
 {
-public:
     // Ethernet driver does not have any special operations.
-    // Default EthernetDriver will always return NULL for these attributes.
-    CHIP_ERROR GetLastNetworkingStatus(Status & status) override { return CHIP_ERROR_KEY_NOT_FOUND; }
-    CHIP_ERROR GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen) override { return CHIP_ERROR_KEY_NOT_FOUND; }
-    CHIP_ERROR GetLastConnectErrorValue(uint32_t & value) override { return CHIP_ERROR_KEY_NOT_FOUND; }
-
-    virtual ~EthernetDriver() {}
 };
 
 } // namespace NetworkCommissioning

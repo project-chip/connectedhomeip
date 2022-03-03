@@ -38,7 +38,7 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 static uint8_t WiFiSSIDStr[DeviceLayer::Internal::kMaxWiFiSSIDLength];
 } // namespace
 
-CHIP_ERROR ESPWiFiDriver::Init()
+CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;

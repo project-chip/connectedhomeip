@@ -127,6 +127,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChang
     {
         ChipLogError(DeviceLayer, "Failed to post Thread state change: %" CHIP_ERROR_FORMAT, status.Format());
     }
+
+    DeviceLayer::SystemLayer().ScheduleLambda([]() { ThreadStackMgrImpl()._UpdateNetworkStatus(); });
 }
 
 template <class ImplClass>
@@ -1827,6 +1829,36 @@ exit:
     ChipLogProgress(DeviceLayer, "Joiner start: %s", chip::ErrorStr(error));
 
     return error;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
+{
+    // Thread is not enabled, then we are not trying to connect to the network.
+    VerifyOrReturn(ThreadStackMgrImpl().IsThreadEnabled() && mpStatusChangeCallback != nullptr);
+
+    ByteSpan datasetTLV;
+    Thread::OperationalDataset dataset;
+    uint8_t extpanid[chip::Thread::kSizeExtendedPanId];
+
+    // If we have not provisioned any Thread network, return the status from last network scan,
+    // If we have provisioned a network, we assume the ot-br-posix is activitely connecting to that network.
+    ReturnOnFailure(ThreadStackMgrImpl().GetThreadProvision(datasetTLV));
+    ReturnOnFailure(dataset.Init(datasetTLV));
+    // The Thread network is not enabled, but has a different extended pan id.
+    ReturnOnFailure(dataset.GetExtendedPanId(extpanid));
+    // If we don't have a valid dataset, we are not attempting to connect the network.
+
+    // We have already connected to the network, thus return success.
+    if (ThreadStackMgrImpl().IsThreadAttached())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(ByteSpan(extpanid)), NullOptional);
+    }
+    else
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(ByteSpan(extpanid)),
+                                                         MakeOptional(static_cast<int32_t>(OT_ERROR_DETACHED)));
+    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT

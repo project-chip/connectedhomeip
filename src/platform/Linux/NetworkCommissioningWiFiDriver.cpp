@@ -50,7 +50,7 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 // NOTE: For now, the LinuxWiFiDriver only supports one network, this can be fixed by using the wpa_supplicant API directly (then
 // wpa_supplicant will manage the networks for us.)
 
-CHIP_ERROR LinuxWiFiDriver::Init()
+CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;
@@ -73,6 +73,14 @@ CHIP_ERROR LinuxWiFiDriver::Init()
     mSavedNetwork.ssidLen        = ssidLen;
 
     mStagingNetwork = mSavedNetwork;
+
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LinuxWiFiDriver::Shutdown()
+{
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -95,75 +103,6 @@ CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
 bool LinuxWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
 {
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
-}
-
-CHIP_ERROR LinuxWiFiDriver::GetLastNetworkingStatus(Status & status)
-{
-    Network configuredNetwork;
-
-    // If WiFi is not enabled, then we won't trying to connect to the AP, so we return null to the client.
-    VerifyOrReturnError(DeviceLayer::ConnectivityMgrImpl().IsWiFiStationEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
-
-    // If the WiFi station is not configured, then we won't trying to connect to any network.
-    // GetConfiguredNetwork will return CHIP_ERROR_KEY_NOT_FOUND when no networks are configured.
-    // If we have not provisioned any WiFi network, return the status from last network scan,
-    // If we have provisioned a network, we assume the wpa_supplicant is activitely connecting to that network.
-    CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork);
-    if (err == CHIP_ERROR_KEY_NOT_FOUND)
-    {
-        if (mScanStatus.HasValue())
-        {
-            status = mScanStatus.Value();
-            return CHIP_NO_ERROR;
-        }
-        return CHIP_ERROR_KEY_NOT_FOUND;
-    }
-
-    // If we have already connected to the WiFi AP, then return null to indicate a success state.
-    if (DeviceLayer::ConnectivityMgrImpl().IsWiFiStationConnected())
-    {
-        status = Status::kSuccess;
-        return CHIP_NO_ERROR;
-    }
-
-    // If we are not connected to the network, then LastConnectErrorValue will indicate the actual error value.
-    status = Status::kUnknownError;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LinuxWiFiDriver::GetLastNetworkID(uint8_t * networkID, size_t * networkIDLen)
-{
-    Network configuredNetwork;
-    VerifyOrReturnError(networkIDLen != nullptr && networkID != nullptr && (*networkIDLen) >= sizeof(configuredNetwork.networkID),
-                        CHIP_ERROR_INVALID_ARGUMENT);
-
-    // If the WiFi station is not configured, then we won't trying to connect to any network.
-    // GetConfiguredNetwork will return CHIP_ERROR_KEY_NOT_FOUND when no networks are configured.
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork));
-    VerifyOrReturnError(configuredNetwork.networkIDLen <= *networkIDLen, CHIP_ERROR_INTERNAL);
-    memcpy(networkID, configuredNetwork.networkID, configuredNetwork.networkIDLen);
-    *networkIDLen = configuredNetwork.networkIDLen;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LinuxWiFiDriver::GetLastConnectErrorValue(uint32_t & value)
-{
-    Network configuredNetwork;
-
-    // If WiFi is not enabled, then we won't trying to connect to the AP, so we return null to the client.
-    VerifyOrReturnError(DeviceLayer::ConnectivityMgrImpl().IsWiFiStationEnabled(), CHIP_ERROR_KEY_NOT_FOUND);
-
-    // If the WiFi station is not configured, then we won't trying to connect to any network.
-    // GetConfiguredNetwork will return CHIP_ERROR_KEY_NOT_FOUND when no networks are configured.
-    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork));
-
-    // If we have already connected to the WiFi AP, then return null to indicate a success state.
-    VerifyOrReturnError(!DeviceLayer::ConnectivityMgrImpl().IsWiFiStationConnected(), CHIP_ERROR_KEY_NOT_FOUND);
-
-    // DisconnectReason records the last 802.11 error value of the disconnection.
-    value = DeviceLayer::ConnectivityMgrImpl().GetDisconnectReason();
-    return CHIP_NO_ERROR;
 }
 
 Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
