@@ -942,9 +942,9 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   struct ProviderLocation {
-    fabric_idx fabricIndex = 0;
     node_id providerNodeID = 1;
     endpoint_no endpoint = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   info event StateTransition = 0 {

@@ -7039,9 +7039,9 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     auto & entry_0 = iter_0.GetValue();
                     CHIPOtaSoftwareUpdateRequestorClusterProviderLocation * newElement_0;
                     newElement_0 = [CHIPOtaSoftwareUpdateRequestorClusterProviderLocation new];
-                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     newElement_0.providerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.providerNodeID];
                     newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();

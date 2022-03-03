@@ -16826,9 +16826,9 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPOtaSoftwareUpdateRequestorClusterProviderLocation *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].providerNodeID = element_0.providerNodeID.unsignedLongLongValue;
                         listHolder_0->mList[i_0].endpoint = element_0.endpoint.unsignedShortValue;
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {

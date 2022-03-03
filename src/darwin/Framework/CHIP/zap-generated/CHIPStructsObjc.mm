@@ -209,11 +209,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIndex = @(0);
-
         _providerNodeID = @(0);
 
         _endpoint = @(0);
+
+        _fabricIndex = @(0);
     }
     return self;
 }
