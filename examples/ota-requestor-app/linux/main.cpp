@@ -87,9 +87,11 @@ static void InitOTARequestor(void)
     // Set the global instance of the OTA requestor core component
     SetRequestorInstance(&gRequestorCore);
 
+    // Periodic query timeout must be set prior to requestor being initialized
+    gRequestorUser.SetPeriodicQueryTimeout(gPeriodicQueryTimeoutSec);
+
     gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-    gRequestorUser.SetPeriodicQueryTimeout(gPeriodicQueryTimeoutSec);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
     // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
