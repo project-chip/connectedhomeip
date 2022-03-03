@@ -23549,6 +23549,622 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster FanControl                                                  | 0x0202 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * FanMode                                                           | 0x0000 |
+| * FanModeSequence                                                   | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute FanMode
+ */
+class ReadFanControlFanMode : public ModelCommand {
+public:
+    ReadFanControlFanMode()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "fan-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlFanMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeFanModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.FanMode response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl FanMode Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteFanControlFanMode : public ModelCommand {
+public:
+    WriteFanControlFanMode()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "fan-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlFanMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeFanModeWithValue:value
+                              completionHandler:^(NSError * _Nullable error) {
+                                  err = [CHIPError errorToCHIPErrorCode:error];
+                                  ChipLogError(chipTool, "FanControl FanMode Error: %s", chip::ErrorStr(err));
+                                  SetCommandExitStatus(err);
+                              }];
+        return err;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeFanControlFanMode : public ModelCommand {
+public:
+    SubscribeAttributeFanControlFanMode()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "fan-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlFanMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeFanModeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                   params:params
+                                  subscriptionEstablished:NULL
+                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                NSLog(@"FanControl.FanMode response %@", [value description]);
+                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute FanModeSequence
+ */
+class ReadFanControlFanModeSequence : public ModelCommand {
+public:
+    ReadFanControlFanModeSequence()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "fan-mode-sequence");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlFanModeSequence() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeFanModeSequenceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.FanModeSequence response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl FanModeSequence Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class WriteFanControlFanModeSequence : public ModelCommand {
+public:
+    WriteFanControlFanModeSequence()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "fan-mode-sequence");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlFanModeSequence() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) WriteAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeFanModeSequenceWithValue:value
+                                      completionHandler:^(NSError * _Nullable error) {
+                                          err = [CHIPError errorToCHIPErrorCode:error];
+                                          ChipLogError(chipTool, "FanControl FanModeSequence Error: %s", chip::ErrorStr(err));
+                                          SetCommandExitStatus(err);
+                                      }];
+        return err;
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class SubscribeAttributeFanControlFanModeSequence : public ModelCommand {
+public:
+    SubscribeAttributeFanControlFanModeSequence()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "fan-mode-sequence");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlFanModeSequence() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeFanModeSequenceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"FanControl.FanModeSequence response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ServerGeneratedCommandList
+ */
+class ReadFanControlServerGeneratedCommandList : public ModelCommand {
+public:
+    ReadFanControlServerGeneratedCommandList()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "server-generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlServerGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster
+            readAttributeServerGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"FanControl.ServerGeneratedCommandList response %@", [value description]);
+                err = [CHIPError errorToCHIPErrorCode:error];
+
+                ChipLogError(chipTool, "FanControl ServerGeneratedCommandList Error: %s", chip::ErrorStr(err));
+                SetCommandExitStatus(err);
+            }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlServerGeneratedCommandList : public ModelCommand {
+public:
+    SubscribeAttributeFanControlServerGeneratedCommandList()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "server-generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlServerGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x0000FFF8) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                 params:params
+                                                subscriptionEstablished:NULL
+                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                              NSLog(@"FanControl.ServerGeneratedCommandList response %@",
+                                                                  [value description]);
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ClientGeneratedCommandList
+ */
+class ReadFanControlClientGeneratedCommandList : public ModelCommand {
+public:
+    ReadFanControlClientGeneratedCommandList()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "client-generated-command-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlClientGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x0000FFF9) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster
+            readAttributeClientGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"FanControl.ClientGeneratedCommandList response %@", [value description]);
+                err = [CHIPError errorToCHIPErrorCode:error];
+
+                ChipLogError(chipTool, "FanControl ClientGeneratedCommandList Error: %s", chip::ErrorStr(err));
+                SetCommandExitStatus(err);
+            }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlClientGeneratedCommandList : public ModelCommand {
+public:
+    SubscribeAttributeFanControlClientGeneratedCommandList()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "client-generated-command-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlClientGeneratedCommandList() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x0000FFF9) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                 params:params
+                                                subscriptionEstablished:NULL
+                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                              NSLog(@"FanControl.ClientGeneratedCommandList response %@",
+                                                                  [value description]);
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadFanControlAttributeList : public ModelCommand {
+public:
+    ReadFanControlAttributeList()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.AttributeList response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl AttributeList Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlAttributeList : public ModelCommand {
+public:
+    SubscribeAttributeFanControlAttributeList()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                         params:params
+                                        subscriptionEstablished:NULL
+                                                  reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                      NSLog(@"FanControl.AttributeList response %@", [value description]);
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadFanControlFeatureMap : public ModelCommand {
+public:
+    ReadFanControlFeatureMap()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlFeatureMap() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.FeatureMap response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl FeatureMap Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlFeatureMap : public ModelCommand {
+public:
+    SubscribeAttributeFanControlFeatureMap()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "feature-map");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlFeatureMap() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                      params:params
+                                     subscriptionEstablished:NULL
+                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                   NSLog(@"FanControl.FeatureMap response %@", [value description]);
+                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                               }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadFanControlClusterRevision : public ModelCommand {
+public:
+    ReadFanControlClusterRevision()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlClusterRevision() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReadAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"FanControl.ClusterRevision response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            ChipLogError(chipTool, "FanControl ClusterRevision Error: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributeFanControlClusterRevision : public ModelCommand {
+public:
+    SubscribeAttributeFanControlClusterRevision()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeFanControlClusterRevision() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPFanControl * cluster = [[CHIPFanControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:NULL
+                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"FanControl.ClusterRevision response %@", [value description]);
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster FixedLabel                                                  | 0x0040 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -54165,6 +54781,83 @@ private:
 };
 
 /*
+ * Attribute ListFabricScoped
+ */
+class ReadTestClusterListFabricScoped : public ModelCommand {
+public:
+    ReadTestClusterListFabricScoped()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "list-fabric-scoped");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterListFabricScoped() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReadAttribute (0x0000002B) on endpoint %" PRIu16, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        CHIPReadParams * params = [[CHIPReadParams alloc] init];
+        [cluster readAttributeListFabricScopedWithParams:params
+                                       completionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                           NSLog(@"TestCluster.ListFabricScoped response %@", [value description]);
+                                           err = [CHIPError errorToCHIPErrorCode:error];
+
+                                           ChipLogError(chipTool, "TestCluster ListFabricScoped Error: %s", chip::ErrorStr(err));
+                                           SetCommandExitStatus(err);
+                                       }];
+        return err;
+    }
+};
+
+class SubscribeAttributeTestClusterListFabricScoped : public ModelCommand {
+public:
+    SubscribeAttributeTestClusterListFabricScoped()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "list-fabric-scoped");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeTestClusterListFabricScoped() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000002B) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        [cluster subscribeAttributeListFabricScopedWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                            params:params
+                                           subscriptionEstablished:NULL
+                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                         NSLog(@"TestCluster.ListFabricScoped response %@", [value description]);
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute TimedWriteBoolean
  */
 class ReadTestClusterTimedWriteBoolean : public ModelCommand {
@@ -72845,6 +73538,31 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterFanControl(Commands & commands)
+{
+    const char * clusterName = "FanControl";
+
+    commands_list clusterCommands = {
+        make_unique<ReadFanControlFanMode>(), //
+        make_unique<WriteFanControlFanMode>(), //
+        make_unique<SubscribeAttributeFanControlFanMode>(), //
+        make_unique<ReadFanControlFanModeSequence>(), //
+        make_unique<WriteFanControlFanModeSequence>(), //
+        make_unique<SubscribeAttributeFanControlFanModeSequence>(), //
+        make_unique<ReadFanControlServerGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeFanControlServerGeneratedCommandList>(), //
+        make_unique<ReadFanControlClientGeneratedCommandList>(), //
+        make_unique<SubscribeAttributeFanControlClientGeneratedCommandList>(), //
+        make_unique<ReadFanControlAttributeList>(), //
+        make_unique<SubscribeAttributeFanControlAttributeList>(), //
+        make_unique<ReadFanControlFeatureMap>(), //
+        make_unique<SubscribeAttributeFanControlFeatureMap>(), //
+        make_unique<ReadFanControlClusterRevision>(), //
+        make_unique<SubscribeAttributeFanControlClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterFixedLabel(Commands & commands)
 {
     const char * clusterName = "FixedLabel";
@@ -73911,6 +74629,8 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<SubscribeAttributeTestClusterRangeRestrictedInt16s>(), //
         make_unique<ReadTestClusterListLongOctetString>(), //
         make_unique<SubscribeAttributeTestClusterListLongOctetString>(), //
+        make_unique<ReadTestClusterListFabricScoped>(), //
+        make_unique<SubscribeAttributeTestClusterListFabricScoped>(), //
         make_unique<ReadTestClusterTimedWriteBoolean>(), //
         make_unique<WriteTestClusterTimedWriteBoolean>(), //
         make_unique<SubscribeAttributeTestClusterTimedWriteBoolean>(), //
@@ -74476,6 +75196,7 @@ void registerClusters(Commands & commands)
     registerClusterDoorLock(commands);
     registerClusterElectricalMeasurement(commands);
     registerClusterEthernetNetworkDiagnostics(commands);
+    registerClusterFanControl(commands);
     registerClusterFixedLabel(commands);
     registerClusterFlowMeasurement(commands);
     registerClusterGeneralCommissioning(commands);
