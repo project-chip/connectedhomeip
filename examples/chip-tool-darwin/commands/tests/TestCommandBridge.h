@@ -83,14 +83,14 @@ public:
     {
         VerifyOrReturn(CurrentCommissioner() != nil, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
         [CurrentCommissioner() getConnectedDevice:nodeId
-                                 queue:mCallbackQueue
-                     completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                         CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
-                         VerifyOrReturn(CHIP_NO_ERROR == err, SetCommandExitStatus(err));
+                                            queue:mCallbackQueue
+                                completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                                    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+                                    VerifyOrReturn(CHIP_NO_ERROR == err, SetCommandExitStatus(err));
 
-                         mConnectedDevice = device;
-                         NextTest();
-                     }];
+                                    mConnectedDevice = device;
+                                    NextTest();
+                                }];
     }
 
     CHIPDevice * _Nullable GetConnectedDevice(void) { return mConnectedDevice; }
