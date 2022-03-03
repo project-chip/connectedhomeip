@@ -83,10 +83,6 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg
         CHIP_LOG_ERROR("ECDSA sign msg failure: no signature returned");
         return CHIP_ERROR_INTERNAL;
     }
-    if (signature.length > out_signature.Capacity()) {
-        CHIP_LOG_ERROR("ECDSA sign msg failure: unexpected signature size %tu vs %tu ", signature.length, out_signature.Capacity());
-        return CHIP_ERROR_NO_MEMORY;
-    }
     out_signature.SetLength(signature.length);
     std::memcpy(out_signature, signature.bytes, signature.length);
     return CHIP_NO_ERROR;
@@ -102,11 +98,6 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(const uint8_t * hash, size_t h
     if (!signature) {
         CHIP_LOG_ERROR("ECDSA sign hash failure: no signature returned");
         return CHIP_ERROR_INTERNAL;
-    }
-    if (signature.length > out_signature.Capacity()) {
-        CHIP_LOG_ERROR(
-            "ECDSA sign hash failure: unexpected signature size %tu vs %tu ", signature.length, out_signature.Capacity());
-        return CHIP_ERROR_NO_MEMORY;
     }
     out_signature.SetLength(signature.length);
     std::memcpy(out_signature, signature.bytes, signature.length);
