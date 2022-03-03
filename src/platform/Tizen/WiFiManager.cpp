@@ -265,10 +265,20 @@ void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
         ChipLogProgress(DeviceLayer, "WiFi is connected");
+        if (sInstance.mpConnectCallback != nullptr)
+        {
+            sInstance.mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+            sInstance.mpConnectCallback = nullptr;
+        }
     }
     else
     {
         ChipLogProgress(DeviceLayer, "FAIL: connect WiFi [%s]", get_error_message(wifiErr));
+        if (sInstance.mpConnectCallback != nullptr)
+        {
+            sInstance.mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
+            sInstance.mpConnectCallback = nullptr;
+        }
     }
 
     g_main_loop_quit(loop);
@@ -644,7 +654,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key)
+CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
+                                DeviceLayer::NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * apCallback)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     int wifiErr               = WIFI_MANAGER_ERROR_NONE;
@@ -660,6 +671,8 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key)
                  ChipLogProgress(DeviceLayer, "FAIL: check whether WiFi is activated [%s]", get_error_message(wifiErr)));
 
     VerifyOrExit(isWiFiActivated == true, ChipLogProgress(DeviceLayer, "WiFi is deactivated"));
+
+    sInstance.mpConnectCallback = apCallback;
 
     foundAp = sInstance._WiFiGetFoundAP();
     if (foundAp != NULL)
