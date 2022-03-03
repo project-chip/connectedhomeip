@@ -260,7 +260,7 @@ void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
     CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
-class TestCASESessionPersistentStorageDelegate : public PersistentStorageDelegate, public FabricStorage
+class TestCASESessionPersistentStorageDelegate : public PersistentStorageDelegate
 {
 public:
     TestCASESessionPersistentStorageDelegate()
@@ -350,18 +350,6 @@ public:
         }
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
-
-    CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
-    {
-        return SyncSetKeyValue(key, buffer, size);
-    };
-
-    CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override
-    {
-        return SyncGetKeyValue(key, buffer, size);
-    };
-
-    CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
 
 private:
     char * keys[16]; // Not null-terminated
