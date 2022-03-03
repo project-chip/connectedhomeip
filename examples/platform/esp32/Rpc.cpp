@@ -34,7 +34,9 @@
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
+#if CONFIG_DEVICE_TYPE_M5STACK
 #include "ScreenManager.h"
+#endif // CONFIG_DEVICE_TYPE_M5STACK
 #include "pigweed/rpc_services/Button.h"
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 

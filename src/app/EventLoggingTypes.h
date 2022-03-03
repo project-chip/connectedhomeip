@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
 #include <app/ClusterInfo.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -152,8 +153,7 @@ public:
 struct EventLoadOutContext
 {
     EventLoadOutContext(TLV::TLVWriter & aWriter, PriorityLevel aPriority, EventNumber aStartingEventNumber) :
-        mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber), mCurrentEventNumber(0), mFirst(true),
-        mFabricIndex(0)
+        mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber), mCurrentEventNumber(0), mFirst(true)
     {}
 
     TLV::TLVWriter & mWriter;
@@ -165,7 +165,7 @@ struct EventLoadOutContext
     size_t mEventCount                   = 0;
     ClusterInfo * mpInterestedEventPaths = nullptr;
     bool mFirst                          = true;
-    FabricIndex mFabricIndex             = kUndefinedFabricIndex;
+    Access::SubjectDescriptor mSubjectDescriptor;
 };
 } // namespace app
 } // namespace chip

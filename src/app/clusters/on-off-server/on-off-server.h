@@ -23,6 +23,8 @@
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
+using chip::app::Clusters::OnOff::OnOffFeature;
+
 /**********************************************************
  * Defines and Macros
  *********************************************************/
@@ -57,6 +59,12 @@ public:
                                const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & commandData);
     void updateOnOffTimeCommand(chip::EndpointId endpoint);
     EmberAfStatus setOnOffValue(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
+
+    bool HasFeature(chip::EndpointId endpoint, OnOffFeature feature);
+    inline bool SupportsLightingApplications(chip::EndpointId endpointId)
+    {
+        return HasFeature(endpointId, OnOffFeature::kLighting);
+    }
 
 private:
     /**********************************************************

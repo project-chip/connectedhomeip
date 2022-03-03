@@ -83,7 +83,7 @@ CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 
 CHIP_ERROR MessagingContext::CreateSessionBobToFriends()
 {
-    mSessionBobToFriends.Grab(mSessionManager.CreateGroupSession(GetFriendsGroupId(), mSrcFabricIndex, GetBobNodeId()).Value());
+    mSessionBobToFriends.Emplace(GetFriendsGroupId(), mSrcFabricIndex, GetBobNodeId());
     return CHIP_NO_ERROR;
 }
 
@@ -99,7 +99,7 @@ SessionHandle MessagingContext::GetSessionAliceToBob()
 
 SessionHandle MessagingContext::GetSessionBobToFriends()
 {
-    return mSessionBobToFriends.Get();
+    return SessionHandle(mSessionBobToFriends.Value());
 }
 
 void MessagingContext::ExpireSessionBobToAlice()
@@ -114,7 +114,7 @@ void MessagingContext::ExpireSessionAliceToBob()
 
 void MessagingContext::ExpireSessionBobToFriends()
 {
-    mSessionManager.RemoveGroupSession(mSessionBobToFriends.Get()->AsGroupSession());
+    mSessionBobToFriends.ClearValue();
 }
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)

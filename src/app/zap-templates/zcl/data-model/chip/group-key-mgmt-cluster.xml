@@ -47,7 +47,7 @@ limitations under the License.
   <enum name="GroupKeySecurityPolicy" type="ENUM8">
     <cluster code="0x003F"/>
     <item name="Standard" value="0x00"/>
-    <item name="LowLatency" value="0x01"/>
+    <item name="TrustFirst" value="0x01"/>
   </enum>
 
   <cluster>

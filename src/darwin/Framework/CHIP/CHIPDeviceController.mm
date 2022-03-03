@@ -198,7 +198,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         params.fabricStorage = _fabricStorage;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
         commissionerParams.storageDelegate = _persistentStorageDelegateBridge;
-        commissionerParams.deviceAddressUpdateDelegate = _pairingDelegateBridge;
+        commissionerParams.deviceAddressUpdateDelegate = nullptr;
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
         commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;

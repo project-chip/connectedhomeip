@@ -20,7 +20,6 @@
 
 #include <type_traits>
 
-#include "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h"
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
@@ -87,7 +86,6 @@ private:
 
 extern chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter();
 extern chip::Controller::Python::StorageAdapter * sStorageAdapter;
-extern chip::Controller::ScriptDeviceAddressUpdateDelegate sDeviceAddressUpdateDelegate;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 bool sTestCommissionerUsed = false;
 class TestCommissioner : public chip::Controller::AutoCommissioner
@@ -166,13 +164,15 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
 
     Controller::SetupParams initParams;
     initParams.storageDelegate                = sStorageAdapter;
-    initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
+    initParams.deviceAddressUpdateDelegate    = nullptr;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = context->mAdapter.get();
     initParams.operationalKeypair             = &ephemeralKey;
     initParams.controllerRCAC                 = rcacSpan;
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
+    initParams.enableServerInteractions       = true;
+
     if (useTestCommissioner)
     {
         initParams.defaultCommissioner = &sTestCommissioner;

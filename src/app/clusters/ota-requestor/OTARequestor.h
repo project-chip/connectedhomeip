@@ -287,8 +287,10 @@ private:
     BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
     ByteSpan mUpdateToken;
-    uint32_t mCurrentVersion               = 0;
-    uint32_t mTargetVersion                = 0;
+    uint32_t mCurrentVersion = 0;
+    uint32_t mTargetVersion  = 0;
+    char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
+    CharSpan mFileDesignator;
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
     Server * mServer                       = nullptr;
     chip::Optional<bool> mRequestorCanConsent;

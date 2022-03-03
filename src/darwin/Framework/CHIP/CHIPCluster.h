@@ -56,4 +56,26 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+/**
+ * CHIPSubscribeParams
+ *    This is used to control the behavior of attribute subscribes.  If not
+ *    provided (i.e. nil passed for the CHIPSubscribeParams argument), will be
+ *    treated as if a default-initialized object was passed in.
+ */
+@interface CHIPSubscribeParams : CHIPReadParams
+
+/**
+ * Whether the subscribe should allow previous subscriptions to stay in
+ * place. nil (the default value) is treated as NO.
+ *
+ * If NO, the subscribe will cancel any existing subscriptions to the target
+ * node when it sets up the new one.
+ *
+ * If YES, the subscribe will allow any previous subscriptions to remain.
+ */
+@property (strong, nonatomic, nullable) NSNumber * keepPreviousSubscriptions;
+
+- (instancetype)init;
+@end
+
 NS_ASSUME_NONNULL_END

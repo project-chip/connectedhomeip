@@ -145,6 +145,8 @@ public:
         printf("Test_TC_WNCV_3_3\n");
         printf("Test_TC_WNCV_3_4\n");
         printf("Test_TC_WNCV_3_5\n");
+        printf("Test_TC_WNCV_4_1\n");
+        printf("Test_TC_WNCV_4_2\n");
         printf("Test_TC_WNCV_4_3\n");
         printf("Test_TC_WNCV_4_4\n");
         printf("TV_TargetNavigatorCluster\n");
@@ -365,28 +367,76 @@ public:
             err = TestWaitForCommissionee_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Write three entries\n");
-            err = TestWriteThreeEntries_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Write entries\n");
+            err = TestWriteEntries_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read three entries\n");
-            err = TestReadThreeEntries_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Verify\n");
+            err = TestVerify_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Write two entries\n");
-            err = TestWriteTwoEntries_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Write entries empty lists\n");
+            err = TestWriteEntriesEmptyLists_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read two entries\n");
-            err = TestReadTwoEntries_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Verify\n");
+            err = TestVerify_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Write one entry\n");
-            err = TestWriteOneEntry_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Write entry invalid privilege\n");
+            err = TestWriteEntryInvalidPrivilege_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read one entry\n");
-            err = TestReadOneEntry_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Verify\n");
+            err = TestVerify_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Write entry invalid auth mode\n");
+            err = TestWriteEntryInvalidAuthMode_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Verify\n");
+            err = TestVerify_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Write entry invalid subject\n");
+            err = TestWriteEntryInvalidSubject_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Verify\n");
+            err = TestVerify_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Write entry invalid target\n");
+            err = TestWriteEntryInvalidTarget_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Verify\n");
+            err = TestVerify_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Write entry too many subjects\n");
+            err = TestWriteEntryTooManySubjects_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Verify\n");
+            err = TestVerify_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Write entry too many targets\n");
+            err = TestWriteEntryTooManyTargets_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Verify\n");
+            err = TestVerify_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Restore ACL\n");
+            err = TestRestoreAcl_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Verify\n");
+            err = TestVerify_18();
             break;
         }
 
@@ -399,7 +449,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 19;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -482,6 +532,144 @@ private:
         (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_6(acl);
     }
 
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_7();
+    }
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_8(acl);
+    }
+
+    static void OnFailureCallback_9(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_9(error);
+    }
+
+    static void OnSuccessCallback_9(void * context)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_9();
+    }
+
+    static void OnFailureCallback_10(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_10(error);
+    }
+
+    static void OnSuccessCallback_10(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_10(acl);
+    }
+
+    static void OnFailureCallback_11(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_11(error);
+    }
+
+    static void OnSuccessCallback_11(void * context)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_11();
+    }
+
+    static void OnFailureCallback_12(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_12(error);
+    }
+
+    static void OnSuccessCallback_12(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_12(acl);
+    }
+
+    static void OnFailureCallback_13(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_13(error);
+    }
+
+    static void OnSuccessCallback_13(void * context)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_13();
+    }
+
+    static void OnFailureCallback_14(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_14(error);
+    }
+
+    static void OnSuccessCallback_14(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_14(acl);
+    }
+
+    static void OnFailureCallback_15(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_15(error);
+    }
+
+    static void OnSuccessCallback_15(void * context)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_15();
+    }
+
+    static void OnFailureCallback_16(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_16(error);
+    }
+
+    static void OnSuccessCallback_16(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_16(acl);
+    }
+
+    static void OnFailureCallback_17(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_17(error);
+    }
+
+    static void OnSuccessCallback_17(void * context)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_17();
+    }
+
+    static void OnFailureCallback_18(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnFailureResponse_18(error);
+    }
+
+    static void OnSuccessCallback_18(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        (static_cast<TestAccessControlClusterSuite *>(context))->OnSuccessResponse_18(acl);
+    }
+
     //
     // Tests methods
     //
@@ -492,7 +680,7 @@ private:
         return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
-    CHIP_ERROR TestWriteThreeEntries_1()
+    CHIP_ERROR TestWriteEntries_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
@@ -543,10 +731,10 @@ private:
             {
                 auto * listHolder_3 = new ListHolder<uint64_t>(4);
                 listFreer.add(listHolder_3);
-                listHolder_3->mList[0]                  = 1234ULL;
-                listHolder_3->mList[1]                  = 5678ULL;
-                listHolder_3->mList[2]                  = 32896ULL;
-                listHolder_3->mList[3]                  = 65535ULL;
+                listHolder_3->mList[0]                  = 4ULL;
+                listHolder_3->mList[1]                  = 5ULL;
+                listHolder_3->mList[2]                  = 6ULL;
+                listHolder_3->mList[3]                  = 7ULL;
                 listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 4);
             }
             listHolder_0->mList[1].targets.SetNonNull();
@@ -557,18 +745,18 @@ private:
 
                 listHolder_3->mList[0].cluster.SetNull();
                 listHolder_3->mList[0].endpoint.SetNonNull();
-                listHolder_3->mList[0].endpoint.Value() = 1U;
+                listHolder_3->mList[0].endpoint.Value() = 8U;
                 listHolder_3->mList[0].deviceType.SetNull();
 
                 listHolder_3->mList[1].cluster.SetNonNull();
-                listHolder_3->mList[1].cluster.Value() = 2UL;
+                listHolder_3->mList[1].cluster.Value() = 9UL;
                 listHolder_3->mList[1].endpoint.SetNull();
                 listHolder_3->mList[1].deviceType.SetNull();
 
                 listHolder_3->mList[2].cluster.SetNonNull();
-                listHolder_3->mList[2].cluster.Value() = 3UL;
+                listHolder_3->mList[2].cluster.Value() = 10UL;
                 listHolder_3->mList[2].endpoint.SetNonNull();
-                listHolder_3->mList[2].endpoint.Value() = 4U;
+                listHolder_3->mList[2].endpoint.Value() = 11U;
                 listHolder_3->mList[2].deviceType.SetNull();
 
                 listHolder_0->mList[1].targets.Value() =
@@ -583,10 +771,10 @@ private:
             {
                 auto * listHolder_3 = new ListHolder<uint64_t>(4);
                 listFreer.add(listHolder_3);
-                listHolder_3->mList[0]                  = 257ULL;
-                listHolder_3->mList[1]                  = 258ULL;
-                listHolder_3->mList[2]                  = 43690ULL;
-                listHolder_3->mList[3]                  = 48059ULL;
+                listHolder_3->mList[0]                  = 12ULL;
+                listHolder_3->mList[1]                  = 13ULL;
+                listHolder_3->mList[2]                  = 14ULL;
+                listHolder_3->mList[3]                  = 15ULL;
                 listHolder_0->mList[2].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 4);
             }
             listHolder_0->mList[2].targets.SetNonNull();
@@ -597,18 +785,18 @@ private:
 
                 listHolder_3->mList[0].cluster.SetNull();
                 listHolder_3->mList[0].endpoint.SetNonNull();
-                listHolder_3->mList[0].endpoint.Value() = 2U;
+                listHolder_3->mList[0].endpoint.Value() = 16U;
                 listHolder_3->mList[0].deviceType.SetNull();
 
                 listHolder_3->mList[1].cluster.SetNonNull();
-                listHolder_3->mList[1].cluster.Value() = 3UL;
+                listHolder_3->mList[1].cluster.Value() = 17UL;
                 listHolder_3->mList[1].endpoint.SetNull();
                 listHolder_3->mList[1].deviceType.SetNull();
 
                 listHolder_3->mList[2].cluster.SetNonNull();
-                listHolder_3->mList[2].cluster.Value() = 4UL;
+                listHolder_3->mList[2].cluster.Value() = 18UL;
                 listHolder_3->mList[2].endpoint.SetNonNull();
-                listHolder_3->mList[2].endpoint.Value() = 5U;
+                listHolder_3->mList[2].endpoint.Value() = 19U;
                 listHolder_3->mList[2].deviceType.SetNull();
 
                 listHolder_0->mList[2].targets.Value() =
@@ -632,7 +820,7 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestReadThreeEntries_2()
+    CHIP_ERROR TestVerify_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
@@ -694,16 +882,16 @@ private:
                 auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 0));
-                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_NaN.GetValue(), 1234ULL));
+                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_NaN.GetValue(), 4ULL));
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 1));
-                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_NaN.GetValue(), 5678ULL));
+                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_NaN.GetValue(), 5ULL));
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 2));
-                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[2]", iter_NaN.GetValue(), 32896ULL));
+                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[2]", iter_NaN.GetValue(), 6ULL));
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 3));
-                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[3]", iter_NaN.GetValue(), 65535ULL));
+                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[3]", iter_NaN.GetValue(), 7ULL));
                 VerifyOrReturn(
                     CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 4));
             }
@@ -714,20 +902,20 @@ private:
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 0));
                 VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
                 VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
-                VerifyOrReturn(CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 1U));
+                VerifyOrReturn(CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 8U));
                 VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 1));
                 VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
-                VerifyOrReturn(CheckValue("acl[1].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 2UL));
+                VerifyOrReturn(CheckValue("acl[1].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 9UL));
                 VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
                 VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 2));
                 VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
-                VerifyOrReturn(CheckValue("acl[1].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 3UL));
+                VerifyOrReturn(CheckValue("acl[1].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 10UL));
                 VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
-                VerifyOrReturn(CheckValue("acl[1].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 4U));
+                VerifyOrReturn(CheckValue("acl[1].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 11U));
                 VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
                 VerifyOrReturn(
                     CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 3));
@@ -741,16 +929,16 @@ private:
                 auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()", iter_NaN, 0));
-                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[0]", iter_NaN.GetValue(), 257ULL));
+                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[0]", iter_NaN.GetValue(), 12ULL));
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()", iter_NaN, 1));
-                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[1]", iter_NaN.GetValue(), 258ULL));
+                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[1]", iter_NaN.GetValue(), 13ULL));
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()", iter_NaN, 2));
-                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[2]", iter_NaN.GetValue(), 43690ULL));
+                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[2]", iter_NaN.GetValue(), 14ULL));
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()", iter_NaN, 3));
-                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[3]", iter_NaN.GetValue(), 48059ULL));
+                VerifyOrReturn(CheckValue("acl[2].subjects.Value()[3]", iter_NaN.GetValue(), 15ULL));
                 VerifyOrReturn(
                     CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()", iter_NaN, 4));
             }
@@ -761,20 +949,20 @@ private:
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_NaN, 0));
                 VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
                 VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
-                VerifyOrReturn(CheckValue("acl[2].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 2U));
+                VerifyOrReturn(CheckValue("acl[2].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 16U));
                 VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_NaN, 1));
                 VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
-                VerifyOrReturn(CheckValue("acl[2].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 3UL));
+                VerifyOrReturn(CheckValue("acl[2].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 17UL));
                 VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
                 VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
                 VerifyOrReturn(
                     CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_NaN, 2));
                 VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
-                VerifyOrReturn(CheckValue("acl[2].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 4UL));
+                VerifyOrReturn(CheckValue("acl[2].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 18UL));
                 VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
-                VerifyOrReturn(CheckValue("acl[2].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 5U));
+                VerifyOrReturn(CheckValue("acl[2].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 19U));
                 VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
                 VerifyOrReturn(
                     CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_NaN, 3));
@@ -785,7 +973,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTwoEntries_3()
+    CHIP_ERROR TestWriteEntriesEmptyLists_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
@@ -802,59 +990,18 @@ private:
             listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
             listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
             listHolder_0->mList[0].subjects.SetNull();
-            listHolder_0->mList[0].targets.SetNonNull();
-
-            {
-                auto * listHolder_3 = new ListHolder<chip::app::Clusters::AccessControl::Structs::Target::Type>(3);
-                listFreer.add(listHolder_3);
-
-                listHolder_3->mList[0].cluster.SetNull();
-                listHolder_3->mList[0].endpoint.SetNonNull();
-                listHolder_3->mList[0].endpoint.Value() = 0U;
-                listHolder_3->mList[0].deviceType.SetNull();
-
-                listHolder_3->mList[1].cluster.SetNonNull();
-                listHolder_3->mList[1].cluster.Value() = 1UL;
-                listHolder_3->mList[1].endpoint.SetNull();
-                listHolder_3->mList[1].deviceType.SetNull();
-
-                listHolder_3->mList[2].cluster.SetNonNull();
-                listHolder_3->mList[2].cluster.Value() = 2UL;
-                listHolder_3->mList[2].endpoint.SetNonNull();
-                listHolder_3->mList[2].endpoint.Value() = 3U;
-                listHolder_3->mList[2].deviceType.SetNull();
-
-                listHolder_0->mList[0].targets.Value() =
-                    chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 3);
-            }
+            listHolder_0->mList[0].targets.SetNull();
 
             listHolder_0->mList[1].fabricIndex = 0;
             listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
             listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
             listHolder_0->mList[1].subjects.SetNonNull();
 
-            {
-                auto * listHolder_3 = new ListHolder<uint64_t>(2);
-                listFreer.add(listHolder_3);
-                listHolder_3->mList[0]                  = 52428ULL;
-                listHolder_3->mList[1]                  = 56797ULL;
-                listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 2);
-            }
+            listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>();
             listHolder_0->mList[1].targets.SetNonNull();
 
-            {
-                auto * listHolder_3 = new ListHolder<chip::app::Clusters::AccessControl::Structs::Target::Type>(1);
-                listFreer.add(listHolder_3);
-
-                listHolder_3->mList[0].cluster.SetNonNull();
-                listHolder_3->mList[0].cluster.Value() = 5UL;
-                listHolder_3->mList[0].endpoint.SetNonNull();
-                listHolder_3->mList[0].endpoint.Value() = 6U;
-                listHolder_3->mList[0].deviceType.SetNull();
-
-                listHolder_0->mList[1].targets.Value() =
-                    chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 1);
-            }
+            listHolder_0->mList[1].targets.Value() =
+                chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>();
 
             aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
                 listHolder_0->mList, 2);
@@ -873,7 +1020,7 @@ private:
 
     void OnSuccessResponse_3() { NextTest(); }
 
-    CHIP_ERROR TestReadTwoEntries_4()
+    CHIP_ERROR TestVerify_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
@@ -901,67 +1048,641 @@ private:
             VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
             VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
             VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
-            VerifyOrReturn(CheckValueNonNull("acl[0].targets", iter_0.GetValue().targets));
-            {
-                auto iter_NaN = iter_0.GetValue().targets.Value().begin();
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 0));
-                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
-                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
-                VerifyOrReturn(CheckValue("acl[0].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 0U));
-                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 1));
-                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
-                VerifyOrReturn(CheckValue("acl[0].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 1UL));
-                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
-                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 2));
-                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
-                VerifyOrReturn(CheckValue("acl[0].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 2UL));
-                VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
-                VerifyOrReturn(CheckValue("acl[0].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 3U));
-                VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
-                VerifyOrReturn(
-                    CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_NaN, 3));
-            }
+            VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 1));
             VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
             VerifyOrReturn(CheckValue("acl[1].privilege", iter_0.GetValue().privilege, 1));
             VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2));
-            VerifyOrReturn(CheckValueNonNull("acl[1].subjects", iter_0.GetValue().subjects));
-            {
-                auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 0));
-                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_NaN.GetValue(), 52428ULL));
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 1));
-                VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_NaN.GetValue(), 56797ULL));
-                VerifyOrReturn(
-                    CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()", iter_NaN, 2));
-            }
-            VerifyOrReturn(CheckValueNonNull("acl[1].targets", iter_0.GetValue().targets));
-            {
-                auto iter_NaN = iter_0.GetValue().targets.Value().begin();
-                VerifyOrReturn(
-                    CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 0));
-                VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
-                VerifyOrReturn(CheckValue("acl[1].targets.Value()[0].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 5UL));
-                VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
-                VerifyOrReturn(CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 6U));
-                VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
-                VerifyOrReturn(
-                    CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_NaN, 1));
-            }
+            VerifyOrReturn(CheckValueNull("acl[1].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNull("acl[1].targets", iter_0.GetValue().targets));
             VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 2));
         }
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteOneEntry_5()
+    CHIP_ERROR TestWriteEntryInvalidPrivilege_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
+
+            listHolder_0->mList[1].fabricIndex = 0;
+            listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
+            listHolder_0->mList[1].subjects.SetNull();
+            listHolder_0->mList[1].targets.SetNull();
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 2);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+        NextTest();
+    }
+
+    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestVerify_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        {
+            auto iter_0 = acl.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 0));
+            VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
+            VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 1));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteEntryInvalidAuthMode_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
+
+            listHolder_0->mList[1].fabricIndex = 0;
+            listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
+            listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(1);
+            listHolder_0->mList[1].subjects.SetNull();
+            listHolder_0->mList[1].targets.SetNull();
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 2);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+        NextTest();
+    }
+
+    void OnSuccessResponse_7() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestVerify_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        {
+            auto iter_0 = acl.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 0));
+            VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
+            VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 1));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteEntryInvalidSubject_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
+
+            listHolder_0->mList[1].fabricIndex = 0;
+            listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
+            listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[1].subjects.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<uint64_t>(1);
+                listFreer.add(listHolder_3);
+                listHolder_3->mList[0]                  = 0ULL;
+                listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 1);
+            }
+            listHolder_0->mList[1].targets.SetNull();
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 2);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+        NextTest();
+    }
+
+    void OnSuccessResponse_9() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestVerify_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            this, OnSuccessCallback_10, OnFailureCallback_10, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_10(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        {
+            auto iter_0 = acl.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 0));
+            VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
+            VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 1));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteEntryInvalidTarget_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
+
+            listHolder_0->mList[1].fabricIndex = 0;
+            listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
+            listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[1].subjects.SetNull();
+            listHolder_0->mList[1].targets.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<chip::app::Clusters::AccessControl::Structs::Target::Type>(1);
+                listFreer.add(listHolder_3);
+
+                listHolder_3->mList[0].cluster.SetNull();
+                listHolder_3->mList[0].endpoint.SetNull();
+                listHolder_3->mList[0].deviceType.SetNull();
+
+                listHolder_0->mList[1].targets.Value() =
+                    chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 1);
+            }
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 2);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+        NextTest();
+    }
+
+    void OnSuccessResponse_11() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestVerify_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_12(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        {
+            auto iter_0 = acl.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 0));
+            VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
+            VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 1));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteEntryTooManySubjects_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
+
+            listHolder_0->mList[1].fabricIndex = 0;
+            listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
+            listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[1].subjects.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<uint64_t>(20);
+                listFreer.add(listHolder_3);
+                listHolder_3->mList[0]                  = 1ULL;
+                listHolder_3->mList[1]                  = 2ULL;
+                listHolder_3->mList[2]                  = 3ULL;
+                listHolder_3->mList[3]                  = 4ULL;
+                listHolder_3->mList[4]                  = 5ULL;
+                listHolder_3->mList[5]                  = 6ULL;
+                listHolder_3->mList[6]                  = 7ULL;
+                listHolder_3->mList[7]                  = 8ULL;
+                listHolder_3->mList[8]                  = 9ULL;
+                listHolder_3->mList[9]                  = 10ULL;
+                listHolder_3->mList[10]                 = 11ULL;
+                listHolder_3->mList[11]                 = 12ULL;
+                listHolder_3->mList[12]                 = 13ULL;
+                listHolder_3->mList[13]                 = 14ULL;
+                listHolder_3->mList[14]                 = 15ULL;
+                listHolder_3->mList[15]                 = 16ULL;
+                listHolder_3->mList[16]                 = 17ULL;
+                listHolder_3->mList[17]                 = 18ULL;
+                listHolder_3->mList[18]                 = 19ULL;
+                listHolder_3->mList[19]                 = 20ULL;
+                listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 20);
+            }
+            listHolder_0->mList[1].targets.SetNull();
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 2);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+        NextTest();
+    }
+
+    void OnSuccessResponse_13() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestVerify_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            this, OnSuccessCallback_14, OnFailureCallback_14, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_14(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        {
+            auto iter_0 = acl.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 0));
+            VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
+            VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 1));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteEntryTooManyTargets_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 0;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
+
+            listHolder_0->mList[1].fabricIndex = 0;
+            listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(1);
+            listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[1].subjects.SetNull();
+            listHolder_0->mList[1].targets.SetNonNull();
+
+            {
+                auto * listHolder_3 = new ListHolder<chip::app::Clusters::AccessControl::Structs::Target::Type>(20);
+                listFreer.add(listHolder_3);
+
+                listHolder_3->mList[0].cluster.SetNull();
+                listHolder_3->mList[0].endpoint.SetNonNull();
+                listHolder_3->mList[0].endpoint.Value() = 1U;
+                listHolder_3->mList[0].deviceType.SetNull();
+
+                listHolder_3->mList[1].cluster.SetNull();
+                listHolder_3->mList[1].endpoint.SetNonNull();
+                listHolder_3->mList[1].endpoint.Value() = 2U;
+                listHolder_3->mList[1].deviceType.SetNull();
+
+                listHolder_3->mList[2].cluster.SetNull();
+                listHolder_3->mList[2].endpoint.SetNonNull();
+                listHolder_3->mList[2].endpoint.Value() = 3U;
+                listHolder_3->mList[2].deviceType.SetNull();
+
+                listHolder_3->mList[3].cluster.SetNull();
+                listHolder_3->mList[3].endpoint.SetNonNull();
+                listHolder_3->mList[3].endpoint.Value() = 4U;
+                listHolder_3->mList[3].deviceType.SetNull();
+
+                listHolder_3->mList[4].cluster.SetNull();
+                listHolder_3->mList[4].endpoint.SetNonNull();
+                listHolder_3->mList[4].endpoint.Value() = 5U;
+                listHolder_3->mList[4].deviceType.SetNull();
+
+                listHolder_3->mList[5].cluster.SetNull();
+                listHolder_3->mList[5].endpoint.SetNonNull();
+                listHolder_3->mList[5].endpoint.Value() = 6U;
+                listHolder_3->mList[5].deviceType.SetNull();
+
+                listHolder_3->mList[6].cluster.SetNull();
+                listHolder_3->mList[6].endpoint.SetNonNull();
+                listHolder_3->mList[6].endpoint.Value() = 7U;
+                listHolder_3->mList[6].deviceType.SetNull();
+
+                listHolder_3->mList[7].cluster.SetNull();
+                listHolder_3->mList[7].endpoint.SetNonNull();
+                listHolder_3->mList[7].endpoint.Value() = 8U;
+                listHolder_3->mList[7].deviceType.SetNull();
+
+                listHolder_3->mList[8].cluster.SetNull();
+                listHolder_3->mList[8].endpoint.SetNonNull();
+                listHolder_3->mList[8].endpoint.Value() = 9U;
+                listHolder_3->mList[8].deviceType.SetNull();
+
+                listHolder_3->mList[9].cluster.SetNull();
+                listHolder_3->mList[9].endpoint.SetNonNull();
+                listHolder_3->mList[9].endpoint.Value() = 10U;
+                listHolder_3->mList[9].deviceType.SetNull();
+
+                listHolder_3->mList[10].cluster.SetNull();
+                listHolder_3->mList[10].endpoint.SetNonNull();
+                listHolder_3->mList[10].endpoint.Value() = 11U;
+                listHolder_3->mList[10].deviceType.SetNull();
+
+                listHolder_3->mList[11].cluster.SetNull();
+                listHolder_3->mList[11].endpoint.SetNonNull();
+                listHolder_3->mList[11].endpoint.Value() = 12U;
+                listHolder_3->mList[11].deviceType.SetNull();
+
+                listHolder_3->mList[12].cluster.SetNull();
+                listHolder_3->mList[12].endpoint.SetNonNull();
+                listHolder_3->mList[12].endpoint.Value() = 13U;
+                listHolder_3->mList[12].deviceType.SetNull();
+
+                listHolder_3->mList[13].cluster.SetNull();
+                listHolder_3->mList[13].endpoint.SetNonNull();
+                listHolder_3->mList[13].endpoint.Value() = 14U;
+                listHolder_3->mList[13].deviceType.SetNull();
+
+                listHolder_3->mList[14].cluster.SetNull();
+                listHolder_3->mList[14].endpoint.SetNonNull();
+                listHolder_3->mList[14].endpoint.Value() = 15U;
+                listHolder_3->mList[14].deviceType.SetNull();
+
+                listHolder_3->mList[15].cluster.SetNull();
+                listHolder_3->mList[15].endpoint.SetNonNull();
+                listHolder_3->mList[15].endpoint.Value() = 16U;
+                listHolder_3->mList[15].deviceType.SetNull();
+
+                listHolder_3->mList[16].cluster.SetNull();
+                listHolder_3->mList[16].endpoint.SetNonNull();
+                listHolder_3->mList[16].endpoint.Value() = 17U;
+                listHolder_3->mList[16].deviceType.SetNull();
+
+                listHolder_3->mList[17].cluster.SetNull();
+                listHolder_3->mList[17].endpoint.SetNonNull();
+                listHolder_3->mList[17].endpoint.Value() = 18U;
+                listHolder_3->mList[17].deviceType.SetNull();
+
+                listHolder_3->mList[18].cluster.SetNull();
+                listHolder_3->mList[18].endpoint.SetNonNull();
+                listHolder_3->mList[18].endpoint.Value() = 19U;
+                listHolder_3->mList[18].deviceType.SetNull();
+
+                listHolder_3->mList[19].cluster.SetNull();
+                listHolder_3->mList[19].endpoint.SetNonNull();
+                listHolder_3->mList[19].endpoint.Value() = 20U;
+                listHolder_3->mList[19].deviceType.SetNull();
+
+                listHolder_0->mList[1].targets.Value() =
+                    chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList, 20);
+            }
+
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 2);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            aclArgument, this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+        NextTest();
+    }
+
+    void OnSuccessResponse_15() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestVerify_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::AccessControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            this, OnSuccessCallback_16, OnFailureCallback_16, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_16(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            acl)
+    {
+        {
+            auto iter_0 = acl.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acl)>("acl", iter_0, 0));
+            VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("acl[0].privilege", iter_0.GetValue().privilege, 5));
+            VerifyOrReturn(CheckValue("acl[0].authMode", iter_0.GetValue().authMode, 2));
+            VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
+            VerifyOrReturn(CheckValueNull("acl[0].targets", iter_0.GetValue().targets));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acl)>("acl", iter_0, 1));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestRestoreAcl_17()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
@@ -985,36 +1706,36 @@ private:
         }
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
-            aclArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+            aclArgument, this, OnSuccessCallback_17, OnFailureCallback_17));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_5(CHIP_ERROR error)
+    void OnFailureResponse_17(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5() { NextTest(); }
+    void OnSuccessResponse_17() { NextTest(); }
 
-    CHIP_ERROR TestReadOneEntry_6()
+    CHIP_ERROR TestVerify_18()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::AccessControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6, true));
+            this, OnSuccessCallback_18, OnFailureCallback_18, true));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_6(CHIP_ERROR error)
+    void OnFailureResponse_18(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(
+    void OnSuccessResponse_18(
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
             acl)
     {
@@ -29112,7 +29833,7 @@ private:
 
     void OnSuccessResponse_6(uint32_t featureMap)
     {
-        VerifyOrReturn(CheckValue("featureMap", featureMap, 0UL));
+        VerifyOrReturn(CheckValue("featureMap", featureMap, 1UL));
 
         NextTest();
     }
@@ -29182,7 +29903,7 @@ private:
 
     void OnSuccessResponse_9(uint32_t featureMap)
     {
-        VerifyOrReturn(CheckValue("featureMap", featureMap, 0UL));
+        VerifyOrReturn(CheckValue("featureMap", featureMap, 1UL));
 
         NextTest();
     }
@@ -50328,6 +51049,822 @@ private:
     }
 };
 
+class Test_TC_WNCV_4_1Suite : public TestCommand
+{
+public:
+    Test_TC_WNCV_4_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_4_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("fullMotionDuration", 0, UINT16_MAX, &mFullMotionDuration);
+    }
+
+    ~Test_TC_WNCV_4_1Suite() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_4_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_4_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 0: Wait for the commissioned device to be retrieved\n");
+            err = Test0WaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 1 : 1a: TH sends DownOrClose command to preposition the DUT in the opposite direction\n");
+            err = Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 1b: TH waits for x seconds movement(s) on the DUT\n");
+            err = Test1bThWaitsForXSecondsMovementsOnTheDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : 1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_PA_LF && WNCV_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1cIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : 2a: TH sends GoToLiftPercentage command with 25 percent to DUT\n");
+            if (ShouldSkip("WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test2aThSendsGoToLiftPercentageCommandWith25PercentToDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : 2b: DUT updates its attributes\n");
+            err = Test2bDutUpdatesItsAttributes_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 6 : 2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_PA_LF && WNCV_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test2cIfPaLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : 3a: TH set a timeout of X minutes for failure\n");
+            err = Test3aThSetATimeoutOfXMinutesForFailure_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : 3b: TH reads OperationalStatus attribute from DUT\n");
+            err = Test3bThReadsOperationalStatusAttributeFromDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : 4a: TH sends GoToLiftPercentage command with 75.20 percent to DUT\n");
+            if (ShouldSkip("WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test4aThSendsGoToLiftPercentageCommandWith7520PercentToDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 4b: DUT updates its attributes\n");
+            err = Test4bDutUpdatesItsAttributes_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : 5a: TH waits for x seconds movement(s) on the DUT\n");
+            err = Test5aThWaitsForXSecondsMovementsOnTheDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : 5b: TH reads OperationalStatus attribute from DUT\n");
+            err = Test5bThReadsOperationalStatusAttributeFromDut_12();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 13;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mFullMotionDuration;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnSuccessResponse_3(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnFailureResponse_6(error);
+    }
+
+    static void OnSuccessCallback_6(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnSuccessResponse_6(targetPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnSuccessResponse_8(operationalStatus);
+    }
+
+    static void OnFailureCallback_12(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnFailureResponse_12(error);
+    }
+
+    static void OnSuccessCallback_12(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnSuccessResponse_12(operationalStatus);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnSuccessResponse_1();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR Test1bThWaitsForXSecondsMovementsOnTheDut_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+    }
+
+    CHIP_ERROR Test1cIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintNotValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test2aThSendsGoToLiftPercentageCommandWith25PercentToDut_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type;
+
+        RequestType request;
+        request.liftPercentageValue    = 25;
+        request.liftPercent100thsValue = 2500U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnSuccessResponse_4();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnFailureResponse_4(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR Test2bDutUpdatesItsAttributes_5()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
+
+    CHIP_ERROR Test2cIfPaLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckValueNonNull("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths));
+        VerifyOrReturn(CheckValue("targetPositionLiftPercent100ths.Value()", targetPositionLiftPercent100ths.Value(), 2500U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aThSetATimeoutOfXMinutesForFailure_7()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+    }
+
+    CHIP_ERROR Test3bThReadsOperationalStatusAttributeFromDut_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(uint8_t operationalStatus)
+    {
+        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test4aThSendsGoToLiftPercentageCommandWith7520PercentToDut_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type;
+
+        RequestType request;
+        request.liftPercentageValue    = 75;
+        request.liftPercent100thsValue = 7520U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_1Suite *>(context))->OnFailureResponse_9(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    CHIP_ERROR Test4bDutUpdatesItsAttributes_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
+
+    CHIP_ERROR Test5aThWaitsForXSecondsMovementsOnTheDut_11()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+    }
+
+    CHIP_ERROR Test5bThReadsOperationalStatusAttributeFromDut_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_12(uint8_t operationalStatus)
+    {
+        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
+
+        NextTest();
+    }
+};
+
+class Test_TC_WNCV_4_2Suite : public TestCommand
+{
+public:
+    Test_TC_WNCV_4_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_4_2", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("fullMotionDuration", 0, UINT16_MAX, &mFullMotionDuration);
+    }
+
+    ~Test_TC_WNCV_4_2Suite() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_4_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_4_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 0: Wait for the commissioned device to be retrieved\n");
+            err = Test0WaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 1 : 1a: TH sends DownOrClose command to preposition the DUT in the opposite direction\n");
+            err = Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 1b: TH waits for x seconds movement(s) on the DUT\n");
+            err = Test1bThWaitsForXSecondsMovementsOnTheDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : 1c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_PA_TL && WNCV_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1cIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : 2a: TH sends GoToTiltPercentage command with 30 percent to DUT\n");
+            if (ShouldSkip("WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test2aThSendsGoToTiltPercentageCommandWith30PercentToDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : 2b: DUT updates its attributes\n");
+            err = Test2bDutUpdatesItsAttributes_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 6 : 2c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_PA_TL && WNCV_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test2cIfPaTlThReadsTargetPositionTiltPercent100thsAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : 3a: TH set a timeout of X minutes for failure\n");
+            err = Test3aThSetATimeoutOfXMinutesForFailure_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : 3b: TH reads OperationalStatus attribute from DUT\n");
+            err = Test3bThReadsOperationalStatusAttributeFromDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : 4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT\n");
+            if (ShouldSkip("WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test4aThSendsGoToTiltPercentageCommandWith6020PercentToDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 4b: DUT updates its attributes\n");
+            err = Test4bDutUpdatesItsAttributes_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : 5a: TH waits for x seconds movement(s) on the DUT\n");
+            err = Test5aThWaitsForXSecondsMovementsOnTheDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : 5b: TH reads OperationalStatus attribute from DUT\n");
+            err = Test5bThReadsOperationalStatusAttributeFromDut_12();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 13;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mFullMotionDuration;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnSuccessResponse_3(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnFailureResponse_6(error);
+    }
+
+    static void OnSuccessCallback_6(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnSuccessResponse_6(targetPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnSuccessResponse_8(operationalStatus);
+    }
+
+    static void OnFailureCallback_12(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnFailureResponse_12(error);
+    }
+
+    static void OnSuccessCallback_12(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnSuccessResponse_12(operationalStatus);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnSuccessResponse_1();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR Test1bThWaitsForXSecondsMovementsOnTheDut_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+    }
+
+    CHIP_ERROR Test1cIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_3, OnFailureCallback_3, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintNotValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test2aThSendsGoToTiltPercentageCommandWith30PercentToDut_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type;
+
+        RequestType request;
+        request.tiltPercentageValue    = 30;
+        request.tiltPercent100thsValue = 3000U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnSuccessResponse_4();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnFailureResponse_4(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR Test2bDutUpdatesItsAttributes_5()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
+
+    CHIP_ERROR Test2cIfPaTlThReadsTargetPositionTiltPercent100thsAttributeFromDut_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_6, OnFailureCallback_6, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckValueNonNull("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths));
+        VerifyOrReturn(CheckValue("targetPositionTiltPercent100ths.Value()", targetPositionTiltPercent100ths.Value(), 3000U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aThSetATimeoutOfXMinutesForFailure_7()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+    }
+
+    CHIP_ERROR Test3bThReadsOperationalStatusAttributeFromDut_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(uint8_t operationalStatus)
+    {
+        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test4aThSendsGoToTiltPercentageCommandWith6020PercentToDut_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type;
+
+        RequestType request;
+        request.tiltPercentageValue    = 60;
+        request.tiltPercent100thsValue = 6005U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_4_2Suite *>(context))->OnFailureResponse_9(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    CHIP_ERROR Test4bDutUpdatesItsAttributes_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
+
+    CHIP_ERROR Test5aThWaitsForXSecondsMovementsOnTheDut_11()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+    }
+
+    CHIP_ERROR Test5bThReadsOperationalStatusAttributeFromDut_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_12, OnFailureCallback_12, true));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_12(uint8_t operationalStatus)
+    {
+        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
+
+        NextTest();
+    }
+};
+
 class Test_TC_WNCV_4_3Suite : public TestCommand
 {
 public:
@@ -52978,7 +54515,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_8(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_8(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -52995,9 +54532,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_8(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_8(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53010,7 +54550,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_9(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_9(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53027,9 +54567,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_9(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_9(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53042,7 +54585,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_10(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_10(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53059,9 +54602,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_10(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53074,7 +54620,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_11(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_11(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53091,9 +54637,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_11(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_11(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53106,7 +54655,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_12(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_12(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53123,9 +54672,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_12(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_12(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53138,7 +54690,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_13(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_13(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53155,9 +54707,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_13(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_13(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53170,7 +54725,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_14(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_14(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53187,9 +54742,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_14(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_14(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53202,7 +54760,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_15(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_15(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53219,9 +54777,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_15(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_15(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53235,7 +54796,7 @@ private:
         request.deltaPositionMilliseconds = 500ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_16(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_16(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53252,9 +54813,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_16(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_16(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53297,7 +54861,7 @@ private:
         request.deltaPositionMilliseconds = 100ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_18(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_18(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53314,9 +54878,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_18(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_18(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53359,7 +54926,7 @@ private:
         request.position = 1000ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_20(data.status);
+            (static_cast<TV_MediaPlaybackClusterSuite *>(context))->OnSuccessResponse_20(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53376,9 +54943,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_20(chip::app::Clusters::MediaPlayback::StatusEnum status)
+    void OnSuccessResponse_20(chip::app::Clusters::MediaPlayback::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -53705,7 +55275,7 @@ private:
         request.match = chip::Span<const char>("PBSgarbage: not in length on purpose", 3);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelClusterSuite *>(context))->OnSuccessResponse_4(data.channelMatch, data.status);
+            (static_cast<TV_ChannelClusterSuite *>(context))->OnSuccessResponse_4(data.status, data.data);
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
@@ -53722,21 +55292,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & channelMatch,
-                             chip::app::Clusters::Channel::StatusEnum status)
+    void OnSuccessResponse_4(chip::app::Clusters::Channel::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
-        VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 9U));
-        VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 1U));
-        VerifyOrReturn(CheckValuePresent("channelMatch.name", channelMatch.name));
-        VerifyOrReturn(CheckValueAsString("channelMatch.name.Value()", channelMatch.name.Value(), chip::CharSpan("PBS", 3)));
-        VerifyOrReturn(CheckValuePresent("channelMatch.callSign", channelMatch.callSign));
-        VerifyOrReturn(
-            CheckValueAsString("channelMatch.callSign.Value()", channelMatch.callSign.Value(), chip::CharSpan("KCTS-TV", 7)));
-        VerifyOrReturn(CheckValuePresent("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign));
-        VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign.Value()", channelMatch.affiliateCallSign.Value(),
-                                          chip::CharSpan("KCTS", 4)));
-
         VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -75221,7 +76782,7 @@ private:
             isExpectedDnssdResult = true;
 
             VerifyOrReturn(CheckValue("longDiscriminator", value.longDiscriminator,
-                                      mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator()));
+                                      mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U));
             VerifyOrReturn(CheckConstraintMinValue<uint16_t>("value.longDiscriminator", value.longDiscriminator, 0U));
             VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("value.longDiscriminator", value.longDiscriminator, 4096U));
         }
@@ -75309,7 +76870,7 @@ private:
     CHIP_ERROR TestRebootTargetDevice_0()
     {
         SetIdentity(kIdentityAlpha);
-        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
     }
 
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_1()
@@ -75356,14 +76917,13 @@ private:
     CHIP_ERROR TestCheckLongDiscriminatorL_4()
     {
         SetIdentity(kIdentityAlpha);
-        return FindCommissionableByLongDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+        return FindCommissionableByLongDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
     }
 
     CHIP_ERROR TestCheckShortDiscriminatorS_5()
     {
         SetIdentity(kIdentityAlpha);
-        return FindCommissionableByShortDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value()
-                                                                                : GetUniqueDiscriminator());
+        return FindCommissionableByShortDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
     }
 
     CHIP_ERROR TestCheckCommissioningModeCm_6()
@@ -75447,7 +77007,7 @@ private:
     CHIP_ERROR TestRebootTargetDevice_19()
     {
         SetIdentity(kIdentityAlpha);
-        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
     }
 
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_20()
@@ -103540,6 +105100,8 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_WNCV_3_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_WNCV_3_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_WNCV_3_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_4_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_4_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_WNCV_4_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_WNCV_4_4Suite>(credsIssuerConfig),
         make_unique<TV_TargetNavigatorClusterSuite>(credsIssuerConfig),

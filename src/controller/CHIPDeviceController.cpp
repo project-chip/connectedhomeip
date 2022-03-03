@@ -45,6 +45,8 @@
 #include <platform/ConfigurationManager.h>
 #endif
 
+#include <app/server/Dnssd.h>
+
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/util/error-mapping.h>
@@ -139,6 +141,15 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     if (params.operationalKeypair != nullptr || !params.controllerNOC.empty() || !params.controllerRCAC.empty())
     {
         ReturnErrorOnFailure(ProcessControllerNOCChain(params));
+
+        if (params.enableServerInteractions)
+        {
+            //
+            // Advertise our operational identity on the network to facilitate discovery by clients that look to
+            // establish CASE with a controller that is also offering server-side capabilities (e.g an OTA provider).
+            //
+            app::DnssdServer::Instance().AdvertiseOperational();
+        }
     }
 
     DeviceProxyInitParams deviceInitParams = {
@@ -762,6 +773,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         params.GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
     {
 #if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+        ConnectBleTransportToSelf();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
         if (!params.HasBleLayer())
         {
             params.SetPeerAddress(Transport::PeerAddress::BLE());
@@ -1316,6 +1330,17 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(Co
 }
 
 #if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+void DeviceCommissioner::ConnectBleTransportToSelf()
+{
+    Transport::BLEBase & transport = std::get<Transport::BLE<1>>(mSystemState->TransportMgr()->GetTransport().GetTransports());
+    if (!transport.IsBleLayerTransportSetToSelf())
+    {
+        transport.SetBleLayerTransportToSelf();
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
 CHIP_ERROR DeviceCommissioner::CloseBleConnection()
 {
     // It is fine since we can only commission one device at the same time.

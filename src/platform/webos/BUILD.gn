@@ -1,0 +1,128 @@
+# Copyright (c) 2021-2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/linux/pkg_config.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "webos")
+
+declare_args() {
+  # Support syslog along instead of stdout(printf)
+  enable_syslog = true
+}
+
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+  import("//build_overrides/ot_br_posix.gni")
+}
+
+if (chip_mdns != "none") {
+  pkg_config("avahi_client_config") {
+    packages = [ "avahi-client" ]
+  }
+}
+
+pkg_config("glib") {
+  packages = [
+    "glib-2.0",
+    "gio-unix-2.0",
+  ]
+}
+
+pkg_config("luna-service") {
+  packages = [
+    "luna-service2",
+    "PmLogLib",
+    "pbnjson_cpp",
+  ]
+}
+
+static_library("webos") {
+  if (enable_syslog) {
+    defines = [ "USE_SYSLOG=1" ]
+  }
+  sources = [
+    "../DeviceSafeQueue.cpp",
+    "../DeviceSafeQueue.h",
+    "../Linux/CHIPLinuxStorage.cpp",
+    "../Linux/CHIPLinuxStorage.h",
+    "../Linux/CHIPLinuxStorageIni.cpp",
+    "../Linux/CHIPLinuxStorageIni.h",
+    "../Linux/ConfigurationManagerImpl.cpp",
+    "../Linux/ConfigurationManagerImpl.h",
+    "../Linux/ConnectivityUtils.cpp",
+    "../Linux/ConnectivityUtils.h",
+    "../Linux/DiagnosticDataProviderImpl.cpp",
+    "../Linux/DiagnosticDataProviderImpl.h",
+    "../Linux/InetPlatformConfig.h",
+    "../Linux/KeyValueStoreManagerImpl.cpp",
+    "../Linux/KeyValueStoreManagerImpl.h",
+    "../Linux/PlatformManagerImpl.cpp",
+    "../Linux/PlatformManagerImpl.h",
+    "../Linux/PosixConfig.cpp",
+    "../Linux/PosixConfig.h",
+    "../Linux/SystemTimeSupport.cpp",
+    "../SingletonConfigurationManager.cpp",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPPlatformConfig.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DeviceNetworkProvisioningDelegateImpl.cpp",
+    "DeviceNetworkProvisioningDelegateImpl.h",
+    "Logging.cpp",
+    "SystemPlatformConfig.h",
+  ]
+
+  deps = [ "${chip_root}/src/setup_payload" ]
+
+  public_deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/third_party/inipp",
+  ]
+
+  public_configs = []
+
+  if (chip_mdns != "none") {
+    sources += [
+      "../Linux/DnssdImpl.cpp",
+      "../Linux/DnssdImpl.h",
+    ]
+
+    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+
+    public_configs += [
+      ":avahi_client_config",
+      ":glib",
+      ":luna-service",
+    ]
+  }
+
+  if (chip_enable_wifi) {
+    # TBD: Use webOS specific Wi-Fi resource
+    #public_deps += [ "dbus/wpa" ]
+  }
+
+  if (chip_enable_ble) {
+    # TBD: Use webOS specific Bluetooth resource
+    #public_deps += [ "dbus/bluez" ]
+  }
+}

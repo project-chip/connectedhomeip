@@ -27,7 +27,8 @@ namespace Transport {
 
 class SecureSession;
 class UnauthenticatedSession;
-class GroupSession;
+class IncomingGroupSession;
+class OutgoingGroupSession;
 
 class Session
 {
@@ -39,7 +40,8 @@ public:
         kUndefined       = 0,
         kUnauthenticated = 1,
         kSecure          = 2,
-        kGroup           = 3,
+        kGroupIncoming   = 3,
+        kGroupOutgoing   = 4,
     };
 
     virtual SessionType GetSessionType() const = 0;
@@ -72,9 +74,13 @@ public:
 
     SecureSession * AsSecureSession();
     UnauthenticatedSession * AsUnauthenticatedSession();
-    GroupSession * AsGroupSession();
+    IncomingGroupSession * AsIncomingGroupSession();
+    OutgoingGroupSession * AsOutgoingGroupSession();
 
-    bool IsGroupSession() const { return GetSessionType() == SessionType::kGroup; }
+    bool IsGroupSession() const
+    {
+        return GetSessionType() == SessionType::kGroupIncoming || GetSessionType() == SessionType::kGroupOutgoing;
+    }
 
 protected:
     // This should be called by sub-classes at the very beginning of the destructor, before any data field is disposed, such that

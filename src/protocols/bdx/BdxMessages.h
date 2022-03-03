@@ -32,6 +32,8 @@
 namespace chip {
 namespace bdx {
 
+constexpr uint16_t kMaxFileDesignatorLen = 0xFF;
+
 enum class MessageType : uint8_t
 {
     SendInit           = 0x01,

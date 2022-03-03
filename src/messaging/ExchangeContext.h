@@ -79,10 +79,7 @@ public:
 
     bool IsEncryptionRequired() const { return mDispatch.IsEncryptionRequired(); }
 
-    bool IsGroupExchangeContext() const
-    {
-        return (mSession && mSession->GetSessionType() == Transport::Session::SessionType::kGroup);
-    }
+    bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
 
     // Implement SessionReleaseDelegate
     void OnSessionReleased() override;

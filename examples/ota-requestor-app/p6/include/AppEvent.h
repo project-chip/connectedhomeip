@@ -1,6 +1,9 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2018 Nest Labs, Inc.
+ *    Copyright 2021, Cypress Semiconductor Corporation (an Infineon company)
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,23 +20,33 @@
 
 #pragma once
 
-#include <controller/DeviceAddressUpdateDelegate.h>
+struct AppEvent;
+typedef void (*EventHandler)(AppEvent *);
 
-namespace chip {
-namespace Controller {
-
-extern "C" using DeviceAddressUpdateDelegate_OnUpdateComplete = void(*)(NodeId, ChipError::StorageType);
-
-class ScriptDeviceAddressUpdateDelegate final : public Controller::DeviceAddressUpdateDelegate
+struct AppEvent
 {
-public:
-    void SetOnAddressUpdateComplete(DeviceAddressUpdateDelegate_OnUpdateComplete cb) { mOnAddressUpdateComplete = cb; }
+    enum AppEventTypes
+    {
+        kEventType_Button = 0,
+        kEventType_Timer,
+        kEventType_Light,
+        kEventType_Install,
+    };
 
-private:
-    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
+    uint16_t Type;
 
-    DeviceAddressUpdateDelegate_OnUpdateComplete mOnAddressUpdateComplete = nullptr;
+    union
+    {
+        struct
+        {
+            uint8_t ButtonIdx;
+            uint8_t Action;
+        } ButtonEvent;
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+    };
+
+    EventHandler Handler;
 };
-
-} // namespace Controller
-} // namespace chip
