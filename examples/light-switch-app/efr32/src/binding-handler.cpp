@@ -77,25 +77,11 @@ void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTa
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          offCommand, onSuccess, onFailure);
         break;
-
-    default:
-        ChipLogError(NotSpecified, "Invalid binding command data - commandId is not supported");
-        break;
     }
 }
 
 void ProcessOnOffGroupBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding)
 {
-    auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
-        ChipLogProgress(NotSpecified, "OnOff command succeeds");
-    };
-
-    auto onFailure = [](CHIP_ERROR error) {
-        ChipLogError(NotSpecified, "OnOff command failed: %" CHIP_ERROR_FORMAT, error.Format());
-    };
-
-    auto onDone = [](CommandSender * commandSender) { ChipLogError(NotSpecified, "OnOff command done"); };
-
     NodeId sourceNodeId = Server::GetInstance().GetFabricTable().FindFabricWithIndex(binding.fabricIndex)->GetNodeId();
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 
@@ -103,25 +89,18 @@ void ProcessOnOffGroupBindingCommand(CommandId commandId, const EmberBindingTabl
     {
     case Clusters::OnOff::Commands::Toggle::Id:
         Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, sourceNodeId, toggleCommand,
-                                              onSuccess, onFailure, onDone);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, sourceNodeId, toggleCommand);
         break;
 
     case Clusters::OnOff::Commands::On::Id:
         Clusters::OnOff::Commands::On::Type onCommand;
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, sourceNodeId, onCommand,
-                                              onSuccess, onFailure, onDone);
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, sourceNodeId, onCommand);
 
         break;
 
     case Clusters::OnOff::Commands::Off::Id:
         Clusters::OnOff::Commands::Off::Type offCommand;
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, sourceNodeId, offCommand,
-                                              onSuccess, onFailure, onDone);
-        break;
-
-    default:
-        ChipLogError(NotSpecified, "Invalid binding command data - commandId is not supported");
+        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, sourceNodeId, offCommand);
         break;
     }
 }
@@ -131,31 +110,22 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, DevicePro
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
 
-    if (binding.local == 1 && (!binding.clusterId.HasValue() || binding.clusterId.Value() == data->clusterId))
+    if (binding.type == EMBER_MULTICAST_BINDING && data->isGroup)
     {
-        if (binding.type == EMBER_MULTICAST_BINDING && data->isGroup)
+        switch (data->clusterId)
         {
-            switch (data->clusterId)
-            {
-            case Clusters::OnOff::Id:
-                ProcessOnOffGroupBindingCommand(data->commandId, binding);
-                break;
-            default:
-                ChipLogError(NotSpecified, "Invalid binding command data - clusterId is not supported");
-                break;
-            }
+        case Clusters::OnOff::Id:
+            ProcessOnOffGroupBindingCommand(data->commandId, binding);
+            break;
         }
-        else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
+    }
+    else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
+    {
+        switch (data->clusterId)
         {
-            switch (data->clusterId)
-            {
-            case Clusters::OnOff::Id:
-                ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device);
-                break;
-            default:
-                ChipLogError(NotSpecified, "Invalid binding command data - clusterId is not supported");
-                break;
-            }
+        case Clusters::OnOff::Id:
+            ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device);
+            break;
         }
     }
 }
@@ -367,7 +337,7 @@ void SwitchWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
 
     BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
-    BindingManager::GetInstance().NotifyBoundClusterChanged(1, data->clusterId, static_cast<void *>(data));
+    BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
 
     Platform::Delete(data);
 }

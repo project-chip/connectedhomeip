@@ -25,7 +25,7 @@ void SwitchWorkerFunction(intptr_t context);
 
 struct BindingCommandData
 {
-    chip::EndpointId endpointId = 1;
+    chip::EndpointId localEndpointId = 1;
     chip::CommandId commandId;
     chip::ClusterId clusterId;
     bool isGroup = false;

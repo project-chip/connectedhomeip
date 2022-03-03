@@ -102,55 +102,26 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
  * function
  */
 template <typename RequestObjectT>
-CHIP_ERROR
-InvokeGroupCommandRequest(Messaging::ExchangeManager * exchangeMgr, chip::FabricIndex fabric, chip::GroupId groupId,
-                          chip::NodeId sourceNodeId, const RequestObjectT & requestCommandData,
-                          typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
-                          typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
-                          typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnDoneCallbackType onDoneCb)
+CHIP_ERROR InvokeGroupCommandRequest(Messaging::ExchangeManager * exchangeMgr, chip::FabricIndex fabric, chip::GroupId groupId,
+                                     chip::NodeId sourceNodeId, const RequestObjectT & requestCommandData)
 {
-    app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, RequestObjectT::GetClusterId(),
-                                           RequestObjectT::GetCommandId(), (app::CommandPathFlags::kGroupIdValid) };
+    CHIP_ERROR error                   = CHIP_NO_ERROR;
+    app::CommandPathParams commandPath = { groupId, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
+                                           app::CommandPathFlags::kGroupIdValid };
+    Transport::OutgoingGroupSession session(groupId, fabric, sourceNodeId);
 
-    // Let's create a handle version of the decoder to ensure we do correct clean-up of it if things go south at any point below
-    auto decoder = chip::Platform::MakeUnique<TypedCommandCallback<typename RequestObjectT::ResponseType>>(onSuccessCb, onErrorCb);
-    VerifyOrReturnError(decoder != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    // Upon successful completion of SendCommandRequest below, we're expected to free up the respective allocated objects
-    // in the OnDone callback.
-    auto onDone = [rawDecoderPtr = decoder.get(), onDoneCallback = onDoneCb](app::CommandSender * commandSender) {
-        if (onDoneCallback != nullptr)
-        {
-            onDoneCallback(commandSender);
-        }
-
-        chip::Platform::Delete(commandSender);
-        chip::Platform::Delete(rawDecoderPtr);
-    };
-
-    decoder->SetOnDoneCallback(onDone);
-
-    auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), exchangeMgr);
+    auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(nullptr, exchangeMgr);
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData));
+    error = commandSender->AddRequestData(commandPath, requestCommandData);
+    SuccessOrExit(error);
 
-    Optional<SessionHandle> session = exchangeMgr->GetSessionManager()->CreateGroupSession(groupId, fabric, sourceNodeId);
-    if (!session.HasValue())
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    error = commandSender->SendGroupCommandRequest(SessionHandle(session));
+    SuccessOrExit(error);
 
-    // decoder and commandSender will be deleted by the onDone call before the return of SendGroupCommandRequest
-    // decoder and commandSender should not be used after the SendGroupCommandRequest call
-    ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(session.Value()));
-
-    // decoder and commandSender are already deleted and are not to be used
-    commandSender.release();
-    decoder.release();
-
-    exchangeMgr->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
-    return CHIP_NO_ERROR;
+exit:
+    chip::Platform::Delete(commandSender.release());
+    return error;
 }
 
 template <typename RequestObjectT>

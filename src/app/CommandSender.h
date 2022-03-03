@@ -135,6 +135,8 @@ public:
      * Constructor.
      *
      * The callback passed in has to outlive this CommandSender object.
+     * If used in a groups setting, callbacks do not need to be passed.
+     * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false);
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
