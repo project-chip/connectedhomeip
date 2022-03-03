@@ -18,6 +18,7 @@
 
 #include "BDXDownloader.h"
 
+#include <platform/CHIPDeviceLayer.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BufferReader.h>
@@ -35,6 +36,41 @@ using chip::bdx::TransferSession;
 
 namespace chip {
 
+// Timeout value in seconds to abort the download if there's no progress in the transfer session.
+System::Clock::Timeout mTimeout           = System::Clock::kZero;
+
+static uint8_t prevPercentageComplete = 0;
+
+void StartTimeoutTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    if( static_cast<BDXDownloader *>(appState)->CheckTransferTimeout() )
+    {
+        //End download if transfer timeout has been detected
+        static_cast<BDXDownloader *>(appState)->OnDownloadTimeout();  
+    }
+    else
+    {
+       //Else restart the timer
+       systemLayer->StartTimer(mTimeout, StartTimeoutTimerHandler, appState);  
+    }
+}
+
+bool BDXDownloader::CheckTransferTimeout()
+{
+    uint8_t curPercentageComplete = mImageProcessor->GetPercentComplete().IsNull() ? 0 : mImageProcessor->GetPercentComplete().Value();
+
+    if( curPercentageComplete > prevPercentageComplete )
+    {
+        prevPercentageComplete = curPercentageComplete;
+        return false;
+    }
+    else
+    {
+        ChipLogError(BDX, "BDX transfer timeout");
+        return true;
+    }
+}
+
 void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle msg)
 {
     VerifyOrReturn(mState == State::kInProgress, ChipLogError(BDX, "Can't accept messages, no transfer in progress"));
@@ -50,8 +86,9 @@ void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader,
     PollTransferSession();
 }
 
-CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData)
+CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData, System::Clock::Timeout timeout)
 {
+    mTimeout = timeout;
     mState = State::kIdle;
     mBdxTransfer.Reset();
 
@@ -69,6 +106,10 @@ CHIP_ERROR BDXDownloader::BeginPrepareDownload()
 {
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    prevPercentageComplete = 0;
+    DeviceLayer::SystemLayer().StartTimer(mTimeout, StartTimeoutTimerHandler, this);
+
     ReturnErrorOnFailure(mImageProcessor->PrepareDownload());
 
     SetState(State::kPreparing, OTAChangeReasonEnum::kSuccess);
@@ -108,6 +149,9 @@ CHIP_ERROR BDXDownloader::FetchNextData()
 
 void BDXDownloader::OnDownloadTimeout()
 {
+    prevPercentageComplete = 0;
+    DeviceLayer::SystemLayer().CancelTimer(StartTimeoutTimerHandler, this); 
+
     if (mState == State::kInProgress)
     {
         ChipLogDetail(BDX, "aborting due to timeout");
@@ -126,6 +170,9 @@ void BDXDownloader::OnDownloadTimeout()
 
 void BDXDownloader::EndDownload(CHIP_ERROR reason)
 {
+    prevPercentageComplete = 0;
+    DeviceLayer::SystemLayer().CancelTimer(StartTimeoutTimerHandler, this);
+
     if (mState == State::kInProgress)
     {
         bdx::StatusCode status = bdx::StatusCode::kUnknown;
@@ -186,6 +233,9 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         ReturnErrorOnFailure(mMsgDelegate->SendMessage(outEvent));
         if (outEvent.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
         {
+            prevPercentageComplete = 0;
+            DeviceLayer::SystemLayer().CancelTimer(StartTimeoutTimerHandler, this);
+
             // BDX transfer is not complete until BlockAckEOF has been sent
             SetState(State::kComplete, OTAChangeReasonEnum::kSuccess);
         }
@@ -212,11 +262,15 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "TransferSession error");
+        prevPercentageComplete = 0;
+        DeviceLayer::SystemLayer().CancelTimer(StartTimeoutTimerHandler, this);
         mBdxTransfer.Reset();
         ReturnErrorOnFailure(mImageProcessor->Abort());
         break;
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
+        prevPercentageComplete = 0;
+        DeviceLayer::SystemLayer().CancelTimer(StartTimeoutTimerHandler, this);
         mBdxTransfer.Reset();
         ReturnErrorOnFailure(mImageProcessor->Abort());
         break;
