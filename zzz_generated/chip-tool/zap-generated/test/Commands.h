@@ -76782,7 +76782,7 @@ private:
             isExpectedDnssdResult = true;
 
             VerifyOrReturn(CheckValue("longDiscriminator", value.longDiscriminator,
-                                      mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator()));
+                                      mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U));
             VerifyOrReturn(CheckConstraintMinValue<uint16_t>("value.longDiscriminator", value.longDiscriminator, 0U));
             VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("value.longDiscriminator", value.longDiscriminator, 4096U));
         }
@@ -76870,7 +76870,7 @@ private:
     CHIP_ERROR TestRebootTargetDevice_0()
     {
         SetIdentity(kIdentityAlpha);
-        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
     }
 
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_1()
@@ -76917,14 +76917,13 @@ private:
     CHIP_ERROR TestCheckLongDiscriminatorL_4()
     {
         SetIdentity(kIdentityAlpha);
-        return FindCommissionableByLongDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+        return FindCommissionableByLongDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
     }
 
     CHIP_ERROR TestCheckShortDiscriminatorS_5()
     {
         SetIdentity(kIdentityAlpha);
-        return FindCommissionableByShortDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value()
-                                                                                : GetUniqueDiscriminator());
+        return FindCommissionableByShortDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
     }
 
     CHIP_ERROR TestCheckCommissioningModeCm_6()
@@ -77008,7 +77007,7 @@ private:
     CHIP_ERROR TestRebootTargetDevice_19()
     {
         SetIdentity(kIdentityAlpha);
-        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
     }
 
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_20()
