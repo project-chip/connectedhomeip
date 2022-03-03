@@ -34,7 +34,6 @@ public:
     TestCommandBridge(const char * _Nonnull commandName)
         : CHIPCommandBridge(commandName)
     {
-        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
     }
@@ -82,10 +81,8 @@ public:
 
     void WaitForCommissionee(chip::NodeId nodeId)
     {
-        CHIPDeviceController * controller = [CHIPDeviceController sharedController];
-        VerifyOrReturn(controller != nil, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
-
-        [controller getConnectedDevice:nodeId
+        VerifyOrReturn(CurrentCommissioner() != nil, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+        [CurrentCommissioner() getConnectedDevice:nodeId
                                  queue:mCallbackQueue
                      completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
                          CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
@@ -101,7 +98,6 @@ public:
 protected:
     dispatch_queue_t _Nullable mCallbackQueue;
     CHIPDevice * _Nullable mConnectedDevice;
-    chip::NodeId mNodeId;
 
     void Wait()
     {
