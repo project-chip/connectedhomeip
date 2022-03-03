@@ -142,6 +142,7 @@ public:
 
 private:
     bool mInitialized;
+    FabricTable mFabricTable;
     SessionManager mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
