@@ -33,6 +33,7 @@ public:
         AddArgument("attribute-value", &mAttributeValue);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         ModelCommand::AddArguments();
     }
 
@@ -43,6 +44,7 @@ public:
         AddArgument("attribute-value", &mAttributeValue);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         ModelCommand::AddArguments();
     }
 
@@ -51,6 +53,7 @@ public:
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
     }
 
     ~WriteAttribute() {}
@@ -103,7 +106,8 @@ public:
         attributePathParams.mClusterId   = clusterId;
         attributePathParams.mAttributeId = attributeId;
 
-        mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), this, mTimedInteractionTimeoutMs);
+        mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), this, mTimedInteractionTimeoutMs,
+                                                                mSuppressResponse);
 
         ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, mDataVersion));
 
@@ -148,6 +152,7 @@ private:
     CHIP_ERROR mError = CHIP_NO_ERROR;
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
     chip::Optional<chip::DataVersion> mDataVersion = chip::NullOptional;
+    chip::Optional<bool> mSuppressResponse;
     CustomArgument mAttributeValue;
     std::unique_ptr<chip::app::WriteClient> mWriteClient;
 };
