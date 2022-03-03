@@ -21,6 +21,7 @@ assert(chip_build_tools)
 
 executable("chip-tool-darwin") {
   sources = [
+    "commands/clusters/ModelCommandBridge.mm",
     "commands/common/CHIPCommandBridge.mm",
     "commands/pairing/Commands.h",
     "commands/pairing/PairingCommandBridge.mm",
@@ -28,7 +29,10 @@ executable("chip-tool-darwin") {
     "main.mm",
   ]
 
-  include_dirs = [ "." ]
+  include_dirs = [
+    ".",
+    "${chip_root}/zzz_generated/chip-tool-darwin",
+  ]
 
   deps = [
     "${chip_root}/examples/chip-tool:chip-tool-utils",
@@ -46,22 +50,4 @@ executable("chip-tool-darwin") {
   ]
 
   output_dir = root_out_dir
-}
-
-action("codesign") {
-  script = "entitlements/codesign.py"
-  sources = [ "entitlements/chip-tool-darwin.entitlements" ]
-  public_deps = [ ":chip-tool-darwin" ]
-
-  args = [
-    "--target_path",
-    rebase_path("${root_build_dir}/chip-tool-darwin", root_build_dir),
-    "--entitlements_path",
-    rebase_path("entitlements/chip-tool-darwin.entitlements", root_build_dir),
-    "--log_path",
-    rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
-  ]
-
-  output_name = "codesign_log.txt"
-  outputs = [ "${root_build_dir}/${output_name}" ]
 }
