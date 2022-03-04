@@ -19951,7 +19951,7 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="maxCoolSetpointLimit", Tag=0x00000018, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="minSetpointDeadBand", Tag=0x00000019, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="remoteSensing", Tag=0x0000001A, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="controlSequenceOfOperation", Tag=0x0000001B, Type=uint),
+                ClusterObjectFieldDescriptor(Label="controlSequenceOfOperation", Tag=0x0000001B, Type=Thermostat.Enums.ThermostatControlSequence),
                 ClusterObjectFieldDescriptor(Label="systemMode", Tag=0x0000001C, Type=uint),
                 ClusterObjectFieldDescriptor(Label="alarmMask", Tag=0x0000001D, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="thermostatRunningMode", Tag=0x0000001E, Type=typing.Optional[uint]),
@@ -20001,7 +20001,7 @@ class Thermostat(Cluster):
     maxCoolSetpointLimit: 'typing.Optional[int]' = None
     minSetpointDeadBand: 'typing.Optional[int]' = None
     remoteSensing: 'typing.Optional[uint]' = None
-    controlSequenceOfOperation: 'uint' = None
+    controlSequenceOfOperation: 'Thermostat.Enums.ThermostatControlSequence' = None
     systemMode: 'uint' = None
     alarmMask: 'typing.Optional[uint]' = None
     thermostatRunningMode: 'typing.Optional[uint]' = None
@@ -20034,6 +20034,28 @@ class Thermostat(Cluster):
             kHeatSetpoint = 0x00
             kCoolSetpoint = 0x01
             kHeatAndCoolSetpoints = 0x02
+
+        class ThermostatControlSequence(IntEnum):
+            kCoolingOnly = 0x00
+            kCoolingWithReheat = 0x01
+            kHeatingOnly = 0x02
+            kHeatingWithReheat = 0x03
+            kCoolingAndHeating = 0x04
+            kCoolingAndHeatingWithReheat = 0x05
+
+        class ThermostatRunningMode(IntEnum):
+            kOff = 0x00
+            kCool = 0x03
+            kHeat = 0x04
+
+        class ThermostatSystemMode(IntEnum):
+            kOff = 0x00
+            kAuto = 0x01
+            kCool = 0x03
+            kHeat = 0x04
+            kEmergencyHeating = 0x05
+            kPrecooling = 0x06
+            kFanOnly = 0x07
 
 
 
@@ -20515,9 +20537,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=Thermostat.Enums.ThermostatControlSequence)
 
-            value: 'uint' = 0
+            value: 'Thermostat.Enums.ThermostatControlSequence' = 0
 
         @dataclass
         class SystemMode(ClusterAttributeDescriptor):
