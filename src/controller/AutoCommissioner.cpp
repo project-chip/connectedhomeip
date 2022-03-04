@@ -262,7 +262,7 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(Commissioni
 {
     // Per spec, all commands that are sent with the arm failsafe held need at least a 30s timeout.
     // Network clusters can indicate the time required to connect, so if we are connecting, use that time as long as it is > 30s.
-    uint8_t seconds = 30;
+    app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType seconds = 30;
     switch (stage)
     {
     case CommissioningStage::kWiFiNetworkEnable:
