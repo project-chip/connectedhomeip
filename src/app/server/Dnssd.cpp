@@ -259,7 +259,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
     mdnsAdvertiser.RemoveServices();
 
     VerifyOrDie(mFabricTable != nullptr);
-    for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
+    for (const FabricInfo & fabricInfo : *mFabricTable)
     {
         if (fabricInfo.IsInitialized())
         {
