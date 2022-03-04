@@ -33,6 +33,7 @@
 #include "esp_netif.h"
 #include "esp_netif_net_stack.h"
 #include "esp_wifi.h"
+#include "nvs.h"
 
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
@@ -310,6 +311,10 @@ CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
     if (error == ESP_OK)
     {
         return CHIP_NO_ERROR;
+    }
+    if (error == ESP_ERR_NVS_NOT_FOUND)
+    {
+        return CHIP_ERROR_KEY_NOT_FOUND;
     }
     return CHIP_ERROR(ChipError::Range::kPlatform, error);
 }

@@ -40,7 +40,10 @@ public:
     CHIP_ERROR
     SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        size_t bytesRead = 0;
+        CHIP_ERROR err   = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+        size             = static_cast<uint16_t>(bytesRead);
+        return err;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -140,8 +143,8 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, 0, ephemeralKey.Pubkey(), rcacSpan,
-                                                                                icacSpan, nocSpan);
+            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, /* fabricId = */ 1,
+                                                                                ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
             SuccessOrExit(err);
 
             commissionerParams.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;

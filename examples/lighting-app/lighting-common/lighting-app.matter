@@ -624,8 +624,8 @@ server cluster GeneralDiagnostics = 51 {
 
 server cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicy : ENUM8 {
-    kStandard = 0;
-    kLowLatency = 1;
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
   }
 
   struct GroupKeyMapStruct {
@@ -693,45 +693,45 @@ server cluster Groups = 4 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct GetGroupMembershipRequest {
-    INT16U groupList[] = 0;
+    group_id groupList[] = 0;
   }
 
   request struct RemoveGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   request struct ViewGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   response struct AddGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct GetGroupMembershipResponse {
-    INT8U capacity = 0;
-    INT16U groupList[] = 1;
+    nullable INT8U capacity = 0;
+    group_id groupList[] = 1;
   }
 
   response struct RemoveGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct ViewGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     CHAR_STRING groupName = 2;
   }
 
@@ -1099,9 +1099,9 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   struct ProviderLocation {
-    fabric_idx fabricIndex = 0;
     node_id providerNodeID = 1;
     endpoint_no endpoint = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   info event StateTransition = 0 {
@@ -1165,6 +1165,10 @@ server cluster OnOff = 6 {
 
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
+  }
+
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
   }
 
   readonly attribute boolean onOff = 0;

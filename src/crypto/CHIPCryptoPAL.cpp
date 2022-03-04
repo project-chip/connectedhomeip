@@ -515,7 +515,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeW0(uint8_t * w0out, size_t * w0
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2pVerifier::Serialize(MutableByteSpan & outSerialized)
+CHIP_ERROR Spake2pVerifier::Serialize(MutableByteSpan & outSerialized) const
 {
     VerifyOrReturnError(outSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -527,7 +527,7 @@ CHIP_ERROR Spake2pVerifier::Serialize(MutableByteSpan & outSerialized)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2pVerifier::Deserialize(ByteSpan inSerialized)
+CHIP_ERROR Spake2pVerifier::Deserialize(const ByteSpan & inSerialized)
 {
     VerifyOrReturnError(inSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
 

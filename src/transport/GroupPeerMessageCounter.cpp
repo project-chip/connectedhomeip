@@ -275,6 +275,7 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
     }
 
     temp = mGroupControlCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
+    size = static_cast<uint16_t>(sizeof(temp));
     ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key.GroupControlCounter(), &temp, size));
 
     temp = mGroupDataCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;

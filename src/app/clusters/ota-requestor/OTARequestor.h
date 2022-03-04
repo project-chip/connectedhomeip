@@ -37,15 +37,6 @@ namespace chip {
 class OTARequestor : public OTARequestorInterface, public BDXDownloader::StateDelegate
 {
 public:
-    // Various actions to take when OnConnected callback is called
-    enum OnConnectedAction
-    {
-        kQueryImage = 0,
-        kStartBDX,
-        kApplyUpdate,
-        kNotifyUpdateApplied,
-    };
-
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
     //////////// OTARequestorInterface Implementation ///////////////
@@ -53,24 +44,30 @@ public:
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
         const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
 
-    // Application directs the Requestor to start the Image Query process
-    // and download the new image if available
+    // Application API to send the QueryImage command and start the image update process with the next available Provider
     OTATriggerResult TriggerImmediateQuery() override;
+
+    // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process
+    // with the Provider currently set in the OTARequestor
+    void TriggerImmediateQueryInternal() override;
 
     // Initiate download of the new image
     void DownloadUpdate() override;
 
-    // Send ApplyImage
+    // Initiate the session to send ApplyUpdateRequest command
     void ApplyUpdate() override;
 
-    // Send NotifyUpdateApplied, update Basic cluster SoftwareVersion attribute, log the VersionApplied event
+    // Initiate the session to send NotifyUpdateApplied command
     void NotifyUpdateApplied(uint32_t version) override;
 
     // Get image update progress in percents unit
     CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
 
     // Get requestor state
-    CHIP_ERROR GetState(EndpointId endpointId, app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) override;
+    CHIP_ERROR GetState(EndpointId endpointId, OTAUpdateStateEnum & state) override;
+
+    // Get the current state of the OTA update
+    OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
@@ -78,6 +75,14 @@ public:
 
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
+
+    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    void SetCurrentProviderLocation(ProviderLocationType providerLocation) override
+    {
+        mProviderLocation.SetValue(providerLocation);
+    }
+
+    void ClearCurrentProviderLocation() override { mProviderLocation.ClearValue(); }
 
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(
@@ -98,7 +103,7 @@ public:
      *   - Set the OTA requestor driver instance used to communicate download progress and errors
      *   - Set the BDX downloader instance used for initiating BDX downloads
      */
-    void Init(Server * server, OTARequestorDriver * driver, BDXDownloader * downloader)
+    CHIP_ERROR Init(Server * server, OTARequestorDriver * driver, BDXDownloader * downloader)
     {
         mServer             = server;
         mCASESessionManager = server->GetCASESessionManager();
@@ -106,38 +111,31 @@ public:
         mBdxDownloader      = downloader;
 
         uint32_t version;
-        ReturnOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
         mCurrentVersion = version;
 
         OtaRequestorServerSetUpdateState(mCurrentUpdateState);
         app::DataModel::Nullable<uint8_t> percent;
         percent.SetNull();
         OtaRequestorServerSetUpdateStateProgress(percent);
-    }
 
-    /**
-     * Called to establish a session to mProviderLocation. This must be called from the same externally
-     * synchronized context as any other Matter stack method.
-     *
-     * @param onConnectedAction  The action to take once session to provider has been established
-     */
-    void ConnectToProvider(OnConnectedAction onConnectedAction);
+        // This results in the initial periodic timer kicking off
+        RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+
+        return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor,
+                                                                    reinterpret_cast<intptr_t>(this));
+    }
 
     /**
      * Called to set optional requestorCanConsent value provided by Requestor.
      */
     void SetRequestorCanConsent(bool requestorCanConsent) { mRequestorCanConsent.SetValue(requestorCanConsent); }
 
-    // Application notifies the Requestor on the user consent action, TRUE if consent is given,
-    // FALSE otherwise
-    void OnUserConsent(bool result);
-
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
-    using ProviderLocationType             = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-    using OTAUpdateStateEnum               = app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
-    using OTAChangeReasonEnum              = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
+
+    using OTAChangeReasonEnum = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
 
     static constexpr size_t kMaxUpdateTokenLen = 32;
 
@@ -205,16 +203,6 @@ private:
     };
 
     /**
-     * Set the cached default OTA provider location to use for the next query
-     */
-    bool SetDefaultProviderLocation(const ProviderLocationType & providerLocation);
-
-    /**
-     * Clear the cached default OTA provider location to indicate no OTA update may be in progress
-     */
-    bool ClearDefaultProviderLocation(void);
-
-    /**
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
      */
     void RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason);
@@ -239,6 +227,22 @@ private:
      * Validate and extract mandatory information from QueryImageResponse
      */
     CHIP_ERROR ExtractUpdateDescription(const QueryImageResponseDecodableType & response, UpdateDescription & update) const;
+
+    // Various actions to take when OnConnected callback is called
+    enum OnConnectedAction
+    {
+        kQueryImage = 0,
+        kDownload,
+        kApplyUpdate,
+        kNotifyUpdateApplied,
+    };
+
+    /**
+     * Called to establish a session to mProviderLocation.
+     *
+     * @param onConnectedAction  The action to take once session to provider has been established
+     */
+    void ConnectToProvider(OnConnectedAction onConnectedAction);
 
     /**
      * Start download of the software image returned in QueryImageResponse
@@ -281,8 +285,12 @@ private:
     static void OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response);
     static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
 
+    /**
+     * Commissioning callback
+     */
+    static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
-    uint32_t mOtaStartDelayMs                 = 0;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
@@ -290,9 +298,11 @@ private:
     BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
     ByteSpan mUpdateToken;
-    uint32_t mCurrentVersion               = 0;
-    uint32_t mTargetVersion                = 0;
-    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
+    uint32_t mCurrentVersion = 0;
+    uint32_t mTargetVersion  = 0;
+    char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
+    CharSpan mFileDesignator;
+    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
     chip::Optional<bool> mRequestorCanConsent;
     ProviderLocationList mDefaultOtaProviderList;

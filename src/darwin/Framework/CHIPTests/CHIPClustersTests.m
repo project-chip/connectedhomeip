@@ -233,7 +233,7 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTestAccessControlCluster_000001_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write three entries"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write entries"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -274,27 +274,27 @@ CHIPDevice * GetConnectedDevice(void)
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
-            temp_3[0] = [NSNumber numberWithUnsignedLongLong:1234ULL];
-            temp_3[1] = [NSNumber numberWithUnsignedLongLong:5678ULL];
-            temp_3[2] = [NSNumber numberWithUnsignedLongLong:32896ULL];
-            temp_3[3] = [NSNumber numberWithUnsignedLongLong:65535ULL];
+            temp_3[0] = [NSNumber numberWithUnsignedLongLong:4ULL];
+            temp_3[1] = [NSNumber numberWithUnsignedLongLong:5ULL];
+            temp_3[2] = [NSNumber numberWithUnsignedLongLong:6ULL];
+            temp_3[3] = [NSNumber numberWithUnsignedLongLong:7ULL];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
         }
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
             temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
             ((CHIPAccessControlClusterTarget *) temp_3[0]).cluster = nil;
-            ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:1U];
+            ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:8U];
             ((CHIPAccessControlClusterTarget *) temp_3[0]).deviceType = nil;
 
             temp_3[1] = [[CHIPAccessControlClusterTarget alloc] init];
-            ((CHIPAccessControlClusterTarget *) temp_3[1]).cluster = [NSNumber numberWithUnsignedInt:2UL];
+            ((CHIPAccessControlClusterTarget *) temp_3[1]).cluster = [NSNumber numberWithUnsignedInt:9UL];
             ((CHIPAccessControlClusterTarget *) temp_3[1]).endpoint = nil;
             ((CHIPAccessControlClusterTarget *) temp_3[1]).deviceType = nil;
 
             temp_3[2] = [[CHIPAccessControlClusterTarget alloc] init];
-            ((CHIPAccessControlClusterTarget *) temp_3[2]).cluster = [NSNumber numberWithUnsignedInt:3UL];
-            ((CHIPAccessControlClusterTarget *) temp_3[2]).endpoint = [NSNumber numberWithUnsignedShort:4U];
+            ((CHIPAccessControlClusterTarget *) temp_3[2]).cluster = [NSNumber numberWithUnsignedInt:10UL];
+            ((CHIPAccessControlClusterTarget *) temp_3[2]).endpoint = [NSNumber numberWithUnsignedShort:11U];
             ((CHIPAccessControlClusterTarget *) temp_3[2]).deviceType = nil;
 
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
@@ -306,27 +306,27 @@ CHIPDevice * GetConnectedDevice(void)
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).authMode = [NSNumber numberWithUnsignedChar:3];
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
-            temp_3[0] = [NSNumber numberWithUnsignedLongLong:257ULL];
-            temp_3[1] = [NSNumber numberWithUnsignedLongLong:258ULL];
-            temp_3[2] = [NSNumber numberWithUnsignedLongLong:43690ULL];
-            temp_3[3] = [NSNumber numberWithUnsignedLongLong:48059ULL];
+            temp_3[0] = [NSNumber numberWithUnsignedLongLong:12ULL];
+            temp_3[1] = [NSNumber numberWithUnsignedLongLong:13ULL];
+            temp_3[2] = [NSNumber numberWithUnsignedLongLong:14ULL];
+            temp_3[3] = [NSNumber numberWithUnsignedLongLong:15ULL];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).subjects = temp_3;
         }
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
             temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
             ((CHIPAccessControlClusterTarget *) temp_3[0]).cluster = nil;
-            ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:2U];
+            ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:16U];
             ((CHIPAccessControlClusterTarget *) temp_3[0]).deviceType = nil;
 
             temp_3[1] = [[CHIPAccessControlClusterTarget alloc] init];
-            ((CHIPAccessControlClusterTarget *) temp_3[1]).cluster = [NSNumber numberWithUnsignedInt:3UL];
+            ((CHIPAccessControlClusterTarget *) temp_3[1]).cluster = [NSNumber numberWithUnsignedInt:17UL];
             ((CHIPAccessControlClusterTarget *) temp_3[1]).endpoint = nil;
             ((CHIPAccessControlClusterTarget *) temp_3[1]).deviceType = nil;
 
             temp_3[2] = [[CHIPAccessControlClusterTarget alloc] init];
-            ((CHIPAccessControlClusterTarget *) temp_3[2]).cluster = [NSNumber numberWithUnsignedInt:4UL];
-            ((CHIPAccessControlClusterTarget *) temp_3[2]).endpoint = [NSNumber numberWithUnsignedShort:5U];
+            ((CHIPAccessControlClusterTarget *) temp_3[2]).cluster = [NSNumber numberWithUnsignedInt:18UL];
+            ((CHIPAccessControlClusterTarget *) temp_3[2]).endpoint = [NSNumber numberWithUnsignedShort:19U];
             ((CHIPAccessControlClusterTarget *) temp_3[2]).deviceType = nil;
 
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).targets = temp_3;
@@ -336,7 +336,7 @@ CHIPDevice * GetConnectedDevice(void)
     }
     [cluster writeAttributeAclWithValue:aclArgument
                       completionHandler:^(NSError * _Nullable err) {
-                          NSLog(@"Write three entries Error: %@", err);
+                          NSLog(@"Write entries Error: %@", err);
 
                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -347,7 +347,7 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTestAccessControlCluster_000002_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read three entries"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -359,7 +359,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster
         readAttributeAclWithParams:params
                  completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                     NSLog(@"Read three entries Error: %@", err);
+                     NSLog(@"Verify Error: %@", err);
 
                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -446,16 +446,16 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects count], 4);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects[0] unsignedLongLongValue],
-                             1234ULL);
+                             4ULL);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects[1] unsignedLongLongValue],
-                             5678ULL);
+                             5ULL);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects[2] unsignedLongLongValue],
-                             32896ULL);
+                             6ULL);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects[3] unsignedLongLongValue],
-                             65535ULL);
+                             7ULL);
                          XCTAssertFalse(((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).targets == nil);
                          XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).targets count], 3);
                          XCTAssertTrue(
@@ -471,7 +471,7 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
                                      .targets[0]).endpoint unsignedShortValue],
-                             1U);
+                             8U);
                          XCTAssertTrue(
                              ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
                                      .targets[0])
@@ -485,7 +485,7 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
                                      .targets[1]).cluster unsignedIntValue],
-                             2UL);
+                             9UL);
                          XCTAssertTrue(
                              ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
                                      .targets[1])
@@ -504,7 +504,7 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
                                      .targets[2]).cluster unsignedIntValue],
-                             3UL);
+                             10UL);
                          XCTAssertFalse(
                              ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
                                      .targets[2])
@@ -513,7 +513,7 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
                                      .targets[2]).endpoint unsignedShortValue],
-                             4U);
+                             11U);
                          XCTAssertTrue(
                              ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
                                      .targets[2])
@@ -529,16 +529,16 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects count], 4);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects[0] unsignedLongLongValue],
-                             257ULL);
+                             12ULL);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects[1] unsignedLongLongValue],
-                             258ULL);
+                             13ULL);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects[2] unsignedLongLongValue],
-                             43690ULL);
+                             14ULL);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).subjects[3] unsignedLongLongValue],
-                             48059ULL);
+                             15ULL);
                          XCTAssertFalse(((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).targets == nil);
                          XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).targets count], 3);
                          XCTAssertTrue(
@@ -554,7 +554,7 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
                                      .targets[0]).endpoint unsignedShortValue],
-                             2U);
+                             16U);
                          XCTAssertTrue(
                              ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
                                      .targets[0])
@@ -568,7 +568,7 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
                                      .targets[1]).cluster unsignedIntValue],
-                             3UL);
+                             17UL);
                          XCTAssertTrue(
                              ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
                                      .targets[1])
@@ -587,7 +587,7 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
                                      .targets[2]).cluster unsignedIntValue],
-                             4UL);
+                             18UL);
                          XCTAssertFalse(
                              ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
                                      .targets[2])
@@ -596,7 +596,7 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
                                      .targets[2]).endpoint unsignedShortValue],
-                             5U);
+                             19U);
                          XCTAssertTrue(
                              ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[2])
                                      .targets[2])
@@ -611,7 +611,7 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTestAccessControlCluster_000003_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write two entries"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write entries empty lists"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -626,25 +626,7 @@ CHIPDevice * GetConnectedDevice(void)
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
-        {
-            NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
-            temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
-            ((CHIPAccessControlClusterTarget *) temp_3[0]).cluster = nil;
-            ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:0U];
-            ((CHIPAccessControlClusterTarget *) temp_3[0]).deviceType = nil;
-
-            temp_3[1] = [[CHIPAccessControlClusterTarget alloc] init];
-            ((CHIPAccessControlClusterTarget *) temp_3[1]).cluster = [NSNumber numberWithUnsignedInt:1UL];
-            ((CHIPAccessControlClusterTarget *) temp_3[1]).endpoint = nil;
-            ((CHIPAccessControlClusterTarget *) temp_3[1]).deviceType = nil;
-
-            temp_3[2] = [[CHIPAccessControlClusterTarget alloc] init];
-            ((CHIPAccessControlClusterTarget *) temp_3[2]).cluster = [NSNumber numberWithUnsignedInt:2UL];
-            ((CHIPAccessControlClusterTarget *) temp_3[2]).endpoint = [NSNumber numberWithUnsignedShort:3U];
-            ((CHIPAccessControlClusterTarget *) temp_3[2]).deviceType = nil;
-
-            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = temp_3;
-        }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
@@ -652,17 +634,10 @@ CHIPDevice * GetConnectedDevice(void)
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
-            temp_3[0] = [NSNumber numberWithUnsignedLongLong:52428ULL];
-            temp_3[1] = [NSNumber numberWithUnsignedLongLong:56797ULL];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
         }
         {
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
-            temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
-            ((CHIPAccessControlClusterTarget *) temp_3[0]).cluster = [NSNumber numberWithUnsignedInt:5UL];
-            ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:6U];
-            ((CHIPAccessControlClusterTarget *) temp_3[0]).deviceType = nil;
-
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
         }
 
@@ -670,7 +645,7 @@ CHIPDevice * GetConnectedDevice(void)
     }
     [cluster writeAttributeAclWithValue:aclArgument
                       completionHandler:^(NSError * _Nullable err) {
-                          NSLog(@"Write two entries Error: %@", err);
+                          NSLog(@"Write entries empty lists Error: %@", err);
 
                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -681,7 +656,7 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTestAccessControlCluster_000004_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read two entries"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -693,7 +668,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster
         readAttributeAclWithParams:params
                  completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                     NSLog(@"Read two entries Error: %@", err);
+                     NSLog(@"Verify Error: %@", err);
 
                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -707,108 +682,15 @@ CHIPDevice * GetConnectedDevice(void)
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
-                         XCTAssertFalse(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
-                         XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets count], 3);
-                         XCTAssertTrue(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[0])
-                                 .cluster
-                             == nil);
-                         XCTAssertFalse(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[0])
-                                 .endpoint
-                             == nil);
-                         XCTAssertEqual(
-                             [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[0]).endpoint unsignedShortValue],
-                             0U);
-                         XCTAssertTrue(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[0])
-                                 .deviceType
-                             == nil);
-                         XCTAssertFalse(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[1])
-                                 .cluster
-                             == nil);
-                         XCTAssertEqual(
-                             [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[1]).cluster unsignedIntValue],
-                             1UL);
-                         XCTAssertTrue(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[1])
-                                 .endpoint
-                             == nil);
-                         XCTAssertTrue(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[1])
-                                 .deviceType
-                             == nil);
-                         XCTAssertFalse(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[2])
-                                 .cluster
-                             == nil);
-                         XCTAssertEqual(
-                             [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[2]).cluster unsignedIntValue],
-                             2UL);
-                         XCTAssertFalse(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[2])
-                                 .endpoint
-                             == nil);
-                         XCTAssertEqual(
-                             [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[2]).endpoint unsignedShortValue],
-                             3U);
-                         XCTAssertTrue(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[0])
-                                     .targets[2])
-                                 .deviceType
-                             == nil);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex unsignedCharValue], 1);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).privilege unsignedCharValue], 1);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).authMode unsignedCharValue], 2);
-                         XCTAssertFalse(((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects == nil);
-                         XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects count], 2);
-                         XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects[0] unsignedLongLongValue],
-                             52428ULL);
-                         XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects[1] unsignedLongLongValue],
-                             56797ULL);
-                         XCTAssertFalse(((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).targets == nil);
-                         XCTAssertEqual([((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).targets count], 1);
-                         XCTAssertFalse(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
-                                     .targets[0])
-                                 .cluster
-                             == nil);
-                         XCTAssertEqual(
-                             [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
-                                     .targets[0]).cluster unsignedIntValue],
-                             5UL);
-                         XCTAssertFalse(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
-                                     .targets[0])
-                                 .endpoint
-                             == nil);
-                         XCTAssertEqual(
-                             [((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
-                                     .targets[0]).endpoint unsignedShortValue],
-                             6U);
-                         XCTAssertTrue(
-                             ((CHIPAccessControlClusterTarget *) ((CHIPAccessControlClusterAccessControlEntry *) actualValue[1])
-                                     .targets[0])
-                                 .deviceType
-                             == nil);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects == nil);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).targets == nil);
                      }
 
                      [expectation fulfill];
@@ -818,7 +700,589 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTestAccessControlCluster_000005_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write one entry"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write entry invalid privilege"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id aclArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+
+        temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:5];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:3];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+
+        aclArgument = temp_0;
+    }
+    [cluster writeAttributeAclWithValue:aclArgument
+                      completionHandler:^(NSError * _Nullable err) {
+                          NSLog(@"Write entry invalid privilege Error: %@", err);
+
+                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
+                          [expectation fulfill];
+                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000006_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster
+        readAttributeAclWithParams:params
+                 completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                     NSLog(@"Verify Error: %@", err);
+
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                     {
+                         id actualValue = value;
+                         XCTAssertEqual([actualValue count], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                     }
+
+                     [expectation fulfill];
+                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000007_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write entry invalid auth mode"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id aclArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+
+        temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+
+        aclArgument = temp_0;
+    }
+    [cluster writeAttributeAclWithValue:aclArgument
+                      completionHandler:^(NSError * _Nullable err) {
+                          NSLog(@"Write entry invalid auth mode Error: %@", err);
+
+                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
+                          [expectation fulfill];
+                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000008_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster
+        readAttributeAclWithParams:params
+                 completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                     NSLog(@"Verify Error: %@", err);
+
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                     {
+                         id actualValue = value;
+                         XCTAssertEqual([actualValue count], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                     }
+
+                     [expectation fulfill];
+                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000009_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write entry invalid subject"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id aclArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+
+        temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
+        {
+            NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+            temp_3[0] = [NSNumber numberWithUnsignedLongLong:0ULL];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
+        }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+
+        aclArgument = temp_0;
+    }
+    [cluster writeAttributeAclWithValue:aclArgument
+                      completionHandler:^(NSError * _Nullable err) {
+                          NSLog(@"Write entry invalid subject Error: %@", err);
+
+                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
+                          [expectation fulfill];
+                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000010_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster
+        readAttributeAclWithParams:params
+                 completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                     NSLog(@"Verify Error: %@", err);
+
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                     {
+                         id actualValue = value;
+                         XCTAssertEqual([actualValue count], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                     }
+
+                     [expectation fulfill];
+                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000011_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write entry invalid target"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id aclArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+
+        temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
+        {
+            NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+            temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[0]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[0]).deviceType = nil;
+
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
+        }
+
+        aclArgument = temp_0;
+    }
+    [cluster writeAttributeAclWithValue:aclArgument
+                      completionHandler:^(NSError * _Nullable err) {
+                          NSLog(@"Write entry invalid target Error: %@", err);
+
+                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
+                          [expectation fulfill];
+                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000012_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster
+        readAttributeAclWithParams:params
+                 completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                     NSLog(@"Verify Error: %@", err);
+
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                     {
+                         id actualValue = value;
+                         XCTAssertEqual([actualValue count], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                     }
+
+                     [expectation fulfill];
+                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000013_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write entry too many subjects"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id aclArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+
+        temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
+        {
+            NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+            temp_3[0] = [NSNumber numberWithUnsignedLongLong:1ULL];
+            temp_3[1] = [NSNumber numberWithUnsignedLongLong:2ULL];
+            temp_3[2] = [NSNumber numberWithUnsignedLongLong:3ULL];
+            temp_3[3] = [NSNumber numberWithUnsignedLongLong:4ULL];
+            temp_3[4] = [NSNumber numberWithUnsignedLongLong:5ULL];
+            temp_3[5] = [NSNumber numberWithUnsignedLongLong:6ULL];
+            temp_3[6] = [NSNumber numberWithUnsignedLongLong:7ULL];
+            temp_3[7] = [NSNumber numberWithUnsignedLongLong:8ULL];
+            temp_3[8] = [NSNumber numberWithUnsignedLongLong:9ULL];
+            temp_3[9] = [NSNumber numberWithUnsignedLongLong:10ULL];
+            temp_3[10] = [NSNumber numberWithUnsignedLongLong:11ULL];
+            temp_3[11] = [NSNumber numberWithUnsignedLongLong:12ULL];
+            temp_3[12] = [NSNumber numberWithUnsignedLongLong:13ULL];
+            temp_3[13] = [NSNumber numberWithUnsignedLongLong:14ULL];
+            temp_3[14] = [NSNumber numberWithUnsignedLongLong:15ULL];
+            temp_3[15] = [NSNumber numberWithUnsignedLongLong:16ULL];
+            temp_3[16] = [NSNumber numberWithUnsignedLongLong:17ULL];
+            temp_3[17] = [NSNumber numberWithUnsignedLongLong:18ULL];
+            temp_3[18] = [NSNumber numberWithUnsignedLongLong:19ULL];
+            temp_3[19] = [NSNumber numberWithUnsignedLongLong:20ULL];
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
+        }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+
+        aclArgument = temp_0;
+    }
+    [cluster writeAttributeAclWithValue:aclArgument
+                      completionHandler:^(NSError * _Nullable err) {
+                          NSLog(@"Write entry too many subjects Error: %@", err);
+
+                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
+                          [expectation fulfill];
+                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000014_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster
+        readAttributeAclWithParams:params
+                 completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                     NSLog(@"Verify Error: %@", err);
+
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                     {
+                         id actualValue = value;
+                         XCTAssertEqual([actualValue count], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                     }
+
+                     [expectation fulfill];
+                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000015_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write entry too many targets"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id aclArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+
+        temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
+        {
+            NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
+            temp_3[0] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[0]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[0]).endpoint = [NSNumber numberWithUnsignedShort:1U];
+            ((CHIPAccessControlClusterTarget *) temp_3[0]).deviceType = nil;
+
+            temp_3[1] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[1]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[1]).endpoint = [NSNumber numberWithUnsignedShort:2U];
+            ((CHIPAccessControlClusterTarget *) temp_3[1]).deviceType = nil;
+
+            temp_3[2] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[2]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[2]).endpoint = [NSNumber numberWithUnsignedShort:3U];
+            ((CHIPAccessControlClusterTarget *) temp_3[2]).deviceType = nil;
+
+            temp_3[3] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[3]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[3]).endpoint = [NSNumber numberWithUnsignedShort:4U];
+            ((CHIPAccessControlClusterTarget *) temp_3[3]).deviceType = nil;
+
+            temp_3[4] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[4]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[4]).endpoint = [NSNumber numberWithUnsignedShort:5U];
+            ((CHIPAccessControlClusterTarget *) temp_3[4]).deviceType = nil;
+
+            temp_3[5] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[5]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[5]).endpoint = [NSNumber numberWithUnsignedShort:6U];
+            ((CHIPAccessControlClusterTarget *) temp_3[5]).deviceType = nil;
+
+            temp_3[6] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[6]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[6]).endpoint = [NSNumber numberWithUnsignedShort:7U];
+            ((CHIPAccessControlClusterTarget *) temp_3[6]).deviceType = nil;
+
+            temp_3[7] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[7]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[7]).endpoint = [NSNumber numberWithUnsignedShort:8U];
+            ((CHIPAccessControlClusterTarget *) temp_3[7]).deviceType = nil;
+
+            temp_3[8] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[8]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[8]).endpoint = [NSNumber numberWithUnsignedShort:9U];
+            ((CHIPAccessControlClusterTarget *) temp_3[8]).deviceType = nil;
+
+            temp_3[9] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[9]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[9]).endpoint = [NSNumber numberWithUnsignedShort:10U];
+            ((CHIPAccessControlClusterTarget *) temp_3[9]).deviceType = nil;
+
+            temp_3[10] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[10]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[10]).endpoint = [NSNumber numberWithUnsignedShort:11U];
+            ((CHIPAccessControlClusterTarget *) temp_3[10]).deviceType = nil;
+
+            temp_3[11] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[11]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[11]).endpoint = [NSNumber numberWithUnsignedShort:12U];
+            ((CHIPAccessControlClusterTarget *) temp_3[11]).deviceType = nil;
+
+            temp_3[12] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[12]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[12]).endpoint = [NSNumber numberWithUnsignedShort:13U];
+            ((CHIPAccessControlClusterTarget *) temp_3[12]).deviceType = nil;
+
+            temp_3[13] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[13]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[13]).endpoint = [NSNumber numberWithUnsignedShort:14U];
+            ((CHIPAccessControlClusterTarget *) temp_3[13]).deviceType = nil;
+
+            temp_3[14] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[14]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[14]).endpoint = [NSNumber numberWithUnsignedShort:15U];
+            ((CHIPAccessControlClusterTarget *) temp_3[14]).deviceType = nil;
+
+            temp_3[15] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[15]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[15]).endpoint = [NSNumber numberWithUnsignedShort:16U];
+            ((CHIPAccessControlClusterTarget *) temp_3[15]).deviceType = nil;
+
+            temp_3[16] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[16]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[16]).endpoint = [NSNumber numberWithUnsignedShort:17U];
+            ((CHIPAccessControlClusterTarget *) temp_3[16]).deviceType = nil;
+
+            temp_3[17] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[17]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[17]).endpoint = [NSNumber numberWithUnsignedShort:18U];
+            ((CHIPAccessControlClusterTarget *) temp_3[17]).deviceType = nil;
+
+            temp_3[18] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[18]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[18]).endpoint = [NSNumber numberWithUnsignedShort:19U];
+            ((CHIPAccessControlClusterTarget *) temp_3[18]).deviceType = nil;
+
+            temp_3[19] = [[CHIPAccessControlClusterTarget alloc] init];
+            ((CHIPAccessControlClusterTarget *) temp_3[19]).cluster = nil;
+            ((CHIPAccessControlClusterTarget *) temp_3[19]).endpoint = [NSNumber numberWithUnsignedShort:20U];
+            ((CHIPAccessControlClusterTarget *) temp_3[19]).deviceType = nil;
+
+            ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
+        }
+
+        aclArgument = temp_0;
+    }
+    [cluster writeAttributeAclWithValue:aclArgument
+                      completionHandler:^(NSError * _Nullable err) {
+                          NSLog(@"Write entry too many targets Error: %@", err);
+
+                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 1);
+                          [expectation fulfill];
+                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000016_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAccessControl * cluster = [[CHIPTestAccessControl alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster
+        readAttributeAclWithParams:params
+                 completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                     NSLog(@"Verify Error: %@", err);
+
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                     {
+                         id actualValue = value;
+                         XCTAssertEqual([actualValue count], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
+                         XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                     }
+
+                     [expectation fulfill];
+                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestAccessControlCluster_000017_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Restore ACL"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -839,7 +1303,7 @@ CHIPDevice * GetConnectedDevice(void)
     }
     [cluster writeAttributeAclWithValue:aclArgument
                       completionHandler:^(NSError * _Nullable err) {
-                          NSLog(@"Write one entry Error: %@", err);
+                          NSLog(@"Restore ACL Error: %@", err);
 
                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -848,9 +1312,9 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestAccessControlCluster_000006_ReadAttribute
+- (void)testSendClusterTestAccessControlCluster_000018_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read one entry"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -862,7 +1326,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster
         readAttributeAclWithParams:params
                  completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                     NSLog(@"Read one entry Error: %@", err);
+                     NSLog(@"Verify Error: %@", err);
 
                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -16095,7 +16559,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+            XCTAssertEqual([actualValue unsignedIntValue], 1UL);
         }
 
         [expectation fulfill];
@@ -16160,7 +16624,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], 0UL);
+            XCTAssertEqual([actualValue unsignedIntValue], 1UL);
         }
 
         [expectation fulfill];
@@ -26961,6 +27425,446 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_WNCV_4_1_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000001_DownOrClose
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"1a: TH sends DownOrClose command to preposition the DUT in the opposite direction"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
+        NSLog(@"1a: TH sends DownOrClose command to preposition the DUT in the opposite direction Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000002_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"1b: TH waits for x seconds movement(s) on the DUT"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertNotEqual([actualValue unsignedShortValue], 0U);
+                }
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000004_GoToLiftPercentage
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2a: TH sends GoToLiftPercentage command with 25 percent to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPWindowCoveringClusterGoToLiftPercentageParams alloc] init];
+    params.liftPercentageValue = [NSNumber numberWithUnsignedChar:25];
+    params.liftPercent100thsValue = [NSNumber numberWithUnsignedShort:2500U];
+    [cluster goToLiftPercentageWithParams:params
+                        completionHandler:^(NSError * _Nullable err) {
+                            NSLog(@"2a: TH sends GoToLiftPercentage command with 25 percent to DUT Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000005_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"2b: DUT updates its attributes"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 100);
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000006_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                XCTAssertFalse(actualValue == nil);
+                XCTAssertEqual([actualValue unsignedShortValue], 2500U);
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000007_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3a: TH set a timeout of X minutes for failure"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000008_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: TH reads OperationalStatus attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"3b: TH reads OperationalStatus attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000009_GoToLiftPercentage
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"4a: TH sends GoToLiftPercentage command with 75.20 percent to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPWindowCoveringClusterGoToLiftPercentageParams alloc] init];
+    params.liftPercentageValue = [NSNumber numberWithUnsignedChar:75];
+    params.liftPercent100thsValue = [NSNumber numberWithUnsignedShort:7520U];
+    [cluster goToLiftPercentageWithParams:params
+                        completionHandler:^(NSError * _Nullable err) {
+                            NSLog(@"4a: TH sends GoToLiftPercentage command with 75.20 percent to DUT Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000010_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"4b: DUT updates its attributes"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 100);
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000011_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"5a: TH waits for x seconds movement(s) on the DUT"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_1_000012_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"5b: TH reads OperationalStatus attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"5b: TH reads OperationalStatus attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_WNCV_4_2_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000001_DownOrClose
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"1a: TH sends DownOrClose command to preposition the DUT in the opposite direction"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
+        NSLog(@"1a: TH sends DownOrClose command to preposition the DUT in the opposite direction Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000002_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"1b: TH waits for x seconds movement(s) on the DUT"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000003_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"1c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"1c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                if (actualValue != nil) {
+                    XCTAssertNotEqual([actualValue unsignedShortValue], 0U);
+                }
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000004_GoToTiltPercentage
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2a: TH sends GoToTiltPercentage command with 30 percent to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPWindowCoveringClusterGoToTiltPercentageParams alloc] init];
+    params.tiltPercentageValue = [NSNumber numberWithUnsignedChar:30];
+    params.tiltPercent100thsValue = [NSNumber numberWithUnsignedShort:3000U];
+    [cluster goToTiltPercentageWithParams:params
+                        completionHandler:^(NSError * _Nullable err) {
+                            NSLog(@"2a: TH sends GoToTiltPercentage command with 30 percent to DUT Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000005_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"2b: DUT updates its attributes"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 100);
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000006_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"2c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster
+        readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"2c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+            {
+                id actualValue = value;
+                XCTAssertFalse(actualValue == nil);
+                XCTAssertEqual([actualValue unsignedShortValue], 3000U);
+            }
+
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000007_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3a: TH set a timeout of X minutes for failure"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000008_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3b: TH reads OperationalStatus attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"3b: TH reads OperationalStatus attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000009_GoToTiltPercentage
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPWindowCoveringClusterGoToTiltPercentageParams alloc] init];
+    params.tiltPercentageValue = [NSNumber numberWithUnsignedChar:60];
+    params.tiltPercent100thsValue = [NSNumber numberWithUnsignedShort:6005U];
+    [cluster goToTiltPercentageWithParams:params
+                        completionHandler:^(NSError * _Nullable err) {
+                            NSLog(@"4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000010_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"4b: DUT updates its attributes"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 100);
+    [self waitForExpectationsWithTimeout:(100 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000011_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"5a: TH waits for x seconds movement(s) on the DUT"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 6000);
+    [self waitForExpectationsWithTimeout:(6000 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_4_2_000012_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"5b: TH reads OperationalStatus attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"5b: TH reads OperationalStatus attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTest_TC_WNCV_4_3_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
@@ -36768,8 +37672,11 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     uint16_t minIntervalArgument = 2U;
     uint16_t maxIntervalArgument = 5U;
+    CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
     [cluster subscribeAttributeListInt8uWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
+        params:params
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTestCluster_000366_WaitForReport_Fulfilled, true);
             [expectation fulfill];
@@ -43378,7 +44285,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
                             {
                                 id actualValue = values.capacity;
-                                XCTAssertEqual([actualValue unsignedCharValue], 255);
+                                XCTAssertTrue(actualValue == nil);
                             }
                             {
                                 id actualValue = values.groupList;
@@ -43612,7 +44519,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
                             {
                                 id actualValue = values.capacity;
-                                XCTAssertEqual([actualValue unsignedCharValue], 255);
+                                XCTAssertTrue(actualValue == nil);
                             }
                             {
                                 id actualValue = values.groupList;
@@ -43765,7 +44672,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
                             {
                                 id actualValue = values.capacity;
-                                XCTAssertEqual([actualValue unsignedCharValue], 255);
+                                XCTAssertTrue(actualValue == nil);
                             }
                             {
                                 id actualValue = values.groupList;
@@ -45205,8 +46112,11 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
 
     uint16_t minIntervalArgument = 2U;
     uint16_t maxIntervalArgument = 5U;
+    CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
     [cluster subscribeAttributeOnOffWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
+        params:params
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled, true);
             [expectation fulfill];

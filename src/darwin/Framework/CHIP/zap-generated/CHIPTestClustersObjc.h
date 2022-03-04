@@ -491,6 +491,22 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Fan Control
+ *
+ */
+@interface CHIPTestFanControl : CHIPFanControl
+
+- (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
  * Cluster Fixed Label
  *
  */

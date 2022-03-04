@@ -17,14 +17,14 @@
  */
 
 /* This file contains the declaration for the OTA Requestor interface.
- * Any implementation of the OTA Requestor (e.g. the OTARequestor class) must implement
- * this interface.
+ * Any implementation of the OTA Requestor must implement this interface.
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/util/af-enums.h>
+#include <lib/core/ClusterEnums.h>
 
 #pragma once
 
@@ -140,15 +140,18 @@ private:
 };
 
 // Interface class to connect the OTA Software Update Requestor cluster command processing
-// with the core OTA Requestor logic. The OTARequestor class implements this interface
+// with the core OTA Requestor logic
 class OTARequestorInterface
 {
 public:
+    using OTAUpdateStateEnum = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+
     // Return value for various trigger-type APIs
     enum OTATriggerResult
     {
         kTriggerSuccessful = 0,
-        kNoProviderKnown   = 1
+        kNoProviderKnown   = 1,
+        kWrongState        = 2
     };
 
     // Handler for the AnnounceOTAProvider command
@@ -156,33 +159,33 @@ public:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
 
-    // TBD: This probably doesn't need to be a method OTARequestorInterface as the response handler is
-    // explicitly supplied at command invocation
-    // Handler for the QueryImageResponse command
-    // virtual bool
-    // HandleQueryImageResponse(chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType) = 0;
-
     // Destructor
     virtual ~OTARequestorInterface() = default;
 
-    // Send QueryImage command
+    // Application API to send the QueryImage command and start the image update process with the next available Provider
     virtual OTATriggerResult TriggerImmediateQuery() = 0;
+
+    // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process
+    // with the Provider currently set in the OTARequestor
+    virtual void TriggerImmediateQueryInternal() = 0;
 
     // Download image
     virtual void DownloadUpdate() = 0;
 
-    // Send ApplyImage command
+    // Initiate the session to send ApplyUpdateRequest command
     virtual void ApplyUpdate() = 0;
 
-    // Send NotifyUpdateApplied command
+    // Initiate the session to send NotifyUpdateApplied command
     virtual void NotifyUpdateApplied(uint32_t version) = 0;
 
     // Get image update progress in percents unit
     virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
 
-    // Get requestor state
-    virtual CHIP_ERROR GetState(EndpointId endpointId,
-                                chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
+    // Get the value of the UpdateState attribute of the OTA Software Update Requestor Cluster on the given endpoint
+    virtual CHIP_ERROR GetState(EndpointId endpointId, OTAUpdateStateEnum & state) = 0;
+
+    // Get the current state of the OTA update
+    virtual OTAUpdateStateEnum GetCurrentUpdateState() = 0;
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
@@ -190,6 +193,14 @@ public:
 
     // Clear all entries with the specified fabric index in the default OTA provider list
     virtual CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) = 0;
+
+    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+
+    // Set the provider location to be used in the next query and OTA update process
+    virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
+
+    // Clear the provider location to indicate that no OTA update may be in progress
+    virtual void ClearCurrentProviderLocation() = 0;
 
     // Add a default OTA provider to the cached list
     virtual CHIP_ERROR

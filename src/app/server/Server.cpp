@@ -139,6 +139,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mFabrics.Init(&mDeviceStorage);
     SuccessOrExit(err);
 
+    app::DnssdServer::Instance().SetFabricTable(&mFabrics);
+
     // Group data provider must be initialized after mDeviceStorage
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
@@ -233,22 +235,20 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     app::DnssdServer::Instance().SetSecuredPort(mSecuredServicePort);
     app::DnssdServer::Instance().SetUnsecuredPort(mUnsecuredServicePort);
     app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     // TODO @bzbarsky-apple @cecille Move to examples
     // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED &&                        \
+#if !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED &&                                                           \
     (!CHIP_DEVICE_LAYER_TARGET_AMEBA || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
     // StartServer only enables commissioning mode if device has not been commissioned
     app::DnssdServer::Instance().StartServer();
 #endif
 
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
-                                                    &mSessions, &mFabrics, &mSessionIDAllocator);
+                                                    &mSessions, &mFabrics);
     SuccessOrExit(err);
 
     err = mCASESessionManager.Init();
@@ -344,6 +344,7 @@ void Server::Shutdown()
     mSessions.Shutdown();
     mTransports.Close();
     mCommissioningWindowManager.Shutdown();
+    mCASESessionManager.Shutdown();
     chip::Platform::MemoryShutdown();
 }
 

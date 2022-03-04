@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -199,7 +199,7 @@ bool OpenFile(const char * fileName, FILE *& file, bool toWrite)
         file = fopen(fileName, toWrite ? "w+" : "r");
         if (file == nullptr)
         {
-            fprintf(stderr, "Unable to open %s: %s\n", fileName, strerror(ferror(file) ? errno : ENOSPC));
+            fprintf(stderr, "Unable to open %s: %s\n", fileName, strerror(errno));
             ExitNow(res = false);
         }
     }

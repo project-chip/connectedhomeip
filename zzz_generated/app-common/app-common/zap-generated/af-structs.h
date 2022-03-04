@@ -421,9 +421,9 @@ typedef struct _PowerProfileRecord
 // Struct for ProviderLocation
 typedef struct _ProviderLocation
 {
-    chip::FabricIndex FabricIndex;
     chip::NodeId ProviderNodeID;
     chip::EndpointId Endpoint;
+    chip::FabricIndex FabricIndex;
 } ProviderLocation;
 
 // Struct for ReadAttributeStatusRecord

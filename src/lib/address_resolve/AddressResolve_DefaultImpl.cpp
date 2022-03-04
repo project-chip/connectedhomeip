@@ -50,7 +50,7 @@ constexpr unsigned ScoreValue(IpScore score)
 }
 
 /**
- * Gives a score for an IP address, generally relating on "how good" the address
+ * Gives a score for an IP address, generally related to "how good" the address
  * is and how likely it is for it to be reachable.
  */
 IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
@@ -103,16 +103,33 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
 {
+#if CHIP_PROGRESS_LOGGING
+    char addr_string[Transport::PeerAddress::kMaxToStringSize];
+    result.address.ToString(addr_string);
+#endif
+
     unsigned newScore = ScoreValue(ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface()));
     if (newScore > mBestAddressScore)
     {
         mBestResult       = result;
         mBestAddressScore = newScore;
 
+        if (!mBestResult.address.GetIPAddress().IsIPv6LinkLocal())
+        {
+            // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
+            // For all other addresses, we should rely on the device's routing table to route messages sent.
+            // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
+            // mDNS advertisements are not usually received on the same interface the peer is reachable on.
+            mBestResult.address.SetInterface(Inet::InterfaceId::Null());
+            ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
+        }
+
 #if CHIP_PROGRESS_LOGGING
-        char addr_string[Transport::PeerAddress::kMaxToStringSize];
-        mBestResult.address.ToString(addr_string);
-        ChipLogProgress(Discovery, "Address %s is scored at %u", addr_string, mBestAddressScore);
+        ChipLogProgress(Discovery, "%s: new best score: %u", addr_string, mBestAddressScore);
+    }
+    else
+    {
+        ChipLogProgress(Discovery, "%s: score has not improved: %u", addr_string, newScore);
 #endif
     }
 }
@@ -149,7 +166,7 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
         return NodeLookupAction::kKeepSearching;
     }
 
-    // Minimal time to search reached. If any Ip available, ready to return it.
+    // Minimal time to search reached. If any IP available, ready to return it.
     if (mBestAddressScore > ScoreValue(IpScore::kInvalid))
     {
         GetListener()->OnNodeAddressResolved(GetRequest().GetPeerId(), mBestResult);
@@ -245,7 +262,7 @@ void Resolver::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERR
         }
 
         current->GetListener()->OnNodeAddressResolutionFailed(peerId, error);
-        mActiveLookups.Erase(it);
+        mActiveLookups.Erase(current);
     }
     ReArmTimer();
 }
@@ -279,7 +296,7 @@ void Resolver::ReArmTimer()
     {
         ChipLogError(Discovery, "Timer schedule error %s assumed permanent", err.AsString());
 
-        // Clear out all active lookups: without timers there is no guaranetee of success
+        // Clear out all active lookups: without timers there is no guarantee of success
         auto it = mActiveLookups.begin();
         while (it != mActiveLookups.end())
         {

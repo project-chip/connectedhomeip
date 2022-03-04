@@ -3307,7 +3307,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ChangeChannelResponseCallback {
-      void onSuccess(ChipStructs.ChannelClusterChannelInfo channelMatch, Integer status);
+      void onSuccess(Integer status, Optional<String> data);
 
       void onError(Exception error);
     }
@@ -7447,6 +7447,189 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
+  public static class FanControlCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 514L;
+
+    public FanControlCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface ServerGeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface ClientGeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public void readFanModeAttribute(IntegerAttributeCallback callback) {
+      readFanModeAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeFanModeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeFanModeAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeFanModeAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeFanModeAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeFanModeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFanModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFanModeSequenceAttribute(IntegerAttributeCallback callback) {
+      readFanModeSequenceAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeFanModeSequenceAttribute(DefaultClusterCallback callback, Integer value) {
+      writeFanModeSequenceAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeFanModeSequenceAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeFanModeSequenceAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeFanModeSequenceAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFanModeSequenceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readServerGeneratedCommandListAttribute(
+        ServerGeneratedCommandListAttributeCallback callback) {
+      readServerGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeServerGeneratedCommandListAttribute(
+        ServerGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeServerGeneratedCommandListAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClientGeneratedCommandListAttribute(
+        ClientGeneratedCommandListAttributeCallback callback) {
+      readClientGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClientGeneratedCommandListAttribute(
+        ClientGeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClientGeneratedCommandListAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readFanModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeFanModeAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeFanModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readFanModeSequenceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeFanModeSequenceAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeFanModeSequenceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readServerGeneratedCommandListAttribute(
+        long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeServerGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        ServerGeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readClientGeneratedCommandListAttribute(
+        long chipClusterPtr, ClientGeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeClientGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        ClientGeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
   public static class FixedLabelCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 64L;
 
@@ -8724,7 +8907,7 @@ public class ChipClusters {
     }
 
     public interface GetGroupMembershipResponseCallback {
-      void onSuccess(Integer capacity, ArrayList<Integer> groupList);
+      void onSuccess(@Nullable Integer capacity, ArrayList<Integer> groupList);
 
       void onError(Exception error);
     }
@@ -10761,7 +10944,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface PlaybackResponseCallback {
-      void onSuccess(Integer status);
+      void onSuccess(Integer status, Optional<String> data);
 
       void onError(Exception error);
     }

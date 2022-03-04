@@ -320,6 +320,8 @@ shutdown:
 
     lSuccessful = Common::WasSuccessful(sTestState.mStatus);
 
+    ShutdownTestInetCommon();
+
 exit:
     return (lSuccessful ? EXIT_SUCCESS : EXIT_FAILURE);
 }

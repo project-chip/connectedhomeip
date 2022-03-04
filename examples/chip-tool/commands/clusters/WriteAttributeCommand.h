@@ -55,9 +55,14 @@ public:
 
     ~WriteAttribute() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, mAttributeValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), mClusterId, mAttributeId, mAttributeValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, mClusterId, mAttributeId, mAttributeValue);
     }
 
     /////////// WriteClient Callback Interface /////////
@@ -103,6 +108,31 @@ public:
         ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, mDataVersion));
 
         return mWriteClient->SendWriteRequest(device->GetSecureSession().Value());
+    }
+
+    template <class T>
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId,
+                                chip::ClusterId clusterId, chip::AttributeId attributeId, const T & value)
+    {
+
+        chip::app::AttributePathParams attributePathParams;
+        attributePathParams.mClusterId   = clusterId;
+        attributePathParams.mAttributeId = attributeId;
+
+        chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
+
+        ChipLogDetail(chipTool, "Sending Write Attribute to Group %u, on Fabric %x, for cluster %u with attributeId %u", groupId,
+                      fabricIndex, clusterId, attributeId);
+
+        auto writeClient = chip::Platform::MakeUnique<chip::app::WriteClient>(exchangeManager, this, mTimedInteractionTimeoutMs);
+        VerifyOrReturnError(writeClient != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(writeClient->EncodeAttribute(attributePathParams, value, mDataVersion));
+
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex, senderNodeId);
+        ReturnErrorOnFailure(writeClient->SendWriteRequest(chip::SessionHandle(session)));
+        writeClient.release();
+
+        return CHIP_NO_ERROR;
     }
 
 private:

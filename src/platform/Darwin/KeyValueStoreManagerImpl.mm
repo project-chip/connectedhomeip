@@ -152,9 +152,11 @@ namespace DeviceLayer {
             ReturnErrorCodeIf(fileName[0] == '\0', CHIP_ERROR_INVALID_ARGUMENT);
 
             NSURL * url = nullptr;
+            NSString * filepath = [NSString stringWithUTF8String:fileName];
+            ReturnErrorCodeIf(filepath == nil, CHIP_ERROR_INVALID_ARGUMENT);
 
             // relative paths are relative to Documents folder
-            if (fileName[0] != '/') {
+            if (![filepath hasPrefix:@"/"]) {
                 NSURL * documentsDirectory = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory
                                                                                   inDomain:NSUserDomainMask
                                                                          appropriateForURL:nil
@@ -167,9 +169,9 @@ namespace DeviceLayer {
                 ChipLogProgress(
                     DeviceLayer, "Found user documents directory: %s", [[documentsDirectory absoluteString] UTF8String]);
 
-                url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName] relativeToURL:documentsDirectory];
+                url = [NSURL URLWithString:filepath relativeToURL:documentsDirectory];
             } else {
-                url = [NSURL fileURLWithPath:[NSString stringWithUTF8String:fileName]];
+                url = [NSURL fileURLWithPath:filepath];
             }
             ReturnErrorCodeIf(url == nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -274,9 +276,12 @@ namespace DeviceLayer {
 
             NSData * data = [[NSData alloc] initWithBytes:value length:value_size];
 
-            KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil);
+            NSString * itemKey = [[NSString alloc] initWithUTF8String:key];
+            ReturnErrorCodeIf(itemKey == nil, CHIP_ERROR_INVALID_ARGUMENT);
+
+            KeyValueItem * item = FindItemForKey(itemKey, nil);
             if (!item) {
-                item = [[KeyValueItem alloc] initWithContext:gContext key:[[NSString alloc] initWithUTF8String:key] value:data];
+                item = [[KeyValueItem alloc] initWithContext:gContext key:itemKey value:data];
                 [gContext performBlockAndWait:^{
                     [gContext insertObject:item];
                 }];

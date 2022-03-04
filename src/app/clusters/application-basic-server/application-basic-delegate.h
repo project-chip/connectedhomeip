@@ -84,6 +84,7 @@ public:
     bool Matches(ApplicationBasicApplication match);
 
     inline CatalogVendorApp * GetCatalogVendorApp() { return &mCatalogVendorApp; }
+    virtual std::list<uint16_t> GetAllowedVendorList() = 0;
 
     virtual ~Delegate() = default;
 

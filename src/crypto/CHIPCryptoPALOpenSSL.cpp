@@ -1204,6 +1204,11 @@ exit:
         X509_REQ_free(x509_req);
     }
 
+    if (ec_key != nullptr)
+    {
+        EC_KEY_free(ec_key);
+    }
+
     _logSSLError();
     return error;
 }

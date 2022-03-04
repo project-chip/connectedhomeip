@@ -596,8 +596,8 @@ client cluster Channel = 1284 {
   }
 
   response struct ChangeChannelResponse {
-    ChannelInfo channelMatch = 0;
-    StatusEnum status = 1;
+    StatusEnum status = 0;
+    optional CHAR_STRING data = 1;
   }
 
   command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
@@ -1646,6 +1646,16 @@ client cluster EthernetNetworkDiagnostics = 55 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+client cluster FanControl = 514 {
+  attribute enum8 fanMode = 0;
+  attribute enum8 fanModeSequence = 1;
+  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
+  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 client cluster FixedLabel = 64 {
   readonly attribute LabelStruct labelList[] = 0;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
@@ -1822,8 +1832,8 @@ client cluster GeneralDiagnostics = 51 {
 
 client cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicy : ENUM8 {
-    kStandard = 0;
-    kLowLatency = 1;
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
   }
 
   struct GroupKeyMapStruct {
@@ -1897,45 +1907,45 @@ client cluster Groups = 4 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct GetGroupMembershipRequest {
-    INT16U groupList[] = 0;
+    group_id groupList[] = 0;
   }
 
   request struct RemoveGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   request struct ViewGroupRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   response struct AddGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct GetGroupMembershipResponse {
-    INT8U capacity = 0;
-    INT16U groupList[] = 1;
+    nullable INT8U capacity = 0;
+    group_id groupList[] = 1;
   }
 
   response struct RemoveGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct ViewGroupResponse {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     CHAR_STRING groupName = 2;
   }
 
@@ -2334,6 +2344,7 @@ client cluster MediaPlayback = 1286 {
 
   response struct PlaybackResponse {
     StatusEnum status = 0;
+    optional CHAR_STRING data = 1;
   }
 
   command FastForward(): PlaybackResponse = 7;
@@ -2594,9 +2605,9 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   struct ProviderLocation {
-    fabric_idx fabricIndex = 0;
     node_id providerNodeID = 1;
     endpoint_no endpoint = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   info event StateTransition = 0 {
@@ -2664,6 +2675,10 @@ client cluster OnOff = 6 {
 
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
+  }
+
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -2908,6 +2923,10 @@ client cluster PowerSourceConfiguration = 46 {
 }
 
 client cluster PressureMeasurement = 1027 {
+  bitmap PressureFeature : BITMAP32 {
+    kExt = 0x1;
+  }
+
   readonly attribute nullable int16s measuredValue = 0;
   readonly attribute nullable int16s minMeasuredValue = 1;
   readonly attribute nullable int16s maxMeasuredValue = 2;
@@ -4030,6 +4049,7 @@ endpoint 1 {
   binding cluster DoorLock;
   binding cluster ElectricalMeasurement;
   binding cluster EthernetNetworkDiagnostics;
+  binding cluster FanControl;
   binding cluster FixedLabel;
   binding cluster FlowMeasurement;
   binding cluster GeneralCommissioning;

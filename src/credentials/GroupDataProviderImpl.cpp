@@ -718,7 +718,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     bool first                     = true;
 
     uint16_t keyset_id                       = 0;
-    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kStandard;
+    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kCacheAndSync;
     uint8_t keys_count                       = 0;
     OperationalKey operational_keys[KeySet::kEpochKeysMax];
 
@@ -738,7 +738,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
 
     void Clear() override
     {
-        policy     = GroupDataProvider::SecurityPolicy::kStandard;
+        policy     = GroupDataProvider::SecurityPolicy::kCacheAndSync;
         keys_count = 0;
         memset(operational_keys, 0x00, sizeof(operational_keys));
         next = 0xffff;

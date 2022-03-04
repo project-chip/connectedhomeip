@@ -48,8 +48,6 @@ shared_library("ChipDeviceCtrl") {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
       "ChipDeviceController-ScriptBinding.cpp",
-      "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
-      "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
       "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
       "ChipDeviceController-ScriptDevicePairingDelegate.h",
       "ChipDeviceController-StorageDelegate.cpp",
@@ -213,6 +211,8 @@ pw_python_action("python") {
     cpu_tag = "x86_64"
   } else if (current_cpu == "arm64" && current_os == "linux") {
     cpu_tag = "aarch64"
+  } else if (current_cpu == "arm" && current_os == "linux") {
+    cpu_tag = "armv7l"
   } else {
     cpu_tag = current_cpu
   }

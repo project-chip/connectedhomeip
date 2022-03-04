@@ -117,6 +117,7 @@ BDX
 BDXDownloader
 BeagleBone
 befc
+betaprogram
 BinaryInputBasic
 bitbake
 bld
@@ -279,6 +280,7 @@ CQM
 crypto
 cryptographic
 CSA
+csrrequest
 csu
 csv
 ctl
@@ -294,6 +296,7 @@ CY
 CYW
 DAC
 DAP
+DAPLINK
 DataFrame
 DataModelRevision
 dataset
@@ -808,6 +811,7 @@ NitrogenDioxideConcentrationMeasurement
 nl
 NLUnitTest
 NLUnitTests
+noc
 NodeId
 nongnu
 nordicsemi
@@ -854,6 +858,7 @@ optionsOverride
 orgs
 OTA
 OTADownloader
+otaDownloadPath
 otaImageList
 OTAImageProcessorDriver
 OTAImageProcessorInterface
@@ -898,11 +903,13 @@ peerNodeId
 peerSessionId
 pem
 percentageLiftValue
+periodicQueryTimeout
 pexpect
 pickString
 PID
 Pigweed
 PinCode
+pinrequest
 pkgconfig
 plaintext
 PlatformManager
@@ -1056,6 +1063,7 @@ SetDns
 SetImageProcessorDelegate
 SetOtaRequestorDriver
 setpin
+setpoint
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
@@ -1170,6 +1178,7 @@ ThermostatUserInterfaceConfiguration
 ThIsIsNoTMyReAlGiThUbToKeNSoDoNoTtRy
 ThreadNetworkDiagnostics
 threadOperationalDataset
+threadnetworkdiagnostics
 ThreadStackManager
 ThreadStackManagerImpl
 ths
@@ -1210,6 +1219,7 @@ TurbidityConcentrationMeasurement
 TXD
 txt
 UART
+uargument
 udc
 udcport
 udhcpc
@@ -1233,7 +1243,9 @@ updateAvailable
 updateNotAvailable
 UpdateTokens
 upstreamed
+ureverse
 URI
+urlrequest
 usbmodem
 USBtoUART
 uscif

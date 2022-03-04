@@ -719,6 +719,8 @@ server cluster SoftwareDiagnostics = 52 {
   readonly attribute int64u currentHeapHighWatermark = 3;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
+
+  command ResetWatermarks(): DefaultSuccess = 0;
 }
 
 server cluster ThreadNetworkDiagnostics = 53 {
@@ -870,6 +872,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster TimeFormatLocalization = 44 {

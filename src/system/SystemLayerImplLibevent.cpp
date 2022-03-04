@@ -72,10 +72,10 @@ CHIP_ERROR LayerImplLibevent::Init(System::Layer & systemLayer)
     mEventBase   = event_base_new();
     VerifyOrReturnError(mEventBase != nullptr, CHIP_ERROR_NO_MEMORY);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !__ZEPHYR__
+#if !__ZEPHYR__
     mMdnsTimeoutEvent = evtimer_new(mEventBase, MdnsTimeoutCallbackHandler, this);
     VerifyOrReturnError(mMdnsTimeoutEvent != nullptr, CHIP_ERROR_NO_MEMORY);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !__ZEPHYR__
+#endif // !__ZEPHYR__
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = PTHREAD_NULL;
@@ -87,7 +87,7 @@ CHIP_ERROR LayerImplLibevent::Init(System::Layer & systemLayer)
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !__ZEPHYR__
+#if !__ZEPHYR__
 
 // static
 void LayerImplLibevent::MdnsTimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
@@ -107,7 +107,7 @@ void LayerImplLibevent::MdnsTimeoutCallbackHandler()
     mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !__ZEPHYR__
+#endif // !__ZEPHYR__
 
 CHIP_ERROR LayerImplLibevent::Shutdown()
 {
@@ -115,13 +115,13 @@ CHIP_ERROR LayerImplLibevent::Shutdown()
 
     event_base_loopbreak(mEventBase);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !__ZEPHYR__
+#if !__ZEPHYR__
     if (mMdnsTimeoutEvent != nullptr)
     {
         event_free(mMdnsTimeoutEvent);
         mMdnsTimeoutEvent = nullptr;
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !__ZEPHYR__
+#endif // !__ZEPHYR__
 
     mTimerListMutex.Lock();
     mTimers.clear();
@@ -386,14 +386,14 @@ LayerImplLibevent::SocketWatch::~SocketWatch()
 
 void LayerImplLibevent::PrepareEvents()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !__ZEPHYR__ && !__MBED__
+#if !__ZEPHYR__ && !__MBED__
     timeval mdnsTimeout = { 0, 0 };
     chip::Dnssd::GetMdnsTimeout(mdnsTimeout);
     if (mdnsTimeout.tv_sec || mdnsTimeout.tv_usec)
     {
         evtimer_add(mMdnsTimeoutEvent, &mdnsTimeout);
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !__ZEPHYR__
+#endif // !__ZEPHYR__ && !__MBED__
 }
 
 void LayerImplLibevent::WaitForEvents()
