@@ -203,7 +203,8 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
             }
         }
 
-        if (queryStatus == OTAQueryStatus::kUpdateAvailable && mUserConsentDelegate != nullptr)
+        // If requestor is capable of taking user consent then delegate obtaining user consent to the requestor
+        if (requestorCanConsent == false && queryStatus == OTAQueryStatus::kUpdateAvailable && mUserConsentDelegate != nullptr)
         {
             UserConsentState state = mUserConsentDelegate->GetUserConsentState(
                 GetUserConsentSubject(commandObj, commandPath, commandData, newSoftwareVersion));
@@ -279,7 +280,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     response.status = queryStatus;
     response.delayedActionTime.Emplace(delayedActionTimeSec);
-    if (mUserConsentNeeded && requestorCanConsent)
+    if (mUserConsentNeeded || requestorCanConsent)
     {
         response.userConsentNeeded.Emplace(true);
     }
