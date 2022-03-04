@@ -8910,17 +8910,17 @@ namespace Structs {
 namespace ProviderLocation {
 enum class Fields
 {
-    kFabricIndex    = 0,
     kProviderNodeID = 1,
     kEndpoint       = 2,
+    kFabricIndex    = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::NodeId providerNodeID   = static_cast<chip::NodeId>(0);
     chip::EndpointId endpoint     = static_cast<chip::EndpointId>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

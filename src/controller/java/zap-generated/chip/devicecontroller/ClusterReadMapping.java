@@ -3474,6 +3474,103 @@ public class ClusterReadMapping {
         readEthernetNetworkDiagnosticsClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put(
         "ethernetNetworkDiagnostics", readEthernetNetworkDiagnosticsInteractionInfo);
+    Map<String, InteractionInfo> readFanControlInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readFanControlFanModeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlFanModeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readFanModeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlFanModeCommandParams);
+    readFanControlInteractionInfo.put(
+        "readFanModeAttribute", readFanControlFanModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlFanModeSequenceCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlFanModeSequenceAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readFanModeSequenceAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlFanModeSequenceCommandParams);
+    readFanControlInteractionInfo.put(
+        "readFanModeSequenceAttribute", readFanControlFanModeSequenceAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlServerGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlServerGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readServerGeneratedCommandListAttribute(
+                      (ChipClusters.FanControlCluster.ServerGeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedFanControlClusterServerGeneratedCommandListAttributeCallback(),
+            readFanControlServerGeneratedCommandListCommandParams);
+    readFanControlInteractionInfo.put(
+        "readServerGeneratedCommandListAttribute",
+        readFanControlServerGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlClientGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlClientGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readClientGeneratedCommandListAttribute(
+                      (ChipClusters.FanControlCluster.ClientGeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedFanControlClusterClientGeneratedCommandListAttributeCallback(),
+            readFanControlClientGeneratedCommandListCommandParams);
+    readFanControlInteractionInfo.put(
+        "readClientGeneratedCommandListAttribute",
+        readFanControlClientGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.FanControlCluster.AttributeListAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedFanControlClusterAttributeListAttributeCallback(),
+            readFanControlAttributeListCommandParams);
+    readFanControlInteractionInfo.put(
+        "readAttributeListAttribute", readFanControlAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readFanControlFeatureMapCommandParams);
+    readFanControlInteractionInfo.put(
+        "readFeatureMapAttribute", readFanControlFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFanControlClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFanControlClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFanControlClusterRevisionCommandParams);
+    readFanControlInteractionInfo.put(
+        "readClusterRevisionAttribute", readFanControlClusterRevisionAttributeInteractionInfo);
+    readAttributeMap.put("fanControl", readFanControlInteractionInfo);
     Map<String, InteractionInfo> readFixedLabelInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readFixedLabelLabelListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

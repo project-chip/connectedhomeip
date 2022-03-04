@@ -7574,14 +7574,14 @@ class OtaSoftwareUpdateRequestor(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="providerNodeID", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="endpoint", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
-            fabricIndex: 'uint' = 0
             providerNodeID: 'uint' = 0
             endpoint: 'uint' = 0
+            fabricIndex: 'uint' = 0
 
 
 

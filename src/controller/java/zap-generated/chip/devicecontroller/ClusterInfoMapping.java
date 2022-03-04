@@ -2443,6 +2443,78 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedFanControlClusterServerGeneratedCommandListAttributeCallback
+      implements ChipClusters.FanControlCluster.ServerGeneratedCommandListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedFanControlClusterClientGeneratedCommandListAttributeCallback
+      implements ChipClusters.FanControlCluster.ClientGeneratedCommandListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedFanControlClusterAttributeListAttributeCallback
+      implements ChipClusters.FanControlCluster.AttributeListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedFixedLabelClusterLabelListAttributeCallback
       implements ChipClusters.FixedLabelCluster.LabelListAttributeCallback,
           DelegatedClusterCallback {
@@ -7178,6 +7250,11 @@ public class ClusterInfoMapping {
                 new ChipClusters.EthernetNetworkDiagnosticsCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("ethernetNetworkDiagnostics", ethernetNetworkDiagnosticsClusterInfo);
+    ClusterInfo fanControlClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.FanControlCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("fanControl", fanControlClusterInfo);
     ClusterInfo fixedLabelClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.FixedLabelCluster(ptr, endpointId),
@@ -7419,6 +7496,7 @@ public class ClusterInfoMapping {
     destination
         .get("ethernetNetworkDiagnostics")
         .combineCommands(source.get("ethernetNetworkDiagnostics"));
+    destination.get("fanControl").combineCommands(source.get("fanControl"));
     destination.get("fixedLabel").combineCommands(source.get("fixedLabel"));
     destination.get("flowMeasurement").combineCommands(source.get("flowMeasurement"));
     destination.get("generalCommissioning").combineCommands(source.get("generalCommissioning"));
@@ -9509,6 +9587,8 @@ public class ClusterInfoMapping {
         "resetCounts", ethernetNetworkDiagnosticsresetCountsInteractionInfo);
     commandMap.put(
         "ethernetNetworkDiagnostics", ethernetNetworkDiagnosticsClusterInteractionInfoMap);
+    Map<String, InteractionInfo> fanControlClusterInteractionInfoMap = new LinkedHashMap<>();
+    commandMap.put("fanControl", fanControlClusterInteractionInfoMap);
     Map<String, InteractionInfo> fixedLabelClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("fixedLabel", fixedLabelClusterInteractionInfoMap);
     Map<String, InteractionInfo> flowMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();

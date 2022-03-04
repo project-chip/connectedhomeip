@@ -1155,29 +1155,29 @@ public class ChipStructs {
   }
 
   public static class OtaSoftwareUpdateRequestorClusterProviderLocation {
-    public Integer fabricIndex;
     public Long providerNodeID;
     public Integer endpoint;
+    public Integer fabricIndex;
 
     public OtaSoftwareUpdateRequestorClusterProviderLocation(
-        Integer fabricIndex, Long providerNodeID, Integer endpoint) {
-      this.fabricIndex = fabricIndex;
+        Long providerNodeID, Integer endpoint, Integer fabricIndex) {
       this.providerNodeID = providerNodeID;
       this.endpoint = endpoint;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\tproviderNodeID: ");
       output.append(providerNodeID);
       output.append("\n");
       output.append("\tendpoint: ");
       output.append(endpoint);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();

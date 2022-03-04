@@ -54,17 +54,20 @@ public:
     // Initiate download of the new image
     void DownloadUpdate() override;
 
-    // Send ApplyImage
+    // Initiate the session to send ApplyUpdateRequest command
     void ApplyUpdate() override;
 
-    // Send NotifyUpdateApplied, update Basic cluster SoftwareVersion attribute, log the VersionApplied event
+    // Initiate the session to send NotifyUpdateApplied command
     void NotifyUpdateApplied(uint32_t version) override;
 
     // Get image update progress in percents unit
     CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
 
     // Get requestor state
-    CHIP_ERROR GetState(EndpointId endpointId, app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) override;
+    CHIP_ERROR GetState(EndpointId endpointId, OTAUpdateStateEnum & state) override;
+
+    // Get the current state of the OTA update
+    OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
@@ -116,12 +119,12 @@ public:
         percent.SetNull();
         OtaRequestorServerSetUpdateStateProgress(percent);
 
+        // This results in the initial periodic timer kicking off
+        RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+
         return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor,
                                                                     reinterpret_cast<intptr_t>(this));
     }
-
-    // Getter for the value of the UpdateState cached by the object
-    UpdateState GetCurrentUpdateState() override;
 
     /**
      * Called to set optional requestorCanConsent value provided by Requestor.
@@ -132,7 +135,6 @@ private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 
-    using OTAUpdateStateEnum  = app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
     using OTAChangeReasonEnum = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
 
     static constexpr size_t kMaxUpdateTokenLen = 32;
@@ -230,7 +232,7 @@ private:
     enum OnConnectedAction
     {
         kQueryImage = 0,
-        kStartBDX,
+        kDownload,
         kApplyUpdate,
         kNotifyUpdateApplied,
     };
@@ -300,7 +302,7 @@ private:
     uint32_t mTargetVersion  = 0;
     char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
     CharSpan mFileDesignator;
-    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
+    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
     chip::Optional<bool> mRequestorCanConsent;
     ProviderLocationList mDefaultOtaProviderList;

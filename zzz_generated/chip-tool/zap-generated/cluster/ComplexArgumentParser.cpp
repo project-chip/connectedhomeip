@@ -1512,31 +1512,31 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ProviderLocation.fabricIndex", "fabricIndex", value.isMember("fabricIndex")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ProviderLocation.providerNodeID", "providerNodeID",
                                                                   value.isMember("providerNodeID")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ProviderLocation.endpoint", "endpoint", value.isMember("endpoint")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ProviderLocation.fabricIndex", "fabricIndex", value.isMember("fabricIndex")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "providerNodeID");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.providerNodeID, value["providerNodeID"]));
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+
     return CHIP_NO_ERROR;
 }
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.fabricIndex);
     ComplexArgumentParser::Finalize(request.providerNodeID);
     ComplexArgumentParser::Finalize(request.endpoint);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & request,

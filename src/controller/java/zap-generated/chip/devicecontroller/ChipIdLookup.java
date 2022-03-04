@@ -88,6 +88,9 @@ public final class ChipIdLookup {
     if (clusterId == 55L) {
       return "EthernetNetworkDiagnostics";
     }
+    if (clusterId == 514L) {
+      return "FanControl";
+    }
     if (clusterId == 64L) {
       return "FixedLabel";
     }
@@ -1014,6 +1017,30 @@ public final class ChipIdLookup {
       }
       if (attributeId == 8L) {
         return "TimeSinceReset";
+      }
+      if (attributeId == 65528L) {
+        return "ServerGeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "ClientGeneratedCommandList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 514L) {
+      if (attributeId == 0L) {
+        return "FanMode";
+      }
+      if (attributeId == 1L) {
+        return "FanModeSequence";
       }
       if (attributeId == 65528L) {
         return "ServerGeneratedCommandList";

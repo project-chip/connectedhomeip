@@ -92,6 +92,8 @@ public:
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
+    PersistentStorageDelegate & GetPersistentStorage() { return mDeviceStorage; }
+
     /**
      * This function send the ShutDown event before stopping
      * the event loop.

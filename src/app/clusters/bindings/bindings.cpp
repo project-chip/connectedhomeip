@@ -101,6 +101,7 @@ void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
         CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.node.Value());
         if (err != CHIP_NO_ERROR)
         {
+            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
             ChipLogProgress(
                 Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                 ChipLogValueX64(entry.node.Value()), err.Format());
@@ -187,7 +188,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
                 {
                     BindingManager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
                 }
-                bindingTableIter = BindingTable::GetInstance().RemoveAt(bindingTableIter);
+                ReturnErrorOnFailure(BindingTable::GetInstance().RemoveAt(bindingTableIter));
             }
             else
             {

@@ -203,7 +203,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
-    controllerParams.deviceAddressUpdateDelegate    = params.deviceAddressUpdateDelegate;
     controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;
     controllerParams.operationalKeypair             = params.operationalKeypair;
     controllerParams.controllerNOC                  = params.controllerNOC;
