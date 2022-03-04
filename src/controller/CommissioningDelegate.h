@@ -266,6 +266,15 @@ struct AttestationResponse
     ByteSpan signature;
 };
 
+struct OpCertResponse
+{
+    OpCertResponse(ByteSpan newAttestationElements, ByteSpan newSignature) :
+        attestationElements(newAttestationElements), signature(newSignature)
+    {}
+    ByteSpan attestationElements;
+    ByteSpan signature;
+};
+
 struct NocChain
 {
     NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, AesCcm128KeySpan newIpk, NodeId newAdminSubject) :
@@ -324,8 +333,8 @@ class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, AdditionalErrorInfo>
+    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, OpCertResponse, NocChain,
+                                         OperationalNodeFoundData, ReadCommissioningInfo, AdditionalErrorInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
