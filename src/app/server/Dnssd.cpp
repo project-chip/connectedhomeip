@@ -252,9 +252,14 @@ CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t buff
 /// Set MDNS operational advertisement
 CHIP_ERROR DnssdServer::AdvertiseOperational()
 {
-    VerifyOrDie(mFabricTable != nullptr);
+    auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
-    for (const FabricInfo & fabricInfo : *mFabricTable)
+    // clear existing advertisements before advertising operational.
+    ChipLogDetail(Discovery, "Removing previous advertisements before opertional advertisement.");
+    mdnsAdvertiser.RemoveServices();
+
+    VerifyOrDie(mFabricTable != nullptr);
+    for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
     {
         if (fabricInfo.IsInitialized())
         {
@@ -274,8 +279,6 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                                  .SetMRPConfig(GetLocalMRPConfig())
                                                  .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
                                                  .EnableIpV4(true);
-
-            auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
             ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,
                             ChipLogValueX64(advertiseParameters.GetPeerId().GetCompressedFabricId()),
