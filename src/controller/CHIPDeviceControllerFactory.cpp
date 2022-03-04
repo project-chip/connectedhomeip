@@ -148,7 +148,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
-                                                      stateParams.messageCounterManager, params.fabricIndependentStorage));
+                                                      stateParams.messageCounterManager, params.fabricIndependentStorage,
+                                                      stateParams.fabricTable));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
