@@ -24,6 +24,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/util/af-enums.h>
+#include <lib/core/ClusterEnums.h>
 
 #pragma once
 
@@ -143,25 +144,14 @@ private:
 class OTARequestorInterface
 {
 public:
+    using OTAUpdateStateEnum = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+
     // Return value for various trigger-type APIs
     enum OTATriggerResult
     {
         kTriggerSuccessful = 0,
         kNoProviderKnown   = 1,
         kWrongState        = 2
-    };
-
-    enum UpdateState
-    {
-        kStateUnknown,
-        kStateIdle,
-        kStateQuerying,
-        kStateDelayedOnQuery,
-        kStateDownloading,
-        kStateApplying,
-        kStateDelayedOnApply,
-        kStateRollingBack,
-        kStateDelayedOnUserConsent,
     };
 
     // Handler for the AnnounceOTAProvider command
@@ -192,10 +182,10 @@ public:
     virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
 
     // Get the value of the UpdateState attribute of the OTA Software Update Requestor Cluster on the given endpoint
-    virtual CHIP_ERROR GetState(EndpointId endpointId,
-                                chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
-    // Getter for the value of the UpdateState cached by the object
-    virtual UpdateState GetCurrentUpdateState() = 0;
+    virtual CHIP_ERROR GetState(EndpointId endpointId, OTAUpdateStateEnum & state) = 0;
+
+    // Get the current state of the OTA update
+    virtual OTAUpdateStateEnum GetCurrentUpdateState() = 0;
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
