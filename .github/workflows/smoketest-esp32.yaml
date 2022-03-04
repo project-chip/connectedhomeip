@@ -68,6 +68,16 @@ jobs:
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
+            - name: Build all-clusters on DevKitC
+              timeout-minutes: 30
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --enable-flashbundle \
+                        --target 'esp32-devkitc-all-clusters' \
+                        build \
+                        --copy-artifacts-to out/artifacts \
+                     "
             - name: Prepare bloat report
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \

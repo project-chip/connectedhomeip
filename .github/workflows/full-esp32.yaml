@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+ Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ on:
 concurrency:
     group: full-${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
-  
+
 jobs:
     esp32:
         name: Run
-        timeout-minutes: 200 
+        timeout-minutes: 200
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
