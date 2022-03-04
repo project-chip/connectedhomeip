@@ -158,7 +158,7 @@ void CommissioningWindowManager::OnSessionEstablished()
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 
-    StopAdvertisement(/* aShuttingDown = */ true);
+    StopAdvertisement(/* aShuttingDown = */ false);
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
 }
 
