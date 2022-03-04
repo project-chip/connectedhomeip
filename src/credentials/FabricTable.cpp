@@ -51,11 +51,8 @@ CHIP_ERROR FabricInfo::CommitToStorage(FabricStorage * storage)
     StorableFabricInfo * info = chip::Platform::New<StorableFabricInfo>();
     ReturnErrorCodeIf(info == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    info->mNodeId   = Encoding::LittleEndian::HostSwap64(mOperationalId.GetNodeId());
-    info->mFabric   = Encoding::LittleEndian::HostSwap16(mFabric);
-    info->mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
-
-    info->mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
+    info->mFabricIndex = mFabric;
+    info->mVendorId    = Encoding::LittleEndian::HostSwap16(mVendorId);
 
     size_t stringLength = strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes);
     memcpy(info->mFabricLabel, mFabricLabel, stringLength);
@@ -130,17 +127,14 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
 
     uint16_t infoSize = sizeof(StorableFabricInfo);
 
-    uint16_t id;
+    FabricIndex id;
     uint16_t rootCertLen, icaCertLen, nocCertLen;
     size_t stringLength;
-
     NodeId nodeId;
 
     SuccessOrExit(err = storage->SyncLoad(mFabric, key, info, infoSize));
 
-    mFabricId   = Encoding::LittleEndian::HostSwap64(info->mFabricId);
-    nodeId      = Encoding::LittleEndian::HostSwap64(info->mNodeId);
-    id          = Encoding::LittleEndian::HostSwap16(info->mFabric);
+    id          = info->mFabricIndex;
     mVendorId   = Encoding::LittleEndian::HostSwap16(info->mVendorId);
     rootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
     icaCertLen  = Encoding::LittleEndian::HostSwap16(info->mICACertLen);
@@ -174,6 +168,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
     // The compressed fabric ID doesn't change for a fabric over time.
     // Computing it here will save computational overhead when it's accessed by other
     // parts of the code.
+    SuccessOrExit(err = ExtractNodeIdFabricIdFromOpCert(ByteSpan(info->mNOCCert, nocCertLen), &nodeId, &mFabricId));
     SuccessOrExit(err = GetCompressedId(mFabricId, nodeId, &mOperationalId));
 
     SuccessOrExit(err = SetICACert(ByteSpan(info->mICACert, icaCertLen)));
