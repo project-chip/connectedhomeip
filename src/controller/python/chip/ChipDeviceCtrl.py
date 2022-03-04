@@ -51,8 +51,6 @@ __all__ = ["ChipDeviceController"]
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, c_uint32)
 _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
     None, c_uint64, c_uint32)
-_DeviceAddressUpdateDelegate_OnUpdateComplete = CFUNCTYPE(
-    None, c_uint64, c_uint32)
 # void (*)(Device *, CHIP_ERROR).
 #
 # CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
