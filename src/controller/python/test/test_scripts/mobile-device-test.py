@@ -96,7 +96,7 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, devic
 @click.option('--log-level', default='WARN', type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']), help="The log level of the test.")
 @click.option('--log-format', default=None, type=str, help="Override logging format")
 def main(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, enable_test, disable_test, log_level, log_format):
-    coloredlogs.install(level=log_level, fmt=log_format)
+    coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
     logger.info("Test Parameters:")
     logger.info(f"\tController NodeId: {controller_nodeid}")
     logger.info(f"\tDevice NodeId:     {device_nodeid}")

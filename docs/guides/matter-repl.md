@@ -163,3 +163,66 @@ launched into the playground:
 [Multi Fabric Commissioning](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Multi%20Fabric%20Commissioning.ipynb)
 
 [Access Control](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Access%20Control.ipynb)
+
+## Testing
+
+We also provide `mobile-device-test.py` for testing your accessories, you can
+run it manually or using a wrapper script.
+
+### Usage
+
+mobile-device-test.py provides the following options for running the tests:
+
+```
+  --controller-nodeid INTEGER     NodeId of the controller.
+  --device-nodeid INTEGER         NodeId of the device.
+  -t, --timeout INTEGER           The program will return with timeout after specified seconds.
+  --discriminator INTEGER         Discriminator of the device.
+  --setup-pin INTEGER             Setup pincode of the device.
+  --enable-test TEXT              The tests to be executed.
+  --disable-test TEXT             The tests to be excluded.
+  --log-level [ERROR|WARN|INFO|DEBUG]
+                                  The log level of the test.
+  --log-format TEXT               Override logging format
+  --help                          Show this message and exit.
+```
+
+By default, all tests will be executed, however, you can exclude one or more
+tests or only include a few tests if you want.
+
+For example, if you are working for commissioning, then you may want to exclude
+the data model test cases by adding `--disable-test datamodel` to disable all
+data model tests.
+
+Some tests provides the option to exclude them. For example, you can use
+`--disable-test ClusterObjectTests.TestTimedRequestTimeout` to exclude the
+"TestTimedRequestTimeout" test case.
+
+It is recommanded to use the test wrapper to run mobile-device-test.py, for
+example, you can run:
+
+```
+./scripts/tests/run_python_test.py --app chip-all-clusters-app --factoryreset
+```
+
+It provides some extra options, for example:
+
+```
+  --app TEXT                  Local application to use, omit to use external
+                              apps.
+  --factoryreset              Remove /tmp/chip* before running the tests.
+  --wait-before-test INTEGER  Time for the device to start before running the
+                              tests.
+  --script PATH               Test script to use.
+  --help                      Show this message and exit.
+```
+
+You can pass your own flags for mobile-device-test.py by appending them to the
+command line with two dashes, for example:
+
+```
+./scripts/tests/run_python_test.py --app chip-all-clusters-app --factoryreset -- -t 90 --disable-test ClusterObjectTests.TestTimedRequestTimeout
+```
+
+will pass `-t 90 --disable-test ClusterObjectTests.TestTimedRequestTimeout` to
+`mobile-device-test.py`
