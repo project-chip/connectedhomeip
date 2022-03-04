@@ -651,27 +651,28 @@ class ChipDeviceController():
 
     async def ReadEvent(self, nodeid: int, events: typing.List[typing.Union[
         None,  # Empty tuple, all wildcard
-        typing.Tuple[int],  # Endpoint
+        typing.Tuple[str, int],  # all wildcard with urgency set
+        typing.Tuple[int, int],  # Endpoint,
         # Wildcard endpoint, Cluster id present
-        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+        typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
         # Wildcard endpoint, Cluster + Event present
-        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent]],
+        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
         # Wildcard event id
-        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
         # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent]]
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
     ]], reportInterval: typing.Tuple[int, int] = None):
         '''
         Read a list of events from a target node
 
         nodeId: Target's Node ID
         events: A list of tuples of varying types depending on the type of read being requested:
-            (endpoint, Clusters.ClusterA.EventA):       Endpoint = specific,    Cluster = specific,   Event = specific
-            (endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Event = *
-            (Clusters.ClusterA.EventA):                 Endpoint = *,           Cluster = specific,   Event = specific
-            endpoint:                                   Endpoint = specific,    Cluster = *,          Event = *
-            Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Event = *
-            '*' or ():                                  Endpoint = *,           Cluster = *,          Event = *
+            (endpoint, Clusters.ClusterA.EventA, urgent):       Endpoint = specific,    Cluster = specific,   Event = specific, Urgent = True/False
+            (endpoint, Clusters.ClusterA, urgent):              Endpoint = specific,    Cluster = specific,   Event = *, Urgent = True/False
+            (Clusters.ClusterA.EventA, urgent):                 Endpoint = *,           Cluster = specific,   Event = specific, Urgent = True/False
+            endpoint:                                   Endpoint = specific,    Cluster = *,          Event = *, Urgent = True/False
+            Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Event = *, Urgent = True/False
+            '*' or ():                                  Endpoint = *,           Cluster = *,          Event = *, Urgent = True/False
 
         The cluster and events specified above are to be selected from the generated cluster objects.
 
@@ -694,6 +695,7 @@ class ChipDeviceController():
             endpoint = None
             cluster = None
             event = None
+            urgent = False
             if v in [('*'), ()]:
                 # Wildcard
                 pass
@@ -708,16 +710,21 @@ class ChipDeviceController():
                 else:
                     raise ValueError("Unsupported Event Path")
             else:
-                # endpoint + (cluster) event / endpoint + cluster
-                endpoint = v[0]
-                if issubclass(v[1], ClusterObjects.Cluster):
-                    cluster = v[1]
-                elif issubclass(v[1], ClusterAttribute.ClusterEvent):
-                    event = v[1]
+                if v[0] == '*':
+                    urgent = v[-1]
+                    pass
                 else:
-                    raise ValueError("Unsupported Attribute Path")
+                    # endpoint + (cluster) event / endpoint + cluster
+                    endpoint = v[0]
+                    if issubclass(v[1], ClusterObjects.Cluster):
+                        cluster = v[1]
+                    elif issubclass(v[1], ClusterAttribute.ClusterEvent):
+                        event = v[1]
+                    else:
+                        raise ValueError("Unsupported Attribute Path")
+                    urgent = v[-1]
             eves.append(ClusterAttribute.EventPath(
-                EndpointId=endpoint, Cluster=cluster, Event=event))
+                EndpointId=endpoint, Cluster=cluster, Event=event, Urgent=urgent))
         res = self._ChipStack.Call(
             lambda: ClusterAttribute.ReadEvents(future, eventLoop, device, self, eves, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None))
         if res != 0:

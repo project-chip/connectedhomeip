@@ -127,21 +127,11 @@ struct Timestamp
 class EventOptions
 {
 public:
-    enum class Type
-    {
-        kUrgent = 0,
-        kNotUrgent,
-    };
-    EventOptions() : mPriority(PriorityLevel::Invalid), mUrgent(Type::kNotUrgent) {}
-    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid), mUrgent(Type::kNotUrgent) {}
-
-    EventOptions(Timestamp aTimestamp, Type aUrgent) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid), mUrgent(aUrgent)
-    {}
+    EventOptions() : mPriority(PriorityLevel::Invalid) {}
+    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid) {}
     ConcreteEventPath mPath;
     Timestamp mTimestamp;
     PriorityLevel mPriority = PriorityLevel::Invalid;
-    Type mUrgent            = Type::kNotUrgent; /**< A flag denoting if the event is time sensitive.  When kUrgent is set, it causes
-                                                       the event log to be flushed. */
     // kUndefinedFabricIndex 0 means not fabric associated at all
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };

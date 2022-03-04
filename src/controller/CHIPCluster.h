@@ -306,10 +306,11 @@ public:
     }
 
     template <typename DecodableType>
-    CHIP_ERROR
-    SubscribeEvent(void * context, ReadResponseSuccessCallback<DecodableType> reportCb, ReadResponseFailureCallback failureCb,
-                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
-                   SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr, bool aKeepPreviousSubscriptions = false)
+    CHIP_ERROR SubscribeEvent(void * context, ReadResponseSuccessCallback<DecodableType> reportCb,
+                              ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
+                              uint16_t maxIntervalCeilingSeconds,
+                              SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
+                              bool aKeepPreviousSubscriptions = false, bool aIsUrgentEvent = false)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -334,9 +335,10 @@ public:
             }
         };
 
-        return Controller::SubscribeEvent<DecodableType>(
-            mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, onReportCb, onFailureCb,
-            minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, aKeepPreviousSubscriptions);
+        return Controller::SubscribeEvent<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
+                                                         mEndpoint, onReportCb, onFailureCb, minIntervalFloorSeconds,
+                                                         maxIntervalCeilingSeconds, onSubscriptionEstablishedCb,
+                                                         aKeepPreviousSubscriptions, aIsUrgentEvent);
     }
 
 protected:
