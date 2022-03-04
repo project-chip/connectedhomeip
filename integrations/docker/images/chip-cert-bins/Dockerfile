@@ -5,15 +5,15 @@ WORKDIR /root/connectedhomeip/
 RUN scripts/build/gn_bootstrap.sh
 RUN gn gen out/debug --args='chip_mdns="platform" chip_inet_config_enable_ipv4=false'
 RUN ninja -C out/debug
-RUN scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ examples/all-clusters-app/linux/out/all-clusters-app
-RUN scripts/examples/gn_build_example.sh examples/bridge-app/linux/ examples/bridge-app/linux/out/bridge-app
-RUN scripts/examples/gn_build_example.sh examples/tv-app/linux/ examples/tv-app/linux/out/tv-app
-RUN scripts/examples/gn_build_example.sh examples/tv-casting-app/linux/ examples/tv-casting-app/linux/out/tv-casting-app
-RUN scripts/examples/gn_build_example.sh examples/lighting-app/linux/ examples/lighting-app/linux/out/lighting-app
-RUN scripts/examples/gn_build_example.sh examples/thermostat/linux/ examples/thermostat/linux/out/thermostat
+RUN scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ examples/all-clusters-app/linux/out/all-clusters-app chip_inet_config_enable_ipv4=false
+RUN scripts/examples/gn_build_example.sh examples/bridge-app/linux/ examples/bridge-app/linux/out/bridge-app chip_inet_config_enable_ipv4=false
+RUN scripts/examples/gn_build_example.sh examples/tv-app/linux/ examples/tv-app/linux/out/tv-app chip_inet_config_enable_ipv4=false
+RUN scripts/examples/gn_build_example.sh examples/tv-casting-app/linux/ examples/tv-casting-app/linux/out/tv-casting-app chip_inet_config_enable_ipv4=false
+RUN scripts/examples/gn_build_example.sh examples/lighting-app/linux/ examples/lighting-app/linux/out/lighting-app chip_inet_config_enable_ipv4=false
+RUN scripts/examples/gn_build_example.sh examples/thermostat/linux/ examples/thermostat/linux/out/thermostat chip_inet_config_enable_ipv4=false
 RUN scripts/examples/gn_build_example.sh examples/ota-provider-app/linux examples/ota-provider-app/linux/out/host 'chip_config_network_layer_ble=false'
 RUN scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux examples/ota-requestor-app/linux/out/host 'chip_config_network_layer_ble=false'
-RUN scripts/examples/gn_build_example.sh examples/door-lock-app/linux/ out/door-lock-app
+RUN scripts/examples/gn_build_example.sh examples/door-lock-app/linux/ out/door-lock-app chip_inet_config_enable_ipv4=false
 
 FROM ubuntu:21.10
 ENV TZ=America/Los_Angeles
