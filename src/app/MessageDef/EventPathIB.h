@@ -119,7 +119,7 @@ public:
     /**
      *  @brief Fill the fields in apPath from the parser, the path in the parser should be a concrete path.
      *
-     *  @param [in] apPath    A pointer to the path to fill in.
+     *  @param [in] apEvent    A pointer to apEvent
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_IM_MALFORMED_EVENT_PATH if the path from the reader is not a valid concrere event path.

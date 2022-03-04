@@ -77,10 +77,19 @@ jobs:
               # enable it for various reasons.  Keep whatever Xcode settings
               # for OTHER_CFLAGS exist by using ${inherited}.
               #
+              # Disable -Wdocumentation because so much of our doxygen is so
+              # broken.  See https://github.com/project-chip/connectedhomeip/issues/6734
+              #
+              # Disable -Wconditional-uninitialized because the generated IM TLV
+              # code hits this all over the place.
+              #
               # Disable -Wmacro-redefined because CHIP_DEVICE_CONFIG_ENABLE_MDNS
               # seems to be unconditionally defined in CHIPDeviceBuildConfig.h,
               # which is apparently being included after CHIPDeviceConfig.h.
-              run: xcodebuild -target "CHIP" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-macro-redefined'
+              #
+              # Disable -Wdeprecated-declarations because we use deprecated
+              # things like PairTestDeviceWithoutSecurity.
+              run: xcodebuild -target "CHIP" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-documentation -Wno-conditional-uninitialized -Wno-macro-redefined -Wno-deprecated-declarations'
               working-directory: src/darwin/Framework
             - name: Clean Build
               run: xcodebuild clean
@@ -109,7 +118,7 @@ jobs:
               run: |
                 mkdir -p /tmp/darwin/framework-tests
                 ../../../out/debug/chip-all-clusters-app > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
-                xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-incomplete-umbrella' > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
+                xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-documentation -Wno-conditional-uninitialized -Wno-incomplete-umbrella' > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Uploading log files
               uses: actions/upload-artifact@v2
