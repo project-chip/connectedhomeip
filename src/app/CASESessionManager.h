@@ -21,6 +21,7 @@
 #include <app/CASEClientPool.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/OperationalDeviceProxyPool.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/dnssd/DnssdCache.h>
@@ -38,6 +39,7 @@ struct CASESessionManagerConfig
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
     OperationalDeviceProxyPoolDelegate * devicePool           = nullptr;
     Dnssd::ResolverProxy * dnsResolver                        = nullptr;
+    AddressResolve::Resolver * addressResolver                = nullptr;
 };
 
 /**
