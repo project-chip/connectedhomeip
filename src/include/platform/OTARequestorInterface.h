@@ -172,6 +172,9 @@ public:
     // Download image
     virtual void DownloadUpdate() = 0;
 
+    // Image download delayed on user consent
+    virtual void DownloadUpdateDelayedOnUserConsent() = 0;
+
     // Initiate the session to send ApplyUpdateRequest command
     virtual void ApplyUpdate() = 0;
 

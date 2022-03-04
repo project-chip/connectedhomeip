@@ -446,6 +446,11 @@ void OTARequestor::DownloadUpdate()
     ConnectToProvider(kDownload);
 }
 
+void OTARequestor::DownloadUpdateDelayedOnUserConsent()
+{
+    RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnUserConsent, OTAChangeReasonEnum::kSuccess);
+}
+
 void OTARequestor::ApplyUpdate()
 {
     RecordNewUpdateState(OTAUpdateStateEnum::kApplying, OTAChangeReasonEnum::kSuccess);

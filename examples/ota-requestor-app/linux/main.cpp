@@ -18,8 +18,9 @@
 
 #include "AppMain.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
+#include "app/clusters/ota-requestor/DefaultOTARequestorUserConsentProvider.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/GenericOTARequestorDriver.h"
+#include "platform/ExtendedOTARequestorDriver.h"
 #include "platform/Linux/OTAImageProcessorImpl.h"
 
 using chip::BDXDownloader;
@@ -47,12 +48,15 @@ using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 OTARequestor gRequestorCore;
-DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+DeviceLayer::ExtendedOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
+chip::ota::DefaultOTARequestorUserConsentProvider gUserConsentProvider;
+static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 
+constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionRequestorCanConsent  = 'c';
 constexpr uint16_t kOptionOtaDownloadPath      = 'f';
@@ -66,6 +70,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "requestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
     { "otaDownloadPath", chip::ArgParser::kArgumentRequired, kOptionOtaDownloadPath },
+    { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     {},
 };
 
@@ -78,7 +83,11 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Otherwise, the value is determined by the driver.\n "
                              "  -f/--otaDownloadPath <file path>\n"
                              "        If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
-                             "        Otherwise, the value defaults to /tmp/test.bin.\n " };
+                             "        Otherwise, the value defaults to /tmp/test.bin.\n "
+                             "  -u/--userConsentState <granted | denied | deferred>\n"
+                             "        granted: Authorize OTA requestor to download an OTA image\n"
+                             "        denied: Forbid OTA requestor to download an OTA image\n"
+                             "        deferred: Defer obtaining user consent \n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
@@ -100,6 +109,12 @@ static void InitOTARequestor(void)
 
     // Set the image processor instance used for handling image being downloaded
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+
+    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
+    {
+        gUserConsentProvider.SetUserConsentState(gUserConsentState);
+        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
+    }
 }
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -116,6 +131,30 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         break;
     case kOptionOtaDownloadPath:
         chip::Platform::CopyString(gOtaDownloadPath, aValue);
+        break;
+    case kOptionUserConsentState:
+        if (aValue == NULL)
+        {
+            PrintArgError("%s: ERROR: NULL UserConsent parameter\n", aProgram);
+            retval = false;
+        }
+        else if (strcmp(aValue, "granted") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kGranted;
+        }
+        else if (strcmp(aValue, "denied") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kDenied;
+        }
+        else if (strcmp(aValue, "deferred") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kObtaining;
+        }
+        else
+        {
+            PrintArgError("%s: ERROR: Invalid UserConsent parameter:  %s\n", aProgram, aValue);
+            retval = false;
+        }
         break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);

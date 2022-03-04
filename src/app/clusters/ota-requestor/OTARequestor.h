@@ -54,6 +54,9 @@ public:
     // Initiate download of the new image
     void DownloadUpdate() override;
 
+    // Set the requestor state to kDelayedOnUserConsent
+    void DownloadUpdateDelayedOnUserConsent() override;
+
     // Initiate the session to send ApplyUpdateRequest command
     void ApplyUpdate() override;
 
