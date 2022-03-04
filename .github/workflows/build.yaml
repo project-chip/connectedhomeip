@@ -48,11 +48,14 @@ jobs:
               env:
                 CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Retry Checkout
               with:
-                  submodules: true
-
+                action: actions/checkout@v2
+                with: |
+                 submodules: true
+                attempt_limit: 3
+                attempt_delay: 2000
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
