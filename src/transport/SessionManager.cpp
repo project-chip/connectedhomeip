@@ -259,12 +259,12 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         multicastAddress.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
 
         ChipLogProgress(Inet,
-                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to %d"
-                        " at monotonic time: %" PRId64
-                        " msec to Multicast IPV6 address : %s with GroupID of %d and fabric Id of %d",
-                        "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(), groupSession->GetGroupId(),
-                        System::SystemClock().GetMonotonicMilliseconds64().count(), addressStr, groupSession->GetGroupId(),
-                        groupSession->GetFabricIndex());
+                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter
+                        " to Multicast IPV6 address : %s with GroupID of %d and fabric Id of %d"
+                        " at monotonic time: %" PRId64,
+                        sessionHandle->GetSessionTypeString(), &preparedMessage, preparedMessage.GetMessageCounter(), addressStr,
+                        groupSession->GetGroupId(), groupSession->GetFabricIndex(),
+                        System::SystemClock().GetMonotonicMilliseconds64().count());
     }
     break;
     case Transport::Session::SessionType::kSecure: {
