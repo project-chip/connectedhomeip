@@ -22,6 +22,7 @@
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
+#include "platform/CHIPDeviceLayer.h"
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "lib/shell/Engine.h"
@@ -132,6 +133,15 @@ static void RegisterSwitchCommands()
     return;
 }
 #endif // ENABLE_CHIP_SHELL
+
+void InitBindingHandlerInternal(intptr_t arg)
+{
+    auto & server = chip::Server::GetInstance();
+    chip::BindingManager::GetInstance().Init(
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+}
+
 } // namespace
 
 void SwitchToggleOnOff(intptr_t context)
@@ -169,12 +179,12 @@ void SwitchOnOffOff(intptr_t context)
 
 CHIP_ERROR InitBindingHandler()
 {
-    BindingManager::GetInstance().SetAppServer(&Server::GetInstance());
-    BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-
+    // The initialization of binding manager will try establishing connection with unicast peers
+    // so it requires the Server instance to be correctly initialized. Post the init function to
+    // the event queue so that everything is ready when initialization is conducted.
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
 #if defined(ENABLE_CHIP_SHELL)
     RegisterSwitchCommands();
 #endif
-
     return CHIP_NO_ERROR;
 }

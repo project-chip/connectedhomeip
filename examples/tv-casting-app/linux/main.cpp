@@ -132,7 +132,9 @@ static void OnBindingAdded(const EmberBindingTableEntry & binding)
 
 CHIP_ERROR InitBindingHandlers()
 {
-    chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
+    auto & server = chip::Server::GetInstance();
+    chip::BindingManager::GetInstance().Init(
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     ReturnErrorOnFailure(chip::BindingManager::GetInstance().RegisterBindingAddedHandler(OnBindingAdded));
     return CHIP_NO_ERROR;
 }
