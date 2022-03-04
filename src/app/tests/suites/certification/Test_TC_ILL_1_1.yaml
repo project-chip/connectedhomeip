@@ -28,7 +28,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #issue #12190 as per spec default value is 3 but expecting 2
     - label: "read the global attribute: ClusterRevision"
+      disabled: true
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
