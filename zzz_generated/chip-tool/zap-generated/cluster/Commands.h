@@ -17241,6 +17241,35 @@ private:
     TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
 };
 
+class WriteTestClusterListFabricScoped : public WriteAttribute
+{
+public:
+    WriteTestClusterListFabricScoped(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ListFabricScoped", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-fabric-scoped");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterListFabricScoped() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000002B, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x0000050F, 0x0000002B, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type>>
+        mComplex;
+};
+
 class WriteTestClusterTimedWriteBoolean : public WriteAttribute
 {
 public:
@@ -25902,6 +25931,7 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteTestClusterRangeRestrictedInt16u>(credsIssuerConfig),                                        //
         make_unique<WriteTestClusterRangeRestrictedInt16s>(credsIssuerConfig),                                        //
         make_unique<WriteTestClusterListLongOctetString>(credsIssuerConfig),                                          //
+        make_unique<WriteTestClusterListFabricScoped>(credsIssuerConfig),                                             //
         make_unique<WriteTestClusterTimedWriteBoolean>(credsIssuerConfig),                                            //
         make_unique<WriteTestClusterGeneralErrorBoolean>(credsIssuerConfig),                                          //
         make_unique<WriteTestClusterClusterErrorBoolean>(credsIssuerConfig),                                          //

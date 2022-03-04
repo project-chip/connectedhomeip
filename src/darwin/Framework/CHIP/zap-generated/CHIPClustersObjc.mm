@@ -25559,6 +25559,136 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
+- (void)readAttributeListFabricScopedWithParams:(CHIPReadParams * _Nullable)params
+                              completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPTestClusterListFabricScopedListAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = TestCluster::Attributes::ListFabricScoped::TypeInfo;
+            auto successFn = Callback<TestClusterListFabricScopedListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]);
+        });
+}
+
+- (void)writeAttributeListFabricScopedWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TestCluster::Attributes::ListFabricScoped::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[CHIPTestClusterClusterTestFabricScoped class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (CHIPTestClusterClusterTestFabricScoped *) value[i_0];
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+                        listHolder_0->mList[i_0].fabricSensitiveInt8u = element_0.fabricSensitiveInt8u.unsignedCharValue;
+                        if (element_0.optionalFabricSensitiveInt8u != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].optionalFabricSensitiveInt8u.Emplace();
+                            definedValue_2 = element_0.optionalFabricSensitiveInt8u.unsignedCharValue;
+                        }
+                        if (element_0.nullableFabricSensitiveInt8u == nil) {
+                            listHolder_0->mList[i_0].nullableFabricSensitiveInt8u.SetNull();
+                        } else {
+                            auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableFabricSensitiveInt8u.SetNonNull();
+                            nonNullValue_2 = element_0.nullableFabricSensitiveInt8u.unsignedCharValue;
+                        }
+                        if (element_0.nullableOptionalFabricSensitiveInt8u != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalFabricSensitiveInt8u.Emplace();
+                            if (element_0.nullableOptionalFabricSensitiveInt8u == nil) {
+                                definedValue_2.SetNull();
+                            } else {
+                                auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                                nonNullValue_3 = element_0.nullableOptionalFabricSensitiveInt8u.unsignedCharValue;
+                            }
+                        }
+                        listHolder_0->mList[i_0].fabricSensitiveCharString = [self asCharSpan:element_0.fabricSensitiveCharString];
+                        listHolder_0->mList[i_0].fabricSensitiveStruct.a = element_0.fabricSensitiveStruct.a.unsignedCharValue;
+                        listHolder_0->mList[i_0].fabricSensitiveStruct.b = element_0.fabricSensitiveStruct.b.boolValue;
+                        listHolder_0->mList[i_0].fabricSensitiveStruct.c
+                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveStruct.c)>>(
+                                element_0.fabricSensitiveStruct.c.unsignedCharValue);
+                        listHolder_0->mList[i_0].fabricSensitiveStruct.d = [self asByteSpan:element_0.fabricSensitiveStruct.d];
+                        listHolder_0->mList[i_0].fabricSensitiveStruct.e = [self asCharSpan:element_0.fabricSensitiveStruct.e];
+                        listHolder_0->mList[i_0].fabricSensitiveStruct.f
+                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveStruct.f)>>(
+                                element_0.fabricSensitiveStruct.f.unsignedCharValue);
+                        listHolder_0->mList[i_0].fabricSensitiveStruct.g = element_0.fabricSensitiveStruct.g.floatValue;
+                        listHolder_0->mList[i_0].fabricSensitiveStruct.h = element_0.fabricSensitiveStruct.h.doubleValue;
+                        {
+                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveInt8uList)>;
+                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                            if (element_0.fabricSensitiveInt8uList.count != 0) {
+                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.fabricSensitiveInt8uList.count);
+                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_2);
+                                for (size_t i_2 = 0; i_2 < element_0.fabricSensitiveInt8uList.count; ++i_2) {
+                                    if (![element_0.fabricSensitiveInt8uList[i_2] isKindOfClass:[NSNumber class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_2 = (NSNumber *) element_0.fabricSensitiveInt8uList[i_2];
+                                    listHolder_2->mList[i_2] = element_2.unsignedCharValue;
+                                }
+                                listHolder_0->mList[i_0].fabricSensitiveInt8uList
+                                    = ListType_2(listHolder_2->mList, element_0.fabricSensitiveInt8uList.count);
+                            } else {
+                                listHolder_0->mList[i_0].fabricSensitiveInt8uList = ListType_2();
+                            }
+                        }
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeListFabricScopedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
+                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                            reportHandler:
+                                                (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = TestCluster::Attributes::ListFabricScoped::TypeInfo;
+            auto successFn = Callback<TestClusterListFabricScopedListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
 - (void)readAttributeTimedWriteBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler
 {

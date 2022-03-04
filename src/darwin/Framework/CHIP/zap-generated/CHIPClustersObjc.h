@@ -6069,6 +6069,16 @@ NS_ASSUME_NONNULL_BEGIN
                                                reportHandler:
                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeListFabricScopedWithParams:(CHIPReadParams * _Nullable)params
+                              completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeListFabricScopedWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeListFabricScopedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
+                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                            reportHandler:
+                                                (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeTimedWriteBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
 - (void)writeAttributeTimedWriteBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;

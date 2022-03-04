@@ -603,7 +603,11 @@ async function _zapTypeToPythonClusterObjectType(type, options)
       return 'bytes';
     }
 
-    if ([ 'single', 'double' ].includes(type.toLowerCase())) {
+    if (type.toLowerCase() == 'single') {
+      return 'float32';
+    }
+
+    if (type.toLowerCase() == 'double') {
       return 'float';
     }
 

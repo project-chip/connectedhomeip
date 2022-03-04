@@ -2097,6 +2097,63 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("FabricSensitiveInt8u", indent + 1, value.fabricSensitiveInt8u);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricSensitiveInt8u'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("OptionalFabricSensitiveInt8u", indent + 1, value.optionalFabricSensitiveInt8u);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OptionalFabricSensitiveInt8u'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NullableFabricSensitiveInt8u", indent + 1, value.nullableFabricSensitiveInt8u);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NullableFabricSensitiveInt8u'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NullableOptionalFabricSensitiveInt8u", indent + 1, value.nullableOptionalFabricSensitiveInt8u);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1,
+                                       "Struct truncated due to invalid value for 'NullableOptionalFabricSensitiveInt8u'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricSensitiveCharString", indent + 1, value.fabricSensitiveCharString);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricSensitiveCharString'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricSensitiveStruct", indent + 1, value.fabricSensitiveStruct);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricSensitiveStruct'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricSensitiveInt8uList", indent + 1, value.fabricSensitiveInt8uList);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricSensitiveInt8uList'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
