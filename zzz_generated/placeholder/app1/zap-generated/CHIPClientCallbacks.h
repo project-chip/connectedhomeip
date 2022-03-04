@@ -31,6 +31,21 @@
 #include <lib/support/Span.h>
 
 // List specific responses
+void GeneralCommissioningClusterServerGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                              chip::Callback::Cancelable * onSuccessCallback,
+                                                                              chip::Callback::Cancelable * onFailureCallback);
+typedef void (*GeneralCommissioningServerGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+void GeneralCommissioningClusterClientGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                              chip::Callback::Cancelable * onSuccessCallback,
+                                                                              chip::Callback::Cancelable * onFailureCallback);
+typedef void (*GeneralCommissioningClientGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+void GeneralCommissioningClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                 chip::Callback::Cancelable * onSuccessCallback,
+                                                                 chip::Callback::Cancelable * onFailureCallback);
+typedef void (*GeneralCommissioningAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 void OperationalCredentialsClusterFabricsListAttributeFilter(chip::TLV::TLVReader * data,
                                                              chip::Callback::Cancelable * onSuccessCallback,
                                                              chip::Callback::Cancelable * onFailureCallback);

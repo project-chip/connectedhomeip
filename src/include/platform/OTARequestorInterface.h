@@ -147,7 +147,21 @@ public:
     enum OTATriggerResult
     {
         kTriggerSuccessful = 0,
-        kNoProviderKnown   = 1
+        kNoProviderKnown   = 1,
+        kWrongState        = 2
+    };
+
+    enum UpdateState
+    {
+        kStateUnknown,
+        kStateIdle,
+        kStateQuerying,
+        kStateDelayedOnQuery,
+        kStateDownloading,
+        kStateApplying,
+        kStateDelayedOnApply,
+        kStateRollingBack,
+        kStateDelayedOnUserConsent,
     };
 
     // Handler for the AnnounceOTAProvider command
@@ -158,8 +172,12 @@ public:
     // Destructor
     virtual ~OTARequestorInterface() = default;
 
-    // Send QueryImage command
+    // Application API to send the QueryImage command and start the image update process with the next available Provider
     virtual OTATriggerResult TriggerImmediateQuery() = 0;
+
+    // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process
+    // with the Provider currently set in the OTARequestor
+    virtual void TriggerImmediateQueryInternal() = 0;
 
     // Download image
     virtual void DownloadUpdate() = 0;
@@ -173,9 +191,11 @@ public:
     // Get image update progress in percents unit
     virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
 
-    // Get requestor state
+    // Get the value of the UpdateState attribute of the OTA Software Update Requestor Cluster on the given endpoint
     virtual CHIP_ERROR GetState(EndpointId endpointId,
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
+    // Getter for the value of the UpdateState cached by the object
+    virtual UpdateState GetCurrentUpdateState() = 0;
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
@@ -183,6 +203,14 @@ public:
 
     // Clear all entries with the specified fabric index in the default OTA provider list
     virtual CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) = 0;
+
+    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+
+    // Set the provider location to be used in the next query and OTA update process
+    virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
+
+    // Clear the provider location to indicate that no OTA update may be in progress
+    virtual void ClearCurrentProviderLocation() = 0;
 
     // Add a default OTA provider to the cached list
     virtual CHIP_ERROR

@@ -52,9 +52,9 @@ public:
 
     ~ClusterCommand() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ClusterCommand::SendCommand(device, endpointId, mClusterId, mCommandId, mPayload);
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), mClusterId, mCommandId, mPayload);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
@@ -126,15 +126,8 @@ public:
         VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
 
-        chip::Optional<chip::SessionHandle> session =
-            exchangeManager->GetSessionManager()->CreateGroupSession(groupId, fabricIndex, senderNodeId);
-        if (!session.HasValue())
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        CHIP_ERROR err = commandSender->SendGroupCommandRequest(session.Value());
-        exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
-        ReturnErrorOnFailure(err);
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex, senderNodeId);
+        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(chip::SessionHandle(session)));
         commandSender.release();
 
         return CHIP_NO_ERROR;

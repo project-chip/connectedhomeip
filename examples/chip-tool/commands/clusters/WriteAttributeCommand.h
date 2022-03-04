@@ -55,9 +55,9 @@ public:
 
     ~WriteAttribute() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, mAttributeValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), mClusterId, mAttributeId, mAttributeValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
@@ -128,15 +128,8 @@ public:
         VerifyOrReturnError(writeClient != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(writeClient->EncodeAttribute(attributePathParams, value, mDataVersion));
 
-        chip::Optional<chip::SessionHandle> session =
-            exchangeManager->GetSessionManager()->CreateGroupSession(groupId, fabricIndex, senderNodeId);
-        if (!session.HasValue())
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        CHIP_ERROR err = writeClient->SendWriteRequest(session.Value());
-        exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
-        ReturnErrorOnFailure(err);
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex, senderNodeId);
+        ReturnErrorOnFailure(writeClient->SendWriteRequest(chip::SessionHandle(session)));
         writeClient.release();
 
         return CHIP_NO_ERROR;

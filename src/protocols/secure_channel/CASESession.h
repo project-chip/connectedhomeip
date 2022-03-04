@@ -216,7 +216,7 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
-    void CloseExchange();
+    void AbortExchange();
 
     /**
      * Clear our reference to our exchange context pointer so that it can close

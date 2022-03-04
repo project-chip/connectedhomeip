@@ -78,16 +78,6 @@ void PrintOnboardingCodes(const chip::SetupPayload & payload)
     {
         ChipLogError(AppServer, "Getting manual pairing code failed!");
     }
-
-    // Hand a copy of the payload to GetLongManualPairingCode.
-    if (GetLongManualPairingCode(manualPairingCode, chip::SetupPayload(payload)) == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "Long manual pairing code: [%s]", manualPairingCode.c_str());
-    }
-    else
-    {
-        ChipLogError(AppServer, "Getting long manual pairing code failed!");
-    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC
@@ -191,35 +181,6 @@ CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::Rendezvo
         return err;
     }
     return GetManualPairingCode(aManualPairingCode, payload);
-}
-
-CHIP_ERROR GetLongManualPairingCode(std::string & aLongManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags)
-{
-    chip::SetupPayload payload;
-
-    CHIP_ERROR err = GetSetupPayload(payload, aRendezvousFlags);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
-        return err;
-    }
-    return GetLongManualPairingCode(aLongManualPairingCode, std::move(payload));
-}
-
-CHIP_ERROR GetLongManualPairingCode(std::string & aLongManualPairingCode, chip::SetupPayload && payload)
-{
-    // To get payloadDecimalStringRepresentation to produce a long manual
-    // pairing code, the commissioning flow in the payload needs to be kCustom.
-    payload.commissioningFlow = chip::CommissioningFlow::kCustom;
-
-    CHIP_ERROR err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aLongManualPairingCode);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "Generating long manual pairing code failed: %s", chip::ErrorStr(err));
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, const chip::SetupPayload & payload)

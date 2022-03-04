@@ -126,13 +126,11 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     VerifyOrReturnError(params.systemState->TransportMgr() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     ReturnErrorOnFailure(mDNSResolver.Init(params.systemState->UDPEndPointManager()));
     mDNSResolver.SetOperationalDelegate(this);
     mDNSResolver.SetCommissioningDelegate(this);
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
@@ -165,11 +163,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .sessionInitParams = deviceInitParams,
         .dnsCache          = &mDNSCache,
         .devicePool        = &mDevicePool,
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-        .dnsResolver = &mDNSResolver,
-#else
-        .dnsResolver = nullptr,
-#endif
+        .dnsResolver       = &mDNSResolver,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
@@ -246,6 +240,21 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mState = State::NotInitialized;
 
+    if (mFabricInfo != nullptr)
+    {
+        // Shut down any ongoing CASE session activity we have.  Note that we
+        // own the mCASESessionManager, so shutting down everything on it is
+        // fine.  If we ever end up sharing the CASE session manager with other
+        // DeviceController instances we may need to be more targeted here.
+        mCASESessionManager->ReleaseAllSessions();
+
+        // TODO: The CASE session manager does not shut down existing CASE
+        // sessions.  It just shuts down any ongoing CASE session establishment
+        // we're in the middle of as initiator.  Maybe it should shut down
+        // existing sessions too?
+        mSystemState->SessionMgr()->ExpireAllPairingsForFabric(mFabricInfo->GetFabricIndex());
+    }
+
     mStorageDelegate = nullptr;
 
     if (mFabricInfo != nullptr)
@@ -255,11 +264,9 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemState->Release();
     mSystemState = nullptr;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     mDNSResolver.Shutdown();
     mDeviceAddressUpdateDelegate = nullptr;
     mDeviceDiscoveryDelegate     = nullptr;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     chip::Platform::Delete(mCASESessionManager);
     mCASESessionManager = nullptr;
@@ -554,8 +561,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-
 void DeviceController::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
     VerifyOrReturn(mState == State::Initialized,
@@ -565,7 +570,7 @@ void DeviceController::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNode
     {
         mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), CHIP_NO_ERROR);
     }
-};
+}
 
 void DeviceController::OnOperationalNodeResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
 {
@@ -578,9 +583,7 @@ void DeviceController::OnOperationalNodeResolutionFailed(const chip::PeerId & pe
     {
         mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
     }
-};
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+}
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
@@ -1369,7 +1372,6 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
     static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
@@ -1380,8 +1382,6 @@ const Dnssd::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int id
 {
     return GetDiscoveredNode(idx);
 }
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
 
@@ -1404,8 +1404,6 @@ void DeviceCommissioner::FindCommissionableNode(char * instanceName)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-
 void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
@@ -1417,7 +1415,6 @@ void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData 
     AbstractDnssdDiscoveryController::OnNodeDiscovered(nodeData);
     mSetUpCodePairer.NotifyCommissionableDeviceDiscovered(nodeData);
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 void OnBasicFailure(void * context, CHIP_ERROR error)
 {
@@ -1445,12 +1442,21 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     }
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 void DeviceCommissioner::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
     ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID 0x" ChipLogFormatX64,
                     ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
     VerifyOrReturn(mState == State::Initialized);
+
+    // TODO: minimal mdns is buggy and violates the API contract for the
+    // resolver proxy by handing us results for all sorts of things we did not
+    // ask it to resolve, including results that don't even match our fabric.
+    // Reject at least those mis-matching results, since we can detect those
+    // easily.
+    if (nodeData.mPeerId.GetCompressedFabricId() != GetCompressedFabricId())
+    {
+        return;
+    }
 
     mDNSCache.Insert(nodeData);
 
@@ -1470,8 +1476,6 @@ void DeviceCommissioner::OnOperationalNodeResolutionFailed(const chip::PeerId & 
     }
     DeviceController::OnOperationalNodeResolutionFailed(peer, error);
 }
-
-#endif
 
 void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
 {
