@@ -21,13 +21,13 @@ ARG ZEPHYR_REVISION=b522ea774ab31c3e636f25da374b43855e9d4e60
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install -U --no-cache-dir \
-    west==0.11.1 \
+    west==0.12.0 \
     && git clone https://github.com/rikorsev/zephyr \
     && cd zephyr \
     && git reset ${ZEPHYR_REVISION} --hard \
     && west init -l \
     && cd .. \
-    && west update \
+    && west update -o=--depth=1 -n -f smart \
     && cd modules/hal/telink \
     && git remote add telink https://github.com/rikorsev/hal_telink \
     && git fetch telink telink_crypto \
@@ -58,6 +58,21 @@ RUN set -x \
     pyelftools==0.27 \
     && pip3 install --no-cache-dir --user -r /opt/telink/zephyrproject/zephyr/scripts/requirements.txt \
     && : # last line
+
+# Setup Telink tools required for "west flash"
+ARG TELINK_TOOLS_BASE=/opt/telink/tools
+RUN wget http://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/telink_riscv_ice_flash_tool.zip -O /opt/telink/tools.zip \
+    && unzip /opt/telink/tools.zip -d ${TELINK_TOOLS_BASE} \
+    && rm /opt/telink/tools.zip \
+    && mv ${TELINK_TOOLS_BASE}/telink_riscv_linux_toolchain/* ${TELINK_TOOLS_BASE} \
+    && rm -rf ${TELINK_TOOLS_BASE}/telink_riscv_linux_toolchain \
+    && chmod +x ${TELINK_TOOLS_BASE}/flash/bin/SPI_burn \
+    && chmod +x ${TELINK_TOOLS_BASE}/ice/ICEman \
+    && : # last line
+
+# Add path to Telink tools
+ENV PATH="${TELINK_TOOLS_BASE}/flash/bin:${PATH}"
+ENV PATH="${TELINK_TOOLS_BASE}/ice:${PATH}"
 
 ARG ZEPHYR_PROJECT_DIR=/opt/telink/zephyrproject
 ENV TELINK_ZEPHYR_BASE=${ZEPHYR_PROJECT_DIR}/zephyr
