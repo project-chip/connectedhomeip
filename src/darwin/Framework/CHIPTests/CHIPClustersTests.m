@@ -12805,32 +12805,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 }
 - (void)testSendClusterTest_TC_ILL_1_1_000001_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
-                                                                                             endpoint:1
-                                                                                                queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 3U);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_ILL_1_1_000002_ReadAttribute
-{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
@@ -12850,7 +12824,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_ILL_1_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_ILL_1_1_000002_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
 
