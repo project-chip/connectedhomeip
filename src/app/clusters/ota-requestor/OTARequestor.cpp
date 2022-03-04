@@ -242,9 +242,9 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    ProviderLocation::Type providerLocation = { .fabricIndex    = commandObj->GetAccessingFabricIndex(),
-                                                .providerNodeID = commandData.providerNodeId,
-                                                .endpoint       = commandData.endpoint };
+    ProviderLocation::Type providerLocation = { .providerNodeID = commandData.providerNodeId,
+                                                .endpoint       = commandData.endpoint,
+                                                .fabricIndex    = commandObj->GetAccessingFabricIndex() };
 
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %u", providerLocation.fabricIndex);
     ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(providerLocation.providerNodeID));

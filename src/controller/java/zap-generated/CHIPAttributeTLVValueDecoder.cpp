@@ -8486,12 +8486,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
                 jobject newElement_0_providerNodeID;
                 std::string newElement_0_providerNodeIDClassName     = "java/lang/Long";
                 std::string newElement_0_providerNodeIDCtorSignature = "(J)V";
@@ -8504,6 +8498,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_endpointClassName.c_str(),
                                                                                newElement_0_endpointCtorSignature.c_str(),
                                                                                entry_0.endpoint, newElement_0_endpoint);
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
 
                 jclass providerLocationStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -8515,15 +8515,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID providerLocationStructCtor = env->GetMethodID(
-                    providerLocationStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;)V");
+                    providerLocationStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V");
                 if (providerLocationStructCtor == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(providerLocationStructClass, providerLocationStructCtor, newElement_0_fabricIndex,
-                                              newElement_0_providerNodeID, newElement_0_endpoint);
+                newElement_0 = env->NewObject(providerLocationStructClass, providerLocationStructCtor, newElement_0_providerNodeID,
+                                              newElement_0_endpoint, newElement_0_fabricIndex);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

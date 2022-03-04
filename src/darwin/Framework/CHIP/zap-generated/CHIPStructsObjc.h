@@ -111,9 +111,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPOtaSoftwareUpdateRequestorClusterProviderLocation : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull providerNodeID;
 @property (strong, nonatomic) NSNumber * _Nonnull endpoint;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 
