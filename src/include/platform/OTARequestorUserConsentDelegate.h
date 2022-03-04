@@ -15,22 +15,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <ota-provider-common/DefaultUserConsentProvider.h>
+#pragma once
+#include <platform/UserConsentDelegate.h>
 
 namespace chip {
 namespace ota {
 
-UserConsentState DefaultUserConsentProvider::GetUserConsentState(const UserConsentSubject & subject)
+class OTARequestorUserConsentDelegate : public UserConsentDelegate
 {
-    subject.Log();
+public:
+    virtual ~OTARequestorUserConsentDelegate() = default;
 
-    if (mUseGlobalConsent)
-    {
-        return mGlobalConsentState;
-    }
+    virtual UserConsentState GetUserConsentState(const UserConsentSubject & subject) = 0;
 
-    return UserConsentState::kGranted;
-}
+    // When GetUserConsentState() returns kObtaining this will be called to
+    // check if the user consent is granted or denied.
+    virtual UserConsentState CheckDeferredUserConsentState() = 0;
+};
 
 } // namespace ota
 } // namespace chip
