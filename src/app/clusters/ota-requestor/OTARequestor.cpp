@@ -45,7 +45,7 @@ using bdx::TransferSession;
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
 
 // Abort the QueryImage download request if there's been no progress for 5 minutes
-static constexpr System::Clock::Timeout kDownloadTimeoutSec = chip::System::Clock::Seconds32(300);
+static constexpr System::Clock::Timeout kDownloadTimeoutSec = chip::System::Clock::Seconds32(5 * 60);
 
 static void LogQueryImageResponse(const QueryImageResponse::DecodableType & response)
 {

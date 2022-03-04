@@ -78,7 +78,7 @@ public:
     System::Clock::Timeout GetTimeout();
     // If True, there's been a timeout in the transfer as measured by no download progress after 'mTimeout' seconds.
     // If False, there's been progress in the transfer.
-    bool CheckTransferTimeout();
+    bool HasTransferTimedOut();
 
 private:
     void PollTransferSession();
@@ -91,8 +91,8 @@ private:
     StateDelegate * mStateDelegate   = nullptr;
     // Timeout value in seconds to abort the download if there's no progress in the transfer session.
     System::Clock::Timeout mTimeout = System::Clock::kZero;
-    // Tracks the percentage of transfer session complete from as of the previous check.
-    uint8_t mPrevPercentageComplete = 0;
+    // Tracks the last block counter used during the transfer session as of the previous check.
+    uint32_t mPrevBlockCounter = 0;
 };
 
 } // namespace chip

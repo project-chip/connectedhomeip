@@ -41,7 +41,7 @@ void TransferTimeoutCheckHandler(System::Layer * systemLayer, void * appState)
     VerifyOrReturn(appState != nullptr);
     BDXDownloader * bdxDownloader = static_cast<BDXDownloader *>(appState);
 
-    if (bdxDownloader->CheckTransferTimeout())
+    if (bdxDownloader->HasTransferTimedOut())
     {
         // End download if transfer timeout has been detected
         bdxDownloader->OnDownloadTimeout();
@@ -60,18 +60,17 @@ System::Clock::Timeout BDXDownloader::GetTimeout()
 
 void BDXDownloader::Reset()
 {
-    mPrevPercentageComplete = 0;
+    mPrevBlockCounter = 0;
     DeviceLayer::SystemLayer().StartTimer(mTimeout, TransferTimeoutCheckHandler, this);
 }
 
-bool BDXDownloader::CheckTransferTimeout()
+bool BDXDownloader::HasTransferTimedOut()
 {
-    uint8_t curPercentageComplete =
-        mImageProcessor->GetPercentComplete().IsNull() ? 0 : mImageProcessor->GetPercentComplete().Value();
+    uint32_t curBlockCounter = mBdxTransfer.GetNextBlockNum();
 
-    if (curPercentageComplete > mPrevPercentageComplete)
+    if (curBlockCounter > mPrevBlockCounter)
     {
-        mPrevPercentageComplete = curPercentageComplete;
+        mPrevBlockCounter = curBlockCounter;
         return false;
     }
     else
@@ -118,7 +117,7 @@ CHIP_ERROR BDXDownloader::BeginPrepareDownload()
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mPrevPercentageComplete = 0;
+    mPrevBlockCounter = 0;
     DeviceLayer::SystemLayer().StartTimer(mTimeout, TransferTimeoutCheckHandler, this);
 
     ReturnErrorOnFailure(mImageProcessor->PrepareDownload());
