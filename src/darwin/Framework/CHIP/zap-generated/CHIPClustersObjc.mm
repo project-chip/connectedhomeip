@@ -25392,7 +25392,7 @@ using namespace chip::app::Clusters;
 
 - (void)subscribeAttributeListFabricScopedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                   params:(CHIPReadParams * _Nullable)params
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -25406,7 +25406,8 @@ using namespace chip::app::Clusters;
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
                 CHIPTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
-                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]);
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },
         subscriptionEstablishedHandler);
 }

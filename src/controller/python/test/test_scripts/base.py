@@ -216,7 +216,7 @@ class BaseTestHelper:
         return True
 
     async def TestFabricSensitive(self, nodeid: int):
-        expectedDataFabric1 = [
+        expectedDataFabric1=[
             Clusters.TestCluster.Structs.TestFabricScoped(),
             Clusters.TestCluster.Structs.TestFabricScoped()
         ]
@@ -303,7 +303,7 @@ class BaseTestHelper:
             "Reading back unfiltered data across all fabrics from fabric1...")
 
         def CompareUnfilteredData(accessingFabric, otherFabric, expectedData):
-            index = 0
+            index=0
 
             self.logger.info(
                 f"Comparing data from accessing fabric {accessingFabric}...")
@@ -317,7 +317,7 @@ class BaseTestHelper:
                     if (item != expectedData[index]):
                         raise AssertionError("Got back mismatched data")
 
-                    index = index + 1
+                    index=index + 1
                 else:
                     #
                     # We should not be able to see any fabric sensitive data from the non accessing fabric.
@@ -326,32 +326,32 @@ class BaseTestHelper:
                     # which should automatically be initialized with defaults and compare that
                     # against what we got back.
                     #
-                    expectedDefaultData = Clusters.TestCluster.Structs.TestFabricScoped()
-                    expectedDefaultData.fabricIndex = otherFabric
+                    expectedDefaultData=Clusters.TestCluster.Structs.TestFabricScoped()
+                    expectedDefaultData.fabricIndex=otherFabric
 
                     if (item != expectedDefaultData):
                         raise AssertionError("Got back mismatched data")
 
-        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data=await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered = False)
+        readListDataFabric=data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric1,
                               self.currentFabric2, expectedDataFabric1)
 
-        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data=await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered = False)
+        readListDataFabric=data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric2,
                               self.currentFabric1, expectedDataFabric2)
 
         self.logger.info("Writing smaller list from alpha (again)")
 
-        expectedDataFabric1[0].fabricIndex = 100
-        expectedDataFabric1[0].fabricSensitiveInt8u = 53
-        expectedDataFabric1[0].optionalFabricSensitiveInt8u = 54
-        expectedDataFabric1[0].nullableFabricSensitiveInt8u = 55
-        expectedDataFabric1[0].nullableOptionalFabricSensitiveInt8u = Clusters.Types.NullValue
-        expectedDataFabric1[0].fabricSensitiveCharString = "alpha3"
-        expectedDataFabric1[0].fabricSensitiveStruct.a = 56
-        expectedDataFabric1[0].fabricSensitiveInt8uList = [51, 52, 53, 54]
+        expectedDataFabric1[0].fabricIndex=100
+        expectedDataFabric1[0].fabricSensitiveInt8u=53
+        expectedDataFabric1[0].optionalFabricSensitiveInt8u=54
+        expectedDataFabric1[0].nullableFabricSensitiveInt8u=55
+        expectedDataFabric1[0].nullableOptionalFabricSensitiveInt8u=Clusters.Types.NullValue
+        expectedDataFabric1[0].fabricSensitiveCharString="alpha3"
+        expectedDataFabric1[0].fabricSensitiveStruct.a=56
+        expectedDataFabric1[0].fabricSensitiveInt8uList=[51, 52, 53, 54]
 
         expectedDataFabric1.pop(1)
 
@@ -360,19 +360,19 @@ class BaseTestHelper:
         self.logger.info(
             "Reading back data (again) from fabric2 to ensure it hasn't changed")
 
-        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric2 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data=await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
+        readListDataFabric2=data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
         if (expectedDataFabric2 != readListDataFabric2):
             raise AssertionError("Got back mismatched data")
 
         self.logger.info(
             "Reading back data (again) from fabric1 to ensure it hasn't changed")
 
-        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric1 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data=await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
+        readListDataFabric1=data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
 
         self.logger.info("Comparing data on fabric1...")
-        expectedDataFabric1[0].fabricIndex = self.currentFabric1
+        expectedDataFabric1[0].fabricIndex=self.currentFabric1
         if (expectedDataFabric1 != readListDataFabric1):
             raise AssertionError("Got back mismatched data")
 
@@ -394,8 +394,8 @@ class BaseTestHelper:
     def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
         self.logger.info(
             "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))
-        err, resp = self.devCtrl.ZCLSend("OnOff", "On", nodeid,
-                                         endpoint, group, {}, blocking=True)
+        err, resp=self.devCtrl.ZCLSend("OnOff", "On", nodeid,
+                                         endpoint, group, {}, blocking = True)
         if err != 0:
             self.logger.error(
                 "failed to send OnOff.On: error is {} with im response{}".format(err, resp))

@@ -6001,7 +6001,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeListFabricScopedWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeListFabricScopedWithMinInterval:(NSNumber * _Nonnull)minInterval
                                               maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                   params:(CHIPReadParams * _Nullable)params
+                                                   params:(CHIPSubscribeParams * _Nullable)params
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;

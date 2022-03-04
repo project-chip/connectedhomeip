@@ -78,7 +78,7 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter &writer, TLV::Tag tag, FabricIndex
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter &writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
 {
-    {{#if struct_has_sensitive_fields}}
+    {{#if struct_has_fabric_sensitive_fields}}
     bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == {{ asLowerCamelCase struct_fabric_idx_field }});
     {{/if}}
     TLV::TLVType outer;
