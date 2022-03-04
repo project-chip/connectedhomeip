@@ -27,7 +27,6 @@
 #include <string>
 
 using namespace ::chip;
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
@@ -322,4 +321,3 @@ bool ESPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

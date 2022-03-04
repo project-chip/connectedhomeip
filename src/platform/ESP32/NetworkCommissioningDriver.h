@@ -22,7 +22,6 @@
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 namespace {
 constexpr uint8_t kMaxWiFiNetworks                  = 1;
 constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
@@ -126,11 +125,7 @@ private:
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
 };
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-// TODO: Add Thread Driver for ESP32H2 platform
-#endif
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip
