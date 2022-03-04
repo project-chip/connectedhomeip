@@ -264,7 +264,7 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemState = nullptr;
 
     mDNSResolver.Shutdown();
-    mDeviceDiscoveryDelegate     = nullptr;
+    mDeviceDiscoveryDelegate = nullptr;
 
     chip::Platform::Delete(mCASESessionManager);
     mCASESessionManager = nullptr;
