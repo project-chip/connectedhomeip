@@ -102,6 +102,14 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         acceptData.Length       = mTransfer.GetTransferLength();
         VerifyOrReturn(mTransfer.AcceptTransfer(acceptData) == CHIP_NO_ERROR,
                        ChipLogError(BDX, "%s: %s", __FUNCTION__, chip::ErrorStr(err)));
+
+        // Store the file designator, used during block query
+        uint16_t fdl       = 0;
+        const uint8_t * fd = mTransfer.GetFileDesignator(fdl);
+        VerifyOrReturn(fdl < sizeof(mFileDesignator), ChipLogError(BDX, "Cannot store file designator with length = %d", fdl));
+        memcpy(mFileDesignator, fd, fdl);
+        mFileDesignator[fdl] = 0;
+
         break;
     }
     case TransferSession::OutputEventType::kQueryReceived: {
@@ -138,8 +146,11 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         blockData.Data = blockBuf->Start();
         mNumBytesSent  = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
 
-        VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlock(blockData),
-                       ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err)));
+        if (CHIP_NO_ERROR != mTransfer.PrepareBlock(blockData))
+        {
+            ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err));
+            mTransfer.AbortTransfer(StatusCode::kUnknown);
+        }
         break;
     }
     case TransferSession::OutputEventType::kAckReceived:
@@ -202,15 +213,19 @@ void BdxOtaSender::Reset()
 {
     mFabricIndex.ClearValue();
     mNodeId.ClearValue();
-    mTransfer.Reset();
-    if (mExchangeCtx != nullptr)
+
+    // mExchangeCtx->Close() will crash if ExchangeMgr is nullptr. So, check for nullptr before calling Close().
+    if (mExchangeCtx && mExchangeCtx->GetExchangeMgr())
     {
         mExchangeCtx->Close();
         mExchangeCtx = nullptr;
     }
+    mTransfer.Reset();
 
     mInitialized  = false;
     mNumBytesSent = 0;
+
+    memset(mFileDesignator, 0, sizeof(mFileDesignator));
 }
 
 uint16_t BdxOtaSender::GetTransferBlockSize(void)
