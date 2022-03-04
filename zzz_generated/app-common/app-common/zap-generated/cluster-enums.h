@@ -1115,9 +1115,6 @@ enum class DlUserType : uint8_t
     kRemoteOnlyUser         = 0x09,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockOperationEventCode
 enum class DoorLockOperationEventCode : uint8_t
 {
@@ -1137,13 +1134,7 @@ enum class DoorLockOperationEventCode : uint8_t
     kManualLock            = 0x0D,
     kManualUnlock          = 0x0E,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockOperationEventCode      = EmberAfDoorLockOperationEventCode;
-#endif
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockProgrammingEventCode
 enum class DoorLockProgrammingEventCode : uint8_t
 {
@@ -1155,9 +1146,6 @@ enum class DoorLockProgrammingEventCode : uint8_t
     kIdAdded              = 0x05,
     kIdDeleted            = 0x06,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockProgrammingEventCode    = EmberAfDoorLockProgrammingEventCode;
-#endif
 
 // Enum for DoorLockSetPinOrIdStatus
 enum class DoorLockSetPinOrIdStatus : uint8_t
@@ -1168,9 +1156,6 @@ enum class DoorLockSetPinOrIdStatus : uint8_t
     kDuplicateCodeError = 0x03,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockUserStatus
 enum class DoorLockUserStatus : uint8_t
 {
@@ -1179,13 +1164,7 @@ enum class DoorLockUserStatus : uint8_t
     kOccupiedDisabled = 0x03,
     kNotSupported     = 0xFF,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockUserStatus              = EmberAfDoorLockUserStatus;
-#endif
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockUserType
 enum class DoorLockUserType : uint8_t
 {
@@ -1196,9 +1175,6 @@ enum class DoorLockUserType : uint8_t
     kNonAccessUser       = 0x04,
     kNotSupported        = 0xFF,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockUserType                = EmberAfDoorLockUserType;
-#endif
 
 // Bitmap for DlAlarmMask
 enum class DlAlarmMask : uint16_t
