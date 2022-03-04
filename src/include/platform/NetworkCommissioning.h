@@ -154,10 +154,26 @@ namespace Internal {
 class BaseDriver
 {
 public:
+    class NetworkStatusChangeCallback
+    {
+    public:
+        /**
+         * @brief Callback for the network driver pushing the event of network status change to the network commissioning cluster.
+         * The platforms is explected to push the status from operations such as autonomous connection after loss of connectivity or
+         * during initial establishment.
+         *
+         * This function must be called in a thread-safe manner with CHIP stack.
+         */
+        virtual void OnNetworkingStatusChange(Status commissioningError, Optional<ByteSpan> networkId,
+                                              Optional<int32_t> connectStatus) = 0;
+
+        virtual ~NetworkStatusChangeCallback() = default;
+    };
+
     /**
      * @brief Initializes the driver, this function will be called when initializing the network commissioning cluster.
      */
-    virtual CHIP_ERROR Init() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) { return CHIP_NO_ERROR; }
 
     /**
      * @brief Shuts down the driver, this function will be called when shutting down the network commissioning cluster.

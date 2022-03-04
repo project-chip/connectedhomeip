@@ -37,6 +37,7 @@ namespace NetworkCommissioning {
 class Instance : public CommandHandlerInterface,
                  public AttributeAccessInterface,
                  public DeviceLayer::NetworkCommissioning::Internal::WirelessDriver::ConnectCallback,
+                 public DeviceLayer::NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback,
                  public DeviceLayer::NetworkCommissioning::WiFiDriver::ScanCallback,
                  public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
 {
@@ -53,6 +54,10 @@ public:
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+    // BaseDriver::NetworkStatusChangeCallback
+    void OnNetworkingStatusChange(DeviceLayer::NetworkCommissioning::Status aCommissioningError, Optional<ByteSpan> aNetworkId,
+                                  Optional<int32_t> aConnectStatus) override;
 
     // WirelessDriver::ConnectCallback
     void OnResult(DeviceLayer::NetworkCommissioning::Status commissioningError, CharSpan errorText,
@@ -84,8 +89,9 @@ private:
     // Last* attributes
     // Setting these values don't have to care about parallel requests, since we will reject other requests when there is another
     // request ongoing.
+    // These values can be updated via OnNetworkingStatusChange callback, ScanCallback::OnFinished and ConnectCallback::OnResult.
     DataModel::Nullable<NetworkCommissioningStatus> mLastNetworkingStatusValue;
-    DataModel::Nullable<Attributes::LastConnectErrorValue::TypeInfo::Type> mLastConnectErrorValue;
+    Attributes::LastConnectErrorValue::TypeInfo::Type mLastConnectErrorValue;
     uint8_t mConnectingNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
     uint8_t mConnectingNetworkIDLen = 0;
     uint8_t mLastNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];

@@ -37,6 +37,7 @@
 
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
+uint8_t ESP32Utils::mLastDisconnectedReason;
 
 CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 {
@@ -54,6 +55,21 @@ CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ESP32Utils::IsStationEnabled(bool & staEnabled)
+{
+    wifi_mode_t curWiFiMode;
+    esp_err_t err = esp_wifi_get_mode(&curWiFiMode);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", esp_err_to_name(err));
+        return ESP32Utils::MapError(err);
+    }
+
+    staEnabled = (curWiFiMode == WIFI_MODE_STA || curWiFiMode == WIFI_MODE_APSTA);
+
+    return CHIP_NO_ERROR;
+}
+
 bool ESP32Utils::IsStationProvisioned(void)
 {
     wifi_config_t stationConfig;
@@ -65,6 +81,20 @@ CHIP_ERROR ESP32Utils::IsStationConnected(bool & connected)
     wifi_ap_record_t apInfo;
     connected = (esp_wifi_sta_get_ap_info(&apInfo) == ESP_OK);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ESP32Utils::SetLastDisconnectReason(const ChipDeviceEvent * event)
+{
+    VerifyOrReturnError(event->Type == DeviceEventType::kESPSystemEvent && event->Platform.ESPSystemEvent.Base == WIFI_EVENT &&
+                            event->Platform.ESPSystemEvent.Id == WIFI_EVENT_STA_DISCONNECTED,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    mLastDisconnectedReason = event->Platform.ESPSystemEvent.Data.WiFiStaDisconnected.reason;
+    return CHIP_NO_ERROR;
+}
+
+int32_t ESP32Utils::GetLastDisconnectReason()
+{
+    return mLastDisconnectedReason;
 }
 
 CHIP_ERROR ESP32Utils::StartWiFiLayer(void)
