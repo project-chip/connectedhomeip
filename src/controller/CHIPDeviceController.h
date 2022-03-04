@@ -332,8 +332,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    FabricInfo * GetFabricInfo() { return mFabricInfo; }
-
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
