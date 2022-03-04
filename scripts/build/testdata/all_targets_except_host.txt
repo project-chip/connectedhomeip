@@ -92,6 +92,7 @@ infineon-p6-light
 infineon-p6-lock
 k32w-light (NOGLOB: Debug builds broken due to LWIP_DEBUG redefition)
 k32w-light-release
+k32w-light-tokenizer-release (NOGLOB: Only on demand build)
 k32w-lock-low-power-release (NOGLOB: Only on demand build)
 k32w-lock-release
 k32w-shell-release

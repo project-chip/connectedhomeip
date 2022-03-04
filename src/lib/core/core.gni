@@ -33,6 +33,9 @@ declare_args() {
   # Enable automation logging.
   chip_automation_logging = chip_logging
 
+  # Enable pigweed tokenizer logging.
+  chip_pw_tokenizer_logging = false
+
   # Enable short error strings.
   chip_config_short_error_str = false
 
