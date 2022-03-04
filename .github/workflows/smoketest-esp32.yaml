@@ -25,7 +25,7 @@ concurrency:
 jobs:
     esp32:
         name: Smoke Run - ESP32
-        timeout-minutes: 30
+        timeout-minutes: 45
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
