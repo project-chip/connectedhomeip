@@ -48,9 +48,9 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - uses: Wandalen/wretry.action@v1.0.11
-              name: Retry Checkout
+              name: Checkout
               with:
-                  action: actions/checkout@v2
+                  action: actions/checkout@v3
                   with: |
                       submodules: true
                       token: ${{ github.token }}
@@ -121,10 +121,15 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             # - name: Initialize CodeQL
             #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
             #   uses: github/codeql-action/init@v1
@@ -243,10 +248,15 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -268,10 +278,15 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             #- name: Initialize CodeQL
             #  if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
             #  uses: github/codeql-action/init@v1

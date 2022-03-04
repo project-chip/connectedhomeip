@@ -35,10 +35,15 @@ jobs:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
@@ -56,8 +61,8 @@ jobs:
               with:
                   name: bootstrap-logs
                   path: |
-                   .environment/gn_out/.ninja_log
-                   .environment/pigweed-venv/*.log
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
 
             - name: Build lock-app example
               timeout-minutes: 20
