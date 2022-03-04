@@ -205,8 +205,8 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
         // If mUserConsentNeeded (set by the CLI) is true and requestor is capable of taking user consent
         // then delegate obtaining user consent to the requestor
-        if (mUserConsentDelegate && queryStatus == OTAQueryStatus::kUpdateAvailable
-                && (requestorCanConsent && mUserConsentNeeded) == false)
+        if (mUserConsentDelegate && queryStatus == OTAQueryStatus::kUpdateAvailable &&
+            (requestorCanConsent && mUserConsentNeeded) == false)
         {
             UserConsentState state = mUserConsentDelegate->GetUserConsentState(
                 GetUserConsentSubject(commandObj, commandPath, commandData, newSoftwareVersion));
