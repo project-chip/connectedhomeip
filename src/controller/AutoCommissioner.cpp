@@ -222,7 +222,6 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage)
 
 CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)
 {
-    // TODO: check that there is no commissioning in progress currently.
     if (commissioner == nullptr)
     {
         ChipLogError(Controller, "Invalid DeviceCommissioner");
