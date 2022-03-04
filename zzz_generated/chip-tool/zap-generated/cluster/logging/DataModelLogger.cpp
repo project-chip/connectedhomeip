@@ -8905,7 +8905,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("remote sensing", 1, value);
         }
         case Thermostat::Attributes::ControlSequenceOfOperation::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::ThermostatControlSequence value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("control sequence of operation", 1, value);
         }

@@ -413,6 +413,18 @@ typedef void (*NullablePumpConfigurationAndControlClusterPumpOperationModeAttrib
 typedef void (*ThermostatClusterSetpointAdjustModeAttributeCallback)(void *, chip::app::Clusters::Thermostat::SetpointAdjustMode);
 typedef void (*NullableThermostatClusterSetpointAdjustModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::SetpointAdjustMode> &);
+typedef void (*ThermostatClusterThermostatControlSequenceAttributeCallback)(
+    void *, chip::app::Clusters::Thermostat::ThermostatControlSequence);
+typedef void (*NullableThermostatClusterThermostatControlSequenceAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatControlSequence> &);
+typedef void (*ThermostatClusterThermostatRunningModeAttributeCallback)(void *,
+                                                                        chip::app::Clusters::Thermostat::ThermostatRunningMode);
+typedef void (*NullableThermostatClusterThermostatRunningModeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatRunningMode> &);
+typedef void (*ThermostatClusterThermostatSystemModeAttributeCallback)(void *,
+                                                                       chip::app::Clusters::Thermostat::ThermostatSystemMode);
+typedef void (*NullableThermostatClusterThermostatSystemModeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> &);
 typedef void (*ColorControlClusterColorLoopActionAttributeCallback)(void *, chip::app::Clusters::ColorControl::ColorLoopAction);
 typedef void (*NullableColorControlClusterColorLoopActionAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopAction> &);
@@ -13278,6 +13290,184 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThermostatClusterThermostatControlSequenceAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThermostatClusterThermostatControlSequenceAttributeCallback>
+{
+public:
+    CHIPThermostatClusterThermostatControlSequenceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatClusterThermostatControlSequenceAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatControlSequence value);
+};
+
+class CHIPThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge
+    : public CHIPThermostatClusterThermostatControlSequenceAttributeCallbackBridge
+{
+public:
+    CHIPThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThermostatClusterThermostatControlSequenceAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableThermostatClusterThermostatControlSequenceAttributeCallback>
+{
+public:
+    CHIPNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableThermostatClusterThermostatControlSequenceAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatControlSequence> & value);
+};
+
+class CHIPNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge
+    : public CHIPNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge
+{
+public:
+    CHIPNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThermostatClusterThermostatRunningModeAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThermostatClusterThermostatRunningModeAttributeCallback>
+{
+public:
+    CHIPThermostatClusterThermostatRunningModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatClusterThermostatRunningModeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatRunningMode value);
+};
+
+class CHIPThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge
+    : public CHIPThermostatClusterThermostatRunningModeAttributeCallbackBridge
+{
+public:
+    CHIPThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThermostatClusterThermostatRunningModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableThermostatClusterThermostatRunningModeAttributeCallback>
+{
+public:
+    CHIPNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableThermostatClusterThermostatRunningModeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatRunningMode> & value);
+};
+
+class CHIPNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge
+{
+public:
+    CHIPNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPThermostatClusterThermostatSystemModeAttributeCallbackBridge
+    : public CHIPCallbackBridge<ThermostatClusterThermostatSystemModeAttributeCallback>
+{
+public:
+    CHIPThermostatClusterThermostatSystemModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ThermostatClusterThermostatSystemModeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatSystemMode value);
+};
+
+class CHIPThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge
+    : public CHIPThermostatClusterThermostatSystemModeAttributeCallbackBridge
+{
+public:
+    CHIPThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPThermostatClusterThermostatSystemModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableThermostatClusterThermostatSystemModeAttributeCallback>
+{
+public:
+    CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableThermostatClusterThermostatSystemModeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> & value);
+};
+
+class CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge
+{
+public:
+    CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

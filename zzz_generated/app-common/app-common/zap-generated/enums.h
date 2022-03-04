@@ -475,37 +475,6 @@ enum EmberAfTemperatureDisplayMode : uint8_t
     EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_FAHRENHEIT = 1,
 };
 
-// Enum for ThermostatControlSequence
-enum EmberAfThermostatControlSequence : uint8_t
-{
-    EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_ONLY                    = 0,
-    EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_WITH_REHEAT             = 1,
-    EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_HEATING_ONLY                    = 2,
-    EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_HEATING_WITH_REHEAT             = 3,
-    EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_AND_HEATING             = 4,
-    EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_AND_HEATING_WITH_REHEAT = 5,
-};
-
-// Enum for ThermostatRunningMode
-enum EmberAfThermostatRunningMode : uint8_t
-{
-    EMBER_ZCL_THERMOSTAT_RUNNING_MODE_OFF  = 0,
-    EMBER_ZCL_THERMOSTAT_RUNNING_MODE_COOL = 3,
-    EMBER_ZCL_THERMOSTAT_RUNNING_MODE_HEAT = 4,
-};
-
-// Enum for ThermostatSystemMode
-enum EmberAfThermostatSystemMode : uint8_t
-{
-    EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_OFF               = 0,
-    EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_AUTO              = 1,
-    EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_COOL              = 3,
-    EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_HEAT              = 4,
-    EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_EMERGENCY_HEATING = 5,
-    EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_PRECOOLING        = 6,
-    EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_FAN_ONLY          = 7,
-};
-
 // Enum for WcEndProductType
 enum EmberAfWcEndProductType : uint8_t
 {

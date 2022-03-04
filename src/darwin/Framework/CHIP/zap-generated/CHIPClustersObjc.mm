@@ -28186,12 +28186,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeControlSequenceOfOperationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
-        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPThermostatClusterThermostatControlSequenceAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
+            auto successFn = Callback<ThermostatClusterThermostatControlSequenceAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)writeAttributeControlSequenceOfOperationWithValue:(NSNumber * _Nonnull)value
@@ -28206,7 +28207,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -28221,15 +28222,15 @@ using namespace chip::app::Clusters;
                                                       reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))reportHandler
 {
-    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+    new CHIPThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<ThermostatClusterThermostatControlSequenceAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                CHIPThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
                 params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
                 params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
         },

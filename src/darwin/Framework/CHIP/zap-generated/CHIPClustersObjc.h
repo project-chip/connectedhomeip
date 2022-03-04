@@ -8909,6 +8909,31 @@ typedef NS_ENUM(NSInteger, CHIPThermostatSetpointAdjustMode) {
     CHIPThermostatSetpointAdjustModeHeatAndCoolSetpoints = 0x02,
 };
 
+typedef NS_ENUM(NSInteger, CHIPThermostatControlSequence) {
+    CHIPThermostatControlSequenceCoolingOnly = 0x00,
+    CHIPThermostatControlSequenceCoolingWithReheat = 0x01,
+    CHIPThermostatControlSequenceHeatingOnly = 0x02,
+    CHIPThermostatControlSequenceHeatingWithReheat = 0x03,
+    CHIPThermostatControlSequenceCoolingAndHeating = 0x04,
+    CHIPThermostatControlSequenceCoolingAndHeatingWithReheat = 0x05,
+};
+
+typedef NS_ENUM(NSInteger, CHIPThermostatRunningMode) {
+    CHIPThermostatRunningModeOff = 0x00,
+    CHIPThermostatRunningModeCool = 0x03,
+    CHIPThermostatRunningModeHeat = 0x04,
+};
+
+typedef NS_ENUM(NSInteger, CHIPThermostatSystemMode) {
+    CHIPThermostatSystemModeOff = 0x00,
+    CHIPThermostatSystemModeAuto = 0x01,
+    CHIPThermostatSystemModeCool = 0x03,
+    CHIPThermostatSystemModeHeat = 0x04,
+    CHIPThermostatSystemModeEmergencyHeating = 0x05,
+    CHIPThermostatSystemModePrecooling = 0x06,
+    CHIPThermostatSystemModeFanOnly = 0x07,
+};
+
 typedef NS_OPTIONS(NSUInteger, CHIPThermostatDayOfWeek) {
     CHIPThermostatDayOfWeekSunday = 0x1,
     CHIPThermostatDayOfWeekMonday = 0x2,
