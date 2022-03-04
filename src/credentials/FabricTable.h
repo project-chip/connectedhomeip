@@ -295,9 +295,7 @@ private:
 
     struct StorableFabricInfo
     {
-        uint16_t mFabric;   /* This field is serialized in LittleEndian byte order */
-        uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
-        uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
+        uint8_t mFabricIndex;
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
 
         uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
