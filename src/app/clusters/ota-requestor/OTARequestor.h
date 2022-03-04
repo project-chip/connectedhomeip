@@ -54,10 +54,10 @@ public:
     // Initiate download of the new image
     void DownloadUpdate() override;
 
-    // Send ApplyImage
+    // Initiate the session to send ApplyUpdateRequest command
     void ApplyUpdate() override;
 
-    // Send NotifyUpdateApplied, update Basic cluster SoftwareVersion attribute, log the VersionApplied event
+    // Initiate the session to send NotifyUpdateApplied command
     void NotifyUpdateApplied(uint32_t version) override;
 
     // Get image update progress in percents unit
@@ -230,7 +230,7 @@ private:
     enum OnConnectedAction
     {
         kQueryImage = 0,
-        kStartBDX,
+        kDownload,
         kApplyUpdate,
         kNotifyUpdateApplied,
     };
