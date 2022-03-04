@@ -566,6 +566,21 @@ typedef void (*CHIPEthernetNetworkDiagnosticsClusterFeatureMapAttributeCallbackT
 typedef void (*CHIPEthernetNetworkDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
+typedef void (*CHIPFanControlClusterFanModeAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::FanMode::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterFanModeSequenceAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::FanModeSequence::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterServerGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::FanControl::Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPFanControlClusterClientGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::FanControl::Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPFanControlClusterAttributeListAttributeCallbackType)(
+    void *, const chip::app::Clusters::FanControl::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPFanControlClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::FeatureMap::TypeInfo::DecodableArgType);
+typedef void (*CHIPFanControlClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::FanControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
 typedef void (*CHIPFixedLabelClusterLabelListAttributeCallbackType)(
     void *, const chip::app::Clusters::FixedLabel::Attributes::LabelList::TypeInfo::DecodableType &);
 typedef void (*CHIPFixedLabelClusterServerGeneratedCommandListAttributeCallbackType)(

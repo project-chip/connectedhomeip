@@ -1646,6 +1646,16 @@ client cluster EthernetNetworkDiagnostics = 55 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+client cluster FanControl = 514 {
+  attribute enum8 fanMode = 0;
+  attribute enum8 fanModeSequence = 1;
+  readonly global attribute command_id serverGeneratedCommandList[] = 65528;
+  readonly global attribute command_id clientGeneratedCommandList[] = 65529;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 client cluster FixedLabel = 64 {
   readonly attribute LabelStruct labelList[] = 0;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
@@ -4039,6 +4049,7 @@ endpoint 1 {
   binding cluster DoorLock;
   binding cluster ElectricalMeasurement;
   binding cluster EthernetNetworkDiagnostics;
+  binding cluster FanControl;
   binding cluster FixedLabel;
   binding cluster FlowMeasurement;
   binding cluster GeneralCommissioning;

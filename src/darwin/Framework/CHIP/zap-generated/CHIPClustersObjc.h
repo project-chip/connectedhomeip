@@ -2626,6 +2626,79 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Fan Control
+ *
+ */
+@interface CHIPFanControl : CHIPCluster
+
+- (void)readAttributeFanModeWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeFanModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeFanModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                          params:(CHIPSubscribeParams * _Nullable)params
+                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeFanModeSequenceWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)writeAttributeFanModeSequenceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeFanModeSequenceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
+                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                           reportHandler:
+                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(CHIPSubscribeParams * _Nullable)params
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                params:(CHIPSubscribeParams * _Nullable)params
+                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                         reportHandler:
+                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
+                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                           reportHandler:
+                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+@end
+
+/**
  * Cluster Fixed Label
  *
  */
