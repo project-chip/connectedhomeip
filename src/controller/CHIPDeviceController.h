@@ -220,20 +220,6 @@ public:
 
     /**
      * @brief
-     *   This function update the device informations asynchronously using dnssd.
-     *
-     * @param[in] deviceId  Node ID for the CHIP device
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR UpdateDevice(NodeId deviceId)
-    {
-        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
-    }
-
-    /**
-     * @brief
      *   Compute a PASE verifier and passcode ID for the desired setup pincode.
      *
      *   This can be used to open a commissioning window on the device for

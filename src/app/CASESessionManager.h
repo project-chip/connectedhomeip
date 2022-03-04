@@ -21,7 +21,6 @@
 #include <app/CASEClientPool.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/OperationalDeviceProxyPool.h>
-#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/dnssd/DnssdCache.h>
@@ -38,8 +37,6 @@ struct CASESessionManagerConfig
     DeviceProxyInitParams sessionInitParams;
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
     OperationalDeviceProxyPoolDelegate * devicePool           = nullptr;
-    Dnssd::ResolverProxy * dnsResolver                        = nullptr;
-    AddressResolve::Resolver * addressResolver                = nullptr;
 };
 
 /**
@@ -83,15 +80,6 @@ public:
     void ReleaseSessionsForFabric(CompressedFabricId compressedFabricId);
 
     void ReleaseAllSessions();
-
-    /**
-     * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up
-     * on the fabric that was configured for the CASESessionManager object.
-     *
-     * The results of the DNS-SD resolution request is provided to the class via `OperationalResolveDelegate`
-     * implementation of CASESessionManager.
-     */
-    CHIP_ERROR ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId);
 
     /**
      * This API returns the address for the given node ID.

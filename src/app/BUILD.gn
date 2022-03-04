@@ -156,13 +156,14 @@ static_library("app") {
   public_deps = [
     ":app_buildconfig",
     "${chip_root}/src/access",
-    "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
+
+  deps = [ "${chip_root}/src/lib/address_resolve" ]
 
   cflags = [ "-Wconversion" ]
 

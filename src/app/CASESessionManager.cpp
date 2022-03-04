@@ -17,19 +17,14 @@
  */
 
 #include <app/CASESessionManager.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 
 CHIP_ERROR CASESessionManager::Init()
 {
-    if (mConfig.dnsResolver == nullptr)
-    {
-        ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
-        mDNSResolver.SetOperationalDelegate(this);
-        mConfig.dnsResolver = &mDNSResolver;
-    }
-    return CHIP_NO_ERROR;
+    return AddressResolve::Resolver::Instance().Init(&DeviceLayer::SystemLayer());
 }
 
 CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
@@ -63,7 +58,7 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
         session->OnNodeIdResolved(resolutionData);
     }
 
-    CHIP_ERROR err = session->Connect(onConnection, onFailure, mConfig.dnsResolver);
+    CHIP_ERROR err = session->Connect(onConnection, onFailure);
     if (err != CHIP_NO_ERROR)
     {
         // Release the peer rather than the pointer in case the failure handler has already released the session.
@@ -86,12 +81,6 @@ void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedF
 void CASESessionManager::ReleaseAllSessions()
 {
     mConfig.devicePool->ReleaseAllDevices();
-}
-
-CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
-{
-    VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
 }
 
 void CASESessionManager::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData)

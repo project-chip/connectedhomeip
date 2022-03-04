@@ -112,7 +112,7 @@ public:
      * returned.
      */
     CHIP_ERROR Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                       Callback::Callback<OnDeviceConnectionFailure> * onFailure, Dnssd::ResolverProxy * resolver);
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
     bool IsConnected() const { return mState == State::SecureConnected; }
 

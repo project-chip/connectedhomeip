@@ -111,8 +111,6 @@ Server::Server() :
         },
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
-        .dnsResolver       = nullptr,
-        .addressResolver   = &AddressResolve::Resolver::Instance(),
     }), mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage),
     mAttributePersister(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
 {}

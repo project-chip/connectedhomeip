@@ -162,8 +162,6 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .sessionInitParams = deviceInitParams,
         .dnsCache          = &mDNSCache,
         .devicePool        = &mDevicePool,
-        .dnsResolver       = &mDNSResolver,
-        .addressResolver   = &AddressResolve::Resolver::Instance(),
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
@@ -295,7 +293,11 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
     VerifyOrReturn(session->GetSessionType() == Transport::Session::SessionType::kSecure);
-    CHIP_ERROR err = UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
+    // TODO: implement a retry for lookup
+    // RESOLVE-TODO
+    // CHIP_ERROR err = UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
+    //
+    CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller,
@@ -2016,7 +2018,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kFindOperational: {
-        CHIP_ERROR err = UpdateDevice(proxy->GetDeviceId());
+        // FIXME: implement a proper lookup
+        // RESOLVE-TODO
+        // CHIP_ERROR err = UpdateDevice(proxy->GetDeviceId());
+        CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to proceed to operational discovery\n");

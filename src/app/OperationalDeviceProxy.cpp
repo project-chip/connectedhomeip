@@ -30,6 +30,7 @@
 #include "CommandSender.h"
 #include "ReadPrepareParams.h"
 
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/Resolver.h>
@@ -43,8 +44,7 @@ using namespace chip::Callback;
 namespace chip {
 
 CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                           Dnssd::ResolverProxy * resolver)
+                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -55,8 +55,12 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         break;
 
     case State::NeedsAddress:
-        VerifyOrReturnError(resolver != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        err = resolver->ResolveNodeId(mPeerId, Inet::IPAddressType::kAny);
+        // RESOLVE-TODO
+        // TODO: implement
+        //    Use AddressResolve::Instance
+        //
+        // err = resolver->ResolveNodeId(mPeerId, Inet::IPAddressType::kAny);
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
         EnqueueConnectionCallbacks(onConnection, onFailure);
         break;
 
