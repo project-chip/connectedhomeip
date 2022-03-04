@@ -166,6 +166,7 @@ public:
     }
 
     uint16_t GetVendorId() const { return mVendorId; }
+
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
     Crypto::P256Keypair * GetOperationalKey()

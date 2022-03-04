@@ -21,6 +21,7 @@
 
 #include "FabricTable.h"
 
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
@@ -167,6 +168,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
     // The compressed fabric ID doesn't change for a fabric over time.
     // Computing it here will save computational overhead when it's accessed by other
     // parts of the code.
+    SuccessOrExit(err = ExtractNodeIdFabricIdFromOpCert(ByteSpan(info->mNOCCert, nocCertLen), &nodeId, &mFabricId));
     SuccessOrExit(err = GeneratePeerId(mFabricId, nodeId, &mOperationalId));
 
     SuccessOrExit(err = SetICACert(ByteSpan(info->mICACert, icaCertLen)));
