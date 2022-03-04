@@ -336,7 +336,7 @@ bool ESPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     if (err == CHIP_NO_ERROR)
     {
         bool isConnected = false;
-        err = ESP32Utils::IsStationConnected(isConnected);
+        err              = ESP32Utils::IsStationConnected(isConnected);
         if (err == CHIP_NO_ERROR && isConnected && configuredNetwork.networkIDLen == item.networkIDLen &&
             memcmp(configuredNetwork.networkID, item.networkID, item.networkIDLen) == 0)
         {

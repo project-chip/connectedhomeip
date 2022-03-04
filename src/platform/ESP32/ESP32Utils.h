@@ -53,6 +53,7 @@ public:
     static CHIP_ERROR MapError(esp_err_t error);
     static void RegisterESP32ErrorFormatter();
     static bool FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err);
+
 private:
     static uint8_t mLastDisconnectedReason;
 };
