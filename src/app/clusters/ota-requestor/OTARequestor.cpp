@@ -385,11 +385,9 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, err);
             return;
         }
-
-        // The kQuerying state is set in TriggerImmediateQueryInternal(), do not set it here
         break;
     }
-    case kStartBDX: {
+    case kDownload: {
         CHIP_ERROR err = requestorCore->StartDownload(*deviceProxy);
 
         if (err != CHIP_NO_ERROR)
@@ -398,8 +396,6 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kDownloading, err);
             return;
         }
-
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDownloading, OTAChangeReasonEnum::kSuccess);
         break;
     }
     case kApplyUpdate: {
@@ -411,8 +407,6 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, err);
             return;
         }
-
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kApplying, OTAChangeReasonEnum::kSuccess);
         break;
     }
     case kNotifyUpdateApplied: {
@@ -424,8 +418,6 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, err);
             return;
         }
-
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         break;
     }
     default:
@@ -447,7 +439,7 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
     case kQueryImage:
         requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
         break;
-    case kStartBDX:
+    case kDownload:
         requestorCore->RecordErrorUpdateState(UpdateFailureState::kDownloading, error);
         break;
     case kApplyUpdate:
@@ -483,10 +475,6 @@ OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 
     SetCurrentProviderLocation(providerLocation);
 
-    // We are now querying a provider, leave the kIdle state.
-    // No state matches this one fully but we can't be in kIdle.
-    RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
-
     // Go through the driver as it has additional logic to execute
     mOtaRequestorDriver->SendQueryImage();
 
@@ -495,11 +483,13 @@ OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 
 void OTARequestor::DownloadUpdate()
 {
-    ConnectToProvider(kStartBDX);
+    RecordNewUpdateState(OTAUpdateStateEnum::kDownloading, OTAChangeReasonEnum::kSuccess);
+    ConnectToProvider(kDownload);
 }
 
 void OTARequestor::ApplyUpdate()
 {
+    RecordNewUpdateState(OTAUpdateStateEnum::kApplying, OTAChangeReasonEnum::kSuccess);
     ConnectToProvider(kApplyUpdate);
 }
 
@@ -518,6 +508,9 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
     }
 
     OtaRequestorServerOnVersionApplied(version, productId);
+
+    // There is no response for a notify so consider this OTA complete
+    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
 
     ConnectToProvider(kNotifyUpdateApplied);
 }

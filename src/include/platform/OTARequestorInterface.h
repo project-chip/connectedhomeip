@@ -182,10 +182,10 @@ public:
     // Download image
     virtual void DownloadUpdate() = 0;
 
-    // Send ApplyImage command
+    // Initiate the session to send ApplyUpdateRequest command
     virtual void ApplyUpdate() = 0;
 
-    // Send NotifyUpdateApplied command
+    // Initiate the session to send NotifyUpdateApplied command
     virtual void NotifyUpdateApplied(uint32_t version) = 0;
 
     // Get image update progress in percents unit
