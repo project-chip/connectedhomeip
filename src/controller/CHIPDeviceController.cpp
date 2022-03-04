@@ -1459,7 +1459,10 @@ void DeviceCommissioner::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNo
 
     mDNSCache.Insert(nodeData);
 
-    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    // If we called resolve on this node, we will have created as session. If so, we want to get it.
+    if (mCASESessionManager->FindExistingSession(nodeData.mPeerId) != nullptr) {
+        mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    }
     DeviceController::OnOperationalNodeResolved(nodeData);
 }
 

@@ -230,7 +230,8 @@ public:
     CHIP_ERROR UpdateDevice(NodeId deviceId)
     {
         VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
+        bool establishSession = true;
+        return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId, establishSession);
     }
 
     /**

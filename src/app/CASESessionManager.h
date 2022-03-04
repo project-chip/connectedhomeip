@@ -89,7 +89,7 @@ public:
      * The results of the DNS-SD resolution request is provided to the class via `OperationalResolveDelegate`
      * implementation of CASESessionManager.
      */
-    CHIP_ERROR ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId);
+    CHIP_ERROR ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId, bool establishSession = false);
 
     /**
      * This API returns the address for the given node ID.
@@ -107,6 +107,8 @@ public:
 
 private:
     OperationalDeviceProxy * FindSession(const SessionHandle & session);
+    CHIP_ERROR FindOrCreateSession(const PeerId & peerid, OperationalDeviceProxy ** returnSession);
+
     void ReleaseSession(OperationalDeviceProxy * device);
 
     CASESessionManagerConfig mConfig;
