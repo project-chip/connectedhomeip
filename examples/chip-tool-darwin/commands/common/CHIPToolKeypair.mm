@@ -57,8 +57,8 @@ std::string Base64ToString(const std::string & b64Value)
 
 - (NSData *)ECDSA_sign_hash:(NSData *)hash
 {
-    chip::Crypto::P256ECDSASignature signature; 
-    NSData *out_signature; 
+    chip::Crypto::P256ECDSASignature signature;
+    NSData *out_signature;
     CHIP_ERROR signing_error = _mKeyPair.ECDSA_sign_hash((const uint8_t *)[hash bytes], (const size_t)[hash length], signature);
     if (signing_error != CHIP_NO_ERROR) return nil;
     out_signature = [NSData dataWithBytes:signature length:sizeof(signature)];
@@ -90,7 +90,7 @@ std::string Base64ToString(const std::string & b64Value)
     chip::Crypto::P256SerializedKeypair serializedKey;
     NSString * value;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
       // Initializing the default start validity to start of 2021. The default validity duration is 10 years.
     CHIP_ZERO_AT(effectiveTime);
     effectiveTime.Year = 2021;
@@ -99,7 +99,7 @@ std::string Base64ToString(const std::string & b64Value)
     ReturnErrorOnFailure(chip::Credentials::ASN1ToChipEpochTime(effectiveTime, _mNow));
 
     uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
-    
+
     value = [storage CHIPGetKeyValue: kOperationalCredentialsIssuerKeypairStorage];
     err = [self decodeNSStringWithValue: value serializedKey:serializedKey];
     serializedKey.SetLength(keySize);
@@ -147,7 +147,7 @@ std::string Base64ToString(const std::string & b64Value)
     } else {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
-        
+
     serializedKey.SetLength(keySize);
     return err;
 }
