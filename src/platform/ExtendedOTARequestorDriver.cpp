@@ -26,36 +26,37 @@ constexpr System::Clock::Seconds32 kUserConsentPollInterval = System::Clock::Sec
 
 } // namespace
 
+bool ExtendedOTARequestorDriver::CanConsent()
+{
+    bool localConfigDisabled = false;
+    VerifyOrdo(DeviceLayer::ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR,
+               ChipLogProgress(SoftwareUpdate, "Failed to get local config disabled, using as false"));
+
+    // If local config is disabled, we can't consent.
+    return localConfigDisabled == false;
+}
+
 void ExtendedOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mRequestor != nullptr);
 
     if (update.userConsentNeeded == true && mUserConsentDelegate)
     {
-        bool localConfigDisabled = false;
-        VerifyOrdo(DeviceLayer::ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR,
-                   ChipLogProgress(SoftwareUpdate, "Failed to get local config disabled, using as false"));
-
-        if (localConfigDisabled == false)
+        chip::ota::UserConsentSubject subject;
+        CHIP_ERROR err = GetUserConsentSubject(subject, update);
+        if (err != CHIP_NO_ERROR)
         {
-            chip::ota::UserConsentSubject subject;
-            CHIP_ERROR err = GetUserConsentSubject(subject, update);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(SoftwareUpdate, "Failed to get user consent subject");
-                return;
-            }
-
-            mDelayedActionTime = delay;
-            HandleUserConsentState(mUserConsentDelegate->GetUserConsentState(subject));
+            ChipLogError(SoftwareUpdate, "Failed to get user consent subject");
+            HandleError(UpdateFailureState::kDelayedOnUserConsent, err);
             return;
         }
+
+        mDelayedActionTime = delay;
+        HandleUserConsentState(mUserConsentDelegate->GetUserConsentState(subject));
+        return;
     }
 
-    ScheduleDelayedAction(
-        delay,
-        [](System::Layer *, void * context) { static_cast<ExtendedOTARequestorDriver *>(context)->mRequestor->DownloadUpdate(); },
-        this);
+    GenericOTARequestorDriver::UpdateAvailable(update, delay);
 }
 
 void ExtendedOTARequestorDriver::PollUserConsentState()

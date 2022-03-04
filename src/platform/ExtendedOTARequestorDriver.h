@@ -29,6 +29,8 @@ namespace DeviceLayer {
 class ExtendedOTARequestorDriver : public GenericOTARequestorDriver
 {
 public:
+    bool CanConsent() override;
+
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
 
     /**
