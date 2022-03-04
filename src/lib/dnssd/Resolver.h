@@ -306,7 +306,8 @@ struct DiscoveryFilter
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
     DiscoveryFilter(const DiscoveryFilterType newType) : type(newType) {}
     DiscoveryFilter(const DiscoveryFilterType newType, uint64_t newCode) : type(newType), code(newCode) {}
-    DiscoveryFilter(const DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
+    DiscoveryFilter(const DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName)
+    {}
     bool operator==(const DiscoveryFilter & other) const
     {
         if (type != other.type)
