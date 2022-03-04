@@ -708,12 +708,14 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                     "Leader Router ID: %u\n"
                     "Parent Avg RSSI:  %d\n"
                     "Parent Last RSSI: %d\n"
-                    "Partition ID:     %" PRIu32 "\n"
+                    "Partition ID:     %" PRIu32 "\n",
+                    rloc16, routerId, leaderRouterId, parentAverageRssi, parentLastRssi, partitionId);
+
+    ChipLogProgress(DeviceLayer,
                     "Extended Address: %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
                     "Instant RSSI:     %d\n",
-                    rloc16, routerId, leaderRouterId, parentAverageRssi, parentLastRssi, partitionId, extAddress->m8[0],
-                    extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4], extAddress->m8[5],
-                    extAddress->m8[6], extAddress->m8[7], instantRssi);
+                    extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
+                    extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], instantRssi);
 
 exit:
     Impl()->UnlockThreadStack();
@@ -806,30 +808,38 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
         iterCopy = iter;
     }
 
+    memset(printBuf, 0x00, TELEM_PRINT_BUFFER_SIZE);
+    snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, "%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X\n",
+             leaderAddr->mFields.m8[0], leaderAddr->mFields.m8[1], leaderAddr->mFields.m8[2], leaderAddr->mFields.m8[3],
+             leaderAddr->mFields.m8[4], leaderAddr->mFields.m8[5], leaderAddr->mFields.m8[6], leaderAddr->mFields.m8[7],
+             leaderAddr->mFields.m8[8], leaderAddr->mFields.m8[9], leaderAddr->mFields.m8[10], leaderAddr->mFields.m8[11],
+             leaderAddr->mFields.m8[12], leaderAddr->mFields.m8[13], leaderAddr->mFields.m8[14], leaderAddr->mFields.m8[15]);
+
     ChipLogProgress(DeviceLayer,
                     "Thread Topology:\n"
                     "RLOC16:                        %04X\n"
                     "Router ID:                     %u\n"
                     "Leader Router ID:              %u\n"
-                    "Leader Address:                %02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
+                    "Leader Address:		        %s\n"
                     "Leader Weight:                 %d\n"
                     "Local Leader Weight:           %d\n"
                     "Network Data Len:              %d\n"
                     "Network Data Version:          %d\n"
-                    "Stable Network Data Version:   %d\n"
+                    "Stable Network Data Version:   %d\n",
+                    rloc16, routerId, leaderRouterId, printBuf, leaderWeight, leaderLocalWeight, networkDataLen, networkDataVersion,
+                    stableNetworkDataVersion);
+
+    memset(printBuf, 0x00, TELEM_PRINT_BUFFER_SIZE);
+
+    ChipLogProgress(DeviceLayer,
                     "Extended Address:              %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
                     "Partition ID:                  %" PRIx32 "\n"
                     "Instant RSSI:                  %d\n"
                     "Neighbor Table Length:         %d\n"
                     "Child Table Length:            %d\n",
-                    rloc16, routerId, leaderRouterId, leaderAddr->mFields.m8[0], leaderAddr->mFields.m8[1],
-                    leaderAddr->mFields.m8[2], leaderAddr->mFields.m8[3], leaderAddr->mFields.m8[4], leaderAddr->mFields.m8[5],
-                    leaderAddr->mFields.m8[6], leaderAddr->mFields.m8[7], leaderAddr->mFields.m8[8], leaderAddr->mFields.m8[9],
-                    leaderAddr->mFields.m8[10], leaderAddr->mFields.m8[11], leaderAddr->mFields.m8[12], leaderAddr->mFields.m8[13],
-                    leaderAddr->mFields.m8[14], leaderAddr->mFields.m8[15], leaderWeight, leaderLocalWeight, networkDataLen,
-                    networkDataVersion, stableNetworkDataVersion, extAddress->m8[0], extAddress->m8[1], extAddress->m8[2],
-                    extAddress->m8[3], extAddress->m8[4], extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], partitionId,
-                    instantRssi, neighborTableSize, childTableSize);
+                    extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
+                    extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], partitionId, instantRssi, neighborTableSize,
+                    childTableSize);
 
     // Handle each neighbor event seperatly.
     for (uint32_t i = 0; i < neighborTableSize; i++)
@@ -856,19 +866,22 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                         "Age:               %3" PRIu32 "\n"
                         "LQI:               %1d\n"
                         "AvgRSSI:           %3d\n"
-                        "LastRSSI:          %3d\n"
+                        "LastRSSI:          %3d\n",
+                        i, neighbor->mExtAddress.m8[0], neighbor->mExtAddress.m8[1], neighbor->mExtAddress.m8[2],
+                        neighbor->mExtAddress.m8[3], neighbor->mExtAddress.m8[4], neighbor->mExtAddress.m8[5],
+                        neighbor->mExtAddress.m8[6], neighbor->mExtAddress.m8[7], neighbor->mRloc16, neighbor->mAge,
+                        neighbor->mLinkQualityIn, neighbor->mAverageRssi, neighbor->mLastRssi);
+
+        ChipLogProgress(DeviceLayer,
                         "LinkFrameCounter:  %10" PRIu32 "\n"
                         "MleFrameCounter:   %10" PRIu32 "\n"
                         "RxOnWhenIdle:      %c\n"
                         "FullFunction:      %c\n"
                         "FullNetworkData:   %c\n"
                         "IsChild:           %c%s\n",
-                        i, neighbor->mExtAddress.m8[0], neighbor->mExtAddress.m8[1], neighbor->mExtAddress.m8[2],
-                        neighbor->mExtAddress.m8[3], neighbor->mExtAddress.m8[4], neighbor->mExtAddress.m8[5],
-                        neighbor->mExtAddress.m8[6], neighbor->mExtAddress.m8[7], neighbor->mRloc16, neighbor->mAge,
-                        neighbor->mLinkQualityIn, neighbor->mAverageRssi, neighbor->mLastRssi, neighbor->mLinkFrameCounter,
-                        neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n', neighbor->mFullThreadDevice ? 'Y' : 'n',
-                        neighbor->mFullNetworkData ? 'Y' : 'n', neighbor->mIsChild ? 'Y' : 'n', printBuf);
+                        neighbor->mLinkFrameCounter, neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n',
+                        neighbor->mFullThreadDevice ? 'Y' : 'n', neighbor->mFullNetworkData ? 'Y' : 'n',
+                        neighbor->mIsChild ? 'Y' : 'n', printBuf);
     }
 
 exit:
