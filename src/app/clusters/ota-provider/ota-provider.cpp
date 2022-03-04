@@ -21,7 +21,9 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/error-mapping.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <protocols/interaction_model/Constants.h>
 
 #include <lib/support/Span.h>
 
@@ -32,6 +34,7 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using chip::app::Clusters::OTAProviderDelegate;
+using Protocols::InteractionModel::Status;
 
 static constexpr size_t kOtaProviderDelegateTableSize =
     EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -50,12 +53,12 @@ OTAProviderDelegate * GetDelegate(EndpointId endpoint)
     return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
 }
 
-bool SendStatusIfDelegateNull(EndpointId endpoint)
+bool SendStatusIfDelegateNull(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path)
 {
-    if (GetDelegate(endpoint) == nullptr)
+    if (GetDelegate(path.mEndpointId) == nullptr)
     {
-        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%" PRIu16, endpoint);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%" PRIu16, path.mEndpointId);
+        commandObj->AddStatus(path, Status::UnsupportedCommand);
         return true;
     }
     return false;
@@ -86,7 +89,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     ChipLogDetail(Zcl, "  Update Token: %zu", commandData.updateToken.size());
     ChipLogDetail(Zcl, "  New Version: %" PRIu32, commandData.newVersion);
 
-    if (SendStatusIfDelegateNull(endpoint))
+    if (SendStatusIfDelegateNull(commandObj, commandPath))
     {
         return true;
     }
@@ -94,14 +97,14 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
         ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenMaxLength, updateToken.size());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
     status = delegate->HandleApplyUpdateRequest(commandObj, commandPath, commandData);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfSendImmediateDefaultResponse(status);
+        commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
     }
 
     return true;
@@ -131,7 +134,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     ChipLogDetail(Zcl, "  Update Token: %zu", commandData.updateToken.size());
     ChipLogDetail(Zcl, "  Software Version: %" PRIu32, commandData.softwareVersion);
 
-    if (SendStatusIfDelegateNull(endpoint))
+    if (SendStatusIfDelegateNull(commandObj, commandPath))
     {
         return true;
     }
@@ -139,14 +142,14 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
         ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenMaxLength, updateToken.size());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
     status = delegate->HandleNotifyUpdateApplied(commandObj, commandPath, commandData);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfSendImmediateDefaultResponse(status);
+        commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
     }
 
     return true;
@@ -191,7 +194,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
-    if (SendStatusIfDelegateNull(endpoint))
+    if (SendStatusIfDelegateNull(commandObj, commandPath))
     {
         return true;
     };
@@ -227,21 +230,21 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     if (location.HasValue() && location.Value().size() != kLocationLen)
     {
         ChipLogError(Zcl, "location param length %zu != expected length %zu", location.Value().size(), kLocationLen);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
     if (metadataForProvider.HasValue() && metadataForProvider.Value().size() > kMaxMetadataLen)
     {
         ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForProvider.Value().size(), kMaxMetadataLen);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
     status = delegate->HandleQueryImage(commandObj, commandPath, commandData);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfSendImmediateDefaultResponse(status);
+        commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
     }
 
     return true;
