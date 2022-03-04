@@ -24,7 +24,6 @@ static_library("pw_rpc") {
     "$dir_pw_hdlc:encoder",
     "$dir_pw_hdlc:pw_rpc",
     "$dir_pw_hdlc:rpc_channel_output",
-    "$dir_pw_rpc:synchronized_channel_output",
     "$dir_pw_rpc/system_server:facade",
     "$dir_pw_stream:socket_stream",
     dir_pw_log,

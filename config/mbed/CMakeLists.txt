@@ -371,6 +371,7 @@ target_sources(${APP_TARGET} PRIVATE
 target_include_directories(${APP_TARGET} PRIVATE
                     ${PIGWEED_ROOT}/pw_sys_io/public
                     ${PIGWEED_ROOT}/pw_assert/public
+                    ${PIGWEED_ROOT}/pw_assert/assert_lite_public_overrides
                     ${PIGWEED_ROOT}/pw_assert_log/public
                     ${PIGWEED_ROOT}/pw_assert_log/public_overrides
                     ${PIGWEED_ROOT}/pw_bytes/public
