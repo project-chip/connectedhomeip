@@ -264,7 +264,6 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemState = nullptr;
 
     mDNSResolver.Shutdown();
-    mDeviceAddressUpdateDelegate = nullptr;
     mDeviceDiscoveryDelegate     = nullptr;
 
     chip::Platform::Delete(mCASESessionManager);
@@ -565,10 +564,6 @@ void DeviceController::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNode
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnOperationalNodeResolved was called in incorrect state"));
     mCASESessionManager->OnOperationalNodeResolved(nodeData);
-    if (mDeviceAddressUpdateDelegate != nullptr)
-    {
-        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), CHIP_NO_ERROR);
-    }
 }
 
 void DeviceController::OnOperationalNodeResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
@@ -577,11 +572,6 @@ void DeviceController::OnOperationalNodeResolutionFailed(const chip::PeerId & pe
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnOperationalNodeResolutionFailed was called in incorrect state"));
     mCASESessionManager->OnOperationalNodeResolutionFailed(peer, error);
-
-    if (mDeviceAddressUpdateDelegate != nullptr)
-    {
-        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
-    }
 }
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
