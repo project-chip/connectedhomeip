@@ -10387,7 +10387,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::Thermostat::ThermostatControlSequence mValue;
 };
 
 class WriteThermostatSystemMode : public WriteAttribute

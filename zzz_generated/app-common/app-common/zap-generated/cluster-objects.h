@@ -22415,9 +22415,9 @@ struct TypeInfo
 namespace ControlSequenceOfOperation {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::ThermostatControlSequence;
+    using DecodableType    = chip::app::Clusters::Thermostat::ThermostatControlSequence;
+    using DecodableArgType = chip::app::Clusters::Thermostat::ThermostatControlSequence;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ControlSequenceOfOperation::Id; }
@@ -22766,14 +22766,15 @@ struct TypeInfo
         Attributes::MaxCoolSetpointLimit::TypeInfo::DecodableType maxCoolSetpointLimit               = static_cast<int16_t>(0);
         Attributes::MinSetpointDeadBand::TypeInfo::DecodableType minSetpointDeadBand                 = static_cast<int8_t>(0);
         Attributes::RemoteSensing::TypeInfo::DecodableType remoteSensing                             = static_cast<uint8_t>(0);
-        Attributes::ControlSequenceOfOperation::TypeInfo::DecodableType controlSequenceOfOperation   = static_cast<uint8_t>(0);
-        Attributes::SystemMode::TypeInfo::DecodableType systemMode                                   = static_cast<uint8_t>(0);
-        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask                                     = static_cast<uint8_t>(0);
-        Attributes::ThermostatRunningMode::TypeInfo::DecodableType thermostatRunningMode             = static_cast<uint8_t>(0);
-        Attributes::StartOfWeek::TypeInfo::DecodableType startOfWeek                                 = static_cast<uint8_t>(0);
-        Attributes::NumberOfWeeklyTransitions::TypeInfo::DecodableType numberOfWeeklyTransitions     = static_cast<uint8_t>(0);
-        Attributes::NumberOfDailyTransitions::TypeInfo::DecodableType numberOfDailyTransitions       = static_cast<uint8_t>(0);
-        Attributes::TemperatureSetpointHold::TypeInfo::DecodableType temperatureSetpointHold         = static_cast<uint8_t>(0);
+        Attributes::ControlSequenceOfOperation::TypeInfo::DecodableType controlSequenceOfOperation =
+            static_cast<chip::app::Clusters::Thermostat::ThermostatControlSequence>(0);
+        Attributes::SystemMode::TypeInfo::DecodableType systemMode                               = static_cast<uint8_t>(0);
+        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask                                 = static_cast<uint8_t>(0);
+        Attributes::ThermostatRunningMode::TypeInfo::DecodableType thermostatRunningMode         = static_cast<uint8_t>(0);
+        Attributes::StartOfWeek::TypeInfo::DecodableType startOfWeek                             = static_cast<uint8_t>(0);
+        Attributes::NumberOfWeeklyTransitions::TypeInfo::DecodableType numberOfWeeklyTransitions = static_cast<uint8_t>(0);
+        Attributes::NumberOfDailyTransitions::TypeInfo::DecodableType numberOfDailyTransitions   = static_cast<uint8_t>(0);
+        Attributes::TemperatureSetpointHold::TypeInfo::DecodableType temperatureSetpointHold     = static_cast<uint8_t>(0);
         Attributes::TemperatureSetpointHoldDuration::TypeInfo::DecodableType temperatureSetpointHoldDuration =
             static_cast<uint16_t>(0);
         Attributes::ThermostatProgrammingOperationMode::TypeInfo::DecodableType thermostatProgrammingOperationMode =

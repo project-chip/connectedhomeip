@@ -2448,8 +2448,8 @@ private:
     void OnSuccessResponse_9(uint8_t statusFlags)
     {
         VerifyOrReturn(CheckConstraintType("statusFlags", "", "map8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("statusFlags", statusFlags, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("statusFlags", statusFlags, 15));
+        VerifyOrReturn(CheckConstraintMinValue("statusFlags", statusFlags, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("statusFlags", statusFlags, 15));
         NextTest();
     }
 
@@ -5895,8 +5895,8 @@ private:
     void OnSuccessResponse_2(uint8_t currentHue)
     {
         VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", currentHue, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", currentHue, 254));
+        VerifyOrReturn(CheckConstraintMinValue("currentHue", currentHue, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentHue", currentHue, 254));
         NextTest();
     }
 
@@ -5991,8 +5991,8 @@ private:
     void OnSuccessResponse_6(uint8_t currentSaturation)
     {
         VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", currentSaturation, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", currentSaturation, 254));
+        VerifyOrReturn(CheckConstraintMinValue("currentSaturation", currentSaturation, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentSaturation", currentSaturation, 254));
         NextTest();
     }
 
@@ -6087,8 +6087,8 @@ private:
     void OnSuccessResponse_10(uint16_t currentX)
     {
         VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", currentX, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", currentX, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("currentX", currentX, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentX", currentX, 65279U));
         NextTest();
     }
 
@@ -6183,8 +6183,8 @@ private:
     void OnSuccessResponse_14(uint16_t currentY)
     {
         VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", currentY, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", currentY, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("currentY", currentY, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentY", currentY, 65279U));
         NextTest();
     }
 
@@ -6255,8 +6255,8 @@ private:
     void OnSuccessResponse_17(uint16_t colorTemperature)
     {
         VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", colorTemperature, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", colorTemperature, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorTemperature", colorTemperature, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorTemperature", colorTemperature, 65279U));
         NextTest();
     }
 
@@ -6280,8 +6280,8 @@ private:
     void OnSuccessResponse_18(uint8_t colorMode)
     {
         VerifyOrReturn(CheckConstraintType("colorMode", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("colorMode", colorMode, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("colorMode", colorMode, 2));
+        VerifyOrReturn(CheckConstraintMinValue("colorMode", colorMode, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("colorMode", colorMode, 2));
         NextTest();
     }
 
@@ -7017,8 +7017,8 @@ private:
     void OnSuccessResponse_49(uint16_t colorCapabilities)
     {
         VerifyOrReturn(CheckConstraintType("colorCapabilities", "", "map16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorCapabilities", colorCapabilities, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorCapabilities", colorCapabilities, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorCapabilities", colorCapabilities, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorCapabilities", colorCapabilities, 65279U));
         NextTest();
     }
 
@@ -7113,8 +7113,8 @@ private:
     void OnSuccessResponse_53(uint16_t colorTempPhysicalMin)
     {
         VerifyOrReturn(CheckConstraintType("colorTempPhysicalMin", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTempPhysicalMin", colorTempPhysicalMin, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMin", colorTempPhysicalMin, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorTempPhysicalMin", colorTempPhysicalMin, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorTempPhysicalMin", colorTempPhysicalMin, 65279U));
         NextTest();
     }
 
@@ -7209,8 +7209,8 @@ private:
     void OnSuccessResponse_57(uint16_t colorTempPhysicalMax)
     {
         VerifyOrReturn(CheckConstraintType("colorTempPhysicalMax", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTempPhysicalMax", colorTempPhysicalMax, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMax", colorTempPhysicalMax, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorTempPhysicalMax", colorTempPhysicalMax, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorTempPhysicalMax", colorTempPhysicalMax, 65279U));
         NextTest();
     }
 
@@ -7355,8 +7355,8 @@ private:
     void OnSuccessResponse_63(uint16_t startUpColorTemperatureMireds)
     {
         VerifyOrReturn(CheckConstraintType("startUpColorTemperatureMireds", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("startUpColorTemperatureMireds", startUpColorTemperatureMireds, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("startUpColorTemperatureMireds", startUpColorTemperatureMireds, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("startUpColorTemperatureMireds", startUpColorTemperatureMireds, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("startUpColorTemperatureMireds", startUpColorTemperatureMireds, 65279U));
         NextTest();
     }
 
@@ -7452,8 +7452,8 @@ private:
     void OnSuccessResponse_67(uint16_t remainingTime)
     {
         VerifyOrReturn(CheckConstraintType("remainingTime", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("remainingTime", remainingTime, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("remainingTime", remainingTime, 254U));
+        VerifyOrReturn(CheckConstraintMinValue("remainingTime", remainingTime, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("remainingTime", remainingTime, 254U));
         NextTest();
     }
 
@@ -7524,8 +7524,8 @@ private:
     void OnSuccessResponse_70(uint8_t driftCompensation)
     {
         VerifyOrReturn(CheckConstraintType("driftCompensation", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("driftCompensation", driftCompensation, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("driftCompensation", driftCompensation, 4));
+        VerifyOrReturn(CheckConstraintMinValue("driftCompensation", driftCompensation, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("driftCompensation", driftCompensation, 4));
         NextTest();
     }
 
@@ -7667,8 +7667,8 @@ private:
     void OnSuccessResponse_76(uint8_t numberOfPrimaries)
     {
         VerifyOrReturn(CheckConstraintType("numberOfPrimaries", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("numberOfPrimaries", numberOfPrimaries, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("numberOfPrimaries", numberOfPrimaries, 6));
+        VerifyOrReturn(CheckConstraintMinValue("numberOfPrimaries", numberOfPrimaries, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("numberOfPrimaries", numberOfPrimaries, 6));
         NextTest();
     }
 
@@ -7739,8 +7739,8 @@ private:
     void OnSuccessResponse_79(uint16_t primary1X)
     {
         VerifyOrReturn(CheckConstraintType("primary1X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary1X", primary1X, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1X", primary1X, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary1X", primary1X, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary1X", primary1X, 65279U));
         NextTest();
     }
 
@@ -7811,8 +7811,8 @@ private:
     void OnSuccessResponse_82(uint16_t primary1Y)
     {
         VerifyOrReturn(CheckConstraintType("primary1Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary1Y", primary1Y, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1Y", primary1Y, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary1Y", primary1Y, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary1Y", primary1Y, 65279U));
         NextTest();
     }
 
@@ -7906,8 +7906,8 @@ private:
     void OnSuccessResponse_86(uint16_t primary2X)
     {
         VerifyOrReturn(CheckConstraintType("primary2X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary2X", primary2X, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2X", primary2X, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary2X", primary2X, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary2X", primary2X, 65279U));
         NextTest();
     }
 
@@ -7978,8 +7978,8 @@ private:
     void OnSuccessResponse_89(uint16_t primary2Y)
     {
         VerifyOrReturn(CheckConstraintType("primary2Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary2Y", primary2Y, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2Y", primary2Y, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary2Y", primary2Y, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary2Y", primary2Y, 65279U));
         NextTest();
     }
 
@@ -8073,8 +8073,8 @@ private:
     void OnSuccessResponse_93(uint16_t primary3X)
     {
         VerifyOrReturn(CheckConstraintType("primary3X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary3X", primary3X, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3X", primary3X, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary3X", primary3X, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary3X", primary3X, 65279U));
         NextTest();
     }
 
@@ -8145,8 +8145,8 @@ private:
     void OnSuccessResponse_96(uint16_t primary3Y)
     {
         VerifyOrReturn(CheckConstraintType("primary3Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary3Y", primary3Y, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3Y", primary3Y, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary3Y", primary3Y, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary3Y", primary3Y, 65279U));
         NextTest();
     }
 
@@ -8240,8 +8240,8 @@ private:
     void OnSuccessResponse_100(uint16_t primary4X)
     {
         VerifyOrReturn(CheckConstraintType("primary4X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary4X", primary4X, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4X", primary4X, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary4X", primary4X, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary4X", primary4X, 65279U));
         NextTest();
     }
 
@@ -8312,8 +8312,8 @@ private:
     void OnSuccessResponse_103(uint16_t primary4Y)
     {
         VerifyOrReturn(CheckConstraintType("primary4Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary4Y", primary4Y, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4Y", primary4Y, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary4Y", primary4Y, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary4Y", primary4Y, 65279U));
         NextTest();
     }
 
@@ -8407,8 +8407,8 @@ private:
     void OnSuccessResponse_107(uint16_t primary5X)
     {
         VerifyOrReturn(CheckConstraintType("primary5X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary5X", primary5X, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5X", primary5X, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary5X", primary5X, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary5X", primary5X, 65279U));
         NextTest();
     }
 
@@ -8479,8 +8479,8 @@ private:
     void OnSuccessResponse_110(uint16_t primary5Y)
     {
         VerifyOrReturn(CheckConstraintType("primary5Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary5Y", primary5Y, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5Y", primary5Y, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary5Y", primary5Y, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary5Y", primary5Y, 65279U));
         NextTest();
     }
 
@@ -8574,8 +8574,8 @@ private:
     void OnSuccessResponse_114(uint16_t primary6X)
     {
         VerifyOrReturn(CheckConstraintType("primary6X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary6X", primary6X, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6X", primary6X, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary6X", primary6X, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary6X", primary6X, 65279U));
         NextTest();
     }
 
@@ -8646,8 +8646,8 @@ private:
     void OnSuccessResponse_117(uint16_t primary6Y)
     {
         VerifyOrReturn(CheckConstraintType("primary6Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary6Y", primary6Y, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6Y", primary6Y, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("primary6Y", primary6Y, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("primary6Y", primary6Y, 65279U));
         NextTest();
     }
 
@@ -8741,8 +8741,8 @@ private:
     void OnSuccessResponse_121(uint16_t whitePointX)
     {
         VerifyOrReturn(CheckConstraintType("whitePointX", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("whitePointX", whitePointX, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("whitePointX", whitePointX, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("whitePointX", whitePointX, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("whitePointX", whitePointX, 65279U));
         NextTest();
     }
 
@@ -8812,8 +8812,8 @@ private:
     void OnSuccessResponse_124(uint16_t whitePointY)
     {
         VerifyOrReturn(CheckConstraintType("whitePointY", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("whitePointY", whitePointY, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("whitePointY", whitePointY, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("whitePointY", whitePointY, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("whitePointY", whitePointY, 65279U));
         NextTest();
     }
 
@@ -8883,8 +8883,8 @@ private:
     void OnSuccessResponse_127(uint16_t colorPointRX)
     {
         VerifyOrReturn(CheckConstraintType("colorPointRX", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointRX", colorPointRX, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointRX", colorPointRX, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorPointRX", colorPointRX, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorPointRX", colorPointRX, 65279U));
         NextTest();
     }
 
@@ -8954,8 +8954,8 @@ private:
     void OnSuccessResponse_130(uint16_t colorPointRY)
     {
         VerifyOrReturn(CheckConstraintType("colorPointRY", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointRY", colorPointRY, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointRY", colorPointRY, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorPointRY", colorPointRY, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorPointRY", colorPointRY, 65279U));
         NextTest();
     }
 
@@ -9094,8 +9094,8 @@ private:
     void OnSuccessResponse_136(uint16_t colorPointGX)
     {
         VerifyOrReturn(CheckConstraintType("colorPointGX", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointGX", colorPointGX, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointGX", colorPointGX, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorPointGX", colorPointGX, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorPointGX", colorPointGX, 65279U));
         NextTest();
     }
 
@@ -9165,8 +9165,8 @@ private:
     void OnSuccessResponse_139(uint16_t colorPointGY)
     {
         VerifyOrReturn(CheckConstraintType("colorPointGY", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointGY", colorPointGY, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointGY", colorPointGY, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorPointGY", colorPointGY, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorPointGY", colorPointGY, 65279U));
         NextTest();
     }
 
@@ -9305,8 +9305,8 @@ private:
     void OnSuccessResponse_145(uint16_t colorPointBX)
     {
         VerifyOrReturn(CheckConstraintType("colorPointBX", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointBX", colorPointBX, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointBX", colorPointBX, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorPointBX", colorPointBX, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorPointBX", colorPointBX, 65279U));
         NextTest();
     }
 
@@ -9376,8 +9376,8 @@ private:
     void OnSuccessResponse_148(uint16_t colorPointBY)
     {
         VerifyOrReturn(CheckConstraintType("colorPointBY", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointBY", colorPointBY, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointBY", colorPointBY, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorPointBY", colorPointBY, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorPointBY", colorPointBY, 65279U));
         NextTest();
     }
 
@@ -9711,8 +9711,8 @@ private:
     void OnSuccessResponse_3(uint8_t currentHue)
     {
         VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", currentHue, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", currentHue, 254));
+        VerifyOrReturn(CheckConstraintMinValue("currentHue", currentHue, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentHue", currentHue, 254));
         NextTest();
     }
 
@@ -13018,8 +13018,8 @@ private:
     void OnSuccessResponse_3(uint16_t colorTemperature)
     {
         VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", colorTemperature, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", colorTemperature, 65279U));
+        VerifyOrReturn(CheckConstraintMinValue("colorTemperature", colorTemperature, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("colorTemperature", colorTemperature, 65279U));
         NextTest();
     }
 
@@ -14175,8 +14175,8 @@ private:
     void OnSuccessResponse_3(uint16_t enhancedCurrentHue)
     {
         VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", enhancedCurrentHue, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", enhancedCurrentHue, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("enhancedCurrentHue", enhancedCurrentHue, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("enhancedCurrentHue", enhancedCurrentHue, 65535U));
         NextTest();
     }
 
@@ -21929,8 +21929,8 @@ private:
     void OnSuccessResponse_11(uint16_t tolerance)
     {
         VerifyOrReturn(CheckConstraintType("tolerance", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("tolerance", tolerance, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("tolerance", tolerance, 2048U));
+        VerifyOrReturn(CheckConstraintMinValue("tolerance", tolerance, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("tolerance", tolerance, 2048U));
         NextTest();
     }
 
@@ -24903,8 +24903,8 @@ private:
 
     void OnSuccessResponse_9(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", currentLevel, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 1));
+        VerifyOrReturn(CheckConstraintMinValue("currentLevel", currentLevel, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentLevel", currentLevel, 1));
         NextTest();
     }
 
@@ -25716,8 +25716,8 @@ private:
 
     void OnSuccessResponse_4(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", currentLevel, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 1));
+        VerifyOrReturn(CheckConstraintMinValue("currentLevel", currentLevel, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentLevel", currentLevel, 1));
         NextTest();
     }
 
@@ -25806,8 +25806,8 @@ private:
 
     void OnSuccessResponse_8(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", currentLevel, 2));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 3));
+        VerifyOrReturn(CheckConstraintMinValue("currentLevel", currentLevel, 2));
+        VerifyOrReturn(CheckConstraintMaxValue("currentLevel", currentLevel, 3));
         NextTest();
     }
 
@@ -29134,8 +29134,8 @@ private:
     void OnSuccessResponse_1(uint8_t occupancy)
     {
         VerifyOrReturn(CheckConstraintType("occupancy", "", "map8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("occupancy", occupancy, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("occupancy", occupancy, 1));
+        VerifyOrReturn(CheckConstraintMinValue("occupancy", occupancy, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("occupancy", occupancy, 1));
         NextTest();
     }
 
@@ -29207,8 +29207,8 @@ private:
     void OnSuccessResponse_4(uint8_t occupancySensorType)
     {
         VerifyOrReturn(CheckConstraintType("occupancySensorType", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("occupancySensorType", occupancySensorType, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("occupancySensorType", occupancySensorType, 3));
+        VerifyOrReturn(CheckConstraintMinValue("occupancySensorType", occupancySensorType, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("occupancySensorType", occupancySensorType, 3));
         NextTest();
     }
 
@@ -29282,8 +29282,8 @@ private:
     void OnSuccessResponse_7(uint8_t occupancySensorTypeBitmap)
     {
         VerifyOrReturn(CheckConstraintType("occupancySensorTypeBitmap", "", "map8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("occupancySensorTypeBitmap", occupancySensorTypeBitmap, 1));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("occupancySensorTypeBitmap", occupancySensorTypeBitmap, 7));
+        VerifyOrReturn(CheckConstraintMinValue("occupancySensorTypeBitmap", occupancySensorTypeBitmap, 1));
+        VerifyOrReturn(CheckConstraintMaxValue("occupancySensorTypeBitmap", occupancySensorTypeBitmap, 7));
         NextTest();
     }
 
@@ -35337,7 +35337,7 @@ private:
     void OnSuccessResponse_21(int16_t minConstTemp)
     {
         VerifyOrReturn(CheckConstraintType("minConstTemp", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minConstTemp", minConstTemp, -27315));
+        VerifyOrReturn(CheckConstraintMinValue("minConstTemp", minConstTemp, -27315));
         NextTest();
     }
 
@@ -35362,7 +35362,7 @@ private:
     void OnSuccessResponse_22(int16_t maxConstTemp)
     {
         VerifyOrReturn(CheckConstraintType("maxConstTemp", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxConstTemp", maxConstTemp, -27315));
+        VerifyOrReturn(CheckConstraintMinValue("maxConstTemp", maxConstTemp, -27315));
         NextTest();
     }
 
@@ -35798,7 +35798,7 @@ private:
     void OnSuccessResponse_40(int16_t minConstTemp)
     {
         VerifyOrReturn(CheckConstraintType("minConstTemp", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minConstTemp", minConstTemp, -27315));
+        VerifyOrReturn(CheckConstraintMinValue("minConstTemp", minConstTemp, -27315));
         NextTest();
     }
 
@@ -35823,7 +35823,7 @@ private:
     void OnSuccessResponse_41(int16_t maxConstTemp)
     {
         VerifyOrReturn(CheckConstraintType("maxConstTemp", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxConstTemp", maxConstTemp, -27315));
+        VerifyOrReturn(CheckConstraintMinValue("maxConstTemp", maxConstTemp, -27315));
         NextTest();
     }
 
@@ -37025,8 +37025,8 @@ private:
     void OnSuccessResponse_2(uint16_t minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("minMeasuredValue", minMeasuredValue, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("minMeasuredValue", minMeasuredValue, 9999U));
+        VerifyOrReturn(CheckConstraintMinValue("minMeasuredValue", minMeasuredValue, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("minMeasuredValue", minMeasuredValue, 9999U));
         NextTest();
     }
 
@@ -37076,8 +37076,8 @@ private:
     void OnSuccessResponse_4(uint16_t tolerance)
     {
         VerifyOrReturn(CheckConstraintType("tolerance", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("tolerance", tolerance, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("tolerance", tolerance, 2048U));
+        VerifyOrReturn(CheckConstraintMinValue("tolerance", tolerance, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("tolerance", tolerance, 2048U));
         NextTest();
     }
 };
@@ -37451,7 +37451,7 @@ private:
     void OnSuccessResponse_2(uint8_t numberOfPositions)
     {
         VerifyOrReturn(CheckConstraintType("numberOfPositions", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("numberOfPositions", numberOfPositions, 2));
+        VerifyOrReturn(CheckConstraintMinValue("numberOfPositions", numberOfPositions, 2));
         NextTest();
     }
 
@@ -37499,7 +37499,7 @@ private:
     void OnSuccessResponse_4(uint8_t currentPosition)
     {
         VerifyOrReturn(CheckConstraintType("currentPosition", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentPosition", currentPosition, 0));
+        VerifyOrReturn(CheckConstraintMinValue("currentPosition", currentPosition, 0));
         NextTest();
     }
 
@@ -37547,7 +37547,7 @@ private:
     void OnSuccessResponse_6(uint8_t multiPressMax)
     {
         VerifyOrReturn(CheckConstraintType("multiPressMax", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("multiPressMax", multiPressMax, 2));
+        VerifyOrReturn(CheckConstraintMinValue("multiPressMax", multiPressMax, 2));
         NextTest();
     }
 };
@@ -38395,8 +38395,8 @@ private:
     void OnSuccessResponse_2(uint16_t tolerance)
     {
         VerifyOrReturn(CheckConstraintType("tolerance", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("tolerance", tolerance, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("tolerance", tolerance, 2048U));
+        VerifyOrReturn(CheckConstraintMinValue("tolerance", tolerance, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("tolerance", tolerance, 2048U));
         NextTest();
     }
 };
@@ -39527,7 +39527,8 @@ private:
         (static_cast<Test_TC_TSTAT_2_1Suite *>(context))->OnFailureResponse_42(error);
     }
 
-    static void OnSuccessCallback_42(void * context, uint8_t controlSequenceOfOperation)
+    static void OnSuccessCallback_42(void * context,
+                                     chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperation)
     {
         (static_cast<Test_TC_TSTAT_2_1Suite *>(context))->OnSuccessResponse_42(controlSequenceOfOperation);
     }
@@ -39537,7 +39538,8 @@ private:
         (static_cast<Test_TC_TSTAT_2_1Suite *>(context))->OnFailureResponse_43(error);
     }
 
-    static void OnSuccessCallback_43(void * context, uint8_t controlSequenceOfOperation)
+    static void OnSuccessCallback_43(void * context,
+                                     chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperation)
     {
         (static_cast<Test_TC_TSTAT_2_1Suite *>(context))->OnSuccessResponse_43(controlSequenceOfOperation);
     }
@@ -39554,7 +39556,8 @@ private:
         (static_cast<Test_TC_TSTAT_2_1Suite *>(context))->OnFailureResponse_45(error);
     }
 
-    static void OnSuccessCallback_45(void * context, uint8_t controlSequenceOfOperation)
+    static void OnSuccessCallback_45(void * context,
+                                     chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperation)
     {
         (static_cast<Test_TC_TSTAT_2_1Suite *>(context))->OnSuccessResponse_45(controlSequenceOfOperation);
     }
@@ -39771,8 +39774,8 @@ private:
     void OnSuccessResponse_3(int16_t absMinHeatSetpointLimit)
     {
         VerifyOrReturn(CheckConstraintType("absMinHeatSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("absMinHeatSetpointLimit", absMinHeatSetpointLimit, 700));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("absMinHeatSetpointLimit", absMinHeatSetpointLimit, 3000));
+        VerifyOrReturn(CheckConstraintMinValue("absMinHeatSetpointLimit", absMinHeatSetpointLimit, 700));
+        VerifyOrReturn(CheckConstraintMaxValue("absMinHeatSetpointLimit", absMinHeatSetpointLimit, 3000));
         NextTest();
     }
 
@@ -39867,8 +39870,8 @@ private:
     void OnSuccessResponse_7(int16_t absMaxHeatSetpointLimit)
     {
         VerifyOrReturn(CheckConstraintType("absMaxHeatSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("absMaxHeatSetpointLimit", absMaxHeatSetpointLimit, 700));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("absMaxHeatSetpointLimit", absMaxHeatSetpointLimit, 3000));
+        VerifyOrReturn(CheckConstraintMinValue("absMaxHeatSetpointLimit", absMaxHeatSetpointLimit, 700));
+        VerifyOrReturn(CheckConstraintMaxValue("absMaxHeatSetpointLimit", absMaxHeatSetpointLimit, 3000));
         NextTest();
     }
 
@@ -39963,8 +39966,8 @@ private:
     void OnSuccessResponse_11(int16_t absMinCoolSetpointLimit)
     {
         VerifyOrReturn(CheckConstraintType("absMinCoolSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("absMinCoolSetpointLimit", absMinCoolSetpointLimit, 1600));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("absMinCoolSetpointLimit", absMinCoolSetpointLimit, 3200));
+        VerifyOrReturn(CheckConstraintMinValue("absMinCoolSetpointLimit", absMinCoolSetpointLimit, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue("absMinCoolSetpointLimit", absMinCoolSetpointLimit, 3200));
         NextTest();
     }
 
@@ -40059,8 +40062,8 @@ private:
     void OnSuccessResponse_15(int16_t absMaxCoolSetpointLimit)
     {
         VerifyOrReturn(CheckConstraintType("absMaxCoolSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("absMaxCoolSetpointLimit", absMaxCoolSetpointLimit, 1600));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("absMaxCoolSetpointLimit", absMaxCoolSetpointLimit, 3200));
+        VerifyOrReturn(CheckConstraintMinValue("absMaxCoolSetpointLimit", absMaxCoolSetpointLimit, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue("absMaxCoolSetpointLimit", absMaxCoolSetpointLimit, 3200));
         NextTest();
     }
 
@@ -40155,8 +40158,8 @@ private:
     void OnSuccessResponse_19(int16_t occupiedCoolingSetpoint)
     {
         VerifyOrReturn(CheckConstraintType("occupiedCoolingSetpoint", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 1600));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2600));
+        VerifyOrReturn(CheckConstraintMinValue("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2600));
         NextTest();
     }
 
@@ -40250,8 +40253,8 @@ private:
     void OnSuccessResponse_23(int16_t occupiedHeatingSetpoint)
     {
         VerifyOrReturn(CheckConstraintType("occupiedHeatingSetpoint", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 700));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 2600));
+        VerifyOrReturn(CheckConstraintMinValue("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 700));
+        VerifyOrReturn(CheckConstraintMaxValue("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 2600));
         NextTest();
     }
 
@@ -40345,8 +40348,8 @@ private:
     void OnSuccessResponse_27(int16_t minHeatSetpointLimit)
     {
         VerifyOrReturn(CheckConstraintType("minHeatSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minHeatSetpointLimit", minHeatSetpointLimit, 700));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minHeatSetpointLimit", minHeatSetpointLimit, 3000));
+        VerifyOrReturn(CheckConstraintMinValue("minHeatSetpointLimit", minHeatSetpointLimit, 700));
+        VerifyOrReturn(CheckConstraintMaxValue("minHeatSetpointLimit", minHeatSetpointLimit, 3000));
         NextTest();
     }
 
@@ -40440,8 +40443,8 @@ private:
     void OnSuccessResponse_31(int16_t maxHeatSetpointLimit)
     {
         VerifyOrReturn(CheckConstraintType("maxHeatSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxHeatSetpointLimit", maxHeatSetpointLimit, 700));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxHeatSetpointLimit", maxHeatSetpointLimit, 3000));
+        VerifyOrReturn(CheckConstraintMinValue("maxHeatSetpointLimit", maxHeatSetpointLimit, 700));
+        VerifyOrReturn(CheckConstraintMaxValue("maxHeatSetpointLimit", maxHeatSetpointLimit, 3000));
         NextTest();
     }
 
@@ -40535,8 +40538,8 @@ private:
     void OnSuccessResponse_35(int16_t minCoolSetpointLimit)
     {
         VerifyOrReturn(CheckConstraintType("minCoolSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minCoolSetpointLimit", minCoolSetpointLimit, 1600));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minCoolSetpointLimit", minCoolSetpointLimit, 3200));
+        VerifyOrReturn(CheckConstraintMinValue("minCoolSetpointLimit", minCoolSetpointLimit, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue("minCoolSetpointLimit", minCoolSetpointLimit, 3200));
         NextTest();
     }
 
@@ -40630,8 +40633,8 @@ private:
     void OnSuccessResponse_39(int16_t maxCoolSetpointLimit)
     {
         VerifyOrReturn(CheckConstraintType("maxCoolSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxCoolSetpointLimit", maxCoolSetpointLimit, 1600));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxCoolSetpointLimit", maxCoolSetpointLimit, 3200));
+        VerifyOrReturn(CheckConstraintMinValue("maxCoolSetpointLimit", maxCoolSetpointLimit, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue("maxCoolSetpointLimit", maxCoolSetpointLimit, 3200));
         NextTest();
     }
 
@@ -40699,7 +40702,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_42(uint8_t controlSequenceOfOperation)
+    void OnSuccessResponse_42(chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperation)
     {
         VerifyOrReturn(CheckValue("controlSequenceOfOperation", controlSequenceOfOperation, 4));
 
@@ -40724,11 +40727,11 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_43(uint8_t controlSequenceOfOperation)
+    void OnSuccessResponse_43(chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperation)
     {
         VerifyOrReturn(CheckConstraintType("controlSequenceOfOperation", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 5));
+        VerifyOrReturn(CheckConstraintMinValue("controlSequenceOfOperation", controlSequenceOfOperation, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("controlSequenceOfOperation", controlSequenceOfOperation, 5));
         NextTest();
     }
 
@@ -40738,8 +40741,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint8_t controlSequenceOfOperationArgument;
-        controlSequenceOfOperationArgument = 4;
+        chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperationArgument;
+        controlSequenceOfOperationArgument = static_cast<chip::app::Clusters::Thermostat::ThermostatControlSequence>(4);
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
@@ -40773,7 +40776,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_45(uint8_t controlSequenceOfOperation)
+    void OnSuccessResponse_45(chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperation)
     {
         VerifyOrReturn(CheckValue("controlSequenceOfOperation", controlSequenceOfOperation, 4));
 
@@ -40824,8 +40827,8 @@ private:
     void OnSuccessResponse_47(uint8_t systemMode)
     {
         VerifyOrReturn(CheckConstraintType("systemMode", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("systemMode", systemMode, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("systemMode", systemMode, 9));
+        VerifyOrReturn(CheckConstraintMinValue("systemMode", systemMode, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("systemMode", systemMode, 9));
         NextTest();
     }
 
@@ -40919,8 +40922,8 @@ private:
     void OnSuccessResponse_51(int8_t minSetpointDeadBand)
     {
         VerifyOrReturn(CheckConstraintType("minSetpointDeadBand", "", "int8"));
-        VerifyOrReturn(CheckConstraintMinValue<int8_t>("minSetpointDeadBand", minSetpointDeadBand, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<int8_t>("minSetpointDeadBand", minSetpointDeadBand, 25));
+        VerifyOrReturn(CheckConstraintMinValue("minSetpointDeadBand", minSetpointDeadBand, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("minSetpointDeadBand", minSetpointDeadBand, 25));
         NextTest();
     }
 
@@ -40990,8 +40993,8 @@ private:
     void OnSuccessResponse_54(uint8_t startOfWeek)
     {
         VerifyOrReturn(CheckConstraintType("startOfWeek", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("startOfWeek", startOfWeek, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("startOfWeek", startOfWeek, 6));
+        VerifyOrReturn(CheckConstraintMinValue("startOfWeek", startOfWeek, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("startOfWeek", startOfWeek, 6));
         NextTest();
     }
 
@@ -42020,7 +42023,8 @@ private:
         (static_cast<Test_TC_TSTAT_2_2Suite *>(context))->OnFailureResponse_39(error);
     }
 
-    static void OnSuccessCallback_39(void * context, uint8_t controlSequenceOfOperation)
+    static void OnSuccessCallback_39(void * context,
+                                     chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperation)
     {
         (static_cast<Test_TC_TSTAT_2_2Suite *>(context))->OnSuccessResponse_39(controlSequenceOfOperation);
     }
@@ -42037,7 +42041,8 @@ private:
         (static_cast<Test_TC_TSTAT_2_2Suite *>(context))->OnFailureResponse_41(error);
     }
 
-    static void OnSuccessCallback_41(void * context, uint8_t controlSequenceOfOperation)
+    static void OnSuccessCallback_41(void * context,
+                                     chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperation)
     {
         (static_cast<Test_TC_TSTAT_2_2Suite *>(context))->OnSuccessResponse_41(controlSequenceOfOperation);
     }
@@ -42129,8 +42134,8 @@ private:
     {
         VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2600));
         VerifyOrReturn(CheckConstraintType("occupiedCoolingSetpoint", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 1600));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2600));
+        VerifyOrReturn(CheckConstraintMinValue("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2600));
         NextTest();
     }
 
@@ -42245,8 +42250,8 @@ private:
     {
         VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 2000));
         VerifyOrReturn(CheckConstraintType("occupiedHeatingSetpoint", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 700));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 3000));
+        VerifyOrReturn(CheckConstraintMinValue("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 700));
+        VerifyOrReturn(CheckConstraintMaxValue("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 3000));
         NextTest();
     }
 
@@ -42361,8 +42366,8 @@ private:
     {
         VerifyOrReturn(CheckValue("minHeatSetpointLimit", minHeatSetpointLimit, 700));
         VerifyOrReturn(CheckConstraintType("minHeatSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minHeatSetpointLimit", minHeatSetpointLimit, 700));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minHeatSetpointLimit", minHeatSetpointLimit, 3000));
+        VerifyOrReturn(CheckConstraintMinValue("minHeatSetpointLimit", minHeatSetpointLimit, 700));
+        VerifyOrReturn(CheckConstraintMaxValue("minHeatSetpointLimit", minHeatSetpointLimit, 3000));
         NextTest();
     }
 
@@ -42477,8 +42482,8 @@ private:
     {
         VerifyOrReturn(CheckValue("maxHeatSetpointLimit", maxHeatSetpointLimit, 3000));
         VerifyOrReturn(CheckConstraintType("maxHeatSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxHeatSetpointLimit", maxHeatSetpointLimit, 700));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxHeatSetpointLimit", maxHeatSetpointLimit, 3000));
+        VerifyOrReturn(CheckConstraintMinValue("maxHeatSetpointLimit", maxHeatSetpointLimit, 700));
+        VerifyOrReturn(CheckConstraintMaxValue("maxHeatSetpointLimit", maxHeatSetpointLimit, 3000));
         NextTest();
     }
 
@@ -42593,8 +42598,8 @@ private:
     {
         VerifyOrReturn(CheckValue("minCoolSetpointLimit", minCoolSetpointLimit, 1600));
         VerifyOrReturn(CheckConstraintType("minCoolSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minCoolSetpointLimit", minCoolSetpointLimit, 1600));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minCoolSetpointLimit", minCoolSetpointLimit, 3200));
+        VerifyOrReturn(CheckConstraintMinValue("minCoolSetpointLimit", minCoolSetpointLimit, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue("minCoolSetpointLimit", minCoolSetpointLimit, 3200));
         NextTest();
     }
 
@@ -42709,8 +42714,8 @@ private:
     {
         VerifyOrReturn(CheckValue("maxCoolSetpointLimit", maxCoolSetpointLimit, 3200));
         VerifyOrReturn(CheckConstraintType("maxCoolSetpointLimit", "", "int16"));
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxCoolSetpointLimit", maxCoolSetpointLimit, 1600));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxCoolSetpointLimit", maxCoolSetpointLimit, 3200));
+        VerifyOrReturn(CheckConstraintMinValue("maxCoolSetpointLimit", maxCoolSetpointLimit, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue("maxCoolSetpointLimit", maxCoolSetpointLimit, 3200));
         NextTest();
     }
 
@@ -42998,12 +43003,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_39(uint8_t controlSequenceOfOperation)
+    void OnSuccessResponse_39(chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperation)
     {
         VerifyOrReturn(CheckValue("controlSequenceOfOperation", controlSequenceOfOperation, 4));
         VerifyOrReturn(CheckConstraintType("controlSequenceOfOperation", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 5));
+        VerifyOrReturn(CheckConstraintMinValue("controlSequenceOfOperation", controlSequenceOfOperation, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("controlSequenceOfOperation", controlSequenceOfOperation, 5));
         NextTest();
     }
 
@@ -43013,8 +43018,8 @@ private:
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint8_t controlSequenceOfOperationArgument;
-        controlSequenceOfOperationArgument = 2;
+        chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperationArgument;
+        controlSequenceOfOperationArgument = static_cast<chip::app::Clusters::Thermostat::ThermostatControlSequence>(2);
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
@@ -43048,7 +43053,7 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_41(uint8_t controlSequenceOfOperation)
+    void OnSuccessResponse_41(chip::app::Clusters::Thermostat::ThermostatControlSequence controlSequenceOfOperation)
     {
         VerifyOrReturn(CheckValue("controlSequenceOfOperation", controlSequenceOfOperation, 2));
 
@@ -45087,8 +45092,8 @@ private:
     void OnSuccessResponse_1(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("clusterRevision", clusterRevision, 5U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("clusterRevision", clusterRevision, 200U));
+        VerifyOrReturn(CheckConstraintMinValue("clusterRevision", clusterRevision, 5U));
+        VerifyOrReturn(CheckConstraintMaxValue("clusterRevision", clusterRevision, 200U));
         NextTest();
     }
 
@@ -45183,8 +45188,8 @@ private:
     void OnSuccessResponse_5(uint32_t featureMap)
     {
         VerifyOrReturn(CheckConstraintType("featureMap", "", "uint32"));
-        VerifyOrReturn(CheckConstraintMinValue<uint32_t>("featureMap", featureMap, 0UL));
-        VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("featureMap", featureMap, 32768UL));
+        VerifyOrReturn(CheckConstraintMinValue("featureMap", featureMap, 0UL));
+        VerifyOrReturn(CheckConstraintMaxValue("featureMap", featureMap, 32768UL));
         NextTest();
     }
 
@@ -46081,8 +46086,8 @@ private:
     void OnSuccessResponse_1(uint8_t type)
     {
         VerifyOrReturn(CheckConstraintType("type", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("type", type, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("type", type, 9));
+        VerifyOrReturn(CheckConstraintMinValue("type", type, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("type", type, 9));
         NextTest();
     }
 
@@ -46154,8 +46159,8 @@ private:
     void OnSuccessResponse_4(uint8_t configStatus)
     {
         VerifyOrReturn(CheckConstraintType("configStatus", "", "map8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", configStatus, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", configStatus, 63));
+        VerifyOrReturn(CheckConstraintMinValue("configStatus", configStatus, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("configStatus", configStatus, 63));
         NextTest();
     }
 
@@ -46227,8 +46232,8 @@ private:
     void OnSuccessResponse_7(uint8_t operationalStatus)
     {
         VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("operationalStatus", operationalStatus, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("operationalStatus", operationalStatus, 63));
+        VerifyOrReturn(CheckConstraintMinValue("operationalStatus", operationalStatus, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("operationalStatus", operationalStatus, 63));
         NextTest();
     }
 
@@ -46300,8 +46305,8 @@ private:
     void OnSuccessResponse_10(uint8_t endProductType)
     {
         VerifyOrReturn(CheckConstraintType("endProductType", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("endProductType", endProductType, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("endProductType", endProductType, 23));
+        VerifyOrReturn(CheckConstraintMinValue("endProductType", endProductType, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("endProductType", endProductType, 23));
         NextTest();
     }
 
@@ -46373,8 +46378,8 @@ private:
     void OnSuccessResponse_13(uint8_t mode)
     {
         VerifyOrReturn(CheckConstraintType("mode", "", "map8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("mode", mode, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("mode", mode, 15));
+        VerifyOrReturn(CheckConstraintMinValue("mode", mode, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("mode", mode, 15));
         NextTest();
     }
 
@@ -46445,10 +46450,8 @@ private:
     void OnSuccessResponse_16(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "Percent100ths"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionLiftPercent100ths",
-                                                                    targetPositionLiftPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 10000U));
         NextTest();
     }
 
@@ -46524,10 +46527,8 @@ private:
     void OnSuccessResponse_19(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "Percent100ths"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionTiltPercent100ths",
-                                                                    targetPositionTiltPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 10000U));
         NextTest();
     }
 
@@ -46603,10 +46604,8 @@ private:
     void OnSuccessResponse_22(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "Percent100ths"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
-                                                                    currentPositionLiftPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 10000U));
         NextTest();
     }
 
@@ -46682,10 +46681,8 @@ private:
     void OnSuccessResponse_25(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "Percent100ths"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
-                                                                    currentPositionTiltPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 10000U));
         NextTest();
     }
 
@@ -46761,8 +46758,8 @@ private:
     void OnSuccessResponse_28(uint16_t installedOpenLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("installedOpenLimitLift", installedOpenLimitLift, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("installedOpenLimitLift", installedOpenLimitLift, 65535U));
         NextTest();
     }
 
@@ -46811,8 +46808,8 @@ private:
     void OnSuccessResponse_30(uint16_t installedOpenLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("installedOpenLimitLift", installedOpenLimitLift, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("installedOpenLimitLift", installedOpenLimitLift, 65535U));
         NextTest();
     }
 
@@ -46837,8 +46834,8 @@ private:
     void OnSuccessResponse_31(uint16_t installedClosedLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("installedClosedLimitLift", installedClosedLimitLift, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("installedClosedLimitLift", installedClosedLimitLift, 65535U));
         NextTest();
     }
 
@@ -46887,8 +46884,8 @@ private:
     void OnSuccessResponse_33(uint16_t installedClosedLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("installedClosedLimitLift", installedClosedLimitLift, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("installedClosedLimitLift", installedClosedLimitLift, 65535U));
         NextTest();
     }
 
@@ -46913,8 +46910,8 @@ private:
     void OnSuccessResponse_34(uint16_t installedOpenLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("installedOpenLimitTilt", installedOpenLimitTilt, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("installedOpenLimitTilt", installedOpenLimitTilt, 65535U));
         NextTest();
     }
 
@@ -46963,8 +46960,8 @@ private:
     void OnSuccessResponse_36(uint16_t installedOpenLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("installedOpenLimitTilt", installedOpenLimitTilt, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("installedOpenLimitTilt", installedOpenLimitTilt, 65535U));
         NextTest();
     }
 
@@ -46989,8 +46986,8 @@ private:
     void OnSuccessResponse_37(uint16_t installedClosedLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("installedClosedLimitTilt", installedClosedLimitTilt, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("installedClosedLimitTilt", installedClosedLimitTilt, 65535U));
         NextTest();
     }
 
@@ -47039,8 +47036,8 @@ private:
     void OnSuccessResponse_39(uint16_t installedClosedLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("installedClosedLimitTilt", installedClosedLimitTilt, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("installedClosedLimitTilt", installedClosedLimitTilt, 65535U));
         NextTest();
     }
 
@@ -47064,8 +47061,8 @@ private:
     void OnSuccessResponse_40(uint16_t safetyStatus)
     {
         VerifyOrReturn(CheckConstraintType("safetyStatus", "", "map16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("safetyStatus", safetyStatus, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("safetyStatus", safetyStatus, 2047U));
+        VerifyOrReturn(CheckConstraintMinValue("safetyStatus", safetyStatus, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("safetyStatus", safetyStatus, 2047U));
         NextTest();
     }
 
@@ -47137,8 +47134,8 @@ private:
     void OnSuccessResponse_43(const chip::app::DataModel::Nullable<uint16_t> & currentPositionLift)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentPositionLift", currentPositionLift, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLift", currentPositionLift, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLift", currentPositionLift, 65535U));
         NextTest();
     }
 
@@ -47186,8 +47183,8 @@ private:
     void OnSuccessResponse_45(const chip::app::DataModel::Nullable<uint16_t> & currentPositionLift)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentPositionLift", currentPositionLift, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLift", currentPositionLift, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLift", currentPositionLift, 65535U));
         NextTest();
     }
 
@@ -47211,8 +47208,8 @@ private:
     void OnSuccessResponse_46(const chip::app::DataModel::Nullable<uint16_t> & currentPositionTilt)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentPositionTilt", currentPositionTilt, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTilt", currentPositionTilt, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTilt", currentPositionTilt, 65535U));
         NextTest();
     }
 
@@ -47260,8 +47257,8 @@ private:
     void OnSuccessResponse_48(const chip::app::DataModel::Nullable<uint16_t> & currentPositionTilt)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentPositionTilt", currentPositionTilt, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTilt", currentPositionTilt, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTilt", currentPositionTilt, 65535U));
         NextTest();
     }
 
@@ -47286,8 +47283,8 @@ private:
     void OnSuccessResponse_49(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "Percent"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
         NextTest();
     }
 
@@ -47363,8 +47360,8 @@ private:
     void OnSuccessResponse_52(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "Percent"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
         NextTest();
     }
 
@@ -47657,8 +47654,8 @@ private:
     void OnSuccessResponse_2(uint8_t type)
     {
         VerifyOrReturn(CheckConstraintType("type", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("type", type, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("type", type, 9));
+        VerifyOrReturn(CheckConstraintMinValue("type", type, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("type", type, 9));
         NextTest();
     }
 };
@@ -47822,8 +47819,8 @@ private:
     void OnSuccessResponse_2(uint8_t endProductType)
     {
         VerifyOrReturn(CheckConstraintType("endProductType", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("endProductType", endProductType, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("endProductType", endProductType, 23));
+        VerifyOrReturn(CheckConstraintMinValue("endProductType", endProductType, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("endProductType", endProductType, 23));
         NextTest();
     }
 };
@@ -48303,10 +48300,8 @@ private:
     void OnSuccessResponse_3(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
-                                                                    currentPositionLiftPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 10000U));
         NextTest();
     }
 
@@ -48331,8 +48326,8 @@ private:
     void OnSuccessResponse_4(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 1));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 1));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
         NextTest();
     }
 
@@ -48357,10 +48352,8 @@ private:
     void OnSuccessResponse_5(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
-                                                                    currentPositionTiltPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 10000U));
         NextTest();
     }
 
@@ -48385,8 +48378,8 @@ private:
     void OnSuccessResponse_6(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 1));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 1));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
         NextTest();
     }
 
@@ -48537,8 +48530,8 @@ private:
     {
         mReceivedReport_13 = true;
         VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("operationalStatus", operationalStatus, 5));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("operationalStatus", operationalStatus, 21));
+        VerifyOrReturn(CheckConstraintMinValue("operationalStatus", operationalStatus, 5));
+        VerifyOrReturn(CheckConstraintMaxValue("operationalStatus", operationalStatus, 21));
         NextTest();
     }
 
@@ -48569,10 +48562,8 @@ private:
     void OnSuccessResponse_15(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
-                                                                    currentPositionLiftPercent100ths, 9999U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 9999U));
         NextTest();
     }
 
@@ -48597,8 +48588,8 @@ private:
     void OnSuccessResponse_16(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 99));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 99));
         NextTest();
     }
 
@@ -48623,10 +48614,8 @@ private:
     void OnSuccessResponse_17(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
-                                                                    currentPositionTiltPercent100ths, 9999U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 9999U));
         NextTest();
     }
 
@@ -48651,8 +48640,8 @@ private:
     void OnSuccessResponse_18(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 99));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 99));
         NextTest();
     }
 
@@ -48740,10 +48729,8 @@ private:
     void OnSuccessResponse_23(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionLiftPercent100ths",
-                                                                    targetPositionLiftPercent100ths, 9999U));
+        VerifyOrReturn(CheckConstraintMinValue("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 9999U));
         NextTest();
     }
 
@@ -48768,10 +48755,8 @@ private:
     void OnSuccessResponse_24(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionTiltPercent100ths",
-                                                                    targetPositionTiltPercent100ths, 9999U));
+        VerifyOrReturn(CheckConstraintMinValue("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 9999U));
         NextTest();
     }
 };
@@ -49250,10 +49235,8 @@ private:
     void OnSuccessResponse_3(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
-                                                                    currentPositionLiftPercent100ths, 9999U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 9999U));
         NextTest();
     }
 
@@ -49278,8 +49261,8 @@ private:
     void OnSuccessResponse_4(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 99));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 99));
         NextTest();
     }
 
@@ -49304,10 +49287,8 @@ private:
     void OnSuccessResponse_5(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
-                                                                    currentPositionTiltPercent100ths, 9999U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 9999U));
         NextTest();
     }
 
@@ -49332,8 +49313,8 @@ private:
     void OnSuccessResponse_6(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 99));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 99));
         NextTest();
     }
 
@@ -49484,8 +49465,8 @@ private:
     {
         mReceivedReport_13 = true;
         VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("operationalStatus", operationalStatus, 10));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("operationalStatus", operationalStatus, 42));
+        VerifyOrReturn(CheckConstraintMinValue("operationalStatus", operationalStatus, 10));
+        VerifyOrReturn(CheckConstraintMaxValue("operationalStatus", operationalStatus, 42));
         NextTest();
     }
 
@@ -49516,10 +49497,8 @@ private:
     void OnSuccessResponse_15(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
-                                                                    currentPositionLiftPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 10000U));
         NextTest();
     }
 
@@ -49544,8 +49523,8 @@ private:
     void OnSuccessResponse_16(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 1));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 1));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
         NextTest();
     }
 
@@ -49570,10 +49549,8 @@ private:
     void OnSuccessResponse_17(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
-                                                                    currentPositionTiltPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 10000U));
         NextTest();
     }
 
@@ -49598,8 +49575,8 @@ private:
     void OnSuccessResponse_18(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 1));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 1));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
         NextTest();
     }
 
@@ -49687,10 +49664,8 @@ private:
     void OnSuccessResponse_23(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionLiftPercent100ths",
-                                                                    targetPositionLiftPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 10000U));
         NextTest();
     }
 
@@ -49715,10 +49690,8 @@ private:
     void OnSuccessResponse_24(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 1U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionTiltPercent100ths",
-                                                                    targetPositionTiltPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 10000U));
         NextTest();
     }
 };
@@ -50227,10 +50200,8 @@ private:
 
     void OnSuccessResponse_12(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
-                                                                    currentPositionLiftPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 10000U));
         attrCurrentPositionLift = currentPositionLiftPercent100ths;
         NextTest();
     }
@@ -50290,10 +50261,8 @@ private:
 
     void OnSuccessResponse_14(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
-                                                                    currentPositionTiltPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 10000U));
         attrCurrentPositionTilt = currentPositionTiltPercent100ths;
         NextTest();
     }
@@ -52033,10 +52002,8 @@ private:
 
     void OnSuccessResponse_1(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
-                                                                    currentPositionLiftPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 10000U));
         attrCurrentPositionLiftPercent100ths = currentPositionLiftPercent100ths;
         NextTest();
     }
@@ -52061,8 +52028,8 @@ private:
 
     void OnSuccessResponse_2(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
         attrCurrentPositionLiftPercentage = currentPositionLiftPercentage;
         NextTest();
     }
@@ -52326,10 +52293,8 @@ private:
 
     void OnSuccessResponse_1(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
-        VerifyOrReturn(
-            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
-                                                                    currentPositionTiltPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 10000U));
         attrCurrentPositionTiltPercent100ths = currentPositionTiltPercent100ths;
         NextTest();
     }
@@ -52354,8 +52319,8 @@ private:
 
     void OnSuccessResponse_2(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
-        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
+        VerifyOrReturn(CheckConstraintMinValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
         attrCurrentPositionTiltPercentage = currentPositionTiltPercentage;
         NextTest();
     }
@@ -68318,8 +68283,8 @@ private:
 
     void OnSuccessResponse_216(const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("nullableInt8u", nullableInt8u, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("nullableInt8u", nullableInt8u, 254));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt8u", nullableInt8u, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt8u", nullableInt8u, 254));
         NextTest();
     }
 
@@ -68389,8 +68354,8 @@ private:
 
     void OnSuccessResponse_219(const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("nullableInt8u", nullableInt8u, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("nullableInt8u", nullableInt8u, 254));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt8u", nullableInt8u, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt8u", nullableInt8u, 254));
         NextTest();
     }
 
@@ -68628,8 +68593,8 @@ private:
 
     void OnSuccessResponse_229(const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("nullableInt16u", nullableInt16u, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("nullableInt16u", nullableInt16u, 65534U));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt16u", nullableInt16u, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt16u", nullableInt16u, 65534U));
         NextTest();
     }
 
@@ -68699,8 +68664,8 @@ private:
 
     void OnSuccessResponse_232(const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("nullableInt16u", nullableInt16u, 0U));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("nullableInt16u", nullableInt16u, 65534U));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt16u", nullableInt16u, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt16u", nullableInt16u, 65534U));
         NextTest();
     }
 
@@ -68938,8 +68903,8 @@ private:
 
     void OnSuccessResponse_242(const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint32_t>("nullableInt32u", nullableInt32u, 0UL));
-        VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("nullableInt32u", nullableInt32u, 4294967294UL));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt32u", nullableInt32u, 0UL));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt32u", nullableInt32u, 4294967294UL));
         NextTest();
     }
 
@@ -69009,8 +68974,8 @@ private:
 
     void OnSuccessResponse_245(const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint32_t>("nullableInt32u", nullableInt32u, 0UL));
-        VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("nullableInt32u", nullableInt32u, 4294967294UL));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt32u", nullableInt32u, 0UL));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt32u", nullableInt32u, 4294967294UL));
         NextTest();
     }
 
@@ -69248,8 +69213,8 @@ private:
 
     void OnSuccessResponse_255(const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint64_t>("nullableInt64u", nullableInt64u, 0ULL));
-        VerifyOrReturn(CheckConstraintMaxValue<uint64_t>("nullableInt64u", nullableInt64u, 18446744073709551614ULL));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt64u", nullableInt64u, 0ULL));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt64u", nullableInt64u, 18446744073709551614ULL));
         NextTest();
     }
 
@@ -69319,8 +69284,8 @@ private:
 
     void OnSuccessResponse_258(const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint64_t>("nullableInt64u", nullableInt64u, 0ULL));
-        VerifyOrReturn(CheckConstraintMaxValue<uint64_t>("nullableInt64u", nullableInt64u, 18446744073709551614ULL));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt64u", nullableInt64u, 0ULL));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt64u", nullableInt64u, 18446744073709551614ULL));
         NextTest();
     }
 
@@ -69510,8 +69475,8 @@ private:
 
     void OnSuccessResponse_266(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
     {
-        VerifyOrReturn(CheckConstraintMinValue<int8_t>("nullableInt8s", nullableInt8s, -127));
-        VerifyOrReturn(CheckConstraintMaxValue<int8_t>("nullableInt8s", nullableInt8s, 127));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt8s", nullableInt8s, -127));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt8s", nullableInt8s, 127));
         NextTest();
     }
 
@@ -69581,8 +69546,8 @@ private:
 
     void OnSuccessResponse_269(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
     {
-        VerifyOrReturn(CheckConstraintMinValue<int8_t>("nullableInt8s", nullableInt8s, -127));
-        VerifyOrReturn(CheckConstraintMaxValue<int8_t>("nullableInt8s", nullableInt8s, 127));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt8s", nullableInt8s, -127));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt8s", nullableInt8s, 127));
         NextTest();
     }
 
@@ -69772,8 +69737,8 @@ private:
 
     void OnSuccessResponse_277(const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
     {
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("nullableInt16s", nullableInt16s, -32767));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("nullableInt16s", nullableInt16s, 32767));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt16s", nullableInt16s, -32767));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt16s", nullableInt16s, 32767));
         NextTest();
     }
 
@@ -69843,8 +69808,8 @@ private:
 
     void OnSuccessResponse_280(const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
     {
-        VerifyOrReturn(CheckConstraintMinValue<int16_t>("nullableInt16s", nullableInt16s, -32767));
-        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("nullableInt16s", nullableInt16s, 32767));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt16s", nullableInt16s, -32767));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt16s", nullableInt16s, 32767));
         NextTest();
     }
 
@@ -70034,8 +69999,8 @@ private:
 
     void OnSuccessResponse_288(const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
     {
-        VerifyOrReturn(CheckConstraintMinValue<int32_t>("nullableInt32s", nullableInt32s, -2147483647L));
-        VerifyOrReturn(CheckConstraintMaxValue<int32_t>("nullableInt32s", nullableInt32s, 2147483647L));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt32s", nullableInt32s, -2147483647L));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt32s", nullableInt32s, 2147483647L));
         NextTest();
     }
 
@@ -70105,8 +70070,8 @@ private:
 
     void OnSuccessResponse_291(const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
     {
-        VerifyOrReturn(CheckConstraintMinValue<int32_t>("nullableInt32s", nullableInt32s, -2147483647L));
-        VerifyOrReturn(CheckConstraintMaxValue<int32_t>("nullableInt32s", nullableInt32s, 2147483647L));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt32s", nullableInt32s, -2147483647L));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt32s", nullableInt32s, 2147483647L));
         NextTest();
     }
 
@@ -70296,8 +70261,8 @@ private:
 
     void OnSuccessResponse_299(const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
     {
-        VerifyOrReturn(CheckConstraintMinValue<int64_t>("nullableInt64s", nullableInt64s, -9223372036854775807LL));
-        VerifyOrReturn(CheckConstraintMaxValue<int64_t>("nullableInt64s", nullableInt64s, 9223372036854775807LL));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt64s", nullableInt64s, -9223372036854775807LL));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt64s", nullableInt64s, 9223372036854775807LL));
         NextTest();
     }
 
@@ -70367,8 +70332,8 @@ private:
 
     void OnSuccessResponse_302(const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
     {
-        VerifyOrReturn(CheckConstraintMinValue<int64_t>("nullableInt64s", nullableInt64s, -9223372036854775807LL));
-        VerifyOrReturn(CheckConstraintMaxValue<int64_t>("nullableInt64s", nullableInt64s, 9223372036854775807LL));
+        VerifyOrReturn(CheckConstraintMinValue("nullableInt64s", nullableInt64s, -9223372036854775807LL));
+        VerifyOrReturn(CheckConstraintMaxValue("nullableInt64s", nullableInt64s, 9223372036854775807LL));
         NextTest();
     }
 
@@ -76008,7 +75973,7 @@ private:
 
     void OnSuccessResponse_2(uint32_t int32u)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint32_t>("int32u", int32u, 5UL));
+        VerifyOrReturn(CheckConstraintMinValue("int32u", int32u, 5UL));
         NextTest();
     }
 
@@ -76031,7 +75996,7 @@ private:
 
     void OnSuccessResponse_3(uint32_t int32u)
     {
-        VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("int32u", int32u, 5UL));
+        VerifyOrReturn(CheckConstraintMaxValue("int32u", int32u, 5UL));
         NextTest();
     }
 
@@ -76783,8 +76748,8 @@ private:
 
             VerifyOrReturn(CheckValue("longDiscriminator", value.longDiscriminator,
                                       mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U));
-            VerifyOrReturn(CheckConstraintMinValue<uint16_t>("value.longDiscriminator", value.longDiscriminator, 0U));
-            VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("value.longDiscriminator", value.longDiscriminator, 4096U));
+            VerifyOrReturn(CheckConstraintMinValue("value.longDiscriminator", value.longDiscriminator, 0U));
+            VerifyOrReturn(CheckConstraintMaxValue("value.longDiscriminator", value.longDiscriminator, 4096U));
         }
         if ((mTestIndex - 1) == 9)
         {
@@ -76803,16 +76768,16 @@ private:
             isExpectedDnssdResult = true;
 
             VerifyOrReturn(CheckValuePresent("value.mrpRetryIntervalIdle", value.mrpRetryIntervalIdle));
-            VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("value.mrpRetryIntervalIdle.Value()",
-                                                             value.mrpRetryIntervalIdle.Value(), 3600000UL));
+            VerifyOrReturn(
+                CheckConstraintMaxValue("value.mrpRetryIntervalIdle.Value()", value.mrpRetryIntervalIdle.Value(), 3600000UL));
         }
         if ((mTestIndex - 1) == 12)
         {
             isExpectedDnssdResult = true;
 
             VerifyOrReturn(CheckValuePresent("value.mrpRetryIntervalActive", value.mrpRetryIntervalActive));
-            VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("value.mrpRetryIntervalActive.Value()",
-                                                             value.mrpRetryIntervalActive.Value(), 3600000UL));
+            VerifyOrReturn(
+                CheckConstraintMaxValue("value.mrpRetryIntervalActive.Value()", value.mrpRetryIntervalActive.Value(), 3600000UL));
         }
         if ((mTestIndex - 1) == 13)
         {
@@ -76830,7 +76795,7 @@ private:
         {
             isExpectedDnssdResult = true;
 
-            VerifyOrReturn(CheckConstraintMaxValue<uint64_t>("value.rotatingIdLen", value.rotatingIdLen, 100ULL));
+            VerifyOrReturn(CheckConstraintMaxValue("value.rotatingIdLen", value.rotatingIdLen, 100ULL));
         }
         if ((mTestIndex - 1) == 16)
         {
@@ -76846,7 +76811,7 @@ private:
         {
             isExpectedDnssdResult = true;
 
-            VerifyOrReturn(CheckConstraintMinValue<uint8_t>("value.numIPs", value.numIPs, 1));
+            VerifyOrReturn(CheckConstraintMinValue("value.numIPs", value.numIPs, 1));
         }
         if ((mTestIndex - 1) == 22)
         {
@@ -82334,7 +82299,7 @@ private:
     void OnSuccessResponse_1(uint8_t supportedFabrics)
     {
         VerifyOrReturn(CheckConstraintType("supportedFabrics", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("supportedFabrics", supportedFabrics, 4));
+        VerifyOrReturn(CheckConstraintMinValue("supportedFabrics", supportedFabrics, 4));
         NextTest();
     }
 
@@ -82359,7 +82324,7 @@ private:
     void OnSuccessResponse_2(uint8_t commissionedFabrics)
     {
         VerifyOrReturn(CheckConstraintType("commissionedFabrics", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("commissionedFabrics", commissionedFabrics, 1));
+        VerifyOrReturn(CheckConstraintMinValue("commissionedFabrics", commissionedFabrics, 1));
         NextTest();
     }
 
@@ -82384,7 +82349,7 @@ private:
     void OnSuccessResponse_3(chip::FabricIndex currentFabricIndex)
     {
         VerifyOrReturn(CheckConstraintType("currentFabricIndex", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::FabricIndex>("currentFabricIndex", currentFabricIndex, 1));
+        VerifyOrReturn(CheckConstraintMinValue("currentFabricIndex", currentFabricIndex, 1));
         ourFabricIndex = currentFabricIndex;
         NextTest();
     }
@@ -95332,7 +95297,7 @@ private:
 
     void OnSuccessResponse_1(uint16_t maxGroupsPerFabric)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("maxGroupsPerFabric", maxGroupsPerFabric, 2U));
+        VerifyOrReturn(CheckConstraintMinValue("maxGroupsPerFabric", maxGroupsPerFabric, 2U));
         NextTest();
     }
 

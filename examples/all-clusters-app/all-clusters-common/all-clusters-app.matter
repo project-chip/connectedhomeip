@@ -3091,6 +3091,31 @@ server cluster Thermostat = 513 {
     kHeatAndCoolSetpoints = 2;
   }
 
+  enum ThermostatControlSequence : ENUM8 {
+    kCoolingOnly = 0;
+    kCoolingWithReheat = 1;
+    kHeatingOnly = 2;
+    kHeatingWithReheat = 3;
+    kCoolingAndHeating = 4;
+    kCoolingAndHeatingWithReheat = 5;
+  }
+
+  enum ThermostatRunningMode : ENUM8 {
+    kOff = 0;
+    kCool = 3;
+    kHeat = 4;
+  }
+
+  enum ThermostatSystemMode : ENUM8 {
+    kOff = 0;
+    kAuto = 1;
+    kCool = 3;
+    kHeat = 4;
+    kEmergencyHeating = 5;
+    kPrecooling = 6;
+    kFanOnly = 7;
+  }
+
   bitmap DayOfWeek : BITMAP8 {
     kSunday = 0x1;
     kMonday = 0x2;
@@ -3128,7 +3153,7 @@ server cluster Thermostat = 513 {
   attribute int16s minCoolSetpointLimit = 23;
   attribute int16s maxCoolSetpointLimit = 24;
   attribute int8s minSetpointDeadBand = 25;
-  attribute enum8 controlSequenceOfOperation = 27;
+  attribute ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute enum8 systemMode = 28;
   readonly attribute enum8 startOfWeek = 32;
   readonly attribute int8u numberOfWeeklyTransitions = 33;
