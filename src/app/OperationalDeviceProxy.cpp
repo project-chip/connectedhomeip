@@ -56,14 +56,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
 
     case State::NeedsAddress:
         VerifyOrReturnError(resolver != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        if (resolver->ResolveNodeIdFromInternalCache(mPeerId, Inet::IPAddressType::kAny))
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = resolver->ResolveNodeId(mPeerId, Inet::IPAddressType::kAny);
-        }
+        err = resolver->ResolveNodeId(mPeerId, Inet::IPAddressType::kAny);
         EnqueueConnectionCallbacks(onConnection, onFailure);
         break;
 
