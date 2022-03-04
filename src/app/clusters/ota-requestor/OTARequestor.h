@@ -306,7 +306,6 @@ private:
     char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
     CharSpan mFileDesignator;
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
-    System::Clock::Timeout mTimeoutSec     = chip::System::Clock::Seconds32(5*60); // Abort the QueryImage download request if there's been no progress for 5 minutes
     Server * mServer                       = nullptr;
     chip::Optional<bool> mRequestorCanConsent;
     ProviderLocationList mDefaultOtaProviderList;
