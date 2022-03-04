@@ -26,7 +26,6 @@
 const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
 
-
 CHIP_ERROR CHIPCommandBridge::Run()
 {
     ChipLogProgress(chipTool, "Running Command");
@@ -41,7 +40,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
 
     [mController setListenPort:kListenPort];
 
-    [nocSigner createOrLoadKeys: storage];
+    [nocSigner createOrLoadKeys:storage];
 
     if (![mController startup:storage vendorId:0 nocSigner:nocSigner]) {
         ChipLogError(chipTool, "Controller startup failure.");

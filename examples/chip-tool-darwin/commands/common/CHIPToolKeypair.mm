@@ -1,12 +1,12 @@
-#include <stddef.h>
-#include <lib/asn1/ASN1.h>
 #import "CHIPToolKeypair.h"
-#import <CHIP/CHIPKeypair.h>
-#include <crypto/CHIPCryptoPAL.h>
 #include <CHIP/CHIP.h>
+#import <CHIP/CHIPKeypair.h>
 #include <credentials/CHIPCert.h>
-#include <string>
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/asn1/ASN1.h>
 #include <lib/support/Base64.h>
+#include <stddef.h>
+#include <string>
 
 NSString * const kOperationalCredentialsIssuerKeypairStorage = @"ChipToolOpCredsCAKey";
 
@@ -58,9 +58,10 @@ std::string Base64ToString(const std::string & b64Value)
 - (NSData *)ECDSA_sign_hash:(NSData *)hash
 {
     chip::Crypto::P256ECDSASignature signature;
-    NSData *out_signature;
-    CHIP_ERROR signing_error = _mKeyPair.ECDSA_sign_hash((const uint8_t *)[hash bytes], (const size_t)[hash length], signature);
-    if (signing_error != CHIP_NO_ERROR) return nil;
+    NSData * out_signature;
+    CHIP_ERROR signing_error = _mKeyPair.ECDSA_sign_hash((const uint8_t *) [hash bytes], (const size_t)[hash length], signature);
+    if (signing_error != CHIP_NO_ERROR)
+        return nil;
     out_signature = [NSData dataWithBytes:signature length:sizeof(signature)];
     return out_signature;
 }
@@ -68,30 +69,32 @@ std::string Base64ToString(const std::string & b64Value)
 - (SecKeyRef)pubkey
 {
     chip::Crypto::P256PublicKey publicKey = _mKeyPair.Pubkey();
-    NSData *publicKeyNSData = [NSData dataWithBytes:publicKey.Bytes() length:publicKey.Length()];
-    NSDictionary *attributes = @{(__bridge NSString*)kSecAttrKeyType : (__bridge NSString*)kSecAttrKeyTypeECDSA,
-                                 (__bridge NSString*)kSecAttrKeyClass : (__bridge NSString*)kSecAttrKeyClassPublic};
-    return SecKeyCreateWithData((__bridge CFDataRef)publicKeyNSData, (__bridge CFDictionaryRef)attributes, NULL);
+    NSData * publicKeyNSData = [NSData dataWithBytes:publicKey.Bytes() length:publicKey.Length()];
+    NSDictionary * attributes = @{
+        (__bridge NSString *) kSecAttrKeyType : (__bridge NSString *) kSecAttrKeyTypeECDSA,
+        (__bridge NSString *) kSecAttrKeyClass : (__bridge NSString *) kSecAttrKeyClassPublic
+    };
+    return SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, NULL);
 }
 
- - (CHIP_ERROR)Deserialize: (chip::Crypto::P256SerializedKeypair &) input
- {
+- (CHIP_ERROR)Deserialize:(chip::Crypto::P256SerializedKeypair &)input
+{
     return _mKeyPair.Deserialize(input);
- }
+}
 
- - (CHIP_ERROR)Serialize: (chip::Crypto::P256SerializedKeypair &) output
- {
+- (CHIP_ERROR)Serialize:(chip::Crypto::P256SerializedKeypair &)output
+{
     return _mKeyPair.Serialize(output);
- }
+}
 
- - (CHIP_ERROR)createOrLoadKeys: (CHIPToolPersistentStorageDelegate *) storage
- {
+- (CHIP_ERROR)createOrLoadKeys:(CHIPToolPersistentStorageDelegate *)storage
+{
     chip::ASN1::ASN1UniversalTime effectiveTime;
     chip::Crypto::P256SerializedKeypair serializedKey;
     NSString * value;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-      // Initializing the default start validity to start of 2021. The default validity duration is 10 years.
+    // Initializing the default start validity to start of 2021. The default validity duration is 10 years.
     CHIP_ZERO_AT(effectiveTime);
     effectiveTime.Year = 2021;
     effectiveTime.Month = 1;
@@ -100,31 +103,29 @@ std::string Base64ToString(const std::string & b64Value)
 
     uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
-    value = [storage CHIPGetKeyValue: kOperationalCredentialsIssuerKeypairStorage];
-    err = [self decodeNSStringWithValue: value serializedKey:serializedKey];
+    value = [storage CHIPGetKeyValue:kOperationalCredentialsIssuerKeypairStorage];
+    err = [self decodeNSStringWithValue:value serializedKey:serializedKey];
     serializedKey.SetLength(keySize);
 
     if (err != CHIP_NO_ERROR) {
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
-        if (![self initialize]){
+        if (![self initialize]) {
             return CHIP_ERROR_INTERNAL;
         }
         ReturnErrorOnFailure([self Serialize:serializedKey]);
 
         keySize = static_cast<uint16_t>(serializedKey.Capacity());
-        std::string serializeString(serializedKey.Bytes(), serializedKey.Bytes()+serializedKey.Capacity());
+        std::string serializeString(serializedKey.Bytes(), serializedKey.Bytes() + serializedKey.Capacity());
         std::string base64Value = StringToBase64(serializeString);
         NSString * valueString = [NSString stringWithUTF8String:base64Value.c_str()];
         [storage CHIPSetKeyValue:kOperationalCredentialsIssuerKeypairStorage value:valueString];
-    }
-    else
-    {
+    } else {
         ReturnErrorOnFailure([self Deserialize:serializedKey]);
     }
     return err;
- }
+}
 
- - (CHIP_ERROR) decodeNSStringWithValue:(NSString *)value serializedKey:(chip::Crypto::P256SerializedKeypair &) serializedKey
+- (CHIP_ERROR)decodeNSStringWithValue:(NSString *)value serializedKey:(chip::Crypto::P256SerializedKeypair &)serializedKey
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
