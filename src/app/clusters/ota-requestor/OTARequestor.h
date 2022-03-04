@@ -119,6 +119,9 @@ public:
         percent.SetNull();
         OtaRequestorServerSetUpdateStateProgress(percent);
 
+        // This results in the initial periodic timer kicking off
+        RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+
         return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor,
                                                                     reinterpret_cast<intptr_t>(this));
     }
@@ -299,7 +302,7 @@ private:
     uint32_t mTargetVersion  = 0;
     char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
     CharSpan mFileDesignator;
-    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
+    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
     chip::Optional<bool> mRequestorCanConsent;
     ProviderLocationList mDefaultOtaProviderList;
