@@ -39,17 +39,17 @@ using namespace chip;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 
-constexpr int16_t kDefaultAbsMinHeatSetpointLimit    = 700;  // 7C (44.5 F) is the default
-constexpr int16_t kDefaultAbsMaxHeatSetpointLimit    = 3000; // 30C (86 F) is the default
-constexpr int16_t kDefaultMinHeatSetpointLimit       = 700;  // 7C (44.5 F) is the default
-constexpr int16_t kDefaultMaxHeatSetpointLimit       = 3000; // 30C (86 F) is the default
-constexpr int16_t kDefaultAbsMinCoolSetpointLimit    = 1600; // 16C (61 F) is the default
-constexpr int16_t kDefaultAbsMaxCoolSetpointLimit    = 3200; // 32C (90 F) is the default
-constexpr int16_t kDefaultMinCoolSetpointLimit       = 1600; // 16C (61 F) is the default
-constexpr int16_t kDefaultMaxCoolSetpointLimit       = 3200; // 32C (90 F) is the default
-constexpr int16_t kDefaultHeatingSetpoint            = 2000;
-constexpr int16_t kDefaultCoolingSetpoint            = 2600;
-constexpr int8_t kDefaultDeadBand                    = 25; // 2.5C is the default
+constexpr int16_t kDefaultAbsMinHeatSetpointLimit = 700;  // 7C (44.5 F) is the default
+constexpr int16_t kDefaultAbsMaxHeatSetpointLimit = 3000; // 30C (86 F) is the default
+constexpr int16_t kDefaultMinHeatSetpointLimit    = 700;  // 7C (44.5 F) is the default
+constexpr int16_t kDefaultMaxHeatSetpointLimit    = 3000; // 30C (86 F) is the default
+constexpr int16_t kDefaultAbsMinCoolSetpointLimit = 1600; // 16C (61 F) is the default
+constexpr int16_t kDefaultAbsMaxCoolSetpointLimit = 3200; // 32C (90 F) is the default
+constexpr int16_t kDefaultMinCoolSetpointLimit    = 1600; // 16C (61 F) is the default
+constexpr int16_t kDefaultMaxCoolSetpointLimit    = 3200; // 32C (90 F) is the default
+constexpr int16_t kDefaultHeatingSetpoint         = 2000;
+constexpr int16_t kDefaultCoolingSetpoint         = 2600;
+constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
 
 // IMPORTANT NOTE:
 // No Side effects are permitted in emberAfThermostatClusterServerPreAttributeChangedCallback
@@ -346,8 +346,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
 
             case ThermostatControlSequence::kHeatingOnly:
             case ThermostatControlSequence::kHeatingWithReheat:
-                if (RequestedSystemMode == ThermostatSystemMode::kCool ||
-                    RequestedSystemMode == ThermostatSystemMode::kPrecooling)
+                if (RequestedSystemMode == ThermostatSystemMode::kCool || RequestedSystemMode == ThermostatSystemMode::kPrecooling)
                     return imcode::InvalidValue;
                 else
                     return imcode::Success;
