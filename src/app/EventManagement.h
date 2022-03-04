@@ -326,7 +326,7 @@ public:
      *                         completion, the event number of the next one we plan to fetch.
      *
      * @param[out] aEventCount The number of fetched event
-     * @param[in] aFabricIndex fabric index for current read handler
+     * @param[in] aSubjectDescriptor Subject descriptor for current read handler
      * @retval #CHIP_END_OF_TLV             The function has reached the end of the
      *                                       available log entries at the specified
      *                                       priority level
