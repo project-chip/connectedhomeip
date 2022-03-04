@@ -80,7 +80,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
 
     default:
         err = CHIP_ERROR_INCORRECT_STATE;
-    };
+    }
 
     if (err != CHIP_NO_ERROR && onFailure != nullptr)
     {
