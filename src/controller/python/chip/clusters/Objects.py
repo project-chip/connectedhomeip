@@ -14546,8 +14546,8 @@ class GroupKeyManagement(Cluster):
 
     class Enums:
         class GroupKeySecurityPolicy(IntEnum):
-            kStandard = 0x00
-            kLowLatency = 0x01
+            kTrustFirst = 0x00
+            kCacheAndSync = 0x01
 
 
     class Structs:
@@ -31399,12 +31399,12 @@ class Channel(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="channelMatch", Tag=0, Type=Channel.Structs.ChannelInfo),
-                            ClusterObjectFieldDescriptor(Label="status", Tag=1, Type=Channel.Enums.StatusEnum),
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=Channel.Enums.StatusEnum),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            channelMatch: 'Channel.Structs.ChannelInfo' = field(default_factory=lambda: Channel.Structs.ChannelInfo())
             status: 'Channel.Enums.StatusEnum' = 0
+            data: 'typing.Optional[str]' = None
 
         @dataclass
         class ChangeChannelByNumber(ClusterCommand):
@@ -31982,9 +31982,11 @@ class MediaPlayback(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaPlayback.Enums.StatusEnum),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
 
             status: 'MediaPlayback.Enums.StatusEnum' = 0
+            data: 'typing.Optional[str]' = None
 
         @dataclass
         class Seek(ClusterCommand):

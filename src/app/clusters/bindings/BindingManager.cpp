@@ -158,7 +158,16 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
 void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, FabricIndex fabricIndex)
 {
     mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
-    mAppServer->GetCASESessionManager()->ReleaseSessionForFabric(compressedFabricId);
+    mAppServer->GetCASESessionManager()->ReleaseSessionsForFabric(compressedFabricId);
+}
+
+CHIP_ERROR BindingManager::NotifyBindingAdded(const EmberBindingTableEntry & binding)
+{
+    if (mBindingAddedHandler)
+    {
+        mBindingAddedHandler(binding);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)

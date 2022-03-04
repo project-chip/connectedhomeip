@@ -596,8 +596,8 @@ client cluster Channel = 1284 {
   }
 
   response struct ChangeChannelResponse {
-    ChannelInfo channelMatch = 0;
-    StatusEnum status = 1;
+    StatusEnum status = 0;
+    optional CHAR_STRING data = 1;
   }
 
   command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
@@ -1822,8 +1822,8 @@ client cluster GeneralDiagnostics = 51 {
 
 client cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicy : ENUM8 {
-    kStandard = 0;
-    kLowLatency = 1;
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
   }
 
   struct GroupKeyMapStruct {
@@ -2334,6 +2334,7 @@ client cluster MediaPlayback = 1286 {
 
   response struct PlaybackResponse {
     StatusEnum status = 0;
+    optional CHAR_STRING data = 1;
   }
 
   command FastForward(): PlaybackResponse = 7;
@@ -2664,6 +2665,10 @@ client cluster OnOff = 6 {
 
   bitmap OnOffControl : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
+  }
+
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
   }
 
   readonly attribute boolean onOff = 0;

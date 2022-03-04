@@ -605,40 +605,40 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
     {
         if (rdn[i].mAttrOID == kOID_AttributeType_ChipRootId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_Root;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_ChipICAId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_ICA;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_ChipNodeId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
+            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(IsOperationalNodeId(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
             lCertType = kCertType_Node;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_ChipFirmwareSigningId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_FirmwareSigning;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_ChipFabricId)
         {
             // Only one fabricId attribute is allowed per DN.
-            VerifyOrExit(!fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
+            VerifyOrExit(!fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(IsValidFabricId(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
             fabricIdPresent = true;
         }
     }
 
     if (lCertType == kCertType_Node)
     {
-        VerifyOrExit(fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_TYPE);
+        VerifyOrExit(fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_DN);
     }
 
     certType = lCertType;
@@ -661,7 +661,7 @@ CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
         case kOID_AttributeType_ChipICAId:
         case kOID_AttributeType_ChipNodeId:
         case kOID_AttributeType_ChipFirmwareSigningId:
-            VerifyOrReturnError(chipId == 0, CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrReturnError(chipId == 0, CHIP_ERROR_WRONG_CERT_DN);
 
             chipId = rdn[i].mChipVal;
             break;
@@ -677,16 +677,16 @@ CHIP_ERROR ChipDN::GetCertFabricId(uint64_t & fabricId) const
 {
     uint8_t rdnCount = RDNCount();
 
-    fabricId = UINT64_MAX;
+    fabricId = kUndefinedFabricId;
 
     for (uint8_t i = 0; i < rdnCount; i++)
     {
         switch (rdn[i].mAttrOID)
         {
         case kOID_AttributeType_ChipFabricId:
-            // Ensure only one FabricID RDN present, since start value is UINT64_MAX, which is reserved and never seen.
-            VerifyOrReturnError(fabricId == UINT64_MAX, CHIP_ERROR_WRONG_CERT_TYPE);
-
+            // Ensure only one FabricID RDN present, since start value is kUndefinedFabricId, which is reserved and never seen.
+            VerifyOrReturnError(fabricId == kUndefinedFabricId, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(IsValidFabricId(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
             fabricId = rdn[i].mChipVal;
             break;
         default:
@@ -694,7 +694,7 @@ CHIP_ERROR ChipDN::GetCertFabricId(uint64_t & fabricId) const
         }
     }
 
-    VerifyOrReturnError(fabricId != UINT64_MAX, CHIP_ERROR_WRONG_CERT_TYPE);
+    VerifyOrReturnError(IsValidFabricId(fabricId), CHIP_ERROR_WRONG_CERT_DN);
     return CHIP_NO_ERROR;
 }
 
@@ -740,6 +740,14 @@ CHIP_ERROR ChipDN::DecodeFromTLV(TLVReader & reader)
             uint64_t chipAttr;
             VerifyOrReturnError(attrIsPrintableString == false, CHIP_ERROR_INVALID_TLV_TAG);
             ReturnErrorOnFailure(reader.Get(chipAttr));
+            if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId)
+            {
+                VerifyOrReturnError(IsOperationalNodeId(attrOID), CHIP_ERROR_INVALID_ARGUMENT);
+            }
+            else if (attrOID == chip::ASN1::kOID_AttributeType_ChipFabricId)
+            {
+                VerifyOrReturnError(IsValidFabricId(attrOID), CHIP_ERROR_INVALID_ARGUMENT);
+            }
             ReturnErrorOnFailure(AddAttribute(attrOID, chipAttr));
         }
         // For 32-bit CHIP-defined DN attributes.
@@ -748,6 +756,10 @@ CHIP_ERROR ChipDN::DecodeFromTLV(TLVReader & reader)
             uint32_t chipAttr;
             VerifyOrReturnError(attrIsPrintableString == false, CHIP_ERROR_INVALID_TLV_TAG);
             ReturnErrorOnFailure(reader.Get(chipAttr));
+            if (attrOID == chip::ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag)
+            {
+                VerifyOrReturnError(IsValidCASEAuthTag(chipAttr), CHIP_ERROR_INVALID_ARGUMENT);
+            }
             ReturnErrorOnFailure(AddAttribute(attrOID, chipAttr));
         }
         // Otherwise the attribute is one of the supported X.509 attributes

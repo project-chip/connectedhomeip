@@ -1252,8 +1252,8 @@ public:
     uint8_t mW0[kP256_FE_Length];
     uint8_t mL[kP256_Point_Length];
 
-    CHIP_ERROR Serialize(MutableByteSpan & outSerialized);
-    CHIP_ERROR Deserialize(ByteSpan inSerialized);
+    CHIP_ERROR Serialize(MutableByteSpan & outSerialized) const;
+    CHIP_ERROR Deserialize(const ByteSpan & inSerialized);
 
     /**
      * @brief Generate the Spake2+ verifier.

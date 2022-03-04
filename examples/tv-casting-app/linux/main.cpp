@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "app/clusters/bindings/BindingManager.h"
 #include <app/OperationalDeviceProxy.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -114,6 +115,28 @@ HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
+static void OnBindingAdded(const EmberBindingTableEntry & binding)
+{
+    if (binding.type == EMBER_UNICAST_BINDING)
+    {
+        ChipLogProgress(NotSpecified,
+                        "Unicast binding received nodeId=0x" ChipLogFormatX64 " remote endpoint=%d cluster=" ChipLogFormatMEI,
+                        ChipLogValueX64(binding.nodeId), binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+        // TODO read descriptor cluster for endpoint and use this to construct command options for GUI
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "Non-unicast binding received");
+    }
+}
+
+CHIP_ERROR InitBindingHandlers()
+{
+    chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
+    ReturnErrorOnFailure(chip::BindingManager::GetInstance().RegisterBindingAddedHandler(OnBindingAdded));
+    return CHIP_NO_ERROR;
+}
+
 /**
  * Enters commissioning mode, opens commissioning window, logs onboarding payload.
  * If non-null selectedCommissioner is provided, sends user directed commissioning
@@ -132,6 +155,9 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
+
+    // Initialize binding handlers
+    ReturnOnFailure(InitBindingHandlers());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (selectedCommissioner != nullptr)

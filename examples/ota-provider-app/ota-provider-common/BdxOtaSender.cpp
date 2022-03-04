@@ -32,19 +32,7 @@ using chip::bdx::TransferSession;
 
 BdxOtaSender::BdxOtaSender()
 {
-    memset(mFilepath, 0, kFilepathMaxLength);
-}
-
-void BdxOtaSender::SetFilepath(const char * path)
-{
-    if (path != nullptr)
-    {
-        chip::Platform::CopyString(mFilepath, path);
-    }
-    else
-    {
-        memset(mFilepath, 0, kFilepathMaxLength);
-    }
+    memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
 }
 
 void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
@@ -88,6 +76,15 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         acceptData.Length       = mTransfer.GetTransferLength();
         VerifyOrReturn(mTransfer.AcceptTransfer(acceptData) == CHIP_NO_ERROR,
                        ChipLogError(BDX, "%s: %s", __FUNCTION__, chip::ErrorStr(err)));
+
+        // Store the file designator used during block query
+        uint16_t fdl       = 0;
+        const uint8_t * fd = mTransfer.GetFileDesignator(fdl);
+        VerifyOrReturn(fdl < chip::bdx::kMaxFileDesignatorLen,
+                       ChipLogError(BDX, "Cannot store file designator with length = %d", fdl));
+        memcpy(mFileDesignator, fd, fdl);
+        mFileDesignator[fdl] = 0;
+
         break;
     }
     case TransferSession::OutputEventType::kQueryReceived: {
@@ -110,7 +107,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             return;
         }
 
-        std::ifstream otaFile(mFilepath, std::ifstream::in);
+        std::ifstream otaFile(mFileDesignator, std::ifstream::in);
         VerifyOrReturn(otaFile.good(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
         otaFile.seekg(mNumBytesSent);
         otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
@@ -162,5 +159,5 @@ void BdxOtaSender::Reset()
     }
 
     mNumBytesSent = 0;
-    memset(mFilepath, 0, kFilepathMaxLength);
+    memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
 }

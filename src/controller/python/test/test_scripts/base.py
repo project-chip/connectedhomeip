@@ -191,8 +191,8 @@ class BaseTestHelper:
         data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
 
         # Read out noclist from each fabric, and each should contain two NOCs.
-        nocList1 = data1[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
-        nocList2 = data2[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
+        nocList1 = data1[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
+        nocList2 = data2[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
 
         if (len(nocList1) != 2 or len(nocList2) != 2):
             self.logger.error("Got back invalid nocList")
@@ -202,9 +202,8 @@ class BaseTestHelper:
         data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=False)
 
         # Read out current fabric from each fabric, and both should be different.
-        self.currentFabric1 = data1[0][0][Clusters.OperationalCredentials][
-            Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
-        self.currentFabric2 = data2[0][0][Clusters.OperationalCredentials][
+        currentFabric1 = data1[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        currentFabric2 = data2[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
             Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
         if (self.currentFabric1 == self.currentFabric2):
             self.logger.error(
@@ -271,7 +270,7 @@ class BaseTestHelper:
         self.logger.info("Reading back data from fabric1...")
 
         data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric1 = data[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        readListDataFabric1 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
 
         #
         # Update the expected data's fabric index to that we just read back
@@ -287,7 +286,7 @@ class BaseTestHelper:
         self.logger.info("Reading back data from fabric2...")
 
         data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric2 = data[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        readListDataFabric2 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
 
         #
         # Update the expected data's fabric index to that we just read back
@@ -334,12 +333,12 @@ class BaseTestHelper:
                         raise AssertionError("Got back mismatched data")
 
         data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric = data[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        readListDataFabric = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric1,
                               self.currentFabric2, expectedDataFabric1)
 
         data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric = data[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        readListDataFabric = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric2,
                               self.currentFabric1, expectedDataFabric2)
 
@@ -362,7 +361,7 @@ class BaseTestHelper:
             "Reading back data (again) from fabric2 to ensure it hasn't changed")
 
         data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric2 = data[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        readListDataFabric2 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
         if (expectedDataFabric2 != readListDataFabric2):
             raise AssertionError("Got back mismatched data")
 
@@ -370,7 +369,7 @@ class BaseTestHelper:
             "Reading back data (again) from fabric1 to ensure it hasn't changed")
 
         data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric1 = data[0][1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        readListDataFabric1 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
 
         self.logger.info("Comparing data on fabric1...")
         expectedDataFabric1[0].fabricIndex = self.currentFabric1

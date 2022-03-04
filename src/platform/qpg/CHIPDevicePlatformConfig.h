@@ -45,8 +45,6 @@
 
 #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
 
-#define CHIP_DEVICE_CONFIG_ENABLE_DNSSD 1
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the platform.

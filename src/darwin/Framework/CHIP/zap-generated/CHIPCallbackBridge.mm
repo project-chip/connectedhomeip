@@ -10245,34 +10245,16 @@ void CHIPChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPChannelClusterChangeChannelResponseParams new];
     {
-        response.channelMatch = [CHIPChannelClusterChannelInfo new];
-        response.channelMatch.majorNumber = [NSNumber numberWithUnsignedShort:data.channelMatch.majorNumber];
-        response.channelMatch.minorNumber = [NSNumber numberWithUnsignedShort:data.channelMatch.minorNumber];
-        if (data.channelMatch.name.HasValue()) {
-            response.channelMatch.name = [[NSString alloc] initWithBytes:data.channelMatch.name.Value().data()
-                                                                  length:data.channelMatch.name.Value().size()
-                                                                encoding:NSUTF8StringEncoding];
-        } else {
-            response.channelMatch.name = nil;
-        }
-        if (data.channelMatch.callSign.HasValue()) {
-            response.channelMatch.callSign = [[NSString alloc] initWithBytes:data.channelMatch.callSign.Value().data()
-                                                                      length:data.channelMatch.callSign.Value().size()
-                                                                    encoding:NSUTF8StringEncoding];
-        } else {
-            response.channelMatch.callSign = nil;
-        }
-        if (data.channelMatch.affiliateCallSign.HasValue()) {
-            response.channelMatch.affiliateCallSign =
-                [[NSString alloc] initWithBytes:data.channelMatch.affiliateCallSign.Value().data()
-                                         length:data.channelMatch.affiliateCallSign.Value().size()
-                                       encoding:NSUTF8StringEncoding];
-        } else {
-            response.channelMatch.affiliateCallSign = nil;
-        }
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+        if (data.data.HasValue()) {
+            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
+                                                     length:data.data.Value().size()
+                                                   encoding:NSUTF8StringEncoding];
+        } else {
+            response.data = nil;
+        }
     }
     DispatchSuccess(context, response);
 };
@@ -10754,6 +10736,15 @@ void CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPMediaPlaybackClusterPlaybackResponseParams new];
     {
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    }
+    {
+        if (data.data.HasValue()) {
+            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
+                                                     length:data.data.Value().size()
+                                                   encoding:NSUTF8StringEncoding];
+        } else {
+            response.data = nil;
+        }
     }
     DispatchSuccess(context, response);
 };

@@ -320,6 +320,13 @@ class SubscriptionParameters:
     MaxReportIntervalCeilingSeconds: int
 
 
+class DataVersion:
+    '''
+    A helper class as a key for getting cluster data version when reading attributes without returnClusterObject.
+    '''
+    pass
+
+
 @dataclass
 class AttributeCache:
     ''' A cache that stores data & errors returned in read/subscribe reports, but organizes it topologically
@@ -358,23 +365,18 @@ class AttributeCache:
             self.versionList[path.EndpointId] = {}
 
         endpointCache = self.attributeTLVCache[path.EndpointId]
-        endpoint = self.versionList[path.EndpointId]
+        endpointVersion = self.versionList[path.EndpointId]
         if (path.ClusterId not in endpointCache):
             endpointCache[path.ClusterId] = {}
 
-        if (path.ClusterId not in endpoint):
-            endpoint[path.ClusterId] = {}
+        # All attributes from the same cluster instance should have the same dataVersion, so we can set the dataVersion of the cluster to the dataVersion with a random attribute.
+        endpointVersion[path.ClusterId] = dataVersion
 
         clusterCache = endpointCache[path.ClusterId]
-        cluster = endpoint[path.ClusterId]
         if (path.AttributeId not in clusterCache):
             clusterCache[path.AttributeId] = None
 
-        if (path.AttributeId not in cluster):
-            cluster[path.AttributeId] = None
-
         clusterCache[path.AttributeId] = data
-        cluster[path.AttributeId] = dataVersion
 
     def UpdateCachedData(self):
         ''' This converts the raw TLV data into a cluster object format.
@@ -409,12 +411,16 @@ class AttributeCache:
                     endpointCache[clusterType] = {}
 
                 clusterCache = endpointCache[clusterType]
+                clusterDataVersion = self.versionList.get(
+                    endpoint, {}).get(cluster, None)
 
                 if (self.returnClusterObject):
                     try:
                         # Since the TLV data is already organized by attribute tags, we can trivially convert to a cluster object representation.
                         endpointCache[clusterType] = clusterType.FromDict(
                             data=clusterType.descriptor.TagDictToLabelDict([], tlvCache[endpoint][cluster]))
+                        endpointCache[clusterType].SetDataVersion(
+                            clusterDataVersion)
                     except Exception as ex:
                         logging.error(
                             f"Error converting TLV to Cluster Object for path: Endpoint = {endpoint}, cluster = {str(clusterType)}")
@@ -423,6 +429,7 @@ class AttributeCache:
                             tlvCache[endpoint][cluster], ex)
                         endpointCache[clusterType] = decodedValue
                 else:
+                    clusterCache[DataVersion] = clusterDataVersion
                     for attribute in tlvCache[endpoint][cluster]:
                         value = tlvCache[endpoint][cluster][attribute]
 
@@ -604,32 +611,36 @@ class AsyncReadTransaction:
     def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
         self._handleAttributeData(path, dataVersion, status, data)
 
-    def _handleEventData(self, header: EventHeader, path: EventPath, data: bytes):
+    def _handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
         try:
             eventType = _EventIndex.get(str(path), None)
             eventValue = None
-            tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
-            if eventType is None:
-                eventValue = ValueDecodeFailure(
-                    tlvData, LookupError("event schema not found"))
-            else:
-                try:
-                    eventValue = eventType.FromTLV(data)
-                except Exception as ex:
-                    logging.error(
-                        f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Event = {path.EventId}")
-                    logging.error(
-                        f"Failed Cluster Object: {str(eventType)}")
-                    logging.error(ex)
-                    eventValue = ValueDecodeFailure(
-                        tlvData, ex)
 
-                    # If we're in debug mode, raise the exception so that we can better debug what's happening.
-                    if (builtins.enableDebugMode):
-                        raise
+            if data:
+                # data will be an empty buffer when we received an EventStatusIB instead of an EventDataIB.
+                tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
+
+                if eventType is None:
+                    eventValue = ValueDecodeFailure(
+                        tlvData, LookupError("event schema not found"))
+                else:
+                    try:
+                        eventValue = eventType.FromTLV(data)
+                    except Exception as ex:
+                        logging.error(
+                            f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Event = {path.EventId}")
+                        logging.error(
+                            f"Failed Cluster Object: {str(eventType)}")
+                        logging.error(ex)
+                        eventValue = ValueDecodeFailure(
+                            tlvData, ex)
+
+                        # If we're in debug mode, raise the exception so that we can better debug what's happening.
+                        if (builtins.enableDebugMode):
+                            raise
 
             eventResult = EventReadResult(
-                Header=header, Data=eventValue, Status=chip.interaction_model.Status.Success)
+                Header=header, Data=eventValue, Status=chip.interaction_model.Status(status))
             self._events.append(eventResult)
 
             if (self._subscription_handler is not None):
@@ -639,8 +650,8 @@ class AsyncReadTransaction:
         except Exception as ex:
             logging.exception(ex)
 
-    def handleEventData(self, header: EventHeader, path: EventPath, data: bytes):
-        self._handleEventData(header, path, data)
+    def handleEventData(self, header: EventHeader, path: EventPath, data: bytes, status: int):
+        self._handleEventData(header, path, data, status)
 
     def _handleError(self, chipError: int):
         self._future.set_exception(
@@ -680,14 +691,12 @@ class AsyncReadTransaction:
             if (self._transactionType == TransactionType.READ_EVENTS):
                 self._future.set_result(self._events)
             else:
-                self._future.set_result(
-                    (self._cache.attributeCache, self._cache.versionList))
+                self._future.set_result(self._cache.attributeCache)
 
     def handleDone(self):
         self._event_loop.call_soon_threadsafe(self._handleDone)
 
     def handleReportBegin(self):
-        self._cache.versionList.clear()
         pass
 
     def handleReportEnd(self):
@@ -730,10 +739,10 @@ class AsyncWriteTransaction:
 
 
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint32, c_uint16, c_uint32, c_uint32, c_uint32, c_void_p, c_size_t)
+    None, py_object, c_uint32, c_uint16, c_uint32, c_uint32, c_uint8, c_void_p, c_size_t)
 _OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint64)
 _OnReadEventDataCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint16, c_uint32, c_uint32, c_uint32, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t)
+    None, py_object, c_uint16, c_uint32, c_uint32, c_uint32, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t, c_uint8)
 _OnReadErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32)
 _OnReadDoneCallbackFunct = CFUNCTYPE(
@@ -752,11 +761,11 @@ def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, clust
 
 
 @_OnReadEventDataCallbackFunct
-def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: int, number: int, priority: int, timestamp: int, timestampType: int, data, len):
+def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: int, number: int, priority: int, timestamp: int, timestampType: int, data, len, status):
     dataBytes = ctypes.string_at(data, len)
     path = EventPath(ClusterId=cluster, EventId=event)
     closure.handleEventData(EventHeader(
-        EndpointId=endpoint, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), path, dataBytes[:])
+        EndpointId=endpoint, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), path, dataBytes[:], status)
 
 
 @_OnSubscriptionEstablishedCallbackFunct

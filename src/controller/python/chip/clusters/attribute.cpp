@@ -66,7 +66,8 @@ using OnReadAttributeDataCallback       = void (*)(PyObject * appContext, chip::
                                              uint32_t dataLen);
 using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                          chip::EventId eventId, chip::EventNumber eventNumber, uint8_t priority, uint64_t timestamp,
-                                         uint8_t timestampType, uint8_t * data, uint32_t dataLen);
+                                         uint8_t timestampType, uint8_t * data, uint32_t dataLen,
+                                         std::underlying_type_t<Protocols::InteractionModel::Status> imstatus);
 using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, uint64_t subscriptionId);
 using OnReadErrorCallback               = void (*)(PyObject * appContext, uint32_t chiperror);
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
@@ -156,15 +157,21 @@ public:
             }
             size = writer.GetLengthWritten();
         }
+        else if (apStatus != nullptr)
+        {
+            size = 0;
+        }
         else
         {
             err = CHIP_ERROR_INCORRECT_STATE;
             this->OnError(err);
         }
 
-        gOnReadEventDataCallback(mAppContext, aEventHeader.mPath.mEndpointId, aEventHeader.mPath.mClusterId,
-                                 aEventHeader.mPath.mEventId, aEventHeader.mEventNumber, to_underlying(aEventHeader.mPriorityLevel),
-                                 aEventHeader.mTimestamp.mValue, to_underlying(aEventHeader.mTimestamp.mType), buffer, size);
+        gOnReadEventDataCallback(
+            mAppContext, aEventHeader.mPath.mEndpointId, aEventHeader.mPath.mClusterId, aEventHeader.mPath.mEventId,
+            aEventHeader.mEventNumber, to_underlying(aEventHeader.mPriorityLevel), aEventHeader.mTimestamp.mValue,
+            to_underlying(aEventHeader.mTimestamp.mType), buffer, size,
+            to_underlying(apStatus == nullptr ? Protocols::InteractionModel::Status::Success : apStatus->mStatus));
     }
 
     void OnError(CHIP_ERROR aError) override { gOnReadErrorCallback(mAppContext, aError.AsInteger()); }

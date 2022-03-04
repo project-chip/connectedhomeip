@@ -294,17 +294,22 @@ public:
     {
         for (int i = 0; i < 16; i++)
         {
-            if (keys[i] != nullptr && keysize[i] != 0 && size >= valuesize[i])
+            if (keys[i] != nullptr && keysize[i] != 0 && strncmp(key, keys[i], keysize[i]) == 0)
             {
-                if (memcmp(key, keys[i], keysize[i]) == 0)
+                if (size >= valuesize[i])
                 {
                     memcpy(buffer, values[i], valuesize[i]);
                     size = valuesize[i];
                     return CHIP_NO_ERROR;
                 }
+                else
+                {
+                    size = (valuesize[i]);
+                    return CHIP_ERROR_BUFFER_TOO_SMALL;
+                }
             }
         }
-        return CHIP_ERROR_INTERNAL;
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -316,7 +321,7 @@ public:
                 keysize[i] = static_cast<uint16_t>(strlen(key));
                 keysize[i]++;
                 keys[i] = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(keysize[i]));
-                strcpy(keys[i], key);
+                memcpy(keys[i], key, keysize[i]);
                 values[i] = reinterpret_cast<char *>(chip::Platform::MemoryAlloc(size));
                 memcpy(values[i], value, size);
                 valuesize[i] = size;
@@ -326,7 +331,25 @@ public:
         return CHIP_ERROR_INTERNAL;
     }
 
-    CHIP_ERROR SyncDeleteKeyValue(const char * key) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            if (keys[i] != nullptr && keysize[i] != 0 && strncmp(key, keys[i], keysize[i]) == 0)
+            {
+                Platform::MemoryFree(keys[i]);
+                keys[i] = nullptr;
+
+                if (values[i] != nullptr)
+                {
+                    Platform::MemoryFree(values[i]);
+                    values[i] = nullptr;
+                }
+                return CHIP_NO_ERROR;
+            }
+        }
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
 
     CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
     {
@@ -341,7 +364,7 @@ public:
     CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
 
 private:
-    char * keys[16];
+    char * keys[16]; // Not null-terminated
     void * values[16];
     uint16_t keysize[16];
     uint16_t valuesize[16];

@@ -39,6 +39,7 @@
 using namespace chip;
 using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
+using namespace chip::Access;
 using ApplicationStatusEnum   = app::Clusters::ApplicationBasic::ApplicationStatusEnum;
 using GetSetupPINResponseType = app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
 
@@ -388,49 +389,137 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
     return (uint32_t) strtol(pinString.c_str(), &eptr, 10);
 }
 
-CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy * device, EndpointId deviceEndpointId,
-                                                         NodeId bindingNodeId, GroupId bindingGroupId, EndpointId bindingEndpointId,
-                                                         ClusterId bindingClusterId,
-                                                         Controller::WriteResponseSuccessCallback successCb,
-                                                         Controller::WriteResponseFailureCallback failureCb)
+constexpr EndpointId kTargetBindingClusterEndpointId = 0;
+constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
+constexpr EndpointId kLocalSpeakerEndpointId         = 2;
+constexpr ClusterId kNoClusterIdSpecified            = kInvalidClusterId;
+constexpr ClusterId kClusterIdOnOff                  = 0x0006;
+constexpr ClusterId kClusterIdWakeOnLAN              = 0x0503;
+// constexpr ClusterId kClusterIdChannel             = 0x0504;
+// constexpr ClusterId kClusterIdTargetNavigator     = 0x0505;
+constexpr ClusterId kClusterIdMediaPlayback = 0x0506;
+// constexpr ClusterId kClusterIdMediaInput          = 0x0507;
+constexpr ClusterId kClusterIdLowPower        = 0x0508;
+constexpr ClusterId kClusterIdKeypadInput     = 0x0509;
+constexpr ClusterId kClusterIdContentLauncher = 0x050a;
+constexpr ClusterId kClusterIdAudioOutput     = 0x050b;
+// constexpr ClusterId kClusterIdApplicationLauncher = 0x050c;
+// constexpr ClusterId kClusterIdAccountLogin        = 0x050e;
+
+CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targetDeviceProxy, uint16_t targetVendorId,
+                                                  NodeId localNodeId, Controller::WriteResponseSuccessCallback successCb,
+                                                  Controller::WriteResponseFailureCallback failureCb)
 {
-    chip::Controller::BindingCluster cluster;
-    cluster.Associate(device, deviceEndpointId);
-    Binding::Structs::TargetStruct::Type entries[1];
+    VerifyOrReturnError(targetDeviceProxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(successCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(failureCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (bindingNodeId != kUndefinedNodeId)
+    Access::AccessControl::Entry entry;
+    ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
+    ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
+    entry.SetFabricIndex(targetDeviceProxy->GetFabricIndex());
+    ReturnErrorOnFailure(entry.SetPrivilege(Access::Privilege::kOperate));
+    ReturnErrorOnFailure(entry.AddSubject(nullptr, targetDeviceProxy->GetDeviceId()));
+
+    std::vector<Binding::Structs::TargetStruct::Type> bindings;
+
+    /**
+     * Here we are creating a single ACL entry containing:
+     * a) selection of clusters on video player endpoint (7 targets)
+     * b) speaker endpoint (1 target)
+     * c) selection of content app endpoints (0 to many)
+     * d) single subject which is the casting app
+     * This organization was selected to make it easy to remove access (single ACL removal)
+     *
+     * We could have organized things differently, for example,
+     * - a single ACL for (a) and (b) which is shared by many subjects
+     * - a single ACL entry per subject for (c)
+     */
+
+    ChipLogProgress(Controller, "Create video player endpoint ACL and binding");
     {
-        entries[0] = Binding::Structs::TargetStruct::Type{
+        std::list<ClusterId> allowedClusterList = { kClusterIdOnOff,      kClusterIdWakeOnLAN,   kClusterIdMediaPlayback,
+                                                    kClusterIdLowPower,   kClusterIdKeypadInput, kClusterIdContentLauncher,
+                                                    kClusterIdAudioOutput };
+
+        for (const auto & clusterId : allowedClusterList)
+        {
+            Access::AccessControl::Entry::Target target = { .flags = Access::AccessControl::Entry::Target::kCluster |
+                                                                Access::AccessControl::Entry::Target::kEndpoint,
+                                                            .cluster  = clusterId,
+                                                            .endpoint = kLocalVideoPlayerEndpointId };
+            ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
+        }
+
+        bindings.push_back(Binding::Structs::TargetStruct::Type{
             .fabricIndex = kUndefinedFabricIndex,
-            .node        = MakeOptional(bindingNodeId),
+            .node        = MakeOptional(localNodeId),
             .group       = NullOptional,
-            .endpoint    = MakeOptional(bindingEndpointId),
-            .cluster     = MakeOptional(bindingClusterId),
-        };
-    }
-    else
-    {
-        entries[0] = Binding::Structs::TargetStruct::Type{
-            .fabricIndex = kUndefinedFabricIndex,
-            .node        = NullOptional,
-            .group       = MakeOptional(bindingGroupId),
-            .endpoint    = NullOptional,
-            .cluster     = MakeOptional(bindingClusterId),
-        };
-    }
-    using BindingListTypeInfo = Binding::Attributes::Binding::TypeInfo;
-    BindingListTypeInfo::Type bindingList(entries);
-    CHIP_ERROR error = cluster.WriteAttribute<BindingListTypeInfo>(bindingList, nullptr, successCb, failureCb);
-    if (error == CHIP_NO_ERROR)
-    {
-        ChipLogDetail(Controller, "CreateBindingWithCallback: Sent write request, waiting for response");
-    }
-    else
-    {
-        ChipLogError(Controller, "CreateBindingWithCallback: Failed to send write request: %" CHIP_ERROR_FORMAT, error.Format());
+            .endpoint    = MakeOptional(kLocalVideoPlayerEndpointId),
+            .cluster     = MakeOptional(kNoClusterIdSpecified),
+        });
     }
 
-    return error;
+    ChipLogProgress(Controller, "Create speaker endpoint ACL and binding");
+    {
+        Access::AccessControl::Entry::Target target = { .flags    = Access::AccessControl::Entry::Target::kEndpoint,
+                                                        .endpoint = kLocalSpeakerEndpointId };
+        ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
+
+        bindings.push_back(Binding::Structs::TargetStruct::Type{
+            .fabricIndex = kUndefinedFabricIndex,
+            .node        = MakeOptional(localNodeId),
+            .group       = NullOptional,
+            .endpoint    = MakeOptional(kLocalSpeakerEndpointId),
+            .cluster     = MakeOptional(kNoClusterIdSpecified),
+        });
+    }
+
+    ChipLogProgress(Controller, "Create content app endpoints ACL and binding");
+    {
+        uint8_t index = 0;
+        while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+        {
+            ContentApp * app = mContentApps[index++];
+            if (app == nullptr)
+            {
+                continue;
+            }
+
+            for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
+            {
+                if (allowedVendor == targetVendorId)
+                {
+                    Access::AccessControl::Entry::Target target = { .flags    = Access::AccessControl::Entry::Target::kEndpoint,
+                                                                    .endpoint = app->GetEndpointId() };
+                    ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
+
+                    bindings.push_back(Binding::Structs::TargetStruct::Type{
+                        .fabricIndex = kUndefinedFabricIndex,
+                        .node        = MakeOptional(localNodeId),
+                        .group       = NullOptional,
+                        .endpoint    = MakeOptional(app->GetEndpointId()),
+                        .cluster     = MakeOptional(kNoClusterIdSpecified),
+                    });
+                }
+            }
+        }
+    }
+
+    ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, entry, nullptr));
+
+    ChipLogProgress(Controller, "Attempting to update Binding list");
+    BindingListType bindingList(bindings.data(), bindings.size());
+
+    chip::Controller::BindingCluster cluster;
+    ReturnErrorOnFailure(cluster.Associate(targetDeviceProxy, kTargetBindingClusterEndpointId));
+
+    ReturnErrorOnFailure(
+        cluster.WriteAttribute<Binding::Attributes::Binding::TypeInfo>(bindingList, nullptr, successCb, failureCb));
+
+    ChipLogProgress(Controller, "Completed Bindings and ACLs");
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace AppPlatform
