@@ -30,6 +30,7 @@ class ESP32Utils
 {
 public:
     static CHIP_ERROR IsAPEnabled(bool & apEnabled);
+    static CHIP_ERROR IsStationEnabled(bool & staEnabled);
     static bool IsStationProvisioned(void);
     static CHIP_ERROR IsStationConnected(bool & connected);
     static CHIP_ERROR StartWiFiLayer(void);
