@@ -161,7 +161,7 @@ void BLEManagerImpl::BleEntry(void *, void *, void *)
     }
 }
 
-/* Thread for runing BLE main loop */
+/* Thread for running BLE main loop */
 K_THREAD_DEFINE(chipBleThread, CHIP_BLE_THREAD_STACK_SIZE, BLEManagerImpl::BleEntry, NULL, NULL, NULL, CHIP_BLE_THREAD_PRIORITY, 0,
                 0);
 
@@ -542,11 +542,11 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     srsp[index++] = matterServiceUUID[0];
     srsp[index++] = matterServiceUUID[1];
 
-    /* Set scan responce data */
+    /* Set scan response data */
     status = bls_ll_setScanRspData(srsp, sizeof(srsp));
     if (status != BLE_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "Fail to set BLE scan responce data. Error %d", status);
+        ChipLogError(DeviceLayer, "Fail to set BLE scan response data. Error %d", status);
 
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -576,7 +576,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     CHIP_ERROR err   = CHIP_NO_ERROR;
     ble_sts_t status = BLE_SUCCESS;
 
-    /* At first run always select fast advertising, on the next attemp slow down interval. */
+    /* At first run always select fast advertising, on the next attempt slow down interval. */
     u16 intervalMin = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
                                                                  : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
     u16 intervalMax = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
@@ -613,12 +613,12 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         return err;
     }
 
-    /* Setup advertisement paramiters */
+    /* Setup advertisement parameters */
     status = bls_ll_setAdvParam(intervalMin, intervalMax, ADV_TYPE_CONNECTABLE_UNDIRECTED, OWN_ADDRESS_PUBLIC, 0, NULL,
                                 BLT_ENABLE_ADV_ALL, ADV_FP_NONE);
     if (status != BLE_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "Fail to set BLE advertisement paramiters. Error %d", status);
+        ChipLogError(DeviceLayer, "Fail to set BLE advertisement parameters. Error %d", status);
 
         return CHIP_ERROR_INCORRECT_STATE;
     }
