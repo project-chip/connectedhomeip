@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +15,22 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_INTERNAL_H
-#define CHIP_DEVICE_INTERNAL_H
-
-#import "CHIPDevice.h"
 #import <Foundation/Foundation.h>
 
-#include <app/DeviceProxy.h>
+#import "CHIPDeviceControllerOverXPC.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPDevice ()
+@interface CHIPDeviceControllerOverXPC (AttributeCache)
 
-- (instancetype)initWithDevice:(chip::DeviceProxy *)device;
-- (chip::DeviceProxy *)internalDevice;
+- (void)subscribeAttributeCacheWithNodeId:(uint64_t)nodeId completion:(void (^)(NSError * _Nullable error))completion;
+
+- (void)readAttributeCacheWithNodeId:(uint64_t)nodeId
+                          endpointId:(NSUInteger)endpointId
+                           clusterId:(NSUInteger)clusterId
+                         attributeId:(NSUInteger)attributeId
+                          completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion;
 
 @end
 
-// Exported utility function
-id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data);
-
 NS_ASSUME_NONNULL_END
-
-#endif /* CHIP_DEVICE_INTERNAL_H */
