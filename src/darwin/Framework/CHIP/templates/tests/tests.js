@@ -90,6 +90,11 @@ function getTests()
     'Test_TC_FLW_2_2',
   ];
 
+  const Identify = [
+    'Test_TC_I_1_1',
+    'Test_TC_I_2_1',
+  ];
+
   const IlluminanceMeasurement = [
     'Test_TC_ILL_1_1',
   ];
@@ -112,6 +117,17 @@ function getTests()
 
   const MediaControl = [
     'Test_TC_MC_1_1',
+    'Test_TC_MC_1_2',
+    'Test_TC_MC_1_3',
+    'Test_TC_MC_1_4',
+    'Test_TC_MC_1_5',
+    'Test_TC_MC_1_6',
+    'Test_TC_MC_1_7',
+    'Test_TC_MC_1_8',
+    'Test_TC_MC_1_9',
+    'Test_TC_MC_1_10',
+    'Test_TC_MC_1_11',
+    'Test_TC_MC_1_12',
     'Test_TC_MC_2_1',
     'Test_TC_MC_3_1',
     'Test_TC_MC_3_2',
@@ -158,6 +174,7 @@ function getTests()
     'Test_TC_PCC_2_1',
     'Test_TC_PCC_2_2',
     'Test_TC_PCC_2_3',
+    'Test_TC_PCC_2_4',
   ];
 
   const RelativeHumidityMeasurement = [
@@ -256,6 +273,7 @@ function getTests()
     ElectricalMeasurement, //
     EthernetNetworkDiagnostics, //
     FlowMeasurement, //
+    Identify, //
     IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
