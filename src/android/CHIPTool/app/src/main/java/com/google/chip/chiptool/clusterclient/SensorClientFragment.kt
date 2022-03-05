@@ -35,6 +35,8 @@ import kotlinx.coroutines.launch
 private typealias ReadCallback = ChipClusters.IntegerAttributeCallback
 private typealias PressureReadCallback =
   ChipClusters.PressureMeasurementCluster.MeasuredValueAttributeCallback
+private typealias TemperatureReadCallback =
+  ChipClusters.TemperatureMeasurementCluster.MeasuredValueAttributeCallback
 
 class SensorClientFragment : Fragment() {
   private lateinit var scope: CoroutineScope
@@ -241,11 +243,11 @@ class SensorClientFragment : Fragment() {
     private const val MAX_DATA_POINTS = 60
     private val CLUSTERS = mapOf(
         "Temperature" to mapOf(
-            "read" to { device: Long, endpointId: Int, callback: ReadCallback ->
+            "read" to { device: Long, endpointId: Int, callback: TemperatureReadCallback ->
               val cluster = ChipClusters.TemperatureMeasurementCluster(device, endpointId)
               cluster.readMeasuredValueAttribute(callback)
             },
-            "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
+            "subscribe" to { device: Long, endpointId: Int, callback: TemperatureReadCallback ->
               val cluster = ChipClusters.TemperatureMeasurementCluster(device, endpointId)
               cluster.subscribeMeasuredValueAttribute(callback,
                                                       MIN_REFRESH_PERIOD_S,
