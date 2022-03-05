@@ -177,6 +177,7 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
+    mListeningForPASE = true;
 
     if (mUseECM)
     {
@@ -279,6 +280,27 @@ void CommissioningWindowManager::CloseCommissioningWindow()
     }
 }
 
+Dnssd::CommissioningMode CommissioningWindowManager::GetCommissioningMode() const
+{
+    if (!mListeningForPASE)
+    {
+        // We should not be advertising ourselves as in commissioning mode.
+        // We need to check this before mWindowStatus, because we might have an
+        // open window even while we are not listening for PASE.
+        return Dnssd::CommissioningMode::kDisabled;
+    }
+
+    switch (mWindowStatus)
+    {
+    case AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen:
+        return Dnssd::CommissioningMode::kEnabledEnhanced;
+    case AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen:
+        return Dnssd::CommissioningMode::kEnabledBasic;
+    default:
+        return Dnssd::CommissioningMode::kDisabled;
+    }
+}
+
 CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 {
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -303,20 +325,17 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
         mAppDelegate->OnPairingWindowOpened();
     }
 
-    Dnssd::CommissioningMode commissioningMode;
     if (mUseECM)
     {
-        mWindowStatus     = AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
-        commissioningMode = Dnssd::CommissioningMode::kEnabledEnhanced;
+        mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
     }
     else
     {
-        mWindowStatus     = AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
-        commissioningMode = Dnssd::CommissioningMode::kEnabledBasic;
+        mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
     }
 
-    // reset all advertising, indicating we are in commissioningMode
-    app::DnssdServer::Instance().StartServer(commissioningMode);
+    // reset all advertising, switching to our new commissioning mode.
+    app::DnssdServer::Instance().StartServer();
 
     return CHIP_NO_ERROR;
 }
@@ -326,6 +345,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
     RestoreDiscriminator();
 
     mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
+    mListeningForPASE = false;
     mPairingSession.Clear();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
@@ -341,7 +361,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
         // Stop advertising commissioning mode, since we're not accepting PASE
         // connections right now.  If we start accepting them again (via
         // OpenCommissioningWindow) that will call StartAdvertisement as needed.
-        app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kDisabled);
+        app::DnssdServer::Instance().StartServer();
     }
 
     if (mIsBLE)

@@ -164,9 +164,6 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (selectedCommissioner != nullptr)
     {
-        // Advertise self as Commissionable Node over mDNS
-        app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledBasic);
-
         // Send User Directed commissioning request
         ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
             selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));

@@ -19,6 +19,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server/AppDelegate.h>
+#include <app/server/CommissioningModeProvider.h>
+#include <lib/dnssd/Advertiser.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 
@@ -34,7 +36,7 @@ enum class CommissioningWindowAdvertisement
 
 class Server;
 
-class CommissioningWindowManager : public SessionEstablishmentDelegate
+class CommissioningWindowManager : public SessionEstablishmentDelegate, public app::CommissioningModeProvider
 {
 public:
     CommissioningWindowManager(Server * server) : mAppDelegate(nullptr), mServer(server) {}
@@ -60,6 +62,9 @@ public:
     void CloseCommissioningWindow();
 
     app::Clusters::AdministratorCommissioning::CommissioningWindowStatus CommissioningWindowStatus() const { return mWindowStatus; }
+
+    // CommissioningModeProvider implemetation.
+    Dnssd::CommissioningMode GetCommissioningMode() const override;
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -109,8 +114,11 @@ private:
     Spake2pVerifier mECMPASEVerifier;
     uint16_t mECMDiscriminator = 0;
     PasscodeId mECMPasscodeID  = kDefaultCommissioningPasscodeId;
-    uint32_t mECMIterations    = 0;
-    uint32_t mECMSaltLength    = 0;
+    // mListeningForPASE is true only when we are listening for
+    // PBKDFParamRequest messages.
+    bool mListeningForPASE  = false;
+    uint32_t mECMIterations = 0;
+    uint32_t mECMSaltLength = 0;
     uint8_t mECMSalt[kSpake2p_Max_PBKDF_Salt_Length];
 };
 
