@@ -8080,6 +8080,21 @@ public class ClusterReadMapping {
     readTestClusterInteractionInfo.put(
         "readListLongOctetStringAttribute",
         readTestClusterListLongOctetStringAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterListFabricScopedCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterListFabricScopedAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readListFabricScopedAttribute(
+                      (ChipClusters.TestClusterCluster.ListFabricScopedAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTestClusterClusterListFabricScopedAttributeCallback(),
+            readTestClusterListFabricScopedCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readListFabricScopedAttribute", readTestClusterListFabricScopedAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterTimedWriteBooleanCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterTimedWriteBooleanAttributeInteractionInfo =

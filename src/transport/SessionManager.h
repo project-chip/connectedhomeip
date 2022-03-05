@@ -188,7 +188,7 @@ public:
      */
     CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                     Transport::MessageCounterManagerInterface * messageCounterManager,
-                    chip::PersistentStorageDelegate * storageDelegate);
+                    chip::PersistentStorageDelegate * storageDelegate, FabricTable * fabricTable);
 
     /**
      * @brief
@@ -244,6 +244,7 @@ private:
     };
 
     System::Layer * mSystemLayer = nullptr;
+    FabricTable * mFabricTable   = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
     Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions;
     State mState; // < Initialization state of the object

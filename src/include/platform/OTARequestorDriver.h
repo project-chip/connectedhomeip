@@ -51,6 +51,7 @@ enum class UpdateFailureState
     kApplying,
     kNotifying,
     kAwaitingNextAction,
+    kDelayedOnUserConsent,
 };
 
 enum class UpdateNotFoundReason

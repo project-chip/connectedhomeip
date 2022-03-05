@@ -5327,6 +5327,13 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x0000002B: {
+                    "attributeName": "ListFabricScoped",
+                    "attributeId": 0x0000002B,
+                    "type": "",
+                    "reportable": True,
+                    "writable": True,
+                },
                 0x00000030: {
                     "attributeName": "TimedWriteBoolean",
                     "attributeId": 0x00000030,

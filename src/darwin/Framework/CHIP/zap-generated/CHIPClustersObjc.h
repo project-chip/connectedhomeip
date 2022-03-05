@@ -6069,6 +6069,16 @@ NS_ASSUME_NONNULL_BEGIN
                                                reportHandler:
                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeListFabricScopedWithParams:(CHIPReadParams * _Nullable)params
+                              completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeListFabricScopedWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeListFabricScopedWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
+                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                            reportHandler:
+                                                (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeTimedWriteBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
 - (void)writeAttributeTimedWriteBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -8980,6 +8990,31 @@ typedef NS_ENUM(NSInteger, CHIPThermostatSetpointAdjustMode) {
     CHIPThermostatSetpointAdjustModeHeatSetpoint = 0x00,
     CHIPThermostatSetpointAdjustModeCoolSetpoint = 0x01,
     CHIPThermostatSetpointAdjustModeHeatAndCoolSetpoints = 0x02,
+};
+
+typedef NS_ENUM(NSInteger, CHIPThermostatControlSequence) {
+    CHIPThermostatControlSequenceCoolingOnly = 0x00,
+    CHIPThermostatControlSequenceCoolingWithReheat = 0x01,
+    CHIPThermostatControlSequenceHeatingOnly = 0x02,
+    CHIPThermostatControlSequenceHeatingWithReheat = 0x03,
+    CHIPThermostatControlSequenceCoolingAndHeating = 0x04,
+    CHIPThermostatControlSequenceCoolingAndHeatingWithReheat = 0x05,
+};
+
+typedef NS_ENUM(NSInteger, CHIPThermostatRunningMode) {
+    CHIPThermostatRunningModeOff = 0x00,
+    CHIPThermostatRunningModeCool = 0x03,
+    CHIPThermostatRunningModeHeat = 0x04,
+};
+
+typedef NS_ENUM(NSInteger, CHIPThermostatSystemMode) {
+    CHIPThermostatSystemModeOff = 0x00,
+    CHIPThermostatSystemModeAuto = 0x01,
+    CHIPThermostatSystemModeCool = 0x03,
+    CHIPThermostatSystemModeHeat = 0x04,
+    CHIPThermostatSystemModeEmergencyHeating = 0x05,
+    CHIPThermostatSystemModePrecooling = 0x06,
+    CHIPThermostatSystemModeFanOnly = 0x07,
 };
 
 typedef NS_OPTIONS(NSUInteger, CHIPThermostatDayOfWeek) {
