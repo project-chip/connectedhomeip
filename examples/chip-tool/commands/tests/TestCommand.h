@@ -47,14 +47,17 @@ public:
     {
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
+        AddArgument("testTimeoutInS", 0, UINT16_MAX, &mTimeout);
     }
 
     ~TestCommand(){};
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(kTimeoutInSeconds); }
-
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
     virtual void NextTest() = 0;
 
 protected:
