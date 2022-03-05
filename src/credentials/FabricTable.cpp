@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -312,12 +312,24 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     NodeId nodeId;
     ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(certificates.GetLastCert()[0], &nodeId, &fabricId));
 
+    FabricId icacFabricId = kUndefinedFabricId;
     if (!icac.empty())
     {
-        FabricId icacFabric = kUndefinedFabricId;
-        if (ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabric) == CHIP_NO_ERROR && icacFabric != kUndefinedFabricId)
+        if (ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabricId) == CHIP_NO_ERROR &&
+            icacFabricId != kUndefinedFabricId)
         {
-            ReturnErrorCodeIf(icacFabric != fabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
+            ReturnErrorCodeIf(icacFabricId != fabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
+        }
+    }
+
+    FabricId rcacFabricId = kUndefinedFabricId;
+    if (ExtractFabricIdFromCert(certificates.GetCertSet()[0], &rcacFabricId) == CHIP_NO_ERROR && rcacFabricId != kUndefinedFabricId)
+    {
+        ReturnErrorCodeIf(rcacFabricId != fabricId, CHIP_ERROR_WRONG_CERT_DN);
+        if (!icac.empty())
+        {
+            // If FabricId attribute is present in RCAC then it SHOULD be present in ICAC as well.
+            ReturnErrorCodeIf(icacFabricId == kUndefinedFabricId, CHIP_ERROR_WRONG_CERT_DN);
         }
     }
 
