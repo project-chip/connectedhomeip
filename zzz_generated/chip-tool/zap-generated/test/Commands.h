@@ -22522,8 +22522,8 @@ private:
     void OnSuccessResponse_2(uint8_t identifyType)
     {
         VerifyOrReturn(CheckConstraintType("identifyType", "", "enum8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("identifyType", identifyType, 0));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("identifyType", identifyType, 5));
+        VerifyOrReturn(CheckConstraintMinValue("identifyType", identifyType, 0));
+        VerifyOrReturn(CheckConstraintMaxValue("identifyType", identifyType, 5));
         NextTest();
     }
 };
