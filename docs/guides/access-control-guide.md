@@ -88,11 +88,11 @@ All fields are nullable, but at least one must be present, and the endpoint and
 device type fields are mutually exclusive (only one of those two may be
 present).
 
-If cluster is present, the ACL is targetted to just that cluster.
+If cluster is present, the ACL is targeted to just that cluster.
 
-If endpoint is present, the ACL is targetted to just that endpoint.
+If endpoint is present, the ACL is targeted to just that endpoint.
 
-If device type is present, the ACL is targetted to just endpoints which contain
+If device type is present, the ACL is targeted to just endpoints which contain
 that device type (as reported by the Descriptor Cluster).
 
 Specifying device type in targets is not yet supported in the Matter SDK.
