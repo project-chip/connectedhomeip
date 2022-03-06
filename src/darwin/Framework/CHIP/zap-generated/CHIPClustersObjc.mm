@@ -892,7 +892,6 @@ using namespace chip::app::Clusters;
     request.discriminator = params.discriminator.unsignedShortValue;
     request.iterations = params.iterations.unsignedIntValue;
     request.salt = [self asByteSpan:params.salt];
-    request.passcodeID = params.passcodeID.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,

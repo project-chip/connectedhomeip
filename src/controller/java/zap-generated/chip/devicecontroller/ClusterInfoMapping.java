@@ -7683,13 +7683,6 @@ public class ClusterInfoMapping {
     administratorCommissioningopenCommissioningWindowCommandParams.put(
         "salt", administratorCommissioningopenCommissioningWindowsaltCommandParameterInfo);
 
-    CommandParameterInfo
-        administratorCommissioningopenCommissioningWindowpasscodeIDCommandParameterInfo =
-            new CommandParameterInfo("passcodeID", Integer.class);
-    administratorCommissioningopenCommissioningWindowCommandParams.put(
-        "passcodeID",
-        administratorCommissioningopenCommissioningWindowpasscodeIDCommandParameterInfo);
-
     InteractionInfo administratorCommissioningopenCommissioningWindowInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -7701,7 +7694,6 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("discriminator"),
                       (Long) commandArguments.get("iterations"),
                       (byte[]) commandArguments.get("salt"),
-                      (Integer) commandArguments.get("passcodeID"),
                       10000);
             },
             () -> new DelegatedDefaultClusterCallback(),

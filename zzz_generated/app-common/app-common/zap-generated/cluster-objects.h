@@ -14828,7 +14828,6 @@ enum class Fields
     kDiscriminator        = 2,
     kIterations           = 3,
     kSalt                 = 4,
-    kPasscodeID           = 5,
 };
 
 struct Type
@@ -14843,7 +14842,6 @@ public:
     uint16_t discriminator = static_cast<uint16_t>(0);
     uint32_t iterations    = static_cast<uint32_t>(0);
     chip::ByteSpan salt;
-    uint16_t passcodeID = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14863,7 +14861,6 @@ public:
     uint16_t discriminator = static_cast<uint16_t>(0);
     uint32_t iterations    = static_cast<uint32_t>(0);
     chip::ByteSpan salt;
-    uint16_t passcodeID = static_cast<uint16_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OpenCommissioningWindow

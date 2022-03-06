@@ -233,8 +233,8 @@ CHIP_ERROR PASESession::SetupSpake2p()
 }
 
 CHIP_ERROR PASESession::WaitForPairing(const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       PasscodeId passcodeID, uint16_t mySessionId,
-                                       Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate)
+                                       uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                                       SessionEstablishmentDelegate * delegate)
 {
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(salt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -265,10 +265,9 @@ CHIP_ERROR PASESession::WaitForPairing(const Spake2pVerifier & verifier, uint32_
     mIterationCount  = pbkdf2IterCount;
     mNextExpectedMsg = MsgType::PBKDFParamRequest;
     mPairingComplete = false;
-    mPasscodeID      = passcodeID;
     mLocalMRPConfig  = mrpConfig;
 
-    SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
+    SetPeerNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId));
 
     ChipLogDetail(SecureChannel, "Waiting for PBKDF param request");
 
@@ -280,9 +279,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, PasscodeId passcodeID,
-                             uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
-                             Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
+                             Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
+                             SessionEstablishmentDelegate * delegate)
 {
     TRACE_EVENT_SCOPE("Pair", "PASESession");
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -295,8 +294,7 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
     SetPeerAddress(peerAddress);
 
     mLocalMRPConfig = mrpConfig;
-    mPasscodeID     = passcodeID;
-    SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
+    SetPeerNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId));
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
@@ -356,7 +354,7 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId()));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mPasscodeID));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), kDefaultCommissioningPasscodeId));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
     if (mLocalMRPConfig.HasValue())
     {
@@ -416,8 +414,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(passcodeId));
-    // TODO: uncomment once proper fix for #15362 is implemented
-    // VerifyOrExit(passcodeId == mPasscodeID, err = CHIP_ERROR_INVALID_PASE_PARAMETER);
+    VerifyOrExit(passcodeId == kDefaultCommissioningPasscodeId, err = CHIP_ERROR_INVALID_PASE_PARAMETER);
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);

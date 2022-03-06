@@ -442,11 +442,10 @@ void DeviceController::OnOpenPairingWindowFailureResponse(void * context, CHIP_E
 }
 
 CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
-                                                 Spake2pVerifier & outVerifier, PasscodeId & outPasscodeId)
+                                                 Spake2pVerifier & outVerifier)
 {
     ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(outVerifier, iterations, salt, /* useRandomPIN= */ false, setupPincode));
 
-    outPasscodeId = mPAKEVerifierID++;
     return CHIP_NO_ERROR;
 }
 
@@ -529,7 +528,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
         request.discriminator        = mSetupPayload.discriminator;
         request.iterations           = mCommissioningWindowIteration;
         request.salt                 = salt;
-        request.passcodeID           = mPAKEVerifierID++;
 
         // TODO: What should the timed invoke timeout here be?
         uint16_t timedInvokeTimeoutMs = 10000;
@@ -845,8 +843,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    // TODO: Need to determine how PasscodeId is provided for a non-default case. i.e. ECM
-    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), kDefaultCommissioningPasscodeId, keyID,
+    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID,
                                     Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), exchangeCtxt, this);
     SuccessOrExit(err);
 

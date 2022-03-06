@@ -13853,7 +13853,6 @@ class AdministratorCommissioning(Cluster):
                             ClusterObjectFieldDescriptor(Label="discriminator", Tag=2, Type=uint),
                             ClusterObjectFieldDescriptor(Label="iterations", Tag=3, Type=uint),
                             ClusterObjectFieldDescriptor(Label="salt", Tag=4, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="passcodeID", Tag=5, Type=uint),
                     ])
 
             @ChipUtility.classproperty
@@ -13865,7 +13864,6 @@ class AdministratorCommissioning(Cluster):
             discriminator: 'uint' = 0
             iterations: 'uint' = 0
             salt: 'bytes' = b""
-            passcodeID: 'uint' = 0
 
         @dataclass
         class OpenBasicCommissioningWindow(ClusterCommand):
