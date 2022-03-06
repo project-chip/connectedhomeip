@@ -41,7 +41,7 @@ tests:
       verification:
           "no Matter messages, result will be used in steps 5a and beyond"
       disabled: true
-      
+
     - label:
           "Read PartsList attribute of Descriptor cluster on all endpoints of
           the DUT"
