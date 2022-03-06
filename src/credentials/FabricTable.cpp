@@ -312,25 +312,32 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     NodeId nodeId;
     ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(certificates.GetLastCert()[0], &nodeId, &fabricId));
 
+    CHIP_ERROR err;
     FabricId icacFabricId = kUndefinedFabricId;
     if (!icac.empty())
     {
-        if (ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabricId) == CHIP_NO_ERROR &&
-            icacFabricId != kUndefinedFabricId)
+        err = ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabricId);
+        if (err == CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(icacFabricId != fabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
+        }
+        // FabricId is optional field in ICAC and "not found" code is not treated as error.
+        else if (err != CHIP_ERROR_NOT_FOUND)
+        {
+            return err;
         }
     }
 
     FabricId rcacFabricId = kUndefinedFabricId;
-    if (ExtractFabricIdFromCert(certificates.GetCertSet()[0], &rcacFabricId) == CHIP_NO_ERROR && rcacFabricId != kUndefinedFabricId)
+    err                   = ExtractFabricIdFromCert(certificates.GetCertSet()[0], &rcacFabricId);
+    if (err == CHIP_NO_ERROR)
     {
         ReturnErrorCodeIf(rcacFabricId != fabricId, CHIP_ERROR_WRONG_CERT_DN);
-        if (!icac.empty())
-        {
-            // If FabricId attribute is present in RCAC then it SHOULD be present in ICAC as well.
-            ReturnErrorCodeIf(icacFabricId == kUndefinedFabricId, CHIP_ERROR_WRONG_CERT_DN);
-        }
+    }
+    // FabricId is optional field in RCAC and "not found" code is not treated as error.
+    else if (err != CHIP_ERROR_NOT_FOUND)
+    {
+        return err;
     }
 
     ReturnErrorOnFailure(GeneratePeerId(fabricId, nodeId, &nocPeerId));
