@@ -58,6 +58,8 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
         session->OnNodeIdResolved(resolutionData);
     }
 
+    // RESOLVE-TODO
+    // what do we need to pass in here?
     CHIP_ERROR err = session->Connect(onConnection, onFailure);
     if (err != CHIP_NO_ERROR)
     {
