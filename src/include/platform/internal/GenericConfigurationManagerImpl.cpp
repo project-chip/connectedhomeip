@@ -816,7 +816,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             deviceType = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Device Type: %" PRIu16 " (0x%" PRIX16 ")", deviceType, deviceType);
+        ChipLogProgress(DeviceLayer, "  Device Type: %" PRIu32 " (0x%" PRIX32 ")", deviceType, deviceType);
     }
 }
 
