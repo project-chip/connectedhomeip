@@ -70,7 +70,6 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
 #endif
-#include <controller/DeviceAddressUpdateDelegate.h>
 #include <controller/DeviceDiscoveryDelegate.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/ResolverProxy.h>
@@ -308,7 +307,6 @@ public:
                                                    Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                    bool readVIDPIDAttributes = false);
 
-    void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
     void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
 
     /**
@@ -332,6 +330,8 @@ public:
         *value = mFabricInfo->GetFabricIndex();
         return CHIP_NO_ERROR;
     }
+
+    FabricInfo * GetFabricInfo() { return mFabricInfo; }
 
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
@@ -359,8 +359,7 @@ protected:
     FabricId mFabricId       = kUndefinedFabricId;
     FabricInfo * mFabricInfo = nullptr;
 
-    PersistentStorageDelegate * mStorageDelegate               = nullptr;
-    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
+    PersistentStorageDelegate * mStorageDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];

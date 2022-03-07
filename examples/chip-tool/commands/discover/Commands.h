@@ -21,7 +21,6 @@
 #include "DiscoverCommand.h"
 #include "DiscoverCommissionablesCommand.h"
 #include "DiscoverCommissionersCommand.h"
-#include <controller/DeviceAddressUpdateDelegate.h>
 #include <lib/address_resolve/AddressResolve.h>
 
 class Resolve : public DiscoverCommand, public chip::AddressResolve::NodeListener
@@ -65,42 +64,12 @@ private:
     chip::AddressResolve::NodeLookupHandle mNodeLookupHandle;
 };
 
-class Update : public DiscoverCommand
-{
-public:
-    Update(CredentialIssuerCommands * credsIssuerConfig) : DiscoverCommand("update", credsIssuerConfig) {}
-
-    /////////// DiscoverCommand Interface /////////
-    CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
-    {
-        ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " Compressed FabricId: %" PRIx64 " ...", remoteId,
-                        CurrentCommissioner().GetCompressedFabricId());
-        return CurrentCommissioner().UpdateDevice(remoteId);
-    }
-
-    /////////// DeviceAddressUpdateDelegate Interface /////////
-    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override
-    {
-        if (CHIP_NO_ERROR == error)
-        {
-            ChipLogProgress(chipTool, "Device address updated successfully");
-        }
-        else
-        {
-            ChipLogError(chipTool, "Failed to update the device address: %s", chip::ErrorStr(error));
-        }
-
-        SetCommandExitStatus(error);
-    }
-};
-
 void registerCommandsDiscover(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Discover";
 
     commands_list clusterCommands = {
         make_unique<Resolve>(credsIssuerConfig),
-        make_unique<Update>(credsIssuerConfig),
         make_unique<DiscoverCommissionablesCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionersCommand>(credsIssuerConfig),
     };

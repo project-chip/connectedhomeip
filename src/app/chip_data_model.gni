@@ -131,6 +131,7 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}-server.cpp",
           "${_app_root}/clusters/${cluster}/BDXDownloader.cpp",
           "${_app_root}/clusters/${cluster}/BDXDownloader.h",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestorUserConsentProvider.h",
           "${_app_root}/clusters/${cluster}/OTARequestor.cpp",
         ]
       } else if (cluster == "bindings") {

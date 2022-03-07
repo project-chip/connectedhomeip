@@ -21,9 +21,9 @@
 
     {{~#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{asPropertyValue}}", {{asPropertyValue}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "minValue")}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
+    {{~#if (hasProperty expectedConstraints "minValue")}}VerifyOrReturn(CheckConstraintMinValue("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
 
-    {{~#if (hasProperty expectedConstraints "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
+    {{~#if (hasProperty expectedConstraints "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue("{{asPropertyValue}}", {{asPropertyValue}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
 
     {{~#if (hasProperty expectedConstraints "notValue")}}
         {{#if (isLiteralNull expectedConstraints.notValue)}}

@@ -284,17 +284,21 @@ struct OperationalNodeFoundData
     OperationalDeviceProxy * operationalProxy;
 };
 
+struct NetworkClusterInfo
+{
+    EndpointId endpoint = kInvalidEndpointId;
+    app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime;
+};
 struct NetworkClusters
 {
-    EndpointId wifi   = kInvalidEndpointId;
-    EndpointId thread = kInvalidEndpointId;
-    EndpointId eth    = kInvalidEndpointId;
+    NetworkClusterInfo wifi;
+    NetworkClusterInfo thread;
+    NetworkClusterInfo eth;
 };
 struct BasicClusterInfo
 {
-    VendorId vendorId        = VendorId::Common;
-    uint16_t productId       = 0;
-    uint32_t softwareVersion = 0;
+    VendorId vendorId  = VendorId::Common;
+    uint16_t productId = 0;
 };
 struct GeneralCommissioningInfo
 {

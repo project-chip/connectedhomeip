@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,22 +15,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
-
-#include <lib/support/DLLUtil.h>
-#include <transport/raw/MessageHeader.h>
+#include <platform/UserConsentDelegate.h>
 
 namespace chip {
-namespace Controller {
+namespace ota {
 
-/// Callbacks for CHIP device address resolution
-class DLL_EXPORT DeviceAddressUpdateDelegate
+class OTARequestorUserConsentDelegate : public UserConsentDelegate
 {
 public:
-    virtual ~DeviceAddressUpdateDelegate() {}
-    virtual void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) = 0;
+    virtual ~OTARequestorUserConsentDelegate() = default;
+
+    virtual UserConsentState GetUserConsentState(const UserConsentSubject & subject) = 0;
+
+    // When GetUserConsentState() returns kObtaining this will be called to
+    // check if the user consent is granted or denied.
+    virtual UserConsentState CheckDeferredUserConsentState() = 0;
 };
 
-} // namespace Controller
+} // namespace ota
 } // namespace chip

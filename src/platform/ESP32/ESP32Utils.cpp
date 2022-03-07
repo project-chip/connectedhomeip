@@ -314,7 +314,7 @@ CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
     }
     if (error == ESP_ERR_NVS_NOT_FOUND)
     {
-        return CHIP_ERROR_KEY_NOT_FOUND;
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
     return CHIP_ERROR(ChipError::Range::kPlatform, error);
 }

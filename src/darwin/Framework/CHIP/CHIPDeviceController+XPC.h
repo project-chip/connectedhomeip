@@ -97,6 +97,23 @@ NS_ASSUME_NONNULL_BEGIN
                              maxInterval:(NSUInteger)maxInterval
                       establishedHandler:(void (^)(void))establishedHandler;
 
+/**
+ * Requests a specific node attribute subscription into a cache
+ */
+- (void)subscribeAttributeCacheWithController:(id _Nullable)controller
+                                       nodeId:(uint64_t)nodeId
+                                   completion:(void (^)(NSError * _Nullable error))completion;
+
+/**
+ * Requests reading attribute cache
+ */
+- (void)readAttributeCacheWithController:(id _Nullable)controller
+                                  nodeId:(uint64_t)nodeId
+                              endpointId:(NSUInteger)endpointId
+                               clusterId:(NSUInteger)clusterId
+                             attributeId:(NSUInteger)attributeId
+                              completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion;
+
 @end
 
 /**

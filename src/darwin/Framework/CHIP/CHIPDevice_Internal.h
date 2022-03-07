@@ -32,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+// Exported utility function
+id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data);
+
 NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_DEVICE_INTERNAL_H */
