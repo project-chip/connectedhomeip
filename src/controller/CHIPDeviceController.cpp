@@ -1494,11 +1494,22 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
 {
     // CASE session establishment failed.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
     ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
     VerifyOrReturn(commissioner != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
+
+    //
+    // If a device is being commissioned currently and it is the very same device that we just failed to establish CASE with,
+    // we need to clean it up to prevent a dangling CommissioneeDeviceProxy object.
+    //
+    if (commissioner->mDeviceBeingCommissioned != nullptr && commissioner->mDeviceBeingCommissioned->GetPeerId() == peerId)
+    {
+        commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
+        commissioner->mDeviceBeingCommissioned = nullptr;
+    }
 
     commissioner->mCASESessionManager->ReleaseSession(peerId);
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
