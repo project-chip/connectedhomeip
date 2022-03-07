@@ -531,6 +531,9 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     FabricIndex fabricIndex = 0;
     Credentials::GroupDataProvider::KeySet keyset;
 
+    uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
+    MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
+
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
 
     if (nullptr == groups)
@@ -582,7 +585,8 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     keyset.policy        = GroupKeyManagement::GroupKeySecurityPolicy::kTrustFirst;
     keyset.num_keys_used = 1;
     memcpy(keyset.epoch_keys[0].key, ipkValue.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-    err = groups->SetKeySet(fabricIndex, keyset);
+    err = gFabricBeingCommissioned.GetCompressedId(compressed_fabric_id);
+    err = groups->SetKeySet(fabricIndex, compressed_fabric_id, keyset);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
