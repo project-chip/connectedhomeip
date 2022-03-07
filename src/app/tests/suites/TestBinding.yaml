@@ -85,16 +85,14 @@ tests:
       attribute: "binding"
       endpoint: 0
       arguments:
-          value:
-              [{ FabricIndex: 0, Node: 3, Endpoint: 1 }]
+          value: [{ FabricIndex: 0, Node: 3, Endpoint: 1 }]
 
     - label: "Read binding table (endpoint 0)"
       command: "readAttribute"
       attribute: "binding"
       endpoint: 0
       response:
-          value:
-              [{ FabricIndex: 1, Node: 3, Endpoint: 1 }]
+          value: [{ FabricIndex: 1, Node: 3, Endpoint: 1 }]
 
     - label: "Verify endpoint 1 not changed"
       command: "readAttribute"
