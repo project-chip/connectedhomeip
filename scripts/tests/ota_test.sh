@@ -1,8 +1,11 @@
 #!/bin/bash
 
 PASSCODE=${1:-20202021}
-DISCRIMINATOR=${2:-42}
-UDP_PORT=${3:-5560}
+# DISCRIMINATOR=${2:-42}
+# UDP_PORT=${3:-5560}
+
+DISCRIMINATOR=${2:-( $RANDOM % 4096 + 1 )}
+UDP_PORT=${3:-( $RANDOM % 9000 + 1000 )}
 
 pkill chip-ota-provider-app
 pkill chip-ota-requestor-app
