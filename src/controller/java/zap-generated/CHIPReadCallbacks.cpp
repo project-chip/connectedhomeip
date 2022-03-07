@@ -16894,6 +16894,207 @@ void CHIPTargetNavigatorAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
+CHIPTemperatureMeasurementMeasuredValueAttributeCallback::CHIPTemperatureMeasurementMeasuredValueAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPTemperatureMeasurementClusterMeasuredValueAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPTemperatureMeasurementMeasuredValueAttributeCallback::~CHIPTemperatureMeasurementMeasuredValueAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPTemperatureMeasurementMeasuredValueAttributeCallback::CallbackFn(void * context,
+                                                                          const chip::app::DataModel::Nullable<int16_t> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPTemperatureMeasurementMeasuredValueAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTemperatureMeasurementMeasuredValueAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback::CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPTemperatureMeasurementClusterMinMeasuredValueAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback::~CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback::CallbackFn(void * context,
+                                                                             const chip::app::DataModel::Nullable<int16_t> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback::CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPTemperatureMeasurementClusterMaxMeasuredValueAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback::~CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback::CallbackFn(void * context,
+                                                                             const chip::app::DataModel::Nullable<int16_t> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      value.Value(), javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
 CHIPTemperatureMeasurementAttributeListAttributeCallback::CHIPTemperatureMeasurementAttributeListAttributeCallback(
     jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPTemperatureMeasurementClusterAttributeListAttributeCallbackType>(CallbackFn, this),
@@ -17859,6 +18060,253 @@ void CHIPTestClusterListLongOctetStringAttributeCallback::CallbackFn(
         env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
                                 reinterpret_cast<const jbyte *>(entry_0.data()));
         newElement_0 = newElement_0ByteArray;
+        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
+CHIPTestClusterListFabricScopedAttributeCallback::CHIPTestClusterListFabricScopedAttributeCallback(jobject javaCallback,
+                                                                                                   bool keepAlive) :
+    chip::Callback::Callback<CHIPTestClusterClusterListFabricScopedAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPTestClusterListFabricScopedAttributeCallback::~CHIPTestClusterListFabricScopedAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPTestClusterListFabricScopedAttributeCallback::CallbackFn(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPTestClusterListFabricScopedAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPTestClusterListFabricScopedAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
+    {
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
+        jobject newElement_0_fabricSensitiveInt8u;
+        std::string newElement_0_fabricSensitiveInt8uClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricSensitiveInt8uCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_fabricSensitiveInt8uClassName.c_str(), newElement_0_fabricSensitiveInt8uCtorSignature.c_str(),
+            entry_0.fabricSensitiveInt8u, newElement_0_fabricSensitiveInt8u);
+        jobject newElement_0_optionalFabricSensitiveInt8u;
+        if (!entry_0.optionalFabricSensitiveInt8u.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_optionalFabricSensitiveInt8u);
+        }
+        else
+        {
+            jobject newElement_0_optionalFabricSensitiveInt8uInsideOptional;
+            std::string newElement_0_optionalFabricSensitiveInt8uInsideOptionalClassName     = "java/lang/Integer";
+            std::string newElement_0_optionalFabricSensitiveInt8uInsideOptionalCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_0_optionalFabricSensitiveInt8uInsideOptionalClassName.c_str(),
+                newElement_0_optionalFabricSensitiveInt8uInsideOptionalCtorSignature.c_str(),
+                entry_0.optionalFabricSensitiveInt8u.Value(), newElement_0_optionalFabricSensitiveInt8uInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_optionalFabricSensitiveInt8uInsideOptional,
+                                                              newElement_0_optionalFabricSensitiveInt8u);
+        }
+        jobject newElement_0_nullableFabricSensitiveInt8u;
+        if (entry_0.nullableFabricSensitiveInt8u.IsNull())
+        {
+            newElement_0_nullableFabricSensitiveInt8u = nullptr;
+        }
+        else
+        {
+            std::string newElement_0_nullableFabricSensitiveInt8uClassName     = "java/lang/Integer";
+            std::string newElement_0_nullableFabricSensitiveInt8uCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_0_nullableFabricSensitiveInt8uClassName.c_str(),
+                newElement_0_nullableFabricSensitiveInt8uCtorSignature.c_str(), entry_0.nullableFabricSensitiveInt8u.Value(),
+                newElement_0_nullableFabricSensitiveInt8u);
+        }
+        jobject newElement_0_nullableOptionalFabricSensitiveInt8u;
+        if (!entry_0.nullableOptionalFabricSensitiveInt8u.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_nullableOptionalFabricSensitiveInt8u);
+        }
+        else
+        {
+            jobject newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional;
+            if (entry_0.nullableOptionalFabricSensitiveInt8u.Value().IsNull())
+            {
+                newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional = nullptr;
+            }
+            else
+            {
+                std::string newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalClassName     = "java/lang/Integer";
+                std::string newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalClassName.c_str(),
+                    newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalCtorSignature.c_str(),
+                    entry_0.nullableOptionalFabricSensitiveInt8u.Value().Value(),
+                    newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional);
+            }
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional,
+                                                              newElement_0_nullableOptionalFabricSensitiveInt8u);
+        }
+        jobject newElement_0_fabricSensitiveCharString;
+        newElement_0_fabricSensitiveCharString = env->NewStringUTF(
+            std::string(entry_0.fabricSensitiveCharString.data(), entry_0.fabricSensitiveCharString.size()).c_str());
+        jobject newElement_0_fabricSensitiveStruct;
+        jobject newElement_0_fabricSensitiveStruct_a;
+        std::string newElement_0_fabricSensitiveStruct_aClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricSensitiveStruct_aCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_fabricSensitiveStruct_aClassName.c_str(), newElement_0_fabricSensitiveStruct_aCtorSignature.c_str(),
+            entry_0.fabricSensitiveStruct.a, newElement_0_fabricSensitiveStruct_a);
+        jobject newElement_0_fabricSensitiveStruct_b;
+        std::string newElement_0_fabricSensitiveStruct_bClassName     = "java/lang/Boolean";
+        std::string newElement_0_fabricSensitiveStruct_bCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+            newElement_0_fabricSensitiveStruct_bClassName.c_str(), newElement_0_fabricSensitiveStruct_bCtorSignature.c_str(),
+            entry_0.fabricSensitiveStruct.b, newElement_0_fabricSensitiveStruct_b);
+        jobject newElement_0_fabricSensitiveStruct_c;
+        std::string newElement_0_fabricSensitiveStruct_cClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricSensitiveStruct_cCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_fabricSensitiveStruct_cClassName.c_str(), newElement_0_fabricSensitiveStruct_cCtorSignature.c_str(),
+            static_cast<uint8_t>(entry_0.fabricSensitiveStruct.c), newElement_0_fabricSensitiveStruct_c);
+        jobject newElement_0_fabricSensitiveStruct_d;
+        jbyteArray newElement_0_fabricSensitiveStruct_dByteArray =
+            env->NewByteArray(static_cast<jsize>(entry_0.fabricSensitiveStruct.d.size()));
+        env->SetByteArrayRegion(newElement_0_fabricSensitiveStruct_dByteArray, 0,
+                                static_cast<jsize>(entry_0.fabricSensitiveStruct.d.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.fabricSensitiveStruct.d.data()));
+        newElement_0_fabricSensitiveStruct_d = newElement_0_fabricSensitiveStruct_dByteArray;
+        jobject newElement_0_fabricSensitiveStruct_e;
+        newElement_0_fabricSensitiveStruct_e =
+            env->NewStringUTF(std::string(entry_0.fabricSensitiveStruct.e.data(), entry_0.fabricSensitiveStruct.e.size()).c_str());
+        jobject newElement_0_fabricSensitiveStruct_f;
+        std::string newElement_0_fabricSensitiveStruct_fClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricSensitiveStruct_fCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0_fabricSensitiveStruct_fClassName.c_str(), newElement_0_fabricSensitiveStruct_fCtorSignature.c_str(),
+            entry_0.fabricSensitiveStruct.f.Raw(), newElement_0_fabricSensitiveStruct_f);
+        jobject newElement_0_fabricSensitiveStruct_g;
+        std::string newElement_0_fabricSensitiveStruct_gClassName     = "java/lang/Float";
+        std::string newElement_0_fabricSensitiveStruct_gCtorSignature = "(F)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<float>(
+            newElement_0_fabricSensitiveStruct_gClassName.c_str(), newElement_0_fabricSensitiveStruct_gCtorSignature.c_str(),
+            entry_0.fabricSensitiveStruct.g, newElement_0_fabricSensitiveStruct_g);
+        jobject newElement_0_fabricSensitiveStruct_h;
+        std::string newElement_0_fabricSensitiveStruct_hClassName     = "java/lang/Double";
+        std::string newElement_0_fabricSensitiveStruct_hCtorSignature = "(D)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<double>(
+            newElement_0_fabricSensitiveStruct_hClassName.c_str(), newElement_0_fabricSensitiveStruct_hCtorSignature.c_str(),
+            entry_0.fabricSensitiveStruct.h, newElement_0_fabricSensitiveStruct_h);
+
+        jclass simpleStructStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
+            return;
+        }
+        jmethodID simpleStructStructCtor = env->GetMethodID(simpleStructStructClass, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/"
+                                                            "lang/String;Ljava/lang/Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
+        if (simpleStructStructCtor == nullptr)
+        {
+            ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor");
+            return;
+        }
+
+        newElement_0_fabricSensitiveStruct = env->NewObject(
+            simpleStructStructClass, simpleStructStructCtor, newElement_0_fabricSensitiveStruct_a,
+            newElement_0_fabricSensitiveStruct_b, newElement_0_fabricSensitiveStruct_c, newElement_0_fabricSensitiveStruct_d,
+            newElement_0_fabricSensitiveStruct_e, newElement_0_fabricSensitiveStruct_f, newElement_0_fabricSensitiveStruct_g,
+            newElement_0_fabricSensitiveStruct_h);
+        jobject newElement_0_fabricSensitiveInt8uList;
+        chip::JniReferences::GetInstance().CreateArrayList(newElement_0_fabricSensitiveInt8uList);
+
+        auto iter_newElement_0_fabricSensitiveInt8uList_NaN = entry_0.fabricSensitiveInt8uList.begin();
+        while (iter_newElement_0_fabricSensitiveInt8uList_NaN.Next())
+        {
+            auto & entry_NaN = iter_newElement_0_fabricSensitiveInt8uList_NaN.GetValue();
+            jobject newElement_NaN;
+            std::string newElement_NaNClassName     = "java/lang/Integer";
+            std::string newElement_NaNCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
+            chip::JniReferences::GetInstance().AddToList(newElement_0_fabricSensitiveInt8uList, newElement_NaN);
+        }
+
+        jclass testFabricScopedStructClass;
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$TestClusterClusterTestFabricScoped", testFabricScopedStructClass);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterTestFabricScoped");
+            return;
+        }
+        jmethodID testFabricScopedStructCtor = env->GetMethodID(
+            testFabricScopedStructClass, "<init>",
+            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/"
+            "String;Lchip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;Ljava/util/ArrayList;)V");
+        if (testFabricScopedStructCtor == nullptr)
+        {
+            ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterTestFabricScoped constructor");
+            return;
+        }
+
+        newElement_0 = env->NewObject(testFabricScopedStructClass, testFabricScopedStructCtor, newElement_0_fabricIndex,
+                                      newElement_0_fabricSensitiveInt8u, newElement_0_optionalFabricSensitiveInt8u,
+                                      newElement_0_nullableFabricSensitiveInt8u, newElement_0_nullableOptionalFabricSensitiveInt8u,
+                                      newElement_0_fabricSensitiveCharString, newElement_0_fabricSensitiveStruct,
+                                      newElement_0_fabricSensitiveInt8uList);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

@@ -148,7 +148,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
-                                                      stateParams.messageCounterManager, params.fabricIndependentStorage));
+                                                      stateParams.messageCounterManager, params.fabricIndependentStorage,
+                                                      stateParams.fabricTable));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
@@ -190,9 +191,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
 
         //
-        // Start up the DNS-SD server
+        // Start up the DNS-SD server.  We are not giving it a
+        // CommissioningModeProvider, so it will not claim we are in
+        // commissioning mode.
         //
-        chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
+        chip::app::DnssdServer::Instance().StartServer();
     }
 
     // store the system state

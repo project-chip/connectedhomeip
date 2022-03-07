@@ -2098,6 +2098,9 @@ public final class ChipIdLookup {
       if (attributeId == 42L) {
         return "ListLongOctetString";
       }
+      if (attributeId == 43L) {
+        return "ListFabricScoped";
+      }
       if (attributeId == 48L) {
         return "TimedWriteBoolean";
       }

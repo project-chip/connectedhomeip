@@ -22,7 +22,7 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <ota-provider-common/BdxOtaSender.h>
-#include <ota-provider-common/UserConsentDelegate.h>
+#include <platform/UserConsentDelegate.h>
 #include <vector>
 
 /**

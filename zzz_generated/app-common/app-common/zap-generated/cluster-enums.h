@@ -1464,6 +1464,37 @@ enum class SetpointAdjustMode : uint8_t
 using SetpointAdjustMode              = EmberAfSetpointAdjustMode;
 #endif
 
+// Enum for ThermostatControlSequence
+enum class ThermostatControlSequence : uint8_t
+{
+    kCoolingOnly                 = 0x00,
+    kCoolingWithReheat           = 0x01,
+    kHeatingOnly                 = 0x02,
+    kHeatingWithReheat           = 0x03,
+    kCoolingAndHeating           = 0x04,
+    kCoolingAndHeatingWithReheat = 0x05,
+};
+
+// Enum for ThermostatRunningMode
+enum class ThermostatRunningMode : uint8_t
+{
+    kOff  = 0x00,
+    kCool = 0x03,
+    kHeat = 0x04,
+};
+
+// Enum for ThermostatSystemMode
+enum class ThermostatSystemMode : uint8_t
+{
+    kOff              = 0x00,
+    kAuto             = 0x01,
+    kCool             = 0x03,
+    kHeat             = 0x04,
+    kEmergencyHeating = 0x05,
+    kPrecooling       = 0x06,
+    kFanOnly          = 0x07,
+};
+
 // Bitmap for DayOfWeek
 enum class DayOfWeek : uint8_t
 {

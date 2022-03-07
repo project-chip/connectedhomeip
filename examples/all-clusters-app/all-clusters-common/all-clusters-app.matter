@@ -2801,9 +2801,9 @@ server cluster TargetNavigator = 1285 {
 }
 
 server cluster TemperatureMeasurement = 1026 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
   readonly global attribute int16u clusterRevision = 65533;
 }
@@ -2855,6 +2855,13 @@ server cluster TestCluster = 1295 {
 
   struct TestFabricScoped {
     fabric_idx fabricIndex = 0;
+    INT8U fabricSensitiveInt8u = 1;
+    optional INT8U optionalFabricSensitiveInt8u = 2;
+    nullable INT8U nullableFabricSensitiveInt8u = 3;
+    optional nullable INT8U nullableOptionalFabricSensitiveInt8u = 4;
+    CHAR_STRING fabricSensitiveCharString = 5;
+    SimpleStruct fabricSensitiveStruct = 6;
+    INT8U fabricSensitiveInt8uList[] = 7;
   }
 
   struct NestedStructList {
@@ -2929,7 +2936,7 @@ server cluster TestCluster = 1295 {
   attribute int16u rangeRestrictedInt16u = 40;
   attribute int16s rangeRestrictedInt16s = 41;
   attribute LONG_OCTET_STRING listLongOctetString[] = 42;
-  readonly attribute TestFabricScoped listFabricScoped[] = 43;
+  attribute TestFabricScoped listFabricScoped[] = 43;
   attribute boolean timedWriteBoolean = 48;
   attribute boolean generalErrorBoolean = 49;
   attribute boolean clusterErrorBoolean = 50;
@@ -3091,6 +3098,31 @@ server cluster Thermostat = 513 {
     kHeatAndCoolSetpoints = 2;
   }
 
+  enum ThermostatControlSequence : ENUM8 {
+    kCoolingOnly = 0;
+    kCoolingWithReheat = 1;
+    kHeatingOnly = 2;
+    kHeatingWithReheat = 3;
+    kCoolingAndHeating = 4;
+    kCoolingAndHeatingWithReheat = 5;
+  }
+
+  enum ThermostatRunningMode : ENUM8 {
+    kOff = 0;
+    kCool = 3;
+    kHeat = 4;
+  }
+
+  enum ThermostatSystemMode : ENUM8 {
+    kOff = 0;
+    kAuto = 1;
+    kCool = 3;
+    kHeat = 4;
+    kEmergencyHeating = 5;
+    kPrecooling = 6;
+    kFanOnly = 7;
+  }
+
   bitmap DayOfWeek : BITMAP8 {
     kSunday = 0x1;
     kMonday = 0x2;
@@ -3128,7 +3160,7 @@ server cluster Thermostat = 513 {
   attribute int16s minCoolSetpointLimit = 23;
   attribute int16s maxCoolSetpointLimit = 24;
   attribute int8s minSetpointDeadBand = 25;
-  attribute enum8 controlSequenceOfOperation = 27;
+  attribute ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute enum8 systemMode = 28;
   readonly attribute enum8 startOfWeek = 32;
   readonly attribute int8u numberOfWeeklyTransitions = 33;

@@ -44,6 +44,9 @@ using bdx::TransferSession;
 // Global instance of the OTARequestorInterface.
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
 
+// Abort the QueryImage download request if there's been no progress for 5 minutes
+static constexpr System::Clock::Timeout kDownloadTimeoutSec = chip::System::Clock::Seconds32(5 * 60);
+
 static void LogQueryImageResponse(const QueryImageResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "QueryImageResponse:");
@@ -446,6 +449,11 @@ void OTARequestor::DownloadUpdate()
     ConnectToProvider(kDownload);
 }
 
+void OTARequestor::DownloadUpdateDelayedOnUserConsent()
+{
+    RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnUserConsent, OTAChangeReasonEnum::kSuccess);
+}
+
 void OTARequestor::ApplyUpdate()
 {
     RecordNewUpdateState(OTAUpdateStateEnum::kApplying, OTAChangeReasonEnum::kSuccess);
@@ -696,7 +704,7 @@ CHIP_ERROR OTARequestor::StartDownload(OperationalDeviceProxy & deviceProxy)
     mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
     mBdxDownloader->SetStateDelegate(this);
 
-    ReturnErrorOnFailure(mBdxDownloader->SetBDXParams(initOptions));
+    ReturnErrorOnFailure(mBdxDownloader->SetBDXParams(initOptions, kDownloadTimeoutSec));
     return mBdxDownloader->BeginPrepareDownload();
 }
 

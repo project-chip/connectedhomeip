@@ -375,6 +375,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     CHIP_ERROR err = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
     SuccessOrExit(err);
 
+    // We need to withdraw the advertisement for the now-removed fabric, so need
+    // to restart advertising altogether.
     app::DnssdServer::Instance().StartServer();
 
 exit:
@@ -629,11 +631,10 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     fabricIndex = fabric->GetFabricIndex();
 
-    // We have a new operational identity and should start advertising it.  We
-    // can't just wait until we get network configuration commands, because we
-    // might be on the operational network already, in which case we are
-    // expected to be live with our new identity at this point.
-    app::DnssdServer::Instance().AdvertiseOperational();
+    // We might have a new operational identity, so we should start advertising
+    // it right away.  Also, we need to withdraw our old operational identity.
+    // So we need to StartServer() here.
+    app::DnssdServer::Instance().StartServer();
 
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index associated with the UpdateNOC command being invoked.

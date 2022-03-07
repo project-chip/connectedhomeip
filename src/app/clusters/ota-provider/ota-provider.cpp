@@ -33,6 +33,14 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using chip::app::Clusters::OTAProviderDelegate;
 
+// EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT is only defined if the
+// cluster is actually enabled in the ZAP config.  To allow operation in setups
+// where that's not the case (and custom dispatch is used), define it here as
+// needed.
+#ifndef EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
+#define EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT 0
+#endif // EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
+
 static constexpr size_t kOtaProviderDelegateTableSize =
     EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
@@ -66,11 +74,7 @@ bool SendStatusIfDelegateNull(EndpointId endpoint)
  * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback
  *
  * @note It is the application's reponsibility to send the ApplyUpdateRequestResponse command after this is handled.
- *
- * @param updateToken Identifier for the Software Image to be applied. Should be 32 octets long.
- * @param newVersion The SoftwareVersion value of the new Software Image that the client is ready to apply.
  */
-
 bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::ApplyUpdateRequest::DecodableType & commandData)
@@ -109,13 +113,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
 
 /**
  * @brief OTA Software Update Provider Cluster NotifyUpdateApplied Command callback
- *
- *
- * @param updateToken Identifier for the Software Image that was applied. Should be 32 octets long.
- * @param softwareVersion The current SoftwareVersion value. Should match the SoftwarVersion attribute in the
- *                       OTA Requestor's Basic Information Cluster.
  */
-
 bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::NotifyUpdateApplied::DecodableType & commandData)
@@ -154,21 +152,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
 
 /**
  * @brief OTA Software Update Provider Cluster QueryImage Command callback
- *
- * @param vendorId The Vendor ID applying to the OTA Requestor’s Node. Should match the value in the Basic Information Cluster.
- * @param productId The Product ID applying to the OTA Requestor’s Node. Should match the value in the Basic Information Cluster.
- * @param imageType A Vendor-specific numerical value that may help an OTA Provider select the correct payload.
- * @param hardwareVersion The OTA Requestor’s hardware version. Should match the HardwareVersion attribute of the Client's Basic
- *                        Information Cluster.
- * @param softwareVersion The current version running on the OTA Requestor. Should match the SoftwareVersion attribute of the
- * Client's Basic Information Cluster.
- * @param protocolsSupported A list of OTADownloadProtocol enum values indicating download protocols supported by the OTA Requestor
- *                           (max length 8 entries).
- * @param location Optional, 2 chars. If present, it should match the Location value in the Client's Basic Information Cluster.
- * @param clientCanConsent Optional. May be set by an OTA Requestor which is capable of obtaining user consent for OTA application.
- * @param metadataForProvider Optional, max 512 octets. A TLV-encoded Vendor-specific payload.
  */
-
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandler * commandObj,
                                                                const app::ConcreteCommandPath & commandPath,
                                                                const Commands::QueryImage::DecodableType & commandData)
