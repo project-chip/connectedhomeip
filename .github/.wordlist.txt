@@ -22,9 +22,11 @@ AccountLogin
 acdbc
 ACKed
 ACL
+ACLs
 AdapterAddress
 AdapterName
 adb
+AddNOC
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
 addr
@@ -164,6 +166,7 @@ cancelled
 capacitive
 CarbonDioxideConcentrationMeasurement
 CarbonMonoxideConcentrationMeasurement
+CaseAdminNode
 CatalogVendorId
 CBB
 cbd
@@ -185,6 +188,7 @@ CharString
 checkmark
 ChipBLEMgr
 CHIPCirqueTest
+CHIPConfig
 CHIPCryptoPALHsm
 CHIPDeviceController
 ChipDeviceCtrl
@@ -198,6 +202,7 @@ ChipImResponder
 ChipLight
 ChipMessageLayer
 CHIPOBLE
+CHIPProjectAppConfig
 CHIPProjectConfig
 CHIPTest
 chiptests
@@ -301,6 +306,7 @@ DataFrame
 DataModelRevision
 dataset
 datasets
+DataVersion
 dbf
 DBG
 dBm
@@ -632,6 +638,7 @@ JTAG
 Jupyter
 jupyterlab
 KA
+kAdminister
 kBusy
 kCase
 Kconfig
@@ -639,10 +646,13 @@ KeypadInput
 kGroup
 kInvalidCommandId
 KitProg
+kManage
 kNodeIdNotSpecified
 knownissues
+kOperate
 kPAKEParameterError
 kPase
+kView
 KVS
 kWindowNotOpen
 LabelList
@@ -669,6 +679,7 @@ libical
 libncurses
 libreadline
 libsdl
+libshell
 libssl
 libstdc
 libthread
@@ -944,6 +955,7 @@ providerNodeId
 ProxyConfiguration
 ProxyDiscovery
 ProxyValid
+ProxyView
 PRs
 PSCAN
 PSK
@@ -982,6 +994,7 @@ raspberryPi
 RasPi
 rAv
 RCP
+ReadAttribute
 ReadConfigValue
 readelf
 readfds
@@ -1178,7 +1191,6 @@ ThermostatUserInterfaceConfiguration
 ThIsIsNoTMyReAlGiThUbToKeNSoDoNoTtRy
 ThreadNetworkDiagnostics
 threadOperationalDataset
-threadnetworkdiagnostics
 ThreadStackManager
 ThreadStackManagerImpl
 ths
@@ -1218,8 +1230,8 @@ ttyUSB
 TurbidityConcentrationMeasurement
 TXD
 txt
-UART
 uargument
+UART
 udc
 udcport
 udhcpc
@@ -1295,6 +1307,7 @@ wmm
 WPA
 wpan
 wra
+WriteAttribute
 writefds
 wrover
 WS
@@ -1330,6 +1343,7 @@ xFF
 xFFF
 xFFFF
 xfffff
+xFFFFFFFD
 xffffffffe
 xfffffffff
 xtensa
@@ -1359,4 +1373,3 @@ zephyrproject
 Zigbee
 zigbeealliance
 zigbeethread
-libshell
