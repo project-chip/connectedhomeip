@@ -179,8 +179,9 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs, bool aSuppressResponse = false)
     {
+        mSuppressResponse = aSuppressResponse;
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
     }
 #endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
