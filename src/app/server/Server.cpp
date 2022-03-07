@@ -45,6 +45,8 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
 
+using namespace chip::DeviceLayer;
+
 using chip::kMinValidFabricIndex;
 using chip::RendezvousInformationFlag;
 using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
@@ -72,16 +74,6 @@ void StopEventLoop(intptr_t arg)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Stopping event loop: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
-
-void DispatchShutDownEvent(intptr_t arg)
-{
-    // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
-    chip::DeviceLayer::PlatformManagerDelegate * platformManagerDelegate = chip::DeviceLayer::PlatformMgr().GetDelegate();
-    if (platformManagerDelegate != nullptr)
-    {
-        platformManagerDelegate->OnShutDown();
     }
 }
 
@@ -263,6 +255,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     RejoinExistingMulticastGroups();
 #endif // !CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+    PlatformMgr().HandleServerStarted();
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -310,27 +304,18 @@ void Server::RejoinExistingMulticastGroups()
 
 void Server::DispatchShutDownAndStopEventLoop()
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(DispatchShutDownEvent);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
+    PlatformMgr().ScheduleWork(StopEventLoop);
 }
 
 void Server::ScheduleFactoryReset()
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(FactoryReset);
-}
-
-void Server::FactoryReset(intptr_t arg)
-{
-    // Delete all fabrics and emit Leave event.
-    GetInstance().GetFabricTable().DeleteAllFabrics();
-
-    // Emit Shutdown event, as shutdown will come after factory reset.
-    DispatchShutDownEvent(0);
-
-    // Flush all dispatched events.
-    chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
-
-    chip::DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
+    PlatformMgr().ScheduleWork([](intptr_t) {
+        // Delete all fabrics and emit Leave event.
+        GetInstance().GetFabricTable().DeleteAllFabrics();
+        PlatformMgr().HandleServerShuttingDown();
+        ConfigurationMgr().InitiateFactoryReset();
+    });
 }
 
 void Server::Shutdown()
