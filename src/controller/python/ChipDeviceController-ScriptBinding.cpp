@@ -210,11 +210,7 @@ chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter()
 
 ChipError::StorageType pychip_DeviceController_StackInit()
 {
-    CHIP_ERROR err;
-
     VerifyOrDie(sStorageAdapter != nullptr);
-
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     FactoryInitParams factoryParams;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
