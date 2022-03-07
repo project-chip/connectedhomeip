@@ -56,19 +56,19 @@ void TestGetCompressedFabricID(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, fabricInfo.SetRootCert(ByteSpan(sTestRootCert)) == CHIP_NO_ERROR);
 
     PeerId compressedId;
-    NL_TEST_ASSERT(inSuite, fabricInfo.GetCompressedId(1234, 4321, &compressedId) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabricInfo.GeneratePeerId(1234, 4321, &compressedId) == CHIP_NO_ERROR);
 
     // We are compairing with hard coded values here (which are generated manually when the test was written)
     // This is to ensure that the same value is generated on big endian and little endian platforms.
-    // If in this test any input to GetCompressedId() is changed, this value must be recomputed.
+    // If in this test any input to GeneratePeerId() is changed, this value must be recomputed.
     NL_TEST_ASSERT(inSuite, compressedId.GetCompressedFabricId() == 0x090F17C67be7b663);
     NL_TEST_ASSERT(inSuite, compressedId.GetNodeId() == 4321);
 
-    NL_TEST_ASSERT(inSuite, fabricInfo.GetCompressedId(0xabcd, 0xdeed, &compressedId) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabricInfo.GeneratePeerId(0xabcd, 0xdeed, &compressedId) == CHIP_NO_ERROR);
 
     // We are compairing with hard coded values here (which are generated manually when the test was written)
     // This is to ensure that the same value is generated on big endian and little endian platforms
-    // If in this test any input to GetCompressedId() is changed, this value must be recomputed.
+    // If in this test any input to GeneratePeerId() is changed, this value must be recomputed.
     NL_TEST_ASSERT(inSuite, compressedId.GetCompressedFabricId() == 0xf3fecbcec485d5d7);
     NL_TEST_ASSERT(inSuite, compressedId.GetNodeId() == 0xdeed);
 }

@@ -523,13 +523,21 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     auto & NOCValue      = commandData.NOCValue;
     auto & ICACValue     = commandData.ICACValue;
     auto & adminVendorId = commandData.adminVendorId;
-
-    auto nocResponse = OperationalCertStatus::kSuccess;
+    auto & ipkValue      = commandData.IPKValue;
+    auto * groups        = Credentials::GetGroupDataProvider();
+    auto nocResponse     = OperationalCertStatus::kSuccess;
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
+    Credentials::GroupDataProvider::KeySet keyset;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
+
+    if (nullptr == groups)
+    {
+        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::Failure));
+        return true;
+    }
 
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
@@ -566,6 +574,16 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // Notify the secure session of the new fabric.
     commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->NewFabric(fabricIndex);
+
+    // Set the Identity Protection Key (IPK)
+    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
+                 nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_ARGUMENT));
+    keyset.keyset_id     = 0; // The IPK SHALL be the operational group key under GroupKeySetID of 0
+    keyset.policy        = GroupKeyManagement::GroupKeySecurityPolicy::kTrustFirst;
+    keyset.num_keys_used = 1;
+    memcpy(keyset.epoch_keys[0].key, ipkValue.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+    err = groups->SetKeySet(fabricIndex, keyset);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();
