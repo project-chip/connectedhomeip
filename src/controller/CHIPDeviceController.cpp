@@ -1465,15 +1465,19 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
 
-    if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
+    if (commissioner->mDeviceBeingCommissioned != nullptr &&
+        commissioner->mDeviceBeingCommissioned->GetPeerId() == device->GetPeerId())
     {
-        if (commissioner->mDeviceBeingCommissioned != nullptr &&
-            commissioner->mDeviceBeingCommissioned->GetDeviceId() == device->GetDeviceId())
+        //
+        // We can safely release the commissionee device if we just successfully connected
+        // to it over CASE, presuming we don't need to do any further IM work on the underlying
+        // PASE session anymore.
+        //
+        commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
+        commissioner->mDeviceBeingCommissioned = nullptr;
+
+        if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
         {
-            // Let's release the device that's being paired, if pairing was successful,
-            // and the device is available on the operational network.
-            commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
-            commissioner->mDeviceBeingCommissioned = nullptr;
             if (commissioner->mCommissioningDelegate != nullptr)
             {
                 CommissioningDelegate::CommissioningReport report;
@@ -1481,12 +1485,12 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
                 commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
             }
         }
-    }
-    else
-    {
-        VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
-                       ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
-        commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+        else
+        {
+            VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
+                           ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
+            commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+        }
     }
 }
 
