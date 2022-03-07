@@ -140,6 +140,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SuccessOrExit(err);
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
+    app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
     // Group data provider must be initialized after mDeviceStorage
     err = mGroupsProvider.Init();
@@ -334,6 +335,7 @@ void Server::FactoryReset(intptr_t arg)
 
 void Server::Shutdown()
 {
+    app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     CHIP_ERROR err = mExchangeMgr.Shutdown();

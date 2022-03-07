@@ -191,9 +191,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
 
         //
-        // Start up the DNS-SD server
+        // Start up the DNS-SD server.  We are not giving it a
+        // CommissioningModeProvider, so it will not claim we are in
+        // commissioning mode.
         //
-        chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
+        chip::app::DnssdServer::Instance().StartServer();
     }
 
     // store the system state

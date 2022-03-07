@@ -354,7 +354,6 @@ public:
         }
         else if (i == 2)
         {
-            app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledBasic);
             chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
             chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
                 kNoCommissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly);
