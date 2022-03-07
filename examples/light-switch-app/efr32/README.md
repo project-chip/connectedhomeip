@@ -295,8 +295,8 @@ combination with JLinkRTTClient as follows:
     chip-tool binding write binding '[{"fabricIndex": 1, "group": 257}]' 1 1
     ```
 
-    To run the example with unicast and groups commands, run the grousp command
-    only commands and replace the last one with binding command
+    To run the example with unicast and groups commands, run the group
+    configuration commands and replace the last one with binding this command
 
     ```
     chip-tool binding write binding '[{"fabricIndex": 1, "group": 257},{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6} ]' 1 1
