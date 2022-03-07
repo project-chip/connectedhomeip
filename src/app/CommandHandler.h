@@ -163,6 +163,15 @@ public:
     FabricIndex GetAccessingFabricIndex() const;
 
     /**
+     * API for resetting the internal response builder, useful when encoding the response manually.
+     * The TLVWriter got from GetCommandDataIBTLVWriter will be invalid after calling this.
+     *
+     * After calling this, users must call PrepareCommand or PrepareStatus before encoding something else. AddResponseData and
+     * AddStatus will handle this correctly.
+     */
+    CHIP_ERROR ResetResponse();
+
+    /**
      * API for adding a data response.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
      * object that can be encoded using the DataModel::Encode machinery and
@@ -175,13 +184,37 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        ConcreteCommandPath path = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, CommandData::GetCommandId() };
-        ReturnErrorOnFailure(PrepareCommand(path, false));
-        TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
-        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
+        // We should not encode anything when we are not in the correct state, the user must be using CommandHandler incorrectly.
+        VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
 
-        return FinishCommand(/* aEndDataStruct = */ false);
+        CHIP_ERROR err = TryAddResponseData(aRequestCommandPath, aData);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We have verified the state above, so this call must success since we must be one of the state required by
+            // ResetResponse.
+            ResetResponse();
+        }
+        return err;
+    }
+
+    /**
+     * API for adding a data response. Will encode Protocols::InteractionModel::Status::Failure status code when it failed to encode
+     * the command data.  The template parameter T is generally expected to be a ClusterName::Commands::CommandName::Type struct,
+     * but any object that can be encoded using the DataModel::Encode machinery and exposes the right command id will work.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aData the data for the response.
+     */
+    template <typename CommandData>
+    CHIP_ERROR AddResponseDataOrFailureStatus(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    {
+        CHIP_ERROR err = AddResponseData(aRequestCommandPath, aData);
+        if (err != CHIP_NO_ERROR)
+        {
+            return AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
+        }
+        return err;
     }
 
     /**
@@ -269,6 +302,28 @@ private:
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                  const Optional<ClusterStatus> & aClusterStatus);
+
+    /**
+     * Adds a data response.  The template parameter T is generally
+     * expected to be a ClusterName::Commands::CommandName::Type struct, but any
+     * object that can be encoded using the DataModel::Encode machinery and
+     * exposes the right command id will work.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aData the data for the response.
+     */
+    template <typename CommandData>
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    {
+        ConcreteCommandPath path = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, CommandData::GetCommandId() };
+        ReturnErrorOnFailure(PrepareCommand(path, false));
+        TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
+        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
+
+        return FinishCommand(/* aEndDataStruct = */ false);
+    }
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;

@@ -540,6 +540,17 @@ CHIP_ERROR CommandHandler::FinishStatus()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CommandHandler::ResetResponse()
+{
+    VerifyOrReturnError(mState == State::Idle || mState == State::AddedCommand || mState == State::AddingCommand,
+                        CHIP_ERROR_INCORRECT_STATE);
+    // Calling mCommandMessageWriter will release its underlying buffer, thus we can allocate another one when encode something.
+    mCommandMessageWriter.Reset();
+    mBufferAllocated = false;
+    MoveToState(State::Idle);
+    return CHIP_NO_ERROR;
+}
+
 TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 {
     if (mState != State::AddingCommand)
