@@ -91,7 +91,7 @@ public:
     CHIP_ERROR SetFailSafeArmed(bool val) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
     bool IsCommissionableDeviceTypeEnabled() override;
-    CHIP_ERROR GetDeviceTypeId(uint16_t & deviceType) override;
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;
     bool IsCommissionableDeviceNameEnabled() override;
     CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override;
