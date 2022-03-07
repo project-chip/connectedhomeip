@@ -241,11 +241,16 @@ private:
     };
 
     /**
-     * Called to establish a session to mProviderLocation.
+     * Called to establish a session to provider indicated by mProviderLocation
      *
      * @param onConnectedAction  The action to take once session to provider has been established
      */
     void ConnectToProvider(OnConnectedAction onConnectedAction);
+
+    /**
+     * Called to tear down a session to provider indicated by mProviderLocation
+     */
+    void DisconnectFromProvider();
 
     /**
      * Start download of the software image returned in QueryImageResponse

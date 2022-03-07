@@ -184,7 +184,14 @@ void OTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" CHIP_ERROR_FORMAT, error.Format());
+    ChipLogError(SoftwareUpdate, "Received QueryImage failure response: %" CHIP_ERROR_FORMAT, error.Format());
+
+    if (error == CHIP_ERROR_TIMEOUT)
+    {
+        ChipLogError(SoftwareUpdate, "CASE session may be invalid, tear down session");
+        requestorCore->DisconnectFromProvider();
+    }
+
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
 }
 
@@ -303,6 +310,33 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
+}
+
+void OTARequestor::DisconnectFromProvider()
+{
+    if (mServer == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Server not set");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    if (!mProviderLocation.HasValue())
+    {
+        ChipLogError(SoftwareUpdate, "Provider location not set");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
+    if (fabricInfo == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot find fabric");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    mCASESessionManager->ReleaseSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID));
 }
 
 // Requestor is directed to cancel image update in progress. All the Requestor state is
