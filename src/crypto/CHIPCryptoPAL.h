@@ -434,6 +434,7 @@ private:
     bool mInitialized = false;
 };
 
+
 /**
  *  @brief  A data structure for holding an AES CCM128 symmetric key, without the ownership of it.
  */
@@ -1401,6 +1402,39 @@ public:
      */
     virtual void Release() = 0;
 };
+
+
+/**
+ *  @brief P256 key builder for Operatinal and Ephermal keys.
+ **/
+class P256KeypairBuilder {
+public:
+    virtual ~P256KeypairBuilder(){}
+
+    /**
+     * @brief Create the keypair for given fabric Index.
+     * @return Return reference to P256 Keypair
+     **/
+    virtual P256Keypair * BuildP256KeyPairForOperationalKey (int fabricIndex) = 0;
+
+    /**
+     * @brief Create the ephermal keypair for CASE.
+     * @return Return reference to P256 Keypair
+     **/
+    virtual P256Keypair * BuildP256KeyPairForEphermalUsage() = 0;
+};
+
+/**
+ * @brief To get the keyPair builder for operation kay and case emphermal key.
+ * @return Return reference to Keypair builder
+ **/
+P256KeypairBuilder * GetP256KeypairBuilder();
+
+/**
+ *  @brief Set the Keypair builder.
+ **/
+void SetP256KeypairBuilder(P256KeypairBuilder * builder);
+
 
 /**
  *  @brief Derives the Operational Group Key using the Key Derivation Function (KDF) from the given epoch key.

@@ -24,6 +24,7 @@
 
 #include "CHIPCryptoPALHsm_SE05X_utils.h"
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMem.h>
 
 #if ENABLE_HSM_GENERATE_EC_KEY
 
@@ -739,6 +740,26 @@ exit:
     }
 
     return error;
+}
+
+P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(int fabricIndex)
+{
+    (void)fabricIndex;
+    P256KeypairHSM * keypair = nullptr;
+    ChipLogProgress(Crypto, "HSM-BuildP256KeyPairForOperationalKey() called");
+    keypair = Platform::New<P256KeypairHSM>();
+    keypair->Initialize();
+    return keypair;
+}
+
+P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForEphermalUsage()
+{
+    P256KeypairHSM * keypair = nullptr;
+    ChipLogProgress(Crypto, "HSM-BuildP256KeyPairForEphermalUsage() called");
+    keypair = Platform::New<P256KeypairHSM>();
+    keypair->SetKeyId(kKeyId_case_ephermal_keyid);
+    keypair->Initialize();
+    return keypair;
 }
 
 } // namespace Crypto

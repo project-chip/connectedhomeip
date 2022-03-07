@@ -46,6 +46,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMem.h>
 
 #include <string.h>
 
@@ -1929,6 +1930,55 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
+
+
+/**
+ *  @brief Mbedtls P256 key builder for Operatinal and Ephermal keys.
+ **/
+class MbedTlsDefaultP256KeypairBuilder : public P256KeypairBuilder {
+public:
+
+    virtual P256Keypair * BuildP256KeyPairForOperationalKey(int fabricIndex) override;
+
+    virtual P256Keypair * BuildP256KeyPairForEphermalUsage() override;
+};
+
+P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(int fabricIndex)
+{
+    (void)fabricIndex;
+    P256Keypair * keypair = nullptr;
+    keypair = Platform::New<P256Keypair>();
+    keypair->Initialize();
+    return keypair;
+}
+
+P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForEphermalUsage()
+{
+    P256Keypair * keypair = nullptr;
+    keypair = Platform::New<P256Keypair>();
+    keypair->Initialize();
+    return keypair;
+}
+
+
+/**
+ *  @brief Default Key Builder for Mbedtls
+ **/
+MbedTlsDefaultP256KeypairBuilder gDefaultP256KeyPairBuilder;
+P256KeypairBuilder *gP256KeypairBuilder = &gDefaultP256KeyPairBuilder;
+
+
+P256KeypairBuilder* GetP256KeypairBuilder()
+{
+    return gP256KeypairBuilder;
+}
+
+
+void SetP256KeypairBuilder(P256KeypairBuilder* builder){
+    printf("%s\n", __FUNCTION__);
+    gP256KeypairBuilder = builder;
+}
+
 
 } // namespace Crypto
 } // namespace chip

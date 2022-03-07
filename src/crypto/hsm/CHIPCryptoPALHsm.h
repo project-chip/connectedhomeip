@@ -209,5 +209,18 @@ private:
 
 #endif //#if ENABLE_HSM_HMAC_SHA256
 
+
+/**
+ *  @brief HSM P256 key builder for Operatinal and Ephermal keys.
+ **/
+class HSMDefaultP256KeypairBuilder : public P256KeypairBuilder {
+public:
+
+    virtual P256Keypair * BuildP256KeyPairForOperationalKey(int fabricIndex) override;
+
+    virtual P256Keypair * BuildP256KeyPairForEphermalUsage() override;
+};
+
+
 } // namespace Crypto
 } // namespace chip

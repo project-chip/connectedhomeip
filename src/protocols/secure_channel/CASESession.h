@@ -54,10 +54,6 @@ constexpr uint16_t kIPKSize = 16;
 
 constexpr size_t kCASEResumptionIDSize = 16;
 
-#ifdef ENABLE_HSM_CASE_EPHEMERAL_KEY
-#define CASE_EPHEMERAL_KEY 0xCA5EECD0
-#endif
-
 struct CASESessionCachable
 {
     uint16_t mSharedSecretLen                              = 0;
@@ -235,11 +231,7 @@ private:
 
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
-#ifdef ENABLE_HSM_CASE_EPHEMERAL_KEY
-    Crypto::P256KeypairHSM mEphemeralKey;
-#else
-    Crypto::P256Keypair mEphemeralKey;
-#endif
+    Crypto::P256Keypair *mEphemeralKey;
     Crypto::P256ECDHDerivedSecret mSharedSecret;
     Credentials::CertificateKeyId mTrustedRootId;
     Credentials::ValidationContext mValidContext;
