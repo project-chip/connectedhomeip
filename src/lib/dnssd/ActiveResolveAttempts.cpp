@@ -67,12 +67,13 @@ void ActiveResolveAttempts::Complete(const chip::Dnssd::DiscoveredNodeData & dat
 
 void ActiveResolveAttempts::MarkPending(const chip::PeerId & peerId)
 {
-    ScheduledAttempt attempt(peerId, true);
+    ScheduledAttempt attempt(peerId, /* firstSend */ true);
     MarkPending(attempt);
 }
+
 void ActiveResolveAttempts::MarkPending(const chip::Dnssd::DiscoveryFilter & filter, const chip::Dnssd::DiscoveryType type)
 {
-    ScheduledAttempt attempt(filter, type, true);
+    ScheduledAttempt attempt(filter, type, /* firstSend */ true);
     MarkPending(attempt);
 }
 
@@ -202,12 +203,7 @@ Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextSch
         entry.nextRetryDelay *= 2;
 
         Optional<ScheduledAttempt> attempt = MakeOptional(entry.attempt);
-        ChipLogError(Controller, "sending back attempt %d %d", (int) entry.attempt.attemptType, entry.attempt.firstSend);
-        if (entry.attempt.attemptType == ScheduledAttempt::kResolve)
-        {
-            ChipLogError(Controller, "peer id = %" PRIX64, entry.attempt.peerId.GetNodeId());
-        }
-        entry.attempt.firstSend = false;
+        entry.attempt.firstSend            = false;
 
         return attempt;
     }
