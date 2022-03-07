@@ -25,7 +25,6 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/TestGroupData.h>
 
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
@@ -44,9 +43,6 @@ int Commands::Run(int argc, char ** argv)
 
     err = mStorage.Init();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
-
-    err = chip::GroupTesting::InitGroupData();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Group Data failure: %s", chip::ErrorStr(err)));
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
