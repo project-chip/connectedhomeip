@@ -339,8 +339,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             break;
         case CommissioningStage::kSendOpCertSigningRequest: {
             NOCChainGenerationParameters nocParams;
-            nocParams.nocsrElements = report.Get<OpCertResponse>().attestationElements;
-            nocParams.signature     = report.Get<OpCertResponse>().signature;
+            nocParams.nocsrElements = report.Get<CSRResponse>().nocsrElements;
+            nocParams.signature     = report.Get<CSRResponse>().signature;
             mParams.SetNOCChainGenerationParameters(nocParams);
         }
         break;
