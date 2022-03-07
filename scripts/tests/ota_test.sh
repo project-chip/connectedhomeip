@@ -1,11 +1,8 @@
 #!/bin/bash
 
 PASSCODE=${1:-20202021}
-# DISCRIMINATOR=${2:-42}
-# UDP_PORT=${3:-5560}
-
-DISCRIMINATOR=${2:-( $RANDOM % 59535 + 6000 )}
-UDP_PORT=${3:-( $RANDOM % 9000 + 1000 )}
+DISCRIMINATOR=${2:-42}
+UDP_PORT=${3:-5560}
 
 pkill chip-ota-provider-app
 pkill chip-ota-requestor-app
@@ -15,8 +12,6 @@ scripts/examples/gn_build_example.sh examples/chip-tool out/
 touch my-firmware.bin
 
 echo "TST" >> my-firmware.bin
-
-rm -r /tmp/chip_*
 
 ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 my-firmware.bin my-firmware.ota
 
