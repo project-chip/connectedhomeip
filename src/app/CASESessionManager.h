@@ -47,7 +47,7 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager : public Dnssd::OperationalResolveDelegate
+class CASESessionManager
 {
 public:
     CASESessionManager() = delete;
@@ -90,10 +90,6 @@ public:
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
     CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
-
-    //////////// OperationalResolveDelegate Implementation ///////////////
-    void OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData) override;
-    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override;
 
 private:
     OperationalDeviceProxy * FindSession(const SessionHandle & session);

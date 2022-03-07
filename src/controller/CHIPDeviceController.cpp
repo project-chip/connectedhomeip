@@ -127,7 +127,6 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.systemState->TransportMgr() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(mDNSResolver.Init(params.systemState->UDPEndPointManager()));
-    mDNSResolver.SetOperationalDelegate(this);
     mDNSResolver.SetCommissioningDelegate(this);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
 
@@ -567,21 +566,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
     }
 
     return CHIP_NO_ERROR;
-}
-
-void DeviceController::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
-{
-    VerifyOrReturn(mState == State::Initialized,
-                   ChipLogError(Controller, "OnOperationalNodeResolved was called in incorrect state"));
-    mCASESessionManager->OnOperationalNodeResolved(nodeData);
-}
-
-void DeviceController::OnOperationalNodeResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
-{
-    ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
-    VerifyOrReturn(mState == State::Initialized,
-                   ChipLogError(Controller, "OnOperationalNodeResolutionFailed was called in incorrect state"));
-    mCASESessionManager->OnOperationalNodeResolutionFailed(peer, error);
 }
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
@@ -1439,41 +1423,6 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
             mPairingDelegate->OnCommissioningComplete(mDeviceBeingCommissioned->GetDeviceId(), status);
         }
     }
-}
-
-void DeviceCommissioner::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
-{
-    ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID 0x" ChipLogFormatX64,
-                    ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-    VerifyOrReturn(mState == State::Initialized);
-
-    // TODO: minimal mdns is buggy and violates the API contract for the
-    // resolver proxy by handing us results for all sorts of things we did not
-    // ask it to resolve, including results that don't even match our fabric.
-    // Reject at least those mis-matching results, since we can detect those
-    // easily.
-    if (nodeData.mPeerId.GetCompressedFabricId() != GetCompressedFabricId())
-    {
-        return;
-    }
-
-    mDNSCache.Insert(nodeData);
-
-    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-    DeviceController::OnOperationalNodeResolved(nodeData);
-}
-
-void DeviceCommissioner::OnOperationalNodeResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
-{
-    if (mDeviceBeingCommissioned != nullptr)
-    {
-        CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
-        if (device->GetDeviceId() == peer.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
-        {
-            CommissioningStageComplete(error);
-        }
-    }
-    DeviceController::OnOperationalNodeResolutionFailed(peer, error);
 }
 
 void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
