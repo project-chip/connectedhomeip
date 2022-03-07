@@ -255,7 +255,7 @@ jobs:
             - name: Build Python REPL and example apps
               timeout-minutes: 50
               run: |
-                    scripts/run_in_build_env.sh ./scripts/build_python.sh
+                    scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                     scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug chip_enable_wifi=false
             - name: Run Tests
               timeout-minutes: 30
@@ -287,10 +287,8 @@ jobs:
         strategy:
             matrix:
                 build_variant: [no-ble-tsan, no-ble-asan]
-                chip_tool: ["", -same-event-loop]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
-            CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
 
         if: github.actor != 'restyled-io[bot]'
@@ -334,7 +332,7 @@ jobs:
             - name: Build Python REPL and example apps
               timeout-minutes: 50
               run: |
-                    scripts/run_in_build_env.sh ./scripts/build_python.sh
+                    scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                     scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug chip_enable_wifi=false
             - name: Run Tests
               timeout-minutes: 30
