@@ -49030,7 +49030,7 @@ NSNumber * _Nonnull ourFabricIndex;
 }
 - (void)testSendClusterTestBinding_000004_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write binding table"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write binding table (endpoint 1)"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -49059,7 +49059,7 @@ NSNumber * _Nonnull ourFabricIndex;
     }
     [cluster writeAttributeBindingWithValue:bindingArgument
                           completionHandler:^(NSError * _Nullable err) {
-                              NSLog(@"Write binding table Error: %@", err);
+                              NSLog(@"Write binding table (endpoint 1) Error: %@", err);
 
                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -49070,7 +49070,7 @@ NSNumber * _Nonnull ourFabricIndex;
 }
 - (void)testSendClusterTestBinding_000005_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read binding table"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read binding table (endpoint 1)"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -49082,7 +49082,105 @@ NSNumber * _Nonnull ourFabricIndex;
     [cluster
         readAttributeBindingWithParams:params
                      completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                         NSLog(@"Read binding table Error: %@", err);
+                         NSLog(@"Read binding table (endpoint 1) Error: %@", err);
+
+                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                         {
+                             id actualValue = value;
+                             XCTAssertEqual([actualValue count], 3);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).group unsignedShortValue], 1U);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).node unsignedLongLongValue], 1ULL);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).endpoint unsignedShortValue], 1U);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).cluster unsignedIntValue], 6UL);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex unsignedCharValue], 1);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).node unsignedLongLongValue], 2ULL);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).endpoint unsignedShortValue], 1U);
+                         }
+
+                         [expectation fulfill];
+                     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestBinding_000006_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write binding table (endpoint 0)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBinding * cluster = [[CHIPTestBinding alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id bindingArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[CHIPBindingClusterTargetStruct alloc] init];
+        ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+        ((CHIPBindingClusterTargetStruct *) temp_0[0]).node = [NSNumber numberWithUnsignedLongLong:3ULL];
+        ((CHIPBindingClusterTargetStruct *) temp_0[0]).endpoint = [NSNumber numberWithUnsignedShort:1U];
+
+        bindingArgument = temp_0;
+    }
+    [cluster writeAttributeBindingWithValue:bindingArgument
+                          completionHandler:^(NSError * _Nullable err) {
+                              NSLog(@"Write binding table (endpoint 0) Error: %@", err);
+
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestBinding_000007_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read binding table (endpoint 0)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBinding * cluster = [[CHIPTestBinding alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster
+        readAttributeBindingWithParams:params
+                     completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                         NSLog(@"Read binding table (endpoint 0) Error: %@", err);
+
+                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                         {
+                             id actualValue = value;
+                             XCTAssertEqual([actualValue count], 1);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).node unsignedLongLongValue], 3ULL);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).endpoint unsignedShortValue], 1U);
+                         }
+
+                         [expectation fulfill];
+                     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestBinding_000008_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify endpoint 1 not changed"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBinding * cluster = [[CHIPTestBinding alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    CHIPReadParams * params = [[CHIPReadParams alloc] init];
+    params.fabricFiltered = [NSNumber numberWithBool:true];
+    [cluster
+        readAttributeBindingWithParams:params
+                     completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                         NSLog(@"Verify endpoint 1 not changed Error: %@", err);
 
                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
