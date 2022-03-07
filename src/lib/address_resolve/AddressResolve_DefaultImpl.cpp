@@ -163,24 +163,22 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     if (elapsed < mRequest.GetMinLookupTime())
     {
         ChipLogProgress(Discovery, "Keeping DNSSD lookup active");
-        return NodeLookupAction::kKeepSearching;
+        return NodeLookupAction::KeepSearching();
     }
 
     // Minimal time to search reached. If any IP available, ready to return it.
     if (mBestAddressScore > ScoreValue(IpScore::kInvalid))
     {
-        GetListener()->OnNodeAddressResolved(GetRequest().GetPeerId(), mBestResult);
-        return NodeLookupAction::kStopSearching;
+        return NodeLookupAction::Success(mBestResult);
     }
 
     // Give up if the maximum search time has been reached
     if (elapsed >= mRequest.GetMaxLookupTime())
     {
-        GetListener()->OnNodeAddressResolutionFailed(GetRequest().GetPeerId(), CHIP_ERROR_TIMEOUT);
-        return NodeLookupAction::kStopSearching;
+        return NodeLookupAction::Error(CHIP_ERROR_TIMEOUT);
     }
 
-    return NodeLookupAction::kKeepSearching;
+    return NodeLookupAction::KeepSearching();
 }
 
 CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle)
@@ -231,13 +229,40 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
             current->LookupResult(result);
         }
 
-        if (current->NextAction(mTimeSource.GetMonotonicTimestamp()) == NodeLookupAction::kStopSearching)
-        {
-            mActiveLookups.Erase(current);
-        }
+        HandleAction(current);
     }
 
     ReArmTimer();
+}
+
+void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
+{
+    const NodeLookupAction action = current->NextAction(mTimeSource.GetMonotonicTimestamp());
+
+    if (action.Type() == NodeLookupResult::kKeepSearching)
+    {
+        // No change in iterator
+        return;
+    }
+
+    // final result, handle either success or failure
+    const PeerId peerId     = current->GetRequest().GetPeerId();
+    NodeListener * listener = current->GetListener();
+    mActiveLookups.Erase(current);
+
+    // ensure action is taken AFTER the current current lookup is marked complete
+    switch (action.Type())
+    {
+    case NodeLookupResult::kLookupError:
+        listener->OnNodeAddressResolutionFailed(peerId, action.ErrorResult());
+        break;
+    case NodeLookupResult::kLookupSuccess:
+        listener->OnNodeAddressResolved(peerId, action.ResolveResult());
+        break;
+    default:
+        ChipLogError(Discovery, "Unexpected lookup state (not success or fail).");
+        break;
+    }
 }
 
 void Resolver::HandleTimer()
@@ -247,10 +272,8 @@ void Resolver::HandleTimer()
     {
         auto current = it;
         it++;
-        if (current->NextAction(mTimeSource.GetMonotonicTimestamp()) == NodeLookupAction::kStopSearching)
-        {
-            mActiveLookups.Erase(current);
-        }
+
+        HandleAction(current);
     }
 
     ReArmTimer();
@@ -268,8 +291,11 @@ void Resolver::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERR
             continue;
         }
 
-        current->GetListener()->OnNodeAddressResolutionFailed(peerId, error);
+        NodeListener * listener = current->GetListener();
         mActiveLookups.Erase(current);
+
+        // Failure callback only called after iterator was cleaned
+        listener->OnNodeAddressResolutionFailed(peerId, error);
     }
     ReArmTimer();
 }
@@ -307,9 +333,14 @@ void Resolver::ReArmTimer()
         auto it = mActiveLookups.begin();
         while (it != mActiveLookups.end())
         {
-            it->GetListener()->OnNodeAddressResolutionFailed(it->GetRequest().GetPeerId(), err);
+            const PeerId peerId     = it->GetRequest().GetPeerId();
+            NodeListener * listener = it->GetListener();
+
             mActiveLookups.Erase(it);
             it = mActiveLookups.begin();
+
+            // Callback only called after active lookup is cleared
+            listener->OnNodeAddressResolutionFailed(peerId, err);
         }
     }
 }

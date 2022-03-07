@@ -1467,13 +1467,12 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
 
-    //
-    // If a device is being commissioned currently and it is the very same device that we just failed to establish CASE with,
-    // we need to clean it up to prevent a dangling CommissioneeDeviceProxy object.
-    //
     if (commissioner->mDeviceBeingCommissioned != nullptr && commissioner->mDeviceBeingCommissioned->GetPeerId() == peerId)
     {
-        commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
+        // NOTE: this is NOT calling commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
+        // since CommissioningStageComplete/CommissioningStepFinished is expected to do the cleanup of memory.
+        //
+        // Just mark the device as not in use anymore
         commissioner->mDeviceBeingCommissioned = nullptr;
     }
 
