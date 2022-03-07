@@ -297,6 +297,10 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
     // RESOLVE-TODO
     // CHIP_ERROR err = UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
     //
+    //   => return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
+    //       =>
+    //
+    ChipLogError(NotSpecified, "!!!!! RESOLVE-TODO: Update device when first message delivery fails.");
     CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
     if (err != CHIP_NO_ERROR)
     {
@@ -2056,7 +2060,21 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // FIXME: implement a proper lookup
         // RESOLVE-TODO
         // CHIP_ERROR err = UpdateDevice(proxy->GetDeviceId());
-        CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
+        //
+        //   => return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
+        //       => return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
+        ChipLogError(NotSpecified, "!!!!! RESOLVE-TODO: Find operational device after commissioning looks ok.");
+
+        OperationalDeviceProxy * session =
+            mCASESessionManager->FindExistingSession(mFabricInfo->GetPeerIdForNode(proxy->GetDeviceId()));
+        if (session == nullptr)
+        {
+            ChipLogError(Controller, "No active session to find an operational address for.");
+            CommissioningStageComplete(CHIP_ERROR_NOT_FOUND);
+            return;
+        }
+
+        CHIP_ERROR err = session->LookupPeerAddress();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to proceed to operational discovery\n");

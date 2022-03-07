@@ -60,6 +60,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         //    Use AddressResolve::Instance
         //
         // err = resolver->ResolveNodeId(mPeerId, Inet::IPAddressType::kAny);
+        ChipLogError(NotSpecified, "!!!!! RESOLVE-TODO: Node needs address in opcred proxy connect");
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         EnqueueConnectionCallbacks(onConnection, onFailure);
         break;
@@ -306,6 +307,23 @@ OperationalDeviceProxy::~OperationalDeviceProxy()
         // Make sure we don't leak it.
         mInitParams.clientPool->Release(mCASEClient);
     }
+}
+
+CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
+{
+    AddressResolve::NodeLookupRequest request(mPeerId);
+
+    return AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
+}
+
+void OperationalDeviceProxy::OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result)
+{
+    ChipLogError(NotSpecified, "RESOLVE-TODO: what to do on resolve success");
+}
+
+void OperationalDeviceProxy::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)
+{
+    ChipLogError(NotSpecified, "RESOLVE-TODO: what to do on resolve failure");
 }
 
 } // namespace chip
