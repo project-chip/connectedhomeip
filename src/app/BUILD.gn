@@ -164,8 +164,6 @@ static_library("app") {
     "${nlio_root}:nlio",
   ]
 
-  deps = [ "${chip_root}/src/lib/address_resolve" ]
-
   cflags = [ "-Wconversion" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
