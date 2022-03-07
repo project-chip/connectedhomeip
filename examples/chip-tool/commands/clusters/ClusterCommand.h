@@ -32,6 +32,7 @@ public:
         AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
         AddArgument("payload", &mPayload);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         ModelCommand::AddArguments();
     }
 
@@ -41,6 +42,7 @@ public:
         AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
         AddArgument("payload", &mPayload);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         ModelCommand::AddArguments();
     }
 
@@ -48,6 +50,7 @@ public:
         ModelCommand(commandName, credsIssuerConfig)
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
     }
 
     ~ClusterCommand() {}
@@ -107,7 +110,8 @@ public:
         mCommandSender =
             std::make_unique<chip::app::CommandSender>(this, device->GetExchangeManager(), mTimedInteractionTimeoutMs.HasValue());
         VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(mCommandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
+        ReturnErrorOnFailure(mCommandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs,
+                                                                        mSuppressResponse.ValueOr(false)));
         ReturnErrorOnFailure(mCommandSender->SendCommandRequest(device->GetSecureSession().Value()));
         return CHIP_NO_ERROR;
     }
@@ -137,6 +141,7 @@ private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
+    chip::Optional<bool> mSuppressResponse;
 
     CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;

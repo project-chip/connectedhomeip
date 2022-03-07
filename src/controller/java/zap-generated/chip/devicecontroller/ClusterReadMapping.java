@@ -7469,7 +7469,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TemperatureMeasurementCluster) cluster)
-                  .readMeasuredValueAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMeasuredValueAttribute(
+                      (ChipClusters.TemperatureMeasurementCluster.MeasuredValueAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTemperatureMeasurementMeasuredValueCommandParams);
@@ -7482,7 +7484,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TemperatureMeasurementCluster) cluster)
-                  .readMinMeasuredValueAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinMeasuredValueAttribute(
+                      (ChipClusters.TemperatureMeasurementCluster.MinMeasuredValueAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTemperatureMeasurementMinMeasuredValueCommandParams);
@@ -7495,7 +7499,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TemperatureMeasurementCluster) cluster)
-                  .readMaxMeasuredValueAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxMeasuredValueAttribute(
+                      (ChipClusters.TemperatureMeasurementCluster.MaxMeasuredValueAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTemperatureMeasurementMaxMeasuredValueCommandParams);

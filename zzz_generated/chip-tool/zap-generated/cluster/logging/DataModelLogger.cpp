@@ -8408,17 +8408,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case TemperatureMeasurement::Attributes::MeasuredValue::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasuredValue", 1, value);
         }
         case TemperatureMeasurement::Attributes::MinMeasuredValue::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
         }
         case TemperatureMeasurement::Attributes::MaxMeasuredValue::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
         }

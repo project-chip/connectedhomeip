@@ -264,8 +264,7 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemState = nullptr;
 
     mDNSResolver.Shutdown();
-    mDeviceAddressUpdateDelegate = nullptr;
-    mDeviceDiscoveryDelegate     = nullptr;
+    mDeviceDiscoveryDelegate = nullptr;
 
     chip::Platform::Delete(mCASESessionManager);
     mCASESessionManager = nullptr;
@@ -565,10 +564,6 @@ void DeviceController::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNode
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnOperationalNodeResolved was called in incorrect state"));
     mCASESessionManager->OnOperationalNodeResolved(nodeData);
-    if (mDeviceAddressUpdateDelegate != nullptr)
-    {
-        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), CHIP_NO_ERROR);
-    }
 }
 
 void DeviceController::OnOperationalNodeResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
@@ -577,11 +572,6 @@ void DeviceController::OnOperationalNodeResolutionFailed(const chip::PeerId & pe
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnOperationalNodeResolutionFailed was called in incorrect state"));
     mCASESessionManager->OnOperationalNodeResolutionFailed(peer, error);
-
-    if (mDeviceAddressUpdateDelegate != nullptr)
-    {
-        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
-    }
 }
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
@@ -1511,11 +1501,22 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
 {
     // CASE session establishment failed.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
     ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
     VerifyOrReturn(commissioner != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
+
+    //
+    // If a device is being commissioned currently and it is the very same device that we just failed to establish CASE with,
+    // we need to clean it up to prevent a dangling CommissioneeDeviceProxy object.
+    //
+    if (commissioner->mDeviceBeingCommissioned != nullptr && commissioner->mDeviceBeingCommissioned->GetPeerId() == peerId)
+    {
+        commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
+        commissioner->mDeviceBeingCommissioned = nullptr;
+    }
 
     commissioner->mCASESessionManager->ReleaseSession(peerId);
     if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
@@ -1586,8 +1587,7 @@ void DeviceCommissioner::OnDone()
 
     err = mAttributeCache->ForEachAttribute(app::Clusters::Basic::Id, [this, &info](const app::ConcreteAttributePath & path) {
         if (path.mAttributeId != app::Clusters::Basic::Attributes::VendorID::Id &&
-            path.mAttributeId != app::Clusters::Basic::Attributes::ProductID::Id &&
-            path.mAttributeId != app::Clusters::Basic::Attributes::SoftwareVersion::Id)
+            path.mAttributeId != app::Clusters::Basic::Attributes::ProductID::Id)
         {
             // Continue on
             return CHIP_NO_ERROR;
@@ -1599,9 +1599,6 @@ void DeviceCommissioner::OnDone()
             return this->mAttributeCache->Get<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(path, info.basic.vendorId);
         case app::Clusters::Basic::Attributes::ProductID::Id:
             return this->mAttributeCache->Get<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(path, info.basic.productId);
-        case app::Clusters::Basic::Attributes::SoftwareVersion::Id:
-            return this->mAttributeCache->Get<app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(
-                path, info.basic.softwareVersion);
         default:
             return CHIP_NO_ERROR;
         }
@@ -1609,6 +1606,7 @@ void DeviceCommissioner::OnDone()
     // Try to parse as much as we can here before returning, even if this is an error.
     return_err = err == CHIP_NO_ERROR ? return_err : err;
 
+    // Set the network cluster endpoints first so we can match up the connection times.
     err = mAttributeCache->ForEachAttribute(
         app::Clusters::NetworkCommissioning::Id, [this, &info](const app::ConcreteAttributePath & path) {
             if (path.mAttributeId != app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id)
@@ -1623,31 +1621,57 @@ void DeviceCommissioner::OnDone()
                 {
                     if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
                     {
-                        info.network.wifi = path.mEndpointId;
+                        info.network.wifi.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
                     {
-                        info.network.thread = path.mEndpointId;
+                        info.network.thread.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
                     {
-                        info.network.eth = path.mEndpointId;
+                        info.network.eth.endpoint = path.mEndpointId;
                     }
                     else
                     {
                         // TODO: Gross workaround for the empty feature map on all clusters. Remove.
-                        if (info.network.thread == kInvalidEndpointId)
+                        if (info.network.thread.endpoint == kInvalidEndpointId)
                         {
-                            info.network.thread = path.mEndpointId;
+                            info.network.thread.endpoint = path.mEndpointId;
                         }
-                        if (info.network.wifi == kInvalidEndpointId)
+                        if (info.network.wifi.endpoint == kInvalidEndpointId)
                         {
-                            info.network.wifi = path.mEndpointId;
+                            info.network.wifi.endpoint = path.mEndpointId;
                         }
                     }
                 }
+            }
+            return CHIP_NO_ERROR;
+        });
+    return_err = err == CHIP_NO_ERROR ? return_err : err;
+
+    err = mAttributeCache->ForEachAttribute(
+        app::Clusters::NetworkCommissioning::Id, [this, &info](const app::ConcreteAttributePath & path) {
+            if (path.mAttributeId != app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id)
+            {
+                return CHIP_NO_ERROR;
+            }
+            app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableArgType time;
+            ReturnErrorOnFailure(
+                this->mAttributeCache->Get<app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo>(path,
+                                                                                                                             time));
+            if (path.mEndpointId == info.network.wifi.endpoint)
+            {
+                info.network.wifi.minConnectionTime = time;
+            }
+            else if (path.mEndpointId == info.network.thread.endpoint)
+            {
+                info.network.thread.minConnectionTime = time;
+            }
+            else if (path.mEndpointId == info.network.eth.endpoint)
+            {
+                info.network.eth.minConnectionTime = time;
             }
             return CHIP_NO_ERROR;
         });
@@ -1758,8 +1782,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         readPaths[5] = app::AttributePathParams(endpoint, app::Clusters::Basic::Id, app::Clusters::Basic::Attributes::VendorID::Id);
         readPaths[6] =
             app::AttributePathParams(endpoint, app::Clusters::Basic::Id, app::Clusters::Basic::Attributes::ProductID::Id);
-        readPaths[7] =
-            app::AttributePathParams(endpoint, app::Clusters::Basic::Id, app::Clusters::Basic::Attributes::SoftwareVersion::Id);
+        // Read the requested minimum connection times from all network commissioning clusters
+        readPaths[7] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
+                                                app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id);
 
         readParams.mpAttributePathParamsList    = readPaths;
         readParams.mAttributePathParamsListSize = 8;

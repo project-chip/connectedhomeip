@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -169,7 +169,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
     // Computing it here will save computational overhead when it's accessed by other
     // parts of the code.
     SuccessOrExit(err = ExtractNodeIdFabricIdFromOpCert(ByteSpan(info->mNOCCert, nocCertLen), &nodeId, &mFabricId));
-    SuccessOrExit(err = GeneratePeerId(mFabricId, nodeId, &mOperationalId));
+    SuccessOrExit(err = GetCompressedId(mFabricId, nodeId, &mOperationalId));
 
     SuccessOrExit(err = SetICACert(ByteSpan(info->mICACert, icaCertLen)));
     SuccessOrExit(err = SetNOCCert(ByteSpan(info->mNOCCert, nocCertLen)));
@@ -182,7 +182,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
+CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
 {
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
@@ -312,16 +312,28 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     NodeId nodeId;
     ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(certificates.GetLastCert()[0], &nodeId, &fabricId));
 
+    FabricId icacFabricId = kUndefinedFabricId;
     if (!icac.empty())
     {
-        FabricId icacFabric = kUndefinedFabricId;
-        if (ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabric) == CHIP_NO_ERROR && icacFabric != kUndefinedFabricId)
+        if (ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabricId) == CHIP_NO_ERROR &&
+            icacFabricId != kUndefinedFabricId)
         {
-            ReturnErrorCodeIf(icacFabric != fabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
+            ReturnErrorCodeIf(icacFabricId != fabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
         }
     }
 
-    ReturnErrorOnFailure(GeneratePeerId(fabricId, nodeId, &nocPeerId));
+    FabricId rcacFabricId = kUndefinedFabricId;
+    if (ExtractFabricIdFromCert(certificates.GetCertSet()[0], &rcacFabricId) == CHIP_NO_ERROR && rcacFabricId != kUndefinedFabricId)
+    {
+        ReturnErrorCodeIf(rcacFabricId != fabricId, CHIP_ERROR_WRONG_CERT_DN);
+        if (!icac.empty())
+        {
+            // If FabricId attribute is present in RCAC then it SHOULD be present in ICAC as well.
+            ReturnErrorCodeIf(icacFabricId == kUndefinedFabricId, CHIP_ERROR_WRONG_CERT_DN);
+        }
+    }
+
+    ReturnErrorOnFailure(GetCompressedId(fabricId, nodeId, &nocPeerId));
     nocPubkey = P256PublicKey(certificates.GetLastCert()[0].mPublicKey);
 
     return CHIP_NO_ERROR;

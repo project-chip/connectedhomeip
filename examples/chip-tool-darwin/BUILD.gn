@@ -23,6 +23,8 @@ executable("chip-tool-darwin") {
   sources = [
     "commands/clusters/ModelCommandBridge.mm",
     "commands/common/CHIPCommandBridge.mm",
+    "commands/common/CHIPCommandStorageDelegate.mm",
+    "commands/common/CHIPToolKeypair.mm",
     "commands/pairing/Commands.h",
     "commands/pairing/PairingCommandBridge.mm",
     "commands/pairing/PairingDelegateBridge.mm",

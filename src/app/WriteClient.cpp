@@ -240,6 +240,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
     ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(reservedSize));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
+    mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
     mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();

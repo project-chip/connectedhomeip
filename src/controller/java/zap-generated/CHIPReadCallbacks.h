@@ -6983,6 +6983,96 @@ private:
     bool keepAlive;
 };
 
+class CHIPTemperatureMeasurementMeasuredValueAttributeCallback
+    : public chip::Callback::Callback<CHIPTemperatureMeasurementClusterMeasuredValueAttributeCallbackType>
+{
+public:
+    CHIPTemperatureMeasurementMeasuredValueAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTemperatureMeasurementMeasuredValueAttributeCallback();
+
+    static void maybeDestroy(CHIPTemperatureMeasurementMeasuredValueAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTemperatureMeasurementMeasuredValueAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPTemperatureMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback
+    : public chip::Callback::Callback<CHIPTemperatureMeasurementClusterMinMeasuredValueAttributeCallbackType>
+{
+public:
+    CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback();
+
+    static void maybeDestroy(CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback
+    : public chip::Callback::Callback<CHIPTemperatureMeasurementClusterMaxMeasuredValueAttributeCallbackType>
+{
+public:
+    CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback();
+
+    static void maybeDestroy(CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPTemperatureMeasurementAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPTemperatureMeasurementClusterAttributeListAttributeCallbackType>
 {

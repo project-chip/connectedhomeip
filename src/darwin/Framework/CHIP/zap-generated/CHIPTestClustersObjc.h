@@ -1105,9 +1105,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestTemperatureMeasurement : CHIPTemperatureMeasurement
 
-- (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeMaxMeasuredValueWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMinMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMaxMeasuredValueWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeToleranceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
