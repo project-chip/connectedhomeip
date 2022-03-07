@@ -200,22 +200,26 @@
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 // Use a wildcard subscription
-                [chipDevice subscribeWithQueue:dispatch_get_main_queue() minInterval:minIntervalSeconds maxInterval:maxIntervalSeconds reportHandler:^(NSArray<CHIPAttributeReport *> * _Nullable reports, NSError * _Nullable error) {
-                    if (error) {
-                        NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
-                        return;
-                    }
-                    for (CHIPAttributeReport * report in reports)
-                    {
-                        // These should be exposed by the SDK
-                        if ([report.path.cluster isEqualToNumber:@(1026)] && [report.path.attribute isEqualToNumber:@(0)])
-                        {
-                            [self updateTempInUI:((NSNumber *)report.value).shortValue];
-                        }
-                    }
-                } subscriptionEstablished:^{
+                [chipDevice subscribeWithQueue:dispatch_get_main_queue()
+                                   minInterval:minIntervalSeconds
+                                   maxInterval:maxIntervalSeconds
+                                 reportHandler:^(NSArray<CHIPAttributeReport *> * _Nullable reports, NSError * _Nullable error) {
+                                     if (error) {
+                                         NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
+                                             [error description]);
+                                         return;
+                                     }
+                                     for (CHIPAttributeReport * report in reports) {
+                                         // These should be exposed by the SDK
+                                         if ([report.path.cluster isEqualToNumber:@(1026)] &&
+                                             [report.path.attribute isEqualToNumber:@(0)]) {
+                                             [self updateTempInUI:((NSNumber *) report.value).shortValue];
+                                         }
+                                     }
+                                 }
+                       subscriptionEstablished:^ {
 
-                }];
+                       }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
