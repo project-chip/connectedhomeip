@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -67,8 +67,10 @@ constexpr size_t kMAX_CSR_Length = 255;
 
 constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 
-constexpr size_t kMin_Salt_Length = 16;
-constexpr size_t kMax_Salt_Length = 32;
+constexpr size_t kSpake2p_Min_PBKDF_Salt_Length  = 16;
+constexpr size_t kSpake2p_Max_PBKDF_Salt_Length  = 32;
+constexpr uint32_t kSpake2p_Min_PBKDF_Iterations = 1000;
+constexpr uint32_t kSpake2p_Max_PBKDF_Iterations = 100000;
 
 constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
 constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
@@ -91,6 +93,9 @@ constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
 constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1 sign stuffer
 
 constexpr size_t kMAX_Hash_SHA256_Context_Size = CHIP_CONFIG_SHA256_CONTEXT_SIZE;
+
+constexpr size_t kSpake2p_WS_Length                 = kP256_FE_Length + 8;
+constexpr size_t kSpake2p_VerifierSerialized_Length = kP256_FE_Length + kP256_Point_Length;
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
@@ -849,7 +854,7 @@ public:
      * @param my_identity_len   The verifier identity length.
      * @param peer_identity     The peer identity. May be NULL if identities are not established.
      * @param peer_identity_len The peer identity length.
-     * @param w0in              The input w0 (an output from the PBKDF).
+     * @param w0in              The input w0 (a parameter baked into the device or computed with ComputeW0).
      * @param w0in_len          The input w0 length.
      * @param Lin               The input L (a parameter baked into the device or computed with ComputeL).
      * @param Lin_len           The input L length.
@@ -1046,6 +1051,18 @@ public:
     virtual CHIP_ERROR PointIsValid(void * R) = 0;
 
     /*
+     *   @synopsis Compute w0sin mod p
+     *
+     *   @param w0out       Output field element (modulo p)
+     *   @param w0_len      Output field element length
+     *   @param w1sin       Input field element
+     *   @param w1sin_len   Input field element length
+     *
+     *   @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len) = 0;
+
+    /*
      *   @synopsis Compute w1in*G
      *
      *   @param Lout        Output point in 0x04 || X || Y format.
@@ -1208,6 +1225,8 @@ public:
     CHIP_ERROR PointInvert(void * R) override;
     CHIP_ERROR PointCofactorMul(void * R) override;
     CHIP_ERROR PointIsValid(void * R) override;
+
+    CHIP_ERROR ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len) override;
     CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
 
 protected:
@@ -1223,6 +1242,55 @@ private:
 
     Spake2pOpaqueContext mSpake2pContext;
 };
+
+/**
+ * @brief Class used for verifying PASE secure sessions.
+ **/
+class Spake2pVerifier
+{
+public:
+    uint8_t mW0[kP256_FE_Length];
+    uint8_t mL[kP256_Point_Length];
+
+    CHIP_ERROR Serialize(MutableByteSpan & outSerialized) const;
+    CHIP_ERROR Deserialize(const ByteSpan & inSerialized);
+
+    /**
+     * @brief Generate the Spake2+ verifier.
+     *
+     * @param pbkdf2IterCount Iteration count for PBKDF2 function
+     * @param salt            Salt to be used for Spake2+ operation
+     * @param setupPin        Provided setup PIN (passcode)
+     *
+     * @return CHIP_ERROR     The result of Spake2+ verifier generation
+     */
+    CHIP_ERROR Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin);
+
+    /**
+     * @brief Compute the initiator values (w0, w1) used for PAKE input.
+     *
+     * @param pbkdf2IterCount Iteration count for PBKDF2 function
+     * @param salt            Salt to be used for Spake2+ operation
+     * @param setupPin        Provided setup PIN (passcode)
+     * @param ws              The output pair (w0, w1) stored sequentially
+     * @param ws_len          The output length
+     *
+     * @return CHIP_ERROR     The result from running PBKDF2
+     */
+    static CHIP_ERROR ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin, uint8_t * ws,
+                                uint32_t ws_len);
+};
+
+/**
+ * @brief Serialized format of the Spake2+ Verifier components.
+ *
+ *  This is used when the Verifier should be presented in a serialized form.
+ *  For example, when it is generated using PBKDF function, when stored in the
+ *  memory or when sent over the wire.
+ *  The serialized format is concatentation of 'W0' and 'L' verifier components:
+ *      { Spake2pVerifier.mW0[kP256_FE_Length], Spake2pVerifier.mL[kP256_Point_Length] }
+ **/
+typedef uint8_t Spake2pVerifierSerialized[kSpake2p_VerifierSerialized_Length];
 
 /**
  * @brief Compute the compressed fabric identifier used for operational discovery service

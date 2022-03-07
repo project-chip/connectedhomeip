@@ -8,18 +8,13 @@
         "../../../../../src/app/zap-templates/templates/app/helper.js",
         "../../../../../src/app/zap-templates/templates/chip/helper.js",
         "../../../../../src/app/zap-templates/common/ClusterTestGeneration.js",
-        "helper.js",
-        "tests.js"
+        "helper.js"
     ],
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [
         {
             "name": "header",
             "path": "../../../../../src/app/zap-templates/partials/header.zapt"
-        },
-        {
-            "name": "test_cluster",
-            "path": "partials/test_cluster.zapt"
         },
         {
             "name": "CHIPCallbackBridge",
@@ -32,14 +27,6 @@
         {
             "name": "decode_value",
             "path": "partials/decode_value.zapt"
-        },
-        {
-            "name": "test_value",
-            "path": "partials/test_value.zapt"
-        },
-        {
-            "name": "check_test_value",
-            "path": "partials/check_test_value.zapt"
         },
         {
             "name": "init_struct_member",
@@ -114,11 +101,6 @@
             "path": "CHIPAttributeTLVValueDecoder-src.zapt",
             "name": "Decode TLV attribute values into Objc objects",
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPAttributeTLVValueDecoder.mm"
-        },
-        {
-            "path": "clusters-tests.zapt",
-            "name": "Cluster Tests",
-            "output": "src/darwin/Framework/CHIPTests/CHIPClustersTests.m"
         }
     ]
 }

@@ -15,6 +15,7 @@
 name: 21.8.3. [TC-MC-6.3] Advanced Seek Media Playback Verification
 
 config:
+    nodeId: 0x12344321
     cluster: "Media Playback"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #issue #12884 Media cluster commands and precondition not supported
     - labe: "Precondition: Connect media content available for playback"
@@ -62,7 +67,7 @@ tests:
     - label: "Reads the SampledPosition attribute"
       disabled: true
       command: "readAttribute"
-      attribute: "position"
+      attribute: "SampledPosition"
       response:
           value: 10000
 
@@ -93,6 +98,6 @@ tests:
     - label: "Reads the SampledPosition attribute"
       disabled: true
       command: "readAttribute"
-      attribute: "position"
+      attribute: "SampledPosition"
       response:
           error: 5

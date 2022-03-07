@@ -15,6 +15,7 @@
 name: 45.1.4. [TC-SWDIAG-3.1] Command received functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Software Diagnostics"
     endpoint: 0
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Sends ResetWatermarks to DUT"
       command: "ResetWatermarks"
@@ -36,18 +41,22 @@ tests:
           # TODO: Say something about the values?
           value: {}
 
+    #issue #830
     - label: "Reads CurrentHeapUsed attribute value from DUT"
       optional: true
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
       PICS: A_CURRENTHEAPUSED
       response:
-          value: 0
+          constraints:
+              type: uint64
 
+    #issue #830
     - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
       optional: true
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
       PICS: A_CURRENTHEAPHIGHWATERMARK
       response:
-          value: 0
+          constraints:
+              type: uint64

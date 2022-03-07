@@ -15,6 +15,7 @@
 name: 21.5.3. [TC-MC-3.10] Show and Hide Input Status Verification
 
 config:
+    nodeId: 0x12344321
     cluster: "Media Input"
     endpoint: 1
 
@@ -22,12 +23,16 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     # TDOD: Enable when SDK supports command
     - label: "Hide Input Status Command"
       disabled: true
-      command: "HideInputStatusRequest"
+      command: "HideInputStatus"
     # TDOD: Enable when SDK supports command
     - label: "Show Input Status Command"
       disabled: true
-      command: "ShowInputStatusRequest"
+      command: "ShowInputStatus"

@@ -16,8 +16,29 @@ except:
 
 
 class MatterIdlTransformer(Transformer):
-    """A transformer capable to transform data
-       parsed by Lark according to matter_grammar.lark
+    """
+    A transformer capable to transform data parsed by Lark according to 
+    matter_grammar.lark.
+
+    Generally transforms a ".matter" file into an Abstract Syntax Tree (AST).
+    End result will be a `matter_idl_types.Idl` value that represents the
+    entire parsed .matter file.
+
+    The content of this file closely resembles the .lark input file and its
+    purpose is to convert LARK tokens (that ar generally inputted by name)
+    into underlying python types.
+
+    Some documentation to get started is available at 
+    https://lark-parser.readthedocs.io/en/latest/visitors.html#transformer
+
+    TLDR would be:
+      When the ".lark" defines a token like `foo: number`, the transformer
+      has the option to define a method called `foo` which will take the
+      parsed input (as strings unless transformed) and interpret them.
+
+      Actual parametes to the methods depend on the rules multiplicity and/or
+      optionality.
+
     """
 
     def number(self, tokens):
@@ -221,10 +242,15 @@ class MatterIdlTransformer(Transformer):
 
 
 def CreateParser():
+    """
+    Generates a parser that will process a ".matter" file into a IDL
+    """
     return Lark.open('matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', transformer=MatterIdlTransformer())
 
 
 if __name__ == '__main__':
+    # This Parser is generally not intended to be run as a stand-alone binary.
+    # The ability to run is for debug and to print out the parsed AST.
     import click
     import coloredlogs
 

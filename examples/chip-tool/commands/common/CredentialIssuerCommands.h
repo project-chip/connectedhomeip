@@ -20,6 +20,7 @@
 
 #include <app/util/basic-types.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
@@ -46,10 +47,12 @@ public:
      *
      * @param[in] setupParams A reference to the Setup/Commissioning Parameters, to be initialized with custom Device Attestation
      *                        Verifier.
+     * @param[in] trustStore  A pointer to the PAA trust store to use to find valid PAA roots.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams) = 0;
+    virtual CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
+                                              const chip::Credentials::AttestationTrustStore * trustStore) = 0;
 
     virtual chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() = 0;
 

@@ -31,6 +31,7 @@ namespace DeviceLayer {
 class GenericOTARequestorDriver : public OTARequestorDriver
 {
 public:
+    //// Public API methods
     /**
      * Called to perform some initialization including:
      *   - Set the OTA requestor instance used to direct download progress
@@ -42,10 +43,20 @@ public:
         mImageProcessor = processor;
     }
 
+    // Set the timeout (in seconds) for querying providers on the default OTA provider list; must be non-zero
+    void SetPeriodicQueryTimeout(uint32_t timeout)
+    {
+        if (timeout != 0)
+        {
+            mPeriodicQueryTimeInterval = timeout;
+        }
+    }
+
+    //// Virtual methods from OTARequestorDriver
     bool CanConsent() override;
     uint16_t GetMaxDownloadBlockSize() override;
-
     void HandleError(UpdateFailureState state, CHIP_ERROR error) override;
+    void HandleIdleState() override;
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
     void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;
     void UpdateDownloaded() override;
@@ -53,12 +64,29 @@ public:
     void UpdateSuspended(System::Clock::Seconds32 delay) override;
     void UpdateDiscontinued() override;
     void UpdateCancelled() override;
+    void OTACommissioningCallback() override;
+    void ProcessAnnounceOTAProviders(const ProviderLocationType & providerLocation,
+                                     app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
+    void SendQueryImage() override;
 
-private:
-    void ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action);
+    // Returns the next available Provider location
+    bool DetermineProviderLocation(
+        app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) override;
+
+protected:
+    void StartDefaultProviderTimer();
+    void StopDefaultProviderTimer();
+    void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
+    void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
+    void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
 
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
+    uint32_t mOtaStartDelaySec                   = 0;
+    uint32_t mPeriodicQueryTimeInterval = (24 * 60 * 60); // Timeout for querying providers on the default OTA provider list
+
+    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    ProviderLocationType mLastUsedProvider; // Provider location used for the last query or update
 };
 
 } // namespace DeviceLayer

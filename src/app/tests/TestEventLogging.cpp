@@ -22,6 +22,7 @@
  *
  */
 
+#include <access/SubjectDescriptor.h>
 #include <app/ClusterInfo.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
@@ -60,9 +61,9 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int Initialize(void * context)
+    static int InitializeAsync(void * context)
     {
-        if (AppContext::Initialize(context) != SUCCESS)
+        if (AppContext::InitializeAsync(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -141,7 +142,7 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     uint8_t backingStore[1024];
     size_t totalNumElements;
     writer.Init(backingStore, 1024);
-    err = alogMgmt.FetchEventsSince(writer, clusterInfo, startingEventNumber, eventCount, 0);
+    err = alogMgmt.FetchEventsSince(writer, clusterInfo, startingEventNumber, eventCount, chip::Access::SubjectDescriptor{});
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV);
 
     reader.Init(backingStore, writer.GetLengthWritten());
@@ -294,7 +295,7 @@ nlTestSuite sSuite =
 {
     "EventLogging",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on

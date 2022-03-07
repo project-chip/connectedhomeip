@@ -8,16 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import androidx.appcompat.widget.MenuItemHoverListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ChipIdLookup
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.SubscriptionEstablishedCallback
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipPathId
+import chip.devicecontroller.model.NodeState
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
+import java.lang.StringBuilder
 import kotlinx.android.synthetic.main.wildcard_fragment.attributeIdEd
 import kotlinx.android.synthetic.main.wildcard_fragment.clusterIdEd
 import kotlinx.android.synthetic.main.wildcard_fragment.endpointIdEd
@@ -37,17 +39,15 @@ class WildcardFragment : Fragment() {
 
   private val reportCallback = object : ReportCallback {
     override fun onError(attributePath: ChipAttributePath, ex: Exception) {
-      Log.i(TAG, "Report error for $attributePath: $ex")
+      Log.e(TAG, "Report error for $attributePath: $ex")
     }
 
-    override fun onReport(values: Map<ChipAttributePath, Any?>) {
-      Log.i(TAG, "Received report with ${values.size} values")
-      val builder = StringBuilder()
-      values.forEach { builder.append("${it.key}: ${it.value}\n") }
-      val output = builder.toString()
+    override fun onReport(nodeState: NodeState) {
+      Log.i(TAG, "Received wildcard report")
 
-      Log.i(TAG, output)
-      requireActivity().runOnUiThread { outputTv.text = output }
+      val debugString = nodeStateToDebugString(nodeState)
+      Log.i(TAG, debugString)
+      requireActivity().runOnUiThread { outputTv.text = debugString }
     }
   }
 
@@ -66,6 +66,23 @@ class WildcardFragment : Fragment() {
     }
   }
 
+  private fun nodeStateToDebugString(nodeState: NodeState): String {
+    val stringBuilder = StringBuilder()
+    nodeState.endpointStates.forEach { (endpointId, endpointState) ->
+      stringBuilder.append("Endpoint $endpointId: {\n")
+      endpointState.clusterStates.forEach { (clusterId, clusterState) ->
+        stringBuilder.append("\t${ChipIdLookup.clusterIdToName(clusterId)}Cluster: {\n")
+        clusterState.attributeStates.forEach { (attributeId, attributeState) ->
+          val attributeName = ChipIdLookup.attributeIdToName(clusterId, attributeId)
+          stringBuilder.append("\t\t$attributeName: ${attributeState.value}\n")
+        }
+        stringBuilder.append("\t}\n")
+      }
+      stringBuilder.append("}\n")
+    }
+    return stringBuilder.toString()
+  }
+
   private suspend fun subscribe(minInterval: Int, maxInterval: Int) {
     val subscriptionEstablishedCallback =
       SubscriptionEstablishedCallback { Log.i(TAG, "Subscription to device established") }
@@ -79,7 +96,7 @@ class WildcardFragment : Fragment() {
                                      reportCallback,
                                      ChipClient.getConnectedDevicePointer(requireContext(),
                                                                           addressUpdateFragment.deviceId),
-                                     attributePath,
+                                     listOf(attributePath),
                                      minInterval,
                                      maxInterval)
   }
@@ -93,7 +110,7 @@ class WildcardFragment : Fragment() {
     deviceController.readPath(reportCallback,
                               ChipClient.getConnectedDevicePointer(requireContext(),
                                                                    addressUpdateFragment.deviceId),
-                              attributePath)
+                              listOf(attributePath))
   }
 
   private fun showSubscribeDialog() {

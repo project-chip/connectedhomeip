@@ -15,6 +15,7 @@
 name: 27.2.1. [TC-CC-2.1] Attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
@@ -22,12 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
-
-    - label: "Reads mandatory attribute: CurrentHue"
-      command: "readAttribute"
-      attribute: "current hue"
-      response:
-          value: 0
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Validate constraints of attribute: current hue"
       command: "readAttribute"
@@ -49,12 +48,6 @@ tests:
     - label: "Reads back mandatory attribute: CurrentHue"
       command: "readAttribute"
       attribute: "current hue"
-      response:
-          value: 0
-
-    - label: "Reads mandatory attribute: CurrentSaturation"
-      command: "readAttribute"
-      attribute: "current saturation"
       response:
           value: 0
 
@@ -81,12 +74,6 @@ tests:
       response:
           value: 0
 
-    - label: "Read the mandatory attribute: CurrentX"
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          value: 24939
-
     - label: "Validate constraints of attribute: CurrentX"
       command: "readAttribute"
       attribute: "current x"
@@ -110,12 +97,6 @@ tests:
       response:
           value: 24939
 
-    - label: "Read the mandatory attribute: CurrentY"
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          value: 24701
-
     - label: "Validate constraints of attribute: CurrentY"
       command: "readAttribute"
       attribute: "current y"
@@ -138,13 +119,6 @@ tests:
       attribute: "current y"
       response:
           value: 24701
-
-    - label: "Read the mandatory attribute: ColorTemperatureMireds"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color temperature"
-      response:
-          value: 250
 
     - label: "Validate constraints of attribute: ColorTemperatureMireds"
       command: "readAttribute"
@@ -173,13 +147,6 @@ tests:
       response:
           value: 250
 
-    - label: "Read the mandatory attribute: ColorMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color mode"
-      response:
-          value: 1
-
     - label: "Validate constraints of attribute: ColorMode"
       command: "readAttribute"
       attribute: "color mode"
@@ -205,12 +172,6 @@ tests:
       response:
           value: 1
 
-    - label: "Read the mandatory attribute: Options"
-      command: "readAttribute"
-      attribute: "color control options"
-      response:
-          value: 0
-
     - label: "Validate constraints of attribute: Options"
       command: "readAttribute"
       attribute: "color control options"
@@ -227,12 +188,6 @@ tests:
     - label: "Reads back mandatory attribute: Options"
       command: "readAttribute"
       attribute: "color control options"
-      response:
-          value: 0
-
-    - label: "Read the mandatory attribute: EnhancedCurrentHue"
-      command: "readAttribute"
-      attribute: "enhanced current hue"
       response:
           value: 0
 
@@ -258,13 +213,6 @@ tests:
       response:
           value: 0
 
-    - label: "Read the mandatory attribute: EnhancedColorMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "enhanced color mode"
-      response:
-          value: 1
-
     - label: "Validate constraints of attribute: EnhancedColorMode"
       command: "readAttribute"
       attribute: "enhanced color mode"
@@ -289,12 +237,6 @@ tests:
       response:
           value: 1
 
-    - label: "Read the mandatory attribute: ColorLoopActive"
-      command: "readAttribute"
-      attribute: "color loop active"
-      response:
-          value: 0
-
     - label: "Validate constraints of attribute: ColorLoopActive"
       command: "readAttribute"
       attribute: "color loop active"
@@ -313,12 +255,6 @@ tests:
     - label: "Reads back mandatory attribute: ColorLoopActive"
       command: "readAttribute"
       attribute: "color loop active"
-      response:
-          value: 0
-
-    - label: "Read the mandatory attribute: ColorLoopDirection"
-      command: "readAttribute"
-      attribute: "color loop direction"
       response:
           value: 0
 
@@ -344,12 +280,6 @@ tests:
       response:
           value: 0
 
-    - label: "Read the mandatory attribute: ColorLoopTime"
-      command: "readAttribute"
-      attribute: "color loop time"
-      response:
-          value: 25
-
     - label: "Validate constraints of attribute: ColorLoopTime"
       command: "readAttribute"
       attribute: "color loop time"
@@ -370,12 +300,6 @@ tests:
       attribute: "color loop time"
       response:
           value: 25
-
-    - label: "Read the mandatory attribute: ColorLoopStartEnhancedHue"
-      command: "readAttribute"
-      attribute: "color loop start enhanced hue"
-      response:
-          value: 8960
 
     - label: "Validate constraints of attribute: ColorLoopStartEnhancedHue"
       command: "readAttribute"
@@ -400,12 +324,6 @@ tests:
       response:
           value: 8960
 
-    - label: "Read the mandatory attribute: ColorLoopStoredEnhancedHue"
-      command: "readAttribute"
-      attribute: "color loop stored enhanced hue"
-      response:
-          value: 0
-
     - label: "Validate constraints of attribute: ColorLoopStoredEnhancedHue"
       command: "readAttribute"
       attribute: "color loop stored enhanced hue"
@@ -429,12 +347,6 @@ tests:
       response:
           value: 0
 
-    - label: "Read the mandatory attribute: ColorCapabilities"
-      command: "readAttribute"
-      attribute: "color capabilities"
-      response:
-          value: 0
-
     - label: "Validate constraints of attribute: ColorCapabilities"
       command: "readAttribute"
       attribute: "color capabilities"
@@ -442,7 +354,7 @@ tests:
           constraints:
               type: map16
               minValue: 0
-              maxValue: 65279
+              maxValue: 31
 
     - label:
           "Write the default values to mandatory attribute: ColorCapabilities"
@@ -456,12 +368,6 @@ tests:
     - label: "Reads back mandatory attribute: ColorCapabilities"
       command: "readAttribute"
       attribute: "color capabilities"
-      response:
-          value: 0
-
-    - label: "Read the mandatory attribute: ColorTempPhysicalMinMireds"
-      command: "readAttribute"
-      attribute: "color temp physical min"
       response:
           value: 0
 
@@ -489,12 +395,6 @@ tests:
       attribute: "color temp physical min"
       response:
           value: 0
-
-    - label: "Read the mandatory attribute: ColorTempPhysicalMaxMireds"
-      command: "readAttribute"
-      attribute: "color temp physical max"
-      response:
-          value: 65279
 
     - label: "Validate constraints of attribute: ColorTempPhysicalMaxMireds"
       command: "readAttribute"
@@ -573,13 +473,6 @@ tests:
       response:
           value: 0
 
-    - label: "Read the Optional attribute: RemainingTime"
-      optional: true
-      command: "readAttribute"
-      attribute: "remaining time"
-      response:
-          value: 0
-
     - label: "Validate constraints of attribute: RemainingTime"
       optional: true
       command: "readAttribute"
@@ -587,8 +480,6 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
-              maxValue: 254
 
     - label: "Write the default values to optional attribute: RemainingTime"
       optional: true

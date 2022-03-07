@@ -124,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _capacity = @(0);
+        _capacity = nil;
 
         _groupList = [NSArray array];
     }
@@ -973,40 +973,6 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _warningEvent = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBindingClusterBindParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _nodeId = @(0);
-
-        _groupId = @(0);
-
-        _endpointId = @(0);
-
-        _clusterId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBindingClusterUnbindParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _nodeId = @(0);
-
-        _groupId = @(0);
-
-        _endpointId = @(0);
-
-        _clusterId = @(0);
     }
     return self;
 }
@@ -3259,7 +3225,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPChannelClusterChangeChannelRequestParams
+@implementation CHIPChannelClusterChangeChannelParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3275,15 +3241,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _channelMatch = [CHIPChannelClusterChannelInfo new];
+        _status = @(0);
 
-        _errorType = @(0);
+        _data = nil;
     }
     return self;
 }
 @end
 
-@implementation CHIPChannelClusterChangeChannelByNumberRequestParams
+@implementation CHIPChannelClusterChangeChannelByNumberParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3296,7 +3262,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPChannelClusterSkipChannelRequestParams
+@implementation CHIPChannelClusterSkipChannelParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3307,7 +3273,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTargetNavigatorClusterNavigateTargetRequestParams
+@implementation CHIPTargetNavigatorClusterNavigateTargetParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3333,7 +3299,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterSkipForwardRequestParams
+@implementation CHIPMediaPlaybackClusterSkipForwardParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3344,7 +3310,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterSkipBackwardRequestParams
+@implementation CHIPMediaPlaybackClusterSkipBackwardParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3361,12 +3327,14 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _status = @(0);
+
+        _data = nil;
     }
     return self;
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterSeekRequestParams
+@implementation CHIPMediaPlaybackClusterSeekParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3377,7 +3345,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaInputClusterSelectInputRequestParams
+@implementation CHIPMediaInputClusterSelectInputParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3388,7 +3356,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaInputClusterRenameInputRequestParams
+@implementation CHIPMediaInputClusterRenameInputParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3401,7 +3369,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPKeypadInputClusterSendKeyRequestParams
+@implementation CHIPKeypadInputClusterSendKeyParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3423,12 +3391,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchContentRequestParams
+@implementation CHIPContentLauncherClusterLaunchContentParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _search = [NSArray array];
+        _search = [CHIPContentLauncherClusterContentSearch new];
 
         _autoPlay = @(0);
 
@@ -3438,7 +3406,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchURLRequestParams
+@implementation CHIPContentLauncherClusterLaunchURLParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3466,7 +3434,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAudioOutputClusterSelectOutputRequestParams
+@implementation CHIPAudioOutputClusterSelectOutputParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3477,7 +3445,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAudioOutputClusterRenameOutputRequestParams
+@implementation CHIPAudioOutputClusterRenameOutputParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3490,7 +3458,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterLaunchAppRequestParams
+@implementation CHIPApplicationLauncherClusterLaunchAppParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3503,7 +3471,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterStopAppRequestParams
+@implementation CHIPApplicationLauncherClusterStopAppParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3514,7 +3482,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterHideAppRequestParams
+@implementation CHIPApplicationLauncherClusterHideAppParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3538,7 +3506,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAccountLoginClusterGetSetupPINRequestParams
+@implementation CHIPAccountLoginClusterGetSetupPINParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3560,7 +3528,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAccountLoginClusterLoginRequestParams
+@implementation CHIPAccountLoginClusterLoginParams
 - (instancetype)init
 {
     if (self = [super init]) {

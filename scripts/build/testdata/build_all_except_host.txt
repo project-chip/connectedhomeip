@@ -8,7 +8,7 @@ bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {ro
 bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-light lighting-app'
 
 # Generating ameba-amebad-pigweed
-bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-pigweed pigweed-app'
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh -r {root} ninja {out}/ameba-amebad-pigweed pigweed-app'
 
 # Generating JARs for Java build rules test
 python3 build/chip/java/tests/generate_jars_for_test.py
@@ -187,6 +187,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4161a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-lock-rpc
 
+# Generating efr32-brd4161a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-switch
+
 # Generating efr32-brd4161a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-unit-test
 
@@ -204,6 +207,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating efr32-brd4163a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4163A" import("//with_pw_rpc.gni")' {out}/efr32-brd4163a-lock-rpc
+
+# Generating efr32-brd4163a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-switch
 
 # Generating efr32-brd4163a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4163A"' {out}/efr32-brd4163a-unit-test
@@ -223,6 +229,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4164a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4164A" import("//with_pw_rpc.gni")' {out}/efr32-brd4164a-lock-rpc
 
+# Generating efr32-brd4164a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-switch
+
 # Generating efr32-brd4164a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4164A"' {out}/efr32-brd4164a-unit-test
 
@@ -240,6 +249,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating efr32-brd4166a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4166A" import("//with_pw_rpc.gni")' {out}/efr32-brd4166a-lock-rpc
+
+# Generating efr32-brd4166a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-switch
 
 # Generating efr32-brd4166a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4166A"' {out}/efr32-brd4166a-unit-test
@@ -259,6 +271,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4170a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4170A" import("//with_pw_rpc.gni")' {out}/efr32-brd4170a-lock-rpc
 
+# Generating efr32-brd4170a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-switch
+
 # Generating efr32-brd4170a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4170A"' {out}/efr32-brd4170a-unit-test
 
@@ -276,6 +291,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating efr32-brd4186a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4186A" import("//with_pw_rpc.gni")' {out}/efr32-brd4186a-lock-rpc
+
+# Generating efr32-brd4186a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-switch
 
 # Generating efr32-brd4186a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4186A"' {out}/efr32-brd4186a-unit-test
@@ -295,6 +313,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating efr32-brd4187a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4187A" import("//with_pw_rpc.gni")' {out}/efr32-brd4187a-lock-rpc
 
+# Generating efr32-brd4187a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-switch
+
 # Generating efr32-brd4187a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4187A"' {out}/efr32-brd4187a-unit-test
 
@@ -312,6 +333,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating efr32-brd4304a-lock-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4304A" import("//with_pw_rpc.gni")' {out}/efr32-brd4304a-lock-rpc
+
+# Generating efr32-brd4304a-switch
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/light-switch-app/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-switch
 
 # Generating efr32-brd4304a-unit-test
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4304A"' {out}/efr32-brd4304a-unit-test
@@ -408,6 +432,17 @@ rm -f examples/temperature-measurement-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
 idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement reconfigure'
+
+# Generating esp32-devkitc-temperature-measurement-rpc
+mkdir -p {out}/esp32-devkitc-temperature-measurement-rpc
+
+cp examples/temperature-measurement-app/esp32/sdkconfig_rpc.defaults {out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
+
+rm -f examples/temperature-measurement-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
+idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement-rpc reconfigure'
 
 # Generating esp32-m5stack-all-clusters
 mkdir -p {out}/esp32-m5stack-all-clusters
@@ -594,72 +629,72 @@ cmake -S {root}/examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-rele
 
 # Generating nrf-native-posix-64-tests
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-native-posix-64-tests -b native_posix_64 {root}/src/test_driver/nrfconnect'
 
 # Generating nrf-nrf52840dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
 
 # Generating nrf-nrf52840dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-light-rpc -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
 # Generating nrf-nrf52840dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
 
 # Generating nrf-nrf52840dk-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-pump -b nrf52840dk_nrf52840 {root}/examples/pump-app/nrfconnect'
 
 # Generating nrf-nrf52840dk-pump-controller
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-pump-controller -b nrf52840dk_nrf52840 {root}/examples/pump-controller-app/nrfconnect'
 
 # Generating nrf-nrf52840dk-shell
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
 
 # Generating nrf-nrf52840dongle-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf52840 {root}/examples/lighting-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
 # Generating nrf-nrf5340dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-pump -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-pump-controller
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-pump-controller -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-controller-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-shell
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
 
 # Generating qpg-qpg6100-lock
@@ -725,7 +760,11 @@ mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a
 
 cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
+cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libTvCastingApp.so
+
 cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
+
+cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
 
 cp {out}/android-arm-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
 
@@ -805,7 +844,11 @@ mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
+cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libTvCastingApp.so
+
 cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
+
+cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
 
@@ -898,6 +941,9 @@ ninja -C {out}/efr32-brd4161a-lock
 # Building efr32-brd4161a-lock-rpc
 ninja -C {out}/efr32-brd4161a-lock-rpc
 
+# Building efr32-brd4161a-switch
+ninja -C {out}/efr32-brd4161a-switch
+
 # Building efr32-brd4161a-unit-test
 ninja -C {out}/efr32-brd4161a-unit-test
 
@@ -915,6 +961,9 @@ ninja -C {out}/efr32-brd4163a-lock
 
 # Building efr32-brd4163a-lock-rpc
 ninja -C {out}/efr32-brd4163a-lock-rpc
+
+# Building efr32-brd4163a-switch
+ninja -C {out}/efr32-brd4163a-switch
 
 # Building efr32-brd4163a-unit-test
 ninja -C {out}/efr32-brd4163a-unit-test
@@ -934,6 +983,9 @@ ninja -C {out}/efr32-brd4164a-lock
 # Building efr32-brd4164a-lock-rpc
 ninja -C {out}/efr32-brd4164a-lock-rpc
 
+# Building efr32-brd4164a-switch
+ninja -C {out}/efr32-brd4164a-switch
+
 # Building efr32-brd4164a-unit-test
 ninja -C {out}/efr32-brd4164a-unit-test
 
@@ -951,6 +1003,9 @@ ninja -C {out}/efr32-brd4166a-lock
 
 # Building efr32-brd4166a-lock-rpc
 ninja -C {out}/efr32-brd4166a-lock-rpc
+
+# Building efr32-brd4166a-switch
+ninja -C {out}/efr32-brd4166a-switch
 
 # Building efr32-brd4166a-unit-test
 ninja -C {out}/efr32-brd4166a-unit-test
@@ -970,6 +1025,9 @@ ninja -C {out}/efr32-brd4170a-lock
 # Building efr32-brd4170a-lock-rpc
 ninja -C {out}/efr32-brd4170a-lock-rpc
 
+# Building efr32-brd4170a-switch
+ninja -C {out}/efr32-brd4170a-switch
+
 # Building efr32-brd4170a-unit-test
 ninja -C {out}/efr32-brd4170a-unit-test
 
@@ -987,6 +1045,9 @@ ninja -C {out}/efr32-brd4186a-lock
 
 # Building efr32-brd4186a-lock-rpc
 ninja -C {out}/efr32-brd4186a-lock-rpc
+
+# Building efr32-brd4186a-switch
+ninja -C {out}/efr32-brd4186a-switch
 
 # Building efr32-brd4186a-unit-test
 ninja -C {out}/efr32-brd4186a-unit-test
@@ -1006,6 +1067,9 @@ ninja -C {out}/efr32-brd4187a-lock
 # Building efr32-brd4187a-lock-rpc
 ninja -C {out}/efr32-brd4187a-lock-rpc
 
+# Building efr32-brd4187a-switch
+ninja -C {out}/efr32-brd4187a-switch
+
 # Building efr32-brd4187a-unit-test
 ninja -C {out}/efr32-brd4187a-unit-test
 
@@ -1023,6 +1087,9 @@ ninja -C {out}/efr32-brd4304a-lock
 
 # Building efr32-brd4304a-lock-rpc
 ninja -C {out}/efr32-brd4304a-lock-rpc
+
+# Building efr32-brd4304a-switch
+ninja -C {out}/efr32-brd4304a-switch
 
 # Building efr32-brd4304a-unit-test
 ninja -C {out}/efr32-brd4304a-unit-test
@@ -1085,6 +1152,13 @@ rm -f examples/temperature-measurement-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
 idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement build'
+
+rm -f examples/temperature-measurement-app/esp32/sdkconfig
+
+# Building esp32-devkitc-temperature-measurement-rpc
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
+idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement-rpc build'
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 

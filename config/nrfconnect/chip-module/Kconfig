@@ -59,3 +59,9 @@ config CHIP_OTA_IMAGE_BUILD
 	bool
 	default y if CHIP_OTA_REQUESTOR
 	depends on SIGN_IMAGES
+
+config CHIP_DEBUG_SYMBOLS
+	bool "Generate debug symbols"
+	default y
+	help
+	  Build the application with debug symbols.

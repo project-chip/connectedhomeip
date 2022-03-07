@@ -127,7 +127,8 @@ server cluster GeneralCommissioning = 48 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
-    kNotCommissioning = 3;
+    kNoFailSafe = 3;
+    kBusyWithOtherAdmin = 4;
   }
 
   enum RegulatoryLocationType : ENUM8 {
@@ -311,7 +312,7 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING<32> label = 5;
   }
 
-  readonly attribute FabricDescriptor fabricsList[] = 1;
+  readonly attribute FabricDescriptor fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;

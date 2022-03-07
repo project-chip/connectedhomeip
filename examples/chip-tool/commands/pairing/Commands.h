@@ -250,7 +250,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
         make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
         make_unique<PairOnNetworkInstanceName>(credsIssuerConfig),
-        // TODO - enable CommissionedListCommand once DNS Cache is implemented
+        // TODO(#13973) - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
         make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),

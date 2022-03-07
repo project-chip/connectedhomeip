@@ -169,16 +169,16 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     ByteSpan block   = imageProcessor->mBlock;
     CHIP_ERROR error = imageProcessor->ProcessHeader(block);
-
-    if (error == CHIP_NO_ERROR &&
-        !imageProcessor->mOfs.write(reinterpret_cast<const char *>(block.data()), static_cast<std::streamsize>(block.size())))
-    {
-        error = CHIP_ERROR_WRITE_FAILED;
-    }
-
     if (error != CHIP_NO_ERROR)
     {
-        imageProcessor->mDownloader->EndDownload(error);
+        ChipLogError(SoftwareUpdate, "Image does not contain a valid header");
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+        return;
+    }
+
+    if (!imageProcessor->mOfs.write(reinterpret_cast<const char *>(block.data()), static_cast<std::streamsize>(block.size())))
+    {
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
     }
 

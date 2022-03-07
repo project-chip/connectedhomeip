@@ -6,9 +6,7 @@
         "../../../src/app/zap-templates/common/StringHelper.js",
         "../../../src/app/zap-templates/templates/app/helper.js",
         "../../../src/app/zap-templates/templates/chip/helper.js",
-        "../../../src/app/zap-templates/common/ClusterTestGeneration.js",
-        "helper.js",
-        "tests.js"
+        "helper.js"
     ],
     "override": "../../../src/app/zap-templates/common/override.js",
     "partials": [
@@ -23,18 +21,6 @@
         {
             "name": "cluster_header",
             "path": "../../../src/app/zap-templates/partials/cluster_header.zapt"
-        },
-        {
-            "name": "test_cluster",
-            "path": "partials/test_cluster.zapt"
-        },
-        {
-            "name": "commandValue",
-            "path": "partials/test_cluster_command_value.zapt"
-        },
-        {
-            "name": "valueEquals",
-            "path": "partials/test_cluster_value_equals.zapt"
         }
     ],
     "templates": [
@@ -62,11 +48,6 @@
             "path": "ComplexArgumentParser-src.zapt",
             "name": "Complex Argument Parser",
             "output": "cluster/ComplexArgumentParser.cpp"
-        },
-        {
-            "path": "tests-commands.zapt",
-            "name": "Tests Commands header",
-            "output": "test/Commands.h"
         }
     ]
 }

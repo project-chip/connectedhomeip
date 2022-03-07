@@ -31,9 +31,24 @@ static_library("helpers") {
   cflags = [ "-Wconversion" ]
 
   deps = [
+    "${chip_root}/src/access",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
+  ]
+}
+
+source_set("binding-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.cpp",
+    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.h",
+    "${chip_root}/src/app/util/binding-table.cpp",
+    "${chip_root}/src/app/util/binding-table.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
   ]
 }
 
@@ -44,16 +59,19 @@ chip_test_suite("tests") {
     "TestAttributePathExpandIterator.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
+    "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
     "TestDataModelSerialization.cpp",
     "TestEventLogging.cpp",
+    "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
+    "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
     "TestStatusIB.cpp",
@@ -74,6 +92,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":binding-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",

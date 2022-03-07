@@ -62,6 +62,9 @@ function __cirquetest_start_flask() {
 function __cirquetest_clean_flask() {
     echo "Cleanup Flask pid $FLASK_PID"
     kill -SIGTERM -"$FLASK_PID"
+    mv "$LOG_DIR/$CURRENT_TEST"/flask.log "$LOG_DIR/$CURRENT_TEST"/flask.log.old
+    cat "$LOG_DIR/$CURRENT_TEST"/flask.log.old | sed 's/\\n/\n/g' | sed 's/\\t/ /g' >"$LOG_DIR/$CURRENT_TEST"/flask.log
+    rm "$LOG_DIR/$CURRENT_TEST"/flask.log.old
 }
 
 function __cirquetest_build_ot() {

@@ -22,7 +22,6 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/support/CHIPArgParser.hpp>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -48,7 +47,8 @@ enum
     kDeviceOption_UnsecuredCommissionerPort = 0x100c,
     kDeviceOption_Command                   = 0x100d,
     kDeviceOption_PICS                      = 0x100e,
-    kDeviceOption_KVS                       = 0x100f
+    kDeviceOption_KVS                       = 0x100f,
+    kDeviceOption_InterfaceId               = 0x1010
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -76,6 +76,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "command", kArgumentRequired, kDeviceOption_Command },
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
+    { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
     {}
 };
 
@@ -134,6 +135,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --KVS <filepath>\n"
     "       A file to store Key Value Store items.\n"
+    "\n"
+    "  --interface-id <interface>\n"
+    "       A interface id to advertise on.\n"
     "\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -189,7 +193,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         else
         {
             LinuxDeviceOptions::GetInstance().payload.discriminator = value;
-            DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(value);
         }
         break;
     }
@@ -222,6 +225,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().KVS = aValue;
         break;
 
+    case kDeviceOption_InterfaceId:
+        LinuxDeviceOptions::GetInstance().interfaceId =
+            Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(atoi(aValue)));
+        break;
+
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -233,16 +241,24 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 OptionSet sDeviceOptions = { HandleOption, sDeviceOptionDefs, "GENERAL OPTIONS", sDeviceOptionHelp };
 
-OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr };
+OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr, nullptr };
 } // namespace
 
-CHIP_ERROR ParseArguments(int argc, char * argv[])
+CHIP_ERROR ParseArguments(int argc, char * argv[], OptionSet * customOptions)
 {
+    // Index 0 is for the general Linux options
+    uint8_t optionSetIndex = 1;
+    if (customOptions != nullptr)
+    {
+        // If there are custom options, include it during arg parsing
+        sLinuxDeviceOptionSets[optionSetIndex++] = customOptions;
+    }
+
     char usage[kAppUsageLength];
     snprintf(usage, kAppUsageLength, "Usage: %s [options]", argv[0]);
 
     HelpOptions helpOptions(argv[0], usage, "1.0");
-    sLinuxDeviceOptionSets[1] = &helpOptions;
+    sLinuxDeviceOptionSets[optionSetIndex] = &helpOptions;
 
     if (!ParseArgs(argv[0], argc, argv, sLinuxDeviceOptionSets))
     {

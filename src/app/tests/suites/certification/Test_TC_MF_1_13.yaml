@@ -1,0 +1,81 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    22.1.13. [TC-MF-1.13] Open commissioning window on DUT twice using ECM then
+    BCM [DUT - Commissionee]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      disabled: true
+
+    - label:
+          "TH_CR1 opens a commissioning window on DUT_CE and TH_CR3 Commissions
+          with DUT_CE using ECM"
+      disabled: true
+
+    - label:
+          "TH_CR1 opens a commissioning window on DUT_CE and TH_CR2 Commissions
+          with DUT_CE using ECM"
+      disabled: true
+
+    - label:
+          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
+          timeout of PIXIT_COMM_WIN seconds using ECM"
+      disabled: true
+
+    - label:
+          "Before the expiration of PIXIT_COMM_WIN seconds, TH_CR1 opens a 2nd
+          commissioning window on DUT_CE using a commissioning timeout of
+          PIXIT_COMM_WIN seconds using ECM"
+      disabled: true
+
+    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      disabled: true
+
+    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+      disabled: true
+
+    - label:
+          "TH_CR1 re-opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
+      disabled: true
+
+    - label:
+          "Before the expiration of PIXIT_COMM_WIN seconds, TH_CR3 opens a 2nd
+          commissioning window on DUT_CE using a commissioning timeout of
+          PIXIT_COMM_WIN seconds using BCM"
+      disabled: true
+
+    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+      disabled: true
+
+    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      disabled: true
+
+    - label:
+          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
+          timeout of PIXIT_COMM_WIN seconds using BCM"
+      disabled: true
+
+    - label:
+          "Before the expiration of PIXIT_COMM_WIN seconds, TH_CR2 opens a
+          second commissioning window on DUT_CE using a commissioning timeout of
+          PIXIT_COMM_WIN seconds using BCM"
+      disabled: true

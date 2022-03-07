@@ -178,6 +178,12 @@ public:
      */
     size_t GetNumActiveReadClients();
 
+    /**
+     * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
+     * transaction is in the middle of processing the chunked value of the given path.)
+     */
+    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
@@ -337,7 +343,13 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 /**
  * TODO: Document.
  */
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                  const ConcreteDataAttributePath & aAttributePath, TLV::TLVReader & aReader,
+                                  WriteHandler * apWriteHandler);
+
+/**
+ * Check if the given cluster has the given DataVersion.
+ */
+bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
 } // namespace app
 } // namespace chip

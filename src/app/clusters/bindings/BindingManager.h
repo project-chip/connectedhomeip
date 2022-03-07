@@ -21,6 +21,8 @@
 #include <app/clusters/bindings/PendingNotificationMap.h>
 #include <app/server/Server.h>
 #include <app/util/binding-table.h>
+#include <credentials/FabricTable.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 
@@ -36,7 +38,16 @@ namespace chip {
  * E.g. The application will send on/off commands to peer for the OnOff cluster.
  *
  */
-using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry * binding, DeviceProxy * peer_device, void * context);
+using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
+
+struct BindingManagerInitParams
+{
+    FabricTable * mFabricTable               = nullptr;
+    CASESessionManager * mCASESessionManager = nullptr;
+    PersistentStorageDelegate * mStorage     = nullptr;
+};
+
+using BindingAddedHandler = void (*)(const EmberBindingTableEntry & binding);
 
 /**
  *
@@ -60,14 +71,23 @@ public:
     {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
+    CHIP_ERROR RegisterBindingAddedHandler(BindingAddedHandler handler)
+    {
+        if (mBindingAddedHandler == nullptr)
+        {
+            mBindingAddedHandler = handler;
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
-    void SetAppServer(Server * appServer);
+    CHIP_ERROR Init(const BindingManagerInitParams & params);
 
     /*
      * Notifies the BindingManager that a new unicast binding is created.
      *
      */
-    CHIP_ERROR UnicastBindingCreated(const EmberBindingTableEntry & bindingEntry);
+    CHIP_ERROR UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId);
 
     /*
      * Notifies the BindingManager that a unicast binding is about to be removed from the given index.
@@ -93,6 +113,11 @@ public:
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
+    /*
+     * Notify the BindingAddedHandler that a binding was added.
+     */
+    CHIP_ERROR NotifyBindingAdded(const EmberBindingTableEntry & binding);
+
     static BindingManager & GetInstance() { return sBindingManager; }
 
 private:
@@ -108,7 +133,8 @@ private:
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
-    Server * mAppServer = nullptr;
+    BindingManagerInitParams mInitParams;
+    BindingAddedHandler mBindingAddedHandler;
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

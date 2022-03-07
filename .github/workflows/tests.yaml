@@ -20,8 +20,7 @@ on:
     workflow_dispatch:
 
 concurrency:
-    group:
-        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
         'pull_request' && github.event.number) || (github.event_name ==
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
@@ -44,18 +43,21 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.52
-            options:
-                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            image: connectedhomeip/chip-build:0.5.56
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
-            - name:
-                  Try to ensure the directories for core dumping exist and we
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
+            - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
@@ -68,8 +70,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ always() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
@@ -99,8 +100,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -108,8 +108,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
@@ -130,10 +129,15 @@ jobs:
         runs-on: macos-latest
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install openssl pkg-config coreutils
@@ -159,8 +163,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ always() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
@@ -189,8 +192,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -198,15 +200,13 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5

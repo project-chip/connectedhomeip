@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        if (event->CommissioningComplete.status == CHIP_NO_ERROR)
+        if (event->CommissioningComplete.Status == CHIP_NO_ERROR)
         {
             ChipLogProgress(AppServer, "Commissioning completed successfully");
             Cleanup();
@@ -62,8 +62,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         else
         {
             ChipLogError(AppServer, "Commissioning failed with error %" CHIP_ERROR_FORMAT,
-                         event->CommissioningComplete.status.Format());
-            OnSessionEstablishmentError(event->CommissioningComplete.status);
+                         event->CommissioningComplete.Status.Format());
+            OnSessionEstablishmentError(event->CommissioningComplete.Status);
         }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
@@ -88,6 +88,7 @@ void CommissioningWindowManager::ResetState()
     mECMPasscodeID    = 0;
     mECMIterations    = 0;
     mECMSaltLength    = 0;
+    mWindowStatus     = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
 
     memset(&mECMPASEVerifier, 0, sizeof(mECMPASEVerifier));
     memset(mECMSalt, 0, sizeof(mECMSalt));
@@ -157,7 +158,7 @@ void CommissioningWindowManager::OnSessionEstablished()
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 
-    StopAdvertisement(/* aShuttingDown = */ true);
+    StopAdvertisement(/* aShuttingDown = */ false);
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
 }
 
@@ -176,6 +177,7 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
+    mListeningForPASE = true;
 
     if (mUseECM)
     {
@@ -186,13 +188,23 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     }
     else
     {
-        uint32_t pinCode;
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
+        uint32_t iterationCount                      = 0;
+        uint8_t salt[kSpake2p_Max_PBKDF_Salt_Length] = { 0 };
+        size_t saltLen                               = 0;
+        Spake2pVerifierSerialized serializedVerifier = { 0 };
+        size_t serializedVerifierLen                 = 0;
+        Spake2pVerifier verifier;
 
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
-            pinCode, kSpake2p_Iteration_Count,
-            ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), keyID,
-            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pIterationCount(iterationCount));
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pSalt(salt, sizeof(salt), saltLen));
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pVerifier(
+            serializedVerifier, kSpake2p_VerifierSerialized_Length, serializedVerifierLen));
+        VerifyOrReturnError(kSpake2p_VerifierSerialized_Length == serializedVerifierLen, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
+
+        ReturnErrorOnFailure(
+            mPairingSession.WaitForPairing(verifier, iterationCount, ByteSpan(salt, saltLen), kDefaultCommissioningPasscodeId,
+                                           keyID, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());
@@ -228,8 +240,8 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t com
 }
 
 CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                                                       PASEVerifier & verifier, uint32_t iterations, ByteSpan salt,
-                                                                       PasscodeId passcodeID)
+                                                                       Spake2pVerifier & verifier, uint32_t iterations,
+                                                                       ByteSpan salt, PasscodeId passcodeID)
 {
     // Once a device is operational, it shall be commissioned into subsequent fabrics using
     // the operational network only.
@@ -247,7 +259,7 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
     mECMPasscodeID    = passcodeID;
     mECMIterations    = iterations;
 
-    memcpy(&mECMPASEVerifier, &verifier, sizeof(PASEVerifier));
+    memcpy(&mECMPASEVerifier, &verifier, sizeof(Spake2pVerifier));
 
     mUseECM = true;
 
@@ -265,6 +277,27 @@ void CommissioningWindowManager::CloseCommissioningWindow()
     {
         ChipLogProgress(AppServer, "Closing pairing window");
         Cleanup();
+    }
+}
+
+Dnssd::CommissioningMode CommissioningWindowManager::GetCommissioningMode() const
+{
+    if (!mListeningForPASE)
+    {
+        // We should not be advertising ourselves as in commissioning mode.
+        // We need to check this before mWindowStatus, because we might have an
+        // open window even while we are not listening for PASE.
+        return Dnssd::CommissioningMode::kDisabled;
+    }
+
+    switch (mWindowStatus)
+    {
+    case AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen:
+        return Dnssd::CommissioningMode::kEnabledEnhanced;
+    case AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen:
+        return Dnssd::CommissioningMode::kEnabledBasic;
+    default:
+        return Dnssd::CommissioningMode::kDisabled;
     }
 }
 
@@ -292,20 +325,17 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
         mAppDelegate->OnPairingWindowOpened();
     }
 
-    Dnssd::CommissioningMode commissioningMode;
     if (mUseECM)
     {
-        mWindowStatus     = AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
-        commissioningMode = Dnssd::CommissioningMode::kEnabledEnhanced;
+        mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
     }
     else
     {
-        mWindowStatus     = AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
-        commissioningMode = Dnssd::CommissioningMode::kEnabledBasic;
+        mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
     }
 
-    // reset all advertising, indicating we are in commissioningMode
-    app::DnssdServer::Instance().StartServer(commissioningMode);
+    // reset all advertising, switching to our new commissioning mode.
+    app::DnssdServer::Instance().StartServer();
 
     return CHIP_NO_ERROR;
 }
@@ -315,6 +345,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
     RestoreDiscriminator();
 
     mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
+    mListeningForPASE = false;
     mPairingSession.Clear();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
@@ -324,15 +355,13 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
     }
 #endif
 
-    mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
-
     // If aShuttingDown, don't try to change our DNS-SD advertisements.
     if (!aShuttingDown)
     {
         // Stop advertising commissioning mode, since we're not accepting PASE
         // connections right now.  If we start accepting them again (via
         // OpenCommissioningWindow) that will call StartAdvertisement as needed.
-        app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kDisabled);
+        app::DnssdServer::Instance().StartServer();
     }
 
     if (mIsBLE)

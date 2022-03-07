@@ -1,29 +1,58 @@
+#!/usr/bin/env -S python3 -B
+
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
 import subprocess
 import re
 
 
-def find_identity():
-    fail_str = "0 valid identities found"
-    cmd = "/usr/bin/security find-identity -v -p codesigning"
-    find_result = str(subprocess.check_output(cmd.split()))
-    if fail_str in find_result:
-        exit(-1)
-    result = re.search(r'\b[0-9a-fA-F]{40}\b', find_result)
-    return result.group()
+def run_command(command):
+    print("Running {}".format(command))
+    return str(subprocess.check_output(command.split()))
+
+
+def get_identity():
+    command = "/usr/bin/security find-identity -v -p codesigning"
+    command_result = run_command(command)
+
+    failure_str = "Error: 0 valid identities found"
+    if failure_str in command_result:
+        print(
+            "No valid identity has been found. Application will run without entitlements.")
+        exit(0)
+
+    identity = re.search(r'\b[0-9a-fA-F]{40}\b', command_result)
+    if identity is None:
+        print(
+            "No valid identity has been found. Application will run without entitlements.")
+        exit(0)
+
+    return identity.group()
 
 
 def codesign(args):
-    identity = find_identity()
-    cmd = "codesign --force -d --sign {identity} --entitlements {entitlement} {target}".format(
-        identity=identity,
+    command = "codesign --force -d --sign {identity} --entitlements {entitlement} {target}".format(
+        identity=get_identity(),
         entitlement=args.entitlements_path,
         target=args.target_path)
-    print("COMMAND " + cmd)
-    codesign_result = str(subprocess.check_output(cmd.split()))
-    print("Codesign Result: {}".format(codesign_result))
+    command_result = run_command(command)
+
+    print("Codesign Result: {}".format(command_result))
     with open(args.log_path, "w") as f:
-        f.write(codesign_result)
+        f.write(command_result)
 
 
 if __name__ == '__main__':

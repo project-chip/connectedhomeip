@@ -86,6 +86,10 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverBle(SetupPayload & payload)
 {
 #if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mCommissioner->ConnectBleTransportToSelf();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     return mBleLayer->NewBleConnectionByDiscriminator(payload.discriminator, this, OnDiscoveredDeviceOverBleSuccess,
                                                       OnDiscoveredDeviceOverBleError);
@@ -106,22 +110,16 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverBle()
 
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(SetupPayload & payload)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     currentFilter.type = payload.isShortDiscriminator ? Dnssd::DiscoveryFilterType::kShortDiscriminator
                                                       : Dnssd::DiscoveryFilterType::kLongDiscriminator;
     currentFilter.code =
         payload.isShortDiscriminator ? static_cast<uint16_t>((payload.discriminator >> 8) & 0x0F) : payload.discriminator;
     return mCommissioner->DiscoverCommissionableNodes(currentFilter);
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 }
 
 CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     currentFilter.type = Dnssd::DiscoveryFilterType::kNone;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     return CHIP_NO_ERROR;
 }
 
@@ -169,8 +167,6 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-
 bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData)
 {
     if (nodeData.commissioningMode == 0)
@@ -200,12 +196,11 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
     LogErrorOnFailure(StopConnectOverIP());
     LogErrorOnFailure(StopConnectOverSoftAP());
 
-    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId[0] : Inet::InterfaceId::Null();
+    Inet::InterfaceId interfaceId      = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId : Inet::InterfaceId::Null();
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port, interfaceId);
     RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress);
     OnDeviceDiscovered(params);
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 } // namespace Controller
 } // namespace chip

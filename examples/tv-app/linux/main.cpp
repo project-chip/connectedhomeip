@@ -20,6 +20,7 @@
 #include "AppMain.h"
 #include "AppPlatformShellCommands.h"
 
+#include <access/AccessControl.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
@@ -119,23 +120,12 @@ class MyPostCommissioningListener : public PostCommissioningListener
     void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) override
     {
 
-        // TODO:
-        // - the endpointId chosen should come from the App Platform (determined based upon vid/pid of node)
-        // - the cluster(s) chosen should come from the App Platform
-        constexpr EndpointId kBindingClusterEndpoint = 0;
-
-        GroupId groupId       = kUndefinedGroupId;
-        EndpointId endpointId = 1;
-        ClusterId clusterId   = kInvalidClusterId;
-
-        ChipLogProgress(Controller, "Attempting to create Binding");
-
-        ContentAppPlatform::GetInstance().CreateBindingWithCallback(device, kBindingClusterEndpoint, nodeId, groupId, endpointId,
-                                                                    clusterId, OnSuccessResponse, OnFailureResponse);
+        ContentAppPlatform::GetInstance().ManageClientAccess(device, vendorId, GetDeviceCommissioner()->GetNodeId(),
+                                                             OnSuccessResponse, OnFailureResponse);
     }
 
     /* Callback when command results in success */
-    static void OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
+    static void OnSuccessResponse(void * context)
     {
         ChipLogProgress(Controller, "OnSuccessResponse - Binding Add Successfully");
         CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();

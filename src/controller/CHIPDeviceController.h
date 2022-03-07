@@ -41,8 +41,8 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
-#include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/FabricTable.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -70,12 +70,9 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-#include <controller/DeviceAddressUpdateDelegate.h>
 #include <controller/DeviceDiscoveryDelegate.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/ResolverProxy.h>
-#endif
 
 namespace chip {
 
@@ -91,12 +88,9 @@ void OnBasicFailure(void * context, CHIP_ERROR err);
 
 struct ControllerInitParams
 {
-    PersistentStorageDelegate * storageDelegate = nullptr;
-    DeviceControllerSystemState * systemState   = nullptr;
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate = nullptr;
-    DeviceDiscoveryDelegate * deviceDiscoveryDelegate         = nullptr;
-#endif
+    PersistentStorageDelegate * storageDelegate                     = nullptr;
+    DeviceControllerSystemState * systemState                       = nullptr;
+    DeviceDiscoveryDelegate * deviceDiscoveryDelegate               = nullptr;
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
     /* The following keypair must correspond to the public key used for generating
@@ -107,6 +101,14 @@ struct ControllerInitParams
     ByteSpan controllerNOC;
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
+
+    //
+    // Controls enabling server cluster interactions on a controller. This in turn
+    // causes the following to get enabled:
+    //
+    //  - Advertisement of active controller operational identities.
+    //
+    bool enableServerInteractions = false;
 
     uint16_t controllerVendorId;
 };
@@ -168,17 +170,15 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SessionRecoveryDelegate
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    ,
-                                    public AbstractDnssdDiscoveryController
-#endif
+class DLL_EXPORT DeviceController : public SessionRecoveryDelegate,
+                                    public AbstractDnssdDiscoveryController,
+                                    public Dnssd::OperationalResolveDelegate
 {
 public:
     DeviceController();
     virtual ~DeviceController() {}
 
-    enum class CommissioningWindowOption
+    enum class CommissioningWindowOption : uint8_t
     {
         kOriginalSetupCode = 0,
         kTokenWithRandomPIN,
@@ -242,12 +242,12 @@ public:
      * @param[in] iterations      The number of iterations to use when generating the verifier
      * @param[in] setupPincode    The desired PIN code to use
      * @param[in] salt            The 16-byte salt for verifier computation
-     * @param[out] outVerifier    The PASEVerifier to be populated on success
+     * @param[out] outVerifier    The Spake2pVerifier to be populated on success
      * @param[out] outPasscodeId  The passcode ID to be populated on success
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
+    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, Spake2pVerifier & outVerifier,
                                    PasscodeId & outPasscodeId);
 
     /**
@@ -271,7 +271,7 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
-                                       uint8_t option, SetupPayload & payload)
+                                       CommissioningWindowOption option, SetupPayload & payload)
     {
         mSuggestedSetUpPINCode = payload.setUpPINCode;
         ReturnErrorOnFailure(OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr));
@@ -302,13 +302,11 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
-                                                   uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                                   CommissioningWindowOption option,
+                                                   Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                    bool readVIDPIDAttributes = false);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
     void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
-#endif
 
     /**
      * @brief Get the Compressed Fabric ID assigned to the device.
@@ -324,6 +322,13 @@ public:
      * @brief Get the Node ID of this instance.
      */
     NodeId GetNodeId() const { return mLocalId.GetNodeId(); }
+
+    CHIP_ERROR GetFabricIndex(FabricIndex * value)
+    {
+        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr && value != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        *value = mFabricInfo->GetFabricIndex();
+        return CHIP_NO_ERROR;
+    }
 
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
@@ -352,21 +357,14 @@ protected:
     FabricInfo * mFabricInfo = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    Transport::PeerAddress ToPeerAddress(const chip::Dnssd::ResolvedNodeData & nodeData) const;
-
-    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
-#endif
     DeviceControllerSystemState * mSystemState = nullptr;
 
     CHIP_ERROR InitializePairedDeviceList();
     CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
-
-    void PersistNextKeyId();
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
@@ -377,12 +375,10 @@ protected:
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    //////////// ResolverDelegate Implementation ///////////////
-    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    //////////// OperationalResolveDelegate Implementation ///////////////
+    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
+    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 private:
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
@@ -597,18 +593,9 @@ public:
      * @brief
      *   This function validates the Attestation Information sent by the device.
      *
-     * @param[in] attestationElements Attestation Elements TLV.
-     * @param[in] signature           Attestation signature generated for all the above fields + Attestation Challenge.
-     * @param[in] attestationNonce    Attestation nonce
-     * @param[in] pai                 PAI certificate
-     * @param[in] dac                 DAC certificates
-     * @param[in] remoteVendorId      vendor ID read from the device Basic Information cluster
-     * @param[in] remoteProductId     product ID read from the device Basic Information cluster
-     * @param[in] proxy               device proxy that is being attested.
+     * @param[in] info Structure contatining all the required information for validating the device attestation.
      */
-    CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
-                                       const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
+    CHIP_ERROR ValidateAttestationInfo(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
 
     /**
      * @brief
@@ -621,6 +608,15 @@ public:
                                CommissioningDelegate::CommissioningReport report = CommissioningDelegate::CommissioningReport());
 
 #if CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    /**
+     * @brief
+     *   Prior to commissioning, the Controller should make sure the BleLayer transport
+     *   is set to the Commissioner transport and not the Server transport.
+     */
+    void ConnectBleTransportToSelf();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
     /**
      * @brief
      *   Once we have finished all commissioning work, the Controller should close the BLE
@@ -630,7 +626,6 @@ public:
      */
     CHIP_ERROR CloseBleConnection();
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     /**
      * @brief
      *   Discover all devices advertising as commissionable.
@@ -655,9 +650,9 @@ public:
      */
     int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
 
-    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-#endif
+    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
+    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
      * @brief
@@ -678,7 +673,6 @@ public:
     UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     /**
      * @brief
      *   Overrides method from AbstractDnssdDiscoveryController
@@ -686,8 +680,7 @@ public:
      * @param nodeData DNS-SD node information
      *
      */
-    void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
-#endif
+    void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
@@ -723,8 +716,6 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void SetupCluster(ClusterBase & base, DeviceProxy * proxy, EndpointId endpoint, Optional<System::Clock::Timeout> timeout);
-
-    void FreeRendezvousSession();
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 

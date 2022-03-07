@@ -135,6 +135,21 @@ public:
         Timer * mTiltTimer            = nullptr;
         OperationalState mLiftOpState = OperationalState::Stall;
         OperationalState mTiltOpState = OperationalState::Stall;
+
+        struct CoverWorkData
+        {
+            chip::EndpointId mEndpointId;
+
+            union
+            {
+                chip::Percent100ths percent100ths;
+                OperationalStatus opStatus;
+            };
+        };
+
+        static void ScheduleTiltPositionSet(intptr_t arg);
+        static void ScheduleLiftPositionSet(intptr_t arg);
+        static void ScheduleOperationalStatusSetWithGlobalUpdate(intptr_t arg);
     };
 
     static WindowApp & Instance();

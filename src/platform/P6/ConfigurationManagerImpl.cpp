@@ -48,6 +48,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
     uint32_t rebootCount;
 
+    // Save out software version on first boot
+    if (!P6Config::ConfigValueExists(P6Config::kConfigKey_SoftwareVersion))
+    {
+        err = StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+        SuccessOrExit(err);
+    }
+
     if (P6Config::ConfigValueExists(P6Config::kCounterKey_RebootCount))
     {
         err = GetRebootCount(rebootCount);
@@ -92,6 +99,16 @@ CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
 {
     return WriteConfigValue(P6Config::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
+{
+    return ReadConfigValue(P6Config::kConfigKey_SoftwareVersion, softwareVer);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareVersion(uint32_t softwareVer)
+{
+    return WriteConfigValue(P6Config::kConfigKey_SoftwareVersion, softwareVer);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)

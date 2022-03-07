@@ -20,6 +20,23 @@ import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
+declare_args() {
+  # Enable Wake on LAN cluster
+  chip_enable_wake_on_lan = false
+}
+
+config("config") {
+  include_dirs = [
+    ".",
+    "${chip_root}/zzz_generated/chip-tv-app",
+    "${chip_root}/src/lib",
+  ]
+
+  defines = [ "CHIP_ENABLE_WAKE_ON_LAN=${chip_enable_wake_on_lan}" ]
+
+  cflags = [ "-Wconversion" ]
+}
+
 executable("chip-tv-app") {
   sources = [
     "${chip_root}/examples/tv-app/tv-common/include/CHIPProjectAppConfig.h",
@@ -65,6 +82,8 @@ executable("chip-tv-app") {
   ]
 
   cflags = [ "-Wconversion" ]
+
+  public_configs = [ ":config" ]
 
   if (chip_build_libshell) {
     cflags += [ "-DENABLE_CHIP_SHELL" ]

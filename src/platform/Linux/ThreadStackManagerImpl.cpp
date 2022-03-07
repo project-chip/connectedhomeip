@@ -238,18 +238,45 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
 
     {
-        // TODO: The following code does not works actually, since otbr-posix does not emit signals for properties changes. Which is
-        // required for gdbus to caching properties.
-        std::unique_ptr<GVariant, GVariantDeleter> value(
-            openthread_io_openthread_border_router_dup_active_dataset_tlvs(mProxy.get()));
+        std::unique_ptr<GError, GErrorDeleter> err;
+
+        std::unique_ptr<GVariant, GVariantDeleter> response(
+            g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                                   g_variant_new("(ss)", "io.openthread.BorderRouter", "ActiveDatasetTlvs"), G_DBUS_CALL_FLAGS_NONE,
+                                   -1, nullptr, &MakeUniquePointerReceiver(err).Get()));
+
+        if (err)
+        {
+            ChipLogError(DeviceLayer, "openthread: failed to read ActiveDatasetTlvs property: %s", err->message);
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        // Note: The actual value is wrapped by a GVariant container, wrapped in another GVariant with tuple type.
+
+        if (response == nullptr)
+        {
+            netInfo = ByteSpan();
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+
+        std::unique_ptr<GVariant, GVariantDeleter> tupleContent(g_variant_get_child_value(response.get(), 0));
+
+        if (tupleContent == nullptr)
+        {
+            netInfo = ByteSpan();
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+
+        std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_get_variant(tupleContent.get()));
+
         if (value == nullptr)
         {
             netInfo = ByteSpan();
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
-        GBytes * bytes = g_variant_get_data_as_bytes(value.get());
+
         gsize size;
-        const uint8_t * data = reinterpret_cast<const uint8_t *>(g_bytes_get_data(bytes, &size));
+        const uint8_t * data = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(value.get(), &size, sizeof(guchar)));
         ReturnErrorOnFailure(mDataset.Init(ByteSpan(data, size)));
     }
 
@@ -270,13 +297,29 @@ void ThreadStackManagerImpl::_ErasePersistentInfo()
 
 bool ThreadStackManagerImpl::_IsThreadEnabled()
 {
-    if (!mProxy)
+    VerifyOrReturnError(mProxy, false);
+
+    std::unique_ptr<GError, GErrorDeleter> err;
+
+    std::unique_ptr<GVariant, GVariantDeleter> value(
+        g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                               g_variant_new("(ss)", "io.openthread.BorderRouter", "DeviceRole"), G_DBUS_CALL_FLAGS_NONE, -1,
+                               nullptr, &MakeUniquePointerReceiver(err).Get()));
+
+    if (err)
+    {
+        ChipLogError(DeviceLayer, "openthread: failed to read DeviceRole property: %s", err->message);
+        return false;
+    }
+
+    if (value == nullptr)
     {
         return false;
     }
 
-    std::unique_ptr<gchar, GFree> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
-    return (strcmp(role.get(), kOpenthreadDeviceRoleDisabled) != 0);
+    const gchar * role = g_variant_get_string(value.get(), nullptr);
+
+    return (strcmp(role, kOpenthreadDeviceRoleDisabled) != 0);
 }
 
 bool ThreadStackManagerImpl::_IsThreadAttached()
@@ -571,8 +614,8 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
                                    &joiner_udp_port, &channel, &rssi, &lqi, &version, &is_native, &is_joinable))
         {
             ChipLogProgress(DeviceLayer,
-                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %" PRIu16 " LQI %" PRIu8
-                            " Version %" PRIu8,
+                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %" PRIu16 " LQI %u"
+                            " Version %u",
                             network_name, ext_address, ext_panid, rssi, lqi, version);
             NetworkCommissioning::ThreadScanResponse networkScanned;
             networkScanned.panId         = panid;

@@ -18,15 +18,19 @@
 
 #include "CHIPCommandBridge.h"
 
+#import "CHIPToolKeypair.h"
 #import <CHIP/CHIPDeviceController.h>
 #include <core/CHIPBuildConfig.h>
 #include <lib/support/CodeUtils.h>
 
 const uint16_t kListenPort = 5541;
+static CHIPToolPersistentStorageDelegate * storage = nil;
 
 CHIP_ERROR CHIPCommandBridge::Run()
 {
     ChipLogProgress(chipTool, "Running Command");
+    CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
+    storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
     mController = [CHIPDeviceController sharedController];
     if (mController == nil) {
@@ -36,7 +40,9 @@ CHIP_ERROR CHIPCommandBridge::Run()
 
     [mController setListenPort:kListenPort];
 
-    if (![mController startup:nil vendorId:0 nocSigner:nil]) {
+    [nocSigner createOrLoadKeys:storage];
+
+    if (![mController startup:storage vendorId:0 nocSigner:nocSigner]) {
         ChipLogError(chipTool, "Controller startup failure.");
         return CHIP_ERROR_INTERNAL;
     }

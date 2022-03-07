@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.19.0)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
-get_filename_component(NLIO_DIR ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
+get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
@@ -27,7 +27,7 @@ if(APP_TYPE STREQUAL "boot" OR APP_TYPE STREQUAL "upgrade")
 endif()
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
-if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W" AND BOOT_ENABLED)   
+if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W" AND BOOT_ENABLED)
     list(REMOVE_ITEM MBED_TARGET_LABELS CM0P_SLEEP)
     list(REMOVE_ITEM MBED_TARGET_DEFINITIONS COMPONENT_CM0P_SLEEP=1)
 endif()
@@ -48,13 +48,17 @@ target_include_directories(${APP_TARGET} PRIVATE
                            main/include/
                            ${GEN_DIR}/app-common
                            ${MBED_COMMON}/util/include
-                           ${NLIO_DIR}
+                           ${NLIO_ROOT}
+                           ${GEN_DIR}/ota-requestor-app
 )
 
 target_sources(${APP_TARGET} PRIVATE
-    main/main.cpp
-    main/AppTask.cpp
-    ${MBED_COMMON}/util/LEDWidget.cpp
+               main/main.cpp
+               main/AppTask.cpp
+               ${GEN_DIR}//ota-requestor-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
+               ${MBED_COMMON}/util/LEDWidget.cpp
+               ${MBED_COMMON}/util/DFUManager.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}

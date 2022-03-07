@@ -100,8 +100,8 @@ static_library("EFR32") {
   if (chip_enable_wifi) {
     sources += [
       "ConnectivityManagerImpl_WIFI.cpp",
-      "ServiceProvisioning.cpp",
-      "ServiceProvisioning.h",
+      "NetworkCommissioningWiFiDriver.cpp",
+      "NetworkCommissioningWiFiDriver.h",
     ]
   }
 }

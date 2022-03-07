@@ -30,6 +30,9 @@ class AppContext : public LoopbackMessagingContext<>
     typedef LoopbackMessagingContext<> Super;
 
 public:
+    // Disallow initialization as a sync loopback context.
+    static void Initialize(void *) = delete;
+
     /// Initialize the underlying layers.
     CHIP_ERROR Init() override;
 

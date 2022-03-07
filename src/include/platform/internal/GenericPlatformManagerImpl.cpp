@@ -123,10 +123,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 
     // TODO Initialize the Software Update Manager object.
 
-    // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
-#if !CHIP_DEVICE_LAYER_TARGET_DARWIN
     _ScheduleWork(HandleDeviceRebooted, 0);
-#endif
 
 exit:
     return err;
@@ -135,17 +132,8 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
-    CHIP_ERROR err;
-    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
-
-    // The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence.
-    if (platformManagerDelegate != nullptr)
-    {
-        platformManagerDelegate->OnShutDown();
-    }
-
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
-    err = UDPEndPointManager()->Shutdown();
+    CHIP_ERROR err = UDPEndPointManager()->Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     ChipLogError(DeviceLayer, "BLE shutdown");
@@ -310,7 +298,10 @@ void GenericPlatformManagerImpl<ImplClass>::HandleDeviceRebooted(intptr_t arg)
 
     if (generalDiagnosticsDelegate != nullptr)
     {
-        generalDiagnosticsDelegate->OnDeviceRebooted();
+        uint8_t bootReason;
+
+        if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
+            generalDiagnosticsDelegate->OnDeviceRebooted(static_cast<BootReasonType>(bootReason));
     }
 
     // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
@@ -318,8 +309,8 @@ void GenericPlatformManagerImpl<ImplClass>::HandleDeviceRebooted(intptr_t arg)
     {
         uint32_t softwareVersion;
 
-        ReturnOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
-        platformManagerDelegate->OnStartUp(softwareVersion);
+        if (ConfigurationMgr().GetSoftwareVersion(softwareVersion) == CHIP_NO_ERROR)
+            platformManagerDelegate->OnStartUp(softwareVersion);
     }
 }
 

@@ -63,6 +63,9 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     CHIP_ERROR err;
     mCB = cb;
 
+    err = Platform::MemoryInit();
+    SuccessOrExit(err);
+
     err = PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
@@ -71,21 +74,11 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
 
-    err = Platform::MemoryInit();
-    SuccessOrExit(err);
-
     PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 
     // // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("StartEventLoopTask() - ERROR!\r\n");
-    }
-    else
-    {
-        printf("StartEventLoopTask() - OK\r\n");
-    }
+    SuccessOrExit(err);
 
 exit:
     return err;

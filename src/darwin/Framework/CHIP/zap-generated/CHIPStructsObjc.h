@@ -61,6 +61,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPBindingClusterTargetStruct : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nullable node;
+@property (strong, nonatomic) NSNumber * _Nullable group;
+@property (strong, nonatomic) NSNumber * _Nullable endpoint;
+@property (strong, nonatomic) NSNumber * _Nullable cluster;
+- (instancetype)init;
+@end
+
 @interface CHIPAccessControlClusterTarget : NSObject
 @property (strong, nonatomic) NSNumber * _Nullable cluster;
 @property (strong, nonatomic) NSNumber * _Nullable endpoint;
@@ -102,9 +111,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPOtaSoftwareUpdateRequestorClusterProviderLocation : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull providerNodeID;
 @property (strong, nonatomic) NSNumber * _Nonnull endpoint;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 
@@ -161,10 +170,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPGeneralDiagnosticsClusterNetworkInterfaceType : NSObject
 @property (strong, nonatomic) NSString * _Nonnull name;
-@property (strong, nonatomic) NSNumber * _Nonnull fabricConnected;
+@property (strong, nonatomic) NSNumber * _Nonnull isOperational;
 @property (strong, nonatomic) NSNumber * _Nullable offPremiseServicesReachableIPv4;
 @property (strong, nonatomic) NSNumber * _Nullable offPremiseServicesReachableIPv6;
 @property (strong, nonatomic) NSData * _Nonnull hardwareAddress;
+@property (strong, nonatomic) NSArray * _Nonnull iPv4Addresses;
+@property (strong, nonatomic) NSArray * _Nonnull iPv6Addresses;
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 - (instancetype)init;
 @end
@@ -436,6 +447,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPTestClusterClusterTestFabricScoped : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricSensitiveInt8u;
+@property (strong, nonatomic) NSNumber * _Nullable optionalFabricSensitiveInt8u;
+@property (strong, nonatomic) NSNumber * _Nullable nullableFabricSensitiveInt8u;
+@property (strong, nonatomic) NSNumber * _Nullable nullableOptionalFabricSensitiveInt8u;
+@property (strong, nonatomic) NSString * _Nonnull fabricSensitiveCharString;
+@property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull fabricSensitiveStruct;
+@property (strong, nonatomic) NSArray * _Nonnull fabricSensitiveInt8uList;
+- (instancetype)init;
+@end
+
 @interface CHIPTestClusterClusterNullablesAndOptionalsStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nullable nullableInt;
 @property (strong, nonatomic) NSNumber * _Nullable optionalInt;
@@ -472,11 +495,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPTestClusterClusterDoubleNestedStructList : NSObject
 @property (strong, nonatomic) NSArray * _Nonnull a;
-- (instancetype)init;
-@end
-
-@interface CHIPTestClusterClusterTestFabricScoped : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 - (instancetype)init;
 @end
 

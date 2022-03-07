@@ -39,7 +39,7 @@ declare_args() {
   chip_print_memory_usage = false
 
   # PIN code for PASE session establishment.
-  setupPinCode = 73141520
+  setupPinCode = 20202021
   setupDiscriminator = 3840
 
   # Monitor & log memory usage at runtime.
@@ -48,12 +48,15 @@ declare_args() {
   # Enable Sleepy end device
   enable_sleepy_device = false
 
+  # OTA timeout in seconds
+  OTA_periodic_query_timeout = 10
+
   # Wifi related stuff - they are overriden by gn -args="use_wf200=true"
   use_wf200 = false
   use_rs911x = false
   use_rs911x_sockets = false
   sl_wfx_config_softap = false
-  sl_wfx_config_scan = false
+  sl_wfx_config_scan = true
 }
 
 show_qr_code = true
@@ -100,6 +103,7 @@ efr32_sdk("sdk") {
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
+    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
   ]
 
   if (chip_enable_pw_rpc) {
@@ -114,9 +118,8 @@ efr32_sdk("sdk") {
   } else if (use_wf200) {
     defines += wf200_defs
     include_dirs += wf200_plat_incs
-  } else {
-    defines += [ "SL_HEAP_SIZE=20480" ]
   }
+
   if (use_rs911x_sockets) {
     include_dirs += [ "${examples_plat_dir}/wifi/rsi-sockets" ]
     defines += rs911x_sock_defs
@@ -126,11 +129,13 @@ efr32_sdk("sdk") {
     #
     defines += efr32_lwip_defs
   }
-  if (sl_wfx_config_softap) {
-    defines += "SL_WFX_CONFIG_SOFTAP"
-  }
-  if (sl_wfx_config_scan) {
-    defines += "SL_WFX_CONFIG_SCAN"
+  if (use_rs911x || use_wf200) {
+    if (sl_wfx_config_softap) {
+      defines += [ "SL_WFX_CONFIG_SOFTAP" ]
+    }
+    if (sl_wfx_config_scan) {
+      defines += [ "SL_WFX_CONFIG_SCAN" ]
+    }
   }
 }
 
@@ -217,8 +222,11 @@ efr32_executable("lighting_app") {
       "PW_RPC_ENABLED",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
       "PW_RPC_LIGHTING_SERVICE=1",
+      "PW_RPC_OTCLI_SERVICE=1",
+      "PW_RPC_THREAD_SERVICE=1",
     ]
 
     sources += [
@@ -234,8 +242,11 @@ efr32_executable("lighting_app") {
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     ]
 

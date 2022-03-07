@@ -45,80 +45,80 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPAccessControlClusterAccessControlEntry * newElement_0;
-                newElement_0 = [CHIPAccessControlClusterAccessControlEntry new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-                newElement_0.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.privilege)];
-                newElement_0.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.authMode)];
-                if (entry_0.subjects.IsNull()) {
-                    newElement_0.subjects = nil;
-                } else {
-                    auto * array_3 = [NSMutableArray new];
-                    auto iter_3 = entry_0.subjects.Value().begin();
-                    while (iter_3.Next()) {
-                        auto & entry_3 = iter_3.GetValue();
-                        NSNumber * newElement_3;
-                        newElement_3 = [NSNumber numberWithUnsignedLongLong:entry_3];
-                        [array_3 addObject:newElement_3];
-                    }
-                    { // Scope for the error so we will know what it's named
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            *aError = err;
-                            return nil;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPAccessControlClusterAccessControlEntry * newElement_0;
+                    newElement_0 = [CHIPAccessControlClusterAccessControlEntry new];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    newElement_0.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.privilege)];
+                    newElement_0.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.authMode)];
+                    if (entry_0.subjects.IsNull()) {
+                        newElement_0.subjects = nil;
+                    } else {
+                        { // Scope for our temporary variables
+                            auto * array_3 = [NSMutableArray new];
+                            auto iter_3 = entry_0.subjects.Value().begin();
+                            while (iter_3.Next()) {
+                                auto & entry_3 = iter_3.GetValue();
+                                NSNumber * newElement_3;
+                                newElement_3 = [NSNumber numberWithUnsignedLongLong:entry_3];
+                                [array_3 addObject:newElement_3];
+                            }
+                            CHIP_ERROR err = iter_3.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_0.subjects = array_3;
                         }
                     }
-                    newElement_0.subjects = array_3;
+                    if (entry_0.targets.IsNull()) {
+                        newElement_0.targets = nil;
+                    } else {
+                        { // Scope for our temporary variables
+                            auto * array_3 = [NSMutableArray new];
+                            auto iter_3 = entry_0.targets.Value().begin();
+                            while (iter_3.Next()) {
+                                auto & entry_3 = iter_3.GetValue();
+                                CHIPAccessControlClusterTarget * newElement_3;
+                                newElement_3 = [CHIPAccessControlClusterTarget new];
+                                if (entry_3.cluster.IsNull()) {
+                                    newElement_3.cluster = nil;
+                                } else {
+                                    newElement_3.cluster = [NSNumber numberWithUnsignedInt:entry_3.cluster.Value()];
+                                }
+                                if (entry_3.endpoint.IsNull()) {
+                                    newElement_3.endpoint = nil;
+                                } else {
+                                    newElement_3.endpoint = [NSNumber numberWithUnsignedShort:entry_3.endpoint.Value()];
+                                }
+                                if (entry_3.deviceType.IsNull()) {
+                                    newElement_3.deviceType = nil;
+                                } else {
+                                    newElement_3.deviceType = [NSNumber numberWithUnsignedInt:entry_3.deviceType.Value()];
+                                }
+                                [array_3 addObject:newElement_3];
+                            }
+                            CHIP_ERROR err = iter_3.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_0.targets = array_3;
+                        }
+                    }
+                    [array_0 addObject:newElement_0];
                 }
-                if (entry_0.targets.IsNull()) {
-                    newElement_0.targets = nil;
-                } else {
-                    auto * array_3 = [NSMutableArray new];
-                    auto iter_3 = entry_0.targets.Value().begin();
-                    while (iter_3.Next()) {
-                        auto & entry_3 = iter_3.GetValue();
-                        CHIPAccessControlClusterTarget * newElement_3;
-                        newElement_3 = [CHIPAccessControlClusterTarget new];
-                        if (entry_3.cluster.IsNull()) {
-                            newElement_3.cluster = nil;
-                        } else {
-                            newElement_3.cluster = [NSNumber numberWithUnsignedInt:entry_3.cluster.Value()];
-                        }
-                        if (entry_3.endpoint.IsNull()) {
-                            newElement_3.endpoint = nil;
-                        } else {
-                            newElement_3.endpoint = [NSNumber numberWithUnsignedShort:entry_3.endpoint.Value()];
-                        }
-                        if (entry_3.deviceType.IsNull()) {
-                            newElement_3.deviceType = nil;
-                        } else {
-                            newElement_3.deviceType = [NSNumber numberWithUnsignedInt:entry_3.deviceType.Value()];
-                        }
-                        [array_3 addObject:newElement_3];
-                    }
-                    { // Scope for the error so we will know what it's named
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            *aError = err;
-                            return nil;
-                        }
-                    }
-                    newElement_0.targets = array_3;
-                }
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::Extension::Id: {
@@ -129,24 +129,24 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPAccessControlClusterExtensionEntry * newElement_0;
-                newElement_0 = [CHIPAccessControlClusterExtensionEntry new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-                newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPAccessControlClusterExtensionEntry * newElement_0;
+                    newElement_0 = [CHIPAccessControlClusterExtensionEntry new];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -157,22 +157,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -183,22 +183,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -209,22 +209,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -255,22 +255,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -281,22 +281,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -307,22 +307,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -386,22 +386,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -412,22 +412,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -438,22 +438,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -487,8 +487,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
             return value;
         }
-        case Attributes::VendorId::Id: {
-            using TypeInfo = Attributes::VendorId::TypeInfo;
+        case Attributes::VendorID::Id: {
+            using TypeInfo = Attributes::VendorID::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -509,8 +509,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
             return value;
         }
-        case Attributes::ProductId::Id: {
-            using TypeInfo = Attributes::ProductId::TypeInfo;
+        case Attributes::ProductID::Id: {
+            using TypeInfo = Attributes::ProductID::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -520,8 +520,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
-        case Attributes::ApplicationApp::Id: {
-            using TypeInfo = Attributes::ApplicationApp::TypeInfo;
+        case Attributes::Application::Id: {
+            using TypeInfo = Attributes::Application::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -535,8 +535,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                                                          encoding:NSUTF8StringEncoding];
             return value;
         }
-        case Attributes::ApplicationStatus::Id: {
-            using TypeInfo = Attributes::ApplicationStatus::TypeInfo;
+        case Attributes::Status::Id: {
+            using TypeInfo = Attributes::Status::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -565,22 +565,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -591,22 +591,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -617,22 +617,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -643,22 +643,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -681,34 +681,34 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::ApplicationLauncher::Id: {
         using namespace Clusters::ApplicationLauncher;
         switch (aPath.mAttributeId) {
-        case Attributes::ApplicationLauncherList::Id: {
-            using TypeInfo = Attributes::ApplicationLauncherList::TypeInfo;
+        case Attributes::CatalogList::Id: {
+            using TypeInfo = Attributes::CatalogList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
-        case Attributes::ApplicationLauncherApp::Id: {
-            using TypeInfo = Attributes::ApplicationLauncherApp::TypeInfo;
+        case Attributes::CurrentApp::Id: {
+            using TypeInfo = Attributes::CurrentApp::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -740,22 +740,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -766,22 +766,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -792,22 +792,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -830,39 +830,39 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::AudioOutput::Id: {
         using namespace Clusters::AudioOutput;
         switch (aPath.mAttributeId) {
-        case Attributes::AudioOutputList::Id: {
-            using TypeInfo = Attributes::AudioOutputList::TypeInfo;
+        case Attributes::OutputList::Id: {
+            using TypeInfo = Attributes::OutputList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPAudioOutputClusterOutputInfo * newElement_0;
-                newElement_0 = [CHIPAudioOutputClusterOutputInfo new];
-                newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
-                newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                             length:entry_0.name.size()
-                                                           encoding:NSUTF8StringEncoding];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPAudioOutputClusterOutputInfo * newElement_0;
+                    newElement_0 = [CHIPAudioOutputClusterOutputInfo new];
+                    newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
+                    newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
+                    newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                                 length:entry_0.name.size()
+                                                               encoding:NSUTF8StringEncoding];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
-        case Attributes::CurrentAudioOutput::Id: {
-            using TypeInfo = Attributes::CurrentAudioOutput::TypeInfo;
+        case Attributes::CurrentOutput::Id: {
+            using TypeInfo = Attributes::CurrentOutput::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -880,22 +880,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -906,22 +906,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -932,22 +932,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -1022,22 +1022,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -1048,22 +1048,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -1074,22 +1074,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -1329,22 +1329,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -1355,22 +1355,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -1381,22 +1381,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -1460,22 +1460,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -1486,22 +1486,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -1512,22 +1512,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -1550,6 +1550,53 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::Binding::Id: {
         using namespace Clusters::Binding;
         switch (aPath.mAttributeId) {
+        case Attributes::Binding::Id: {
+            using TypeInfo = Attributes::Binding::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPBindingClusterTargetStruct * newElement_0;
+                    newElement_0 = [CHIPBindingClusterTargetStruct new];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    if (entry_0.node.HasValue()) {
+                        newElement_0.node = [NSNumber numberWithUnsignedLongLong:entry_0.node.Value()];
+                    } else {
+                        newElement_0.node = nil;
+                    }
+                    if (entry_0.group.HasValue()) {
+                        newElement_0.group = [NSNumber numberWithUnsignedShort:entry_0.group.Value()];
+                    } else {
+                        newElement_0.group = nil;
+                    }
+                    if (entry_0.endpoint.HasValue()) {
+                        newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint.Value()];
+                    } else {
+                        newElement_0.endpoint = nil;
+                    }
+                    if (entry_0.cluster.HasValue()) {
+                        newElement_0.cluster = [NSNumber numberWithUnsignedInt:entry_0.cluster.Value()];
+                    } else {
+                        newElement_0.cluster = nil;
+                    }
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
         case Attributes::ServerGeneratedCommandList::Id: {
             using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -1558,22 +1605,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -1584,22 +1631,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -1610,22 +1657,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -1667,22 +1714,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -1693,22 +1740,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -1719,22 +1766,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -1765,30 +1812,30 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPBridgedActionsClusterActionStruct * newElement_0;
-                newElement_0 = [CHIPBridgedActionsClusterActionStruct new];
-                newElement_0.actionID = [NSNumber numberWithUnsignedShort:entry_0.actionID];
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                             length:entry_0.name.size()
-                                                           encoding:NSUTF8StringEncoding];
-                newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
-                newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
-                newElement_0.supportedCommands = [NSNumber numberWithUnsignedShort:entry_0.supportedCommands];
-                newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPBridgedActionsClusterActionStruct * newElement_0;
+                    newElement_0 = [CHIPBridgedActionsClusterActionStruct new];
+                    newElement_0.actionID = [NSNumber numberWithUnsignedShort:entry_0.actionID];
+                    newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                                 length:entry_0.name.size()
+                                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
+                    newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
+                    newElement_0.supportedCommands = [NSNumber numberWithUnsignedShort:entry_0.supportedCommands];
+                    newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::EndpointList::Id: {
@@ -1799,43 +1846,43 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPBridgedActionsClusterEndpointListStruct * newElement_0;
-                newElement_0 = [CHIPBridgedActionsClusterEndpointListStruct new];
-                newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                             length:entry_0.name.size()
-                                                           encoding:NSUTF8StringEncoding];
-                newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
-                auto * array_2 = [NSMutableArray new];
-                auto iter_2 = entry_0.endpoints.begin();
-                while (iter_2.Next()) {
-                    auto & entry_2 = iter_2.GetValue();
-                    NSNumber * newElement_2;
-                    newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
-                    [array_2 addObject:newElement_2];
-                }
-                { // Scope for the error so we will know what it's named
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        *aError = err;
-                        return nil;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPBridgedActionsClusterEndpointListStruct * newElement_0;
+                    newElement_0 = [CHIPBridgedActionsClusterEndpointListStruct new];
+                    newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
+                    newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                                 length:entry_0.name.size()
+                                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
+                    { // Scope for our temporary variables
+                        auto * array_2 = [NSMutableArray new];
+                        auto iter_2 = entry_0.endpoints.begin();
+                        while (iter_2.Next()) {
+                            auto & entry_2 = iter_2.GetValue();
+                            NSNumber * newElement_2;
+                            newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
+                            [array_2 addObject:newElement_2];
+                        }
+                        CHIP_ERROR err = iter_2.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.endpoints = array_2;
                     }
+                    [array_0 addObject:newElement_0];
                 }
-                newElement_0.endpoints = array_2;
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::SetupUrl::Id: {
@@ -1857,22 +1904,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -1883,22 +1930,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -1909,22 +1956,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -1966,7 +2013,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::ProductName::Id: {
@@ -2101,6 +2148,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithBool:cppValue];
             return value;
         }
+        case Attributes::UniqueID::Id: {
+            using TypeInfo = Attributes::UniqueID::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
         case Attributes::ServerGeneratedCommandList::Id: {
             using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -2109,22 +2167,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -2135,22 +2193,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -2161,22 +2219,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -2207,49 +2265,49 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPChannelClusterChannelInfo * newElement_0;
-                newElement_0 = [CHIPChannelClusterChannelInfo new];
-                newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
-                newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
-                if (entry_0.name.HasValue()) {
-                    newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
-                                                                 length:entry_0.name.Value().size()
-                                                               encoding:NSUTF8StringEncoding];
-                } else {
-                    newElement_0.name = nil;
-                }
-                if (entry_0.callSign.HasValue()) {
-                    newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.Value().data()
-                                                                     length:entry_0.callSign.Value().size()
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPChannelClusterChannelInfo * newElement_0;
+                    newElement_0 = [CHIPChannelClusterChannelInfo new];
+                    newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
+                    newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
+                    if (entry_0.name.HasValue()) {
+                        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
+                                                                     length:entry_0.name.Value().size()
                                                                    encoding:NSUTF8StringEncoding];
-                } else {
-                    newElement_0.callSign = nil;
+                    } else {
+                        newElement_0.name = nil;
+                    }
+                    if (entry_0.callSign.HasValue()) {
+                        newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.Value().data()
+                                                                         length:entry_0.callSign.Value().size()
+                                                                       encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_0.callSign = nil;
+                    }
+                    if (entry_0.affiliateCallSign.HasValue()) {
+                        newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.Value().data()
+                                                                                  length:entry_0.affiliateCallSign.Value().size()
+                                                                                encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_0.affiliateCallSign = nil;
+                    }
+                    [array_0 addObject:newElement_0];
                 }
-                if (entry_0.affiliateCallSign.HasValue()) {
-                    newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.Value().data()
-                                                                              length:entry_0.affiliateCallSign.Value().size()
-                                                                            encoding:NSUTF8StringEncoding];
-                } else {
-                    newElement_0.affiliateCallSign = nil;
-                }
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
-        case Attributes::ChannelLineup::Id: {
-            using TypeInfo = Attributes::ChannelLineup::TypeInfo;
+        case Attributes::Lineup::Id: {
+            using TypeInfo = Attributes::Lineup::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -2327,22 +2385,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -2353,22 +2411,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -2379,22 +2437,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -2997,22 +3055,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -3023,22 +3081,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -3049,22 +3107,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -3087,30 +3145,32 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::ContentLauncher::Id: {
         using namespace Clusters::ContentLauncher;
         switch (aPath.mAttributeId) {
-        case Attributes::AcceptHeaderList::Id: {
-            using TypeInfo = Attributes::AcceptHeaderList::TypeInfo;
+        case Attributes::AcceptHeader::Id: {
+            using TypeInfo = Attributes::AcceptHeader::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSString * newElement_0;
-                newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSString * newElement_0;
+                    newElement_0 = [[NSString alloc] initWithBytes:entry_0.data()
+                                                            length:entry_0.size()
+                                                          encoding:NSUTF8StringEncoding];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::SupportedStreamingProtocols::Id: {
@@ -3132,22 +3192,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -3158,22 +3218,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -3184,22 +3244,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -3230,24 +3290,24 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPDescriptorClusterDeviceType * newElement_0;
-                newElement_0 = [CHIPDescriptorClusterDeviceType new];
-                newElement_0.type = [NSNumber numberWithUnsignedInt:entry_0.type];
-                newElement_0.revision = [NSNumber numberWithUnsignedShort:entry_0.revision];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPDescriptorClusterDeviceType * newElement_0;
+                    newElement_0 = [CHIPDescriptorClusterDeviceType new];
+                    newElement_0.type = [NSNumber numberWithUnsignedInt:entry_0.type];
+                    newElement_0.revision = [NSNumber numberWithUnsignedShort:entry_0.revision];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerList::Id: {
@@ -3258,22 +3318,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientList::Id: {
@@ -3284,22 +3344,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::PartsList::Id: {
@@ -3310,22 +3370,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -3336,22 +3396,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -3362,22 +3422,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -3388,22 +3448,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -3434,22 +3494,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -3460,22 +3520,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -3486,22 +3546,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         default:
@@ -3760,22 +3820,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -3786,22 +3846,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -3812,22 +3872,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -3979,22 +4039,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -4005,22 +4065,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -4031,22 +4091,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -4188,22 +4248,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -4214,22 +4274,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -4240,22 +4300,153 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            break;
+        }
+        break;
+    }
+    case Clusters::FanControl::Id: {
+        using namespace Clusters::FanControl;
+        switch (aPath.mAttributeId) {
+        case Attributes::FanMode::Id: {
+            using TypeInfo = Attributes::FanMode::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::FanModeSequence::Id: {
+            using TypeInfo = Attributes::FanModeSequence::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::ServerGeneratedCommandList::Id: {
+            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::ClientGeneratedCommandList::Id: {
+            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::AttributeList::Id: {
+            using TypeInfo = Attributes::AttributeList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -4297,28 +4488,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPFixedLabelClusterLabelStruct * newElement_0;
-                newElement_0 = [CHIPFixedLabelClusterLabelStruct new];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
-                newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                              length:entry_0.value.size()
-                                                            encoding:NSUTF8StringEncoding];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPFixedLabelClusterLabelStruct * newElement_0;
+                    newElement_0 = [CHIPFixedLabelClusterLabelStruct new];
+                    newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                                  length:entry_0.label.size()
+                                                                encoding:NSUTF8StringEncoding];
+                    newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
+                                                                  length:entry_0.value.size()
+                                                                encoding:NSUTF8StringEncoding];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -4329,22 +4520,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -4355,22 +4546,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -4381,22 +4572,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -4426,8 +4617,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::MinMeasuredValue::Id: {
@@ -4437,8 +4632,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::MaxMeasuredValue::Id: {
@@ -4448,8 +4647,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Tolerance::Id: {
@@ -4471,22 +4674,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -4497,22 +4700,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -4523,22 +4726,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -4592,7 +4795,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::LocationCapability::Id: {
@@ -4603,7 +4806,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -4614,22 +4817,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -4640,22 +4843,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -4666,22 +4869,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -4712,41 +4915,73 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPGeneralDiagnosticsClusterNetworkInterfaceType * newElement_0;
-                newElement_0 = [CHIPGeneralDiagnosticsClusterNetworkInterfaceType new];
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                             length:entry_0.name.size()
-                                                           encoding:NSUTF8StringEncoding];
-                newElement_0.fabricConnected = [NSNumber numberWithBool:entry_0.fabricConnected];
-                if (entry_0.offPremiseServicesReachableIPv4.IsNull()) {
-                    newElement_0.offPremiseServicesReachableIPv4 = nil;
-                } else {
-                    newElement_0.offPremiseServicesReachableIPv4 =
-                        [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv4.Value()];
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPGeneralDiagnosticsClusterNetworkInterfaceType * newElement_0;
+                    newElement_0 = [CHIPGeneralDiagnosticsClusterNetworkInterfaceType new];
+                    newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                                 length:entry_0.name.size()
+                                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.isOperational = [NSNumber numberWithBool:entry_0.isOperational];
+                    if (entry_0.offPremiseServicesReachableIPv4.IsNull()) {
+                        newElement_0.offPremiseServicesReachableIPv4 = nil;
+                    } else {
+                        newElement_0.offPremiseServicesReachableIPv4 =
+                            [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv4.Value()];
+                    }
+                    if (entry_0.offPremiseServicesReachableIPv6.IsNull()) {
+                        newElement_0.offPremiseServicesReachableIPv6 = nil;
+                    } else {
+                        newElement_0.offPremiseServicesReachableIPv6 =
+                            [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6.Value()];
+                    }
+                    newElement_0.hardwareAddress = [NSData dataWithBytes:entry_0.hardwareAddress.data()
+                                                                  length:entry_0.hardwareAddress.size()];
+                    { // Scope for our temporary variables
+                        auto * array_2 = [NSMutableArray new];
+                        auto iter_2 = entry_0.IPv4Addresses.begin();
+                        while (iter_2.Next()) {
+                            auto & entry_2 = iter_2.GetValue();
+                            NSData * newElement_2;
+                            newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                            [array_2 addObject:newElement_2];
+                        }
+                        CHIP_ERROR err = iter_2.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.iPv4Addresses = array_2;
+                    }
+                    { // Scope for our temporary variables
+                        auto * array_2 = [NSMutableArray new];
+                        auto iter_2 = entry_0.IPv6Addresses.begin();
+                        while (iter_2.Next()) {
+                            auto & entry_2 = iter_2.GetValue();
+                            NSData * newElement_2;
+                            newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                            [array_2 addObject:newElement_2];
+                        }
+                        CHIP_ERROR err = iter_2.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.iPv6Addresses = array_2;
+                    }
+                    newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
+                    [array_0 addObject:newElement_0];
                 }
-                if (entry_0.offPremiseServicesReachableIPv6.IsNull()) {
-                    newElement_0.offPremiseServicesReachableIPv6 = nil;
-                } else {
-                    newElement_0.offPremiseServicesReachableIPv6 =
-                        [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6.Value()];
-                }
-                newElement_0.hardwareAddress = [NSData dataWithBytes:entry_0.hardwareAddress.data()
-                                                              length:entry_0.hardwareAddress.size()];
-                newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::RebootCount::Id: {
@@ -4801,22 +5036,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ActiveRadioFaults::Id: {
@@ -4827,22 +5062,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ActiveNetworkFaults::Id: {
@@ -4853,22 +5088,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -4879,22 +5114,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -4905,22 +5140,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -4931,22 +5166,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -4977,25 +5212,25 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPGroupKeyManagementClusterGroupKeyMapStruct * newElement_0;
-                newElement_0 = [CHIPGroupKeyManagementClusterGroupKeyMapStruct new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-                newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
-                newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPGroupKeyManagementClusterGroupKeyMapStruct * newElement_0;
+                    newElement_0 = [CHIPGroupKeyManagementClusterGroupKeyMapStruct new];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+                    newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::GroupTable::Id: {
@@ -5006,47 +5241,47 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPGroupKeyManagementClusterGroupInfoMapStruct * newElement_0;
-                newElement_0 = [CHIPGroupKeyManagementClusterGroupInfoMapStruct new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-                newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
-                auto * array_2 = [NSMutableArray new];
-                auto iter_2 = entry_0.endpoints.begin();
-                while (iter_2.Next()) {
-                    auto & entry_2 = iter_2.GetValue();
-                    NSNumber * newElement_2;
-                    newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
-                    [array_2 addObject:newElement_2];
-                }
-                { // Scope for the error so we will know what it's named
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        *aError = err;
-                        return nil;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPGroupKeyManagementClusterGroupInfoMapStruct * newElement_0;
+                    newElement_0 = [CHIPGroupKeyManagementClusterGroupInfoMapStruct new];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+                    { // Scope for our temporary variables
+                        auto * array_2 = [NSMutableArray new];
+                        auto iter_2 = entry_0.endpoints.begin();
+                        while (iter_2.Next()) {
+                            auto & entry_2 = iter_2.GetValue();
+                            NSNumber * newElement_2;
+                            newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
+                            [array_2 addObject:newElement_2];
+                        }
+                        CHIP_ERROR err = iter_2.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.endpoints = array_2;
                     }
+                    if (entry_0.groupName.HasValue()) {
+                        newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
+                                                                          length:entry_0.groupName.Value().size()
+                                                                        encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_0.groupName = nil;
+                    }
+                    [array_0 addObject:newElement_0];
                 }
-                newElement_0.endpoints = array_2;
-                if (entry_0.groupName.HasValue()) {
-                    newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
-                                                                      length:entry_0.groupName.Value().size()
-                                                                    encoding:NSUTF8StringEncoding];
-                } else {
-                    newElement_0.groupName = nil;
-                }
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::MaxGroupsPerFabric::Id: {
@@ -5079,22 +5314,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -5105,22 +5340,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -5131,22 +5366,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -5188,22 +5423,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -5214,22 +5449,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -5240,22 +5475,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -5308,22 +5543,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -5334,22 +5569,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -5360,22 +5595,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -5477,22 +5712,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -5503,22 +5738,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -5529,22 +5764,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -5575,22 +5810,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -5601,22 +5836,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -5627,22 +5862,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -5847,22 +6082,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -5873,22 +6108,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -5899,22 +6134,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -5967,22 +6202,24 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSString * newElement_0;
-                newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSString * newElement_0;
+                    newElement_0 = [[NSString alloc] initWithBytes:entry_0.data()
+                                                            length:entry_0.size()
+                                                          encoding:NSUTF8StringEncoding];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -5993,22 +6230,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -6019,22 +6256,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6065,22 +6302,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -6091,22 +6328,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -6117,22 +6354,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6155,42 +6392,42 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::MediaInput::Id: {
         using namespace Clusters::MediaInput;
         switch (aPath.mAttributeId) {
-        case Attributes::MediaInputList::Id: {
-            using TypeInfo = Attributes::MediaInputList::TypeInfo;
+        case Attributes::InputList::Id: {
+            using TypeInfo = Attributes::InputList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPMediaInputClusterInputInfo * newElement_0;
-                newElement_0 = [CHIPMediaInputClusterInputInfo new];
-                newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
-                newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                             length:entry_0.name.size()
-                                                           encoding:NSUTF8StringEncoding];
-                newElement_0.descriptionString = [[NSString alloc] initWithBytes:entry_0.description.data()
-                                                                          length:entry_0.description.size()
-                                                                        encoding:NSUTF8StringEncoding];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPMediaInputClusterInputInfo * newElement_0;
+                    newElement_0 = [CHIPMediaInputClusterInputInfo new];
+                    newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
+                    newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
+                    newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                                 length:entry_0.name.size()
+                                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.descriptionString = [[NSString alloc] initWithBytes:entry_0.description.data()
+                                                                              length:entry_0.description.size()
+                                                                            encoding:NSUTF8StringEncoding];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
-        case Attributes::CurrentMediaInput::Id: {
-            using TypeInfo = Attributes::CurrentMediaInput::TypeInfo;
+        case Attributes::CurrentInput::Id: {
+            using TypeInfo = Attributes::CurrentInput::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -6208,22 +6445,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -6234,22 +6471,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -6260,22 +6497,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6298,8 +6535,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::MediaPlayback::Id: {
         using namespace Clusters::MediaPlayback;
         switch (aPath.mAttributeId) {
-        case Attributes::PlaybackState::Id: {
-            using TypeInfo = Attributes::PlaybackState::TypeInfo;
+        case Attributes::CurrentState::Id: {
+            using TypeInfo = Attributes::CurrentState::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -6339,20 +6576,24 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
-        case Attributes::Position::Id: {
-            using TypeInfo = Attributes::Position::TypeInfo;
+        case Attributes::SampledPosition::Id: {
+            using TypeInfo = Attributes::SampledPosition::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            CHIPMediaPlaybackClusterPlaybackPosition * _Nonnull value;
-            value = [CHIPMediaPlaybackClusterPlaybackPosition new];
-            value.updatedAt = [NSNumber numberWithUnsignedLongLong:cppValue.updatedAt];
-            if (cppValue.position.IsNull()) {
-                value.position = nil;
+            CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
             } else {
-                value.position = [NSNumber numberWithUnsignedLongLong:cppValue.position.Value()];
+                value = [CHIPMediaPlaybackClusterPlaybackPosition new];
+                value.updatedAt = [NSNumber numberWithUnsignedLongLong:cppValue.Value().updatedAt];
+                if (cppValue.Value().position.IsNull()) {
+                    value.position = nil;
+                } else {
+                    value.position = [NSNumber numberWithUnsignedLongLong:cppValue.Value().position.Value()];
+                }
             }
             return value;
         }
@@ -6405,22 +6646,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -6431,22 +6672,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -6457,22 +6698,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6514,27 +6755,27 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPModeSelectClusterModeOptionStruct * newElement_0;
-                newElement_0 = [CHIPModeSelectClusterModeOptionStruct new];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
-                newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
-                newElement_0.semanticTag = [NSNumber numberWithUnsignedInt:entry_0.semanticTag];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPModeSelectClusterModeOptionStruct * newElement_0;
+                    newElement_0 = [CHIPModeSelectClusterModeOptionStruct new];
+                    newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                                  length:entry_0.label.size()
+                                                                encoding:NSUTF8StringEncoding];
+                    newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
+                    newElement_0.semanticTag = [NSNumber numberWithUnsignedInt:entry_0.semanticTag];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::OnMode::Id: {
@@ -6578,22 +6819,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -6604,22 +6845,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -6630,22 +6871,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6687,24 +6928,24 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPNetworkCommissioningClusterNetworkInfo * newElement_0;
-                newElement_0 = [CHIPNetworkCommissioningClusterNetworkInfo new];
-                newElement_0.networkID = [NSData dataWithBytes:entry_0.networkID.data() length:entry_0.networkID.size()];
-                newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPNetworkCommissioningClusterNetworkInfo * newElement_0;
+                    newElement_0 = [CHIPNetworkCommissioningClusterNetworkInfo new];
+                    newElement_0.networkID = [NSData dataWithBytes:entry_0.networkID.data() length:entry_0.networkID.size()];
+                    newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ScanMaxTimeSeconds::Id: {
@@ -6747,8 +6988,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+            }
             return value;
         }
         case Attributes::LastNetworkID::Id: {
@@ -6758,8 +7003,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSData * _Nonnull value;
-            value = [NSData dataWithBytes:cppValue.data() length:cppValue.size()];
+            NSData * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSData dataWithBytes:cppValue.Value().data() length:cppValue.Value().size()];
+            }
             return value;
         }
         case Attributes::LastConnectErrorValue::Id: {
@@ -6769,8 +7018,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithInt:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -6781,22 +7034,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -6807,22 +7060,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -6864,22 +7117,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6910,25 +7163,25 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPOtaSoftwareUpdateRequestorClusterProviderLocation * newElement_0;
-                newElement_0 = [CHIPOtaSoftwareUpdateRequestorClusterProviderLocation new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-                newElement_0.providerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.providerNodeID];
-                newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPOtaSoftwareUpdateRequestorClusterProviderLocation * newElement_0;
+                    newElement_0 = [CHIPOtaSoftwareUpdateRequestorClusterProviderLocation new];
+                    newElement_0.providerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.providerNodeID];
+                    newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::UpdatePossible::Id: {
@@ -6976,22 +7229,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -7055,22 +7308,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -7081,22 +7334,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -7107,22 +7360,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -7208,22 +7461,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -7234,22 +7487,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -7260,22 +7513,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -7339,22 +7592,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -7365,22 +7618,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -7391,22 +7644,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -7437,64 +7690,64 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPOperationalCredentialsClusterNOCStruct * newElement_0;
-                newElement_0 = [CHIPOperationalCredentialsClusterNOCStruct new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-                newElement_0.noc = [NSData dataWithBytes:entry_0.noc.data() length:entry_0.noc.size()];
-                if (entry_0.icac.IsNull()) {
-                    newElement_0.icac = nil;
-                } else {
-                    newElement_0.icac = [NSData dataWithBytes:entry_0.icac.Value().data() length:entry_0.icac.Value().size()];
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPOperationalCredentialsClusterNOCStruct * newElement_0;
+                    newElement_0 = [CHIPOperationalCredentialsClusterNOCStruct new];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    newElement_0.noc = [NSData dataWithBytes:entry_0.noc.data() length:entry_0.noc.size()];
+                    if (entry_0.icac.IsNull()) {
+                        newElement_0.icac = nil;
+                    } else {
+                        newElement_0.icac = [NSData dataWithBytes:entry_0.icac.Value().data() length:entry_0.icac.Value().size()];
+                    }
+                    [array_0 addObject:newElement_0];
                 }
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
-        case Attributes::FabricsList::Id: {
-            using TypeInfo = Attributes::FabricsList::TypeInfo;
+        case Attributes::Fabrics::Id: {
+            using TypeInfo = Attributes::Fabrics::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPOperationalCredentialsClusterFabricDescriptor * newElement_0;
-                newElement_0 = [CHIPOperationalCredentialsClusterFabricDescriptor new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-                newElement_0.rootPublicKey = [NSData dataWithBytes:entry_0.rootPublicKey.data()
-                                                            length:entry_0.rootPublicKey.size()];
-                newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
-                newElement_0.fabricId = [NSNumber numberWithUnsignedLongLong:entry_0.fabricId];
-                newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPOperationalCredentialsClusterFabricDescriptor * newElement_0;
+                    newElement_0 = [CHIPOperationalCredentialsClusterFabricDescriptor new];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    newElement_0.rootPublicKey = [NSData dataWithBytes:entry_0.rootPublicKey.data()
+                                                                length:entry_0.rootPublicKey.size()];
+                    newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
+                    newElement_0.fabricId = [NSNumber numberWithUnsignedLongLong:entry_0.fabricId];
+                    newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId];
+                    newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                                  length:entry_0.label.size()
+                                                                encoding:NSUTF8StringEncoding];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::SupportedFabrics::Id: {
@@ -7527,22 +7780,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSData * newElement_0;
-                newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSData * newElement_0;
+                    newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::CurrentFabricIndex::Id: {
@@ -7564,22 +7817,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -7590,22 +7843,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -7616,22 +7869,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -7739,22 +7992,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::BatteryChargeState::Id: {
@@ -7776,22 +8029,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -7802,22 +8055,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -7828,22 +8081,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -7885,22 +8138,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -7911,22 +8164,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -7937,22 +8190,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -7963,22 +8216,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8008,8 +8261,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::MinMeasuredValue::Id: {
@@ -8019,8 +8276,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::MaxMeasuredValue::Id: {
@@ -8030,8 +8291,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -8042,22 +8307,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8360,22 +8625,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -8386,22 +8651,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -8412,22 +8677,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -8513,22 +8778,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -8539,22 +8804,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -8565,22 +8830,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8666,22 +8931,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -8692,22 +8957,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -8718,22 +8983,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8764,29 +9029,29 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPSoftwareDiagnosticsClusterThreadMetrics * newElement_0;
-                newElement_0 = [CHIPSoftwareDiagnosticsClusterThreadMetrics new];
-                newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                             length:entry_0.name.size()
-                                                           encoding:NSUTF8StringEncoding];
-                newElement_0.stackFreeCurrent = [NSNumber numberWithUnsignedInt:entry_0.stackFreeCurrent];
-                newElement_0.stackFreeMinimum = [NSNumber numberWithUnsignedInt:entry_0.stackFreeMinimum];
-                newElement_0.stackSize = [NSNumber numberWithUnsignedInt:entry_0.stackSize];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPSoftwareDiagnosticsClusterThreadMetrics * newElement_0;
+                    newElement_0 = [CHIPSoftwareDiagnosticsClusterThreadMetrics new];
+                    newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
+                    newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                                 length:entry_0.name.size()
+                                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.stackFreeCurrent = [NSNumber numberWithUnsignedInt:entry_0.stackFreeCurrent];
+                    newElement_0.stackFreeMinimum = [NSNumber numberWithUnsignedInt:entry_0.stackFreeMinimum];
+                    newElement_0.stackSize = [NSNumber numberWithUnsignedInt:entry_0.stackSize];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::CurrentHeapFree::Id: {
@@ -8830,22 +9095,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -8856,22 +9121,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -8882,22 +9147,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -8972,22 +9237,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -8998,22 +9263,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -9024,22 +9289,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -9073,38 +9338,38 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::TargetNavigator::Id: {
         using namespace Clusters::TargetNavigator;
         switch (aPath.mAttributeId) {
-        case Attributes::TargetNavigatorList::Id: {
-            using TypeInfo = Attributes::TargetNavigatorList::TypeInfo;
+        case Attributes::TargetList::Id: {
+            using TypeInfo = Attributes::TargetList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPTargetNavigatorClusterTargetInfo * newElement_0;
-                newElement_0 = [CHIPTargetNavigatorClusterTargetInfo new];
-                newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                             length:entry_0.name.size()
-                                                           encoding:NSUTF8StringEncoding];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPTargetNavigatorClusterTargetInfo * newElement_0;
+                    newElement_0 = [CHIPTargetNavigatorClusterTargetInfo new];
+                    newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
+                    newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                                 length:entry_0.name.size()
+                                                               encoding:NSUTF8StringEncoding];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
-        case Attributes::CurrentNavigatorTarget::Id: {
-            using TypeInfo = Attributes::CurrentNavigatorTarget::TypeInfo;
+        case Attributes::CurrentTarget::Id: {
+            using TypeInfo = Attributes::CurrentTarget::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -9122,22 +9387,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -9148,22 +9413,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -9174,22 +9439,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -9219,8 +9484,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::MinMeasuredValue::Id: {
@@ -9230,8 +9499,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::MaxMeasuredValue::Id: {
@@ -9241,8 +9514,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Tolerance::Id: {
@@ -9264,22 +9541,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -9596,22 +9873,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ListOctetString::Id: {
@@ -9622,22 +9899,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSData * newElement_0;
-                newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSData * newElement_0;
+                    newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ListStructOctetString::Id: {
@@ -9648,25 +9925,25 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPTestClusterClusterTestListStructOctet * newElement_0;
-                newElement_0 = [CHIPTestClusterClusterTestListStructOctet new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedLongLong:entry_0.fabricIndex];
-                newElement_0.operationalCert = [NSData dataWithBytes:entry_0.operationalCert.data()
-                                                              length:entry_0.operationalCert.size()];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPTestClusterClusterTestListStructOctet * newElement_0;
+                    newElement_0 = [CHIPTestClusterClusterTestListStructOctet new];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedLongLong:entry_0.fabricIndex];
+                    newElement_0.operationalCert = [NSData dataWithBytes:entry_0.operationalCert.data()
+                                                                  length:entry_0.operationalCert.size()];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::LongOctetString::Id: {
@@ -9743,194 +10020,194 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPTestClusterClusterNullablesAndOptionalsStruct * newElement_0;
-                newElement_0 = [CHIPTestClusterClusterNullablesAndOptionalsStruct new];
-                if (entry_0.nullableInt.IsNull()) {
-                    newElement_0.nullableInt = nil;
-                } else {
-                    newElement_0.nullableInt = [NSNumber numberWithUnsignedShort:entry_0.nullableInt.Value()];
-                }
-                if (entry_0.optionalInt.HasValue()) {
-                    newElement_0.optionalInt = [NSNumber numberWithUnsignedShort:entry_0.optionalInt.Value()];
-                } else {
-                    newElement_0.optionalInt = nil;
-                }
-                if (entry_0.nullableOptionalInt.HasValue()) {
-                    if (entry_0.nullableOptionalInt.Value().IsNull()) {
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPTestClusterClusterNullablesAndOptionalsStruct * newElement_0;
+                    newElement_0 = [CHIPTestClusterClusterNullablesAndOptionalsStruct new];
+                    if (entry_0.nullableInt.IsNull()) {
+                        newElement_0.nullableInt = nil;
+                    } else {
+                        newElement_0.nullableInt = [NSNumber numberWithUnsignedShort:entry_0.nullableInt.Value()];
+                    }
+                    if (entry_0.optionalInt.HasValue()) {
+                        newElement_0.optionalInt = [NSNumber numberWithUnsignedShort:entry_0.optionalInt.Value()];
+                    } else {
+                        newElement_0.optionalInt = nil;
+                    }
+                    if (entry_0.nullableOptionalInt.HasValue()) {
+                        if (entry_0.nullableOptionalInt.Value().IsNull()) {
+                            newElement_0.nullableOptionalInt = nil;
+                        } else {
+                            newElement_0.nullableOptionalInt =
+                                [NSNumber numberWithUnsignedShort:entry_0.nullableOptionalInt.Value().Value()];
+                        }
+                    } else {
                         newElement_0.nullableOptionalInt = nil;
-                    } else {
-                        newElement_0.nullableOptionalInt =
-                            [NSNumber numberWithUnsignedShort:entry_0.nullableOptionalInt.Value().Value()];
                     }
-                } else {
-                    newElement_0.nullableOptionalInt = nil;
-                }
-                if (entry_0.nullableString.IsNull()) {
-                    newElement_0.nullableString = nil;
-                } else {
-                    newElement_0.nullableString = [[NSString alloc] initWithBytes:entry_0.nullableString.Value().data()
-                                                                           length:entry_0.nullableString.Value().size()
-                                                                         encoding:NSUTF8StringEncoding];
-                }
-                if (entry_0.optionalString.HasValue()) {
-                    newElement_0.optionalString = [[NSString alloc] initWithBytes:entry_0.optionalString.Value().data()
-                                                                           length:entry_0.optionalString.Value().size()
-                                                                         encoding:NSUTF8StringEncoding];
-                } else {
-                    newElement_0.optionalString = nil;
-                }
-                if (entry_0.nullableOptionalString.HasValue()) {
-                    if (entry_0.nullableOptionalString.Value().IsNull()) {
+                    if (entry_0.nullableString.IsNull()) {
+                        newElement_0.nullableString = nil;
+                    } else {
+                        newElement_0.nullableString = [[NSString alloc] initWithBytes:entry_0.nullableString.Value().data()
+                                                                               length:entry_0.nullableString.Value().size()
+                                                                             encoding:NSUTF8StringEncoding];
+                    }
+                    if (entry_0.optionalString.HasValue()) {
+                        newElement_0.optionalString = [[NSString alloc] initWithBytes:entry_0.optionalString.Value().data()
+                                                                               length:entry_0.optionalString.Value().size()
+                                                                             encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_0.optionalString = nil;
+                    }
+                    if (entry_0.nullableOptionalString.HasValue()) {
+                        if (entry_0.nullableOptionalString.Value().IsNull()) {
+                            newElement_0.nullableOptionalString = nil;
+                        } else {
+                            newElement_0.nullableOptionalString =
+                                [[NSString alloc] initWithBytes:entry_0.nullableOptionalString.Value().Value().data()
+                                                         length:entry_0.nullableOptionalString.Value().Value().size()
+                                                       encoding:NSUTF8StringEncoding];
+                        }
+                    } else {
                         newElement_0.nullableOptionalString = nil;
-                    } else {
-                        newElement_0.nullableOptionalString =
-                            [[NSString alloc] initWithBytes:entry_0.nullableOptionalString.Value().Value().data()
-                                                     length:entry_0.nullableOptionalString.Value().Value().size()
-                                                   encoding:NSUTF8StringEncoding];
                     }
-                } else {
-                    newElement_0.nullableOptionalString = nil;
-                }
-                if (entry_0.nullableStruct.IsNull()) {
-                    newElement_0.nullableStruct = nil;
-                } else {
-                    newElement_0.nullableStruct = [CHIPTestClusterClusterSimpleStruct new];
-                    newElement_0.nullableStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().a];
-                    newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
-                    newElement_0.nullableStruct.c =
-                        [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
-                    newElement_0.nullableStruct.d = [NSData dataWithBytes:entry_0.nullableStruct.Value().d.data()
-                                                                   length:entry_0.nullableStruct.Value().d.size()];
-                    newElement_0.nullableStruct.e = [[NSString alloc] initWithBytes:entry_0.nullableStruct.Value().e.data()
-                                                                             length:entry_0.nullableStruct.Value().e.size()
-                                                                           encoding:NSUTF8StringEncoding];
-                    newElement_0.nullableStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().f.Raw()];
-                    newElement_0.nullableStruct.g = [NSNumber numberWithFloat:entry_0.nullableStruct.Value().g];
-                    newElement_0.nullableStruct.h = [NSNumber numberWithDouble:entry_0.nullableStruct.Value().h];
-                }
-                if (entry_0.optionalStruct.HasValue()) {
-                    newElement_0.optionalStruct = [CHIPTestClusterClusterSimpleStruct new];
-                    newElement_0.optionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().a];
-                    newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
-                    newElement_0.optionalStruct.c =
-                        [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
-                    newElement_0.optionalStruct.d = [NSData dataWithBytes:entry_0.optionalStruct.Value().d.data()
-                                                                   length:entry_0.optionalStruct.Value().d.size()];
-                    newElement_0.optionalStruct.e = [[NSString alloc] initWithBytes:entry_0.optionalStruct.Value().e.data()
-                                                                             length:entry_0.optionalStruct.Value().e.size()
-                                                                           encoding:NSUTF8StringEncoding];
-                    newElement_0.optionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().f.Raw()];
-                    newElement_0.optionalStruct.g = [NSNumber numberWithFloat:entry_0.optionalStruct.Value().g];
-                    newElement_0.optionalStruct.h = [NSNumber numberWithDouble:entry_0.optionalStruct.Value().h];
-                } else {
-                    newElement_0.optionalStruct = nil;
-                }
-                if (entry_0.nullableOptionalStruct.HasValue()) {
-                    if (entry_0.nullableOptionalStruct.Value().IsNull()) {
+                    if (entry_0.nullableStruct.IsNull()) {
+                        newElement_0.nullableStruct = nil;
+                    } else {
+                        newElement_0.nullableStruct = [CHIPTestClusterClusterSimpleStruct new];
+                        newElement_0.nullableStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().a];
+                        newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
+                        newElement_0.nullableStruct.c =
+                            [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
+                        newElement_0.nullableStruct.d = [NSData dataWithBytes:entry_0.nullableStruct.Value().d.data()
+                                                                       length:entry_0.nullableStruct.Value().d.size()];
+                        newElement_0.nullableStruct.e = [[NSString alloc] initWithBytes:entry_0.nullableStruct.Value().e.data()
+                                                                                 length:entry_0.nullableStruct.Value().e.size()
+                                                                               encoding:NSUTF8StringEncoding];
+                        newElement_0.nullableStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().f.Raw()];
+                        newElement_0.nullableStruct.g = [NSNumber numberWithFloat:entry_0.nullableStruct.Value().g];
+                        newElement_0.nullableStruct.h = [NSNumber numberWithDouble:entry_0.nullableStruct.Value().h];
+                    }
+                    if (entry_0.optionalStruct.HasValue()) {
+                        newElement_0.optionalStruct = [CHIPTestClusterClusterSimpleStruct new];
+                        newElement_0.optionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().a];
+                        newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
+                        newElement_0.optionalStruct.c =
+                            [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
+                        newElement_0.optionalStruct.d = [NSData dataWithBytes:entry_0.optionalStruct.Value().d.data()
+                                                                       length:entry_0.optionalStruct.Value().d.size()];
+                        newElement_0.optionalStruct.e = [[NSString alloc] initWithBytes:entry_0.optionalStruct.Value().e.data()
+                                                                                 length:entry_0.optionalStruct.Value().e.size()
+                                                                               encoding:NSUTF8StringEncoding];
+                        newElement_0.optionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().f.Raw()];
+                        newElement_0.optionalStruct.g = [NSNumber numberWithFloat:entry_0.optionalStruct.Value().g];
+                        newElement_0.optionalStruct.h = [NSNumber numberWithDouble:entry_0.optionalStruct.Value().h];
+                    } else {
+                        newElement_0.optionalStruct = nil;
+                    }
+                    if (entry_0.nullableOptionalStruct.HasValue()) {
+                        if (entry_0.nullableOptionalStruct.Value().IsNull()) {
+                            newElement_0.nullableOptionalStruct = nil;
+                        } else {
+                            newElement_0.nullableOptionalStruct = [CHIPTestClusterClusterSimpleStruct new];
+                            newElement_0.nullableOptionalStruct.a =
+                                [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
+                            newElement_0.nullableOptionalStruct.b =
+                                [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
+                            newElement_0.nullableOptionalStruct.c = [NSNumber
+                                numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
+                            newElement_0.nullableOptionalStruct.d =
+                                [NSData dataWithBytes:entry_0.nullableOptionalStruct.Value().Value().d.data()
+                                               length:entry_0.nullableOptionalStruct.Value().Value().d.size()];
+                            newElement_0.nullableOptionalStruct.e =
+                                [[NSString alloc] initWithBytes:entry_0.nullableOptionalStruct.Value().Value().e.data()
+                                                         length:entry_0.nullableOptionalStruct.Value().Value().e.size()
+                                                       encoding:NSUTF8StringEncoding];
+                            newElement_0.nullableOptionalStruct.f =
+                                [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
+                            newElement_0.nullableOptionalStruct.g =
+                                [NSNumber numberWithFloat:entry_0.nullableOptionalStruct.Value().Value().g];
+                            newElement_0.nullableOptionalStruct.h =
+                                [NSNumber numberWithDouble:entry_0.nullableOptionalStruct.Value().Value().h];
+                        }
+                    } else {
                         newElement_0.nullableOptionalStruct = nil;
+                    }
+                    if (entry_0.nullableList.IsNull()) {
+                        newElement_0.nullableList = nil;
                     } else {
-                        newElement_0.nullableOptionalStruct = [CHIPTestClusterClusterSimpleStruct new];
-                        newElement_0.nullableOptionalStruct.a =
-                            [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
-                        newElement_0.nullableOptionalStruct.b =
-                            [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
-                        newElement_0.nullableOptionalStruct.c =
-                            [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
-                        newElement_0.nullableOptionalStruct.d =
-                            [NSData dataWithBytes:entry_0.nullableOptionalStruct.Value().Value().d.data()
-                                           length:entry_0.nullableOptionalStruct.Value().Value().d.size()];
-                        newElement_0.nullableOptionalStruct.e =
-                            [[NSString alloc] initWithBytes:entry_0.nullableOptionalStruct.Value().Value().e.data()
-                                                     length:entry_0.nullableOptionalStruct.Value().Value().e.size()
-                                                   encoding:NSUTF8StringEncoding];
-                        newElement_0.nullableOptionalStruct.f =
-                            [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
-                        newElement_0.nullableOptionalStruct.g =
-                            [NSNumber numberWithFloat:entry_0.nullableOptionalStruct.Value().Value().g];
-                        newElement_0.nullableOptionalStruct.h =
-                            [NSNumber numberWithDouble:entry_0.nullableOptionalStruct.Value().Value().h];
-                    }
-                } else {
-                    newElement_0.nullableOptionalStruct = nil;
-                }
-                if (entry_0.nullableList.IsNull()) {
-                    newElement_0.nullableList = nil;
-                } else {
-                    auto * array_3 = [NSMutableArray new];
-                    auto iter_3 = entry_0.nullableList.Value().begin();
-                    while (iter_3.Next()) {
-                        auto & entry_3 = iter_3.GetValue();
-                        NSNumber * newElement_3;
-                        newElement_3 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3)];
-                        [array_3 addObject:newElement_3];
-                    }
-                    { // Scope for the error so we will know what it's named
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            *aError = err;
-                            return nil;
-                        }
-                    }
-                    newElement_0.nullableList = array_3;
-                }
-                if (entry_0.optionalList.HasValue()) {
-                    auto * array_3 = [NSMutableArray new];
-                    auto iter_3 = entry_0.optionalList.Value().begin();
-                    while (iter_3.Next()) {
-                        auto & entry_3 = iter_3.GetValue();
-                        NSNumber * newElement_3;
-                        newElement_3 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3)];
-                        [array_3 addObject:newElement_3];
-                    }
-                    { // Scope for the error so we will know what it's named
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            *aError = err;
-                            return nil;
-                        }
-                    }
-                    newElement_0.optionalList = array_3;
-                } else {
-                    newElement_0.optionalList = nil;
-                }
-                if (entry_0.nullableOptionalList.HasValue()) {
-                    if (entry_0.nullableOptionalList.Value().IsNull()) {
-                        newElement_0.nullableOptionalList = nil;
-                    } else {
-                        auto * array_4 = [NSMutableArray new];
-                        auto iter_4 = entry_0.nullableOptionalList.Value().Value().begin();
-                        while (iter_4.Next()) {
-                            auto & entry_4 = iter_4.GetValue();
-                            NSNumber * newElement_4;
-                            newElement_4 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_4)];
-                            [array_4 addObject:newElement_4];
-                        }
-                        { // Scope for the error so we will know what it's named
-                            CHIP_ERROR err = iter_4.GetStatus();
+                        { // Scope for our temporary variables
+                            auto * array_3 = [NSMutableArray new];
+                            auto iter_3 = entry_0.nullableList.Value().begin();
+                            while (iter_3.Next()) {
+                                auto & entry_3 = iter_3.GetValue();
+                                NSNumber * newElement_3;
+                                newElement_3 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3)];
+                                [array_3 addObject:newElement_3];
+                            }
+                            CHIP_ERROR err = iter_3.GetStatus();
                             if (err != CHIP_NO_ERROR) {
                                 *aError = err;
                                 return nil;
                             }
+                            newElement_0.nullableList = array_3;
                         }
-                        newElement_0.nullableOptionalList = array_4;
                     }
-                } else {
-                    newElement_0.nullableOptionalList = nil;
+                    if (entry_0.optionalList.HasValue()) {
+                        { // Scope for our temporary variables
+                            auto * array_3 = [NSMutableArray new];
+                            auto iter_3 = entry_0.optionalList.Value().begin();
+                            while (iter_3.Next()) {
+                                auto & entry_3 = iter_3.GetValue();
+                                NSNumber * newElement_3;
+                                newElement_3 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3)];
+                                [array_3 addObject:newElement_3];
+                            }
+                            CHIP_ERROR err = iter_3.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_0.optionalList = array_3;
+                        }
+                    } else {
+                        newElement_0.optionalList = nil;
+                    }
+                    if (entry_0.nullableOptionalList.HasValue()) {
+                        if (entry_0.nullableOptionalList.Value().IsNull()) {
+                            newElement_0.nullableOptionalList = nil;
+                        } else {
+                            { // Scope for our temporary variables
+                                auto * array_4 = [NSMutableArray new];
+                                auto iter_4 = entry_0.nullableOptionalList.Value().Value().begin();
+                                while (iter_4.Next()) {
+                                    auto & entry_4 = iter_4.GetValue();
+                                    NSNumber * newElement_4;
+                                    newElement_4 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_4)];
+                                    [array_4 addObject:newElement_4];
+                                }
+                                CHIP_ERROR err = iter_4.GetStatus();
+                                if (err != CHIP_NO_ERROR) {
+                                    *aError = err;
+                                    return nil;
+                                }
+                                newElement_0.nullableOptionalList = array_4;
+                            }
+                        }
+                    } else {
+                        newElement_0.nullableOptionalList = nil;
+                    }
+                    [array_0 addObject:newElement_0];
                 }
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::EnumAttr::Id: {
@@ -10015,22 +10292,105 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSData * newElement_0;
-                newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSData * newElement_0;
+                    newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
+            return value;
+        }
+        case Attributes::ListFabricScoped::Id: {
+            using TypeInfo = Attributes::ListFabricScoped::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPTestClusterClusterTestFabricScoped * newElement_0;
+                    newElement_0 = [CHIPTestClusterClusterTestFabricScoped new];
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    newElement_0.fabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveInt8u];
+                    if (entry_0.optionalFabricSensitiveInt8u.HasValue()) {
+                        newElement_0.optionalFabricSensitiveInt8u =
+                            [NSNumber numberWithUnsignedChar:entry_0.optionalFabricSensitiveInt8u.Value()];
+                    } else {
+                        newElement_0.optionalFabricSensitiveInt8u = nil;
+                    }
+                    if (entry_0.nullableFabricSensitiveInt8u.IsNull()) {
+                        newElement_0.nullableFabricSensitiveInt8u = nil;
+                    } else {
+                        newElement_0.nullableFabricSensitiveInt8u =
+                            [NSNumber numberWithUnsignedChar:entry_0.nullableFabricSensitiveInt8u.Value()];
+                    }
+                    if (entry_0.nullableOptionalFabricSensitiveInt8u.HasValue()) {
+                        if (entry_0.nullableOptionalFabricSensitiveInt8u.Value().IsNull()) {
+                            newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
+                        } else {
+                            newElement_0.nullableOptionalFabricSensitiveInt8u =
+                                [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalFabricSensitiveInt8u.Value().Value()];
+                        }
+                    } else {
+                        newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
+                    }
+                    newElement_0.fabricSensitiveCharString =
+                        [[NSString alloc] initWithBytes:entry_0.fabricSensitiveCharString.data()
+                                                 length:entry_0.fabricSensitiveCharString.size()
+                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.fabricSensitiveStruct = [CHIPTestClusterClusterSimpleStruct new];
+                    newElement_0.fabricSensitiveStruct.a = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.a];
+                    newElement_0.fabricSensitiveStruct.b = [NSNumber numberWithBool:entry_0.fabricSensitiveStruct.b];
+                    newElement_0.fabricSensitiveStruct.c =
+                        [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.fabricSensitiveStruct.c)];
+                    newElement_0.fabricSensitiveStruct.d = [NSData dataWithBytes:entry_0.fabricSensitiveStruct.d.data()
+                                                                          length:entry_0.fabricSensitiveStruct.d.size()];
+                    newElement_0.fabricSensitiveStruct.e = [[NSString alloc] initWithBytes:entry_0.fabricSensitiveStruct.e.data()
+                                                                                    length:entry_0.fabricSensitiveStruct.e.size()
+                                                                                  encoding:NSUTF8StringEncoding];
+                    newElement_0.fabricSensitiveStruct.f = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.f.Raw()];
+                    newElement_0.fabricSensitiveStruct.g = [NSNumber numberWithFloat:entry_0.fabricSensitiveStruct.g];
+                    newElement_0.fabricSensitiveStruct.h = [NSNumber numberWithDouble:entry_0.fabricSensitiveStruct.h];
+                    { // Scope for our temporary variables
+                        auto * array_2 = [NSMutableArray new];
+                        auto iter_2 = entry_0.fabricSensitiveInt8uList.begin();
+                        while (iter_2.Next()) {
+                            auto & entry_2 = iter_2.GetValue();
+                            NSNumber * newElement_2;
+                            newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
+                            [array_2 addObject:newElement_2];
+                        }
+                        CHIP_ERROR err = iter_2.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.fabricSensitiveInt8uList = array_2;
+                    }
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
             return value;
         }
         case Attributes::TimedWriteBoolean::Id: {
@@ -10592,22 +10952,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -10618,22 +10978,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -10644,22 +11004,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -10822,7 +11182,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::SystemMode::Id: {
@@ -10877,22 +11237,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -10967,22 +11327,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -10993,22 +11353,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -11019,22 +11379,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -11142,36 +11502,36 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPThreadNetworkDiagnosticsClusterNeighborTable * newElement_0;
-                newElement_0 = [CHIPThreadNetworkDiagnosticsClusterNeighborTable new];
-                newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
-                newElement_0.age = [NSNumber numberWithUnsignedInt:entry_0.age];
-                newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
-                newElement_0.linkFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.linkFrameCounter];
-                newElement_0.mleFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.mleFrameCounter];
-                newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
-                newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi];
-                newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi];
-                newElement_0.frameErrorRate = [NSNumber numberWithUnsignedChar:entry_0.frameErrorRate];
-                newElement_0.messageErrorRate = [NSNumber numberWithUnsignedChar:entry_0.messageErrorRate];
-                newElement_0.rxOnWhenIdle = [NSNumber numberWithBool:entry_0.rxOnWhenIdle];
-                newElement_0.fullThreadDevice = [NSNumber numberWithBool:entry_0.fullThreadDevice];
-                newElement_0.fullNetworkData = [NSNumber numberWithBool:entry_0.fullNetworkData];
-                newElement_0.isChild = [NSNumber numberWithBool:entry_0.isChild];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPThreadNetworkDiagnosticsClusterNeighborTable * newElement_0;
+                    newElement_0 = [CHIPThreadNetworkDiagnosticsClusterNeighborTable new];
+                    newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
+                    newElement_0.age = [NSNumber numberWithUnsignedInt:entry_0.age];
+                    newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
+                    newElement_0.linkFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.linkFrameCounter];
+                    newElement_0.mleFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.mleFrameCounter];
+                    newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
+                    newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi];
+                    newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi];
+                    newElement_0.frameErrorRate = [NSNumber numberWithUnsignedChar:entry_0.frameErrorRate];
+                    newElement_0.messageErrorRate = [NSNumber numberWithUnsignedChar:entry_0.messageErrorRate];
+                    newElement_0.rxOnWhenIdle = [NSNumber numberWithBool:entry_0.rxOnWhenIdle];
+                    newElement_0.fullThreadDevice = [NSNumber numberWithBool:entry_0.fullThreadDevice];
+                    newElement_0.fullNetworkData = [NSNumber numberWithBool:entry_0.fullNetworkData];
+                    newElement_0.isChild = [NSNumber numberWithBool:entry_0.isChild];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::RouteTableList::Id: {
@@ -11182,32 +11542,32 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPThreadNetworkDiagnosticsClusterRouteTable * newElement_0;
-                newElement_0 = [CHIPThreadNetworkDiagnosticsClusterRouteTable new];
-                newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
-                newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
-                newElement_0.routerId = [NSNumber numberWithUnsignedChar:entry_0.routerId];
-                newElement_0.nextHop = [NSNumber numberWithUnsignedChar:entry_0.nextHop];
-                newElement_0.pathCost = [NSNumber numberWithUnsignedChar:entry_0.pathCost];
-                newElement_0.lqiIn = [NSNumber numberWithUnsignedChar:entry_0.LQIIn];
-                newElement_0.lqiOut = [NSNumber numberWithUnsignedChar:entry_0.LQIOut];
-                newElement_0.age = [NSNumber numberWithUnsignedChar:entry_0.age];
-                newElement_0.allocated = [NSNumber numberWithBool:entry_0.allocated];
-                newElement_0.linkEstablished = [NSNumber numberWithBool:entry_0.linkEstablished];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPThreadNetworkDiagnosticsClusterRouteTable * newElement_0;
+                    newElement_0 = [CHIPThreadNetworkDiagnosticsClusterRouteTable new];
+                    newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
+                    newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
+                    newElement_0.routerId = [NSNumber numberWithUnsignedChar:entry_0.routerId];
+                    newElement_0.nextHop = [NSNumber numberWithUnsignedChar:entry_0.nextHop];
+                    newElement_0.pathCost = [NSNumber numberWithUnsignedChar:entry_0.pathCost];
+                    newElement_0.lqiIn = [NSNumber numberWithUnsignedChar:entry_0.LQIIn];
+                    newElement_0.lqiOut = [NSNumber numberWithUnsignedChar:entry_0.LQIOut];
+                    newElement_0.age = [NSNumber numberWithUnsignedChar:entry_0.age];
+                    newElement_0.allocated = [NSNumber numberWithBool:entry_0.allocated];
+                    newElement_0.linkEstablished = [NSNumber numberWithBool:entry_0.linkEstablished];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::PartitionId::Id: {
@@ -11768,24 +12128,24 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_0;
-                newElement_0 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
-                newElement_0.rotationTime = [NSNumber numberWithUnsignedShort:entry_0.rotationTime];
-                newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_0;
+                    newElement_0 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
+                    newElement_0.rotationTime = [NSNumber numberWithUnsignedShort:entry_0.rotationTime];
+                    newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ChannelMask::Id: {
@@ -11807,34 +12167,34 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * newElement_0;
-                newElement_0 = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
-                newElement_0.activeTimestampPresent = [NSNumber numberWithBool:entry_0.activeTimestampPresent];
-                newElement_0.pendingTimestampPresent = [NSNumber numberWithBool:entry_0.pendingTimestampPresent];
-                newElement_0.masterKeyPresent = [NSNumber numberWithBool:entry_0.masterKeyPresent];
-                newElement_0.networkNamePresent = [NSNumber numberWithBool:entry_0.networkNamePresent];
-                newElement_0.extendedPanIdPresent = [NSNumber numberWithBool:entry_0.extendedPanIdPresent];
-                newElement_0.meshLocalPrefixPresent = [NSNumber numberWithBool:entry_0.meshLocalPrefixPresent];
-                newElement_0.delayPresent = [NSNumber numberWithBool:entry_0.delayPresent];
-                newElement_0.panIdPresent = [NSNumber numberWithBool:entry_0.panIdPresent];
-                newElement_0.channelPresent = [NSNumber numberWithBool:entry_0.channelPresent];
-                newElement_0.pskcPresent = [NSNumber numberWithBool:entry_0.pskcPresent];
-                newElement_0.securityPolicyPresent = [NSNumber numberWithBool:entry_0.securityPolicyPresent];
-                newElement_0.channelMaskPresent = [NSNumber numberWithBool:entry_0.channelMaskPresent];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * newElement_0;
+                    newElement_0 = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
+                    newElement_0.activeTimestampPresent = [NSNumber numberWithBool:entry_0.activeTimestampPresent];
+                    newElement_0.pendingTimestampPresent = [NSNumber numberWithBool:entry_0.pendingTimestampPresent];
+                    newElement_0.masterKeyPresent = [NSNumber numberWithBool:entry_0.masterKeyPresent];
+                    newElement_0.networkNamePresent = [NSNumber numberWithBool:entry_0.networkNamePresent];
+                    newElement_0.extendedPanIdPresent = [NSNumber numberWithBool:entry_0.extendedPanIdPresent];
+                    newElement_0.meshLocalPrefixPresent = [NSNumber numberWithBool:entry_0.meshLocalPrefixPresent];
+                    newElement_0.delayPresent = [NSNumber numberWithBool:entry_0.delayPresent];
+                    newElement_0.panIdPresent = [NSNumber numberWithBool:entry_0.panIdPresent];
+                    newElement_0.channelPresent = [NSNumber numberWithBool:entry_0.channelPresent];
+                    newElement_0.pskcPresent = [NSNumber numberWithBool:entry_0.pskcPresent];
+                    newElement_0.securityPolicyPresent = [NSNumber numberWithBool:entry_0.securityPolicyPresent];
+                    newElement_0.channelMaskPresent = [NSNumber numberWithBool:entry_0.channelMaskPresent];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ActiveNetworkFaultsList::Id: {
@@ -11845,22 +12205,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -11871,22 +12231,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -11897,22 +12257,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -11923,22 +12283,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -12002,22 +12362,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -12028,22 +12388,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -12054,22 +12414,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -12111,22 +12471,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -12168,28 +12528,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPUserLabelClusterLabelStruct * newElement_0;
-                newElement_0 = [CHIPUserLabelClusterLabelStruct new];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
-                newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                              length:entry_0.value.size()
-                                                            encoding:NSUTF8StringEncoding];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPUserLabelClusterLabelStruct * newElement_0;
+                    newElement_0 = [CHIPUserLabelClusterLabelStruct new];
+                    newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                                  length:entry_0.label.size()
+                                                                encoding:NSUTF8StringEncoding];
+                    newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
+                                                                  length:entry_0.value.size()
+                                                                encoding:NSUTF8StringEncoding];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -12200,22 +12560,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -12226,22 +12586,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -12264,8 +12624,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::WakeOnLan::Id: {
         using namespace Clusters::WakeOnLan;
         switch (aPath.mAttributeId) {
-        case Attributes::WakeOnLanMacAddress::Id: {
-            using TypeInfo = Attributes::WakeOnLanMacAddress::TypeInfo;
+        case Attributes::MACAddress::Id: {
+            using TypeInfo = Attributes::MACAddress::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -12283,22 +12643,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -12309,22 +12669,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -12335,22 +12695,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -12380,8 +12740,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSData * _Nonnull value;
-            value = [NSData dataWithBytes:cppValue.data() length:cppValue.size()];
+            NSData * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSData dataWithBytes:cppValue.Value().data() length:cppValue.Value().size()];
+            }
             return value;
         }
         case Attributes::SecurityType::Id: {
@@ -12391,8 +12755,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+            }
             return value;
         }
         case Attributes::WiFiVersion::Id: {
@@ -12402,8 +12770,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+            }
             return value;
         }
         case Attributes::ChannelNumber::Id: {
@@ -12413,8 +12785,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Rssi::Id: {
@@ -12424,8 +12800,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::BeaconLostCount::Id: {
@@ -12524,22 +12904,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -12550,22 +12930,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -12576,22 +12956,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -12863,22 +13243,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::ClientGeneratedCommandList::Id: {
@@ -12889,22 +13269,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -12915,22 +13295,22 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
                 CHIP_ERROR err = iter_0.GetStatus();
                 if (err != CHIP_NO_ERROR) {
                     *aError = err;
                     return nil;
                 }
+                value = array_0;
             }
-            value = array_0;
             return value;
         }
         case Attributes::FeatureMap::Id: {

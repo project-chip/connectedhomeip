@@ -47,6 +47,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/LockTracker.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
@@ -549,6 +550,8 @@ bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMe
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write)
 {
+    assertChipStackLockedByCurrentThread();
+
     uint16_t attributeOffsetIndex = 0;
 
     for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
@@ -907,6 +910,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         if (enable)
         {
             initializeEndpoint(&(emAfEndpoints[index]));
+            MatterReportingAttributeChangeCallback(endpoint);
         }
         else
         {
@@ -961,14 +965,10 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             }
         }
 
-        // TODO: We should notify about the fact that all the attributes for
-        // this endpoint have appeared/disappeared, but the reporting engine has
-        // no way to do that right now.
-
         // TODO: Once endpoints are in parts lists other than that of endpoint
         // 0, something more complicated might need to happen here.
 
-        MatterReportingAttributeChangeCallback(/* EndpointId = */ 0, app::Clusters::Descriptor::Id,
+        MatterReportingAttributeChangeCallback(/* endpoint = */ 0, app::Clusters::Descriptor::Id,
                                                app::Clusters::Descriptor::Attributes::PartsList::Id);
     }
 
@@ -1424,9 +1424,9 @@ Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, Cl
     return Optional<AttributeId>(clusterObj->attributes[attributeIndex].attributeId);
 }
 
-DataVersion * emberAfDataVersionStorage(chip::EndpointId endpointId, chip::ClusterId clusterId)
+DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
 {
-    uint16_t index = emberAfIndexFromEndpoint(endpointId);
+    uint16_t index = emberAfIndexFromEndpoint(aConcreteClusterPath.mEndpointId);
     if (index == 0xFFFF)
     {
         // Unknown endpoint.
@@ -1441,7 +1441,7 @@ DataVersion * emberAfDataVersionStorage(chip::EndpointId endpointId, chip::Clust
 
     // This does a second walk over endpoints to find the right one, but
     // probably worth it to avoid duplicating code.
-    auto clusterIndex = emberAfClusterIndex(endpointId, clusterId, CLUSTER_MASK_SERVER);
+    auto clusterIndex = emberAfClusterIndex(aConcreteClusterPath.mEndpointId, aConcreteClusterPath.mClusterId, CLUSTER_MASK_SERVER);
     if (clusterIndex == 0xFF)
     {
         // No such cluster on this endpoint.

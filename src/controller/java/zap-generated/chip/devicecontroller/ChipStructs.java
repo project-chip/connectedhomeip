@@ -225,6 +225,50 @@ public class ChipStructs {
     }
   }
 
+  public static class BindingClusterTargetStruct {
+    public Integer fabricIndex;
+    public Optional<Long> node;
+    public Optional<Integer> group;
+    public Optional<Integer> endpoint;
+    public Optional<Long> cluster;
+
+    public BindingClusterTargetStruct(
+        Integer fabricIndex,
+        Optional<Long> node,
+        Optional<Integer> group,
+        Optional<Integer> endpoint,
+        Optional<Long> cluster) {
+      this.fabricIndex = fabricIndex;
+      this.node = node;
+      this.group = group;
+      this.endpoint = endpoint;
+      this.cluster = cluster;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("BindingClusterTargetStruct {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("\tnode: ");
+      output.append(node);
+      output.append("\n");
+      output.append("\tgroup: ");
+      output.append(group);
+      output.append("\n");
+      output.append("\tendpoint: ");
+      output.append(endpoint);
+      output.append("\n");
+      output.append("\tcluster: ");
+      output.append(cluster);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class BridgedActionsClusterActionStruct {
     public Integer actionID;
     public String name;
@@ -672,24 +716,30 @@ public class ChipStructs {
 
   public static class GeneralDiagnosticsClusterNetworkInterfaceType {
     public String name;
-    public Boolean fabricConnected;
+    public Boolean isOperational;
     public @Nullable Boolean offPremiseServicesReachableIPv4;
     public @Nullable Boolean offPremiseServicesReachableIPv6;
     public byte[] hardwareAddress;
+    public ArrayList<byte[]> IPv4Addresses;
+    public ArrayList<byte[]> IPv6Addresses;
     public Integer type;
 
     public GeneralDiagnosticsClusterNetworkInterfaceType(
         String name,
-        Boolean fabricConnected,
+        Boolean isOperational,
         @Nullable Boolean offPremiseServicesReachableIPv4,
         @Nullable Boolean offPremiseServicesReachableIPv6,
         byte[] hardwareAddress,
+        ArrayList<byte[]> IPv4Addresses,
+        ArrayList<byte[]> IPv6Addresses,
         Integer type) {
       this.name = name;
-      this.fabricConnected = fabricConnected;
+      this.isOperational = isOperational;
       this.offPremiseServicesReachableIPv4 = offPremiseServicesReachableIPv4;
       this.offPremiseServicesReachableIPv6 = offPremiseServicesReachableIPv6;
       this.hardwareAddress = hardwareAddress;
+      this.IPv4Addresses = IPv4Addresses;
+      this.IPv6Addresses = IPv6Addresses;
       this.type = type;
     }
 
@@ -700,8 +750,8 @@ public class ChipStructs {
       output.append("\tname: ");
       output.append(name);
       output.append("\n");
-      output.append("\tfabricConnected: ");
-      output.append(fabricConnected);
+      output.append("\tisOperational: ");
+      output.append(isOperational);
       output.append("\n");
       output.append("\toffPremiseServicesReachableIPv4: ");
       output.append(offPremiseServicesReachableIPv4);
@@ -711,6 +761,12 @@ public class ChipStructs {
       output.append("\n");
       output.append("\thardwareAddress: ");
       output.append(Arrays.toString(hardwareAddress));
+      output.append("\n");
+      output.append("\tIPv4Addresses: ");
+      output.append(IPv4Addresses);
+      output.append("\n");
+      output.append("\tIPv6Addresses: ");
+      output.append(IPv6Addresses);
       output.append("\n");
       output.append("\ttype: ");
       output.append(type);
@@ -1099,29 +1155,29 @@ public class ChipStructs {
   }
 
   public static class OtaSoftwareUpdateRequestorClusterProviderLocation {
-    public Integer fabricIndex;
     public Long providerNodeID;
     public Integer endpoint;
+    public Integer fabricIndex;
 
     public OtaSoftwareUpdateRequestorClusterProviderLocation(
-        Integer fabricIndex, Long providerNodeID, Integer endpoint) {
-      this.fabricIndex = fabricIndex;
+        Long providerNodeID, Integer endpoint, Integer fabricIndex) {
       this.providerNodeID = providerNodeID;
       this.endpoint = endpoint;
+      this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("OtaSoftwareUpdateRequestorClusterProviderLocation {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
       output.append("\tproviderNodeID: ");
       output.append(providerNodeID);
       output.append("\n");
       output.append("\tendpoint: ");
       output.append(endpoint);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1461,6 +1517,68 @@ public class ChipStructs {
     }
   }
 
+  public static class TestClusterClusterTestFabricScoped {
+    public Integer fabricIndex;
+    public Integer fabricSensitiveInt8u;
+    public Optional<Integer> optionalFabricSensitiveInt8u;
+    public @Nullable Integer nullableFabricSensitiveInt8u;
+    public @Nullable Optional<Integer> nullableOptionalFabricSensitiveInt8u;
+    public String fabricSensitiveCharString;
+    public ChipStructs.TestClusterClusterSimpleStruct fabricSensitiveStruct;
+    public ArrayList<Object> fabricSensitiveInt8uList;
+
+    public TestClusterClusterTestFabricScoped(
+        Integer fabricIndex,
+        Integer fabricSensitiveInt8u,
+        Optional<Integer> optionalFabricSensitiveInt8u,
+        @Nullable Integer nullableFabricSensitiveInt8u,
+        @Nullable Optional<Integer> nullableOptionalFabricSensitiveInt8u,
+        String fabricSensitiveCharString,
+        ChipStructs.TestClusterClusterSimpleStruct fabricSensitiveStruct,
+        ArrayList<Object> fabricSensitiveInt8uList) {
+      this.fabricIndex = fabricIndex;
+      this.fabricSensitiveInt8u = fabricSensitiveInt8u;
+      this.optionalFabricSensitiveInt8u = optionalFabricSensitiveInt8u;
+      this.nullableFabricSensitiveInt8u = nullableFabricSensitiveInt8u;
+      this.nullableOptionalFabricSensitiveInt8u = nullableOptionalFabricSensitiveInt8u;
+      this.fabricSensitiveCharString = fabricSensitiveCharString;
+      this.fabricSensitiveStruct = fabricSensitiveStruct;
+      this.fabricSensitiveInt8uList = fabricSensitiveInt8uList;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TestClusterClusterTestFabricScoped {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("\tfabricSensitiveInt8u: ");
+      output.append(fabricSensitiveInt8u);
+      output.append("\n");
+      output.append("\toptionalFabricSensitiveInt8u: ");
+      output.append(optionalFabricSensitiveInt8u);
+      output.append("\n");
+      output.append("\tnullableFabricSensitiveInt8u: ");
+      output.append(nullableFabricSensitiveInt8u);
+      output.append("\n");
+      output.append("\tnullableOptionalFabricSensitiveInt8u: ");
+      output.append(nullableOptionalFabricSensitiveInt8u);
+      output.append("\n");
+      output.append("\tfabricSensitiveCharString: ");
+      output.append(fabricSensitiveCharString);
+      output.append("\n");
+      output.append("\tfabricSensitiveStruct: ");
+      output.append(fabricSensitiveStruct);
+      output.append("\n");
+      output.append("\tfabricSensitiveInt8uList: ");
+      output.append(fabricSensitiveInt8uList);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class TestClusterClusterNullablesAndOptionalsStruct {
     public @Nullable Integer nullableInt;
     public Optional<Integer> optionalInt;
@@ -1647,25 +1765,6 @@ public class ChipStructs {
       output.append("TestClusterClusterDoubleNestedStructList {\n");
       output.append("\ta: ");
       output.append(a);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class TestClusterClusterTestFabricScoped {
-    public Integer fabricIndex;
-
-    public TestClusterClusterTestFabricScoped(Integer fabricIndex) {
-      this.fabricIndex = fabricIndex;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterTestFabricScoped {\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();

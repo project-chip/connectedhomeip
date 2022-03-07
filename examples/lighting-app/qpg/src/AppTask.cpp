@@ -305,7 +305,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -459,7 +459,7 @@ void AppTask::UpdateClusterState(void)
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
     }
 
     newValue = LightingMgr().GetLevel();
@@ -468,6 +468,6 @@ void AppTask::UpdateClusterState(void)
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating level %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: updating level %x", status);
     }
 }

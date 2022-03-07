@@ -75,6 +75,7 @@ const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNam
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability = { kConfigNamespace_ChipConfig, "location-capability" };
+const PosixConfig::Key PosixConfig::kConfigKey_UniqueId           = { kConfigNamespace_ChipFactory, "unique-id" };
 
 // Keys stored in the Chip-counters namespace
 const PosixConfig::Key PosixConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -102,8 +103,7 @@ ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 
 CHIP_ERROR PosixConfig::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    return err;
+    return PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)

@@ -2,8 +2,10 @@
   if ({{source}} != nullptr) {
     jobject optionalValue_{{depth}};
     chip::JniReferences::GetInstance().GetOptionalValue({{source}}, optionalValue_{{depth}});
-    auto & definedValue_{{depth}} = {{target}}.Emplace();
-    {{>encode_value target=(concat "definedValue_" depth) source=(concat "optionalValue_" depth) cluster=cluster depth=(incrementDepth depth) isOptional=false}}
+    if (optionalValue_{{depth}} != nullptr) {
+      auto & definedValue_{{depth}} = {{target}}.Emplace();
+      {{>encode_value target=(concat "definedValue_" depth) source=(concat "optionalValue_" depth) cluster=cluster depth=(incrementDepth depth) isOptional=false}}
+    }
   }
 {{else if isNullable}}
   if ({{source}} == nullptr) {
@@ -17,14 +19,14 @@
     using ListType_{{depth}} = std::remove_reference_t<decltype({{target}})>;
     using ListMemberType_{{depth}} = ListMemberTypeGetter<ListType_{{depth}}>::Type;
     jint {{source}}Size;
-    chip::JniReferences::GetInstance().GetArrayListSize({{source}}, {{source}}Size);
+    chip::JniReferences::GetInstance().GetListSize({{source}}, {{source}}Size);
     if ({{source}}Size != 0) {
       auto * listHolder_{{depth}} = new ListHolder<ListMemberType_{{depth}}>({{source}}Size);
       listFreer.add(listHolder_{{depth}});
 
       for (size_t i_{{depth}} = 0; i_{{depth}} < static_cast<size_t>({{source}}Size); ++i_{{depth}}) {
         jobject element_{{depth}};
-        chip::JniReferences::GetInstance().GetArrayListItem({{source}}, i_{{depth}}, element_{{depth}});
+        chip::JniReferences::GetInstance().GetListItem({{source}}, i_{{depth}}, element_{{depth}});
         {{>encode_value target=(concat "listHolder_" depth "->mList[i_" depth "]") source=(concat "element_" depth) cluster=cluster depth=(incrementDepth depth) isArray=false}}
       }
       {{target}} = ListType_{{depth}}(listHolder_{{depth}}->mList, {{source}}Size);

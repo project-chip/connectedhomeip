@@ -20,12 +20,13 @@
 
 #include <platform/CHIPDeviceConfig.h>
 
+#include "app/server/OnboardingCodesUtil.h"
 #include "app/server/Server.h"
 #include "credentials/FabricTable.h"
 #include "device_service/device_service.rpc.pb.h"
 #include "platform/ConfigurationManager.h"
+#include "platform/DiagnosticDataProvider.h"
 #include "platform/PlatformManager.h"
-#include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
 namespace rpc {
@@ -50,6 +51,26 @@ public:
     {
         // TODO: auto err = DeviceLayer::SoftwareUpdateMgr().CheckNow();
         return pw::Status::Unimplemented();
+    }
+
+    virtual pw::Status SetPairingState(const chip_rpc_PairingState & request, pw_protobuf_Empty & response)
+    {
+        if (request.pairing_enabled)
+        {
+            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingMode(DeviceLayer::ConnectivityMgr().kFastAdvertising);
+        }
+        else
+        {
+            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        }
+        return pw::OkStatus();
+    }
+
+    virtual pw::Status GetPairingState(const pw_protobuf_Empty & request, chip_rpc_PairingState & response)
+    {
+        response.pairing_enabled = DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled();
+        return pw::OkStatus();
     }
 
     virtual pw::Status GetDeviceState(const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
@@ -118,10 +139,18 @@ public:
             response.has_pairing_info           = true;
         }
 
-        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
+        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) ==
             CHIP_NO_ERROR)
         {
             snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
+        }
+
+        std::string qrCodeText;
+        if (GetQRCode(qrCodeText, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
+        {
+            snprintf(response.pairing_info.qr_code, sizeof(response.pairing_info.qr_code), "%s", qrCodeText.c_str());
+            GetQRCodeUrl(response.pairing_info.qr_code_url, sizeof(response.pairing_info.qr_code_url), qrCodeText);
+            response.has_pairing_info = true;
         }
 
         return pw::OkStatus();

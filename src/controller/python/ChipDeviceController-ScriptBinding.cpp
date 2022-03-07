@@ -40,7 +40,6 @@
 #include <inttypes.h>
 #include <net/if.h>
 
-#include "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h"
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
@@ -55,8 +54,8 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <inet/IPAddress.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/BytesToHex.h>
@@ -93,7 +92,6 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 } // namespace
 
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
-chip::Controller::ScriptDeviceAddressUpdateDelegate sDeviceAddressUpdateDelegate;
 chip::Controller::Python::StorageAdapter * sStorageAdapter = nullptr;
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -146,7 +144,7 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
                                                                        chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
-                                                                       uint16_t discriminator, uint8_t option);
+                                                                       uint16_t discriminator, uint8_t optionInt);
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
@@ -160,9 +158,6 @@ pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::Devi
 
 ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
     chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback);
-
-void pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
-    chip::Controller::DeviceAddressUpdateDelegate_OnUpdateComplete callback);
 
 // BLE
 ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
@@ -224,7 +219,9 @@ ChipError::StorageType pychip_DeviceController_StackInit()
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     FactoryInitParams factoryParams;
-    factoryParams.fabricStorage = &sFabricStorage;
+    factoryParams.fabricStorage            = &sFabricStorage;
+    factoryParams.fabricIndependentStorage = sStorageAdapter;
+    factoryParams.enableServerInteractions = true;
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
 
@@ -238,10 +235,6 @@ ChipError::StorageType pychip_DeviceController_StackInit()
     // This retain call ensures the stack doesn't get de-initialized in the REPL.
     //
     DeviceControllerFactory::GetInstance().RetainSystemState();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-    chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     return CHIP_NO_ERROR.AsInteger();
 }
@@ -435,9 +428,11 @@ pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Co
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
                                                                        chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
-                                                                       uint16_t discriminator, uint8_t option)
+                                                                       uint16_t discriminator, uint8_t optionInt)
 {
     SetupPayload payload;
+    const auto option = static_cast<Controller::DeviceController::CommissioningWindowOption>(optionInt);
+
     return devCtrl->OpenCommissioningWindow(nodeid, timeout, iteration, discriminator, option, payload).AsInteger();
 }
 
@@ -521,12 +516,6 @@ ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningComple
 {
     sPairingDelegate.SetCommissioningCompleteCallback(callback);
     return CHIP_NO_ERROR.AsInteger();
-}
-
-void pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
-    chip::Controller::DeviceAddressUpdateDelegate_OnUpdateComplete callback)
-{
-    sDeviceAddressUpdateDelegate.SetOnAddressUpdateComplete(callback);
 }
 
 ChipError::StorageType pychip_DeviceController_UpdateDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)

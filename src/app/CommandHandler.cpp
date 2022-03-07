@@ -93,7 +93,6 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     InvokeRequestMessage::Parser invokeRequestMessage;
     InvokeRequests::Parser invokeRequests;
     reader.Init(std::move(payload));
-    ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(invokeRequestMessage.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(invokeRequestMessage.CheckSchemaValidity());
@@ -147,7 +146,8 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     {
         err = CHIP_NO_ERROR;
     }
-    return err;
+    ReturnErrorOnFailure(err);
+    return invokeRequestMessage.ExitContainer();
 }
 
 void CommandHandler::Close()
@@ -275,12 +275,6 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
         {
-            // Grace period until ACLs are in place
-            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
-            err = CHIP_NO_ERROR;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
             if (err != CHIP_ERROR_ACCESS_DENIED)
             {
                 return AddStatus(concretePath, Status::Failure);
@@ -350,7 +344,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     err = commandPath.GetCommandId(&commandId);
     SuccessOrExit(err);
 
-    groupId = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetGroupId();
+    groupId = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     fabric  = GetAccessingFabricIndex();
 
     ChipLogDetail(DataManagement,
@@ -409,12 +403,6 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
             if (err != CHIP_NO_ERROR)
             {
-                // Grace period until ACLs are in place
-                ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
-                err = CHIP_NO_ERROR;
-            }
-            if (err != CHIP_NO_ERROR)
-            {
                 // TODO: handle errors that aren't CHIP_ERROR_ACCESS_DENIED, etc.
                 continue;
             }
@@ -446,7 +434,7 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
                                              const Optional<ClusterStatus> & aClusterStatus)
 {
     StatusIB statusIB;
-    ReturnLogErrorOnFailure(PrepareStatus(aCommandPath));
+    ReturnErrorOnFailure(PrepareStatus(aCommandPath));
     CommandStatusIB::Builder & commandStatus = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus();
     StatusIB::Builder & statusIBBuilder      = commandStatus.CreateErrorStatus();
     ReturnErrorOnFailure(commandStatus.GetError());

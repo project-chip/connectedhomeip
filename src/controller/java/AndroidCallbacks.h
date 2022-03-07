@@ -52,7 +52,7 @@ struct ReportCallback : public app::ReadClient::Callback
 
     void OnReportEnd() override;
 
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
 
     void OnError(CHIP_ERROR aError) override;
@@ -74,8 +74,9 @@ struct ReportCallback : public app::ReadClient::Callback
     jobject mWrapperCallbackRef                 = nullptr;
     jobject mSubscriptionEstablishedCallbackRef = nullptr;
     jobject mReportCallbackRef                  = nullptr;
-    // List of pairs of Java ChipAttributePath and report value. Not using map because jobjects should not be keys.
-    std::list<std::pair<jobject, jobject>> mReports;
+    // NodeState Java object that will be returned to the application.
+    jobject mNodeStateObj = nullptr;
+    jclass mNodeStateCls  = nullptr;
 };
 
 } // namespace Controller

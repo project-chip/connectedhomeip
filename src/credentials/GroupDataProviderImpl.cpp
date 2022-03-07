@@ -718,7 +718,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     bool first                     = true;
 
     uint16_t keyset_id                       = 0;
-    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kStandard;
+    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kCacheAndSync;
     uint8_t keys_count                       = 0;
     OperationalKey operational_keys[KeySet::kEpochKeysMax];
 
@@ -738,7 +738,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
 
     void Clear() override
     {
-        policy     = GroupDataProvider::SecurityPolicy::kStandard;
+        policy     = GroupDataProvider::SecurityPolicy::kCacheAndSync;
         keys_count = 0;
         memset(operational_keys, 0x00, sizeof(operational_keys));
         next = 0xffff;
@@ -891,6 +891,8 @@ void GroupDataProviderImpl::Finish()
     mGroupKeyIterators.ReleaseAll();
     mEndpointIterators.ReleaseAll();
     mKeySetIterators.ReleaseAll();
+    mGroupSessionsIterator.ReleaseAll();
+    mKeyContexPool.ReleaseAll();
 }
 
 //
@@ -987,7 +989,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     {
         // Insert last
         VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-        // TODO: VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         fabric.group_count++;
     }
 
@@ -1102,7 +1104,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     if (!group.Find(mStorage, fabric, group_id))
     {
         // New group
-        // TODO: VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         ReturnErrorOnFailure(EndpointData(fabric_index, group_id, endpoint_id).Save(mStorage));
         // Save the new group into the fabric
         group.group_id       = group_id;
@@ -1434,7 +1436,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
 
     // Insert last
     VerifyOrReturnError(fabric.map_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-    // TODO: VerifyOrReturnError(fabric.map_count < mMaxGroupKeysPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(fabric.map_count < mMaxGroupKeysPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     map.next = 0;
     ReturnErrorOnFailure(map.Save(mStorage));

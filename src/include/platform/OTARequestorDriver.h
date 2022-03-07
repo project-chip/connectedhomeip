@@ -33,8 +33,10 @@ namespace chip {
 // The set of parameters needed for starting a BDX download.
 struct UpdateDescription
 {
-    CharSpan imageURI;
+    NodeId nodeId;
+    CharSpan fileDesignator;
     uint32_t softwareVersion;
+    CharSpan softwareVersionStr;
     ByteSpan updateToken;
     bool userConsentNeeded;
     ByteSpan metadataForRequestor;
@@ -42,18 +44,22 @@ struct UpdateDescription
 
 enum class UpdateFailureState
 {
+    kUnknown,
+    kIdle,
     kQuerying,
     kDownloading,
     kApplying,
     kNotifying,
     kAwaitingNextAction,
+    kDelayedOnUserConsent,
 };
 
 enum class UpdateNotFoundReason
 {
     Busy,
     NotAvailable,
-    UpToDate
+    UpToDate,
+    ConnectionFailed,
 };
 
 // Interface class to abstract the OTA-related business logic. Each application
@@ -71,6 +77,9 @@ public:
 
     /// Called when an error occurs at any OTA requestor operation
     virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
+
+    // Called when the OTA Requestor enters the kIdle update state
+    virtual void HandleIdleState() = 0;
 
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;
@@ -92,6 +101,27 @@ public:
 
     /// Called when the current software update has been cancelled by the local application
     virtual void UpdateCancelled() = 0;
+
+    /// Inform the driver that the device commissioning has completed
+    virtual void OTACommissioningCallback() = 0;
+
+    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+    virtual void
+    /// Driver portion of the logic for processing the AnnounceOTAProviders command
+    ProcessAnnounceOTAProviders(const ProviderLocationType & providerLocation,
+                                app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) = 0;
+
+    /// Direct the driver to trigger the QueryImage command. The driver may choose to execute some internal
+    /// logic and will then call an OTARequestor API to actually send the command. The purpose of this
+    /// function is to allow implementation-specific logic (such as possibly cancelling an ongoing update)
+    /// to be executed before triggering the image update process
+    virtual void SendQueryImage() = 0;
+
+    // Driver picks the OTA Provider that should be used for the next query and update. The Provider is picked according to
+    // the driver's internal logic such as, for example, traversing the default providers list.
+    // Returns true if there is a Provider available for the next query, returns false otherwise.
+    virtual bool
+    DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) = 0;
 };
 
 } // namespace chip

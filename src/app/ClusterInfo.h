@@ -79,6 +79,8 @@ public:
     // For event, an event id can only be interpreted if the cluster id is known.
     bool IsValidEventPath() const { return !(HasWildcardClusterId() && !HasWildcardEventId()); }
 
+    bool IsValidDataVersionFilter() const { return !HasWildcardEndpointId() && !HasWildcardClusterId() && mDataVersion.HasValue(); }
+
     inline bool HasWildcardNodeId() const { return mNodeId == kUndefinedNodeId; }
     inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
     inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
@@ -100,6 +102,7 @@ public:
     EventId mEventId         = kInvalidEventId;     // uint32
     ListIndex mListIndex     = kInvalidListIndex;   // uint16
     EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
+    Optional<DataVersion> mDataVersion;             // uint32
 };
 } // namespace app
 } // namespace chip

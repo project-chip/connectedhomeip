@@ -1132,8 +1132,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.fabricConnected", "fabricConnected",
-                                                                  value.isMember("fabricConnected")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.isOperational", "isOperational",
+                                                                  value.isMember("isOperational")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.offPremiseServicesReachableIPv4",
                                                                   "offPremiseServicesReachableIPv4",
                                                                   value.isMember("offPremiseServicesReachableIPv4")));
@@ -1142,14 +1142,18 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("offPremiseServicesReachableIPv6")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.hardwareAddress", "hardwareAddress",
                                                                   value.isMember("hardwareAddress")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.IPv4Addresses", "IPv4Addresses",
+                                                                  value.isMember("IPv4Addresses")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.IPv6Addresses", "IPv6Addresses",
+                                                                  value.isMember("IPv6Addresses")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.type", "type", value.isMember("type")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricConnected");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricConnected, value["fabricConnected"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "isOperational");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.isOperational, value["isOperational"]));
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "offPremiseServicesReachableIPv4");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.offPremiseServicesReachableIPv4,
@@ -1162,6 +1166,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "hardwareAddress");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.hardwareAddress, value["hardwareAddress"]));
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "IPv4Addresses");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.IPv4Addresses, value["IPv4Addresses"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "IPv6Addresses");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.IPv6Addresses, value["IPv6Addresses"]));
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "type");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.type, value["type"]));
 
@@ -1171,10 +1181,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & request)
 {
     ComplexArgumentParser::Finalize(request.name);
-    ComplexArgumentParser::Finalize(request.fabricConnected);
+    ComplexArgumentParser::Finalize(request.isOperational);
     ComplexArgumentParser::Finalize(request.offPremiseServicesReachableIPv4);
     ComplexArgumentParser::Finalize(request.offPremiseServicesReachableIPv6);
     ComplexArgumentParser::Finalize(request.hardwareAddress);
+    ComplexArgumentParser::Finalize(request.IPv4Addresses);
+    ComplexArgumentParser::Finalize(request.IPv6Addresses);
     ComplexArgumentParser::Finalize(request.type);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -1500,31 +1512,31 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ProviderLocation.fabricIndex", "fabricIndex", value.isMember("fabricIndex")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ProviderLocation.providerNodeID", "providerNodeID",
                                                                   value.isMember("providerNodeID")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ProviderLocation.endpoint", "endpoint", value.isMember("endpoint")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ProviderLocation.fabricIndex", "fabricIndex", value.isMember("fabricIndex")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "providerNodeID");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.providerNodeID, value["providerNodeID"]));
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+
     return CHIP_NO_ERROR;
 }
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.fabricIndex);
     ComplexArgumentParser::Finalize(request.providerNodeID);
     ComplexArgumentParser::Finalize(request.endpoint);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & request,
@@ -1869,6 +1881,53 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TargetNavigator::Struc
     ComplexArgumentParser::Finalize(request.identifier);
     ComplexArgumentParser::Finalize(request.name);
 }
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Binding::Structs::TargetStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("TargetStruct.fabricIndex", "fabricIndex", value.isMember("fabricIndex")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+
+    if (value.isMember("node"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "node");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.node, value["node"]));
+    }
+
+    if (value.isMember("group"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "group");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.group, value["group"]));
+    }
+
+    if (value.isMember("endpoint"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
+    }
+
+    if (value.isMember("cluster"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "cluster");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.cluster, value["cluster"]));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Binding::Structs::TargetStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.fabricIndex);
+    ComplexArgumentParser::Finalize(request.node);
+    ComplexArgumentParser::Finalize(request.group);
+    ComplexArgumentParser::Finalize(request.endpoint);
+    ComplexArgumentParser::Finalize(request.cluster);
+}
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type & request,
                                         Json::Value & value)
@@ -1877,10 +1936,55 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("TestFabricScoped.fabricIndex", "fabricIndex", value.isMember("fabricIndex")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TestFabricScoped.fabricSensitiveInt8u", "fabricSensitiveInt8u",
+                                                                  value.isMember("fabricSensitiveInt8u")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TestFabricScoped.nullableFabricSensitiveInt8u",
+                                                                  "nullableFabricSensitiveInt8u",
+                                                                  value.isMember("nullableFabricSensitiveInt8u")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
+        "TestFabricScoped.fabricSensitiveCharString", "fabricSensitiveCharString", value.isMember("fabricSensitiveCharString")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TestFabricScoped.fabricSensitiveStruct", "fabricSensitiveStruct",
+                                                                  value.isMember("fabricSensitiveStruct")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
+        "TestFabricScoped.fabricSensitiveInt8uList", "fabricSensitiveInt8uList", value.isMember("fabricSensitiveInt8uList")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricSensitiveInt8u");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.fabricSensitiveInt8u, value["fabricSensitiveInt8u"]));
+
+    if (value.isMember("optionalFabricSensitiveInt8u"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "optionalFabricSensitiveInt8u");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.optionalFabricSensitiveInt8u,
+                                                          value["optionalFabricSensitiveInt8u"]));
+    }
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nullableFabricSensitiveInt8u");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.nullableFabricSensitiveInt8u, value["nullableFabricSensitiveInt8u"]));
+
+    if (value.isMember("nullableOptionalFabricSensitiveInt8u"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nullableOptionalFabricSensitiveInt8u");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.nullableOptionalFabricSensitiveInt8u,
+                                                          value["nullableOptionalFabricSensitiveInt8u"]));
+    }
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricSensitiveCharString");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.fabricSensitiveCharString, value["fabricSensitiveCharString"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricSensitiveStruct");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.fabricSensitiveStruct, value["fabricSensitiveStruct"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricSensitiveInt8uList");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.fabricSensitiveInt8uList, value["fabricSensitiveInt8uList"]));
 
     return CHIP_NO_ERROR;
 }
@@ -1888,6 +1992,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type & request)
 {
     ComplexArgumentParser::Finalize(request.fabricIndex);
+    ComplexArgumentParser::Finalize(request.fabricSensitiveInt8u);
+    ComplexArgumentParser::Finalize(request.optionalFabricSensitiveInt8u);
+    ComplexArgumentParser::Finalize(request.nullableFabricSensitiveInt8u);
+    ComplexArgumentParser::Finalize(request.nullableOptionalFabricSensitiveInt8u);
+    ComplexArgumentParser::Finalize(request.fabricSensitiveCharString);
+    ComplexArgumentParser::Finalize(request.fabricSensitiveStruct);
+    ComplexArgumentParser::Finalize(request.fabricSensitiveInt8uList);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & request,

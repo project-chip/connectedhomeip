@@ -19,6 +19,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server/AppDelegate.h>
+#include <app/server/CommissioningModeProvider.h>
+#include <lib/dnssd/Advertiser.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 
@@ -34,7 +36,7 @@ enum class CommissioningWindowAdvertisement
 
 class Server;
 
-class CommissioningWindowManager : public SessionEstablishmentDelegate
+class CommissioningWindowManager : public SessionEstablishmentDelegate, public app::CommissioningModeProvider
 {
 public:
     CommissioningWindowManager(Server * server) : mAppDelegate(nullptr), mServer(server) {}
@@ -54,12 +56,15 @@ public:
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
     CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                               PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
+                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
                                                PasscodeId passcodeID);
 
     void CloseCommissioningWindow();
 
     app::Clusters::AdministratorCommissioning::CommissioningWindowStatus CommissioningWindowStatus() const { return mWindowStatus; }
+
+    // CommissioningModeProvider implemetation.
+    Dnssd::CommissioningMode GetCommissioningMode() const override;
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -106,12 +111,15 @@ private:
     uint8_t mFailedCommissioningAttempts = 0;
 
     bool mUseECM = false;
-    PASEVerifier mECMPASEVerifier;
+    Spake2pVerifier mECMPASEVerifier;
     uint16_t mECMDiscriminator = 0;
     PasscodeId mECMPasscodeID  = kDefaultCommissioningPasscodeId;
-    uint32_t mECMIterations    = 0;
-    uint32_t mECMSaltLength    = 0;
-    uint8_t mECMSalt[kPBKDFMaximumSaltLen];
+    // mListeningForPASE is true only when we are listening for
+    // PBKDFParamRequest messages.
+    bool mListeningForPASE  = false;
+    uint32_t mECMIterations = 0;
+    uint32_t mECMSaltLength = 0;
+    uint8_t mECMSalt[kSpake2p_Max_PBKDF_Salt_Length];
 };
 
 } // namespace chip

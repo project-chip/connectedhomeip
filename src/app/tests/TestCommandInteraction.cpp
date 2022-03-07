@@ -429,6 +429,8 @@ void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSu
     err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    ctx.DrainAndServiceIO();
+
     GenerateInvokeResponse(apSuite, apContext, buf, true /*aNeedCommandData*/);
     err = commandSender.ProcessInvokeResponse(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -487,8 +489,6 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     chip::System::PacketBufferTLVReader reader;
     InvokeResponseMessage::Parser invokeResponseMessageParser;
     reader.Init(std::move(commandPacket));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = invokeResponseMessageParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = invokeResponseMessageParser.CheckSchemaValidity();
@@ -535,8 +535,6 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     chip::System::PacketBufferTLVReader reader;
     InvokeResponseMessage::Parser invokeResponseMessageParser;
     reader.Init(std::move(commandPacket));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = invokeResponseMessageParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = invokeResponseMessageParser.CheckSchemaValidity();
@@ -602,7 +600,8 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
             chip::isCommandDispatched = false;
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/, messageIsTimed);
             err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
-            NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && chip::isCommandDispatched == (messageIsTimed == transactionIsTimed));
+            NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(apSuite, chip::isCommandDispatched == (messageIsTimed == transactionIsTimed));
         }
     }
 }
@@ -619,6 +618,9 @@ void TestCommandInteraction::TestCommandSenderCommandSuccessResponseFlow(nlTestS
     err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 1 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderDelegate.onErrorCalledTimes == 0);
@@ -640,6 +642,9 @@ void TestCommandInteraction::TestCommandSenderCommandAsyncSuccessResponseFlow(nl
     err          = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 0 &&
                        mockCommandSenderDelegate.onErrorCalledTimes == 0);
@@ -649,6 +654,9 @@ void TestCommandInteraction::TestCommandSenderCommandAsyncSuccessResponseFlow(nl
 
     // Decrease CommandHandler refcount and send response
     asyncCommandHandle = nullptr;
+
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 1 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderDelegate.onErrorCalledTimes == 0);
@@ -669,6 +677,9 @@ void TestCommandInteraction::TestCommandSenderCommandSpecificResponseFlow(nlTest
     err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 1 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderDelegate.onErrorCalledTimes == 0);
@@ -688,7 +699,12 @@ void TestCommandInteraction::TestCommandSenderCommandFailureResponseFlow(nlTestS
     AddInvokeRequestData(apSuite, apContext, &commandSender, kTestNonExistCommandId);
     err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
 
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderDelegate.onErrorCalledTimes == 1);
@@ -717,6 +733,8 @@ void TestCommandInteraction::TestCommandSenderAbruptDestruction(nlTestSuite * ap
         err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
 
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
 
         //
         // No callbacks should be invoked yet - let's validate that.
@@ -767,9 +785,9 @@ const nlTest sTests[] =
 // clang-format off
 nlTestSuite sSuite =
 {
-    "TestReadInteraction",
+    "TestCommandInteraction",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on

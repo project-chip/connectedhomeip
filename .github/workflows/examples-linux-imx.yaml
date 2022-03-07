@@ -31,21 +31,26 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-imx:0.5.52
+            image: connectedhomeip/chip-build-imx:0.5.56
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
               with:
-                  submodules: true
+                  action: actions/checkout@v3
+                  with: |
+                      submodules: true
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Build App
-              timeout-minutes: 10
+              timeout-minutes: 30
               run: |
                   ./scripts/examples/imxlinux_example.sh \
                   examples/lighting-app/linux/ examples/lighting-app/linux/out/aarch64
             - name: Build chip-tool
-              timeout-minutes: 10
+              timeout-minutes: 30
               run: |
-                   ./scripts/examples/imxlinux_example.sh \
-                   examples/chip-tool examples/chip-tool/out/aarch64
+                  ./scripts/examples/imxlinux_example.sh \
+                  examples/chip-tool examples/chip-tool/out/aarch64

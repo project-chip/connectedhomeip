@@ -1,0 +1,62 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    7.2.2. [TC-DD-2.2] Discovery by commissioner verification [DUT -
+    Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "If (PICS_BLE) TH starts matter announcement procedure using BLE
+          transport"
+      disabled: true
+
+    - label:
+          "If (PICS_BLE) DUT starts BLE scan across all three advertising
+          channels with a sufficient dwell time, interval, and overall duration
+          of scan"
+      disabled: true
+
+    - label: "If (PICS_BLE) DUT starts scan in background using BLE transport"
+      disabled: true
+
+    - label: "If (PICS_BLE) TH starts matter announcement using BLE transport"
+      disabled: true
+
+    - label:
+          "If (PICS_WIFI) TH starts SoftAP and begin matter announcement
+          procedure"
+      disabled: true
+
+    - label:
+          "If (PICS_WIFI) DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels
+          allowed per its operational regulatory domain (channels 1, 6, and 11
+          are preferred)"
+      disabled: true
+
+    - label: "If (PICS_WIFI) DUT scans using Wi-Fi in background"
+      disabled: true
+
+    - label:
+          "If (PICS_WIFI) TH starts SoftAP and begin matter announcement
+          procedure"
+      disabled: true
+
+    - label: "If (PICS_ETH) DUT performs service discovery using DNS-SD"
+      disabled: true

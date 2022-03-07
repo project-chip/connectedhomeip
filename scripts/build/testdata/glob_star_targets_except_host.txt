@@ -21,6 +21,7 @@ efr32-brd4161a-light
 efr32-brd4161a-light-rpc
 efr32-brd4161a-lock
 efr32-brd4161a-lock-rpc
+efr32-brd4161a-switch
 efr32-brd4161a-unit-test
 efr32-brd4161a-window-covering
 esp32-c3devkit-all-clusters
@@ -31,6 +32,7 @@ esp32-devkitc-light
 esp32-devkitc-lock
 esp32-devkitc-shell
 esp32-devkitc-temperature-measurement
+esp32-devkitc-temperature-measurement-rpc
 esp32-m5stack-all-clusters
 esp32-m5stack-all-clusters-ipv6only
 esp32-m5stack-all-clusters-rpc

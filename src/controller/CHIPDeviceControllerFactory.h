@@ -31,7 +31,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace chip {
 
@@ -39,9 +39,6 @@ namespace Controller {
 
 struct SetupParams
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate = nullptr;
-#endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
     PersistentStorageDelegate * storageDelegate = nullptr;
@@ -60,6 +57,15 @@ struct SetupParams
     // The Device Pairing Delegated used to initialize a Commissioner
     DevicePairingDelegate * pairingDelegate = nullptr;
 
+    //
+    // Controls enabling server cluster interactions on a controller. This in turn
+    // causes the following to get enabled:
+    //
+    //  - CASEServer to listen for unsolicited Sigma1 messages.
+    //  - Advertisement of active controller operational identities.
+    //
+    bool enableServerInteractions = false;
+
     Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
     CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
@@ -70,11 +76,20 @@ struct FactoryInitParams
 {
     FabricStorage * fabricStorage                                 = nullptr;
     System::Layer * systemLayer                                   = nullptr;
+    PersistentStorageDelegate * fabricIndependentStorage          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
+
+    //
+    // Controls enabling server cluster interactions on a controller. This in turn
+    // causes the following to get enabled:
+    //
+    //  - Advertisement of active controller operational identities.
+    //
+    bool enableServerInteractions = false;
 
     /* The port used for operational communication to listen for and send messages over UDP/TCP.
      * The default value of `0` will pick any available port. */
@@ -130,8 +145,9 @@ private:
     CHIP_ERROR InitSystemState();
 
     uint16_t mListenPort;
-    FabricStorage * mFabricStorage             = nullptr;
-    DeviceControllerSystemState * mSystemState = nullptr;
+    FabricStorage * mFabricStorage                        = nullptr;
+    DeviceControllerSystemState * mSystemState            = nullptr;
+    PersistentStorageDelegate * mFabricIndependentStorage = nullptr;
 };
 
 } // namespace Controller

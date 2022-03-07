@@ -15,6 +15,7 @@
 name: Media Playback Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Media Playback"
     endpoint: 3
 
@@ -22,136 +23,178 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Read attribute playback state"
       command: "readAttribute"
-      attribute: "playback state"
+      attribute: "CurrentState"
       response:
           value: 0
 
     - label: "Read attribute start time"
       command: "readAttribute"
-      attribute: "start time"
+      attribute: "StartTime"
       response:
           value: 0
 
     - label: "Read attribute duration"
       command: "readAttribute"
-      attribute: "duration"
+      attribute: "Duration"
       response:
-          value: 0
+          value: 80000
 
-    # TODO: Enable once attribute struct is supported
     - label: "Read attribute position"
-      disabled: true
       command: "readAttribute"
-      attribute: "position"
+      attribute: "SampledPosition"
       response:
           value: { updatedAt: 0, position: 0 }
 
     - label: "Read attribute playback speed"
       command: "readAttribute"
-      attribute: "playback speed"
+      attribute: "PlaybackSpeed"
       response:
           value: 0.0
 
     - label: "Read attribute seek range end"
       command: "readAttribute"
-      attribute: "seek range end"
+      attribute: "SeekRangeEnd"
       response:
-          value: 0
+          value: 80000
 
     - label: "Read attribute seek range start"
       command: "readAttribute"
-      attribute: "seek range start"
+      attribute: "SeekRangeStart"
       response:
           value: 0
 
     - label: "Media Playback Play Command"
-      command: "playRequest"
+      command: "play"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
     - label: "Media Playback Pause Command"
-      command: "pauseRequest"
+      command: "pause"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
     - label: "Media Playback Stop Command"
-      command: "stopRequest"
+      command: "stopPlayback"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
     - label: "Media Playback Start Over Command"
-      command: "startOverRequest"
+      command: "startOver"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
     - label: "Media Playback Previous Command"
-      command: "previousRequest"
+      command: "previous"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
     - label: "Media Playback Next Command"
-      command: "nextRequest"
+      command: "next"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
     - label: "Media Playback Rewind Command"
-      command: "rewindRequest"
+      command: "rewind"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
     - label: "Media Playback Fast Forward Command"
-      command: "fastForwardRequest"
+      command: "fastForward"
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
     - label: "Media Playback Skip Forward Command"
-      command: "skipForwardRequest"
+      command: "skipForward"
       arguments:
           values:
               - name: "deltaPositionMilliseconds"
-                value: 100
+                value: 500
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
+
+    - label: "Read attribute position after skip forward"
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: { updatedAt: 0, position: 500 }
 
     - label: "Media Playback Skip Backward Command"
-      command: "skipBackwardRequest"
+      command: "skipBackward"
       arguments:
           values:
               - name: "deltaPositionMilliseconds"
                 value: 100
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
 
+    - label: "Read attribute position after skip backward"
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: { updatedAt: 0, position: 400 }
+
     - label: "Media Playback Seek Command"
-      command: "seekRequest"
+      command: "seek"
       arguments:
           values:
               - name: "position"
-                value: 100
+                value: 1000
       response:
           values:
+              - name: "data"
+                value: "data response"
               - name: "status"
                 value: 0
+
+    - label: "Read attribute position after seek"
+      command: "readAttribute"
+      attribute: "SampledPosition"
+      response:
+          value: { updatedAt: 0, position: 1000 }

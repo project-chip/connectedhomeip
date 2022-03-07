@@ -1,10 +1,10 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright(c) 2022 Project CHIP Authors
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0(the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+# http:// www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,6 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/src/platform/device.gni")
-
 assert(chip_device_platform == "p6")
 
 if (chip_enable_openthread) {
@@ -50,6 +49,8 @@ static_library("P6") {
     "MTBKeyValueStore.h",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningWiFiDriver.cpp",
+    "OTAImageProcessorImpl.cpp",
+    "OTAImageProcessorImpl.h",
     "P6Config.cpp",
     "P6Config.h",
     "P6Utils.cpp",
@@ -67,7 +68,11 @@ static_library("P6") {
     "cycfg_gatt_db.c",
     "cycfg_gatt_db.h",
   ]
-  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+
+  deps = [
+    "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/setup_payload",
+  ]
 
   public_deps = [
     "${chip_root}/src/crypto",

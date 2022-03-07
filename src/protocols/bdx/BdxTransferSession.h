@@ -130,8 +130,8 @@ public:
             TransferSkipData bytesToSkip;
         };
 
-        OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kNone }; }
-        OutputEvent(OutputEventType type) : EventType(type) { statusData = { StatusCode::kNone }; }
+        OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kUnknown }; }
+        OutputEvent(OutputEventType type) : EventType(type) { statusData = { StatusCode::kUnknown }; }
 
         const char * ToString(OutputEventType outputEventType);
 
@@ -297,7 +297,13 @@ public:
     uint64_t GetStartOffset() const { return mStartOffset; }
     uint64_t GetTransferLength() const { return mTransferLength; }
     uint16_t GetTransferBlockSize() const { return mTransferMaxBlockSize; }
+    uint32_t GetNextBlockNum() { return mNextBlockNum; }
     size_t GetNumBytesProcessed() const { return mNumBytesProcessed; }
+    const uint8_t * GetFileDesignator(uint16_t & fileDesignatorLen) const
+    {
+        fileDesignatorLen = mTransferRequestData.FileDesLength;
+        return mTransferRequestData.FileDesignator;
+    }
 
     TransferSession();
 

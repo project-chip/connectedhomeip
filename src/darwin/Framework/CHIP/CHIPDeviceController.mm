@@ -36,8 +36,8 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -196,8 +196,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
         params.fabricStorage = _fabricStorage;
+        params.fabricIndependentStorage = _persistentStorageDelegateBridge;
         commissionerParams.storageDelegate = _persistentStorageDelegateBridge;
-        commissionerParams.deviceAddressUpdateDelegate = _pairingDelegateBridge;
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
         commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
@@ -217,7 +217,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         chip::MutableByteSpan icac;
 
         errorCode = _operationalCredentialsDelegate->GenerateNOCChainAfterValidation(
-            _localDeviceId, 0, ephemeralKey.Pubkey(), rcac, icac, noc);
+            _localDeviceId, /* fabricId = */ 1, ephemeralKey.Pubkey(), rcac, icac, noc);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }
@@ -394,24 +394,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     return success;
 }
 
-- (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
-{
-    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-    __block BOOL success = NO;
-    if (![self isRunning]) {
-        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
-        return success;
-    }
-    dispatch_sync(_chipWorkQueue, ^{
-        if ([self isRunning]) {
-            errorCode = self.cppCommissioner->UnpairDevice(deviceID);
-        }
-        success = ![self checkForError:errorCode logMsg:kErrorUnpairDevice error:error];
-    });
-
-    return success;
-}
-
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
@@ -429,22 +411,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     });
 
     return success;
-}
-
-- (BOOL)isDevicePaired:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
-{
-    __block BOOL paired = NO;
-    if (![self isRunning]) {
-        [self checkForError:CHIP_ERROR_INCORRECT_STATE logMsg:kErrorNotRunning error:error];
-        return paired;
-    }
-    dispatch_sync(_chipWorkQueue, ^{
-        if ([self isRunning]) {
-            paired = self.cppCommissioner->DoesDevicePairingExist(chip::PeerId().SetNodeId(deviceID));
-        }
-    });
-
-    return paired;
 }
 
 - (CHIPDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
@@ -510,7 +476,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     }
 
     chip::SetupPayload setupPayload;
-    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 0, 0, 0, setupPayload);
+    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 0, 0,
+        chip::Controller::DeviceController::CommissioningWindowOption::kOriginalSetupCode, setupPayload);
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
@@ -554,8 +521,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     setupPIN &= ((1 << chip::kSetupPINCodeFieldLengthInBits) - 1);
     setupPayload.setUpPINCode = (uint32_t) setupPIN;
 
-    err = self.cppCommissioner->OpenCommissioningWindow(
-        deviceID, (uint16_t) duration, 1000, (uint16_t) discriminator, 2, setupPayload);
+    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 1000, (uint16_t) discriminator,
+        chip::Controller::DeviceController::CommissioningWindowOption::kTokenWithProvidedPIN, setupPayload);
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));

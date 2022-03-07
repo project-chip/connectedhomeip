@@ -210,6 +210,9 @@ void ProcessCommand(streamer_t * stream, char * destination)
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
+    err = gFabricTable.Init(&gStorage);
+    SuccessOrExit(err);
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(DeviceLayer::TCPEndPointManager())
                                .SetAddressType(gDestAddr.Type())
@@ -227,7 +230,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gSendArguments.GetPort());
 
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager, &gStorage, &gFabricTable);
         SuccessOrExit(err);
     }
     else
@@ -235,7 +238,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), chip::Inet::InterfaceId::Null());
 
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager, &gStorage, &gFabricTable);
         SuccessOrExit(err);
     }
 

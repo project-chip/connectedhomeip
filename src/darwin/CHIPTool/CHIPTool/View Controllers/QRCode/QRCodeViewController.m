@@ -692,6 +692,9 @@
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }
+    // track this device
+    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
+    CHIPSetDevicePaired(deviceId, YES);
     [self setVendorIDOnAccessory];
 }
 
@@ -785,10 +788,18 @@
     return peripheralFullName;
 }
 
+- (void)_restartMatterStack
+{
+    CHIPRestartController(self.chipController);
+}
+
 - (void)handleRendezVousDefault:(NSString *)payload
 {
     NSError * error;
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
+
+    // restart the Matter Stack before pairing (for reliability + testing restarts)
+    [self _restartMatterStack];
 
     if ([self.chipController pairDevice:deviceID onboardingPayload:payload error:&error]) {
         deviceID++;

@@ -61,13 +61,18 @@ class Server
 {
 public:
     CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
-                    uint16_t unsecureServicePort = CHIP_UDC_PORT);
+                    uint16_t unsecureServicePort = CHIP_UDC_PORT, Inet::InterfaceId interfaceId = Inet::InterfaceId::Null());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     CHIP_ERROR AddTestCommissioning();
+
+    /**
+     * @brief Call this function to rejoin existing groups found in the GroupDataProvider
+     */
+    void RejoinExistingMulticastGroups();
 
     FabricTable & GetFabricTable() { return mFabrics; }
 
@@ -87,7 +92,19 @@ public:
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
+    PersistentStorageDelegate & GetPersistentStorage() { return mDeviceStorage; }
+
+    /**
+     * This function send the ShutDown event before stopping
+     * the event loop.
+     */
+    void DispatchShutDownAndStopEventLoop();
+
     void Shutdown();
+
+    void ScheduleFactoryReset();
+
+    static void FactoryReset(intptr_t arg);
 
     static Server & GetInstance() { return sServer; }
 
@@ -100,16 +117,15 @@ private:
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
-            size_t bytesRead;
-            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead));
-            if (!CanCastTo<uint16_t>(bytesRead))
+            size_t bytesRead = 0;
+            CHIP_ERROR err   = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+
+            if (err == CHIP_NO_ERROR)
             {
-                ChipLogDetail(AppServer, "0x%" PRIx32 " is too big to fit in uint16_t", static_cast<uint32_t>(bytesRead));
-                return CHIP_ERROR_BUFFER_TOO_SMALL;
+                ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
             }
-            ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
             size = static_cast<uint16_t>(bytesRead);
-            return CHIP_NO_ERROR;
+            return err;
         }
 
         CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -200,6 +216,7 @@ private:
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;
     uint16_t mUnsecuredServicePort;
+    Inet::InterfaceId mInterfaceId;
 };
 
 } // namespace chip

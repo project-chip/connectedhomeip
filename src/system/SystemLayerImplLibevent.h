@@ -125,10 +125,10 @@ private:
     std::atomic<pthread_t> mHandleSelectThread;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !__ZEPHYR__
+#if !__ZEPHYR__
     static void MdnsTimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data);
     void MdnsTimeoutCallbackHandler();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD && !__ZEPHYR__
+#endif // !__ZEPHYR__
     event * mMdnsTimeoutEvent;
 };
 

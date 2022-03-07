@@ -145,8 +145,8 @@ public:
             }
         }
     }
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::DataVersion aVersion,
-                         chip::TLV::TLVReader * aData, const chip::app::StatusIB & status) override
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * aData,
+                         const chip::app::StatusIB & status) override
     {}
 
     void OnError(CHIP_ERROR aError) override { printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format()); }
@@ -185,7 +185,7 @@ public:
     }
     void OnDone(chip::app::CommandSender * apCommandSender) override { delete apCommandSender; }
 
-    void OnResponse(const chip::app::WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path,
+    void OnResponse(const chip::app::WriteClient * apWriteClient, const chip::app::ConcreteDataAttributePath & path,
                     chip::app::StatusIB status) override
     {
         auto respTime                                   = chip::System::SystemClock().GetMonotonicTimestamp();
@@ -360,24 +360,13 @@ exit:
 
 CHIP_ERROR SendWriteRequest(chip::app::WriteClient & apWriteClient)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVWriter * writer;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
     gLastMessageTime = chip::System::SystemClock().GetMonotonicTimestamp();
-    chip::app::AttributePathParams attributePathParams;
 
     printf("\nSend write request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    attributePathParams.mEndpointId  = 2;
-    attributePathParams.mClusterId   = 3;
-    attributePathParams.mAttributeId = 4;
-
-    SuccessOrExit(err = apWriteClient.PrepareAttribute(attributePathParams));
-
-    writer = apWriteClient.GetAttributeDataIBTLVWriter();
-
-    SuccessOrExit(err =
-                      writer->PutBoolean(chip::TLV::ContextTag(chip::to_underlying(chip::app::AttributeDataIB::Tag::kData)), true));
-    SuccessOrExit(err = apWriteClient.FinishAttribute());
+    SuccessOrExit(err = apWriteClient.EncodeAttribute(
+                      chip::app::AttributePathParams(2 /* endpoint */, 3 /* cluster */, 4 /* attribute */), true));
     SuccessOrExit(err = apWriteClient.SendWriteRequest(gSession.Get(), gMessageTimeout));
 
     gWriteCount++;
@@ -664,10 +653,10 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return attributeReport.EndOfAttributeReportIB().GetError();
 }
 
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler *)
 {
-    if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
+    if (aPath.mClusterId != kTestClusterId || aPath.mEndpointId != kTestEndpointId)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -677,6 +666,11 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
     return CHIP_NO_ERROR;
+}
+
+bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
+{
+    return true;
 }
 } // namespace app
 } // namespace chip
@@ -704,12 +698,16 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
+    err = gFabricTable.Init(&gStorage);
+    SuccessOrExit(err);
+
     err = gTransportManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
                                      .SetAddressType(chip::Inet::IPAddressType::kIPv6)
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager);
+    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager, &gStorage,
+                               &gFabricTable);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
