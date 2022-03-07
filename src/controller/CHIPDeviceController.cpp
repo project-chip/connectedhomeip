@@ -2108,8 +2108,6 @@ OperationalDeviceProxy * DeviceController::GetDeviceSession(const PeerId & peerI
 
 OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const PeerId & peerId)
 {
-    // RESOLVE-TODO: validate parameters here
-    //     - session should run the appropriate callbacks on success/failure
     CHIP_ERROR err =
         mCASESessionManager->FindOrEstablishSession(peerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 

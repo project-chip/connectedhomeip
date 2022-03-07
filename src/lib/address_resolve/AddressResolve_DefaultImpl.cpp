@@ -220,6 +220,13 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
 
         for (size_t i = 0; i < nodeData.mNumIPs; i++)
         {
+#if !INET_CONFIG_ENABLE_IPV4
+            if (!nodeData.mAddress[i].IsIPv6())
+            {
+                ChipLogError(Discovery, "Skipping IPv4 address during operational resolve.");
+                continue;
+            }
+#endif
             result.address.SetIPAddress(nodeData.mAddress[i]);
             current->LookupResult(result);
         }

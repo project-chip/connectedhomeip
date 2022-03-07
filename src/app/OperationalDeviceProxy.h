@@ -104,6 +104,7 @@ public:
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId, const Dnssd::ResolvedNodeData & nodeResolutionData) :
         OperationalDeviceProxy(params, peerId)
     {
+        mAddressLookupHandle.SetListener(this);
         OnNodeIdResolved(nodeResolutionData);
     }
 
