@@ -59,9 +59,7 @@ static_library("k32w0") {
 
   deps = []
 
-  public_deps = [ 
-    "${chip_root}/src/platform:platform_base",
-  ]
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (chip_enable_openthread) {
     sources += [
@@ -78,7 +76,6 @@ static_library("k32w0") {
 
   public_deps += [ "${chip_root}/src/crypto" ]
 
-  public_configs = [
-    "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
-  ]
+  public_configs =
+      [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
 }
