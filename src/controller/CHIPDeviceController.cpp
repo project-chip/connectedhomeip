@@ -167,6 +167,8 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
     VerifyOrReturnError(mCASESessionManager != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    ReturnErrorOnFailure(mCASESessionManager->Init(params.systemState->SystemLayer()));
+
     mSystemState = params.systemState->Retain();
     mState       = State::Initialized;
     return CHIP_NO_ERROR;
@@ -2057,16 +2059,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kFindOperational: {
-        // FIXME: implement a proper lookup
-        // RESOLVE-TODO
-        // CHIP_ERROR err = UpdateDevice(proxy->GetDeviceId());
-        //
-        //   => return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
-        //       => return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
-        ChipLogError(NotSpecified, "!!!!! RESOLVE-TODO: Find operational device after commissioning looks ok.");
-
-        OperationalDeviceProxy * session =
-            mCASESessionManager->FindExistingSession(mFabricInfo->GetPeerIdForNode(proxy->GetDeviceId()));
+        const PeerId peerId              = mFabricInfo->GetPeerIdForNode(proxy->GetDeviceId());
+        OperationalDeviceProxy * session = GetDeviceSession(peerId);
         if (session == nullptr)
         {
             ChipLogError(Controller, "No active session to find an operational address for.");
@@ -2105,7 +2099,29 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kSecurePairing:
         break;
     }
-} // namespace Controller
+}
+
+OperationalDeviceProxy * DeviceController::GetDeviceSession(const PeerId & peerId)
+{
+    return mCASESessionManager->FindExistingSession(peerId);
+}
+
+OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const PeerId & peerId)
+{
+    // RESOLVE-TODO: validate parameters here
+    //     - session should run the appropriate callbacks on success/failure
+    CHIP_ERROR err =
+        mCASESessionManager->FindOrEstablishSession(peerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to establish new session: %" CHIP_ERROR_FORMAT, err.Format());
+        return nullptr;
+    }
+
+    // session should have been created now, expect this to return non-null
+    return DeviceController::GetDeviceSession(peerId);
+}
 
 } // namespace Controller
 } // namespace chip

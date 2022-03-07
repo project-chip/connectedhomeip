@@ -18,13 +18,12 @@
 
 #include <app/CASESessionManager.h>
 #include <lib/address_resolve/AddressResolve.h>
-#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 
-CHIP_ERROR CASESessionManager::Init()
+CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer)
 {
-    return AddressResolve::Resolver::Instance().Init(&DeviceLayer::SystemLayer());
+    return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 
 CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,

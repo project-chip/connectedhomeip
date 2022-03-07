@@ -55,13 +55,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         break;
 
     case State::NeedsAddress:
-        // RESOLVE-TODO
-        // TODO: implement
-        //    Use AddressResolve::Instance
-        //
-        // err = resolver->ResolveNodeId(mPeerId, Inet::IPAddressType::kAny);
-        ChipLogError(NotSpecified, "!!!!! RESOLVE-TODO: Node needs address in opcred proxy connect");
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        err = LookupPeerAddress();
         EnqueueConnectionCallbacks(onConnection, onFailure);
         break;
 
@@ -311,6 +305,12 @@ OperationalDeviceProxy::~OperationalDeviceProxy()
 
 CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
 {
+    if (mAddressLookupHandle.IsInList())
+    {
+        ChipLogProgress(Discovery, "Operational node lookup already in progress. Will NOT start a new one.");
+        return CHIP_NO_ERROR;
+    }
+
     AddressResolve::NodeLookupRequest request(mPeerId);
 
     return AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
@@ -318,12 +318,16 @@ CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
 
 void OperationalDeviceProxy::OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result)
 {
-    ChipLogError(NotSpecified, "RESOLVE-TODO: what to do on resolve success");
+    UpdateDeviceData(result.address, result.mrpConfig);
 }
 
 void OperationalDeviceProxy::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)
 {
-    ChipLogError(NotSpecified, "RESOLVE-TODO: what to do on resolve failure");
+    ChipLogError(Discovery, "Operational discovery failed for 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                 ChipLogValueX64(peerId.GetNodeId()), reason.Format());
+
+    DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
+    DequeueConnectionFailureCallbacks(reason, /* executeCallback */ true);
 }
 
 } // namespace chip

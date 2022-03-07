@@ -61,7 +61,7 @@ public:
 
     virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
 
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(chip::System::Layer * systemLayer);
     void Shutdown() { mDNSResolver.Shutdown(); }
 
     /**
