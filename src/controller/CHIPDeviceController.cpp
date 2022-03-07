@@ -295,15 +295,16 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
     VerifyOrReturn(session->GetSessionType() == Transport::Session::SessionType::kSecure);
-    // TODO: implement a retry for lookup
-    // RESOLVE-TODO
-    // CHIP_ERROR err = UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
-    //
-    //   => return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
-    //       =>
-    //
-    ChipLogError(NotSpecified, "!!!!! RESOLVE-TODO: Update device when first message delivery fails.");
-    CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
+
+    OperationalDeviceProxy * proxy =
+        mCASESessionManager->FindExistingSession(mFabricInfo->GetPeerIdForNode(session->AsSecureSession()->GetPeerNodeId()));
+    if (proxy == nullptr)
+    {
+        ChipLogError(Controller, "Unable to find existing operational session on message delivery");
+        return;
+    }
+
+    CHIP_ERROR err = proxy->LookupPeerAddress();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller,
