@@ -22,6 +22,8 @@ if [ ! -f "my-firmware.ota" ]; then
     exit 1
 fi
 
+rm -r /tmp/chip_*
+
 ./out/ota_provider_debug/chip-ota-provider-app -f my-firmware.ota | tee /tmp/ota/provider-log.txt &
 provider_pid=$!
 
