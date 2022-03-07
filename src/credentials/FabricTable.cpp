@@ -169,7 +169,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
     // Computing it here will save computational overhead when it's accessed by other
     // parts of the code.
     SuccessOrExit(err = ExtractNodeIdFabricIdFromOpCert(ByteSpan(info->mNOCCert, nocCertLen), &nodeId, &mFabricId));
-    SuccessOrExit(err = GetCompressedId(mFabricId, nodeId, &mOperationalId));
+    SuccessOrExit(err = GeneratePeerId(mFabricId, nodeId, &mOperationalId));
 
     SuccessOrExit(err = SetICACert(ByteSpan(info->mICACert, icaCertLen)));
     SuccessOrExit(err = SetNOCCert(ByteSpan(info->mNOCCert, nocCertLen)));
@@ -182,7 +182,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
+CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
 {
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
@@ -333,7 +333,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
         }
     }
 
-    ReturnErrorOnFailure(GetCompressedId(fabricId, nodeId, &nocPeerId));
+    ReturnErrorOnFailure(GeneratePeerId(fabricId, nodeId, &nocPeerId));
     nocPubkey = P256PublicKey(certificates.GetLastCert()[0].mPublicKey);
 
     return CHIP_NO_ERROR;
