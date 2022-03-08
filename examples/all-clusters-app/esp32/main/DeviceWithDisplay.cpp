@@ -200,7 +200,7 @@ public:
             {
                 value                  = (value == "Yes") ? "No" : "Yes";
                 uint8_t attributeValue = (value == "Yes") ? 1 : 0;
-                ESP_LOGI(TAG, "Occupancy changed to : %d", value);
+                ESP_LOGI(TAG, "Occupancy changed to : %s", value.c_str());
                 // update the current occupancy here for hardcoded endpoint 1
                 app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
             }
