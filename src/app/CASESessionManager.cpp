@@ -32,7 +32,8 @@ CHIP_ERROR CASESessionManager::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESessionManager::FindOrCreateSession(const PeerId & peerId, OperationalDeviceProxy ** returnSession) {
+CHIP_ERROR CASESessionManager::FindOrCreateSession(const PeerId & peerId, OperationalDeviceProxy ** returnSession)
+{
     Dnssd::ResolvedNodeData resolutionData;
     bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
 
@@ -54,7 +55,8 @@ CHIP_ERROR CASESessionManager::FindOrCreateSession(const PeerId & peerId, Operat
             return CHIP_ERROR_NO_MEMORY;
         }
     }
-    if (returnSession != nullptr) {
+    if (returnSession != nullptr)
+    {
         *returnSession = session;
     }
     return CHIP_NO_ERROR;
@@ -69,7 +71,8 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
 
     OperationalDeviceProxy * session;
     CHIP_ERROR err = FindOrCreateSession(peerId, &session);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         onFailure->mCall(onFailure->mContext, peerId, err);
     }
     if (nodeIDWasResolved)
@@ -107,9 +110,9 @@ CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId 
     VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);
     PeerId peerId = fabric->GetPeerIdForNode(nodeId);
     // Create a session for this peer if it doesn't exist yet.
-    if (establishSession) {
+    if (establishSession)
+    {
         ReturnErrorOnFailure(FindOrCreateSession(peerId, nullptr));
-
     }
     return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
 }
