@@ -223,13 +223,28 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
                 vectorArgument->push_back(static_cast<uint16_t>(v));
             }
         }
-        else
+        else if (arg.type == ArgumentType::Vector32 && arg.flags != Argument::kOptional)
         {
             auto vectorArgument = static_cast<std::vector<uint32_t> *>(arg.value);
             for (uint64_t v : values)
             {
                 vectorArgument->push_back(static_cast<uint32_t>(v));
             }
+        }
+        else if (arg.type == ArgumentType::Vector32 && arg.flags == Argument::kOptional)
+        {
+            std::vector<uint32_t> vectorArgument;
+            for (uint64_t v : values)
+            {
+                vectorArgument.push_back(static_cast<uint32_t>(v));
+            }
+
+            auto optionalArgument = static_cast<chip::Optional<std::vector<uint32_t>> *>(arg.value);
+            optionalArgument->SetValue(vectorArgument);
+        }
+        else
+        {
+            return false;
         }
 
         return true;
@@ -553,6 +568,19 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, std::v
     arg.min   = min;
     arg.max   = max;
     arg.flags = 0;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<uint32_t>> * value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Vector32;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.min   = min;
+    arg.max   = max;
+    arg.flags = Argument::kOptional;
 
     return AddArgumentToList(std::move(arg));
 }
