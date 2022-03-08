@@ -356,7 +356,7 @@ void ReorderFabricRemovalTest(nlTestSuite * inSuite, void * inContext)
 
     for (uint8_t i = 0; i < CHIP_CONFIG_MAX_FABRICS; i++)
     {
-        err = mGroupPeerMsgCounter.FindOrAddPeer((i + 1), 1, false, counter);
+        err = mGroupPeerMsgCounter.FindOrAddPeer(static_cast<chip::FabricIndex>(i + 1), 1, false, counter);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
