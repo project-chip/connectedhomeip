@@ -116,20 +116,15 @@ public:
     /**
      * Delete a provider location from the list if found
      */
-    CHIP_ERROR Delete(const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation)
+    CHIP_ERROR Delete(FabricIndex fabricIndex)
     {
         for (size_t i = 0; i < mMaxSize; i++)
         {
-            if (mList[i].HasValue())
+            if (mList[i].HasValue() && mList[i].Value().GetFabricIndex() == fabricIndex)
             {
-                const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & pl = mList[i].Value();
-                if ((pl.GetFabricIndex() == providerLocation.GetFabricIndex()) &&
-                    (pl.providerNodeID == providerLocation.providerNodeID) && (pl.endpoint == providerLocation.endpoint))
-                {
-                    mList[i].ClearValue();
-                    mListSize--;
-                    return CHIP_NO_ERROR;
-                }
+                mList[i].ClearValue();
+                mListSize--;
+                return CHIP_NO_ERROR;
             }
         }
 

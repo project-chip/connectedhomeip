@@ -21,6 +21,7 @@
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
@@ -73,6 +74,7 @@ private:
     bool mHaveBLEConnections{ false };
 
 #if CONFIG_CHIP_OTA_REQUESTOR
+    chip::DefaultOTARequestorStorage mOTARequestorStorage;
     chip::DeviceLayer::GenericOTARequestorDriver mOTARequestorDriver;
     chip::DeviceLayer::OTAImageProcessorImpl mOTAImageProcessor;
     chip::BDXDownloader mBDXDownloader;

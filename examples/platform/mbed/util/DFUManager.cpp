@@ -56,7 +56,8 @@ CHIP_ERROR DFUManager::Init(chip::Callback::Callback<OnUpdateAvailable> * onUpda
 
 #ifdef CHIP_OTA_REQUESTOR
     SetRequestorInstance(&mRequestorCore);
-    mRequestorCore.Init(&(chip::Server::GetInstance()), &mRequestorDriver, &mDownloader);
+    mRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    mRequestorCore.Init(chip::Server::GetInstance(), mRequestorStorage, mRequestorDriver, mDownloader);
     mImageProcessor.SetOTADownloader(&mDownloader);
     mDownloader.SetImageProcessorDelegate(&mImageProcessor);
     mRequestorDriver.Init(&mRequestorCore, &mImageProcessor, &mOnOtaUpdateAvailableCallback, &mOnOtaUpdateApplyCallback);
