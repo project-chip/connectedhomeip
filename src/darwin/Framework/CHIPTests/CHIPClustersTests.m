@@ -21521,6 +21521,196 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_SC_4_2_000000_Reboot
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reboot target device"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Reboot(expectation, queue, 3840);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000001_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, 305414945);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000002_OpenBasicCommissioningWindow
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"TH is put in Commissioning Mode using Open Basic Commissioning Window command and "
+                                         @"starts advertising Commissionable Node Discovery service using DNS-SD"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestAdministratorCommissioning * cluster = [[CHIPTestAdministratorCommissioning alloc] initWithDevice:device
+                                                                                                     endpoint:0
+                                                                                                        queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
+    params.commissioningTimeout = [NSNumber numberWithUnsignedShort:120U];
+    [cluster openBasicCommissioningWindowWithParams:params
+                                  completionHandler:^(NSError * _Nullable err) {
+                                      NSLog(@"TH is put in Commissioning Mode using Open Basic Commissioning Window command and "
+                                            @"starts advertising Commissionable Node Discovery service using DNS-SD Error: %@",
+                                          err);
+
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                      [expectation fulfill];
+                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+NSString * _Nonnull deviceInstanceNameBeforeReboot1;
+- (void)testSendClusterTest_TC_SC_4_2_000003_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check Instance Name"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000004_FindCommissionableByLongDiscriminator
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check Long Discriminator _L"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionableByLongDiscriminator(expectation, queue, 3840);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000005_FindCommissionableByShortDiscriminator
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check Short Discriminator (_S)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionableByShortDiscriminator(expectation, queue, 3840);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000006_FindCommissionableByVendorId
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check Vendor ID (_V)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionableByVendorId(expectation, queue, 65521);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000007_FindCommissionableByCommissioningMode
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check Commissioning Mode (_CM)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionableByCommissioningMode(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000008_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TXT key for Vendor ID and Product ID (VP)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000009_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TXT key for Vendor ID and Product ID (VP)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000010_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Optional TXT key for MRP Retry Interval Idle (CRI)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000011_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Optional TXT key for MRP Retry Interval Active (CRA)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000012_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TXT key for commissioning mode (CM)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000013_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Optional TXT key for device name (DN)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000014_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Optional TXT key for rotating device identifier (RI)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000015_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Optional TXT key for pairing hint (PH)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000016_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Optional TXT key for pairing instructions (PI)"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000017_FindCommissionable
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check IPs"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    FindCommissionable(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000018_Reboot
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reboot target device"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Reboot(expectation, queue, 3840);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000019_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log commands"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, @"TH adds an unknown key/value pair in the advertised data");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SC_4_2_000020_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log commands"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, @"Scan for DNS-SD commissioner advertisements from TH");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTest_TC_SWTCH_2_1_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
