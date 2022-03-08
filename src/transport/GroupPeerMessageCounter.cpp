@@ -238,6 +238,8 @@ void GroupPeerTable::RemoveAndCompactFabric(uint32_t tableIndex)
         return;
     }
     mGroupFabrics[tableIndex].mFabricIndex = kUndefinedFabricIndex;
+    new (&mGroupFabrics[tableIndex]) GroupFabric();
+
     // To maintain logic integrity Fabric array cannot have empty slot in between data
     // Find the last non empty element
     for (uint32_t i = CHIP_CONFIG_MAX_FABRICS - 1; i > tableIndex; i--)
