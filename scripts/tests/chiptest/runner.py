@@ -14,23 +14,19 @@
 
 import logging
 import os
+import pty
+import re
 import subprocess
 import sys
 import threading
-import time
-import pty
-import re
-
-from dataclasses import dataclass
 
 
 class LogPipe(threading.Thread):
 
     def __init__(self, level, capture_delegate=None, name=None):
-        """Setup the object with a logger and a loglevel
-
-            and start the thread
-            """
+        """
+        Setup the object with a logger and a loglevel and start the thread.
+        """
         threading.Thread.__init__(self)
 
         self.daemon = False
@@ -61,7 +57,7 @@ class LogPipe(threading.Thread):
         return None
 
     def fileno(self):
-        """Return the write file descriptor of the pipe"""
+        """Return the write file descriptor of the pipe."""
         return self.fd_write
 
     def run(self):
@@ -85,9 +81,11 @@ class Runner:
 
     def RunSubprocess(self, cmd, name, wait=True, dependencies=[]):
         outpipe = LogPipe(
-            logging.DEBUG, capture_delegate=self.capture_delegate, name=name + ' OUT')
+            logging.DEBUG, capture_delegate=self.capture_delegate,
+            name=name + ' OUT')
         errpipe = LogPipe(
-            logging.INFO, capture_delegate=self.capture_delegate, name=name + ' ERR')
+            logging.INFO, capture_delegate=self.capture_delegate,
+            name=name + ' ERR')
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)

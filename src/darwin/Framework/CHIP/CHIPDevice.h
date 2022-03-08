@@ -55,11 +55,13 @@ extern NSString * const kCHIPStatusKey;
  * clusters, all attributes, all events) on the device.
  *
  * reportHandler will be called any time a data update is available (with a
- * non-nil "value" and nil "error"), or any time there is an error (with a nil
- * "value" and non-nil "error").  If it's called with an error, that will
- * terminate the subscription.
+ * non-nil "value" and nil "error"), or any time there is an error for the
+ * entire subscription (with a nil "value" and non-nil "error").  If it's called
+ * with an error, that will terminate the subscription.
  *
- * The array passed to reportHandler will contain CHIPAttributeReport instances.
+ * The array passed to reportHandler will contain CHIPAttributeReport
+ * instances.  Errors for specific paths, not the whole subscription, will be
+ * reported via those objects.
  *
  * subscriptionEstablished block, if not nil, will be called once the
  * subscription is established.  This will be _after_ the first (priming) call
@@ -172,6 +174,10 @@ extern NSString * const kCHIPStatusKey;
 @property (nonatomic, readonly, strong, nonnull) CHIPAttributePath * path;
 // value is nullable because nullable attributes can have nil as value.
 @property (nonatomic, readonly, strong, nullable) id value;
+// If this specific path resulted in an error, the error (in the
+// MatterInteractionErrorDomain or CHIPErrorDomain) that corresponds to this
+// path.
+@property (nonatomic, readonly, strong, nullable) NSError * error;
 @end
 
 NS_ASSUME_NONNULL_END

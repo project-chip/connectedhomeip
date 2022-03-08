@@ -31,6 +31,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {

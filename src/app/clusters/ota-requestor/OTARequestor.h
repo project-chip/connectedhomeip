@@ -26,10 +26,10 @@
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/server/Server.h>
 #include <platform/OTARequestorDriver.h>
-#include <platform/OTARequestorInterface.h>
 #include <protocols/bdx/BdxMessages.h>
 
 #include "BDXDownloader.h"
+#include "OTARequestorInterface.h"
 
 namespace chip {
 

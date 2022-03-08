@@ -41,7 +41,6 @@
 
 #include "OTAImageProcessorImpl.h"
 #include "platform/GenericOTARequestorDriver.h"
-#include "platform/OTARequestorInterface.h"
 
 using namespace ::chip;
 using namespace ::chip::System;
