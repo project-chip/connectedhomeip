@@ -169,6 +169,24 @@ public:
                 ESP_LOGI(TAG, "Saturation changed to : %d", n * 100 / 254);
                 app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, n);
             }
+            else if (name == "Illuminance")
+            {
+                // update the current illuminance here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Illuminance changed to : %d", n);
+                app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n));
+            }
+            else if (name == "Occupancy")
+            {
+                // update the current occupancy here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Occupancy changed to : %d", n);
+                app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, n);
+            }
+            else if (name == "Humidity")
+            {
+                // update the current humidity here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Occupancy changed to : %d", n);
+                app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+            }
             value = buffer;
         }
         else if (IsBooleanAttribute())
@@ -443,7 +461,7 @@ void SetupPretendDevices()
     AddDevice("Contact Sensor");
     AddEndpoint("External");
     AddCluster("Contact Sensor");
-    AddAttribute("BooleanState", "true");
+    AddAttribute("Contact", "true");
     app::Clusters::BooleanState::Attributes::StateValue::Set(1, true);
 
     AddDevice("Thermostat");
@@ -461,13 +479,13 @@ void SetupPretendDevices()
     AddDevice("Humidity Sensor");
     AddEndpoint("External");
     AddCluster("Humidity Sensor");
-    AddAttribute("MeasuredValue", "30");
+    AddAttribute("Humidity", "30");
     app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
 
     AddDevice("Light Sensor");
     AddEndpoint("External");
     AddCluster("Illuminance Measurement");
-    AddAttribute("MeasuredValue", "1000");
+    AddAttribute("Illuminance", "1000");
     app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
 
     AddDevice("Color Light");
