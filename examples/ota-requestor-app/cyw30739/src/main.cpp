@@ -18,6 +18,7 @@
  */
 #include <ChipShellCollection.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -26,7 +27,6 @@
 #include <mbedtls/platform.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CYW30739/OTAImageProcessorImpl.h>
-#include <platform/GenericOTARequestorDriver.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <sparcommon.h>
 #include <stdio.h>
