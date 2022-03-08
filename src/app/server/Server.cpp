@@ -136,7 +136,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     InitDataModelHandler(&mExchangeMgr);
 
-    err = mFabrics.Init(&mDeviceStorage, nullptr);
+    err = mFabrics.Init(&mDeviceStorage);
     SuccessOrExit(err);
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);

@@ -188,7 +188,7 @@ private:
             (void) compressedId;
             if (mSessionManager != nullptr)
             {
-                mSessionManager->SyncRemovalFabricIndex(fabricIndex);
+                mSessionManager->FabricRemoved(fabricIndex);
             }
             Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
             if (groupDataProvider != nullptr)

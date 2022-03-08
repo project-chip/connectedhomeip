@@ -401,6 +401,20 @@ CHIP_ERROR FabricInfo::MatchDestinationID(const ByteSpan & targetDestinationId, 
     return CHIP_ERROR_CERT_NOT_TRUSTED;
 }
 
+FabricTable::~FabricTable()
+{
+    FabricTableDelegate * delegate = mDelegate;
+    while (delegate)
+    {
+        FabricTableDelegate * temp = delegate->mNext;
+        if (delegate->mOwnedByFabricTable)
+        {
+            chip::Platform::Delete(delegate);
+        }
+        delegate = temp;
+    }
+}
+
 void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
 {
     FabricInfo * fabric = FindFabricWithIndex(fabricIndex);
@@ -649,13 +663,9 @@ void FabricTable::DeleteAllFabrics()
     }
 }
 
-CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage, FabricTableDelegate * fabricTableDelegate)
+CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    if (fabricTableDelegate != nullptr)
-    {
-        ReturnErrorOnFailure(AddFabricDelegate(fabricTableDelegate));
-    }
 
     mStorage = storage;
     ChipLogDetail(Discovery, "Init fabric pairing table with server storage");

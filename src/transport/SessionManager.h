@@ -198,10 +198,9 @@ public:
     void Shutdown();
 
     /**
-     * @brief
-     * Sync the groupCounter when a fabric is removed from the fabric table
+     * @brief Notification that a fabric was removed.
      */
-    void SyncRemovalFabricIndex(FabricIndex fabricIndex);
+    void FabricRemoved(FabricIndex fabricIndex);
 
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
