@@ -37,14 +37,9 @@ else
     echo Provider not commissioned properly
 fi
 
-<<<<<<< HEAD
 ./out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
 
 stdbuf -o0 ./out/ota_requestor_debug/"$OTA_REQUESTOR_APP" --discriminator "$DISCRIMINATOR" --secured-device-port "$UDP_PORT" --KVS /tmp/chip_kvs_requestor --otaDownloadPath "$OTA_DOWNLOAD_PATH" | tee /tmp/ota/requestor-log.txt &
-=======
-stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app --discriminator "$DISCRIMINATOR" --secured-device-port "$UDP_PORT" --KVS /tmp/chip_kvs_requestor | tee /tmp/ota/requestor-log.txt &
-requestor_pid=$!
->>>>>>> dd78b30b9 (add ota test)
 
 echo "Commissioning Requestor"
 
