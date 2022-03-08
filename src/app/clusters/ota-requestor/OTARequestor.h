@@ -130,11 +130,6 @@ public:
                                                                     reinterpret_cast<intptr_t>(this));
     }
 
-    /**
-     * Called to set optional requestorCanConsent value provided by Requestor.
-     */
-    void SetRequestorCanConsent(bool requestorCanConsent) { mRequestorCanConsent.SetValue(requestorCanConsent); }
-
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
@@ -309,7 +304,6 @@ private:
     CharSpan mFileDesignator;
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
-    chip::Optional<bool> mRequestorCanConsent;
     ProviderLocationList mDefaultOtaProviderList;
     Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current update in progress
 };

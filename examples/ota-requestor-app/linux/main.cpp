@@ -48,9 +48,15 @@ using namespace chip::ArgParser;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
+class CustomOTARequestorDriver : public DeviceLayer::ExtendedOTARequestorDriver
+{
+public:
+    bool CanConsent() override;
+};
+
 OTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-DeviceLayer::ExtendedOTARequestorDriver gRequestorUser;
+CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 chip::ota::DefaultOTARequestorUserConsentProvider gUserConsentProvider;
@@ -81,7 +87,8 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Periodic timeout for querying providers in the default OTA provider list\n"
                              "        If none or zero is supplied the timeout is set to every 24 hours. \n"
                              "  -c/--requestorCanConsent\n"
-                             "        If supplied, the RequestorCanConsent field of the QueryImage command is set to true.\n"
+                             "        If supplied, the RequestorCanConsent field of the QueryImage command is set to "
+                             "true.\n"
                              "        Otherwise, the value is determined by the driver.\n "
                              "  -f/--otaDownloadPath <file path>\n"
                              "        If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
@@ -92,6 +99,11 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        deferred: Defer obtaining user consent \n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
+
+bool CustomOTARequestorDriver::CanConsent()
+{
+    return gRequestorCanConsent.ValueOr(DeviceLayer::ExtendedOTARequestorDriver::CanConsent());
+}
 
 static void InitOTARequestor(void)
 {
@@ -105,8 +117,9 @@ static void InitOTARequestor(void)
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
-    // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
+    // WARNING: this is probably not realistic to know such details of the image or to even have an
+    // OTADownloader instantiated at the beginning of program execution. We're using hardcoded
+    // values here for now since this is a reference application.
     OTAImageProcessorParams ipParams;
     ipParams.imageFile = CharSpan::fromCharString(gOtaDownloadPath);
     gImageProcessor.SetOTAImageProcessorParams(ipParams);
@@ -173,11 +186,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 void ApplicationInit()
 {
     chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
-
-    if (gRequestorCanConsent.HasValue())
-    {
-        gRequestorCore.SetRequestorCanConsent(gRequestorCanConsent.Value());
-    }
 
     // Initialize all OTA download components
     InitOTARequestor();
