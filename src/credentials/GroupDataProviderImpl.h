@@ -74,7 +74,7 @@ public:
     // Key Sets
     //
 
-    CHIP_ERROR SetKeySet(FabricIndex fabric_index, const KeySet & keys) override;
+    CHIP_ERROR SetKeySet(FabricIndex fabric_index, const ByteSpan & compressed_fabric_id, const KeySet & keys) override;
     CHIP_ERROR GetKeySet(FabricIndex fabric_index, chip::KeysetId keyset_id, KeySet & keys) override;
     CHIP_ERROR RemoveKeySet(FabricIndex fabric_index, chip::KeysetId keyset_id) override;
     KeySetIterator * IterateKeySets(FabricIndex fabric_index) override;

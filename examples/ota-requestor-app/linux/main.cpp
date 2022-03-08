@@ -17,11 +17,11 @@
  */
 
 #include "AppMain.h"
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/DefaultOTARequestorUserConsentProvider.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/ExtendedOTARequestorDriver.h"
-#include "platform/Linux/OTAImageProcessorImpl.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsentProvider.h>
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/Linux/OTAImageProcessorImpl.h>
 
 using chip::BDXDownloader;
 using chip::ByteSpan;

@@ -32,10 +32,10 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/EFR32/OTAImageProcessorImpl.h"
-#include "platform/GenericOTARequestorDriver.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/EFR32/OTAImageProcessorImpl.h>
 
 #include <assert.h>
 

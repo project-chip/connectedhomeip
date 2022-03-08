@@ -30,10 +30,10 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <platform/GenericOTARequestorDriver.h>
 #include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
 
 #include <app/server/OnboardingCodesUtil.h>

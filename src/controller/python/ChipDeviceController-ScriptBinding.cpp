@@ -83,7 +83,6 @@ typedef void (*ChipThreadTaskRunnerFunct)(intptr_t context);
 }
 
 namespace {
-chip::SimpleFabricStorage sFabricStorage;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sSsidBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sCredsBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sThreadBuf;
@@ -211,15 +210,9 @@ chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter()
 
 ChipError::StorageType pychip_DeviceController_StackInit()
 {
-    CHIP_ERROR err;
-
     VerifyOrDie(sStorageAdapter != nullptr);
 
-    err = sFabricStorage.Initialize(sStorageAdapter);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
     FactoryInitParams factoryParams;
-    factoryParams.fabricStorage            = &sFabricStorage;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
     factoryParams.enableServerInteractions = true;
 

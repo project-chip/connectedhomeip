@@ -463,10 +463,11 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
     )
 
     target_sources(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/examples/platform/mbed/ota/OTARequestorDriverImpl.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
         ${CHIP_ROOT}/src/platform/mbed/OTAImageProcessorImpl.cpp
-        ${CHIP_ROOT}/src/platform/mbed/OTARequestorDriverImpl.cpp
     )
 
 if (NOT ${APP_TARGET} MATCHES "shell")

@@ -17,9 +17,10 @@
 
 #pragma once
 
-#include <platform/OTARequestorDriver.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
+
+#include "OTARequestorDriver.h"
 
 namespace chip {
 
