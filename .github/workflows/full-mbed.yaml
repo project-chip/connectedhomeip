@@ -124,6 +124,8 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build unit tests
+              # Temporarily disable build due to running out of flash space
+              if: false
               timeout-minutes: 20
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
 
