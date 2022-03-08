@@ -184,7 +184,7 @@ public:
             else if (name == "Humidity")
             {
                 // update the current humidity here for hardcoded endpoint 1
-                ESP_LOGI(TAG, "Occupancy changed to : %d", n);
+                ESP_LOGI(TAG, "Humidity changed to : %d", n);
                 app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
             }
             value = buffer;
