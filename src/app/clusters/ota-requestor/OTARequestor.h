@@ -30,6 +30,7 @@
 #include "BDXDownloader.h"
 #include "OTARequestorDriver.h"
 #include "OTARequestorInterface.h"
+#include "OTARequestorStorage.h"
 
 namespace chip {
 
@@ -106,21 +107,21 @@ public:
      *   - Set the OTA requestor driver instance used to communicate download progress and errors
      *   - Set the BDX downloader instance used for initiating BDX downloads
      */
-    CHIP_ERROR Init(Server * server, OTARequestorDriver * driver, BDXDownloader * downloader)
+    CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader)
     {
-        mServer             = server;
-        mCASESessionManager = server->GetCASESessionManager();
-        mOtaRequestorDriver = driver;
-        mBdxDownloader      = downloader;
+        mServer             = &server;
+        mCASESessionManager = server.GetCASESessionManager();
+        mStorage            = &storage;
+        mOtaRequestorDriver = &driver;
+        mBdxDownloader      = &downloader;
 
         uint32_t version;
         ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
         mCurrentVersion = version;
 
+        storage.LoadDefaultProviders(mDefaultOtaProviderList);
         OtaRequestorServerSetUpdateState(mCurrentUpdateState);
-        app::DataModel::Nullable<uint8_t> percent;
-        percent.SetNull();
-        OtaRequestorServerSetUpdateStateProgress(percent);
+        OtaRequestorServerSetUpdateStateProgress(app::DataModel::NullNullable);
 
         // This results in the initial periodic timer kicking off
         RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
@@ -293,6 +294,7 @@ private:
      */
     static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
+    OTARequestorStorage * mStorage            = nullptr;
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;

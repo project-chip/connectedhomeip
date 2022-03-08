@@ -30,6 +30,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <lib/support/CHIPMem.h>
@@ -63,6 +64,7 @@ static Button_Handle sAppRightHandle;
 AppTask AppTask::sAppTask;
 
 static OTARequestor sRequestorCore;
+static DefaultOTARequestorStorage sRequestorStorage;
 static GenericOTARequestorDriver sRequestorUser;
 static BDXDownloader sDownloader;
 static OTAImageProcessorImpl sImageProcessor;
@@ -72,7 +74,8 @@ void InitializeOTARequestor(void)
     // Initialize and interconnect the Requestor and Image Processor objects
     SetRequestorInstance(&sRequestorCore);
 
-    sRequestorCore.Init(&Server::GetInstance(), &sRequestorUser, &sDownloader);
+    sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
     sImageProcessor.SetOTADownloader(&sDownloader);
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
