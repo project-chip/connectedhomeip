@@ -1298,7 +1298,12 @@ void SubscriptionCallback::ReportError(NSError * _Nullable err)
     dispatch_async(mQueue, ^{
         callback(nil, err);
 
-        delete myself;
+        // Deletion of our ReadClient (and hence of ourselves, since the
+        // ReadClient has a pointer to us) needs to happen on the Matter work
+        // queue.
+        dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+            delete myself;
+        });
     });
 
     mHaveQueuedDeletion = true;
