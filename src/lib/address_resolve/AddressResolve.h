@@ -139,7 +139,7 @@ public:
 
 private:
     static constexpr uint32_t kMinLookupTimeMsDefault = 200;
-    static constexpr uint32_t kMaxLookupTimeMsDefault = 3000;
+    static constexpr uint32_t kMaxLookupTimeMsDefault = 10000;
 
     PeerId mPeerId;
     System::Clock::Milliseconds32 mMinLookupTimeMs{ kMinLookupTimeMsDefault };

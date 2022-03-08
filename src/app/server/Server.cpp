@@ -111,7 +111,6 @@ Server::Server() :
         },
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
-        .dnsResolver       = nullptr,
     }), mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage),
     mAttributePersister(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
 {}
@@ -252,7 +251,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                                                     &mSessions, &mFabrics);
     SuccessOrExit(err);
 
-    err = mCASESessionManager.Init();
+    err = mCASESessionManager.Init(&DeviceLayer::SystemLayer());
 
     // This code is necessary to restart listening to existing groups after a reboot
     // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them

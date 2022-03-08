@@ -375,7 +375,6 @@ public:
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
-    bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) override;
 
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
@@ -534,12 +533,6 @@ CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddress
     return SendPendingResolveQueries();
 }
 
-bool MinMdnsResolver::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
-{
-    // MinMDNS does not do cache node address resolutions.
-    return false;
-}
-
 CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
 {
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -655,11 +648,6 @@ CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().FindCommissioners(filter);
-}
-
-bool ResolverProxy::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
-{
-    return chip::Dnssd::Resolver::Instance().ResolveNodeIdFromInternalCache(peerId, type);
 }
 
 } // namespace Dnssd

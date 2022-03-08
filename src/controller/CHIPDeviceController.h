@@ -170,9 +170,7 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SessionRecoveryDelegate,
-                                    public AbstractDnssdDiscoveryController,
-                                    public Dnssd::OperationalResolveDelegate
+class DLL_EXPORT DeviceController : public SessionRecoveryDelegate, public AbstractDnssdDiscoveryController
 {
 public:
     DeviceController();
@@ -219,18 +217,12 @@ public:
     }
 
     /**
-     * @brief
-     *   This function update the device informations asynchronously using dnssd.
+     * DEPRECATED - to be removed
      *
-     * @param[in] deviceId  Node ID for the CHIP device
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * Forces a DNSSD lookup for the specified device. It finds the corresponding session
+     * for the given nodeID and initiates a DNSSD lookup to find/update the node address
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId)
-    {
-        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
-    }
+    CHIP_ERROR UpdateDevice(NodeId deviceId);
 
     /**
      * @brief
@@ -374,12 +366,13 @@ protected:
 
     uint16_t mVendorId;
 
+    /// Fetches the session to use for the current device. Allows overriding
+    /// in case subclasses want to create the session if it does not yet exist
+    virtual OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId);
+
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
-    //////////// OperationalResolveDelegate Implementation ///////////////
-    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
-    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 
 private:
@@ -630,9 +623,6 @@ public:
      */
     int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
 
-    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
-    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
      * @brief
@@ -666,6 +656,9 @@ public:
 
     // AttributeCache::Callback impl
     void OnDone() override;
+
+    // Commissioner will establish new device connections after PASE.
+    OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
 
 private:
     DevicePairingDelegate * mPairingDelegate;

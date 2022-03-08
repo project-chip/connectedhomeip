@@ -127,7 +127,6 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.systemState->TransportMgr() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(mDNSResolver.Init(params.systemState->UDPEndPointManager()));
-    mDNSResolver.SetOperationalDelegate(this);
     mDNSResolver.SetCommissioningDelegate(this);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
 
@@ -162,11 +161,12 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .sessionInitParams = deviceInitParams,
         .dnsCache          = &mDNSCache,
         .devicePool        = &mDevicePool,
-        .dnsResolver       = &mDNSResolver,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
     VerifyOrReturnError(mCASESessionManager != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    ReturnErrorOnFailure(mCASESessionManager->Init(params.systemState->SystemLayer()));
 
     mSystemState = params.systemState->Retain();
     mState       = State::Initialized;
@@ -294,7 +294,16 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
     VerifyOrReturn(session->GetSessionType() == Transport::Session::SessionType::kSecure);
-    CHIP_ERROR err = UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
+
+    OperationalDeviceProxy * proxy =
+        mCASESessionManager->FindExistingSession(mFabricInfo->GetPeerIdForNode(session->AsSecureSession()->GetPeerNodeId()));
+    if (proxy == nullptr)
+    {
+        ChipLogError(Controller, "Unable to find existing operational session on message delivery");
+        return;
+    }
+
+    CHIP_ERROR err = proxy->LookupPeerAddress();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller,
@@ -559,21 +568,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
-{
-    VerifyOrReturn(mState == State::Initialized,
-                   ChipLogError(Controller, "OnOperationalNodeResolved was called in incorrect state"));
-    mCASESessionManager->OnOperationalNodeResolved(nodeData);
-}
-
-void DeviceController::OnOperationalNodeResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
-{
-    ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
-    VerifyOrReturn(mState == State::Initialized,
-                   ChipLogError(Controller, "OnOperationalNodeResolutionFailed was called in incorrect state"));
-    mCASESessionManager->OnOperationalNodeResolutionFailed(peer, error);
-}
-
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
@@ -617,12 +611,12 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv6)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort(static_cast<uint16_t>(mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv4)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort(static_cast<uint16_t>(mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
                                                     ));
 
@@ -1431,41 +1425,6 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     }
 }
 
-void DeviceCommissioner::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
-{
-    ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID 0x" ChipLogFormatX64,
-                    ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-    VerifyOrReturn(mState == State::Initialized);
-
-    // TODO: minimal mdns is buggy and violates the API contract for the
-    // resolver proxy by handing us results for all sorts of things we did not
-    // ask it to resolve, including results that don't even match our fabric.
-    // Reject at least those mis-matching results, since we can detect those
-    // easily.
-    if (nodeData.mPeerId.GetCompressedFabricId() != GetCompressedFabricId())
-    {
-        return;
-    }
-
-    mDNSCache.Insert(nodeData);
-
-    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-    DeviceController::OnOperationalNodeResolved(nodeData);
-}
-
-void DeviceCommissioner::OnOperationalNodeResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
-{
-    if (mDeviceBeingCommissioned != nullptr)
-    {
-        CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
-        if (device->GetDeviceId() == peer.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
-        {
-            CommissioningStageComplete(error);
-        }
-    }
-    DeviceController::OnOperationalNodeResolutionFailed(peer, error);
-}
-
 void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
 {
     // CASE session established.
@@ -1508,13 +1467,12 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
 
-    //
-    // If a device is being commissioned currently and it is the very same device that we just failed to establish CASE with,
-    // we need to clean it up to prevent a dangling CommissioneeDeviceProxy object.
-    //
     if (commissioner->mDeviceBeingCommissioned != nullptr && commissioner->mDeviceBeingCommissioned->GetPeerId() == peerId)
     {
-        commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
+        // NOTE: this is NOT calling commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
+        // since CommissioningStageComplete/CommissioningStepFinished is expected to do the cleanup of memory.
+        //
+        // Just mark the device as not in use anymore
         commissioner->mDeviceBeingCommissioned = nullptr;
     }
 
@@ -2050,7 +2008,16 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kFindOperational: {
-        CHIP_ERROR err = UpdateDevice(proxy->GetDeviceId());
+        const PeerId peerId              = mFabricInfo->GetPeerIdForNode(proxy->GetDeviceId());
+        OperationalDeviceProxy * session = GetDeviceSession(peerId);
+        if (session == nullptr)
+        {
+            ChipLogError(Controller, "No active session to find an operational address for.");
+            CommissioningStageComplete(CHIP_ERROR_NOT_FOUND);
+            return;
+        }
+
+        CHIP_ERROR err = session->LookupPeerAddress();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to proceed to operational discovery\n");
@@ -2081,7 +2048,37 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kSecurePairing:
         break;
     }
-} // namespace Controller
+}
+
+CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
+{
+    VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    OperationalDeviceProxy * proxy = mCASESessionManager->FindExistingSession(mFabricInfo->GetPeerIdForNode(deviceId));
+    VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_NOT_FOUND);
+
+    return proxy->LookupPeerAddress();
+}
+
+OperationalDeviceProxy * DeviceController::GetDeviceSession(const PeerId & peerId)
+{
+    return mCASESessionManager->FindExistingSession(peerId);
+}
+
+OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const PeerId & peerId)
+{
+    CHIP_ERROR err =
+        mCASESessionManager->FindOrEstablishSession(peerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to establish new session: %" CHIP_ERROR_FORMAT, err.Format());
+        return nullptr;
+    }
+
+    // session should have been created now, expect this to return non-null
+    return DeviceController::GetDeviceSession(peerId);
+}
 
 } // namespace Controller
 } // namespace chip
