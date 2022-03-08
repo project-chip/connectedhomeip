@@ -386,7 +386,6 @@ function parse(filename)
   });
 
   yaml.filename   = filename;
-  yaml.timeout    = yaml.config.timeout;
   yaml.totalTests = yaml.tests.length;
 
   return yaml;
