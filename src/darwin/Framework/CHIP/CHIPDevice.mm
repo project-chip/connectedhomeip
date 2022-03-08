@@ -74,7 +74,7 @@ class NSObjectAttributeCallbackBridge;
 @end
 
 @interface CHIPAttributeReport ()
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value;
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value error:(nullable NSError *)error;
 @end
 
 @interface CHIPReadClientContainer : NSObject
@@ -1193,11 +1193,12 @@ exit:
 @end
 
 @implementation CHIPAttributeReport
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value error:(nullable NSError *)error
 {
     if (self = [super init]) {
         _path = [[CHIPAttributePath alloc] initWithPath:path];
         _value = value;
+        _error = error;
     }
     return self;
 }
@@ -1226,35 +1227,33 @@ void SubscriptionCallback::OnAttributeData(
         return;
     }
 
+    id _Nullable value = nil;
+    NSError * _Nullable error = nil;
     if (aStatus.mStatus != Status::Success) {
-        ReportError(aStatus);
-        return;
-    }
+        error = [CHIPError errorForIMStatus:aStatus];
+    } else if (apData == nullptr) {
+        error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+    } else {
+        CHIP_ERROR err;
+        value = CHIPDecodeAttributeValue(aPath, *apData, &err);
+        if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH) {
+            // We don't know this attribute; just skip it.
+            return;
+        }
 
-    if (apData == nullptr) {
-        ReportError(CHIP_ERROR_INVALID_ARGUMENT);
-        return;
-    }
-
-    CHIP_ERROR err;
-    id _Nullable value = CHIPDecodeAttributeValue(aPath, *apData, &err);
-    if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH) {
-        // We don't know this attribute; just skip it.
-        return;
-    }
-
-    if (err != CHIP_NO_ERROR) {
-        ReportError(err);
-        return;
+        if (err != CHIP_NO_ERROR) {
+            value = nil;
+            error = [CHIPError errorForCHIPErrorCode:err];
+        }
     }
 
     if (mReports == nil) {
-        // Never got a OnReportBegin?
+        // Never got a OnReportBegin?  Not much to do other than tear things down.
         ReportError(CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
-    [mReports addObject:[[CHIPAttributeReport alloc] initWithPath:aPath value:value]];
+    [mReports addObject:[[CHIPAttributeReport alloc] initWithPath:aPath value:value error:error]];
 }
 
 void SubscriptionCallback::OnError(CHIP_ERROR aError) { ReportError([CHIPError errorForCHIPErrorCode:aError]); }
