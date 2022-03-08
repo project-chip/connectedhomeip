@@ -223,7 +223,11 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
         callback(reinterpret_cast<void *>(contextHandle), service, Span<Inet::IPAddress>(), error);
     };
 
+<<<<<<< HEAD
     VerifyOrReturn(address != nullptr && port != 0, dispatch(CHIP_ERROR_UNKNOWN_RESOURCE_ID));
+=======
+    VerifyOrReturn(!(address == nullptr || port == 0), dispatch(CHIP_ERROR_UNKNOWN_RESOURCE_ID));
+>>>>>>> 668bb4657 ([Android] Fix expression in verification instead of commenting out the verification.)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     JniUtfString jniInstanceName(env, instanceName);
