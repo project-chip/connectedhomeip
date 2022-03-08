@@ -21,6 +21,7 @@ function getTests()
     "Test_TC_DM_1_3_Simulated",
     "Test_TC_DM_3_3_Simulated",
     "Test_TC_DM_2_3_Simulated",
+    "Test_TC_OO_3_2_Simulated"
   ];
 
   return tests.join(', ');
