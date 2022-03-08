@@ -105,6 +105,10 @@
 @property (readonly) chip::Controller::EthernetNetworkDiagnosticsCluster cppCluster;
 @end
 
+@interface CHIPFanControl ()
+@property (readonly) chip::Controller::FanControlCluster cppCluster;
+@end
+
 @interface CHIPFixedLabel ()
 @property (readonly) chip::Controller::FixedLabelCluster cppCluster;
 @end

@@ -132,7 +132,9 @@ static void OnBindingAdded(const EmberBindingTableEntry & binding)
 
 CHIP_ERROR InitBindingHandlers()
 {
-    chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
+    auto & server = chip::Server::GetInstance();
+    chip::BindingManager::GetInstance().Init(
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     ReturnErrorOnFailure(chip::BindingManager::GetInstance().RegisterBindingAddedHandler(OnBindingAdded));
     return CHIP_NO_ERROR;
 }
@@ -162,9 +164,6 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (selectedCommissioner != nullptr)
     {
-        // Advertise self as Commissionable Node over mDNS
-        app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledBasic);
-
         // Send User Directed commissioning request
         ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
             selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));

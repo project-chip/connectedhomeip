@@ -19,6 +19,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace ota {
@@ -64,6 +65,20 @@ struct UserConsentSubject
     // This data is not owned by UserConsentSubject and therefore any user of this field
     // has to copy the data and own it if not immediately used from an argument having a UserConsentSubject
     ByteSpan metadata;
+
+    void Log() const
+    {
+        ChipLogDetail(SoftwareUpdate, "User consent request for:");
+        ChipLogDetail(SoftwareUpdate, ":  FabricIndex: %u", this->fabricIndex);
+        ChipLogDetail(SoftwareUpdate, ":  RequestorNodeId: " ChipLogFormatX64, ChipLogValueX64(this->requestorNodeId));
+        ChipLogDetail(SoftwareUpdate, ":  ProviderEndpointId: %" PRIu16, this->providerEndpointId);
+        ChipLogDetail(SoftwareUpdate, ":  RequestorVendorId: %" PRIu16, this->requestorVendorId);
+        ChipLogDetail(SoftwareUpdate, ":  RequestorProductId: %" PRIu16, this->requestorProductId);
+        ChipLogDetail(SoftwareUpdate, ":  RequestorCurrentVersion: %" PRIu32, this->requestorCurrentVersion);
+        ChipLogDetail(SoftwareUpdate, ":  RequestorTargetVersion: %" PRIu32, this->requestorTargetVersion);
+        ChipLogDetail(SoftwareUpdate, ":  Metadata:");
+        ChipLogByteSpan(SoftwareUpdate, this->metadata);
+    }
 };
 
 class UserConsentDelegate

@@ -1,7 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,21 +15,17 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import "CHIPDeviceControllerOverXPC.h"
+#import "CHIPDeviceControllerXPCConnection.h"
 
-#include <lib/support/DLLUtil.h>
-#include <transport/raw/MessageHeader.h>
+NS_ASSUME_NONNULL_BEGIN
 
-namespace chip {
-namespace Controller {
+@interface CHIPDeviceControllerOverXPC ()
 
-/// Callbacks for CHIP device address resolution
-class DLL_EXPORT DeviceAddressUpdateDelegate
-{
-public:
-    virtual ~DeviceAddressUpdateDelegate() {}
-    virtual void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) = 0;
-};
+@property (nonatomic, readwrite, strong) id<NSCopying> _Nullable controllerId;
+@property (nonatomic, readonly, strong) dispatch_queue_t workQueue;
+@property (nonatomic, readonly, strong) CHIPDeviceControllerXPCConnection * xpcConnection;
 
-} // namespace Controller
-} // namespace chip
+@end
+
+NS_ASSUME_NONNULL_END

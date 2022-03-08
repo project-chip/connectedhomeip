@@ -31,6 +31,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {
@@ -148,9 +149,10 @@ private: // ExchangeDelegate
 private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
-    State mState         = State::Uninitialized;
-    bool mIsTimedRequest = false;
-    bool mHasMoreChunks  = false;
+    State mState           = State::Uninitialized;
+    bool mIsTimedRequest   = false;
+    bool mSuppressResponse = false;
+    bool mHasMoreChunks    = false;
     Optional<ConcreteAttributePath> mProcessingAttributePath;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 };

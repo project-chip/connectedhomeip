@@ -46,7 +46,6 @@ static_library("controller") {
       "CommissioneeDeviceProxy.h",
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
-      "DeviceAddressUpdateDelegate.h",
       "DeviceDiscoveryDelegate.h",
       "EmptyDataModelHandler.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",

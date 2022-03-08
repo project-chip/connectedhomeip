@@ -120,11 +120,12 @@ public:
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apCallback       Callback set by application.
      *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
+     *  @param[in]    aSuppressResponse If provided, set SuppressResponse field to the provided value
      */
-    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback,
-                const Optional<uint16_t> & aTimedWriteTimeoutMs) :
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
+                bool aSuppressResponse = false) :
         mpExchangeMgr(apExchangeMgr),
-        mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs)
+        mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mSuppressResponse(aSuppressResponse)
     {}
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
@@ -391,6 +392,7 @@ private:
     // If mTimedWriteTimeoutMs has a value, we are expected to do a timed
     // write.
     Optional<uint16_t> mTimedWriteTimeoutMs;
+    bool mSuppressResponse = false;
 
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;

@@ -629,76 +629,85 @@ cmake -S {root}/examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-rele
 
 # Generating nrf-native-posix-64-tests
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-native-posix-64-tests -b native_posix_64 {root}/src/test_driver/nrfconnect'
 
 # Generating nrf-nrf52840dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
 
 # Generating nrf-nrf52840dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-light-rpc -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
 # Generating nrf-nrf52840dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
 
 # Generating nrf-nrf52840dk-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-pump -b nrf52840dk_nrf52840 {root}/examples/pump-app/nrfconnect'
 
 # Generating nrf-nrf52840dk-pump-controller
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-pump-controller -b nrf52840dk_nrf52840 {root}/examples/pump-controller-app/nrfconnect'
 
 # Generating nrf-nrf52840dk-shell
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dk-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
 
 # Generating nrf-nrf52840dongle-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf52840 {root}/examples/lighting-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
 # Generating nrf-nrf5340dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-pump -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-pump-controller
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-pump-controller -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-controller-app/nrfconnect'
 
 # Generating nrf-nrf5340dk-shell
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340dk-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
 
-# Generating qpg-qpg6100-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
+# Generating qpg-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/qpg '--args=qpg_target_ic="qpg6105"' {out}/qpg-light
+
+# Generating qpg-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/qpg '--args=qpg_target_ic="qpg6105"' {out}/qpg-lock
+
+# Generating qpg-persistent-storage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/persistent-storage/qpg '--args=qpg_target_ic="qpg6105"' {out}/qpg-persistent-storage
+
+# Generating qpg-shell
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/qpg '--args=qpg_target_ic="qpg6105"' {out}/qpg-shell
 
 # Generating telink-tlsr9518adk80d-light
 bash -c 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
@@ -1354,8 +1363,17 @@ ninja -C {out}/nrf-nrf5340dk-pump-controller
 # Building nrf-nrf5340dk-shell
 ninja -C {out}/nrf-nrf5340dk-shell
 
-# Building qpg-qpg6100-lock
-ninja -C {out}/qpg-qpg6100-lock
+# Building qpg-light
+ninja -C {out}/qpg-light
+
+# Building qpg-lock
+ninja -C {out}/qpg-lock
+
+# Building qpg-persistent-storage
+ninja -C {out}/qpg-persistent-storage
+
+# Building qpg-shell
+ninja -C {out}/qpg-shell
 
 # Building telink-tlsr9518adk80d-light
 ninja -C {out}/telink-tlsr9518adk80d-light

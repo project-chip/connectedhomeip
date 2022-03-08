@@ -177,6 +177,13 @@ public:
     ~EthernetNetworkDiagnosticsCluster() {}
 };
 
+class DLL_EXPORT FanControlCluster : public ClusterBase
+{
+public:
+    FanControlCluster() : ClusterBase(app::Clusters::FanControl::Id) {}
+    ~FanControlCluster() {}
+};
+
 class DLL_EXPORT FixedLabelCluster : public ClusterBase
 {
 public:

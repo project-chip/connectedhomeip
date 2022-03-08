@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/server/CommissioningModeProvider.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
@@ -74,6 +75,10 @@ public:
         mFabricTable = table;
     }
 
+    // Set the commissioning mode provider to use.  Null provider will mean we
+    // assume the commissioning mode is kDisabled.
+    void SetCommissioningModeProvider(CommissioningModeProvider * provider) { mCommissioningModeProvider = provider; }
+
     /// Callback from Discovery Expiration timer
     /// Checks if discovery has expired and if so,
     /// kicks off extend discovery (when enabled)
@@ -95,9 +100,8 @@ public:
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
 
-    /// (Re-)starts the Dnssd server
-    /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1)
-    /// - if device has been commissioned, then commissioning mode will be disabled.
+    /// (Re-)starts the Dnssd server, using the commissioning mode from our
+    /// commissioning mode provider.
     void StartServer();
 
     /// (Re-)starts the Dnssd server, using the provided commissioning mode.
@@ -138,10 +142,8 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
 
-    FabricTable * mFabricTable = nullptr;
-
-    // Helper for StartServer.
-    void StartServer(Optional<Dnssd::CommissioningMode> mode);
+    FabricTable * mFabricTable                             = nullptr;
+    CommissioningModeProvider * mCommissioningModeProvider = nullptr;
 
     uint16_t mSecuredPort          = CHIP_PORT;
     uint16_t mUnsecuredPort        = CHIP_UDC_PORT;

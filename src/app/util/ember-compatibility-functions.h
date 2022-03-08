@@ -32,7 +32,6 @@ namespace chip {
 namespace app {
 namespace Compatibility {
 
-void SetupEmberAfCommandSender(CommandSender * command, const ConcreteCommandPath & commandPath);
 void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandPath & commandPath);
 bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status);
 void ResetEmberAfObjects();

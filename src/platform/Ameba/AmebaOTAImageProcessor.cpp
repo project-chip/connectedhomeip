@@ -17,8 +17,8 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/OTARequestorInterface.h>
 
 #include <platform/Ameba/AmebaOTAImageProcessor.h>
 

@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2013-2017 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,24 +15,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <json/json.h>
-#include <lib/core/CHIPTLV.h>
+#pragma once
+#include <platform/UserConsentDelegate.h>
 
 namespace chip {
+namespace ota {
 
-/*
- * Given a TLVReader positioned at a particular cluster data payload, this function converts
- * the TLV data into a JSON object representation.
- *
- * NOTE: This only accepts data model payloads for events/commands/attributes. It does not support
- * arbitrary TLV conversion to JSON.
- */
-CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & root);
+class OTARequestorUserConsentDelegate : public UserConsentDelegate
+{
+public:
+    virtual ~OTARequestorUserConsentDelegate() = default;
 
-/*
- * Converts a JSON object into string representation
- */
-std::string JsonToString(Json::Value & json);
+    virtual UserConsentState GetUserConsentState(const UserConsentSubject & subject) = 0;
 
+    // When GetUserConsentState() returns kObtaining this will be called to
+    // check if the user consent is granted or denied.
+    virtual UserConsentState CheckDeferredUserConsentState() = 0;
+};
+
+} // namespace ota
 } // namespace chip

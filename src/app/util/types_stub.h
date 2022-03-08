@@ -565,12 +565,12 @@ struct EmberBindingTableEntry
             return false;
         }
 
-        if (type == EMBER_UNICAST_BINDING && nodeId != other.nodeId)
+        if (type == EMBER_UNICAST_BINDING && (nodeId != other.nodeId || remote != other.remote))
         {
             return false;
         }
 
-        return fabricIndex == other.fabricIndex && local == other.local && clusterId == other.clusterId && remote == other.remote;
+        return fabricIndex == other.fabricIndex && local == other.local && clusterId == other.clusterId;
     }
 };
 

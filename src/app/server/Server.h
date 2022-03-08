@@ -92,6 +92,8 @@ public:
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
+    PersistentStorageDelegate & GetPersistentStorage() { return mDeviceStorage; }
+
     /**
      * This function send the ShutDown event before stopping
      * the event loop.
@@ -111,7 +113,7 @@ private:
 
     static Server sServer;
 
-    class DeviceStorageDelegate : public PersistentStorageDelegate, public FabricStorage
+    class DeviceStorageDelegate : public PersistentStorageDelegate
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
@@ -135,18 +137,6 @@ private:
         {
             return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
         }
-
-        CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
-        {
-            return SyncSetKeyValue(key, buffer, size);
-        };
-
-        CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override
-        {
-            return SyncGetKeyValue(key, buffer, size);
-        };
-
-        CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
     };
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener

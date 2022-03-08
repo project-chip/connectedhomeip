@@ -209,6 +209,14 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
+    // For testing of manual pairing code with custom commissioning flow
+    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
+    SuccessOrExit(err);
+
+    LinuxDeviceOptions::GetInstance().payload.commissioningFlow = chip::CommissioningFlow::kCustom;
+
+    PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
+
 #if defined(PW_RPC_ENABLED)
     rpc::Init();
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
@@ -302,7 +310,6 @@ DeviceCommissioner gCommissioner;
 CommissionerDiscoveryController gCommissionerDiscoveryController;
 MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
-SimpleFabricStorage gFabricStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
 
@@ -311,15 +318,11 @@ CHIP_ERROR InitCommissioner()
     Controller::FactoryInitParams factoryParams;
     Controller::SetupParams params;
 
-    ReturnErrorOnFailure(gFabricStorage.Initialize(&gServerStorage));
-
-    factoryParams.fabricStorage = &gFabricStorage;
     // use a different listen port for the commissioner than the default used by chip-tool.
     factoryParams.listenPort               = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
     factoryParams.fabricIndependentStorage = &gServerStorage;
 
     params.storageDelegate                = &gServerStorage;
-    params.deviceAddressUpdateDelegate    = nullptr;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));

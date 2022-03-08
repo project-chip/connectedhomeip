@@ -74,7 +74,114 @@ class NSObjectAttributeCallbackBridge;
 @end
 
 @interface CHIPAttributeReport ()
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value;
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value error:(nullable NSError *)error;
+@end
+
+@interface CHIPReadClientContainer : NSObject
+@property (nonatomic, readwrite) app::ReadClient * readClientPtr;
+@property (nonatomic, readwrite) app::AttributePathParams * pathParams;
+@property (nonatomic, readwrite) uint64_t deviceId;
+- (void)onDone;
+@end
+
+static NSMutableDictionary<NSNumber *, NSMutableArray<CHIPReadClientContainer *> *> * readClientContainers;
+static NSLock * readClientContainersLock;
+
+static void InitializeReadClientContainers()
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        readClientContainers = [NSMutableDictionary dictionary];
+        readClientContainersLock = [[NSLock alloc] init];
+    });
+}
+
+static void AddReadClientContainer(uint64_t deviceId, CHIPReadClientContainer * container)
+{
+    InitializeReadClientContainers();
+
+    NSNumber * key = [NSNumber numberWithUnsignedLongLong:deviceId];
+    [readClientContainersLock lock];
+    if (!readClientContainers[key]) {
+        readClientContainers[key] = [NSMutableArray array];
+    }
+    [readClientContainers[key] addObject:container];
+    [readClientContainersLock unlock];
+}
+
+static void PurgeReadClientContainers(uint64_t deviceId, dispatch_queue_t queue, void (^_Nullable completion)(void))
+{
+    InitializeReadClientContainers();
+
+    NSMutableArray<CHIPReadClientContainer *> * listToDelete;
+    NSNumber * key = [NSNumber numberWithUnsignedLongLong:deviceId];
+    [readClientContainersLock lock];
+    listToDelete = readClientContainers[key];
+    [readClientContainers removeObjectForKey:key];
+    [readClientContainersLock unlock];
+
+    // Destroy read clients in the work queue
+    dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+        for (CHIPReadClientContainer * container in listToDelete) {
+            if (container.readClientPtr) {
+                delete container.readClientPtr;
+                container.readClientPtr = nullptr;
+            }
+            if (container.pathParams) {
+                delete container.pathParams;
+                container.pathParams = nullptr;
+            }
+        }
+        [listToDelete removeAllObjects];
+        if (completion) {
+            dispatch_async(queue, completion);
+        }
+    });
+}
+
+static void PurgeCompletedReadClientContainers(uint64_t deviceId)
+{
+    InitializeReadClientContainers();
+
+    NSNumber * key = [NSNumber numberWithUnsignedLongLong:deviceId];
+    [readClientContainersLock lock];
+    NSMutableArray<CHIPReadClientContainer *> * array = readClientContainers[key];
+    NSUInteger i = 0;
+    while (i < [array count]) {
+        if (array[i].readClientPtr == nullptr) {
+            [array removeObjectAtIndex:i];
+            continue;
+        }
+        i++;
+    }
+    [readClientContainersLock unlock];
+}
+
+@implementation CHIPReadClientContainer
+- (void)onDone
+{
+    if (_readClientPtr) {
+        delete _readClientPtr;
+        _readClientPtr = nullptr;
+    }
+    if (_pathParams) {
+        delete _pathParams;
+        _pathParams = nullptr;
+    }
+    PurgeCompletedReadClientContainers(_deviceId);
+}
+
+- (void)dealloc
+{
+    if (_readClientPtr) {
+        delete _readClientPtr;
+        _readClientPtr = nullptr;
+    }
+    if (_pathParams) {
+        delete _pathParams;
+        _pathParams = nullptr;
+    }
+}
 @end
 
 @implementation CHIPDevice
@@ -204,7 +311,7 @@ private:
 }
 
 // Convert TLV data into NSObject
-static id ObjectFromTLV(chip::TLV::TLVReader * data)
+id _Nullable NSObjectFromCHIPTLV(chip::TLV::TLVReader * data)
 {
     chip::TLV::TLVType dataTLVType = data->GetType();
     switch (dataTLVType) {
@@ -299,7 +406,7 @@ static id ObjectFromTLV(chip::TLV::TLVReader * data)
         NSMutableArray * array = [[NSMutableArray alloc] init];
         while ((err = data->Next()) == CHIP_NO_ERROR) {
             chip::TLV::Tag tag = data->GetTag();
-            id value = ObjectFromTLV(data);
+            id value = NSObjectFromCHIPTLV(data);
             if (value == nullptr) {
                 CHIP_LOG_ERROR("Error when decoding TLV container");
                 return nil;
@@ -479,7 +586,7 @@ public:
 
     CHIP_ERROR Decode(chip::TLV::TLVReader & data)
     {
-        decodedObj = ObjectFromTLV(&data);
+        decodedObj = NSObjectFromCHIPTLV(&data);
         if (decodedObj == nil) {
             CHIP_LOG_ERROR("Error: Failed to get value from TLV data for attribute reading response");
         }
@@ -509,37 +616,6 @@ public:
         : CHIPCallbackBridge<NSObjectAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive) {};
 
     static void OnSuccessFn(void * context, id value) { DispatchSuccess(context, value); }
-};
-
-// Subscribe bridge for NSObjectAttributeCallback
-class NSObjectAttributeCallbackSubscribeBridge : public NSObjectAttributeCallbackBridge {
-public:
-    NSObjectAttributeCallbackSubscribeBridge(dispatch_queue_t queue,
-        void (^handler)(NSDictionary<NSString *, id> * _Nullable value, NSError * _Nullable error), CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler)
-        : NSObjectAttributeCallbackBridge(queue, (CHIPDeviceResponseHandler) handler, action, true)
-        , mQueue(queue)
-        , mEstablishedHandler(establishedHandler) {};
-
-    static void OnSubscriptionEstablished(void * context)
-    {
-        auto * self = static_cast<NSObjectAttributeCallbackSubscribeBridge *>(context);
-        if (!self->mQueue) {
-            return;
-        }
-
-        if (self->mEstablishedHandler != nil) {
-            dispatch_async(self->mQueue, self->mEstablishedHandler);
-            // On failure, mEstablishedHandler will be cleaned up by our destructor,
-            // but we can clean it up earlier on successful subscription
-            // establishment.
-            self->mEstablishedHandler = nil;
-        }
-    }
-
-private:
-    dispatch_queue_t mQueue;
-    SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 template <typename DecodableAttributeType> class BufferedReadAttributeCallback final : public app::ReadClient::Callback {
@@ -969,89 +1045,97 @@ exit:
                                              NSError * _Nullable error))reportHandler
                  subscriptionEstablished:(SubscriptionEstablishedHandler)subscriptionEstablishedHandler
 {
-    new NSObjectAttributeCallbackSubscribeBridge(
-        clientQueue, (void (^)(id _Nullable, NSError * _Nullable)) reportHandler,
-        ^(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure) {
-            auto successFn = chip::Callback::Callback<NSObjectAttributeCallback>::FromCancelable(success);
-            auto failureFn = chip::Callback::Callback<CHIPErrorCallback>::FromCancelable(failure);
-            auto context = successFn->mContext;
-            auto successCb = successFn->mCall;
-            auto failureCb = failureFn->mCall;
-            auto onReportCb = [context, successCb](const app::ConcreteAttributePath & attribPath, const NSObjectData & data) {
-                if (successCb != nullptr) {
-                    successCb(context,
-                        [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:attribPath.mEndpointId],
-                                              kCHIPEndpointIdKey, [NSNumber numberWithUnsignedInt:attribPath.mClusterId],
-                                              kCHIPClusterIdKey, [NSNumber numberWithUnsignedInt:attribPath.mAttributeId],
-                                              kCHIPAttributeIdKey, data.GetDecodedObject(), kCHIPValueKey, nil]);
-                }
-            };
+    dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+        auto onReportCb = [clientQueue, reportHandler](const app::ConcreteAttributePath & attribPath, const NSObjectData & data) {
+            id valueObject = data.GetDecodedObject();
+            app::ConcreteAttributePath pathCopy = attribPath;
+            dispatch_async(clientQueue, ^{
+                reportHandler(@ {
+                    kCHIPEndpointIdKey : [NSNumber numberWithUnsignedShort:pathCopy.mEndpointId],
+                    kCHIPClusterIdKey : [NSNumber numberWithUnsignedInt:pathCopy.mClusterId],
+                    kCHIPAttributeIdKey : [NSNumber numberWithUnsignedInt:pathCopy.mAttributeId],
+                    kCHIPValueKey : valueObject
+                },
+                    nil);
+            });
+        };
 
-            auto establishedOrFailed = std::make_shared<BOOL>(NO);
-            auto onFailureCb
-                = [context, failureCb, establishedOrFailed](const app::ConcreteAttributePath * attribPath, CHIP_ERROR error) {
-                      if (!(*establishedOrFailed)) {
-                          *establishedOrFailed = YES;
-                          NSObjectAttributeCallbackSubscribeBridge::OnSubscriptionEstablished(context);
-                      }
-                      if (failureCb != nullptr) {
-                          failureCb(context, error);
-                      }
-                  };
-
-            auto onEstablishedCb = [context, establishedOrFailed]() {
-                if (*establishedOrFailed) {
-                    return;
-                }
+        auto establishedOrFailed = chip::Platform::MakeShared<BOOL>(NO);
+        auto onFailureCb = [establishedOrFailed, clientQueue, subscriptionEstablishedHandler, reportHandler](
+                               const app::ConcreteAttributePath * attribPath, CHIP_ERROR error) {
+            if (!(*establishedOrFailed)) {
                 *establishedOrFailed = YES;
-                NSObjectAttributeCallbackSubscribeBridge::OnSubscriptionEstablished(context);
-            };
-
-            auto chipEndpointId = static_cast<chip::EndpointId>(endpointId);
-            auto chipClusterId = static_cast<chip::ClusterId>(clusterId);
-            auto chipAttributeId = static_cast<chip::AttributeId>(attributeId);
-
-            app::AttributePathParams attributePath(chipEndpointId, chipClusterId, chipAttributeId);
-            app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-            CHIP_ERROR err = CHIP_NO_ERROR;
-
-            chip::app::ReadPrepareParams readParams([self internalDevice]->GetSecureSession().Value());
-            readParams.mpAttributePathParamsList = &attributePath;
-            readParams.mAttributePathParamsListSize = 1;
-
-            auto onDone = [](BufferedReadAttributeCallback<NSObjectData> * callback) { chip::Platform::Delete(callback); };
-
-            auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<NSObjectData>>(
-                chipClusterId, chipAttributeId, onReportCb, onFailureCb, onDone, onEstablishedCb);
-            VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
-
-            auto readClient = chip::Platform::MakeUnique<app::ReadClient>(engine, [self internalDevice]->GetExchangeManager(),
-                callback -> GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
-            VerifyOrReturnError(readClient != nullptr, CHIP_ERROR_NO_MEMORY);
-
-            err = readClient->SendAutoResubscribeRequest(std::move(readParams));
-
-            if (err != CHIP_NO_ERROR) {
-                return err;
+                if (subscriptionEstablishedHandler) {
+                    dispatch_async(clientQueue, subscriptionEstablishedHandler);
+                }
             }
+            if (reportHandler) {
+                dispatch_async(clientQueue, ^{
+                    reportHandler(nil, [CHIPError errorForCHIPErrorCode:error]);
+                });
+            }
+        };
 
-            //
-            // At this point, we'll get a callback through the OnDone callback above regardless of success or failure
-            // of the read operation to permit us to free up the callback object. So, release ownership of the callback
-            // object now to prevent it from being reclaimed at the end of this scoped block.
-            //
-            callback->AdoptReadClient(std::move(readClient));
-            callback.release();
-            return err;
-        },
-        subscriptionEstablishedHandler);
+        auto onEstablishedCb = [establishedOrFailed, clientQueue, subscriptionEstablishedHandler]() {
+            if (*establishedOrFailed) {
+                return;
+            }
+            *establishedOrFailed = YES;
+            if (subscriptionEstablishedHandler) {
+                dispatch_async(clientQueue, subscriptionEstablishedHandler);
+            }
+        };
+
+        auto chipEndpointId = static_cast<chip::EndpointId>(endpointId);
+        auto chipClusterId = static_cast<chip::ClusterId>(clusterId);
+        auto chipAttributeId = static_cast<chip::AttributeId>(attributeId);
+
+        CHIPReadClientContainer * container = [[CHIPReadClientContainer alloc] init];
+        container.deviceId = self.cppDevice->GetDeviceId();
+        container.pathParams = new app::AttributePathParams(chipEndpointId, chipClusterId, chipAttributeId);
+
+        app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        chip::app::ReadPrepareParams readParams([self internalDevice]->GetSecureSession().Value());
+        readParams.mpAttributePathParamsList = container.pathParams;
+        readParams.mAttributePathParamsListSize = 1;
+
+        auto onDone = [container](BufferedReadAttributeCallback<NSObjectData> * callback) {
+            chip::Platform::Delete(callback);
+            [container onDone];
+        };
+
+        auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<NSObjectData>>(
+            chipClusterId, chipAttributeId, onReportCb, onFailureCb, onDone, onEstablishedCb);
+
+        auto readClient = new app::ReadClient(engine, [self internalDevice]->GetExchangeManager(),
+            callback -> GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
+
+        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+
+        if (err != CHIP_NO_ERROR) {
+            if (reportHandler) {
+                dispatch_async(clientQueue, ^{
+                    reportHandler(nil, [CHIPError errorForCHIPErrorCode:err]);
+                });
+            }
+            delete readClient;
+            return;
+        }
+
+        // Read clients will be purged when deregistered.
+        container.readClientPtr = readClient;
+        AddReadClientContainer(container.deviceId, container);
+        callback.release();
+    });
 }
 
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion
 {
-    // Do nothing for a local instance.
-    CHIP_LOG_ERROR("Unexpected call to deregister report handlers");
-    dispatch_async(clientQueue, completion);
+    // This method must only be used for CHIPDeviceOverXPC. However, for unit testing purpose, the method purges all read clients.
+    CHIP_LOG_DEBUG("Unexpected call to deregister report handlers");
+    PurgeReadClientContainers(self.cppDevice->GetDeviceId(), clientQueue, completion);
 }
 
 // The following method is for unit testing purpose only
@@ -1109,11 +1193,12 @@ exit:
 @end
 
 @implementation CHIPAttributeReport
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value error:(nullable NSError *)error
 {
     if (self = [super init]) {
         _path = [[CHIPAttributePath alloc] initWithPath:path];
         _value = value;
+        _error = error;
     }
     return self;
 }
@@ -1142,35 +1227,33 @@ void SubscriptionCallback::OnAttributeData(
         return;
     }
 
+    id _Nullable value = nil;
+    NSError * _Nullable error = nil;
     if (aStatus.mStatus != Status::Success) {
-        ReportError(aStatus);
-        return;
-    }
+        error = [CHIPError errorForIMStatus:aStatus];
+    } else if (apData == nullptr) {
+        error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+    } else {
+        CHIP_ERROR err;
+        value = CHIPDecodeAttributeValue(aPath, *apData, &err);
+        if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH) {
+            // We don't know this attribute; just skip it.
+            return;
+        }
 
-    if (apData == nullptr) {
-        ReportError(CHIP_ERROR_INVALID_ARGUMENT);
-        return;
-    }
-
-    CHIP_ERROR err;
-    id _Nullable value = CHIPDecodeAttributeValue(aPath, *apData, &err);
-    if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH) {
-        // We don't know this attribute; just skip it.
-        return;
-    }
-
-    if (err != CHIP_NO_ERROR) {
-        ReportError(err);
-        return;
+        if (err != CHIP_NO_ERROR) {
+            value = nil;
+            error = [CHIPError errorForCHIPErrorCode:err];
+        }
     }
 
     if (mReports == nil) {
-        // Never got a OnReportBegin?
+        // Never got a OnReportBegin?  Not much to do other than tear things down.
         ReportError(CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
-    [mReports addObject:[[CHIPAttributeReport alloc] initWithPath:aPath value:value]];
+    [mReports addObject:[[CHIPAttributeReport alloc] initWithPath:aPath value:value error:error]];
 }
 
 void SubscriptionCallback::OnError(CHIP_ERROR aError) { ReportError([CHIPError errorForCHIPErrorCode:aError]); }
@@ -1214,7 +1297,12 @@ void SubscriptionCallback::ReportError(NSError * _Nullable err)
     dispatch_async(mQueue, ^{
         callback(nil, err);
 
-        delete myself;
+        // Deletion of our ReadClient (and hence of ourselves, since the
+        // ReadClient has a pointer to us) needs to happen on the Matter work
+        // queue.
+        dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+            delete myself;
+        });
     });
 
     mHaveQueuedDeletion = true;

@@ -78,9 +78,14 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
     ReleaseSession(FindExistingSession(peerId));
 }
 
-void CASESessionManager::ReleaseSessionForFabric(CompressedFabricId compressedFabricId)
+void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId)
 {
-    mConfig.devicePool->ReleaseDeviceForFabric(compressedFabricId);
+    mConfig.devicePool->ReleaseDevicesForFabric(compressedFabricId);
+}
+
+void CASESessionManager::ReleaseAllSessions()
+{
+    mConfig.devicePool->ReleaseAllDevices();
 }
 
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)

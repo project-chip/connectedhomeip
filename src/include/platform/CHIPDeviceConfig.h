@@ -1163,15 +1163,6 @@
 // -------------------- Device DNS-SD Configuration --------------------
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_DNSSD
- *
- * Enable support to use DNS-SD for service advertising and discovery in CHIP.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-#define CHIP_DEVICE_CONFIG_ENABLE_DNSSD 0
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
  *
  * Enable MDNS commissionable node advertising when not yet provisioned.

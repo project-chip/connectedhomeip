@@ -54,7 +54,6 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     }
 
     mListenPort               = params.listenPort;
-    mFabricStorage            = params.fabricStorage;
     mFabricIndependentStorage = params.fabricIndependentStorage;
 
     CHIP_ERROR err = InitSystemState(params);
@@ -145,10 +144,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
-    ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
+    ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
-                                                      stateParams.messageCounterManager, params.fabricIndependentStorage));
+                                                      stateParams.messageCounterManager, params.fabricIndependentStorage,
+                                                      stateParams.fabricTable));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
@@ -156,9 +156,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr));
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     if (params.enableServerInteractions)
     {
@@ -192,9 +190,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
 
         //
-        // Start up the DNS-SD server
+        // Start up the DNS-SD server.  We are not giving it a
+        // CommissioningModeProvider, so it will not claim we are in
+        // commissioning mode.
         //
-        chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
+        chip::app::DnssdServer::Instance().StartServer();
     }
 
     // store the system state
@@ -205,9 +205,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    controllerParams.deviceAddressUpdateDelegate = params.deviceAddressUpdateDelegate;
-#endif
     controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;
     controllerParams.operationalKeypair             = params.operationalKeypair;
     controllerParams.controllerNOC                  = params.controllerNOC;
@@ -271,7 +268,6 @@ void DeviceControllerFactory::Shutdown()
         chip::Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
-    mFabricStorage            = nullptr;
     mFabricIndependentStorage = nullptr;
 }
 
@@ -287,9 +283,7 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mCASEServer = nullptr;
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     Dnssd::Resolver::Instance().Shutdown();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     // Shut down the interaction model
     app::InteractionModelEngine::GetInstance()->Shutdown();

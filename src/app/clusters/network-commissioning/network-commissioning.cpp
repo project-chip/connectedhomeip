@@ -460,12 +460,12 @@ void Instance::OnCommissioningComplete(CHIP_ERROR err)
 
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "Commissioning complete, notify platform driver to persist network credentails.");
+        ChipLogDetail(Zcl, "Commissioning complete, notify platform driver to persist network credentials.");
         mpWirelessDriver->CommitConfiguration();
     }
     else
     {
-        ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentails.");
+        ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
         mpWirelessDriver->RevertConfiguration();
     }
 }

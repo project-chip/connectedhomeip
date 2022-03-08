@@ -54,7 +54,8 @@
 
 @interface CHIPDeviceControllerServerSample<CHIPDeviceControllerServerProtocol> : NSObject
 @property (nonatomic, readonly, strong) NSString * identifier;
-- (instancetype)initWithClientProxy:(id<CHIPDeviceControllerClientProtocol>)proxy;
+- (instancetype)initWithClientProxy:(id<CHIPDeviceControllerClientProtocol>)proxy
+           attributeCacheDictionary:(NSMutableDictionary<NSNumber *, CHIPAttributeCacheContainer *> *)cacheDictionary;
 @end
 
 @interface CHIPXPCListenerSample ()
@@ -64,6 +65,7 @@
 @property (nonatomic, readonly, strong) NSXPCInterface * clientInterface;
 @property (nonatomic, readonly, strong) NSXPCListener * xpcListener;
 @property (nonatomic, readonly, strong) NSMutableDictionary<NSString *, CHIPDeviceControllerServerSample *> * servers;
+@property (nonatomic, readonly, strong) NSMutableDictionary<NSNumber *, CHIPAttributeCacheContainer *> * attributeCacheDictionary;
 
 @end
 
@@ -75,6 +77,7 @@
         _serviceInterface = [NSXPCInterface interfaceWithProtocol:@protocol(CHIPDeviceControllerServerProtocol)];
         _clientInterface = [NSXPCInterface interfaceWithProtocol:@protocol(CHIPDeviceControllerClientProtocol)];
         _servers = [NSMutableDictionary dictionary];
+        _attributeCacheDictionary = [NSMutableDictionary dictionary];
         _xpcListener = [NSXPCListener anonymousListener];
         [_xpcListener setDelegate:(id<NSXPCListenerDelegate>) self];
     }
@@ -101,7 +104,8 @@
     NSLog(@"XPC listener accepting connection");
     newConnection.exportedInterface = _serviceInterface;
     newConnection.remoteObjectInterface = _clientInterface;
-    __auto_type newServer = [[CHIPDeviceControllerServerSample alloc] initWithClientProxy:[newConnection remoteObjectProxy]];
+    __auto_type newServer = [[CHIPDeviceControllerServerSample alloc] initWithClientProxy:[newConnection remoteObjectProxy]
+                                                                 attributeCacheDictionary:_attributeCacheDictionary];
     newConnection.exportedObject = newServer;
     [_servers setObject:newServer forKey:newServer.identifier];
     newConnection.invalidationHandler = ^{
@@ -116,6 +120,7 @@
 
 @interface CHIPDeviceControllerServerSample ()
 @property (nonatomic, readwrite, strong) id<CHIPDeviceControllerClientProtocol> clientProxy;
+@property (nonatomic, readonly, strong) NSMutableDictionary<NSNumber *, CHIPAttributeCacheContainer *> * attributeCacheDictionary;
 @end
 
 // This sample does not have multiple controllers and hence controller Id shall be the same.
@@ -124,10 +129,12 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
 @implementation CHIPDeviceControllerServerSample
 
 - (instancetype)initWithClientProxy:(id<CHIPDeviceControllerClientProtocol>)proxy
+           attributeCacheDictionary:(NSMutableDictionary<NSNumber *, CHIPAttributeCacheContainer *> *)cacheDictionary
 {
     if ([super init]) {
         _clientProxy = proxy;
         _identifier = [[NSUUID UUID] UUIDString];
+        _attributeCacheDictionary = cacheDictionary;
     }
     return self;
 }
@@ -293,6 +300,54 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
     }
 }
 
+- (void)subscribeAttributeCacheWithController:(id _Nullable)controller
+                                       nodeId:(uint64_t)nodeId
+                                   completion:(void (^)(NSError * _Nullable error))completion
+{
+    __auto_type sharedController = [CHIPDeviceController sharedController];
+    if (sharedController) {
+        CHIPAttributeCacheContainer * attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
+        [attributeCacheContainer
+            subscribeWithDeviceController:sharedController
+                                 deviceId:nodeId
+                              clientQueue:dispatch_get_main_queue()
+                               completion:^(NSError * _Nullable error) {
+                                   NSNumber * nodeIdNumber = [NSNumber numberWithUnsignedLongLong:nodeId];
+                                   if (error) {
+                                       NSLog(@"Failed to have subscribe attribute by cache");
+                                       [self.attributeCacheDictionary removeObjectForKey:nodeIdNumber];
+                                   } else {
+                                       NSLog(@"Attribute cache for node %llu successfully subscribed attributes", nodeId);
+                                       [self.attributeCacheDictionary setObject:attributeCacheContainer forKey:nodeIdNumber];
+                                   }
+                                   completion(error);
+                               }];
+    } else {
+        NSLog(@"Failed to get shared controller");
+        completion([NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
+    }
+}
+
+- (void)readAttributeCacheWithController:(id _Nullable)controller
+                                  nodeId:(uint64_t)nodeId
+                              endpointId:(NSUInteger)endpointId
+                               clusterId:(NSUInteger)clusterId
+                             attributeId:(NSUInteger)attributeId
+                              completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion
+{
+    CHIPAttributeCacheContainer * attributeCacheContainer = _attributeCacheDictionary[[NSNumber numberWithUnsignedLongLong:nodeId]];
+    if (attributeCacheContainer) {
+        [attributeCacheContainer readAttributeWithEndpointId:endpointId
+                                                   clusterId:clusterId
+                                                 attributeId:attributeId
+                                                 clientQueue:dispatch_get_main_queue()
+                                                  completion:completion];
+    } else {
+        NSLog(@"Attribute cache for node ID %llu was not setup", nodeId);
+        completion(nil, [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil]);
+    }
+}
+
 @end
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
@@ -308,12 +363,19 @@ static NSString * kAddress = @"::1";
 // This test suite reuses a device object to speed up the test process for CI.
 // The following global variable holds the reference to the device object.
 static CHIPDevice * mConnectedDevice;
+static CHIPDeviceController * mDeviceController;
 static CHIPXPCListenerSample * mSampleListener;
 
 static CHIPDevice * GetConnectedDevice(void)
 {
     XCTAssertNotNil(mConnectedDevice);
     return mConnectedDevice;
+}
+
+static CHIPDeviceController * GetDeviceController(void)
+{
+    XCTAssertNotNil(mDeviceController);
+    return mDeviceController;
 }
 
 @interface CHIPRemoteDeviceSampleTestPairingDelegate : NSObject <CHIPDevicePairingDelegate>
@@ -424,6 +486,8 @@ static CHIPDevice * GetConnectedDevice(void)
 
     BOOL stopped = [controller shutdown];
     XCTAssertTrue(stopped);
+
+    mDeviceController = nil;
 }
 
 - (void)waitForCommissionee
@@ -447,6 +511,7 @@ static CHIPDevice * GetConnectedDevice(void)
                            [expectation fulfill];
                        }];
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    mDeviceController = remoteController;
 }
 
 #if !MANUAL_INDIVIDUAL_TEST
@@ -820,6 +885,91 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Wait till establishment and error report
     [self waitForExpectations:[NSArray arrayWithObjects:expectation, errorReportExpectation, nil] timeout:kTimeoutInSeconds];
+}
+
+- (void)test009_SubscribeAttributeCache
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+    XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe attributes by cache"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * deviceController = GetDeviceController();
+    CHIPAttributeCacheContainer * attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
+    NSLog(@"Setting up attribute cache...");
+    [attributeCacheContainer subscribeWithDeviceController:deviceController
+                                                  deviceId:kDeviceId
+                                               clientQueue:queue
+                                                completion:^(NSError * _Nullable error) {
+                                                    NSLog(@"Attribute cache subscribed attributes");
+                                                    [expectation fulfill];
+                                                }];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+
+    // Wait for initial report to be collected. This can take very long.
+    NSLog(@"Waiting for initial report...");
+    expectation = [self expectationWithDescription:@"Must not jump out while waiting for initial report"];
+    expectation.inverted = YES;
+    [self waitForExpectations:@[ expectation ] timeout:120];
+
+    // Send command to trigger attribute change
+    NSLog(@"Invoking command...");
+    expectation = [self expectationWithDescription:@"Command invoked"];
+    NSDictionary * fields = [NSDictionary dictionaryWithObjectsAndKeys:@"Structure", @"type", [NSArray array], @"value", nil];
+    [device invokeCommandWithEndpointId:1
+                              clusterId:6
+                              commandId:1
+                          commandFields:fields
+                            clientQueue:queue
+                             completion:^(id _Nullable values, NSError * _Nullable error) {
+                                 NSLog(@"invoked command: On values: %@, error: %@", values, error);
+
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+
+                                 {
+                                     XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+                                     NSArray * resultArray = values;
+                                     for (NSDictionary * result in resultArray) {
+                                         XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
+                                         XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
+                                         XCTAssertEqual([result[@"commandId"] unsignedIntegerValue], 1);
+                                         XCTAssertEqual([result[@"status"] unsignedIntegerValue], 0);
+                                     }
+                                     XCTAssertEqual([resultArray count], 1);
+                                 }
+                                 [expectation fulfill];
+                             }];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+
+    // Read attribute cache
+    NSLog(@"Reading from attribute cache...");
+    expectation = [self expectationWithDescription:@"Cache read"];
+    [attributeCacheContainer
+        readAttributeWithEndpointId:1
+                          clusterId:6
+                        attributeId:0
+                        clientQueue:queue
+                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"Cached attribute read: %@, error: %@", values, error);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+                             XCTAssertEqual([values count], 1);
+                             for (NSDictionary<NSString *, id> * value in values) {
+                                 XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
+                                 NSDictionary * result = value;
+                                 XCTAssertEqual([result[@"endpointId"] unsignedIntegerValue], 1);
+                                 XCTAssertEqual([result[@"clusterId"] unsignedIntegerValue], 6);
+                                 XCTAssertEqual([result[@"attributeId"] unsignedIntegerValue], 0);
+                                 XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+                                 XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+                                 XCTAssertEqual([result[@"data"][@"value"] boolValue], YES);
+                             }
+                             [expectation fulfill];
+                         }];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 
 #if !MANUAL_INDIVIDUAL_TEST

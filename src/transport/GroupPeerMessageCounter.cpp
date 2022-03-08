@@ -243,7 +243,7 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
     uint32_t temp;
     CHIP_ERROR err;
     err = mStorage->SyncGetKeyValue(key.GroupControlCounter(), &temp, size);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND || err == CHIP_ERROR_KEY_NOT_FOUND)
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // might be the first time we retrieve the value
         // TODO handle this case
@@ -259,7 +259,7 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
     }
 
     err = mStorage->SyncGetKeyValue(key.GroupDataCounter(), &temp, size);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND || err == CHIP_ERROR_KEY_NOT_FOUND)
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // might be the first time we retrieve the value
         // TODO handle this case
@@ -275,6 +275,7 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
     }
 
     temp = mGroupControlCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
+    size = static_cast<uint16_t>(sizeof(temp));
     ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key.GroupControlCounter(), &temp, size));
 
     temp = mGroupDataCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;

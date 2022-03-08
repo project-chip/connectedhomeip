@@ -308,11 +308,11 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
         if (DlUserStatus::kAvailable != user.userStatus)
         {
             emberAfDoorLockClusterPrintln("Found user in storage: "
-                                          "[userIndex=%d,userName=\"%s\",userStatus=%u,userType=%u"
+                                          "[userIndex=%d,userName=\"%.*s\",userStatus=%u,userType=%u"
                                           ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
-                                          userIndex, user.userName.data(), to_underlying(user.userStatus),
-                                          to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy,
-                                          user.lastModifiedBy);
+                                          userIndex, static_cast<int>(user.userName.size()), user.userName.data(),
+                                          to_underlying(user.userStatus), to_underlying(user.userType),
+                                          to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
             SuccessOrExit(err = writer->PutString(TLV::ContextTag(to_underlying(ResponseFields::kUserName)), user.userName));
             if (0xFFFFFFFFU != user.userUniqueId)
@@ -1541,19 +1541,19 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
     {
         emberAfDoorLockClusterPrintln(
             "[createUser] Unable to create user: app error "
-            "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus="
-            "%u,userType=%u,credentialRule=%u,totalCredentials=%zu]",
-            endpointId, creatorFabricIdx, userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
-            to_underlying(newUserType), to_underlying(newCredentialRule), newTotalCredentials);
+            "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
+            "userType=%u,credentialRule=%u,totalCredentials=%zu]",
+            endpointId, creatorFabricIdx, userIndex, static_cast<int>(newUserName.size()), newUserName.data(), newUserUniqueId,
+            to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule), newTotalCredentials);
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
     emberAfDoorLockClusterPrintln(
         "[createUser] User created "
-        "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%"
-        "u,userType=%u,credentialRule=%u,totalCredentials=%zu]",
-        endpointId, creatorFabricIdx, userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
-        to_underlying(newUserType), to_underlying(newCredentialRule), newTotalCredentials);
+        "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
+        "userType=%u,credentialRule=%u,totalCredentials=%zu]",
+        endpointId, creatorFabricIdx, userIndex, static_cast<int>(newUserName.size()), newUserName.data(), newUserUniqueId,
+        to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule), newTotalCredentials);
 
     sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kAdd, sourceNodeId, creatorFabricIdx,
                              userIndex, userIndex);
@@ -1612,19 +1612,19 @@ EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::Fabr
     {
         ChipLogError(Zcl,
                      "[modifyUser] Unable to modify the user: app error "
-                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u"
+                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32 ",userStatus=%u"
                      ",userType=%u,credentialRule=%u]",
-                     endpointId, modifierFabricIndex, userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
-                     to_underlying(newUserType), to_underlying(newCredentialRule));
+                     endpointId, modifierFabricIndex, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
+                     newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
     emberAfDoorLockClusterPrintln("[modifyUser] User modified "
-                                  "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32
-                                  ",userStatus=%u,"
-                                  "userType=%u,credentialRule=%u]",
-                                  endpointId, modifierFabricIndex, userIndex, newUserName.data(), newUserUniqueId,
-                                  to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
+                                  "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32
+                                  ",userStatus=%u,userType=%u,credentialRule=%u]",
+                                  endpointId, modifierFabricIndex, userIndex, static_cast<int>(newUserName.size()),
+                                  newUserName.data(), newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType),
+                                  to_underlying(newCredentialRule));
 
     sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kModify, sourceNodeId,
                              modifierFabricIndex, userIndex, userIndex);

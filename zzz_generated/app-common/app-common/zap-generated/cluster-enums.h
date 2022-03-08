@@ -917,8 +917,8 @@ namespace GroupKeyManagement {
 // Enum for GroupKeySecurityPolicy
 enum class GroupKeySecurityPolicy : uint8_t
 {
-    kStandard   = 0x00,
-    kTrustFirst = 0x01,
+    kTrustFirst   = 0x00,
+    kCacheAndSync = 0x01,
 };
 } // namespace GroupKeyManagement
 
@@ -1115,9 +1115,6 @@ enum class DlUserType : uint8_t
     kRemoteOnlyUser         = 0x09,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockOperationEventCode
 enum class DoorLockOperationEventCode : uint8_t
 {
@@ -1137,13 +1134,7 @@ enum class DoorLockOperationEventCode : uint8_t
     kManualLock            = 0x0D,
     kManualUnlock          = 0x0E,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockOperationEventCode      = EmberAfDoorLockOperationEventCode;
-#endif
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockProgrammingEventCode
 enum class DoorLockProgrammingEventCode : uint8_t
 {
@@ -1155,9 +1146,6 @@ enum class DoorLockProgrammingEventCode : uint8_t
     kIdAdded              = 0x05,
     kIdDeleted            = 0x06,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockProgrammingEventCode    = EmberAfDoorLockProgrammingEventCode;
-#endif
 
 // Enum for DoorLockSetPinOrIdStatus
 enum class DoorLockSetPinOrIdStatus : uint8_t
@@ -1168,9 +1156,6 @@ enum class DoorLockSetPinOrIdStatus : uint8_t
     kDuplicateCodeError = 0x03,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockUserStatus
 enum class DoorLockUserStatus : uint8_t
 {
@@ -1179,13 +1164,7 @@ enum class DoorLockUserStatus : uint8_t
     kOccupiedDisabled = 0x03,
     kNotSupported     = 0xFF,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockUserStatus              = EmberAfDoorLockUserStatus;
-#endif
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockUserType
 enum class DoorLockUserType : uint8_t
 {
@@ -1196,9 +1175,6 @@ enum class DoorLockUserType : uint8_t
     kNonAccessUser       = 0x04,
     kNotSupported        = 0xFF,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockUserType                = EmberAfDoorLockUserType;
-#endif
 
 // Bitmap for DlAlarmMask
 enum class DlAlarmMask : uint16_t
@@ -1487,6 +1463,37 @@ enum class SetpointAdjustMode : uint8_t
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SetpointAdjustMode              = EmberAfSetpointAdjustMode;
 #endif
+
+// Enum for ThermostatControlSequence
+enum class ThermostatControlSequence : uint8_t
+{
+    kCoolingOnly                 = 0x00,
+    kCoolingWithReheat           = 0x01,
+    kHeatingOnly                 = 0x02,
+    kHeatingWithReheat           = 0x03,
+    kCoolingAndHeating           = 0x04,
+    kCoolingAndHeatingWithReheat = 0x05,
+};
+
+// Enum for ThermostatRunningMode
+enum class ThermostatRunningMode : uint8_t
+{
+    kOff  = 0x00,
+    kCool = 0x03,
+    kHeat = 0x04,
+};
+
+// Enum for ThermostatSystemMode
+enum class ThermostatSystemMode : uint8_t
+{
+    kOff              = 0x00,
+    kAuto             = 0x01,
+    kCool             = 0x03,
+    kHeat             = 0x04,
+    kEmergencyHeating = 0x05,
+    kPrecooling       = 0x06,
+    kFanOnly          = 0x07,
+};
 
 // Bitmap for DayOfWeek
 enum class DayOfWeek : uint8_t
