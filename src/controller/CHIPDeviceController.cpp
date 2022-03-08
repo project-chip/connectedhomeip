@@ -1125,7 +1125,7 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     CommissioningDelegate::CommissioningReport report;
-    report.Set<AttestationResponse>(AttestationResponse(data.NOCSRElements, data.attestationSignature));
+    report.Set<CSRResponse>(CSRResponse(data.NOCSRElements, data.attestationSignature));
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
