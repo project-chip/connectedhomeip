@@ -35,12 +35,12 @@
 /*
  * Enable HSM for Generate EC Key
  */
-#define ENABLE_HSM_GENERATE_EC_KEY 1
+#define ENABLE_HSM_GENERATE_EC_KEY 0
 
 /*
  * Enable HSM for PBKDF SHA256
  */
-#define ENABLE_HSM_PBKDF2_SHA256 1
+#define ENABLE_HSM_PBKDF2_SHA256 0
 
 /*
  * Enable HSM for HKDF SHA256
@@ -58,7 +58,6 @@
 
 #if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
 #define ENABLE_HSM_EC_KEY
-//#define ENABLE_HSM_CASE_OPS_KEY
 #endif
 
 #if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_PBKDF2_SHA256))

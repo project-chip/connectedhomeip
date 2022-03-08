@@ -26,6 +26,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
+#include <crypto/CHIPCryptoPAL.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
@@ -33,6 +34,8 @@
 namespace chip {
 using namespace Credentials;
 using namespace Crypto;
+
+using ChipP256KeypairType = CHIP_CONFIG_P256_CONCRETE_KEYPAIR_TYPE;
 
 CHIP_ERROR FabricInfo::SetFabricLabel(const CharSpan & fabricLabel)
 {
@@ -154,19 +157,10 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
 
     if (mOperationalKey == nullptr)
     {
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-        mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-        mOperationalKey->SetKeyId(CASE_OPS_KEY);
-#else
-        mOperationalKey = chip::Platform::New<P256Keypair>();
-#endif
+        mOperationalKey = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(mFabricId);
     }
     VerifyOrExit(mOperationalKey != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = mOperationalKey->Deserialize(info->mOperationalKey));
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-    // Set provisioned_key = true , so that key is not deleted from HSM.
-    mOperationalKey->provisioned_key = true;
-#endif
 
     ChipLogProgress(Inet, "Loading certs from storage");
     SuccessOrExit(err = SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
@@ -244,14 +238,10 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
     VerifyOrReturnError(keyPair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     P256SerializedKeypair serialized;
     ReturnErrorOnFailure(keyPair->Serialize(serialized));
+
     if (mOperationalKey == nullptr)
     {
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-        mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-        mOperationalKey->SetKeyId(CASE_OPS_KEY);
-#else
-        mOperationalKey = chip::Platform::New<P256Keypair>();
-#endif
+        mOperationalKey = chip::Platform::New<ChipP256KeypairType>();
     }
     VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
     return mOperationalKey->Deserialize(serialized);

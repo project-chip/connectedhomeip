@@ -742,13 +742,25 @@ exit:
     return error;
 }
 
-P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(int fabricIndex)
+P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(uint64_t fabricIndex)
 {
+    static int initkey = 0;
     (void)fabricIndex;
     P256KeypairHSM * keypair = nullptr;
-    ChipLogProgress(Crypto, "HSM-BuildP256KeyPairForOperationalKey() called");
     keypair = Platform::New<P256KeypairHSM>();
-    keypair->Initialize();
+    //fabricIndex - keyid mapping not implemented yet
+    keypair->SetKeyId(kKeyId_case_operational_keyid);
+
+    if (initkey == 0){
+        keypair->Initialize();
+        keypair->provisioned_key = true;
+        initkey = 1;
+    }
+    else{
+        keypair->provisioned_key = true;
+        keypair->Initialize();
+    }
+
     return keypair;
 }
 

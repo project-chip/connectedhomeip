@@ -712,7 +712,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
 
     // Prepare NOCSRElements structure
     {
-        Crypto::P256Keypair keypair;
+        Crypto::P256Keypair *keypair;
         size_t csrLength           = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
@@ -723,8 +723,8 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
             gFabricBeingCommissioned.GetOperationalKey()->Clear();
         }
 
-        keypair.Initialize();
-        SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(&keypair));
+        keypair = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(gFabricBeingCommissioned.GetFabricId());
+        SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(keypair));
 
         // Generate the actual CSR from the ephemeral key
         VerifyOrExit(csr.Alloc(csrLength), err = CHIP_ERROR_NO_MEMORY);

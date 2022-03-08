@@ -36,10 +36,6 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
 
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-#define CASE_OPS_KEY 0xCA5EECC0
-#endif
-
 namespace chip {
 
 static constexpr FabricIndex kMinValidFabricIndex     = 1;
@@ -158,18 +154,9 @@ public:
     {
         if (mOperationalKey == nullptr)
         {
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-            mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
-            mOperationalKey->SetKeyId(CASE_OPS_KEY);
-#else
-            mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
-#endif
-            mOperationalKey->Initialize();
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-            // Set provisioned_key = true , so that key is not deleted from HSM.
-            mOperationalKey->provisioned_key = true;
-#endif
+            mOperationalKey = chip::Crypto::GetP256KeypairBuilder()->BuildP256KeyPairForOperationalKey(mFabricId);
         }
+
         return mOperationalKey;
     }
     CHIP_ERROR SetOperationalKeypair(const Crypto::P256Keypair * keyPair);
@@ -259,11 +246,7 @@ private:
     uint16_t mVendorId                                  = kUndefinedVendorId;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-    Crypto::P256KeypairHSM * mOperationalKey = nullptr;
-#else
     Crypto::P256Keypair * mOperationalKey = nullptr;
-#endif
 
     MutableByteSpan mRootCert;
     MutableByteSpan mICACert;

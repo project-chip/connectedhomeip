@@ -1938,12 +1938,12 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
 class MbedTlsDefaultP256KeypairBuilder : public P256KeypairBuilder {
 public:
 
-    virtual P256Keypair * BuildP256KeyPairForOperationalKey(int fabricIndex) override;
+    virtual P256Keypair * BuildP256KeyPairForOperationalKey(uint64_t fabricIndex) override;
 
     virtual P256Keypair * BuildP256KeyPairForEphermalUsage() override;
 };
 
-P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(int fabricIndex)
+P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(uint64_t fabricIndex)
 {
     (void)fabricIndex;
     P256Keypair * keypair = nullptr;

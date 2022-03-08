@@ -434,6 +434,9 @@ private:
     bool mInitialized = false;
 };
 
+#ifndef CHIP_CONFIG_P256_CONCRETE_KEYPAIR_TYPE
+    #define CHIP_CONFIG_P256_CONCRETE_KEYPAIR_TYPE P256Keypair
+#endif
 
 /**
  *  @brief  A data structure for holding an AES CCM128 symmetric key, without the ownership of it.
@@ -1415,7 +1418,7 @@ public:
      * @brief Create the keypair for given fabric Index.
      * @return Return reference to P256 Keypair
      **/
-    virtual P256Keypair * BuildP256KeyPairForOperationalKey (int fabricIndex) = 0;
+    virtual P256Keypair * BuildP256KeyPairForOperationalKey (uint64_t fabricIndex) = 0;
 
     /**
      * @brief Create the ephermal keypair for CASE.
