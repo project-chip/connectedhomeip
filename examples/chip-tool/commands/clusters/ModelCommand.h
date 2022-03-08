@@ -49,6 +49,12 @@ public:
         return CHIP_ERROR_BAD_REQUEST;
     };
 
+    void Shutdown() override
+    {
+        mOnDeviceConnectedCallback.Cancel();
+        mOnDeviceConnectionFailureCallback.Cancel();
+    }
+
 private:
     chip::NodeId mNodeId;
     std::vector<chip::EndpointId> mEndPointId;

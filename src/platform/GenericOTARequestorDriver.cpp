@@ -31,9 +31,9 @@
 
 #include "GenericOTARequestorDriver.h"
 
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
-#include <platform/OTARequestorInterface.h>
 
 namespace chip {
 namespace DeviceLayer {

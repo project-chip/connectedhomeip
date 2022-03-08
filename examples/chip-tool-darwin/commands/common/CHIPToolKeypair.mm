@@ -8,7 +8,11 @@
 #include <stddef.h>
 #include <string>
 
-NSString * const kOperationalCredentialsIssuerKeypairStorage = @"ChipToolOpCredsCAKey";
+#define CHIPPlugin_CAKeyTag "com.apple.matter.commissioner.ca.issuer.id"
+#define Public_KeySize "256"
+
+static NSString * const kCHIPToolKeychainLabel = @"Chip Tool Keypair";
+static NSString * const kOperationalCredentialsIssuerKeypairStorage = @"ChipToolOpCredsCAKey";
 
 std::string StringToBase64(const std::string & value)
 {
@@ -62,7 +66,7 @@ std::string Base64ToString(const std::string & b64Value)
     CHIP_ERROR signing_error = _mKeyPair.ECDSA_sign_hash((const uint8_t *) [hash bytes], (const size_t)[hash length], signature);
     if (signing_error != CHIP_NO_ERROR)
         return nil;
-    out_signature = [NSData dataWithBytes:signature length:sizeof(signature)];
+    out_signature = [NSData dataWithBytes:signature.Bytes() length:signature.Length()];
     return out_signature;
 }
 
@@ -71,8 +75,11 @@ std::string Base64ToString(const std::string & b64Value)
     chip::Crypto::P256PublicKey publicKey = _mKeyPair.Pubkey();
     NSData * publicKeyNSData = [NSData dataWithBytes:publicKey.Bytes() length:publicKey.Length()];
     NSDictionary * attributes = @{
-        (__bridge NSString *) kSecAttrKeyType : (__bridge NSString *) kSecAttrKeyTypeECDSA,
-        (__bridge NSString *) kSecAttrKeyClass : (__bridge NSString *) kSecAttrKeyClassPublic
+        (__bridge NSString *) kSecAttrKeyClass : (__bridge NSString *) kSecAttrKeyClassPublic,
+        (NSString *) kSecAttrKeyType : (NSString *) kSecAttrKeyTypeECSECPrimeRandom,
+        (NSString *) kSecAttrKeySizeInBits : @Public_KeySize,
+        (NSString *) kSecAttrLabel : kCHIPToolKeychainLabel,
+        (NSString *) kSecAttrApplicationTag : @CHIPPlugin_CAKeyTag,
     };
     return SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, NULL);
 }

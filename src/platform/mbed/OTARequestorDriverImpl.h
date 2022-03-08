@@ -24,7 +24,7 @@
 
 #include <GenericOTARequestorDriver.h>
 #include <OTARequestorDriver.h>
-#include <OTARequestorInterface.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>

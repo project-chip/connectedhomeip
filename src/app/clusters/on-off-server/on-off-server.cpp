@@ -526,7 +526,7 @@ bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint
 {
     if (emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::OnOff::Id, true))
     {
-        return emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::StartUpOnOff::Id, true);
+        return emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id, true);
     }
 
     return false;

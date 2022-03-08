@@ -118,7 +118,6 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     initParams.systemLayer        = systemLayer;
     initParams.tcpEndPointManager = tcpEndPointManager;
     initParams.udpEndPointManager = udpEndPointManager;
-    initParams.fabricStorage      = wrapper.get();
 
     // move bleLayer into platform/android to share with app server
 #if CONFIG_NETWORK_LAYER_BLE
@@ -329,19 +328,3 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
     ChipLogProgress(chipTool, "KVS: Deleting key %s", key);
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
 }
-
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncStore(chip::FabricIndex fabricIndex, const char * key, const void * buffer,
-                                                     uint16_t size)
-{
-    return SyncSetKeyValue(key, buffer, size);
-};
-
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncLoad(chip::FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size)
-{
-    return SyncGetKeyValue(key, buffer, size);
-};
-
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncDelete(chip::FabricIndex fabricIndex, const char * key)
-{
-    return SyncDeleteKeyValue(key);
-};

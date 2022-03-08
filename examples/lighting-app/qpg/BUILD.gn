@@ -34,15 +34,14 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
+qpg_project_dir = "${chip_root}/examples/lighting-app/qpg"
 examples_plat_dir = "${chip_root}/examples/platform/qpg"
 
 qpg_sdk("sdk") {
-  sources = [ "${examples_plat_dir}/project_include/CHIPProjectConfig.h" ]
-
   include_dirs = [
     "${chip_root}/src/platform/qpg",
     "${examples_plat_dir}",
-    "${examples_plat_dir}/project_include",
+    "${qpg_project_dir}/include",
   ]
 
   if (chip_enable_pw_rpc) {

@@ -37,13 +37,6 @@ public:
     ~ColorControlCluster() {}
 };
 
-class DLL_EXPORT GroupsCluster : public ClusterBase
-{
-public:
-    GroupsCluster() : ClusterBase(app::Clusters::Groups::Id) {}
-    ~GroupsCluster() {}
-};
-
 class DLL_EXPORT IdentifyCluster : public ClusterBase
 {
 public:
