@@ -65,7 +65,7 @@ function(chip_configure_data_model APP_TARGET)
             ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
         )
 
-        add_definitions(
+        target_compile_options(${APP_TARGET} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
         )
     endif()
