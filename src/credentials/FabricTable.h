@@ -274,7 +274,7 @@ class DLL_EXPORT FabricTableDelegate
     friend class FabricTable;
 
 public:
-    FabricTableDelegate(bool selfOwned = false) : mOwnedByFabricTable(selfOwned) {}
+    FabricTableDelegate(bool ownedByFabricTable = false) : mOwnedByFabricTable(ownedByFabricTable) {}
     virtual ~FabricTableDelegate() {}
     /**
      * Gets called when a fabric is deleted from KVS store.
