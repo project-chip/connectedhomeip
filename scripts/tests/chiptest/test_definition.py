@@ -27,11 +27,13 @@ TEST_NODE_ID = '0x12344321'
 
 
 class App:
+
     def __init__(self, runner, command):
         self.process = None
         self.outpipe = None
         self.runner = runner
         self.command = command
+        self.cv_stopped = threading.Condition()
         self.stopped = False
         self.lastLogIndex = 0
 
@@ -44,13 +46,17 @@ class App:
             self.__updateSetUpCode(outpipe)
             self.process = process
             self.outpipe = outpipe
-            self.stopped = False
+            with self.cv_stopped:
+                self.stopped = False
+                self.cv_stopped.notify()
             return True
         return False
 
     def stop(self):
         if self.process:
-            self.stopped = True
+            with self.cv_stopped:
+                self.stopped = True
+                self.cv_stopped.notify()
             self.process.kill()
             self.process.wait(10)
             self.process = None
@@ -85,21 +91,21 @@ class App:
                        self.process, self.outpipe)
         return True
 
-    def poll(self):
-        # When the server is manually stopped, process polling is overridden
-        # so the other processes that depends on the accessory beeing alive
-        # does not stop.
-        if self.stopped:
-            return None
-        return self.process.poll()
-
     def kill(self):
         if self.process:
             self.process.kill()
 
-    def wait(self, duration):
-        if self.process:
-            self.process.wait(duration)
+    def wait(self, timeout=None):
+        while True:
+            code = self.process.wait(timeout)
+            with self.cv_stopped:
+                if not self.stopped:
+                    return code
+                # When the server is manually stopped, process waiting is
+                # overridden so the other processes that depends on the
+                # accessory beeing alive does not stop.
+                while self.stopped:
+                    self.cv_stopped.wait()
 
     def __startServer(self, runner, command, discriminator):
         logging.debug(
