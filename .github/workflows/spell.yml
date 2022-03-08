@@ -18,11 +18,11 @@ on:
     push:
         paths:
             - "**.md"
-            - "!.github/*"
+            - ".github/.wordlist.txt"
     pull_request:
         paths:
             - "**.md"
-            - "!.github/*"
+            - ".github/.wordlist.txt"
 
 jobs:
     check-reviewdog:
@@ -47,7 +47,6 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000

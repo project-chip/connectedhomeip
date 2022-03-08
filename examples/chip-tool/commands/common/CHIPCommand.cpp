@@ -23,6 +23,7 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TestGroupData.h>
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceHandlers.h"
@@ -45,10 +46,8 @@ CHIP_ERROR CHIPCommand::Run()
 #endif
 
     ReturnLogErrorOnFailure(mDefaultStorage.Init());
-    ReturnLogErrorOnFailure(mFabricStorage.Initialize(&mDefaultStorage));
 
     chip::Controller::FactoryInitParams factoryInitParams;
-    factoryInitParams.fabricStorage            = &mFabricStorage;
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
     factoryInitParams.listenPort               = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerId());
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
@@ -61,6 +60,19 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId, trustStore));
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId, trustStore));
 
+    // Initialize Group Data
+    ReturnLogErrorOnFailure(chip::GroupTesting::InitProvider());
+    for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
+    {
+        chip::FabricInfo * fabric = it->second->GetFabricInfo();
+        if ((nullptr != fabric) && (0 != it->first.compare(kIdentityNull)))
+        {
+            uint8_t compressed_fabric_id[sizeof(uint64_t)];
+            chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
+            ReturnLogErrorOnFailure(fabric->GetCompressedId(compressed_fabric_id_span));
+            ReturnLogErrorOnFailure(chip::GroupTesting::InitData(fabric->GetFabricIndex(), compressed_fabric_id_span));
+        }
+    }
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
     CHIP_ERROR err = StartWaiting(GetWaitDuration());
 

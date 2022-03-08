@@ -100,14 +100,13 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SimpleFabricStorage fabricStorage;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&fabricStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
     NL_TEST_ASSERT(
         inSuite,
         CHIP_NO_ERROR ==
@@ -131,14 +130,13 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SimpleFabricStorage fabricStorage;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&fabricStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
     NL_TEST_ASSERT(
         inSuite,
         CHIP_NO_ERROR ==
@@ -227,14 +225,13 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SimpleFabricStorage fabricStorage;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&fabricStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
     NL_TEST_ASSERT(
         inSuite,
         CHIP_NO_ERROR ==
@@ -309,14 +306,13 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SimpleFabricStorage fabricStorage;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&fabricStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
     NL_TEST_ASSERT(
         inSuite,
         CHIP_NO_ERROR ==
@@ -419,14 +415,13 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SimpleFabricStorage fabricStorage;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&fabricStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
     NL_TEST_ASSERT(
         inSuite,
         CHIP_NO_ERROR ==
@@ -495,14 +490,13 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SimpleFabricStorage fabricStorage;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&fabricStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
     NL_TEST_ASSERT(
         inSuite,
         CHIP_NO_ERROR ==
@@ -590,14 +584,13 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SimpleFabricStorage fabricStorage;
     FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&fabricStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
     NL_TEST_ASSERT(
         inSuite,
         CHIP_NO_ERROR ==

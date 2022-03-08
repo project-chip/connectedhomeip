@@ -110,6 +110,12 @@ public:
      */
     CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
+    /**
+     * Expire active transactions and release related objects for the given fabric index.
+     * This is used for releasing transactions that won't be closed when a fabric is removed.
+     */
+    void CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex);
+
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
 

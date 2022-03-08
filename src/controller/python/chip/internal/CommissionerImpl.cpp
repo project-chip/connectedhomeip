@@ -82,7 +82,6 @@ private:
 };
 
 ServerStorageDelegate gServerStorage;
-chip::SimpleFabricStorage gFabricStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
@@ -116,10 +115,6 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
-        err = gFabricStorage.Initialize(&gServerStorage);
-        SuccessOrExit(err);
-
-        factoryParams.fabricStorage            = &gFabricStorage;
         factoryParams.fabricIndependentStorage = &gServerStorage;
 
         commissionerParams.pairingDelegate = &gPairingDelegate;

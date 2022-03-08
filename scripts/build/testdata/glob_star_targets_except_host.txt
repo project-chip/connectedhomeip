@@ -62,6 +62,9 @@ nrf-nrf5340dk-lock
 nrf-nrf5340dk-pump
 nrf-nrf5340dk-pump-controller
 nrf-nrf5340dk-shell
-qpg-qpg6100-lock
+qpg-light
+qpg-lock
+qpg-persistent-storage
+qpg-shell
 telink-tlsr9518adk80d-light
 tizen-arm-light
