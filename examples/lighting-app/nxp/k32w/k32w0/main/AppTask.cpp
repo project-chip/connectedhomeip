@@ -36,9 +36,9 @@
 /* OTA related includes */
 #include "OTAImageProcessorImpl.h"
 #include "OtaSupport.h"
-#include "platform/GenericOTARequestorDriver.h"
-#include "src/app/clusters/ota-requestor/BDXDownloader.h"
-#include "src/app/clusters/ota-requestor/OTARequestor.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
 
 #include "Keyboard.h"
 #include "LED.h"

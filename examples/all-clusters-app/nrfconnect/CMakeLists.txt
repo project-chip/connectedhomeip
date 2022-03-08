@@ -73,6 +73,7 @@ target_sources(app PRIVATE
                ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp)
 
 
