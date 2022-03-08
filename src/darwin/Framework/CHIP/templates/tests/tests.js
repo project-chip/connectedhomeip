@@ -189,6 +189,10 @@ function getTests()
     'Test_TC_RH_2_2',
   ];
 
+  const SecureChannel = [
+    'Test_TC_SC_4_2',
+  ];
+
   const Switch = [
     'Test_TC_SWTCH_2_1',
     'Test_TC_SWTCH_2_2',
@@ -290,6 +294,7 @@ function getTests()
     PressureMeasurement, //
     PumpConfigurationControl, //
     RelativeHumidityMeasurement, //
+    SecureChannel, //
     Switch, //
     TemperatureMeasurement, //
     Thermostat, //
