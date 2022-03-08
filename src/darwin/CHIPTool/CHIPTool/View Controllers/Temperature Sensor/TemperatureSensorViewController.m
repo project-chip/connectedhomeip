@@ -213,7 +213,11 @@
                                          // These should be exposed by the SDK
                                          if ([report.path.cluster isEqualToNumber:@(1026)] &&
                                              [report.path.attribute isEqualToNumber:@(0)]) {
-                                             [self updateTempInUI:((NSNumber *) report.value).shortValue];
+                                             if (report.error != nil) {
+                                                 NSLog(@"Error reading temperature: %@", report.error);
+                                             } else {
+                                                 [self updateTempInUI:((NSNumber *) report.value).shortValue];
+                                             }
                                          }
                                      }
                                  }
