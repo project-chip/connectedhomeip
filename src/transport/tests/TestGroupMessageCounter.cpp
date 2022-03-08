@@ -134,7 +134,7 @@ void RemovePeerTest(nlTestSuite * inSuite, void * inContext)
     FabricIndex fabricIndex                       = 1;
     CHIP_ERROR err                                = CHIP_NO_ERROR;
     chip::Transport::PeerMessageCounter * counter = nullptr;
-    chip::Transport::GroupPeerTable mGroupPeerMsgCounter;
+    TestGroupPeerTable mGroupPeerMsgCounter;
 
     // Fill table up (max fabric and mac peer)
     for (uint32_t it = 0; it < CHIP_CONFIG_MAX_FABRICS; it++)
@@ -165,6 +165,28 @@ void RemovePeerTest(nlTestSuite * inSuite, void * inContext)
     // Try re-adding the previous peer without any error
     err = mGroupPeerMsgCounter.FindOrAddPeer(99, 99, true, counter);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = mGroupPeerMsgCounter.FindOrAddPeer(104, 99, true, counter);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = mGroupPeerMsgCounter.FindOrAddPeer(105, 99, true, counter);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = mGroupPeerMsgCounter.FindOrAddPeer(106, 99, true, counter);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Fabric removal test
+    err = mGroupPeerMsgCounter.FabricRemoved(123);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+
+    err = mGroupPeerMsgCounter.FabricRemoved(99);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = mGroupPeerMsgCounter.FabricRemoved(99);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+
+    // Verify that the Fabric List was compacted.
+    NL_TEST_ASSERT(inSuite, 106 == mGroupPeerMsgCounter.GetFabricIndexAt(0));
 }
 
 void PeerRetrievalTest(nlTestSuite * inSuite, void * inContext)

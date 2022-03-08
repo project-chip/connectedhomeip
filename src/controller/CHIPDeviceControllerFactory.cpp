@@ -146,6 +146,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
 
+    auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>(stateParams.sessionMgr);
+    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(delegate.get()));
+    delegate.release();
+
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
                                                       stateParams.messageCounterManager, params.fabricIndependentStorage,
                                                       stateParams.fabricTable));
