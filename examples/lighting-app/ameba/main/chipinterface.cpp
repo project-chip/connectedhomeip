@@ -42,10 +42,10 @@
 #include <lwip_netconf.h>
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/Ameba/AmebaOTAImageProcessor.h"
-#include "platform/GenericOTARequestorDriver.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/Ameba/AmebaOTAImageProcessor.h>
 #endif
 
 using namespace ::chip;

@@ -38,6 +38,7 @@
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/af.h>
@@ -46,7 +47,6 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
-#include <platform/GenericOTARequestorDriver.h>
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
