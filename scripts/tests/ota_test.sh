@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PASSCODE=${1:-20202021}
-DISCRIMINATOR=${2:-(( $RANDOM % 9000 + 1000 ))}
+DISCRIMINATOR=${2:-(( $RANDOM % 4096 + 1 ))}
 UDP_PORT=${3:-(( $RANDOM % 59535 + 6000 ))}
 OTA_DOWNLOAD_PATH=${4:-"/tmp/test.bin"}
 
