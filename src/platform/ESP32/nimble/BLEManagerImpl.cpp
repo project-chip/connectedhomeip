@@ -699,7 +699,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
     // bottom digits of the Chip device id.
     uint16_t discriminator;
-    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+    SuccessOrExit(err = ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
 
     if (!mFlags.Has(Flags::kUseCustomDeviceName))
     {

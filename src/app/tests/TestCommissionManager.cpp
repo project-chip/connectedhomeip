@@ -22,6 +22,7 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/tests/echo/common.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/PlatformManager.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -47,8 +48,13 @@ void InitializeChip(nlTestSuite * suite)
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
+
+    static chip::DeviceLayer::TestCommissionableDataProvider commissionableDataProvider;
+    chip::DeviceLayer::ConfigurationMgr().SetCommissionableDataProvider(&commissionableDataProvider);
+
     err = Server::GetInstance().Init();
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
+
     Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 }
@@ -136,7 +142,7 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     nlTestSuite * suite                        = reinterpret_cast<nlTestSuite *>(context);
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     uint16_t originDiscriminator;
-    CHIP_ERROR err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(originDiscriminator);
+    CHIP_ERROR err = chip::DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
     chip::Spake2pVerifier verifier;
@@ -144,7 +150,6 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     uint8_t salt[chip::kSpake2p_Min_PBKDF_Salt_Length];
     chip::ByteSpan saltData(salt);
     constexpr chip::PasscodeId kPasscodeID = 1;
-    uint16_t currentDiscriminator;
 
     err = commissionMgr.OpenEnhancedCommissioningWindow(kNoCommissioningTimeout, newDiscriminator, verifier, kIterations, saltData,
                                                         kPasscodeID);
@@ -153,17 +158,11 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
                    commissionMgr.CommissioningWindowStatus() ==
                        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen);
     NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
-    err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(currentDiscriminator);
-    NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(suite, currentDiscriminator == newDiscriminator);
 
     commissionMgr.CloseCommissioningWindow();
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatus() ==
                        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
-    err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(currentDiscriminator);
-    NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(suite, currentDiscriminator == originDiscriminator);
 }
 
 void CheckCommissioningWindowManagerEnhancedWindow(nlTestSuite * suite, void *)

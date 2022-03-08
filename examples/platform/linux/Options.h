@@ -25,15 +25,20 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <setup_payload/SetupPayload.h>
 
 struct LinuxDeviceOptions
 {
     chip::SetupPayload payload;
+    chip::Optional<std::vector<uint8_t>> paseVerifier;
+    chip::Optional<std::vector<uint8_t>> paseSalt;
+    uint32_t paseIterations             = 0;
     uint32_t mBleDevice                 = 0;
     bool mWiFi                          = false;
     bool mThread                        = false;

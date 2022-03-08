@@ -799,7 +799,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     ChipBLEDeviceIdentificationInfo mDeviceIdInfo = { 0 };
     uint8_t mDeviceIdInfoLength                   = 0;
 
-    chipErr = ConfigurationMgr().GetSetupDiscriminator(discriminator);
+    chipErr = ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
     if (chipErr != CHIP_NO_ERROR)
     {
         return chipErr;

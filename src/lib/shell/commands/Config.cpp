@@ -100,7 +100,7 @@ static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
     streamer_t * sout = streamer_get();
     uint32_t setupPinCode;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupPinCode(setupPinCode));
+    ReturnErrorOnFailure(ConfigurationMgr().GetCommissionableDataProvider()->GetSetupPasscode(setupPinCode));
     if (printHeader)
     {
         streamer_printf(sout, "PinCode:         ");
@@ -119,7 +119,7 @@ static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t setupDiscriminator;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupDiscriminator(setupDiscriminator));
+    ReturnErrorOnFailure(ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(setupDiscriminator));
     if (printHeader)
     {
         streamer_printf(sout, "Discriminator:   ");
@@ -136,7 +136,7 @@ static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
 
     VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < 0xFFF, CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
+    error = ConfigurationMgr().GetCommissionableDataProvider()->SetSetupDiscriminator(setupDiscriminator);
 
     if (error == CHIP_NO_ERROR)
     {

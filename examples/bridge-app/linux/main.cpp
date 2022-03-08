@@ -550,10 +550,10 @@ CHIP_ERROR PrintQRCodeContent()
     uint16_t productId;
     std::string result;
 
-    err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
+    err = ConfigurationMgr().GetCommissionableDataProvider()->GetSetupPasscode(setUpPINCode);
     SuccessOrExit(err);
 
-    err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
+    err = ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(setUpDiscriminator);
     SuccessOrExit(err);
 
     err = ConfigurationMgr().GetVendorId(vendorId);

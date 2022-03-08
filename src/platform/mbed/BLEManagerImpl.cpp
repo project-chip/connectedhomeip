@@ -771,7 +771,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     if (!mFlags.Has(kFlag_UseCustomDeviceName))
     {
         uint16_t discriminator;
-        SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+        SuccessOrExit(err = ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
         memset(mDeviceName, 0, kMaxDeviceNameLength);
         snprintf(mDeviceName, kMaxDeviceNameLength, "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
     }

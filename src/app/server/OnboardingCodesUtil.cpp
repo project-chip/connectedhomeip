@@ -97,17 +97,22 @@ CHIP_ERROR GetSetupPayload(chip::SetupPayload & aSetupPayload, chip::RendezvousI
     aSetupPayload.version               = 0;
     aSetupPayload.rendezvousInformation = aRendezvousFlags;
 
-    err = ConfigurationMgr().GetSetupPinCode(aSetupPayload.setUpPINCode);
+    err = ConfigurationMgr().GetCommissionableDataProvider()->GetSetupPasscode(aSetupPayload.setUpPINCode);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "ConfigurationMgr().GetCommissionableDataProvider()->GetSetupPasscode() failed: %s", chip::ErrorStr(err));
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+        ChipLogProgress(AppServer, "*** Using default EXAMPLE passcode %" PRIu32 " ***", CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE);
+        aSetupPayload.setUpPINCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
+#else
         return err;
+#endif
     }
 
-    err = ConfigurationMgr().GetSetupDiscriminator(aSetupPayload.discriminator);
+    err = ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(aSetupPayload.discriminator);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
+        ChipLogProgress(AppServer, "ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
