@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "OTARequestorStorageImpl.h"
+#include "DefaultOTARequestorStorage.h"
 #include "OTARequestorInterface.h"
 
 #include <lib/core/CHIPConfig.h>
@@ -38,7 +38,7 @@ constexpr size_t kProviderMaxSerializedSize = 19u;
 // Multiply the serialized provider size by the maximum number of fabrics and add 2 bytes for the array start and end.
 constexpr size_t kProviderListMaxSerializedSize = kProviderMaxSerializedSize * CHIP_CONFIG_MAX_FABRICS + 2;
 
-CHIP_ERROR OTARequestorStorageImpl::StoreDefaultProviders(const ProviderLocationList & providers)
+CHIP_ERROR DefaultOTARequestorStorage::StoreDefaultProviders(const ProviderLocationList & providers)
 {
     uint8_t buffer[kProviderListMaxSerializedSize];
     TLV::TLVWriter writer;
@@ -59,7 +59,7 @@ CHIP_ERROR OTARequestorStorageImpl::StoreDefaultProviders(const ProviderLocation
                                                static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-CHIP_ERROR OTARequestorStorageImpl::LoadDefaultProviders(ProviderLocationList & providers)
+CHIP_ERROR DefaultOTARequestorStorage::LoadDefaultProviders(ProviderLocationList & providers)
 {
     uint8_t buffer[kProviderListMaxSerializedSize];
     uint16_t size = sizeof(buffer);
@@ -85,7 +85,7 @@ CHIP_ERROR OTARequestorStorageImpl::LoadDefaultProviders(ProviderLocationList & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTARequestorStorageImpl::StoreCurrentProviderLocation(const ProviderLocationType & provider)
+CHIP_ERROR DefaultOTARequestorStorage::StoreCurrentProviderLocation(const ProviderLocationType & provider)
 {
     uint8_t buffer[kProviderMaxSerializedSize];
     TLV::TLVWriter writer;
@@ -97,12 +97,12 @@ CHIP_ERROR OTARequestorStorageImpl::StoreCurrentProviderLocation(const ProviderL
                                                static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-CHIP_ERROR OTARequestorStorageImpl::ClearCurrentProviderLocation()
+CHIP_ERROR DefaultOTARequestorStorage::ClearCurrentProviderLocation()
 {
     return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator().OTACurrentProvider());
 }
 
-CHIP_ERROR OTARequestorStorageImpl::LoadCurrentProviderLocation(ProviderLocationType & provider)
+CHIP_ERROR DefaultOTARequestorStorage::LoadCurrentProviderLocation(ProviderLocationType & provider)
 {
     uint8_t buffer[kProviderMaxSerializedSize];
     uint16_t size = sizeof(buffer);
@@ -118,18 +118,18 @@ CHIP_ERROR OTARequestorStorageImpl::LoadCurrentProviderLocation(ProviderLocation
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTARequestorStorageImpl::StoreUpdateToken(ByteSpan updateToken)
+CHIP_ERROR DefaultOTARequestorStorage::StoreUpdateToken(ByteSpan updateToken)
 {
     return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator().OTAUpdateToken(), updateToken.data(),
                                                static_cast<uint16_t>(updateToken.size()));
 }
 
-CHIP_ERROR OTARequestorStorageImpl::ClearUpdateToken()
+CHIP_ERROR DefaultOTARequestorStorage::ClearUpdateToken()
 {
     return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator().OTAUpdateToken());
 }
 
-CHIP_ERROR OTARequestorStorageImpl::LoadUpdateToken(MutableByteSpan & updateToken)
+CHIP_ERROR DefaultOTARequestorStorage::LoadUpdateToken(MutableByteSpan & updateToken)
 {
     uint16_t size    = static_cast<uint16_t>(updateToken.size());
     CHIP_ERROR error = mPersistentStorage->SyncGetKeyValue(DefaultStorageKeyAllocator().OTAUpdateToken(), updateToken.data(), size);

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <app/clusters/ota-requestor/OTARequestorStorageImpl.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -31,7 +31,7 @@ namespace {
 void TestDefaultProviders(nlTestSuite * inSuite, void * inContext)
 {
     TestPersistentStorageDelegate persistentStorage;
-    OTARequestorStorageImpl otaStorage;
+    DefaultOTARequestorStorage otaStorage;
     otaStorage.Init(persistentStorage);
 
     const auto makeProvider = [](FabricIndex fabric, NodeId nodeId, EndpointId endpointId) {
@@ -88,7 +88,7 @@ void TestDefaultProviders(nlTestSuite * inSuite, void * inContext)
 void TestDefaultProvidersEmpty(nlTestSuite * inSuite, void * inContext)
 {
     TestPersistentStorageDelegate persistentStorage;
-    OTARequestorStorageImpl otaStorage;
+    DefaultOTARequestorStorage otaStorage;
     otaStorage.Init(persistentStorage);
 
     ProviderLocationList providers = {};
@@ -100,7 +100,7 @@ void TestDefaultProvidersEmpty(nlTestSuite * inSuite, void * inContext)
 void TestCurrentProviderLocation(nlTestSuite * inSuite, void * inContext)
 {
     TestPersistentStorageDelegate persistentStorage;
-    OTARequestorStorageImpl otaStorage;
+    DefaultOTARequestorStorage otaStorage;
     otaStorage.Init(persistentStorage);
 
     OTARequestorStorage::ProviderLocationType provider;
@@ -123,7 +123,7 @@ void TestCurrentProviderLocation(nlTestSuite * inSuite, void * inContext)
 void TestUpdateToken(nlTestSuite * inSuite, void * inContext)
 {
     TestPersistentStorageDelegate persistentStorage;
-    OTARequestorStorageImpl otaStorage;
+    DefaultOTARequestorStorage otaStorage;
     otaStorage.Init(persistentStorage);
 
     constexpr size_t updateTokenLength = 32;
@@ -164,7 +164,7 @@ int TestTearDown(void * inContext)
 
 } // namespace
 
-int TestOTARequestorStorageImpl()
+int TestDefaultOTARequestorStorage()
 {
     nlTestSuite theSuite = { "OTA Storage tests", &sTests[0], TestSetup, TestTearDown };
 
@@ -173,4 +173,4 @@ int TestOTARequestorStorageImpl()
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestOTARequestorStorageImpl)
+CHIP_REGISTER_TEST_SUITE(TestDefaultOTARequestorStorage)

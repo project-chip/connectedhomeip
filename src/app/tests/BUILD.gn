@@ -55,8 +55,8 @@ source_set("binding-test-srcs") {
 source_set("ota-requestor-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/ota-requestor/OTARequestorStorage.h",
-    "${chip_root}/src/app/clusters/ota-requestor/OTARequestorStorageImpl.cpp",
-    "${chip_root}/src/app/clusters/ota-requestor/OTARequestorStorageImpl.h",
+    "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
+    "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.h",
   ]
 
   public_deps = [
@@ -84,7 +84,7 @@ chip_test_suite("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
-    "TestOTARequestorStorageImpl.cpp",
+    "TestDefaultOTARequestorStorage.cpp",
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",

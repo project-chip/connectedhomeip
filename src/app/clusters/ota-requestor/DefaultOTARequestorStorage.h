@@ -24,7 +24,7 @@ namespace chip {
 
 class PersistentStorageDelegate;
 
-class OTARequestorStorageImpl : public OTARequestorStorage
+class DefaultOTARequestorStorage : public OTARequestorStorage
 {
 public:
     void Init(PersistentStorageDelegate & persistentStorage) { mPersistentStorage = &persistentStorage; }
