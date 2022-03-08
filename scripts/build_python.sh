@@ -90,8 +90,8 @@ while (($#)); do
             chip_case_retry_delta=$2
             shift
             ;;
-        --install_whell | -i)
-            install_whell=$2
+        --install_wheel | -i)
+            install_wheel=$2
             shift
             ;;
         -*)
@@ -123,19 +123,17 @@ else
     ninja -C "$OUTPUT_ROOT" python
 fi
 
-if [ "$install_whell" -eq "no" ]; then
+if [ "$enable_pybindings" == true ]; then
+    WHEEL=$(ls "$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl | head -n 1)
+else
+    WHEEL=$(ls "$OUTPUT_ROOT"/controller/python/chip-*.whl | head -n 1)
+fi
+
+if [ "$install_wheel" = "no" ]; then
     exit 0
-elif [ "$install_wheel" ]; then
+elif [ "$install_wheel" = "separate" ]; then
     # Create a virtual environment that has access to the built python tools
     virtualenv --clear "$ENVIRONMENT_ROOT"
-
-    # Activate the new environment to register the python WHL
-
-    if [ "$enable_pybindings" == true ]; then
-        WHEEL=$(ls "$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl | head -n 1)
-    else
-        WHEEL=$(ls "$OUTPUT_ROOT"/controller/python/chip-*.whl | head -n 1)
-    fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate
     "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
@@ -147,7 +145,7 @@ elif [ "$install_wheel" ]; then
     echo ""
     echo_green "To use please run:"
     echo_bold_white "  source $ENVIRONMENT_ROOT/bin/activate"
-elif [ "$install_whell" -eq "build-env" ]; then
+elif [ "$install_wheel" = "build-env" ]; then
     pip install --force-reinstall "$WHEEL"
 
     echo ""

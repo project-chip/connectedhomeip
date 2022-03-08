@@ -257,6 +257,7 @@ jobs:
               run: |
                     scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                     scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug chip_enable_wifi=false
+                    cp out/all_clusters_debug/chip-all-clusters-app objdir-clone/chip-all-clusters-app
             - name: Run Tests
               timeout-minutes: 30
               run: |
@@ -334,6 +335,7 @@ jobs:
               run: |
                     scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                     scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug chip_enable_wifi=false
+                    cp out/all_clusters_debug/chip-all-clusters-app objdir-clone/chip-all-clusters-app
             - name: Run Tests
               timeout-minutes: 30
               run: |

@@ -56,13 +56,16 @@ TEST_DEVICE_NODE_ID = 1
 ALL_TESTS = ['network_commissioning', 'datamodel']
 
 
-def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, device_nodeid):
+def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, address_override, device_nodeid):
     logger.info("Testing discovery")
     address = test.TestDiscovery(discriminator=discriminator)
     FailIfNot(address, "Failed to discover any devices.")
 
     # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
     #           "Failed to finish network commissioning")
+
+    if address_override:
+        address = address_override
 
     logger.info("Testing key exchange")
     FailIfNot(test.TestKeyExchange(ip=address.decode("utf-8"),
@@ -88,6 +91,7 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, devic
 @click.command()
 @click.option("--controller-nodeid", default=TEST_CONTROLLER_NODE_ID, type=int, help="NodeId of the controller.")
 @click.option("--device-nodeid", default=TEST_DEVICE_NODE_ID, type=int, help="NodeId of the device.")
+@click.option("--address", "-a", default='', type=str, help="Skip commissionee discovery, commission the device with the IP directly.")
 @click.option("--timeout", "-t", default=240, type=int, help="The program will return with timeout after specified seconds.")
 @click.option("--discriminator", default=TEST_DISCRIMINATOR, type=int, help="Discriminator of the device.")
 @click.option("--setup-pin", default=TEST_SETUPPIN, type=int, help="Setup pincode of the device.")
@@ -95,7 +99,7 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, devic
 @click.option('--disable-test', default=[], multiple=True, help='The tests to be excluded.')
 @click.option('--log-level', default='WARN', type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']), help="The log level of the test.")
 @click.option('--log-format', default=None, type=str, help="Override logging format")
-def main(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, enable_test, disable_test, log_level, log_format):
+def main(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level, log_format):
     coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
     logger.info("Test Parameters:")
     logger.info(f"\tController NodeId: {controller_nodeid}")
@@ -105,7 +109,7 @@ def main(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, en
     logger.info(f"\tEnabled Tests:     {enable_test}")
     logger.info(f"\tDisabled Tests:    {disable_test}")
     SetTestSet(enable_test, disable_test)
-    do_tests(controller_nodeid, device_nodeid, timeout,
+    do_tests(controller_nodeid, device_nodeid, address, timeout,
              discriminator, setup_pin)
 
 
@@ -163,7 +167,7 @@ def test_datamodel(test: BaseTestHelper, device_nodeid: int):
                                     group=GROUP_ID), "Failed to test on off cluster")
 
 
-def do_tests(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin):
+def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin):
     timeoutTicker = TestTimeout(timeout)
     timeoutTicker.start()
 
@@ -171,10 +175,8 @@ def do_tests(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin
 
     chip.logging.RedirectToPythonLogging()
 
-    commissioning_method = ethernet_commissioning
-
-    commissioning_method(test, discriminator, setup_pin,
-                         device_nodeid)
+    ethernet_commissioning(test, discriminator, setup_pin, address,
+                           device_nodeid)
 
     logger.info("Testing resolve")
     FailIfNot(test.TestResolve(nodeid=device_nodeid),
