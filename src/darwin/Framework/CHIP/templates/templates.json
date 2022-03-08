@@ -22,11 +22,11 @@
         },
         {
             "name": "encode_value",
-            "path": "partials/encode_value.zapt"
+            "path": "../../../../../examples/chip-tool-darwin/templates/partials/encode_value.zapt"
         },
         {
             "name": "decode_value",
-            "path": "partials/decode_value.zapt"
+            "path": "../../../../../examples/chip-tool-darwin/templates/partials/decode_value.zapt"
         },
         {
             "name": "init_struct_member",
@@ -86,16 +86,6 @@
             "path": "CHIPCommandPayloadsObjc-src.zapt",
             "name": "Objc reflections of CHIP command payloads header",
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCommandPayloadsObjc.mm"
-        },
-        {
-            "path": "CHIPTestClustersObjc.zapt",
-            "name": "Test Objc API Header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPTestClustersObjc.h"
-        },
-        {
-            "path": "CHIPTestClustersObjc-src.zapt",
-            "name": "Test Objc API",
-            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPTestClustersObjc.mm"
         },
         {
             "path": "CHIPAttributeTLVValueDecoder-src.zapt",
