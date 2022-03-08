@@ -369,7 +369,6 @@
                                                                     stringWithFormat:@"Removed own Fabric Index %@ with Error %@",
                                                                     params.fabricIndex, error]
                                                         isError:error];
-                                             dispatch_group_leave(removeGroup);
                                          }];
                             });
                         })) {
