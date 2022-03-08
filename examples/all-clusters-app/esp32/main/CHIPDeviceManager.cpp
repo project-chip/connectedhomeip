@@ -26,12 +26,14 @@
 
 #include "CHIPDeviceManager.h"
 #include <app/ConcreteAttributePath.h>
+#include <app/server/Server.h>
 #include <app/util/basic-types.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <setup_payload/SetupPayload.h>
 
+#include "Globals.h"
 #include "esp_log.h"
 
 using namespace ::chip;
@@ -41,6 +43,25 @@ namespace chip {
 namespace DeviceManager {
 
 using namespace ::chip::DeviceLayer;
+
+namespace {
+
+class AppCallbacks : public AppDelegate
+{
+public:
+    void OnRendezvousStarted() override { bluetoothLED.Set(true); }
+    void OnRendezvousStopped() override
+    {
+        bluetoothLED.Set(false);
+        pairingWindowLED.Set(false);
+    }
+    void OnPairingWindowOpened() override { pairingWindowLED.Set(true); }
+    void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
+};
+
+AppCallbacks sCallbacks;
+
+} // namespace
 
 void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -59,10 +80,8 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     mCB                              = cb;
     RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
 
-    ReturnErrorOnFailure(Platform::MemoryInit());
-
-    // Initialize the CHIP stack.
-    ReturnErrorOnFailure(PlatformMgr().InitChipStack());
+    // Init Matter App Server and ZCL Data Model.
+    ReturnErrorOnFailure(MatterServerScheduleInit(&sCallbacks));
 
     if (flags.Has(RendezvousInformationFlag::kBLE))
     {

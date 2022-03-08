@@ -60,8 +60,8 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 class Server
 {
 public:
-    CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
-                    uint16_t unsecureServicePort = CHIP_UDC_PORT, Inet::InterfaceId interfaceId = Inet::InterfaceId::Null());
+    CHIP_ERROR Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
+                    Inet::InterfaceId interfaceId);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
@@ -239,5 +239,18 @@ private:
     uint16_t mUnsecuredServicePort;
     Inet::InterfaceId mInterfaceId;
 };
+
+/**
+ * Initialize the Matter App server and ZCL Data Module.
+ */
+CHIP_ERROR MatterServerInit(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
+                            uint16_t unsecureServicePort  = CHIP_UDC_PORT,
+                            Inet::InterfaceId interfaceId = Inet::InterfaceId::Null());
+
+/**
+ * Schedules a work to initialize the Matter App server and ZCL Data Module in the CHIP context.
+ * This function is normally used in embedded systems which have small stack configuration in main app thread.
+ */
+CHIP_ERROR MatterServerScheduleInit(AppDelegate * delegate = nullptr);
 
 } // namespace chip

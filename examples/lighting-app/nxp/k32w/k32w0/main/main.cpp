@@ -27,6 +27,7 @@
 #include <openthread/error.h>
 #include <openthread/heap.h>
 
+#include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
@@ -75,13 +76,11 @@ extern "C" void main_task(void const * argument)
      * Thread and Weave tasks are using it */
     freertos_mbedtls_mutex_init();
 
-    // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
-
-    CHIP_ERROR ret = PlatformMgr().InitChipStack();
+    // Init Matter App Server and ZCL Data Model
+    CHIP_ERROR ret = MatterServerScheduleInit();
     if (ret != CHIP_NO_ERROR)
     {
-        K32W_LOG("Error during PlatformMgr().InitWeaveStack()");
+        K32W_LOG("Error during Matter App Server and ZCL Data Model initialization");
         goto exit;
     }
 

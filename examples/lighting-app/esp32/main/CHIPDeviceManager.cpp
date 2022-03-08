@@ -26,6 +26,7 @@
 
 #include "CHIPDeviceManager.h"
 #include <app/ConcreteAttributePath.h>
+#include <app/server/Server.h>
 #include <app/util/basic-types.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -51,13 +52,13 @@ void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, 
 
 CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
+    CHIP_ERROR err;
     mCB                              = cb;
     RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
 
-    ReturnErrorOnFailure(Platform::MemoryInit());
-
-    // Initialize the CHIP stack.
-    ReturnErrorOnFailure(PlatformMgr().InitChipStack());
+    // Init Matter App Server and ZCL Data Model
+    err = MatterServerScheduleInit();
+    SuccessOrExit(err);
 
     if (flags.Has(RendezvousInformationFlag::kBLE))
     {
@@ -78,10 +79,15 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
-    PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+    err = PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+    SuccessOrExit(err);
 
     // Start a task to run the CHIP Device event loop.
-    return PlatformMgr().StartEventLoopTask();
+    err = PlatformMgr().StartEventLoopTask();
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
 } // namespace DeviceManager
 } // namespace chip

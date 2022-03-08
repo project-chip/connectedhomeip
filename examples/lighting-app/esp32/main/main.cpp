@@ -32,7 +32,6 @@
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
@@ -74,12 +73,10 @@ static void InitOTARequestor(void)
 #endif
 }
 
-static void InitServer(intptr_t context)
+static void InitNetworkCommissioning(intptr_t context)
 {
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
-
-    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -118,5 +115,5 @@ extern "C" void app_main()
 
     InitOTARequestor();
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitNetworkCommissioning, reinterpret_cast<intptr_t>(nullptr));
 }

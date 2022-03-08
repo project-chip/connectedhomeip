@@ -37,6 +37,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -63,10 +64,8 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     CHIP_ERROR err;
     mCB = cb;
 
-    err = Platform::MemoryInit();
-    SuccessOrExit(err);
-
-    err = PlatformMgr().InitChipStack();
+    // Init Matter App Server and ZCL Data Model
+    err = MatterServerScheduleInit();
     SuccessOrExit(err);
 
     if (CONFIG_NETWORK_LAYER_BLE)
@@ -74,7 +73,8 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
 
-    PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+    err = PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+    SuccessOrExit(err);
 
     // // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();

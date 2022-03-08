@@ -113,9 +113,6 @@ CHIP_ERROR AppTask::Init()
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
 #endif
 
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
-
     // Init OTA engine
     InitializeOTARequestor();
 

@@ -71,17 +71,10 @@ CHIP_ERROR AppTask::Init()
     // Initialize CHIP stack
     LOG_INF("Init CHIP stack");
 
-    CHIP_ERROR err = chip::Platform::MemoryInit();
+    err = MatterServerScheduleInit();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("Platform::MemoryInit() failed");
-        return err;
-    }
-
-    err = PlatformMgr().InitChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("PlatformMgr().InitChipStack() failed");
+        LOG_ERR("Init Matter App Server and ZCL Data Model failed");
         return err;
     }
 
@@ -125,7 +118,6 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init());
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     InitOTARequestor();

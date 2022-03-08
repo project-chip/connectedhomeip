@@ -77,9 +77,6 @@ extern "C" void vApplicationIdleHook(void)
 
 extern "C" void vApplicationDaemonTaskStartupHook()
 {
-    // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
-
     /* Create the Main task. */
     xTaskCreate(main_task, "Main task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, NULL);
 }
@@ -93,10 +90,10 @@ static void main_task(void * pvParameters)
         appError(ret);
     }
 
-    ret = PlatformMgr().InitChipStack();
+    ret = MatterServerScheduleInit();
     if (ret != CHIP_NO_ERROR)
     {
-        P6_LOG("PlatformMgr().InitChipStack() failed");
+        P6_LOG("Init Matter App Server and ZCL Data Model failed");
         appError(ret);
     }
 

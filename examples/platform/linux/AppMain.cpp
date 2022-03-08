@@ -164,6 +164,7 @@ static bool EnsureWiFiIsStarted()
 int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
 #else  // CONFIG_NETWORK_LAYER_BLE
@@ -174,7 +175,18 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
     rendezvousFlags = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
 #endif
 
-    err = Platform::MemoryInit();
+    uint16_t securePort           = CHIP_PORT;
+    uint16_t unsecurePort         = CHIP_UDC_PORT;
+    Inet::InterfaceId interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
+    // use a different service port to make testing possible with other sample devices running on same host
+    securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
+    unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    // Init Matter App Server and ZCL Data Model
+    err = MatterServerInit(nullptr, securePort, unsecurePort, interfaceId);
     SuccessOrExit(err);
 
     err = ParseArguments(argc, argv, customOptions);
@@ -191,9 +203,6 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
     }
     SuccessOrExit(err);
 #endif
-
-    err = DeviceLayer::PlatformMgr().InitChipStack();
-    SuccessOrExit(err);
 
     if (0 != LinuxDeviceOptions::GetInstance().payload.discriminator)
     {
@@ -565,19 +574,6 @@ void ChipLinuxAppMainLoop()
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     Shell::RegisterCommissioneeCommands();
 #endif
-    uint16_t securePort   = CHIP_PORT;
-    uint16_t unsecurePort = CHIP_UDC_PORT;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
-    // use a different service port to make testing possible with other sample devices running on same host
-    securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
-    unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-
-    Inet::InterfaceId interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
-
-    // Init ZCL Data Model and CHIP App Server
-    Server::GetInstance().Init(nullptr, securePort, unsecurePort, interfaceId);
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
@@ -613,6 +609,4 @@ void ChipLinuxAppMainLoop()
 #endif
 
     Server::GetInstance().Shutdown();
-
-    DeviceLayer::PlatformMgr().Shutdown();
 }

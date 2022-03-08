@@ -35,13 +35,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
     static bool matterStackInitialized = false;
     if (!matterStackInitialized)
     {
-        // Might be simpler to do ChipLinuxAppInit() with argc == 0, argv set to
-        // just a fake executable name?
-        VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
-        VerifyOrDie(PlatformMgr().InitChipStack() == CHIP_NO_ERROR);
-
         // ChipLinuxAppMainLoop blocks, and we don't want that here.
-        VerifyOrDie(Server::GetInstance().Init() == CHIP_NO_ERROR);
+        VerifyOrDie(MatterServerInit() == CHIP_NO_ERROR);
 
         ApplicationInit();
 

@@ -54,11 +54,8 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     CHIP_ERROR err;
     mCB = cb;
 
-    err = Platform::MemoryInit();
-    SuccessOrExit(err);
-
-    // Initialize the CHIP stack.
-    err = PlatformMgr().InitChipStack();
+    // Init Matter App Server and ZCL Data Model
+    err = MatterServerScheduleInit();
     SuccessOrExit(err);
 
     if (CONFIG_NETWORK_LAYER_BLE)

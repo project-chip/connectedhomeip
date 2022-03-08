@@ -62,14 +62,6 @@ int AppTask::Init()
         },
         0);
 
-    // Init ZCL Data Model and start server
-    error = Server::GetInstance().Init();
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Server initialization failed: %s", error.AsString());
-        return EXIT_FAILURE;
-    }
-
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();

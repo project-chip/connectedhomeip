@@ -18,6 +18,7 @@
 
 #include "AppTask.h"
 
+#include <app/server/Server.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -33,18 +34,11 @@ int main(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Platform::MemoryInit() failed");
-        goto exit;
-    }
-
     LOG_INF("Init CHIP stack");
-    err = PlatformMgr().InitChipStack();
+    err = MatterServerScheduleInit();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("PlatformMgr().InitChipStack() failed");
+        LOG_ERR("Init Matter App Server and ZCL Data Model failed");
         goto exit;
     }
 

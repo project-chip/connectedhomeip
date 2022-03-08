@@ -119,9 +119,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
-    chip::Platform::MemoryInit();
-
     SuccessOrExit(err = mCommissioningWindowManager.Init(this));
     mCommissioningWindowManager.SetAppDelegate(delegate);
     mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
@@ -343,6 +340,7 @@ void Server::Shutdown()
     mAttributePersister.Shutdown();
     mCommissioningWindowManager.Shutdown();
     mCASESessionManager.Shutdown();
+    DeviceLayer::PlatformMgr().Shutdown();
 
     // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
@@ -412,6 +410,45 @@ exit:
     {
         mFabrics.ReleaseFabricIndex(kMinValidFabricIndex);
     }
+    return err;
+}
+
+static void ServerScheduleInit(intptr_t context)
+{
+    AppDelegate * delegate = reinterpret_cast<AppDelegate *>(context);
+    Server::GetInstance().Init(delegate, CHIP_PORT, CHIP_UDC_PORT, Inet::InterfaceId::Null());
+}
+
+CHIP_ERROR MatterServerInit(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
+                            Inet::InterfaceId interfaceId)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = chip::Platform::MemoryInit();
+    SuccessOrExit(err);
+
+    err = DeviceLayer::PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
+
+    err = Server::GetInstance().Init(delegate, secureServicePort, unsecureServicePort, interfaceId);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR MatterServerScheduleInit(AppDelegate * delegate)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = chip::Platform::MemoryInit();
+    SuccessOrExit(err);
+
+    err = DeviceLayer::PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ServerScheduleInit, reinterpret_cast<intptr_t>(delegate));
+
+exit:
     return err;
 }
 

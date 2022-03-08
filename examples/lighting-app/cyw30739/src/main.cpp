@@ -56,12 +56,6 @@ APPLICATION_START()
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
-    err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("ERROR MemoryInit %ld\n", err.AsInteger());
-    }
-
     result = app_button_init();
     if (result != WICED_SUCCESS)
     {
@@ -73,11 +67,11 @@ APPLICATION_START()
     if (result != WICED_SUCCESS)
         printf("wiced_led_manager_init fail (%d)\n", result);
 
-    printf("Initializing CHIP\n");
-    err = PlatformMgr().InitChipStack();
+    printf("Initializing Matter App Server and ZCL Data Model\n");
+    err = MatterServerScheduleInit();
     if (err != CHIP_NO_ERROR)
     {
-        printf("ERROR InitChipStack %ld\n", err.AsInteger());
+        printf("ERROR Init Matter App Server and ZCL Data Model %ld\n", err.AsInteger());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -134,9 +128,6 @@ void InitApp(intptr_t args)
     ConfigurationMgr().LogDeviceConfig();
 
     PlatformMgrImpl().AddEventHandler(EventHandler, 0);
-
-    /* Start CHIP datamodel server */
-    chip::Server::GetInstance().Init();
 
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 

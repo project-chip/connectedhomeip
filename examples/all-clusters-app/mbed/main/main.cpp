@@ -19,6 +19,7 @@
 #include "AppTask.h"
 
 #include "mbedtls/platform.h"
+#include <app/server/Server.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -45,18 +46,10 @@ int main(int argc, char * argv[])
         goto exit;
     }
 
-    err = chip::Platform::MemoryInit();
+    err = MatterServerScheduleInit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Memory initialization failed: %s", err.AsString());
-        ret = EXIT_FAILURE;
-        goto exit;
-    }
-
-    err = PlatformMgr().InitChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Chip stack initialization failed: %s", err.AsString());
+        ChipLogError(NotSpecified, "Matter App Server and ZCL Data Model initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }

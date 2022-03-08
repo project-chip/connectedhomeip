@@ -110,9 +110,6 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
-
     // Initialize device attestation config
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());

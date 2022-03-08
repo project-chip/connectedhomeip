@@ -134,16 +134,16 @@ int main(void)
     EFR32_LOG("==================================================");
 
     EFR32_LOG("Init CHIP Stack");
-    // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
-    CHIP_ERROR ret = PlatformMgr().InitChipStack();
+    // Init Matter App Server and ZCL Data Model
+    CHIP_ERROR ret = MatterServerScheduleInit();
     if (ret != CHIP_NO_ERROR)
     {
-        EFR32_LOG("PlatformMgr().InitChipStack() failed");
+        EFR32_LOG("Init Matter App Server and ZCL Data Model failed");
         appError(ret);
     }
+
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(BLE_DEV_NAME);
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Initializing OpenThread stack");
@@ -168,11 +168,6 @@ int main(void)
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     EFR32_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
