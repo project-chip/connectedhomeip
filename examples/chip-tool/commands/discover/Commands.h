@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "DiscoverCommand.h"
 #include "AdvertiseCommissionerCommand.h"
+#include "DiscoverCommand.h"
 #include "DiscoverCommissionablesCommand.h"
 #include "DiscoverCommissionersCommand.h"
 #include <lib/address_resolve/AddressResolve.h>

@@ -158,7 +158,7 @@ private:
     uint16_t mUnsecuredPort        = CHIP_UDC_PORT;
     Inet::InterfaceId mInterfaceId = Inet::InterfaceId::Null();
 #ifdef CHIP_CONFIG_TEST
-    const char * mUnsupportedTxtRecord   = nullptr;
+    const char * mUnsupportedTxtRecord = nullptr;
 #endif // CHIP_CONFIG_TEST
 
     /// schedule next discovery expiration
