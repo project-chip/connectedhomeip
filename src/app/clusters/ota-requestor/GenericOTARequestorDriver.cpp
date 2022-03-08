@@ -29,7 +29,6 @@
 // - The provider location passed in AnnounceOTAProviders is used in a single query (possibly retried) and then discarded
 // - Explicitly triggering a query through TriggerImmediateQuery() cancels any in-progress update
 
-
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 

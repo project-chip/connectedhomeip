@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "OTARequestorInterface.h"
 #include "ExtendedOTARequestorDriver.h"
+#include "OTARequestorInterface.h"
 
 namespace chip {
 namespace DeviceLayer {
