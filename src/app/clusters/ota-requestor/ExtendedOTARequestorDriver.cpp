@@ -68,9 +68,17 @@ void ExtendedOTARequestorDriver::PollUserConsentState()
 CHIP_ERROR ExtendedOTARequestorDriver::GetUserConsentSubject(chip::ota::UserConsentSubject & subject,
                                                              const UpdateDescription & update)
 {
-    // mLastUsedProvider has the provider fabric index and endpoint id
-    subject.fabricIndex        = mLastUsedProvider.fabricIndex;
-    subject.providerEndpointId = mLastUsedProvider.endpoint;
+    if (mLastUsedProvider.HasValue())
+    {
+        // mLastUsedProvider has the provider fabric index and endpoint id
+        subject.fabricIndex        = mLastUsedProvider.Value().fabricIndex;
+        subject.providerEndpointId = mLastUsedProvider.Value().endpoint;
+    }
+    else
+    {
+        ChipLogError(SoftwareUpdate, "mLastProvider is empty");
+        return CHIP_ERROR_INTERNAL;
+    }
 
     // TODO: As we cannot use the src/app/Server.h in here so, figure out a way to get the node id.
 
