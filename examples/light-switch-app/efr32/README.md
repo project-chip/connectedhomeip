@@ -302,7 +302,9 @@ combination with JLinkRTTClient as follows:
     chip-tool binding write binding '[{"fabricIndex": 1, "group": 257},{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6} ]' 1 1
     ```
 
-    To acquire the chip-tool node id, read the acl table right after commissioning
+    To acquire the chip-tool node id, read the acl table right after
+    commissioning
+
     ```
     ./connectedhomeip/out/chip-tool/chip-tool accesscontrol read acl <nodeid> 0
     ```
