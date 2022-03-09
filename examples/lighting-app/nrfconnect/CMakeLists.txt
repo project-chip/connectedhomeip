@@ -92,10 +92,7 @@ target_sources(app PRIVATE
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp)
+               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER

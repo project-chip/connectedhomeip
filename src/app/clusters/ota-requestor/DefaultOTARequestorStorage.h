@@ -41,6 +41,7 @@ public:
     CHIP_ERROR LoadUpdateToken(MutableByteSpan & updateToken) override;
 
 private:
+    CHIP_ERROR Load(const char * key, MutableByteSpan & buffer);
     PersistentStorageDelegate * mPersistentStorage = nullptr;
 };
 

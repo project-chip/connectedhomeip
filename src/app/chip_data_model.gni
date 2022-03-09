@@ -131,10 +131,13 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}-server.cpp",
           "${_app_root}/clusters/${cluster}/BDXDownloader.cpp",
           "${_app_root}/clusters/${cluster}/BDXDownloader.h",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestorStorage.cpp",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestorStorage.h",
           "${_app_root}/clusters/${cluster}/DefaultOTARequestorUserConsentProvider.h",
           "${_app_root}/clusters/${cluster}/ExtendedOTARequestorDriver.cpp",
           "${_app_root}/clusters/${cluster}/GenericOTARequestorDriver.cpp",
           "${_app_root}/clusters/${cluster}/OTARequestor.cpp",
+          "${_app_root}/clusters/${cluster}/OTARequestorStorage.h",
         ]
       } else if (cluster == "bindings") {
         sources += [
