@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <lib/core/NodeId.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/NodeId.h>
 
 namespace chip {
 
@@ -78,20 +78,11 @@ public:
     NodeId GetNodeId() const { return mNodeId; }
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
-    bool IsOperational() const
-    {
-        return mFabricIndex != kUndefinedFabricIndex && IsOperationalNodeId(mNodeId);
-    }
+    bool IsOperational() const { return mFabricIndex != kUndefinedFabricIndex && IsOperationalNodeId(mNodeId); }
 
-    bool operator==(const ScopedNodeId & that) const
-    {
-        return (mNodeId == that.mNodeId) && (mFabricIndex== that.mFabricIndex);
-    }
+    bool operator==(const ScopedNodeId & that) const { return (mNodeId == that.mNodeId) && (mFabricIndex == that.mFabricIndex); }
 
-    bool operator!=(const ScopedNodeId & that) const
-    {
-        return !(*this == that);
-    }
+    bool operator!=(const ScopedNodeId & that) const { return !(*this == that); }
 
 private:
     const NodeId mNodeId;

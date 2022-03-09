@@ -66,10 +66,7 @@ public:
     const char * GetSessionTypeString() const override { return "incoming group"; };
 #endif
 
-    ScopedNodeId GetPeer() const override
-    {
-        return ScopedNodeId(mSourceNodeId, GetFabricIndex());
-    }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mSourceNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -136,10 +133,7 @@ public:
     const char * GetSessionTypeString() const override { return "outgoing group"; };
 #endif
 
-    ScopedNodeId GetPeer() const override
-    {
-        return ScopedNodeId();
-    }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {

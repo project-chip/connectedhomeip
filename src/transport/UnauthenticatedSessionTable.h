@@ -74,10 +74,7 @@ public:
     void Retain() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Retain(); }
     void Release() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Release(); }
 
-    ScopedNodeId GetPeer() const override
-    {
-        return ScopedNodeId(kUndefinedNodeId, GetFabricIndex());
-    }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(kUndefinedNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {

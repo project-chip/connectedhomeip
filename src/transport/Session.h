@@ -66,7 +66,7 @@ public:
     virtual void Retain() {}
     virtual void Release() {}
 
-    virtual ScopedNodeId GetPeer() const = 0;
+    virtual ScopedNodeId GetPeer() const                               = 0;
     virtual Access::SubjectDescriptor GetSubjectDescriptor() const     = 0;
     virtual bool RequireMRP() const                                    = 0;
     virtual const ReliableMessageProtocolConfig & GetMRPConfig() const = 0;
