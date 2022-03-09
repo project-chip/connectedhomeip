@@ -189,9 +189,31 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
-    // TODO: Choose active/idle timeout corresponding to the activity of exchanges of the session.
-    entry->nextRetransTime =
-        System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout;
+#define MRP_BACKOFF_JITTER_BASE 1000
+#define MRP_BACKOFF_BASE_NUMERATOR 16
+#define MRP_BACKOFF_BASE_DENOMENATOR 10
+
+    // TODO(#15800): Choose active/idle timeout corresponding to the activity of exchanges of the session.
+    System::Clock::Timestamp backoff = entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout;
+
+    // Generate fixed point equivalent of 1.6^retryCount
+    unsigned retryCount   = entry->sendCount - 1;
+    unsigned backoffNum   = 1;
+    unsigned backoffDenom = 1;
+
+    for (unsigned i = 0; i < retryCount; i++)
+    {
+        backoffNum *= MRP_BACKOFF_BASE_NUMERATOR;
+        backoffDenom *= MRP_BACKOFF_BASE_DENOMENATOR;
+    }
+
+    backoff = backoff * backoffNum / backoffDenom;
+
+    // Generate jitter as random multiplier from 1.000 to 1.250:
+    unsigned jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU16() % 250;
+    backoff         = backoff * jitter / MRP_BACKOFF_JITTER_BASE;
+
+    entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + backoff;
     StartTimer();
 }
 
