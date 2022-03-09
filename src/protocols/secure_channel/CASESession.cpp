@@ -1274,7 +1274,8 @@ CHIP_ERROR CASESession::ValidatePeerIdentity(const ByteSpan & peerNOC, const Byt
     ReturnErrorOnFailure(SetEffectiveTime());
 
     FabricId peerNOCFabricId;
-    ReturnErrorOnFailure(mFabricInfo->VerifyCredentials(peerNOC, peerICAC, mValidContext, peerNOCFabricId, peerNodeId, peerPublicKey));
+    ReturnErrorOnFailure(
+        mFabricInfo->VerifyCredentials(peerNOC, peerICAC, mValidContext, peerNOCFabricId, peerNodeId, peerPublicKey));
 
     VerifyOrReturnError(mFabricInfo->GetFabricId() == peerNOCFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
 

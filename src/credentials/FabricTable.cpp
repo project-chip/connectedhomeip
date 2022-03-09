@@ -198,7 +198,7 @@ CHIP_ERROR FabricInfo::ComputeCompressedFabricId()
 CHIP_ERROR FabricInfo::BuildNewFabric(FabricId fabricId, NodeId nodeId, const chip::ByteSpan & rootCert, FabricInfo & result)
 {
     result.mFabricId = fabricId;
-    result.mNodeId = nodeId;
+    result.mNodeId   = nodeId;
     result.SetRootCert(rootCert);
     ReturnErrorOnFailure(result.ComputeCompressedFabricId());
     return CHIP_NO_ERROR;
