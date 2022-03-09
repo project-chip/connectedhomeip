@@ -159,7 +159,9 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
-        .dnsCache          = &mDNSCache,
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        .dnsCache = &mDNSCache,
+#endif
         .devicePool        = &mDevicePool,
     };
 

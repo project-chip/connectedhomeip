@@ -109,10 +109,13 @@ Server::Server() :
             .fabricTable    = &mFabrics,
             .clientPool     = &mCASEClientPool,
         },
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
         .dnsCache          = nullptr,
+#endif
         .devicePool        = &mDevicePool,
-    }), mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage),
-    mAttributePersister(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
+    }),
+    mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage), mAttributePersister(mDeviceStorage),
+    mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,

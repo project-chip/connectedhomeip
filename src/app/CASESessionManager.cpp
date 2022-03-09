@@ -31,7 +31,12 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
 {
     Dnssd::ResolvedNodeData resolutionData;
 
-    bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
+    bool nodeIDWasResolved =
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
+#else
+        false;
+#endif
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
@@ -84,6 +89,7 @@ void CASESessionManager::ReleaseAllSessions()
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr)
 {
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     if (mConfig.dnsCache != nullptr)
     {
         Dnssd::ResolvedNodeData resolutionData;
@@ -95,6 +101,7 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddr
             return CHIP_NO_ERROR;
         }
     }
+#endif
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);

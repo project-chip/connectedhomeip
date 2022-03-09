@@ -16151,7 +16151,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> mValue;
 };
 
 class WriteTestClusterBitmap16 : public WriteAttribute
@@ -16177,7 +16177,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> mValue;
 };
 
 class WriteTestClusterBitmap32 : public WriteAttribute
@@ -16203,7 +16203,7 @@ public:
     }
 
 private:
-    uint32_t mValue;
+    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> mValue;
 };
 
 class WriteTestClusterBitmap64 : public WriteAttribute
@@ -16229,7 +16229,7 @@ public:
     }
 
 private:
-    uint64_t mValue;
+    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> mValue;
 };
 
 class WriteTestClusterInt8u : public WriteAttribute
@@ -17428,7 +17428,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
+    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableBitmap16 : public WriteAttribute
@@ -17455,7 +17455,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint16_t> mValue;
+    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableBitmap32 : public WriteAttribute
@@ -17482,7 +17482,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint32_t> mValue;
+    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableBitmap64 : public WriteAttribute
@@ -17509,7 +17509,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint64_t> mValue;
+    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> mValue;
 };
 
 class WriteTestClusterNullableInt8u : public WriteAttribute

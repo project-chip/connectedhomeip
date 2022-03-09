@@ -355,7 +355,9 @@ protected:
 
     CASESessionManager * mCASESessionManager = nullptr;
 
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> mDNSCache;
+#endif
     CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
     OperationalDeviceProxyPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES> mDevicePool;
 
