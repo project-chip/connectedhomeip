@@ -18,7 +18,7 @@ scripts/examples/gn_build_example.sh examples/chip-tool out/
 
 echo "Test" >"$FIRMWARE_BIN"
 
-rm /tmp/chip_*
+rm -r /tmp/chip_*
 
 ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 "$FIRMWARE_BIN" "$FIRMWARE_OTA"
 
