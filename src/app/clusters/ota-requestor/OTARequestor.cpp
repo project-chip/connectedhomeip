@@ -20,6 +20,7 @@
  * OTA Requestor logic is contained in this class.
  */
 
+#include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
@@ -99,6 +100,17 @@ void SetRequestorInstance(OTARequestorInterface * instance)
 OTARequestorInterface * GetRequestorInstance()
 {
     return globalOTARequestorInstance;
+}
+
+void OTARequestor::InitState(intptr_t context)
+{
+    OTARequestor * requestorCore = reinterpret_cast<OTARequestor *>(context);
+    VerifyOrDie(requestorCore != nullptr);
+
+    // This results in the initial periodic timer kicking off
+    requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+
+    OtaRequestorServerSetUpdateStateProgress(app::DataModel::NullNullable);
 }
 
 void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
