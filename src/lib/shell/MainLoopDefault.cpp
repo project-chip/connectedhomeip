@@ -24,12 +24,12 @@
 #include <ctype.h>
 #include <string.h>
 
-using ::std::ptrdiff_t;
 using chip::FormatCHIPError;
 using chip::Platform::MemoryAlloc;
 using chip::Platform::MemoryFree;
 using chip::Shell::Engine;
 using chip::Shell::streamer_get;
+using ::std::ptrdiff_t;
 
 namespace {
 
