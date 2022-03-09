@@ -121,7 +121,8 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
     case UpdateNotFoundReason::NotAvailable:
         // IMPLEMENTATION CHOICE:
         // This implementation schedules a query only if a different provider is available
-        if ((DetermineProviderLocation(providerLocation) != true) || ProviderLocationsEqual(providerLocation, mLastUsedProvider))
+        if ((DetermineProviderLocation(providerLocation) != true) ||
+            (mLastUsedProvider.HasValue() && ProviderLocationsEqual(providerLocation, mLastUsedProvider.Value())))
         {
             willTryAnotherQuery = false;
         }
@@ -130,7 +131,7 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
             willTryAnotherQuery = true;
         }
         mRequestor->SetCurrentProviderLocation(providerLocation);
-        mLastUsedProvider = providerLocation;
+        mLastUsedProvider.SetValue(providerLocation);
         break;
 
     default:
@@ -258,7 +259,7 @@ void GenericOTARequestorDriver::ProcessAnnounceOTAProviders(
 
     // Point the OTARequestor to the announced provider
     mRequestor->SetCurrentProviderLocation(providerLocation);
-    mLastUsedProvider = providerLocation;
+    mLastUsedProvider.SetValue(providerLocation);
 
     ScheduleDelayedAction(System::Clock::Seconds32(secToStart), StartDelayTimerHandler, this);
 }
@@ -290,7 +291,7 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
     }
 
     mRequestor->SetCurrentProviderLocation(providerLocation);
-    mLastUsedProvider = providerLocation;
+    mLastUsedProvider.SetValue(providerLocation);
 
     SendQueryImage();
 }
@@ -320,17 +321,39 @@ void GenericOTARequestorDriver::StopDefaultProviderTimer()
         this);
 }
 
-// Returns the next available Provider location
+/**
+ * Returns the next available Provider location. The algorithm is to simply loop through the list of DefaultOtaProviders and return
+ * the next value (based on the last used provider). If no suitable candidate is found, FALSE is returned.
+ */
+
 bool GenericOTARequestorDriver::DetermineProviderLocation(ProviderLocation::Type & providerLocation)
 {
+    // Iterate through the default providers list and find the last used provider. If found, return the provider after it
     auto iterator = mRequestor->GetDefaultOTAProviderListIterator();
-    while (iterator.Next())
+    while (mLastUsedProvider.HasValue() && iterator.Next())
     {
-        // For now, just return the first one
+        if (ProviderLocationsEqual(iterator.GetValue(), mLastUsedProvider.Value()))
+        {
+            if (iterator.Next())
+            {
+                providerLocation = iterator.GetValue();
+                return true;
+            }
+        }
+    }
+
+    // If no suitable candidate found, return the first element of the default providers list or an error
+    iterator = mRequestor->GetDefaultOTAProviderListIterator();
+    if (iterator.Next())
+    {
         providerLocation = iterator.GetValue();
         return true;
     }
-
+    else
+    {
+        ChipLogError(SoftwareUpdate, "No suitable OTA Provider candidate found");
+        return false;
+    }
     return false;
 }
 
