@@ -340,7 +340,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
             Events::StartUp::Type event{ softwareVersion };
             EventNumber eventNumber;
 
-            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent);
+            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
             if (CHIP_NO_ERROR != err)
             {
                 ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record StartUp event: %" CHIP_ERROR_FORMAT, err.Format());
@@ -359,7 +359,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
             Events::ShutDown::Type event;
             EventNumber eventNumber;
 
-            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent);
+            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
             if (CHIP_NO_ERROR != err)
             {
                 ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record ShutDown event: %" CHIP_ERROR_FORMAT, err.Format());

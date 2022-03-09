@@ -740,15 +740,21 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params)
+{
+    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
+}
+
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode)
 {
-    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode);
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
 {
-    CommissioningParameters commissioningParams;
-    return PairDevice(remoteDeviceId, params, commissioningParams);
+    ReturnErrorOnFailure(EstablishPASEConnection(remoteDeviceId, params));
+    return Commission(remoteDeviceId);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
@@ -756,6 +762,11 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 {
     ReturnErrorOnFailure(EstablishPASEConnection(remoteDeviceId, rendezvousParams));
     return Commission(remoteDeviceId, commissioningParams);
+}
+
+CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode)
+{
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly);
 }
 
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
@@ -869,6 +880,12 @@ exit:
 
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningParameters & params)
 {
+    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
+    return Commission(remoteDeviceId);
+}
+
+CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
+{
     // TODO(cecille): Can we get rid of mDeviceBeingCommissioned and use the remote id instead? Would require storing the
     // commissioning stage in the device.
     CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
@@ -884,18 +901,12 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    if (!params.GetWiFiCredentials().HasValue() && !params.GetThreadOperationalDataset().HasValue() && !mIsIPRendezvous)
-    {
-        ChipLogError(Controller, "Network commissioning parameters are required for BLE auto commissioning.");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
     ChipLogProgress(Controller, "Commission called for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
 
     mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
                                             OnSessionEstablishmentTimeoutCallback, this);
 
     mDefaultCommissioner->SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
-    ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
     if (device->IsSecureConnected())
     {
         mDefaultCommissioner->StartCommissioning(this, device);

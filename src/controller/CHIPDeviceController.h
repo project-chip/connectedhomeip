@@ -465,6 +465,7 @@ public:
      * @param[in] setUpCode             The setup code for connecting to the device
      */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & CommissioningParameters);
 
     /**
      * @brief
@@ -510,6 +511,26 @@ public:
 
     /**
      * @brief
+     *   Start establishing a PASE connection with a node for the purposes of commissioning.
+     *   Commissioners that wish to use the auto-commissioning functions should use the
+     *   supplied "PairDevice" functions above to automatically establish a connection then
+     *   perform commissioning. This function is intended to be used by commissioners that
+     *   are not using the supplied auto-commissioner.
+     *
+     *   This function is non-blocking. PASE is established once the DevicePairingDelegate
+     *   receives the OnPairingComplete call.
+     *
+     *   PASE connections can only be established with nodes that have their commissioning
+     *   window open. The PASE connection will fail if this window is not open and in that case
+     *   OnPairingComplete will be called with an error.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] setUpCode             The setup code for connecting to the device
+     */
+    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode);
+
+    /**
+     * @brief
      *   Start the auto-commissioning process on a node after establishing a PASE connection.
      *   This function is intended to be used in conjunction with the EstablishPASEConnection
      *   function. It can be called either before or after the DevicePairingDelegate receives
@@ -521,6 +542,7 @@ public:
      * @param[in] params                The commissioning parameters
      */
     CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
+    CHIP_ERROR Commission(NodeId remoteDeviceId);
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
