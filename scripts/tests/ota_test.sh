@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 PASSCODE=${1:-20202021}
-DISCRIMINATOR=${2:-42}
-UDP_PORT=${3:-5560}
+DISCRIMINATOR=${2:- $RANDOM % 4096 + 1 }
+UDP_PORT=${3:- $RANDOM % 59535 + 6000 }
 OTA_DOWNLOAD_PATH=${4:-"/tmp/test.bin"}
 
 FIRMWARE_BIN="my-firmware.bin"
@@ -24,7 +24,7 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux "$OTA_PROVI
 
 echo "Test" >"$FIRMWARE_BIN"
 
-rm /tmp/chip_*
+rm -r /tmp/chip_*
 
 ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 "$FIRMWARE_BIN" "$FIRMWARE_OTA"
 
