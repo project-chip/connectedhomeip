@@ -1401,3 +1401,8 @@ kManage
 kOperate
 kView
 xFFFFFFFD
+NAMESERVER
+UTF
+localedef
+nameserver
+nmcli
