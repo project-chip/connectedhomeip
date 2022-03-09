@@ -179,8 +179,7 @@ public:
     }
 
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context,
-                                 FabricId & fabricId, NodeId & nodeId, CompressedFabricId & compressedFabricId,
-                                 Crypto::P256PublicKey & pubkey) const;
+                                 FabricId & fabricId, NodeId & nodeId, Crypto::P256PublicKey & pubkey) const;
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -202,11 +201,8 @@ public:
 
     CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
 
-    /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
-       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
-       output parameter */
-    static CHIP_ERROR ComputeCompressedFabricId(FabricId fabricId, NodeId nodeId,
-                                                const Credentials::P256PublicKeySpan & rootPubkeySpan, CompressedFabricId & result);
+    /* Compute and cache compressedFabricId, using mFabricId and root pubkey. Store it in mCompressedFabricId */
+    CHIP_ERROR ComputeCompressedFabricId();
 
     /* A test-only function, to build a fabric used in tests. Returns a fabric which can be added into a fabric table. */
     static CHIP_ERROR BuildNewFabric(FabricId fabricId, NodeId nodeId, const chip::ByteSpan & cert, FabricInfo & result);
