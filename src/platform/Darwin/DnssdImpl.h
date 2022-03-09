@@ -49,7 +49,7 @@ struct RegisterContext : public GenericContext
 
     RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext)
     {
-        type = ContextType::Register;
+        type     = ContextType::Register;
         context  = cbContext;
         callback = cb;
 
@@ -85,9 +85,9 @@ struct ResolveContext : public GenericContext
 
     ResolveContext(void * cbContext, DnssdResolveCallback cb, const char * cbContextName, chip::Inet::IPAddressType cbAddressType)
     {
-        type     = ContextType::Resolve;
-        context  = cbContext;
-        callback = cb;
+        type        = ContextType::Resolve;
+        context     = cbContext;
+        callback    = cb;
         addressType = cbAddressType;
 
         static constexpr ::std::size_t nameEndIdx = sizeof(name) - 1;
