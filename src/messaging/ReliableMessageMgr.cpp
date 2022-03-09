@@ -197,8 +197,8 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
     System::Clock::Timestamp backoff = entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout;
 
     // Generate fixed point equivalent of 1.6^retryCount
-    unsigned retryCount = entry->sendCount - 1;
-    unsigned backoffNum = 1;
+    unsigned retryCount   = entry->sendCount - 1;
+    unsigned backoffNum   = 1;
     unsigned backoffDenom = 1;
 
     for (unsigned i = 0; i < retryCount; i++)
@@ -211,7 +211,7 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 
     // Generate jitter as random multiplier from 1.000 to 1.250:
     unsigned jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU16() % 250;
-    backoff = backoff * jitter / MRP_BACKOFF_JITTER_BASE;
+    backoff         = backoff * jitter / MRP_BACKOFF_JITTER_BASE;
 
     entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + backoff;
     StartTimer();
