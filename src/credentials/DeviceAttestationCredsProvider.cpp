@@ -81,5 +81,9 @@ void SetDeviceAttestationCredentialsProvider(DeviceAttestationCredentialsProvide
     gDacProvider = provider;
 }
 
+bool IsDeviceAttestationCredentialsProviderSet() {
+    return (gDacProvider != &gDefaultDACProvider);
+}
+
 } // namespace Credentials
 } // namespace chip

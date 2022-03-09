@@ -53,6 +53,8 @@ shared_library("jni") {
     "java/TVApp-JNI.cpp",
     "java/WakeOnLanManager.cpp",
     "java/WakeOnLanManager.h",
+    "java/JNIDACProvider.cpp",
+    "java/JNIDACProvider.h",
   ]
 
   deps = [
@@ -107,6 +109,8 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/TvAppCallback.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/DACProvider.java",
+    "java/src/com/tcl/chip/tvapp/DACProviderStub.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
