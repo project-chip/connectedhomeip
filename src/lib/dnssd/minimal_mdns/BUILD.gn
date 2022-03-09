@@ -41,8 +41,6 @@ config("config") {
 
 static_library("minimal_mdns") {
   sources = [
-    "ActiveResolveAttempts.cpp",
-    "ActiveResolveAttempts.h",
     "Parser.cpp",
     "Parser.h",
     "Query.h",

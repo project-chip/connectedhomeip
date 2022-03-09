@@ -111,21 +111,28 @@ protected:
     CHIP_ERROR ReportAttribute(ChipDevice * device, std::vector<chip::EndpointId> endpointIds,
                                std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
                                chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
-                               uint16_t maxInterval                                   = 0,
-                               const chip::Optional<chip::DataVersion> & aDataVersion = chip::NullOptional)
+                               uint16_t maxInterval                                                = 0,
+                               const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional)
     {
-        const size_t clusterCount   = clusterIds.size();
-        const size_t attributeCount = attributeIds.size();
-        const size_t endpointCount  = endpointIds.size();
+        const size_t clusterCount      = clusterIds.size();
+        const size_t attributeCount    = attributeIds.size();
+        const size_t endpointCount     = endpointIds.size();
+        const size_t dataVersionsCount = dataVersions.HasValue() ? dataVersions.Value().size() : 0;
 
         VerifyOrReturnError(clusterCount > 0 && clusterCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(attributeCount > 0 && attributeCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(endpointCount > 0 && endpointCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(dataVersionsCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
 
-        const bool hasSameIdsCount    = (clusterCount == attributeCount) && (clusterCount == endpointCount);
-        const bool multipleClusters   = clusterCount > 1 && attributeCount == 1 && endpointCount == 1;
-        const bool multipleAttributes = attributeCount > 1 && clusterCount == 1 && endpointCount == 1;
-        const bool multipleEndpoints  = endpointCount > 1 && clusterCount == 1 && attributeCount == 1;
+        const bool hasSameIdsCount = (clusterCount == attributeCount) && (clusterCount == endpointCount) &&
+            (dataVersionsCount == 0 || clusterCount == dataVersionsCount);
+        const bool multipleClusters =
+            clusterCount > 1 && attributeCount == 1 && endpointCount == 1 && (dataVersionsCount == 0 || dataVersionsCount == 1);
+        const bool multipleAttributes =
+            attributeCount > 1 && clusterCount == 1 && endpointCount == 1 && (dataVersionsCount == 0 || dataVersionsCount == 1);
+        const bool multipleEndpoints =
+            endpointCount > 1 && clusterCount == 1 && attributeCount == 1 && (dataVersionsCount == 0 || dataVersionsCount == 1);
+        const bool multipleDataVersions = dataVersionsCount > 1 && clusterCount == 1 && attributeCount == 1 && endpointCount == 1;
 
         size_t pathsCount = 0;
         if (hasSameIdsCount)
@@ -144,6 +151,10 @@ protected:
         {
             pathsCount = endpointCount;
         }
+        else if (multipleDataVersions)
+        {
+            pathsCount = dataVersionsCount;
+        }
         else
         {
             ChipLogError(
@@ -157,11 +168,11 @@ protected:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        chip::app::AttributePathParams attributePathParams[kMaxAllowedPaths];
-        chip::app::DataVersionFilter dataVersionFilter[kMaxAllowedPaths];
-
         ChipLogProgress(chipTool, "Sending %sAttribute to:",
                         interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read");
+
+        chip::app::AttributePathParams attributePathParams[kMaxAllowedPaths];
+        chip::app::DataVersionFilter dataVersionFilter[kMaxAllowedPaths];
         for (size_t i = 0; i < pathsCount; i++)
         {
             chip::ClusterId clusterId     = clusterIds.at((hasSameIdsCount || multipleClusters) ? i : 0);
@@ -174,11 +185,12 @@ protected:
             attributePathParams[i].mAttributeId = attributeId;
             attributePathParams[i].mEndpointId  = endpointId;
 
-            if (aDataVersion.HasValue())
+            if (dataVersions.HasValue())
             {
+                chip::DataVersion dataVersion    = dataVersions.Value().at((hasSameIdsCount || multipleDataVersions) ? i : 0);
                 dataVersionFilter[i].mEndpointId = endpointId;
                 dataVersionFilter[i].mClusterId  = clusterId;
-                dataVersionFilter[i].mDataVersion.SetValue(aDataVersion.Value());
+                dataVersionFilter[i].mDataVersion.SetValue(dataVersion);
             }
         }
 
@@ -193,7 +205,7 @@ protected:
             params.mIsFabricFiltered = mFabricFiltered.Value();
         }
 
-        if (aDataVersion.HasValue())
+        if (dataVersions.HasValue())
         {
             params.mpDataVersionFilterList    = dataVersionFilter;
             params.mDataVersionFilterListSize = pathsCount;
@@ -344,7 +356,7 @@ public:
 private:
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::AttributeId> mAttributeIds;
-    chip::Optional<chip::DataVersion> mDataVersion;
+    chip::Optional<std::vector<chip::DataVersion>> mDataVersion;
 };
 
 class SubscribeAttribute : public ReportCommand
@@ -425,7 +437,7 @@ private:
 
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    chip::Optional<chip::DataVersion> mDataVersion;
+    chip::Optional<std::vector<chip::DataVersion>> mDataVersion;
     bool mWait;
 };
 

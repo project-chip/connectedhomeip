@@ -183,6 +183,10 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, &mDeviceStorage, &GetFabricTable());
     SuccessOrExit(err);
 
+    err = mFabricDelegate.Init(&mSessions);
+    SuccessOrExit(err);
+    mFabrics.AddFabricDelegate(&mFabricDelegate);
+
     err = mExchangeMgr.Init(&mSessions);
     SuccessOrExit(err);
     err = mMessageCounterManager.Init(&mExchangeMgr);

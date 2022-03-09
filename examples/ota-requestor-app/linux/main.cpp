@@ -17,11 +17,12 @@
  */
 
 #include "AppMain.h"
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/DefaultOTARequestorUserConsentProvider.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/ExtendedOTARequestorDriver.h"
-#include "platform/Linux/OTAImageProcessorImpl.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsentProvider.h>
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/Linux/OTAImageProcessorImpl.h>
 
 using chip::BDXDownloader;
 using chip::ByteSpan;
@@ -48,6 +49,7 @@ using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 OTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
 DeviceLayer::ExtendedOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
@@ -99,7 +101,8 @@ static void InitOTARequestor(void)
     // Periodic query timeout must be set prior to requestor being initialized
     gRequestorUser.SetPeriodicQueryTimeout(gPeriodicQueryTimeoutSec);
 
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at

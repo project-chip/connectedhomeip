@@ -310,7 +310,6 @@ DeviceCommissioner gCommissioner;
 CommissionerDiscoveryController gCommissionerDiscoveryController;
 MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
-SimpleFabricStorage gFabricStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
 
@@ -319,9 +318,6 @@ CHIP_ERROR InitCommissioner()
     Controller::FactoryInitParams factoryParams;
     Controller::SetupParams params;
 
-    ReturnErrorOnFailure(gFabricStorage.Initialize(&gServerStorage));
-
-    factoryParams.fabricStorage = &gFabricStorage;
     // use a different listen port for the commissioner than the default used by chip-tool.
     factoryParams.listenPort               = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
     factoryParams.fabricIndependentStorage = &gServerStorage;

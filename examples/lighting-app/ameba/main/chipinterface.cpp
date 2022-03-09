@@ -42,10 +42,11 @@
 #include <lwip_netconf.h>
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/Ameba/AmebaOTAImageProcessor.h"
-#include "platform/GenericOTARequestorDriver.h"
+#include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/Ameba/AmebaOTAImageProcessor.h>
 #endif
 
 using namespace ::chip;
@@ -76,6 +77,7 @@ static DeviceCallbacks EchoCallbacks;
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
 OTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 AmebaOTAImageProcessor gImageProcessor;
@@ -100,8 +102,10 @@ static void InitOTARequestor(void)
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
+    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+
     // Set server instance used for session establishment
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
     // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.

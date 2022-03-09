@@ -484,18 +484,13 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
 
 CHIP_ERROR OTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
 {
-    // Remove all entries for the fabric index indicated
-    auto iterator = mDefaultOtaProviderList.Begin();
-    while (iterator.Next())
-    {
-        ProviderLocation::Type pl = iterator.GetValue();
-        if (pl.GetFabricIndex() == fabricIndex)
-        {
-            mDefaultOtaProviderList.Delete(pl);
-        }
-    }
+    CHIP_ERROR error = mDefaultOtaProviderList.Delete(fabricIndex);
 
-    return CHIP_NO_ERROR;
+    // Ignore the error if no entry for the associated fabric index has been found.
+    ReturnErrorCodeIf(error == CHIP_ERROR_NOT_FOUND, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(error);
+
+    return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);
 }
 
 CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocation::Type & providerLocation)
@@ -514,7 +509,7 @@ CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocation::Type & pr
 
     ReturnErrorOnFailure(mDefaultOtaProviderList.Add(providerLocation));
 
-    return CHIP_NO_ERROR;
+    return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);
 }
 
 void OTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTAChangeReasonEnum reason)

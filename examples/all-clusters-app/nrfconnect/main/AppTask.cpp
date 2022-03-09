@@ -149,7 +149,8 @@ void AppTask::InitOTARequestor()
     mOTAImageProcessor.SetOTADownloader(&mBDXDownloader);
     mBDXDownloader.SetImageProcessorDelegate(&mOTAImageProcessor);
     mOTARequestorDriver.Init(&mOTARequestor, &mOTAImageProcessor);
-    mOTARequestor.Init(&chip::Server::GetInstance(), &mOTARequestorDriver, &mBDXDownloader);
+    mOTARequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    mOTARequestor.Init(chip::Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mBDXDownloader);
     chip::SetRequestorInstance(&mOTARequestor);
 #endif
 }

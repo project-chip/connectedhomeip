@@ -54,7 +54,6 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     }
 
     mListenPort               = params.listenPort;
-    mFabricStorage            = params.fabricStorage;
     mFabricIndependentStorage = params.fabricIndependentStorage;
 
     CHIP_ERROR err = InitSystemState(params);
@@ -145,7 +144,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
-    ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
+    ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+
+    auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>(stateParams.sessionMgr);
+    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(delegate.get()));
+    delegate.release();
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
                                                       stateParams.messageCounterManager, params.fabricIndependentStorage,
@@ -269,7 +272,6 @@ void DeviceControllerFactory::Shutdown()
         chip::Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
-    mFabricStorage            = nullptr;
     mFabricIndependentStorage = nullptr;
 }
 

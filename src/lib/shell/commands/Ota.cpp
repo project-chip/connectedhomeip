@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
-#include <platform/OTARequestorInterface.h>
 
 using namespace chip::DeviceLayer;
 

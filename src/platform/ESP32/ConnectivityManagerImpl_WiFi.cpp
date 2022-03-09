@@ -402,8 +402,10 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
             // Set a default station configuration.
             wifi_config_t wifiConfig;
             memset(&wifiConfig, 0, sizeof(wifiConfig));
-            memcpy(wifiConfig.sta.ssid, CONFIG_DEFAULT_WIFI_SSID, strlen(CONFIG_DEFAULT_WIFI_SSID) + 1);
-            memcpy(wifiConfig.sta.password, CONFIG_DEFAULT_WIFI_PASSWORD, strlen(CONFIG_DEFAULT_WIFI_PASSWORD) + 1);
+            memcpy(wifiConfig.sta.ssid, CONFIG_DEFAULT_WIFI_SSID,
+                   std::min(sizeof(wifiConfig.sta.ssid), strlen(CONFIG_DEFAULT_WIFI_SSID)));
+            memcpy(wifiConfig.sta.password, CONFIG_DEFAULT_WIFI_PASSWORD,
+                   std::min(sizeof(wifiConfig.sta.password), strlen(CONFIG_DEFAULT_WIFI_PASSWORD)));
             wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
             wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
             esp_err_t err              = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);

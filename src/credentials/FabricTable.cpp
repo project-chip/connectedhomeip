@@ -41,7 +41,7 @@ CHIP_ERROR FabricInfo::SetFabricLabel(const CharSpan & fabricLabel)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::CommitToStorage(FabricStorage * storage)
+CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -102,7 +102,7 @@ CHIP_ERROR FabricInfo::CommitToStorage(FabricStorage * storage)
         memcpy(info->mNOCCert, mNOCCert.data(), mNOCCert.size());
     }
 
-    err = storage->SyncStore(mFabric, key, info, sizeof(StorableFabricInfo));
+    err = storage->SyncSetKeyValue(key, info, sizeof(StorableFabricInfo));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue: %s", chip::ErrorStr(err));
@@ -116,7 +116,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
+CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     char key[kKeySize];
@@ -132,7 +132,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
     size_t stringLength;
     NodeId nodeId;
 
-    SuccessOrExit(err = storage->SyncLoad(mFabric, key, info, infoSize));
+    SuccessOrExit(err = storage->SyncGetKeyValue(key, info, infoSize));
 
     id          = info->mFabricIndex;
     mVendorId   = Encoding::LittleEndian::HostSwap16(info->mVendorId);
@@ -210,14 +210,14 @@ CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId *
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::DeleteFromStorage(FabricStorage * storage, FabricIndex fabricIndex)
+CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     char key[kKeySize];
     ReturnErrorOnFailure(GenerateKey(fabricIndex, key, sizeof(key)));
 
-    err = storage->SyncDelete(fabricIndex, key);
+    err = storage->SyncDeleteKeyValue(key);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Discovery, "Fabric %d is not yet configured", fabricIndex);
@@ -399,6 +399,20 @@ CHIP_ERROR FabricInfo::MatchDestinationID(const ByteSpan & targetDestinationId, 
         }
     }
     return CHIP_ERROR_CERT_NOT_TRUSTED;
+}
+
+FabricTable::~FabricTable()
+{
+    FabricTableDelegate * delegate = mDelegate;
+    while (delegate)
+    {
+        FabricTableDelegate * temp = delegate->mNext;
+        if (delegate->mOwnedByFabricTable)
+        {
+            chip::Platform::Delete(delegate);
+        }
+        delegate = temp;
+    }
 }
 
 void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
@@ -629,6 +643,7 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
             mFabricCount--;
         }
         ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", index);
+
         FabricTableDelegate * delegate = mDelegate;
         while (delegate)
         {
@@ -648,9 +663,10 @@ void FabricTable::DeleteAllFabrics()
     }
 }
 
-CHIP_ERROR FabricTable::Init(FabricStorage * storage)
+CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     mStorage = storage;
     ChipLogDetail(Discovery, "Init fabric pairing table with server storage");
 
@@ -698,29 +714,5 @@ CHIP_ERROR formatKey(FabricIndex fabricIndex, MutableCharSpan formattedKey, cons
     }
     return err;
 }
-
-CHIP_ERROR SimpleFabricStorage::SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size)
-{
-    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    char formattedKey[MAX_KEY_SIZE] = "";
-    ReturnErrorOnFailure(formatKey(fabricIndex, MutableCharSpan(formattedKey, MAX_KEY_SIZE), key));
-    return mStorage->SyncSetKeyValue(formattedKey, buffer, size);
-};
-
-CHIP_ERROR SimpleFabricStorage::SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size)
-{
-    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    char formattedKey[MAX_KEY_SIZE] = "";
-    ReturnErrorOnFailure(formatKey(fabricIndex, MutableCharSpan(formattedKey, MAX_KEY_SIZE), key));
-    return mStorage->SyncGetKeyValue(formattedKey, buffer, size);
-};
-
-CHIP_ERROR SimpleFabricStorage::SyncDelete(FabricIndex fabricIndex, const char * key)
-{
-    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    char formattedKey[MAX_KEY_SIZE] = "";
-    ReturnErrorOnFailure(formatKey(fabricIndex, MutableCharSpan(formattedKey, MAX_KEY_SIZE), key));
-    return mStorage->SyncDeleteKeyValue(formattedKey);
-};
 
 } // namespace chip

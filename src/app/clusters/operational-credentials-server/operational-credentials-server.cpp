@@ -356,6 +356,7 @@ public:
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
         FabricIndex currentFabricIndex = ec->GetSessionHandle()->GetFabricIndex();
+        InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(currentFabricIndex);
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
 };
@@ -414,6 +415,7 @@ exit:
         }
         else
         {
+            InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricBeingRemoved);
             ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(fabricBeingRemoved);
         }
     }
