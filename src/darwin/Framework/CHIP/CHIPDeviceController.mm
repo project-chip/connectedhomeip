@@ -183,6 +183,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         if (_listenPort) {
             params.listenPort = _listenPort;
         }
+        params.enableServerInteractions = true;
 
         // Initialize device attestation verifier
         // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
