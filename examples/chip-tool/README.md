@@ -120,6 +120,45 @@ The endpoint id must be between 1 and 240.
 
 The client will send a single command packet and then exit.
 
+## Configuring the client for Group Commands
+
+Prior to sending a Group command, both the end device and the Client (Chip-tool)
+must be configured appropriately.
+
+To configure the client please use the groupsettings option
+
+    $ chip-tool groupsettings
+
+A group with a valid encryption key needs to be set. The groupid and the
+encryption key must match the one configured on the end device.
+
+To add a group
+
+    $ chip-tool groupsettings add-group TestName 0x1010
+
+To add a keyset
+
+    $ chip-tool groupsettings add-keyset 0xAAAA 0 000000000021dfe0d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+
+Take note that the epoch key must be in hex form without the '0x' prefix
+
+Finally to bind the keyset to the group
+
+    $ chip-tool groupsettings bind-keyset 0x1010 0xAAAA
+
+## Using the Client to Send Group (Multicast) Matter Commands
+
+To use the Client to send Matter commands, run the built executable and pass it
+the target cluster name, the target command name, the Group Id in Node Id form
+(0xffffffffffffXXXX) and an unused endpoint Id. Take note that Only commands and
+attributes write can be send with Group Id.
+
+E.G. sending to group Id 0x0025
+
+    $ chip-tool onoff on 0xffffffffffff0025 1
+
+The client will send a single multicast command packet and then exit.
+
 ### How to get the list of supported clusters
 
 To get the list of supported clusters, run the built executable without any
