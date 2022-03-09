@@ -162,7 +162,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .sessionInitParams = deviceInitParams,
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
         .dnsCache = &mDNSCache,
-#else
+#endif
         .devicePool  = &mDevicePool,
         .dnsResolver = &mDNSResolver,
     };
@@ -668,7 +668,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
         chip::Platform::Delete(mUdcServer);
         mUdcServer = nullptr;
     }
-#endif                                               // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     DeviceController::Shutdown();
     return CHIP_NO_ERROR;
