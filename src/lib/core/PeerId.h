@@ -18,6 +18,7 @@
 #pragma once
 
 #include <lib/core/NodeId.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 
@@ -66,6 +67,35 @@ private:
     NodeId mNodeId = kUndefinedNodeId;
 
     CompressedFabricId mCompressedFabricId = kUndefinedCompressedFabricId;
+};
+
+class ScopedNodeId
+{
+public:
+    ScopedNodeId() : mNodeId(kUndefinedNodeId), mFabricIndex(kUndefinedFabricIndex) {}
+    ScopedNodeId(NodeId nodeId, FabricIndex fabricIndex) : mNodeId(nodeId), mFabricIndex(fabricIndex) {}
+
+    NodeId GetNodeId() const { return mNodeId; }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+
+    bool IsOperational() const
+    {
+        return mFabricIndex != kUndefinedFabricIndex && IsOperationalNodeId(mNodeId);
+    }
+
+    bool operator==(const ScopedNodeId & that) const
+    {
+        return (mNodeId == that.mNodeId) && (mFabricIndex== that.mFabricIndex);
+    }
+
+    bool operator!=(const ScopedNodeId & that) const
+    {
+        return !(*this == that);
+    }
+
+private:
+    const NodeId mNodeId;
+    const FabricIndex mFabricIndex;
 };
 
 } // namespace chip
