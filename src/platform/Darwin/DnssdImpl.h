@@ -50,11 +50,12 @@ struct RegisterContext : public GenericContext
     RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext)
     {
         type = ContextType::Register;
+        context  = cbContext;
+        callback = cb;
+
         static constexpr ::std::size_t mTypeEndIdx = sizeof(mType) - 1;
         ::std::strncpy(mType, sType, mTypeEndIdx);
         mType[mTypeEndIdx] = '\0';
-        context  = cbContext;
-        callback = cb;
     }
 
     bool matches(const char * sType) { return (::std::strcmp(mType, sType) == 0); }
@@ -87,10 +88,11 @@ struct ResolveContext : public GenericContext
         type     = ContextType::Resolve;
         context  = cbContext;
         callback = cb;
+        addressType = cbAddressType;
+
         static constexpr ::std::size_t nameEndIdx = sizeof(name) - 1;
         ::std::strncpy(name, cbContextName, nameEndIdx);
         name[nameEndIdx] = '\0';
-        addressType = cbAddressType;
     }
 };
 
@@ -111,6 +113,7 @@ struct GetAddrInfoContext : public GenericContext
         callback    = cb;
         interfaceId = cbInterfaceId;
         port        = cbContextPort;
+
         static constexpr ::std::size_t nameEndIdx = sizeof(name) - 1;
         ::std::strncpy(name, cbContextName, nameEndIdx);
         name[nameEndIdx] = '\0';
