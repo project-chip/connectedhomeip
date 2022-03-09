@@ -35,7 +35,6 @@ using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
 using chip::OTADownloader;
 using chip::OTAImageProcessorImpl;
-using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
 using chip::PeerId;
 using chip::Server;
@@ -117,12 +116,7 @@ static void InitOTARequestor(void)
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    // WARNING: this is probably not realistic to know such details of the image or to even have an
-    // OTADownloader instantiated at the beginning of program execution. We're using hardcoded
-    // values here for now since this is a reference application.
-    OTAImageProcessorParams ipParams;
-    ipParams.imageFile = CharSpan::fromCharString(gOtaDownloadPath);
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTAImageFile(CharSpan::fromCharString(gOtaDownloadPath));
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Set the image processor instance used for handling image being downloaded
