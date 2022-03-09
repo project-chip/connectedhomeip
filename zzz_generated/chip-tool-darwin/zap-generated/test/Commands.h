@@ -56130,12 +56130,24 @@ public:
             err = TestWriteInvalidBindingTable_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Write binding table\n");
-            err = TestWriteBindingTable_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Write binding table (endpoint 1)\n");
+            err = TestWriteBindingTableEndpoint1_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read binding table\n");
-            err = TestReadBindingTable_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read binding table (endpoint 1)\n");
+            err = TestReadBindingTableEndpoint1_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Write binding table (endpoint 0)\n");
+            err = TestWriteBindingTableEndpoint0_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read binding table (endpoint 0)\n");
+            err = TestReadBindingTableEndpoint0_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Verify endpoint 1 not changed\n");
+            err = TestVerifyEndpoint1NotChanged_8();
             break;
         }
 
@@ -56152,7 +56164,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 9;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -56245,7 +56257,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteBindingTable_4()
+    CHIP_ERROR TestWriteBindingTableEndpoint1_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestBinding * cluster = [[CHIPTestBinding alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -56273,7 +56285,7 @@ private:
         }
         [cluster writeAttributeBindingWithValue:bindingArgument
                               completionHandler:^(NSError * _Nullable err) {
-                                  NSLog(@"Write binding table Error: %@", err);
+                                  NSLog(@"Write binding table (endpoint 1) Error: %@", err);
 
                                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -56283,7 +56295,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadBindingTable_5()
+    CHIP_ERROR TestReadBindingTableEndpoint1_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestBinding * cluster = [[CHIPTestBinding alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -56294,7 +56306,107 @@ private:
         [cluster
             readAttributeBindingWithParams:params
                          completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-                             NSLog(@"Read binding table Error: %@", err);
+                             NSLog(@"Read binding table (endpoint 1) Error: %@", err);
+
+                             VerifyOrReturn(CheckValue("status", err, 0));
+
+                             {
+                                 id actualValue = value;
+                                 VerifyOrReturn(CheckValue("Binding", [actualValue count], static_cast<uint32_t>(3)));
+                                 VerifyOrReturn(
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
+                                 VerifyOrReturn(CheckValue("Group", ((CHIPBindingClusterTargetStruct *) actualValue[0]).group, 1U));
+                                 VerifyOrReturn(
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex, 1));
+                                 VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[1]).node, 1ULL));
+                                 VerifyOrReturn(
+                                     CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[1]).endpoint, 1U));
+                                 VerifyOrReturn(
+                                     CheckValue("Cluster", ((CHIPBindingClusterTargetStruct *) actualValue[1]).cluster, 6UL));
+                                 VerifyOrReturn(
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex, 1));
+                                 VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[2]).node, 2ULL));
+                                 VerifyOrReturn(
+                                     CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[2]).endpoint, 1U));
+                             }
+
+                             NextTest();
+                         }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWriteBindingTableEndpoint0_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestBinding * cluster = [[CHIPTestBinding alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id bindingArgument;
+        {
+            NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+            temp_0[0] = [[CHIPBindingClusterTargetStruct alloc] init];
+            ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
+            ((CHIPBindingClusterTargetStruct *) temp_0[0]).node = [NSNumber numberWithUnsignedLongLong:3ULL];
+            ((CHIPBindingClusterTargetStruct *) temp_0[0]).endpoint = [NSNumber numberWithUnsignedShort:1U];
+
+            bindingArgument = temp_0;
+        }
+        [cluster writeAttributeBindingWithValue:bindingArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write binding table (endpoint 0) Error: %@", err);
+
+                                  VerifyOrReturn(CheckValue("status", err, 0));
+
+                                  NextTest();
+                              }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadBindingTableEndpoint0_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestBinding * cluster = [[CHIPTestBinding alloc] initWithDevice:device endpoint:0 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        CHIPReadParams * params = [[CHIPReadParams alloc] init];
+        params.fabricFiltered = [NSNumber numberWithBool:true];
+        [cluster
+            readAttributeBindingWithParams:params
+                         completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                             NSLog(@"Read binding table (endpoint 0) Error: %@", err);
+
+                             VerifyOrReturn(CheckValue("status", err, 0));
+
+                             {
+                                 id actualValue = value;
+                                 VerifyOrReturn(CheckValue("Binding", [actualValue count], static_cast<uint32_t>(1)));
+                                 VerifyOrReturn(
+                                     CheckValue("FabricIndex", ((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex, 1));
+                                 VerifyOrReturn(CheckValue("Node", ((CHIPBindingClusterTargetStruct *) actualValue[0]).node, 3ULL));
+                                 VerifyOrReturn(
+                                     CheckValue("Endpoint", ((CHIPBindingClusterTargetStruct *) actualValue[0]).endpoint, 1U));
+                             }
+
+                             NextTest();
+                         }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestVerifyEndpoint1NotChanged_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestBinding * cluster = [[CHIPTestBinding alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        CHIPReadParams * params = [[CHIPReadParams alloc] init];
+        params.fabricFiltered = [NSNumber numberWithBool:true];
+        [cluster
+            readAttributeBindingWithParams:params
+                         completionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+                             NSLog(@"Verify endpoint 1 not changed Error: %@", err);
 
                              VerifyOrReturn(CheckValue("status", err, 0));
 
