@@ -18,12 +18,12 @@
 #pragma once
 
 /**
- * CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION
+ * CHIP_DEVICE_INTERACTION_MODEL_REVISION
  *
  * A monothonic number identifying the interaction model revision.
  */
-#ifndef CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION
-#define CHIP_DEVICE_CONFIG_INTERACTION_MODEL_REVISION 1
+#ifndef CHIP_DEVICE_INTERACTION_MODEL_REVISION
+#define CHIP_DEVICE_INTERACTION_MODEL_REVISION 1
 #endif
 
 constexpr uint8_t kInteractionModelRevisionTag = 0xFF;

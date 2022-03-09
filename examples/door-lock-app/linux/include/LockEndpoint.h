@@ -42,8 +42,8 @@ public:
 
     inline chip::EndpointId GetEndpointId() { return mEndpointId; }
 
-    bool Lock(const Optional<chip::ByteSpan> & pin);
-    bool Unlock(const Optional<chip::ByteSpan> & pin);
+    bool Lock(const Optional<chip::ByteSpan> & pin, DlOperationError & err);
+    bool Unlock(const Optional<chip::ByteSpan> & pin, DlOperationError & err);
 
     bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
     bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
@@ -64,7 +64,7 @@ public:
                          uint32_t localEndTime);
 
 private:
-    bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin);
+    bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     const char * lockStateToString(DlLockState lockState) const;
 
     chip::EndpointId mEndpointId;

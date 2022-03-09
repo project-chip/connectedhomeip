@@ -27,9 +27,12 @@
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
 #include <ble/CHIPBleServiceData.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <crypto/RandUtils.h>
 #include <inttypes.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/Base64.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -40,6 +43,9 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
+// TODO : may be we can make it configurable
+#define BLE_ADVERTISEMENT_VERSION 0
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -47,10 +53,71 @@ namespace Internal {
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 {
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    CHIP_ERROR err;
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
 #endif
 
+    char uniqueId[kMaxUniqueIDLength + 1];
+
+    // Generate Unique ID only if it is not present in the storage.
+    if (GetUniqueId(uniqueId, sizeof(uniqueId)) == CHIP_NO_ERROR)
+        return CHIP_NO_ERROR;
+
+    err = GenerateUniqueId(uniqueId, sizeof(uniqueId));
+    ReturnErrorOnFailure(err);
+
+    err = StoreUniqueId(uniqueId, strlen(uniqueId));
+
+    return err;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorId(uint16_t & vendorId)
+{
+    vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uint16_t & productId)
+{
+    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersion(uint32_t & softwareVer)
+{
+    softwareVer = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVersion(uint32_t softwareVer)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceTypeId(uint16_t & deviceType)
+{
+    deviceType = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingHint(uint16_t & pairingHint)
+{
+    pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingHint(uint16_t & pairingHint)
+{
+    pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT);
     return CHIP_NO_ERROR;
 }
 
@@ -135,18 +202,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(Mu
         ChipLogDetail(DeviceLayer, "Using Thread extended MAC for hostname.");
         return CHIP_NO_ERROR;
     }
-#else
-    if (DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(buf.data()) == CHIP_NO_ERROR)
+#endif
+
+    if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(buf.data()) == CHIP_NO_ERROR)
     {
         ChipLogDetail(DeviceLayer, "Using wifi MAC for hostname");
         return CHIP_NO_ERROR;
     }
-#endif
 
-    ChipLogError(DeviceLayer, "MAC is not known, using a default.");
-    uint8_t temp[ConfigurationManager::kMaxMACAddressLength] = { 0xEE, 0xAA, 0xBA, 0xDA, 0xBA, 0xD0, 0xDD, 0xCA };
-    memcpy(buf.data(), temp, buf.size());
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 template <class ConfigClass>
@@ -253,7 +317,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::InitiateFactoryReset()
 template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 {
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     // Increment life time counter to protect against long-term tracking of rotating device ID.
     IncrementLifetimeCounter();
     // Inheriting classes should call this method so the lifetime counter is updated if necessary.
@@ -334,43 +398,58 @@ exit:
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)
 {
-    CHIP_ERROR err = ReadConfigValueBin(ConfigClass::kConfigKey_Spake2pSalt, buf, bufSize, saltLen);
+    static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
+
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
+    size_t saltB64Len                       = 0;
+
+    err = ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pSalt, saltB64, sizeof(saltB64), saltB64Len);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        uint8_t salt[] = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT;
-        ReturnErrorCodeIf(sizeof(salt) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, salt, sizeof(salt));
-        saltLen = sizeof(salt);
-        err     = CHIP_NO_ERROR;
+        saltB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT);
+        ReturnErrorCodeIf(saltB64Len > sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(saltB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT, saltB64Len);
+        err = CHIP_NO_ERROR;
     }
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
 
     ReturnErrorOnFailure(err);
+    saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
     ReturnErrorCodeIf(saltLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, saltB64, saltLen);
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)
 {
-    CHIP_ERROR err = ReadConfigValueBin(ConfigClass::kConfigKey_Spake2pVerifier, buf, bufSize, verifierLen);
+    static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
+        BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
+
+    CHIP_ERROR err                                            = CHIP_NO_ERROR;
+    char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
+    size_t verifierB64Len                                     = 0;
+
+    err = ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64), verifierB64Len);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        uint8_t verifier[] = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER;
-        ReturnErrorCodeIf(sizeof(verifier) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, verifier, sizeof(verifier));
-        verifierLen = sizeof(verifier);
-        err         = CHIP_NO_ERROR;
+        verifierB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER);
+        ReturnErrorCodeIf(verifierB64Len > sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(verifierB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER, verifierB64Len);
+        err = CHIP_NO_ERROR;
     }
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
 
     ReturnErrorOnFailure(err);
+    verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
     ReturnErrorCodeIf(verifierLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, verifierB64, verifierLen);
 
     return err;
 }
@@ -493,29 +572,59 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetReachable(bool & rea
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    CHIP_ERROR err;
+    size_t uniqueIdLen = 0; // without counting null-terminator
+    err                = ReadConfigValueStr(ConfigClass::kConfigKey_UniqueId, buf, bufSize, uniqueIdLen);
+
+    ReturnErrorOnFailure(err);
+
+    ReturnErrorCodeIf(uniqueIdLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(buf[uniqueIdLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    return err;
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)
+{
+    return WriteConfigValueStr(ConfigClass::kConfigKey_UniqueId, uniqueId, uniqueIdLen);
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GenerateUniqueId(char * buf, size_t bufSize)
+{
+    uint64_t randomUniqueId = Crypto::GetRandU64();
+    return Encoding::BytesToUppercaseHexString(reinterpret_cast<uint8_t *>(&randomUniqueId), sizeof(uint64_t), buf, bufSize);
+}
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetLifetimeCounter(uint16_t & lifetimeCounter)
 {
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     lifetimeCounter = static_cast<uint16_t>(mLifetimePersistedCounter.GetValue());
     return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
 
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::IncrementLifetimeCounter()
 {
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     return mLifetimePersistedCounter.Advance();
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+{
+    static_assert(kRotatingDeviceIDUniqueIDLength >= kMinRotatingDeviceIDUniqueIDLength,
+                  "Length of unique ID for rotating device ID is smaller than minimum.");
+    constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+
+    ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(sizeof(uniqueId) != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
+    uniqueIdSpan = uniqueIdSpan.SubSpan(0, sizeof(uniqueId));
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
 
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFailSafeArmed(bool & val)
@@ -550,6 +659,8 @@ GenericConfigurationManagerImpl<ConfigClass>::GetBLEDeviceIdentificationInfo(Ble
     err = GetSetupDiscriminator(discriminator);
     SuccessOrExit(err);
     deviceIdInfo.SetDeviceDiscriminator(discriminator);
+
+    deviceIdInfo.SetAdvertisementVersion(BLE_ADVERTISEMENT_VERSION);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     deviceIdInfo.SetAdditionalDataFlag(true);
@@ -691,7 +802,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         err = GetManufacturingDate(year, month, dayOfMonth);
         if (err == CHIP_NO_ERROR)
         {
-            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02" PRIu8 "/%02" PRIu8, year, month, dayOfMonth);
+            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02u/%02u", year, month, dayOfMonth);
         }
         else
         {

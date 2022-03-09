@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -141,24 +142,26 @@ public:
 
 private:
     bool mInitialized;
+    FabricTable mFabricTable;
     SessionManager mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
     IOContext * mIOContext;
-    TransportMgrBase * mTransport; // Only needed for InitFromExisting.
+    TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
+    chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
 
     NodeId mBobNodeId       = 123654;
     NodeId mAliceNodeId     = 111222333;
     uint16_t mBobKeyId      = 1;
     uint16_t mAliceKeyId    = 2;
-    GroupId mFriendsGroupId = 0x1234;
+    GroupId mFriendsGroupId = 0x0101;
     Transport::PeerAddress mAliceAddress;
     Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
     SecurePairingUsingTestSecret mPairingBobToAlice;
     SessionHolder mSessionAliceToBob;
     SessionHolder mSessionBobToAlice;
-    SessionHolder mSessionBobToFriends;
+    Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
     FabricIndex mSrcFabricIndex  = 1;
     FabricIndex mDestFabricIndex = 1;
 };
@@ -235,6 +238,20 @@ public:
     }
 
     /*
+     * Reset the dispatch back to a model that synchronously dispatches received messages up the stack.
+     *
+     * NOTE: This results in highly atypical/complex call stacks that are not representative of what happens on real
+     * devices and can cause subtle and complex bugs to either appear or get masked in the system. Where possible, please
+     * use this sparingly!
+     *
+     */
+    void DisableAsyncDispatch()
+    {
+        auto & impl = GetLoopback();
+        impl.DisableAsyncDispatch();
+    }
+
+    /*
      * This drives the servicing of events using the embedded IOContext while there are pending
      * messages in the loopback transport's pending message queue. This should run to completion
      * in well-behaved logic (i.e there isn't an indefinite ping-pong of messages transmitted back
@@ -243,21 +260,44 @@ public:
      * Consequently, this is guarded with a user-provided timeout to ensure we don't have unit-tests that stall
      * in CI due to bugs in the code that is being tested.
      *
-     * This DOES NOT ensure that all pending events are serviced to completion (i.e timers, any ScheduleWork calls).
+     * This DOES NOT ensure that all pending events are serviced to completion
+     * (i.e timers, any ScheduleWork calls), but does:
      *
+     * 1) Guarantee that every call will make some progress on ready-to-run
+     *    things, by calling DriveIO at least once.
+     * 2) Try to ensure that any ScheduleWork calls that happend directly as a
+     *    result of message reception, and any messages those async tasks send,
+     *    get handled before DrainAndServiceIO returns.
      */
     void DrainAndServiceIO(System::Clock::Timeout maxWait = chip::System::Clock::Seconds16(5))
     {
         auto & impl                        = GetLoopback();
         System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
 
-        while (impl.HasPendingMessages())
+        while (true)
         {
-            mIOContext.DriveIO();
-            if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= maxWait)
+            bool hadPendingMessages = impl.HasPendingMessages();
+            while (impl.HasPendingMessages())
             {
+                mIOContext.DriveIO();
+                if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= maxWait)
+                {
+                    return;
+                }
+            }
+            // Processing those messages might have queued some run-ASAP async
+            // work.  Make sure to process that too, in case it generates
+            // response messages.
+            mIOContext.DriveIO();
+            if (!hadPendingMessages && !impl.HasPendingMessages())
+            {
+                // We're not making any progress on messages.  Just stop.
                 break;
             }
+            // No need to check our timer here: either impl.HasPendingMessages()
+            // is true and we will check it next iteration, or it's false and we
+            // will either stop on the next iteration or it will become true and
+            // we will check the timer then.
         }
     }
 

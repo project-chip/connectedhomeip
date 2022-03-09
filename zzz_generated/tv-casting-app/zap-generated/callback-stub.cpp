@@ -29,6 +29,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case ZCL_ACCESS_CONTROL_CLUSTER_ID:
+        emberAfAccessControlClusterInitCallback(endpoint);
+        break;
     case ZCL_ACCOUNT_LOGIN_CLUSTER_ID:
         emberAfAccountLoginClusterInitCallback(endpoint);
         break;
@@ -55,9 +58,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_BINDING_CLUSTER_ID:
         emberAfBindingClusterInitCallback(endpoint);
-        break;
-    case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID:
-        emberAfBridgedDeviceBasicClusterInitCallback(endpoint);
         break;
     case ZCL_CHANNEL_CLUSTER_ID:
         emberAfChannelClusterInitCallback(endpoint);
@@ -188,6 +188,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
+void __attribute__((weak)) emberAfAccessControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfAccountLoginClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -229,11 +234,6 @@ void __attribute__((weak)) emberAfBinaryInputBasicClusterInitCallback(EndpointId
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfBindingClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfBridgedDeviceBasicClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

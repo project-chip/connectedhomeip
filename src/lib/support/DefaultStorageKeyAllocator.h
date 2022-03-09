@@ -46,6 +46,10 @@ public:
         return Format("acl/%x", static_cast<unsigned int>(index));
     }
 
+    // Group Message Counters
+    const char * GroupDataCounter() { return Format("gdc"); }
+    const char * GroupControlCounter() { return Format("gcc"); }
+
     // Group Data Provider
 
     const char * FabricTable() { return Format("f/t"); }
@@ -64,6 +68,13 @@ public:
         // for the cluster and attribute ids.
         return Format("a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
+
+    const char * BindingTable() { return Format("bt"); }
+    const char * BindingTableEntry(uint8_t index) { return Format("bt/%x", index); }
+
+    static const char * OTADefaultProviders() { return "o/dp"; }
+    static const char * OTACurrentProvider() { return "o/cp"; }
+    static const char * OTAUpdateToken() { return "o/ut"; }
 
 private:
     static const size_t kKeyLengthMax = 32;

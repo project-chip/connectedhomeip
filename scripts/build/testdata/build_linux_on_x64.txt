@@ -64,11 +64,17 @@ PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
 # Generating linux-fake-tests
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_build_tests=true custom_toolchain="//build/toolchain/fake:fake_x64_gcc" chip_link_tests=true chip_device_platform="fake"' {out}/linux-fake-tests
 
+# Generating linux-x64-address-resolve-tool
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} {out}/linux-x64-address-resolve-tool
+
 # Generating linux-x64-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux {out}/linux-x64-all-clusters
 
 # Generating linux-x64-all-clusters-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-all-clusters-ipv6only
+
+# Generating linux-x64-chip-cert
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_crypto="openssl"' {out}/linux-x64-chip-cert
 
 # Generating linux-x64-chip-tool
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool {out}/linux-x64-chip-tool
@@ -151,11 +157,17 @@ ninja -C {out}/linux-arm64-thermostat-ipv6only
 # Building linux-fake-tests
 ninja -C {out}/linux-fake-tests check
 
+# Building linux-x64-address-resolve-tool
+ninja -C {out}/linux-x64-address-resolve-tool src/lib/address_resolve:address-resolve-tool
+
 # Building linux-x64-all-clusters
 ninja -C {out}/linux-x64-all-clusters
 
 # Building linux-x64-all-clusters-ipv6only
 ninja -C {out}/linux-x64-all-clusters-ipv6only
+
+# Building linux-x64-chip-cert
+ninja -C {out}/linux-x64-chip-cert src/tools/chip-cert
 
 # Building linux-x64-chip-tool
 ninja -C {out}/linux-x64-chip-tool

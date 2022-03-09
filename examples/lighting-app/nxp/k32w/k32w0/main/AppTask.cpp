@@ -36,9 +36,10 @@
 /* OTA related includes */
 #include "OTAImageProcessorImpl.h"
 #include "OtaSupport.h"
-#include "platform/GenericOTARequestorDriver.h"
-#include "src/app/clusters/ota-requestor/BDXDownloader.h"
-#include "src/app/clusters/ota-requestor/OTARequestor.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
 
 #include "Keyboard.h"
 #include "LED.h"
@@ -85,12 +86,10 @@ AppTask AppTask::sAppTask;
 
 /* OTA related variables */
 static OTARequestor gRequestorCore;
-DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+static DefaultOTARequestorStorage gRequestorStorage;
+static DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 static BDXDownloader gDownloader;
 static OTAImageProcessorImpl gImageProcessor;
-
-static NodeId providerNodeId           = 2;
-static FabricIndex providerFabricIndex = 1;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -124,7 +123,8 @@ CHIP_ERROR AppTask::Init()
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
@@ -387,7 +387,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     K32W_LOG("Device will factory reset...");
 
     // Actually trigger Factory Reset
-    ConfigurationMgr().InitiateFactoryReset();
+    chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
 void AppTask::ResetActionEventHandler(AppEvent * aEvent)
@@ -492,9 +492,6 @@ void AppTask::OTAHandler(AppEvent * aEvent)
         K32W_LOG("Another function is scheduled. Could not initiate OTA!");
         return;
     }
-
-    // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
-    gRequestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex, chip::kRootEndpointId);
 
     static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
@@ -676,6 +673,6 @@ void AppTask::UpdateClusterState(void)
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
     }
 }

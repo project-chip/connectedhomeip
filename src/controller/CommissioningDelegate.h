@@ -19,6 +19,7 @@
 #pragma once
 #include <app/OperationalDeviceProxy.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/Variant.h>
 
 namespace chip {
@@ -30,11 +31,11 @@ enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,
+    kReadCommissioningInfo,
     kArmFailsafe,
     // kConfigTime,  // NOT YET IMPLEMENTED
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
     // kConfigDST,  // NOT YET IMPLEMENTED
-    kGetNetworkTechnology,
     kConfigRegulatory,
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
@@ -67,16 +68,20 @@ struct NOCChainGenerationParameters
     ByteSpan nocsrElements;
     ByteSpan signature;
 };
-struct NOCerts
-{
-};
+
+constexpr uint16_t kDefaultFailsafeTimeout = 60;
 class CommissioningParameters
 {
 public:
     static constexpr size_t kMaxThreadDatasetLen = 254;
     static constexpr size_t kMaxSsidLen          = 32;
     static constexpr size_t kMaxCredentialsLen   = 64;
-    uint16_t GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
+
+    const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
+    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> GetDeviceRegulatoryLocation() const
+    {
+        return mDeviceRegulatoryLocation;
+    }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
     const Optional<WiFiCredentials> GetWiFiCredentials() const { return mWiFiCreds; }
@@ -94,11 +99,27 @@ public:
     const Optional<ByteSpan> GetAttestationSignature() const { return mAttestationSignature; }
     const Optional<ByteSpan> GetPAI() const { return mPAI; }
     const Optional<ByteSpan> GetDAC() const { return mDAC; }
+    const Optional<VendorId> GetRemoteVendorId() const { return mRemoteVendorId; }
+    const Optional<uint16_t> GetRemoteProductId() const { return mRemoteProductId; }
+    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> GetDefaultRegulatoryLocation() const
+    {
+        return mDefaultRegulatoryLocation;
+    }
+    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> GetLocationCapability() const
+    {
+        return mLocationCapability;
+    }
     CHIP_ERROR GetCompletionStatus() { return completionStatus; }
 
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
-        mFailsafeTimerSeconds = seconds;
+        mFailsafeTimerSeconds.SetValue(seconds);
+        return *this;
+    }
+
+    CommissioningParameters & SetDeviceRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationType location)
+    {
+        mDeviceRegulatoryLocation.SetValue(location);
         return *this;
     }
 
@@ -182,10 +203,32 @@ public:
         mDAC = MakeOptional(dac);
         return *this;
     }
+    CommissioningParameters & SetRemoteVendorId(VendorId id)
+    {
+        mRemoteVendorId = MakeOptional(id);
+        return *this;
+    }
+    CommissioningParameters & SetRemoteProductId(uint16_t id)
+    {
+        mRemoteProductId = MakeOptional(id);
+        return *this;
+    }
+    CommissioningParameters & SetDefaultRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationType location)
+    {
+        mDefaultRegulatoryLocation = MakeOptional(location);
+        return *this;
+    }
+    CommissioningParameters & SetLocationCapability(app::Clusters::GeneralCommissioning::RegulatoryLocationType capability)
+    {
+        mLocationCapability = MakeOptional(capability);
+        return *this;
+    }
     void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
 
 private:
-    uint16_t mFailsafeTimerSeconds = 60;
+    // Items that can be set by the commissioner
+    Optional<uint16_t> mFailsafeTimerSeconds;
+    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDeviceRegulatoryLocation;
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
     Optional<WiFiCredentials> mWiFiCreds;
@@ -196,10 +239,15 @@ private:
     Optional<ByteSpan> mIcac;
     Optional<AesCcm128Key> mIpk;
     Optional<NodeId> mAdminSubject;
+    // Items that come from the device in commissioning steps
     Optional<ByteSpan> mAttestationElements;
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
     Optional<ByteSpan> mDAC;
+    Optional<VendorId> mRemoteVendorId;
+    Optional<uint16_t> mRemoteProductId;
+    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDefaultRegulatoryLocation;
+    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mLocationCapability;
     CHIP_ERROR completionStatus = CHIP_NO_ERROR;
 };
 
@@ -215,6 +263,13 @@ struct AttestationResponse
         attestationElements(newAttestationElements), signature(newSignature)
     {}
     ByteSpan attestationElements;
+    ByteSpan signature;
+};
+
+struct CSRResponse
+{
+    CSRResponse(ByteSpan elements, ByteSpan newSignature) : nocsrElements(elements), signature(newSignature) {}
+    ByteSpan nocsrElements;
     ByteSpan signature;
 };
 
@@ -235,22 +290,56 @@ struct OperationalNodeFoundData
     OperationalNodeFoundData(OperationalDeviceProxy * proxy) : operationalProxy(proxy) {}
     OperationalDeviceProxy * operationalProxy;
 };
-struct FeatureMap
+
+struct NetworkClusterInfo
 {
-    FeatureMap(uint32_t featureBitmap) : features(featureBitmap) {}
-    uint32_t features;
+    EndpointId endpoint = kInvalidEndpointId;
+    app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime;
+};
+struct NetworkClusters
+{
+    NetworkClusterInfo wifi;
+    NetworkClusterInfo thread;
+    NetworkClusterInfo eth;
+};
+struct BasicClusterInfo
+{
+    VendorId vendorId  = VendorId::Common;
+    uint16_t productId = 0;
+};
+struct GeneralCommissioningInfo
+{
+    uint64_t breadcrumb          = 0;
+    uint16_t recommendedFailsafe = 0;
+    app::Clusters::GeneralCommissioning::RegulatoryLocationType currentRegulatoryLocation =
+        app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor;
+    app::Clusters::GeneralCommissioning::RegulatoryLocationType locationCapability =
+        app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor;
+    ;
+};
+
+struct ReadCommissioningInfo
+{
+    NetworkClusters network;
+    BasicClusterInfo basic;
+    GeneralCommissioningInfo general;
+};
+
+struct AdditionalErrorInfo
+{
+    AdditionalErrorInfo(Credentials::AttestationVerificationResult result) : attestationResult(result) {}
+    Credentials::AttestationVerificationResult attestationResult;
 };
 
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, FeatureMap>
+    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
+                                         ReadCommissioningInfo, AdditionalErrorInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
-        // TODO: Add other things the delegate needs to know.
     };
     virtual CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params)                           = 0;
     virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;

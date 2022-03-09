@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include <iostream>
-#include <thread>
-
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissionerDiscoveryController.h>
 #include <lib/core/CHIPError.h>
@@ -28,7 +25,9 @@
 #include <platform/PlatformManager.h>
 #include <transport/TransportMgr.h>
 
-int ChipLinuxAppInit(int argc, char ** argv);
+#include "Options.h"
+
+int ChipLinuxAppInit(int argc, char ** argv, chip::ArgParser::OptionSet * customOptions = nullptr);
 void ChipLinuxAppMainLoop();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

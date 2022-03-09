@@ -53,6 +53,7 @@ const P6Config::Key P6Config::kConfigKey_MfrDeviceId           = { kConfigNamesp
 const P6Config::Key P6Config::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
 const P6Config::Key P6Config::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
 const P6Config::Key P6Config::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
+const P6Config::Key P6Config::kConfigKey_SoftwareVersion       = { kConfigNamespace_ChipFactory, "software-ver" };
 const P6Config::Key P6Config::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
 const P6Config::Key P6Config::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
 const P6Config::Key P6Config::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
@@ -77,6 +78,7 @@ const P6Config::Key P6Config::kConfigKey_WiFiSSID           = { kConfigNamespace
 const P6Config::Key P6Config::kConfigKey_WiFiPassword       = { kConfigNamespace_ChipConfig, "wifi-password" };
 const P6Config::Key P6Config::kConfigKey_WiFiSecurity       = { kConfigNamespace_ChipConfig, "wifi-security" };
 const P6Config::Key P6Config::kConfigKey_WiFiMode           = { kConfigNamespace_ChipConfig, "wifimode" };
+const P6Config::Key P6Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
 
 // Keys stored in the Chip-counters namespace
 const P6Config::Key P6Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -217,10 +219,11 @@ bool P6Config::ConfigValueExists(Key key)
 CHIP_ERROR P6Config::FactoryResetConfig(void)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
-    const Key * config_keys[] = { &kConfigKey_FabricId,      &kConfigKey_ServiceConfig,      &kConfigKey_PairedAccountId,
-                                  &kConfigKey_ServiceId,     &kConfigKey_GroupKeyIndex,      &kConfigKey_LastUsedEpochKeyId,
-                                  &kConfigKey_FailSafeArmed, &kConfigKey_WiFiStationSecType, &kConfigKey_WiFiSSID,
-                                  &kConfigKey_WiFiPassword,  &kConfigKey_WiFiSecurity,       &kConfigKey_WiFiMode };
+    const Key * config_keys[] = { &kConfigKey_FabricId,       &kConfigKey_ServiceConfig,      &kConfigKey_PairedAccountId,
+                                  &kConfigKey_ServiceId,      &kConfigKey_GroupKeyIndex,      &kConfigKey_LastUsedEpochKeyId,
+                                  &kConfigKey_FailSafeArmed,  &kConfigKey_WiFiStationSecType, &kConfigKey_WiFiSSID,
+                                  &kConfigKey_WiFiPassword,   &kConfigKey_WiFiSecurity,       &kConfigKey_WiFiMode,
+                                  &kConfigKey_SoftwareVersion };
 
     for (uint32_t i = 0; i < (sizeof(config_keys) / sizeof(config_keys[0])); i++)
     {

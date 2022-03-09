@@ -42,12 +42,15 @@ struct GenericContext
 
 struct RegisterContext : public GenericContext
 {
+    DnssdPublishCallback callback;
     char mType[kDnssdTypeMaxSize + 1];
-    RegisterContext(const char * sType, void * cbContext)
+
+    RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext)
     {
         type = ContextType::Register;
         strncpy(mType, sType, sizeof(mType));
-        context = cbContext;
+        context  = cbContext;
+        callback = cb;
     }
 
     bool matches(const char * sType) { return (strcmp(mType, sType) == 0); }
@@ -88,6 +91,7 @@ struct ResolveContext : public GenericContext
 struct GetAddrInfoContext : public GenericContext
 {
     DnssdResolveCallback callback;
+    std::vector<Inet::IPAddress> addresses;
     std::vector<TextEntry> textEntries;
     char name[Common::kInstanceNameMaxLength + 1];
     uint32_t interfaceId;

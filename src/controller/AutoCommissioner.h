@@ -28,7 +28,7 @@ class DeviceCommissioner;
 class AutoCommissioner : public CommissioningDelegate
 {
 public:
-    AutoCommissioner() {}
+    AutoCommissioner();
     virtual ~AutoCommissioner();
     CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
     void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
@@ -52,6 +52,7 @@ private:
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk, NodeId adminSubject);
     Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage);
+    EndpointId GetEndpoint(const CommissioningStage & stage);
 
     DeviceCommissioner * mCommissioner                               = nullptr;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
@@ -62,9 +63,9 @@ private:
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
-    // TODO: if the device library adds a network commissioning device type, this will need to be 1 per endpoint.
-    BitFlags<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature> mNetworkTechnology;
+
     bool mNeedsNetworkSetup = false;
+    ReadCommissioningInfo mDeviceCommissioningInfo;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;
@@ -72,10 +73,9 @@ private:
     uint8_t * mPAI   = nullptr;
     uint16_t mPAILen = 0;
     uint8_t mAttestationNonce[kAttestationNonceLength];
-    uint8_t mCSRNonce[kOpCSRNonceLength];
+    uint8_t mCSRNonce[kCSRNonceLength];
     uint8_t mNOCertBuffer[Credentials::kMaxCHIPCertLength];
     uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
 };
-
 } // namespace Controller
 } // namespace chip

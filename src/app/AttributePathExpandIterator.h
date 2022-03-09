@@ -101,6 +101,9 @@ private:
     // Note: should use decltype(EmberAfEndpointType::clusterCount) here, but af-types is including app specific generated files.
     uint8_t mClusterIndex, mEndClusterIndex;
     uint16_t mAttributeIndex, mEndAttributeIndex;
+    // For dealing with global attributes that are not part of the attribute
+    // metadata.
+    uint8_t mGlobalAttributeIndex, mGlobalAttributeEndIndex;
 
     ConcreteAttributePath mOutputPath;
 

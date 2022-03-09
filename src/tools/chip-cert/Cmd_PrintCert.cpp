@@ -156,8 +156,8 @@ void PrintEpochTime(FILE * file, const char * name, int indent, uint32_t epochTi
     Indent(file, indent);
     fprintf(file, "%s: ", name);
 
-    fprintf(file, "0x%08" PRIX32 "  ( %04" PRId16 "/%02" PRId8 "/%02" PRId8 " %02" PRId8 ":%02" PRId8 ":%02" PRId8 " )\n",
-            epochTime, asn1Time.Year, asn1Time.Month, asn1Time.Day, asn1Time.Hour, asn1Time.Minute, asn1Time.Second);
+    fprintf(file, "0x%08" PRIX32 "  ( %04" PRId16 "/%02d/%02d %02d:%02d:%02d )\n", epochTime, asn1Time.Year, asn1Time.Month,
+            asn1Time.Day, asn1Time.Hour, asn1Time.Minute, asn1Time.Second);
 }
 
 void PrintDN(FILE * file, const char * name, int indent, const ChipDN * dn)

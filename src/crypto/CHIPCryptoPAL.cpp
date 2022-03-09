@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -345,6 +345,7 @@ exit:
 CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    MutableByteSpan out_span{ out, *out_len };
     uint8_t point_buffer[kMAX_Point_Length];
     void * MN        = nullptr; // Choose N if a prover, M if a verifier
     void * XY        = nullptr; // Choose Y if a prover, X if a verifier
@@ -406,7 +407,8 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
 
     SuccessOrExit(error = GenerateKeys());
 
-    SuccessOrExit(error = Mac(Kcaorb, hash_size / 2, in, in_len, out));
+    SuccessOrExit(error = Mac(Kcaorb, hash_size / 2, in, in_len, out_span));
+    VerifyOrExit(out_span.size() == hash_size, error = CHIP_ERROR_INTERNAL);
 
     state = CHIP_SPAKE2P_STATE::R2;
     error = CHIP_NO_ERROR;
@@ -419,7 +421,9 @@ CHIP_ERROR Spake2p::GenerateKeys()
 {
     static const uint8_t info_keyconfirm[16] = { 'C', 'o', 'n', 'f', 'i', 'r', 'm', 'a', 't', 'i', 'o', 'n', 'K', 'e', 'y', 's' };
 
-    ReturnErrorOnFailure(HashFinalize(Kae));
+    MutableByteSpan Kae_span{ &Kae[0], sizeof(Kae) };
+
+    ReturnErrorOnFailure(HashFinalize(Kae_span));
     ReturnErrorOnFailure(KDF(Ka, hash_size / 2, nullptr, 0, info_keyconfirm, sizeof(info_keyconfirm), Kcab, hash_size));
 
     return CHIP_NO_ERROR;
@@ -486,9 +490,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Hash(const uint8_t * in, size_t in_len
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::HashFinalize(uint8_t * out)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::HashFinalize(MutableByteSpan & out_span)
 {
-    MutableByteSpan out_span(out, kSHA256_Hash_Length);
     ReturnErrorOnFailure(sha256_hash_ctx.Finish(out_span));
     return CHIP_NO_ERROR;
 }
@@ -502,6 +505,88 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t 
     ReturnErrorOnFailure(mHKDF.HKDF_SHA256(ikm, ikm_len, salt, salt_len, info, info_len, out, out_len));
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len)
+{
+    ReturnErrorOnFailure(FELoad(w0sin, w0sin_len, w0));
+    ReturnErrorOnFailure(FEWrite(w0, w0out, *w0_len));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2pVerifier::Serialize(MutableByteSpan & outSerialized) const
+{
+    VerifyOrReturnError(outSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(&outSerialized.data()[0], mW0, sizeof(mW0));
+    memcpy(&outSerialized.data()[sizeof(mW0)], mL, sizeof(mL));
+
+    outSerialized.reduce_size(kSpake2p_VerifierSerialized_Length);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2pVerifier::Deserialize(const ByteSpan & inSerialized)
+{
+    VerifyOrReturnError(inSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(mW0, &inSerialized.data()[0], sizeof(mW0));
+    memcpy(mL, &inSerialized.data()[sizeof(mW0)], sizeof(mL));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin)
+{
+    uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
+    ReturnErrorOnFailure(ComputeWS(pbkdf2IterCount, salt, setupPin, serializedWS, sizeof(serializedWS)));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t len;
+
+    // Create local Spake2+ object for w0 and L computations.
+#ifdef ENABLE_HSM_SPAKE
+    Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
+#else
+    Spake2p_P256_SHA256_HKDF_HMAC spake2p;
+#endif
+    uint8_t context[kSHA256_Hash_Length] = { 0 };
+    SuccessOrExit(err = spake2p.Init(context, sizeof(context)));
+
+    // Compute w0
+    len = sizeof(mW0);
+    SuccessOrExit(err = spake2p.ComputeW0(mW0, &len, &serializedWS[0], kSpake2p_WS_Length));
+    VerifyOrExit(len == sizeof(mW0), err = CHIP_ERROR_INTERNAL);
+
+    // Compute L
+    len = sizeof(mL);
+    SuccessOrExit(err = spake2p.ComputeL(mL, &len, &serializedWS[kSpake2p_WS_Length], kSpake2p_WS_Length));
+    VerifyOrExit(len == sizeof(mL), err = CHIP_ERROR_INTERNAL);
+
+exit:
+    spake2p.Clear();
+    return err;
+}
+
+CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin, uint8_t * ws,
+                                      uint32_t ws_len)
+{
+#ifdef ENABLE_HSM_PBKDF2
+    PBKDF2_sha256HSM pbkdf2;
+#else
+    PBKDF2_sha256 pbkdf2;
+#endif
+    uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
+    Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setupPin);
+
+    ReturnErrorCodeIf(salt.size() < kSpake2p_Min_PBKDF_Salt_Length || salt.size() > kSpake2p_Max_PBKDF_Salt_Length,
+                      CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(pbkdf2IterCount < kSpake2p_Min_PBKDF_Iterations || pbkdf2IterCount > kSpake2p_Max_PBKDF_Iterations,
+                      CHIP_ERROR_INVALID_ARGUMENT);
+
+    return pbkdf2.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt.data(), salt.size(),
+                                pbkdf2IterCount, ws_len, ws);
 }
 
 CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer)
@@ -670,8 +755,7 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & rootPublicKe
 }
 
 /* Operational Group Key Group, Security Salt: "GroupKey v1.0" */
-static const uint8_t kGroupSecuritySalt[]        = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x20, 0x76, 0x31, 0x2e, 0x30 };
-static const uint8_t kOperationalGroupKeySalt[0] = {};
+static const uint8_t kGroupSecuritySalt[] = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x20, 0x76, 0x31, 0x2e, 0x30 };
 
 /* Group Key Derivation Function, Info: "GroupKeyHash" ” */
 static const uint8_t kGroupKeyHashInfo[]  = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x48, 0x61, 0x73, 0x68 };
@@ -684,13 +768,13 @@ static const uint8_t kGroupKeyHashSalt[0] = {};
         Info = Group Security Salt,
         Length = CRYPTO_SYMMETRIC_KEY_LENGTH_BITS)
 */
-CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key)
+CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id, MutableByteSpan & out_key)
 {
     VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == epoch_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES <= out_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
 
     Crypto::HKDF_sha crypto;
-    return crypto.HKDF_SHA256(epoch_key.data(), epoch_key.size(), kOperationalGroupKeySalt, sizeof(kOperationalGroupKeySalt),
+    return crypto.HKDF_SHA256(epoch_key.data(), epoch_key.size(), compressed_fabric_id.data(), compressed_fabric_id.size(),
                               kGroupSecuritySalt, sizeof(kGroupSecuritySalt), out_key.data(),
                               Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
 }

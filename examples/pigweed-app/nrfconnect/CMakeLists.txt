@@ -37,7 +37,14 @@ project(chip-nrf52840-pigweed-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 
-target_compile_options(app PRIVATE -Werror)
+# -Wmaybe-uninitialized has too many false positives, including on std::optional
+# and chip::Optional.  Make it nonfatal.
+#
+# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
+target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
+
+# Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
+link_libraries($<BUILD_INTERFACE:zephyr_interface>)
 
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
@@ -82,6 +89,9 @@ target_link_libraries(app PUBLIC
   pw_rpc.server
 )
 
-target_link_libraries(pw_build INTERFACE zephyr_interface)
+# Workaround cyclic dependency between nrf_security libraries)
+target_link_libraries(mbedcrypto_base PUBLIC
+  mbedcrypto
+)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

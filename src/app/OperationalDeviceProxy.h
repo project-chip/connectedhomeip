@@ -193,6 +193,18 @@ public:
         return Transport::PeerAddress::UDP(nodeData.mAddress[0], nodeData.mPort, interfaceId);
     }
 
+    /**
+     * @brief Get the raw Fabric ID assigned to the device.
+     */
+    FabricIndex GetFabricIndex() const
+    {
+        if (mFabricInfo != nullptr)
+        {
+            return mFabricInfo->GetFabricIndex();
+        }
+        return kUndefinedFabricIndex;
+    }
+
 private:
     enum class State
     {

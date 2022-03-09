@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -98,8 +98,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     auto & passcodeID           = commandData.passcodeID;
 
     Optional<StatusCode> status = Optional<StatusCode>::Missing();
-    PASEVerifier verifier;
-    const uint8_t * verifierData = pakeVerifier.data();
+    Spake2pVerifier verifier;
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
@@ -110,18 +109,20 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() ==
                      CommissioningWindowStatus::kWindowNotOpen,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
-    VerifyOrExit(sizeof(verifier) == pakeVerifier.size(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(iterations >= kPBKDFMinimumIterations, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(iterations <= kPBKDFMaximumIterations, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(salt.size() >= kPBKDFMinimumSaltLen, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(salt.size() <= kPBKDFMaximumSaltLen, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     VerifyOrExit(discriminator <= kMaxDiscriminatorValue, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
 
-    memcpy(verifier.mW0, &verifierData[0], kSpake2p_WS_Length);
-    memcpy(verifier.mL, &verifierData[kSpake2p_WS_Length], kSpake2p_WS_Length);
-
+    VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenEnhancedCommissioningWindow(
                      commissioningTimeout, discriminator, verifier, iterations, salt, passcodeID) == CHIP_NO_ERROR,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));

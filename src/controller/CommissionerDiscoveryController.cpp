@@ -33,8 +33,23 @@
 using namespace ::chip;
 using namespace chip::Protocols::UserDirectedCommissioning;
 
+void CommissionerDiscoveryController::ResetState()
+{
+    mCurrentInstance[0] = '\0';
+    mVendorId           = 0;
+    mProductId          = 0;
+    mNodeId             = 0;
+    mReady              = true;
+}
+
 void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClientState state)
 {
+    if (!mReady)
+    {
+        ChipLogDetail(Controller, "CommissionerDiscoveryController not read. Current instance=%s", mCurrentInstance);
+        return;
+    }
+    mReady = false;
     strncpy(mCurrentInstance, state.GetInstanceName(), sizeof(mCurrentInstance));
     mPendingConsent = true;
     ChipLogDetail(Controller,
@@ -156,4 +171,80 @@ void CommissionerDiscoveryController::Cancel()
     mPendingConsent = false;
     return;
 }
+
+void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,
+                                                             OperationalDeviceProxy * device)
+{
+    mVendorId  = vendorId;
+    mProductId = productId;
+    mNodeId    = nodeId;
+    if (mPostCommissioningListener != nullptr)
+    {
+        ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, device);
+    }
+    else
+    {
+        PostCommissioningSucceeded();
+    }
+}
+
+void CommissionerDiscoveryController::CommissioningFailed(CHIP_ERROR error)
+{
+    if (mUserPrompter != nullptr)
+    {
+        ChipLogDetail(Controller, "------PROMPT USER: commissioning failed ");
+        mUserPrompter->PromptCommissioningFailed(GetCommissioneeName(), error);
+    }
+    ResetState();
+}
+
+void CommissionerDiscoveryController::PostCommissioningSucceeded()
+{
+    if (mUserPrompter != nullptr)
+    {
+        ChipLogDetail(Controller, "------PROMPT USER: commissioning success ");
+        mUserPrompter->PromptCommissioningSucceeded(mVendorId, mProductId, GetCommissioneeName());
+    }
+    ResetState();
+}
+
+void CommissionerDiscoveryController::PostCommissioningFailed(CHIP_ERROR error)
+{
+    if (mUserPrompter != nullptr)
+    {
+        ChipLogDetail(Controller, "------PROMPT USER: post-commissioning failed ");
+        mUserPrompter->PromptCommissioningFailed(GetCommissioneeName(), error);
+    }
+    ResetState();
+}
+
+const char * CommissionerDiscoveryController::GetCommissioneeName()
+{
+    if (mReady)
+    {
+        // no current commissionee
+        ChipLogError(AppServer, "CommissionerDiscoveryController no current commissionee");
+        return nullptr;
+    }
+    UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+    if (client == nullptr)
+    {
+        ChipLogError(AppServer, "CommissionerDiscoveryController no UDCState for instance=%s", mCurrentInstance);
+        return nullptr;
+    }
+    return client->GetDeviceName();
+}
+
+UDCClientState * CommissionerDiscoveryController::GetUDCClientState()
+{
+    if (mReady)
+    {
+        // no current commissionee
+        ChipLogError(AppServer, "CommissionerDiscoveryController no current commissionee");
+        return nullptr;
+    }
+    return mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

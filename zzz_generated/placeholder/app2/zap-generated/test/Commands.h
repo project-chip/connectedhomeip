@@ -21,16 +21,18 @@
 
 #include "TestCommand.h"
 
-class Test_TC_DM_1_3_Simulated : public TestCommand
+class Test_TC_DM_1_3_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_DM_1_3_Simulated() : TestCommand("Test_TC_DM_1_3_Simulated"), mTestIndex(0)
+    Test_TC_DM_1_3_SimulatedSuite() : TestCommand("Test_TC_DM_1_3_Simulated"), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DM_1_3_Simulated() {}
+    ~Test_TC_DM_1_3_SimulatedSuite() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -154,8 +156,18 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 21;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
 
     //
     // Tests methods
@@ -387,16 +399,18 @@ private:
     }
 };
 
-class Test_TC_DM_3_3_Simulated : public TestCommand
+class Test_TC_DM_3_3_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_DM_3_3_Simulated() : TestCommand("Test_TC_DM_3_3_Simulated"), mTestIndex(0)
+    Test_TC_DM_3_3_SimulatedSuite() : TestCommand("Test_TC_DM_3_3_Simulated"), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DM_3_3_Simulated() {}
+    ~Test_TC_DM_3_3_SimulatedSuite() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -475,8 +489,18 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
 
     //
     // Tests methods
@@ -558,16 +582,18 @@ private:
     }
 };
 
-class Test_TC_DM_2_3_Simulated : public TestCommand
+class Test_TC_DM_2_3_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_DM_2_3_Simulated() : TestCommand("Test_TC_DM_2_3_Simulated"), mTestIndex(0)
+    Test_TC_DM_2_3_SimulatedSuite() : TestCommand("Test_TC_DM_2_3_Simulated"), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DM_2_3_Simulated() {}
+    ~Test_TC_DM_2_3_SimulatedSuite() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -647,8 +673,18 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
 
     //
     // Tests methods
@@ -727,12 +763,12 @@ private:
     CHIP_ERROR TestWaitForCsrRequest_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Operational Credentials Command: OpCSRRequest] Wait for CSR Request",
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Operational Credentials Command: CSRRequest] Wait for CSR Request",
                      endpoint);
 
         ClearAttributeAndCommandPaths();
         mCommandPath = chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::OperationalCredentials::Id,
-                                                      chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Id);
+                                                      chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Id);
         return CHIP_NO_ERROR;
     }
 
@@ -788,15 +824,15 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 {
     if (testName == "Test_TC_DM_1_3_Simulated")
     {
-        return std::unique_ptr<Test_TC_DM_1_3_Simulated>(new Test_TC_DM_1_3_Simulated());
+        return std::unique_ptr<Test_TC_DM_1_3_SimulatedSuite>(new Test_TC_DM_1_3_SimulatedSuite());
     }
     if (testName == "Test_TC_DM_3_3_Simulated")
     {
-        return std::unique_ptr<Test_TC_DM_3_3_Simulated>(new Test_TC_DM_3_3_Simulated());
+        return std::unique_ptr<Test_TC_DM_3_3_SimulatedSuite>(new Test_TC_DM_3_3_SimulatedSuite());
     }
     if (testName == "Test_TC_DM_2_3_Simulated")
     {
-        return std::unique_ptr<Test_TC_DM_2_3_Simulated>(new Test_TC_DM_2_3_Simulated());
+        return std::unique_ptr<Test_TC_DM_2_3_SimulatedSuite>(new Test_TC_DM_2_3_SimulatedSuite());
     }
 
     return nullptr;

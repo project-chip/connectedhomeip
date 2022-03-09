@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -400,9 +400,13 @@ using CHIP_ERROR = ::chip::ChipError;
 
 #define CHIP_CORE_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kCore, (e))
 
-#define CHIP_IM_GLOBAL_STATUS(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, to_underlying(e))
+#define CHIP_IM_GLOBAL_STATUS(type)                                                                                                \
+    CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::type))
 
-#define CHIP_IM_CLUSTER_STATUS(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, e)
+//
+// type must be a compile-time constant as mandated by CHIP_SDK_ERROR.
+//
+#define CHIP_IM_CLUSTER_STATUS(type) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, type)
 
 // clang-format off
 
@@ -1228,16 +1232,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INVALID_ACCESS_TOKEN                        CHIP_CORE_ERROR(0x58)
 
 /**
- *  @def CHIP_ERROR_WRONG_CERT_SUBJECT
+ *  @def CHIP_ERROR_WRONG_CERT_DN
  *
  *  @brief
- *    A certificate subject is wrong.
+ *    A certificate subject/issuer distinguished name is wrong.
  *
  */
-#define CHIP_ERROR_WRONG_CERT_SUBJECT                          CHIP_CORE_ERROR(0x59)
-
-// deprecated alias
-#define CHIP_ERROR_WRONG_CERTIFICATE_SUBJECT CHIP_ERROR_WRONG_CERT_SUBJECT
+#define CHIP_ERROR_WRONG_CERT_DN                               CHIP_CORE_ERROR(0x59)
 
 /**
  *  @def CHIP_ERROR_INVALID_PROVISIONING_BUNDLE
@@ -1891,14 +1892,6 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION                 CHIP_CORE_ERROR(0xa3)
 
 /**
- *  @def CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION
- *
- *  @brief
- *    Encountered a mismatch between update required version and current version
- */
-#define CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION            CHIP_CORE_ERROR(0xa4)
-
-/**
  *  @def CHIP_ERROR_ACCESS_DENIED
  *
  *  @brief
@@ -2381,22 +2374,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_MISSING_URI_SEPARATOR             CHIP_CORE_ERROR(0xd7)
 
 /**
- * @def CHIP_ERROR_IM_CONSTRAINT_ERROR
- *
- * @brief
- *   The equivalent of a CONSTRAINT_ERROR status: a value was out of the valid
- *   range.
- */
-#define CHIP_ERROR_IM_CONSTRAINT_ERROR               CHIP_CORE_ERROR(0xd8)
-
-/**
  * @def CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE
  *
  * @brief
  *   The Attribute DataElement is malformed: it either does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE                    CHIP_CORE_ERROR(0xd9)
+#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE                    CHIP_CORE_ERROR(0xd8)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE
@@ -2405,7 +2389,16 @@ using CHIP_ERROR = ::chip::ChipError;
  *   The Attribute DataElement is malformed: it either does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE                    CHIP_CORE_ERROR(0xda)
+#define CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE                    CHIP_CORE_ERROR(0xd9)
+
+/**
+ * @def CHIP_ERROR_INVALID_FILE_IDENTIFIER
+ *
+ * @brief
+ *   The file identifier, encoded in the first few bytes of a processed file,
+ *   has unexpected value.
+ */
+#define CHIP_ERROR_INVALID_FILE_IDENTIFIER                     CHIP_CORE_ERROR(0xda)
 
 /**
  *  @}

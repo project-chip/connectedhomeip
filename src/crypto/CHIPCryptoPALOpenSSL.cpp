@@ -536,8 +536,8 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
     VerifyOrExit(password != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(slen >= kMin_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(slen <= kMax_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(slen >= kSpake2p_Min_PBKDF_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(slen <= kSpake2p_Max_PBKDF_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1204,6 +1204,11 @@ exit:
         X509_REQ_free(x509_req);
     }
 
+    if (ec_key != nullptr)
+    {
+        EC_KEY_free(ec_key);
+    }
+
     _logSSLError();
     return error;
 }
@@ -1323,10 +1328,14 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len,
+                                              MutableByteSpan & out_span)
 {
     HMAC_sha hmac;
-    return hmac.HMAC_SHA256(key, key_len, in, in_len, out, kSHA256_Hash_Length);
+    VerifyOrReturnError(out_span.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorOnFailure(hmac.HMAC_SHA256(key, key_len, in, in_len, out_span.data(), kSHA256_Hash_Length));
+    out_span = out_span.SubSpan(0, kSHA256_Hash_Length);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len,
@@ -1335,9 +1344,11 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t 
     VerifyOrReturnError(mac_len == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t computed_mac[kSHA256_Hash_Length];
-    ReturnErrorOnFailure(Mac(key, key_len, in, in_len, computed_mac));
+    MutableByteSpan computed_mac_span{ computed_mac };
+    ReturnErrorOnFailure(Mac(key, key_len, in, in_len, computed_mac_span));
+    VerifyOrReturnError(computed_mac_span.size() == mac_len, CHIP_ERROR_INTERNAL);
 
-    VerifyOrReturnError(CRYPTO_memcmp(mac, computed_mac, mac_len) == 0, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(CRYPTO_memcmp(mac, computed_mac_span.data(), computed_mac_span.size()) == 0, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }

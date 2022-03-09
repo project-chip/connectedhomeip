@@ -34,6 +34,8 @@ struct AppEvent
         kEventType_Lighting,
         kEventType_Install,
         kEventType_UpdateLedState,
+        kEventType_IdentifyStart,
+        kEventType_IdentifyStop,
 #ifdef CONFIG_MCUMGR_SMP_BT
         kEventType_StartSMPAdvertising,
 #endif

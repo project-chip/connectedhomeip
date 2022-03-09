@@ -215,7 +215,7 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteAttributePat
     //
     ReturnErrorOnFailure(reader.Next());
 
-    mCallback.OnAttributeData(mBufferedPath, mDataVersion, &reader, statusIB);
+    mCallback.OnAttributeData(mBufferedPath, &reader, statusIB);
 
     //
     // Clear out our buffered contents to free up allocated buffers, and reset the buffered path.
@@ -225,7 +225,7 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteAttributePat
     return CHIP_NO_ERROR;
 }
 
-void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                            const StatusIB & aStatus)
 {
     CHIP_ERROR err;
@@ -246,14 +246,13 @@ void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPa
     }
     else
     {
-        mCallback.OnAttributeData(aPath, aVersion, apData, aStatus);
+        mCallback.OnAttributeData(aPath, apData, aStatus);
     }
 
     //
     // Update our latched buffered path.
     //
     mBufferedPath = aPath;
-    mDataVersion  = aVersion;
 
 exit:
     if (err != CHIP_NO_ERROR)

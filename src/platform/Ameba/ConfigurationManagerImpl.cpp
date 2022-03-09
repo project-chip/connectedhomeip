@@ -80,7 +80,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReason(DiagnosticDataProvider::BootReasonType::Unspecified);
+        err = StoreBootReason(BootReasonType::Unspecified);
         SuccessOrExit(err);
     }
 
@@ -150,6 +150,30 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
         buf[i] = mac[i] & 0xFF;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
+{
+#ifdef CHIP_DEVICE_CONFIG_UNIQUE_ID
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_UNIQUE_ID), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_UNIQUE_ID);
+    return CHIP_NO_ERROR;
+#else
+    ReturnErrorCodeIf(bufSize != 32, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    char temp[32];
+    int i = 0, j = 0;
+
+    memset(&temp[0], 0, 32);
+    ReturnErrorCodeIf(wifi_get_mac_address(temp) != 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (i = 0; i < bufSize; i++)
+    {
+        if (temp[i] != ':')
+            buf[j++] = temp[i];
+    }
+
+    return CHIP_NO_ERROR;
+#endif
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()

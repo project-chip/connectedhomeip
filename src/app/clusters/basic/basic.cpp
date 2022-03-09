@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/DataModelRevision.h>
 #include <app/EventLogging.h>
 #include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -52,6 +53,7 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
+    CHIP_ERROR ReadDataModelRevision(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadLocation(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteLocation(AttributeValueDecoder & aDecoder);
 };
@@ -76,6 +78,10 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
     switch (aPath.mAttributeId)
     {
+    case DataModelRevision::Id:
+        status = ReadDataModelRevision(aEncoder);
+        break;
+
     case Location::Id:
         status = ReadLocation(aEncoder);
         break;
@@ -172,8 +178,8 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         if (status == CHIP_NO_ERROR)
         {
             // Format is YYYYMMDD
-            snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "%02" PRIu8 "%02" PRIu8,
-                     manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
+            snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "%02u%02u", manufacturingYear,
+                     manufacturingMonth, manufacturingDayOfMonth);
             status = aEncoder.Encode(chip::CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
         }
         break;
@@ -267,6 +273,12 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     return status;
 }
 
+CHIP_ERROR BasicAttrAccess::ReadDataModelRevision(AttributeValueEncoder & aEncoder)
+{
+    uint16_t revision = CHIP_DEVICE_DATA_MODEL_REVISION;
+    return aEncoder.Encode(revision);
+}
+
 CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen   = DeviceLayer::ConfigurationManager::kMaxLocationLength;
@@ -293,8 +305,7 @@ CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attri
     {
     case Location::Id: {
         CHIP_ERROR err = WriteLocation(aDecoder);
-        // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
-        ChipLogError(Zcl, "WriteLocation status: %" CHIP_ERROR_FORMAT, err.Format());
+
         return err;
     }
     default:
@@ -310,9 +321,6 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
 
     ReturnErrorOnFailure(aDecoder.Decode(location));
 
-    // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
-    ChipLogError(Zcl, "WriteLocation received, size %zu, location '%.*s'", location.size(), (int) location.size(), location.data());
-
     bool isValidLength = location.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
     VerifyOrReturnError(isValidLength, StatusIB(Protocols::InteractionModel::Status::InvalidValue).ToChipError());
 
@@ -321,7 +329,7 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
 
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
-    // Gets called by the current Node after completing a boot or reboot process.
+    // Gets called by the current Node after completing a boot or reboot process
     void OnStartUp(uint32_t softwareVersion) override
     {
         ChipLogProgress(Zcl, "PlatformMgrDelegate: OnStartUp");
@@ -332,9 +340,10 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
             Events::StartUp::Type event{ softwareVersion };
             EventNumber eventNumber;
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent))
+            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+            if (CHIP_NO_ERROR != err)
             {
-                ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record StartUp event");
+                ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record StartUp event: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
     }
@@ -350,9 +359,10 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
             Events::ShutDown::Type event;
             EventNumber eventNumber;
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent))
+            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+            if (CHIP_NO_ERROR != err)
             {
-                ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record ShutDown event");
+                ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record ShutDown event: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
     }

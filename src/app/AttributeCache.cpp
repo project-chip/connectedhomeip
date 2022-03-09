@@ -100,8 +100,7 @@ void AttributeCache::OnReportEnd()
     mCallback.OnReportEnd();
 }
 
-void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
-                                     const StatusIB & aStatus)
+void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     //
     // Since the cache itself is a ReadClient::Callback, it may be incorrectly passed in directly when registering with the
@@ -121,7 +120,7 @@ void AttributeCache::OnAttributeData(const ConcreteDataAttributePath & aPath, Da
     //
     // Forward the call through.
     //
-    mCallback.OnAttributeData(aPath, aVersion, apData, aStatus);
+    mCallback.OnAttributeData(aPath, apData, aStatus);
 }
 
 CHIP_ERROR AttributeCache::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader)

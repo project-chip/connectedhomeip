@@ -13,13 +13,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import logging
-import time
-import threading
 import sys
-from random import randrange
-from xmlrpc.server import SimpleXMLRPCServer
+import threading
 from xmlrpc.client import ServerProxy
+from xmlrpc.server import SimpleXMLRPCServer
 
 IP = '127.0.0.1'
 PORT = 9000
@@ -38,6 +35,11 @@ class AppsRegister:
     def uninit(self):
         self.__stopXMLRPCServer()
 
+    @property
+    def accessories(self):
+        """List of registered accessory applications."""
+        return self.__accessories.values()
+
     def add(self, name, accessory):
         self.__accessories[name] = accessory
 
@@ -46,13 +48,6 @@ class AppsRegister:
 
     def removeAll(self):
         self.__accessories = {}
-
-    def poll(self):
-        for accessory in self.__accessories.values():
-            status = accessory.poll()
-            if status is not None:
-                return status
-        return None
 
     def kill(self, name):
         accessory = self.__accessories[name]
@@ -91,6 +86,18 @@ class AppsRegister:
             return accessory.factoryReset()
         return False
 
+    def waitForCommissionableAdvertisement(self, name):
+        accessory = self.__accessories[name]
+        if accessory:
+            return accessory.waitForCommissionableAdvertisement()
+        return False
+
+    def waitForOperationalAdvertisement(self, name):
+        accessory = self.__accessories[name]
+        if accessory:
+            return accessory.waitForOperationalAdvertisement()
+        return False
+
     def ping(self):
         return True
 
@@ -101,6 +108,12 @@ class AppsRegister:
         self.server.register_function(self.stop, 'stop')
         self.server.register_function(self.reboot, 'reboot')
         self.server.register_function(self.factoryReset, 'factoryReset')
+        self.server.register_function(
+            self.waitForCommissionableAdvertisement,
+            'waitForCommissionableAdvertisement')
+        self.server.register_function(
+            self.waitForOperationalAdvertisement,
+            'waitForOperationalAdvertisement')
         self.server.register_function(self.ping, 'ping')
 
         self.server_thread = threading.Thread(target=self.__handle_request)
@@ -113,7 +126,8 @@ class AppsRegister:
 
     def __stopXMLRPCServer(self):
         self.__should_handle_requests = False
-        # handle_request will wait until it receives a message, so let's send a ping to the server
+        # handle_request will wait until it receives a message,
+        # so let's send a ping to the server
         client = ServerProxy('http://' + IP + ':' +
                              str(PORT) + '/', allow_none=True)
         client.ping()

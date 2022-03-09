@@ -121,8 +121,14 @@ var endpointClusterWithInit = [
   'Time Format Localization',
   'Thermostat',
 ];
-var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
-var endpointClusterWithPreAttribute     = [
+var endpointClusterWithAttributeChanged = [
+  'Bridged Device Basic',
+  'Door Lock',
+  'Identify',
+  'Pump Configuration and Control',
+  'Window Covering',
+];
+var endpointClusterWithPreAttribute = [
   'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration', 'Time Format Localization', 'Localization Configuration'
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
@@ -180,9 +186,9 @@ function chip_endpoint_generated_functions()
   return ret.concat('\n');
 }
 
-function chip_endpoint_generated_commands_list()
+function chip_endpoint_generated_commands_list(options)
 {
-  let ret = '{ \\\n';
+  let ret = [];
   this.clusterList.forEach((c) => {
     let clientGeneratedCommands = [];
     let serverGeneratedCommands = [];
@@ -197,18 +203,18 @@ function chip_endpoint_generated_commands_list()
     });
 
     if (clientGeneratedCommands.length > 0 || serverGeneratedCommands.length > 0) {
-      ret = ret.concat(`  /* ${c.comment} */\\\n`);
+      ret.push({ text : `  /* ${c.comment} */\\` });
     }
     if (clientGeneratedCommands.length > 0) {
       clientGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret = ret.concat(`  /*   client_generated */ \\\n  ${clientGeneratedCommands.join(', \\\n  ')}, \\\n`);
+      ret.push({ text : `  /*   client_generated */ \\\n  ${clientGeneratedCommands.join(', \\\n  ')}, \\` });
     }
     if (serverGeneratedCommands.length > 0) {
       serverGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret = ret.concat(`  /*   server_generated */ \\\n  ${serverGeneratedCommands.join(', \\\n  ')}, \\\n`);
+      ret.push({ text : `  /*   server_generated */ \\\n  ${serverGeneratedCommands.join(', \\\n  ')}, \\` });
     }
   })
-  return ret.concat('}\n');
+  return templateUtil.collectBlocks(ret, options, this);
 }
 
 /**
@@ -327,9 +333,9 @@ function asPrintFormat(type)
       case 'bool':
         return '%d';
       case 'int8_t':
-        return '%" PRId8 "';
+        return '%d';
       case 'uint8_t':
-        return '%" PRIu8 "';
+        return '%u';
       case 'int16_t':
         return '%" PRId16 "';
       case 'uint16_t':
@@ -419,7 +425,7 @@ function hasSpecificAttributes(options)
 function asLowerCamelCase(label)
 {
   let str = string.toCamelCase(label, true);
-  // Check for the case when were:
+  // Check for the case when we're:
   // 1. A single word (that's the regexp at the beginning, which matches the
   //    word-splitting regexp in string.toCamelCase).
   // 2. Starting with multiple capital letters in a row.
@@ -473,6 +479,11 @@ function nsValueToNamespace(ns)
  */
 async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
+  // Use the entryType as a type
+  if (type == 'array' && this.entryType) {
+    type = this.entryType;
+  }
+
   let passByReference = false;
   async function fn(pkgId)
   {
@@ -592,7 +603,11 @@ async function _zapTypeToPythonClusterObjectType(type, options)
       return 'bytes';
     }
 
-    if ([ 'single', 'double' ].includes(type.toLowerCase())) {
+    if (type.toLowerCase() == 'single') {
+      return 'float32';
+    }
+
+    if (type.toLowerCase() == 'double') {
       return 'float';
     }
 
@@ -725,14 +740,6 @@ function getPythonFieldDefault(type, options)
   return _getPythonFieldDefault.call(this, type, options)
 }
 
-async function getResponseCommandName(responseRef, options)
-{
-  let pkgId = await templateUtil.ensureZclPackageId(this);
-
-  const { db, sessionId } = this.global;
-  return queryCommand.selectCommandById(db, responseRef, pkgId).then(response => asUpperCamelCase(response.name));
-}
-
 // Allow-list of enums that we generate as enums, not enum classes.  The goal is
 // to drive this down to 0.
 function isWeaklyTypedEnum(label)
@@ -748,15 +755,6 @@ function isWeaklyTypedEnum(label)
     "ColorMode",
     "ContentLaunchStatus",
     "ContentLaunchStreamingType",
-    "DoorLockEventSource",
-    "DoorLockEventType",
-    "DoorLockOperatingMode",
-    "DoorLockOperationEventCode",
-    "DoorLockProgrammingEventCode",
-    "DoorLockState",
-    "DoorLockUserStatus",
-    "DoorLockUserType",
-    "DoorState",
     "EnhancedColorMode",
     "HardwareFaultType",
     "HueDirection",
@@ -773,7 +771,6 @@ function isWeaklyTypedEnum(label)
     "LevelControlOptions",
     "MoveMode",
     "NetworkFaultType",
-    "NodeOperationalCertStatus",
     "OnOffDelayedAllOffEffectVariant",
     "OnOffDyingLightEffectVariant",
     "OnOffEffectIdentifier",
@@ -788,9 +785,6 @@ function isWeaklyTypedEnum(label)
     "StatusCode",
     "StepMode",
     "TemperatureDisplayMode",
-    "ThermostatControlSequence",
-    "ThermostatRunningMode",
-    "ThermostatSystemMode",
     "WcEndProductType",
     "WcType",
     "WiFiVersionType",
@@ -823,6 +817,35 @@ async function zcl_events_fields_by_event_name(name, options)
   return templateUtil.templatePromise(this.global, promise)
 }
 
+// Must be used inside zcl_clusters
+async function zcl_commands_that_need_timed_invoke(options)
+{
+  const { db }  = this.global;
+  let packageId = await templateUtil.ensureZclPackageId(this);
+  let commands  = await queryCommand.selectCommandsByClusterId(db, this.id, packageId);
+  commands      = commands.filter(cmd => cmd.mustUseTimedInvoke);
+  return templateUtil.collectBlocks(commands, options, this);
+}
+
+// Allows conditioning generation on whether the given type is a fabric-scoped
+// struct.
+async function if_is_fabric_scoped_struct(type, options)
+{
+  let packageId = await templateUtil.ensureZclPackageId(this);
+  let st        = await zclQuery.selectStructByName(this.global.db, type, packageId);
+
+  if (st) {
+    // TODO: Should know whether a struct is fabric-scoped without sniffing its
+    // members.
+    let fields = await zclQuery.selectAllStructItemsById(this.global.db, st.id);
+    if (fields.find((i) => i.type.toLowerCase() == "fabric_idx")) {
+      return options.fn(this);
+    }
+  }
+
+  return options.inverse(this);
+}
+
 //
 // Module exports
 //
@@ -841,8 +864,9 @@ exports.asMEI                                 = asMEI;
 exports.zapTypeToEncodableClusterObjectType   = zapTypeToEncodableClusterObjectType;
 exports.zapTypeToDecodableClusterObjectType   = zapTypeToDecodableClusterObjectType;
 exports.zapTypeToPythonClusterObjectType      = zapTypeToPythonClusterObjectType;
-exports.getResponseCommandName                = getResponseCommandName;
 exports.isWeaklyTypedEnum                     = isWeaklyTypedEnum;
 exports.getPythonFieldDefault                 = getPythonFieldDefault;
 exports.incrementDepth                        = incrementDepth;
 exports.zcl_events_fields_by_event_name       = zcl_events_fields_by_event_name;
+exports.zcl_commands_that_need_timed_invoke   = zcl_commands_that_need_timed_invoke;
+exports.if_is_fabric_scoped_struct            = if_is_fabric_scoped_struct

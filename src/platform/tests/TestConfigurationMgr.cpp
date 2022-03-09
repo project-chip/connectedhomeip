@@ -87,6 +87,32 @@ static void TestConfigurationMgr_SerialNumber(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, strcmp(buf, "89051") == 0);
 }
 
+static void TestConfigurationMgr_UniqueId(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    char buf[64];
+    const char * uniqueId = "67MXAZ012RT8UE";
+
+    err = ConfigurationMgr().StoreUniqueId(uniqueId, strlen(uniqueId));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetUniqueId(buf, 64);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, strlen(buf) == 14);
+    NL_TEST_ASSERT(inSuite, strcmp(buf, uniqueId) == 0);
+
+    err = ConfigurationMgr().StoreUniqueId(uniqueId, 7);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetUniqueId(buf, 64);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, strlen(buf) == 7);
+    NL_TEST_ASSERT(inSuite, strcmp(buf, "67MXAZ0") == 0);
+}
+
 static void TestConfigurationMgr_ManufacturingDate(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -187,8 +213,7 @@ static void TestConfigurationMgr_Breadcrumb(nlTestSuite * inSuite, void * inCont
 
 static void TestConfigurationMgr_GetPrimaryMACAddress(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    const uint8_t defaultMacAddress[8] = { 0xEE, 0xAA, 0xBA, 0xDA, 0xBA, 0xD0, 0xDD, 0xCA };
+    CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t macBuffer8Bytes[8];
     uint8_t macBuffer6Bytes[6];
     MutableByteSpan mac8Bytes(macBuffer8Bytes);
@@ -199,32 +224,17 @@ static void TestConfigurationMgr_GetPrimaryMACAddress(nlTestSuite * inSuite, voi
     {
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
     }
-    else
-    {
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-        // Verify default MAC address value
-        NL_TEST_ASSERT(inSuite,
-                       strncmp(reinterpret_cast<char *>(mac8Bytes.data()), reinterpret_cast<const char *>(defaultMacAddress),
-                               mac8Bytes.size()) == 0);
-    }
 
     err = ConfigurationMgr().GetPrimaryMACAddress(mac6Bytes);
     if (mac6Bytes.size() != ConfigurationManager::kPrimaryMACAddressLength)
     {
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
     }
-    else
-    {
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-#ifndef __MBED__
-        // Verify default MAC address value
-        NL_TEST_ASSERT(inSuite,
-                       strncmp(reinterpret_cast<char *>(mac6Bytes.data()), reinterpret_cast<const char *>(defaultMacAddress),
-                               mac6Bytes.size()) == 0);
-#endif
-    }
+    // NOTICE for above:
+    //   no validation for CHIP_NO_ERROR:
+    //    - there is no guarantee in CI that a valid IP address exists,
+    //      expecially if running in emulators (zephyr and qemu)
 }
 
 /**
@@ -237,6 +247,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test PlatformMgr::RunUnitTest", TestPlatformMgr_RunUnitTest),
 #endif
     NL_TEST_DEF("Test ConfigurationMgr::SerialNumber", TestConfigurationMgr_SerialNumber),
+    NL_TEST_DEF("Test ConfigurationMgr::UniqueId", TestConfigurationMgr_UniqueId),
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturingDate", TestConfigurationMgr_ManufacturingDate),
     NL_TEST_DEF("Test ConfigurationMgr::HardwareVersion", TestConfigurationMgr_HardwareVersion),
     NL_TEST_DEF("Test ConfigurationMgr::SetupPinCode", TestConfigurationMgr_SetupPinCode),

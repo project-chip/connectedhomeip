@@ -38,6 +38,14 @@
 
 // ==================== Security Adaptations ====================
 
+// Size of the statically allocated context for SHA256 operations in CryptoPAL
+// determined empirically.
+#ifdef CONFIG_CC3XX_BACKEND
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE 240
+#else
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE 208
+#endif
+
 // ==================== General Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_PEER_NODES
@@ -68,6 +76,6 @@
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 
-#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 5
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 5
 #endif

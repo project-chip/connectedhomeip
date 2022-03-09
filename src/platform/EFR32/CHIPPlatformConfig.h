@@ -81,15 +81,15 @@
 #endif // CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
 
 /**
- *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
- *    Maximum number of administrators that can provision the device. Each admin
- *    can provision the device with their unique operational credentials and manage
- *    their access control lists.
+ *    Maximum number of fabrics the device can participate in.  Each fabric can
+ *    provision the device with its unique operational credentials and manage
+ *    its own access control lists.
  */
-#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 5 // 4 fabrics + 1 for rotation slack
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 5 // 4 fabrics + 1 for rotation slack
 #endif
 
 // ==================== FreeRTOS Configuration Overrides ====================

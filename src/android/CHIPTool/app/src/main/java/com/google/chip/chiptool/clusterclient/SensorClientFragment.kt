@@ -33,6 +33,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 private typealias ReadCallback = ChipClusters.IntegerAttributeCallback
+private typealias PressureReadCallback =
+  ChipClusters.PressureMeasurementCluster.MeasuredValueAttributeCallback
+private typealias TemperatureReadCallback =
+  ChipClusters.TemperatureMeasurementCluster.MeasuredValueAttributeCallback
 
 class SensorClientFragment : Fragment() {
   private lateinit var scope: CoroutineScope
@@ -90,15 +94,17 @@ class SensorClientFragment : Fragment() {
     sensorGraph.viewport.isXAxisBoundsManual = true
     sensorGraph.viewport.setMinX(currentTime.toDouble())
     sensorGraph.viewport.setMaxX(currentTime.toDouble() + MIN_REFRESH_PERIOD_S * 1000 * MAX_DATA_POINTS)
-    sensorGraph.gridLabelRenderer.padding = 20
+    sensorGraph.gridLabelRenderer.padding = 30
     sensorGraph.gridLabelRenderer.numHorizontalLabels = 4
     sensorGraph.gridLabelRenderer.setHorizontalLabelsAngle(150)
     sensorGraph.gridLabelRenderer.labelFormatter = object : LabelFormatter {
       override fun setViewport(viewport: Viewport?) = Unit
       override fun formatLabel(value: Double, isValueX: Boolean): String {
-        if (!isValueX)
-          return "%.2f".format(value)
-        return SimpleDateFormat("H:mm:ss").format(Date(value.toLong())).toString()
+        if (isValueX)
+          return SimpleDateFormat("H:mm:ss").format(Date(value.toLong())).toString()
+        if (value >= 100.0)
+          return "%.1f".format(value)
+        return "%.2f".format(value)
       }
     }
   }
@@ -237,11 +243,11 @@ class SensorClientFragment : Fragment() {
     private const val MAX_DATA_POINTS = 60
     private val CLUSTERS = mapOf(
         "Temperature" to mapOf(
-            "read" to { device: Long, endpointId: Int, callback: ReadCallback ->
+            "read" to { device: Long, endpointId: Int, callback: TemperatureReadCallback ->
               val cluster = ChipClusters.TemperatureMeasurementCluster(device, endpointId)
               cluster.readMeasuredValueAttribute(callback)
             },
-            "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
+            "subscribe" to { device: Long, endpointId: Int, callback: TemperatureReadCallback ->
               val cluster = ChipClusters.TemperatureMeasurementCluster(device, endpointId)
               cluster.subscribeMeasuredValueAttribute(callback,
                                                       MIN_REFRESH_PERIOD_S,
@@ -251,11 +257,11 @@ class SensorClientFragment : Fragment() {
             "unitSymbol" to "\u00B0C"
         ),
         "Pressure" to mapOf(
-            "read" to { device: Long, endpointId: Int, callback: ReadCallback ->
+            "read" to { device: Long, endpointId: Int, callback: PressureReadCallback ->
               val cluster = ChipClusters.PressureMeasurementCluster(device, endpointId)
               cluster.readMeasuredValueAttribute(callback)
             },
-            "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
+            "subscribe" to { device: Long, endpointId: Int, callback: PressureReadCallback ->
               val cluster = ChipClusters.PressureMeasurementCluster(device, endpointId)
               cluster.subscribeMeasuredValueAttribute(callback,
                                                       MIN_REFRESH_PERIOD_S,

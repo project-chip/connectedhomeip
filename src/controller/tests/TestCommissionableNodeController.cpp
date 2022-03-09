@@ -33,13 +33,12 @@ class MockResolver : public Resolver
 public:
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override { return InitStatus; }
     void Shutdown() override {}
-    void SetResolverDelegate(ResolverDelegate *) override {}
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override
-    {
-        return ResolveNodeIdStatus;
-    }
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override { return ResolveNodeIdStatus; }
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return FindCommissionersStatus; }
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) override { return false; }
 
     CHIP_ERROR InitStatus              = CHIP_NO_ERROR;
     CHIP_ERROR ResolveNodeIdStatus     = CHIP_NO_ERROR;
@@ -63,7 +62,7 @@ void TestGetDiscoveredCommissioner_HappyCase(nlTestSuite * inSuite, void * inCon
     inNodeData.numIPs++;
     inNodeData.port = 5540;
 
-    controller.OnNodeDiscoveryComplete(inNodeData);
+    controller.OnNodeDiscovered(inNodeData);
 
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0) != nullptr);
     NL_TEST_ASSERT(inSuite, strcmp(inNodeData.hostName, controller.GetDiscoveredCommissioner(0)->hostName) == 0);
@@ -81,7 +80,7 @@ void TestGetDiscoveredCommissioner_InvalidNodeDiscovered_ReturnsNullptr(nlTestSu
     inNodeData.numIPs++;
     inNodeData.port = 5540;
 
-    controller.OnNodeDiscoveryComplete(inNodeData);
+    controller.OnNodeDiscovered(inNodeData);
 
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
@@ -104,8 +103,8 @@ void TestGetDiscoveredCommissioner_HappyCase_OneValidOneInvalidNode(nlTestSuite 
     validNodeData.numIPs++;
     validNodeData.port = 5540;
 
-    controller.OnNodeDiscoveryComplete(validNodeData);
-    controller.OnNodeDiscoveryComplete(invalidNodeData);
+    controller.OnNodeDiscovered(validNodeData);
+    controller.OnNodeDiscovered(invalidNodeData);
 
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0) != nullptr);
     NL_TEST_ASSERT(inSuite, strcmp(validNodeData.hostName, controller.GetDiscoveredCommissioner(0)->hostName) == 0);

@@ -344,6 +344,9 @@ public:
         virtual void SetListener(Listener & listener) { mListener = &listener; }
         virtual void ClearListener() { mListener = nullptr; }
 
+        // TODO(#13867): this will go away
+        virtual bool TemporaryCheckOverride() const { return false; }
+
     private:
         Listener * mListener = nullptr;
     };
@@ -393,6 +396,7 @@ public:
      */
     CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex = nullptr)
     {
+        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
         return mDelegate.CreateEntry(index, entry, fabricIndex);
     }
 
@@ -417,6 +421,7 @@ public:
      */
     CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
     {
+        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
         return mDelegate.UpdateEntry(index, entry, fabricIndex);
     }
 
@@ -453,6 +458,8 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
 
 private:
+    bool IsValid(const Entry & entry);
+
     static Delegate mDefaultDelegate;
     Delegate & mDelegate = mDefaultDelegate;
 };

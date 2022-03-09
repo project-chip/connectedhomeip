@@ -81,17 +81,7 @@ public:
 
     /**
      * @brief
-     *   Get the value of peer session counter which is synced during session establishment
-     */
-    virtual uint32_t GetPeerCounter()
-    {
-        // TODO(#6652): This is a stub implementation, should be replaced by the real one when CASE and PASE is completed
-        return LocalSessionMessageCounter::kInitialSyncValue;
-    }
-
-    /**
-     * @brief
-     *   Get the value of peer session counter which is synced during session establishment
+     *   Get the MRP config that was communicated during the session establishment.
      */
     virtual const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
 
@@ -198,7 +188,7 @@ private:
 
     Optional<uint16_t> mPeerSessionId;
 
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
+    ReliableMessageProtocolConfig mMRPConfig = GetLocalMRPConfig();
 };
 
 } // namespace chip

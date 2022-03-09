@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020-2021 Project CHIP Authors
+#    Copyright (c) 2020-2022 Project CHIP Authors
 #    Copyright (c) 2019-2020 Google, LLC.
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
 #    All rights reserved.
@@ -50,8 +50,6 @@ __all__ = ["ChipDeviceController"]
 
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, c_uint32)
 _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
-    None, c_uint64, c_uint32)
-_DeviceAddressUpdateDelegate_OnUpdateComplete = CFUNCTYPE(
     None, c_uint64, c_uint32)
 # void (*)(Device *, CHIP_ERROR).
 #
@@ -119,18 +117,6 @@ class ChipDeviceController():
             self.state = DCState.IDLE
             self._ChipStack.completeEvent.set()
 
-        def HandleAddressUpdateComplete(nodeid, err):
-            if err != 0:
-                print("Failed to update node address: {}".format(err))
-                # Failed update address, don't wait for HandleCommissioningComplete
-                self.state = DCState.IDLE
-                self._ChipStack.callbackRes = err
-                self._ChipStack.completeEvent.set()
-            else:
-                print("Node address has been updated")
-                # Wait for HandleCommissioningComplete before setting
-                # self._ChipStack.callbackRes; we're not done until that happens.
-
         def HandleCommissioningComplete(nodeid, err):
             if err != 0:
                 print("Failed to commission: {}".format(err))
@@ -151,11 +137,6 @@ class ChipDeviceController():
             HandleCommissioningComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.devCtrl, self.cbHandleCommissioningCompleteFunct)
-
-        self.cbOnAddressUpdateComplete = _DeviceAddressUpdateDelegate_OnUpdateComplete(
-            HandleAddressUpdateComplete)
-        self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
-            self.cbOnAddressUpdateComplete)
 
         self.state = DCState.IDLE
         self.isActive = True
@@ -539,7 +520,7 @@ class ChipDeviceController():
             future.set_exception(self._ChipStack.ErrorToException(res))
         return await future
 
-    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]], timedRequestTimeoutMs: int = None):
+    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: int = None):
         '''
         Write a list of attributes on a target node.
 
@@ -559,8 +540,12 @@ class ChipDeviceController():
 
         attrs = []
         for v in attributes:
-            attrs.append(ClusterAttribute.AttributeWriteRequest(
-                v[0], v[1], v[1].value))
+            if len(v) == 2:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], 0, 0, v[1].value))
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], v[2], 1, v[1].value))
 
         res = self._ChipStack.Call(
             lambda: ClusterAttribute.WriteAttributes(
@@ -581,7 +566,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]], returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
+    ]], dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None, returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
         '''
         Read a list of attributes from a target node
 
@@ -614,6 +599,7 @@ class ChipDeviceController():
 
         device = self.GetConnectedDeviceSync(nodeid)
         attrs = []
+        filters = []
         for v in attributes:
             endpoint = None
             cluster = None
@@ -641,35 +627,52 @@ class ChipDeviceController():
                     raise ValueError("Unsupported Attribute Path")
             attrs.append(ClusterAttribute.AttributePath(
                 EndpointId=endpoint, Cluster=cluster, Attribute=attribute))
+        if dataVersionFilters != None:
+            for v in dataVersionFilters:
+                endpoint = None
+                cluster = None
+
+                # endpoint + (cluster) attribute / endpoint + cluster
+                endpoint = v[0]
+                if issubclass(v[1], ClusterObjects.Cluster):
+                    cluster = v[1]
+                else:
+                    raise ValueError("Unsupported Cluster Path")
+                dataVersion = v[2]
+                filters.append(ClusterAttribute.DataVersionFilter(
+                    EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion))
+            else:
+                filters = None
         res = self._ChipStack.Call(
-            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered))
+            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, filters, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
 
     async def ReadEvent(self, nodeid: int, events: typing.List[typing.Union[
         None,  # Empty tuple, all wildcard
-        typing.Tuple[int],  # Endpoint
+        typing.Tuple[str, int],  # all wildcard with urgency set
+        typing.Tuple[int, int],  # Endpoint,
         # Wildcard endpoint, Cluster id present
-        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+        typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
         # Wildcard endpoint, Cluster + Event present
-        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent]],
+        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
         # Wildcard event id
-        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
         # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent]]
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
     ]], reportInterval: typing.Tuple[int, int] = None):
         '''
         Read a list of events from a target node
 
         nodeId: Target's Node ID
         events: A list of tuples of varying types depending on the type of read being requested:
-            (endpoint, Clusters.ClusterA.EventA):       Endpoint = specific,    Cluster = specific,   Event = specific
-            (endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Event = *
-            (Clusters.ClusterA.EventA):                 Endpoint = *,           Cluster = specific,   Event = specific
-            endpoint:                                   Endpoint = specific,    Cluster = *,          Event = *
-            Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Event = *
-            '*' or ():                                  Endpoint = *,           Cluster = *,          Event = *
+            (endpoint, Clusters.ClusterA.EventA, urgent):       Endpoint = specific,    Cluster = specific,   Event = specific, Urgent = True/False
+            (endpoint, Clusters.ClusterA, urgent):              Endpoint = specific,    Cluster = specific,   Event = *, Urgent = True/False
+            (Clusters.ClusterA.EventA, urgent):                 Endpoint = *,           Cluster = specific,   Event = specific, Urgent = True/False
+            endpoint:                                   Endpoint = specific,    Cluster = *,          Event = *, Urgent = True/False
+            Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Event = *, Urgent = True/False
+            '*' or ():                                  Endpoint = *,           Cluster = *,          Event = *, Urgent = True/False
 
         The cluster and events specified above are to be selected from the generated cluster objects.
 
@@ -692,6 +695,7 @@ class ChipDeviceController():
             endpoint = None
             cluster = None
             event = None
+            urgent = False
             if v in [('*'), ()]:
                 # Wildcard
                 pass
@@ -706,16 +710,21 @@ class ChipDeviceController():
                 else:
                     raise ValueError("Unsupported Event Path")
             else:
-                # endpoint + (cluster) event / endpoint + cluster
-                endpoint = v[0]
-                if issubclass(v[1], ClusterObjects.Cluster):
-                    cluster = v[1]
-                elif issubclass(v[1], ClusterAttribute.ClusterEvent):
-                    event = v[1]
+                if v[0] == '*':
+                    urgent = v[-1]
+                    pass
                 else:
-                    raise ValueError("Unsupported Attribute Path")
+                    # endpoint + (cluster) event / endpoint + cluster
+                    endpoint = v[0]
+                    if issubclass(v[1], ClusterObjects.Cluster):
+                        cluster = v[1]
+                    elif issubclass(v[1], ClusterAttribute.ClusterEvent):
+                        event = v[1]
+                    else:
+                        raise ValueError("Unsupported Attribute Path")
+                    urgent = v[-1]
             eves.append(ClusterAttribute.EventPath(
-                EndpointId=endpoint, Cluster=cluster, Event=event))
+                EndpointId=endpoint, Cluster=cluster, Event=event, Urgent=urgent))
         res = self._ChipStack.Call(
             lambda: ClusterAttribute.ReadEvents(future, eventLoop, device, self, eves, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None))
         if res != 0:
@@ -757,7 +766,7 @@ class ChipDeviceController():
             EndpointId=endpoint, Attribute=attributeType)
         return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[endpoint][clusterType][attributeType])
 
-    def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
+    def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, dataVersion=0, blocking=True):
         req = None
         try:
             req = eval(
@@ -765,7 +774,7 @@ class ChipDeviceController():
         except:
             raise UnknownAttribute(cluster, attribute)
 
-        return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req)]))
+        return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req, dataVersion)]))
 
     def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
         self.CheckIsActive()
@@ -775,7 +784,7 @@ class ChipDeviceController():
             req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
         except:
             raise UnknownAttribute(cluster, attribute)
-        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], False, reportInterval=(minInterval, maxInterval)))
+        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], None, False, reportInterval=(minInterval, maxInterval)))
 
     def ZCLCommandList(self):
         self.CheckIsActive()
@@ -893,10 +902,6 @@ class ChipDeviceController():
                 c_void_p, _DevicePairingDelegate_OnCommissioningCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = c_uint32
 
-            self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.argtypes = [
-                _DeviceAddressUpdateDelegate_OnUpdateComplete]
-            self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.restype = None
-
             self._dmLib.pychip_DeviceController_UpdateDevice.argtypes = [
                 c_void_p, c_uint64]
             self._dmLib.pychip_DeviceController_UpdateDevice.restype = c_uint32
@@ -921,7 +926,7 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_GetCompressedFabricId.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
-                c_void_p, c_uint64, c_uint16, c_uint16, c_uint16, c_uint8]
+                c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = c_uint32
             self._dmLib.pychip_TestCommissionerUsed.argtypes = []
             self._dmLib.pychip_TestCommissionerUsed.restype = c_bool

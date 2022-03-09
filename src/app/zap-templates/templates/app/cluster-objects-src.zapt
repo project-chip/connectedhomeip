@@ -86,7 +86,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader &reader, const Concret
 
     return CHIP_NO_ERROR;
 }
-}
+} // namespace Attributes
 
 namespace Events {
 {{#zcl_events}}
@@ -95,7 +95,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_event_fields}}
+    {{#if_is_fabric_scoped_struct type}}
+    ReturnErrorOnFailure(DataModel::EncodeForRead(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase name}})), GetFabricIndex(), {{asLowerCamelCase name}}));
+    {{else}}
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase name}})), {{asLowerCamelCase name}}));
+    {{/if_is_fabric_scoped_struct}}
     {{/zcl_event_fields}}
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -126,11 +130,42 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 }
 } // namespace {{asUpperCamelCase name}}.
 {{/zcl_events}}
-} // namespace Commands
+} // namespace Events
 
 } // namespace {{asUpperCamelCase name}}
 {{/zcl_clusters}}
 
 } // namespace Clusters
+
+bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
+{
+    // Maybe it would be smaller code to codegen a table and walk over it?
+    // Not sure.
+    switch (aCluster)
+    {
+    {{#zcl_clusters}}
+      {{#zcl_commands_that_need_timed_invoke}}
+      {{#first}}
+      case Clusters::{{asUpperCamelCase parent.name}}::Id:
+      {
+          switch (aCommand) {
+      {{/first}}
+          case Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id:
+      {{#last}}
+              return true;
+          default:
+              return false;
+          }
+      }
+      {{/last}}
+      {{/zcl_commands_that_need_timed_invoke}}
+    {{/zcl_clusters}}
+    default:
+        break;
+    }
+
+    return false;
+}
+
 } // namespace app
 } // namespace chip

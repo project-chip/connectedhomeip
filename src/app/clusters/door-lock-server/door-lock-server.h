@@ -27,7 +27,12 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+
+#ifndef DOOR_LOCK_SERVER_ENDPOINT
+#define DOOR_LOCK_SERVER_ENDPOINT 1
+#endif
 
 using chip::Optional;
 using chip::app::Clusters::DoorLock::DlCredentialRule;
@@ -38,16 +43,18 @@ using chip::app::Clusters::DoorLock::DlDoorState;
 using chip::app::Clusters::DoorLock::DlLockDataType;
 using chip::app::Clusters::DoorLock::DlLockOperationType;
 using chip::app::Clusters::DoorLock::DlLockState;
+using chip::app::Clusters::DoorLock::DlOperationError;
 using chip::app::Clusters::DoorLock::DlOperationSource;
 using chip::app::Clusters::DoorLock::DlStatus;
 using chip::app::Clusters::DoorLock::DlUserStatus;
 using chip::app::Clusters::DoorLock::DlUserType;
 using chip::app::Clusters::DoorLock::DoorLockFeature;
+using chip::app::DataModel::List;
 using chip::app::DataModel::Nullable;
 
-#ifndef DOOR_LOCK_SERVER_ENDPOINT
-#define DOOR_LOCK_SERVER_ENDPOINT 1
-#endif
+using LockOpCredentials = chip::app::Clusters::DoorLock::Structs::DlCredential::Type;
+
+typedef bool (*RemoteLockOpHandler)(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode, DlOperationError & err);
 
 static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10; /**< Maximum size of the user name (in characters). */
 static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
@@ -68,7 +75,7 @@ public:
 
     void InitServer(chip::EndpointId endpointId);
 
-    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState);
+    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, DlOperationSource opSource);
     bool SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState);
     bool SetDoorState(chip::EndpointId endpointId, DlDoorState newDoorState);
 
@@ -79,6 +86,7 @@ public:
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
 
+    bool GetAutoRelockTime(chip::EndpointId endpointId, uint32_t & autoRelockTime);
     bool GetNumberOfUserSupported(chip::EndpointId endpointId, uint16_t & numberOfUsersSupported);
     bool GetNumberOfPINCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfPINCredentials);
     bool GetNumberOfRFIDCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfRFIDCredentials);
@@ -252,6 +260,105 @@ private:
 
     DlLockDataType credentialTypeToLockDataType(DlCredentialType credentialType);
 
+    /**
+     * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
+     *
+     * @param commandObj    original command context
+     * @param commandPath   original command path
+     * @param opType        remote operation type (lock, unlock)
+     * @param opHandler     plugin handler for specified command
+     * @param pinCode       pin code passed by client
+     * @return true         if locking/unlocking was successfull
+     * @return false        if error happenned during lock/unlock
+     */
+    bool HandleRemoteLockOperation(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                   DlLockOperationType opType, RemoteLockOpHandler opHandler,
+                                   const chip::Optional<chip::ByteSpan> & pinCode);
+
+    /**
+     * @brief Send LockOperation event if opSuccess is true, otherwise send LockOperationError with given opErr code
+     *
+     * @param endpointId    endpoint where DoorLockServer is running
+     * @param opType        lock operation type (lock, unlock, etc)
+     * @param opSource      operation source (remote, keypad, auto, etc)
+     * @param opErr         operation error code (if opSuccess == false)
+     * @param userId        user id
+     * @param fabricIdx     fabric index
+     * @param nodeId        node id
+     * @param credList      list of credentials used in lock operation (can be NULL if no credentials were used)
+     * @param credListSize  size of credentials list (if 0, then no credentials were used)
+     * @param opSuccess     flags if operation was successfull or not
+     */
+    void SendLockOperationEvent(chip::EndpointId endpointId, DlLockOperationType opType, DlOperationSource opSource,
+                                DlOperationError opErr, Nullable<uint16_t> userId, Nullable<chip::FabricIndex> fabricIdx,
+                                Nullable<chip::NodeId> nodeId, LockOpCredentials * credList, size_t credListSize,
+                                bool opSuccess = true);
+
+    /**
+     * @brief Schedule auto relocking with a given timeout
+     *
+     * @param endpointId    endpoint where DoorLockServer is running
+     * @param timeoutSec    timeout in seconds
+     */
+    void ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec);
+
+    /**
+     * @brief Send generic event
+     *
+     * @tparam T            Any event type supported by Matter
+     * @param endpointId    endpoint where DoorLockServer is running
+     * @param event         event object built by caller
+     */
+    template <typename T>
+    void SendEvent(chip::EndpointId endpointId, T & event);
+
+    /**
+     * @brief Get generic attribute value
+     *
+     * @tparam T            attribute value type
+     * @param endpointId    endpoint where DoorLockServer is running
+     * @param attributeId   attribute Id (used for logging only)
+     * @param getFn         attribute getter function as defined in <Accessors.h>
+     * @param value         actual attribute value on success
+     * @return true         on success (value is set to the actual attribute value)
+     * @return false        if attribute reading failed (value is kept unchanged)
+     */
+    template <typename T>
+    bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
+                      EmberAfStatus (*getFn)(chip::EndpointId endpointId, T * value), T & value);
+
+    /**
+     * @brief Set generic attribute value
+     *
+     * @tparam T            attribute value type
+     * @param endpointId    endpoint where DoorLockServer is running
+     * @param attributeId   attribute Id (used for logging only)
+     * @param setFn         attribute setter function as defined in <Accessors.h>
+     * @param value         new attribute value
+     * @return true         on success
+     * @return false        if attribute writing failed
+     */
+    template <typename T>
+    bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
+                      EmberAfStatus (*setFn)(chip::EndpointId endpointId, T value), T value);
+
+    friend bool
+    emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::DoorLock::Commands::LockDoor::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterUnlockDoorCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::UnlockDoor::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData);
+
+    friend void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId);
+
+    EmberEventControl AutolockEvent; /**< for automatic relock scheduling */
+
     static DoorLockServer instance;
 };
 
@@ -403,33 +510,6 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t w
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
 
-typedef bool (*EmberAfDoorLockLockUnlockCommand)(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode);
-
-/**
- * @brief This callback is called when Door Lock cluster needs to issue command to lock the door.
- *
- * @param endpointId ID of the endpoint which contains the lock.
- * @param[in] pinCode PIN code that is used to lock the door. Could be absent if attribute RequirePINforRemoteOperation is not set
- * or set to false.
- *
- * @return true if the door was locked, false in case of any failure.
- */
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode);
-
-/**
- * @brief This callback is called when Door Lock cluster needs to issue command to unlock the door.
- *
- * @param endpointId ID of the endpoint which contains the lock.
- * @param[in[ pinCode PIN code that is used to unlock the door. Could be absent if attribute RequirePINforRemoteOperation is not set
- * or set to false.
- *
- * @return true if the door was unlocked, false in case of any failure.
- */
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode);
-
-bool emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
-                                                         uint16_t timeout);
-
 // =============================================================================
 // Pre-change callbacks for cluster attributes
 // =============================================================================
@@ -535,6 +615,37 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTempora
 chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId,
                                                                                           EmberAfAttributeType attrType,
                                                                                           uint16_t attrSize, uint8_t * attrValue);
+
+// =============================================================================
+// Plugin callbacks that are called by cluster server and should be implemented
+// by the server app
+// =============================================================================
+
+/**
+ * @brief User handler for LockDoor command (server)
+ *
+ * @param   endpointId      endpoint for which LockDoor command is called
+ * @param   pinCode         PIN code (optional)
+ * @param   err             error code if door locking failed (set only if retval==false)
+ *
+ * @retval true on success
+ * @retval false if error happenned (err should be set to appropriate error code)
+ */
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
+                                            DlOperationError & err);
+
+/**
+ * @brief User handler for UnlockDoor command (server)
+ *
+ * @param   endpointId      endpoint for which UnlockDoor command is called
+ * @param   pinCode         PIN code (optional)
+ * @param   err             error code if door unlocking failed (set only if retval==false)
+ *
+ * @retval true on success
+ * @retval false if error happenned (err should be set to appropriate error code)
+ */
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
+                                              DlOperationError & err);
 
 /**
  * @brief This callback is called when Door Lock cluster needs to access the users database.

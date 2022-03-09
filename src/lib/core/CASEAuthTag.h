@@ -60,4 +60,19 @@ struct CATValues
 
 static constexpr CATValues kUndefinedCATs = { { kUndefinedCAT } };
 
+constexpr NodeId NodeIdFromCASEAuthTag(CASEAuthTag aCAT)
+{
+    return kMinCASEAuthTag | aCAT;
+}
+
+constexpr CASEAuthTag CASEAuthTagFromNodeId(NodeId aNodeId)
+{
+    return aNodeId & kMaskCASEAuthTag;
+}
+
+constexpr CASEAuthTag IsValidCASEAuthTag(CASEAuthTag aCAT)
+{
+    return (aCAT & kTagVersionMask) > 0;
+}
+
 } // namespace chip

@@ -18,11 +18,18 @@ import enum
 from idl.matter_idl_types import DataType
 from idl import matter_idl_types  # to explicitly say 'Enum'
 
-from typing import Union, List
+from typing import Union, List, Optional
 from dataclasses import dataclass
 
 
 def ToPowerOfTwo(bits: int) -> int:
+    """
+    Given a number, find the next power of two that is >= to the given value.
+
+    Can be used to figure out a variable size given non-standard bit sizes in
+    matter: eg. a int24 can be stored in an int32, so ToPortOfTwo(24) == 32.
+
+    """
     # probably bit manipulation can be faster, but this should be ok as well
     result = 1
     while result < bits:
@@ -50,12 +57,18 @@ class BasicInteger:
 
 @dataclass
 class BasicString:
+    """
+    Represents either a string or a binary string (blob).
+    """
     idl_name: str
     is_binary: bool
     max_length: Union[int, None] = None
 
 
 class FundamentalType(enum.Enum):
+    """
+    Native types, generally available across C++/ObjC/Java/python/other.
+    """
     BOOL = enum.auto()
     FLOAT = enum.auto()
     DOUBLE = enum.auto()
@@ -89,6 +102,10 @@ class FundamentalType(enum.Enum):
 
 @dataclass
 class IdlEnumType:
+    """
+    An enumeration type. Enumerations are constants with an underlying
+    base type that is an interger. 
+    """
     idl_name: str
     base_type: BasicInteger
 
@@ -102,8 +119,47 @@ class IdlEnumType:
 
 
 @dataclass
-class IdlType:
+class IdlBitmapType:
+    """
+    Bitmaps mark that each bit (or a subset of said bits) have a meaning.
+
+    Examples include "feature maps" where bits represent feature available or not.
+    """
     idl_name: str
+    base_type: BasicInteger
+
+    @property
+    def byte_count(self):
+        return base_type.byte_count()
+
+    @property
+    def bits(self):
+        return base_type.bits()
+
+
+class IdlItemType(enum.Enum):
+    UNKNOWN = enum.auto()
+    STRUCT = enum.auto()
+
+
+@dataclass
+class IdlType:
+    """
+    A type defined within the IDL. 
+
+    IDLs would generally only define structures as all other types are 
+    described in other things like enums/bitmaps/basic types etc.
+
+    However since IDL parsing is not yet codegen just syntactically, we allow
+    the option to have a type that is marked 'unknown' (likely invalid/never
+    defined).
+    """
+    idl_name: str
+    item_type: IdlItemType
+
+    @property
+    def is_struct(self) -> bool:
+        return self.item_type == IdlItemType.STRUCT
 
 
 # Data types, held by ZAP in chip-types.xml
@@ -114,6 +170,7 @@ __CHIP_SIZED_TYPES__ = {
     "bitmap64": BasicInteger(idl_name="bitmap64", byte_count=8, is_signed=False),
     "bitmap8": BasicInteger(idl_name="bitmap8", byte_count=1, is_signed=False),
     "enum16": BasicInteger(idl_name="enum16", byte_count=2, is_signed=False),
+    "enum32": BasicInteger(idl_name="enum32", byte_count=4, is_signed=False),
     "enum8": BasicInteger(idl_name="enum8", byte_count=1, is_signed=False),
     "int16s": BasicInteger(idl_name="int16s", byte_count=2, is_signed=True),
     "int16u": BasicInteger(idl_name="int16u", byte_count=2, is_signed=False),
@@ -160,9 +217,152 @@ __CHIP_SIZED_TYPES__ = {
 }
 
 
-def ParseDataType(data_type: DataType, known_enum_types: List[matter_idl_types.Enum]) -> Union[BasicInteger, BasicString, FundamentalType, IdlType]:
+class TypeLookupContext:
     """
-    Match the given string name to a potentially known type
+    Handles type lookups within a scope.
+
+    Generally when looking for a struct/enum, the lookup will be first done
+    at a cluster level, then at a global level.
+
+    Example:
+
+    ================ test.matter ==============
+    enum A {}
+
+    server cluster X {
+      struct A {}
+      struct B {}
+    }
+
+    server cluster Y {
+      enum C {}
+    }
+    ===========================================
+
+    When considering a lookup context of global (i.e. cluster is not set)
+       "A" is defined as an enum (::A)
+       "B" is undefined
+       "C" is undefined
+
+    When considering a lookup context of cluster X
+       "A" is defined as a struct (X::A)
+       "B" is defined as a struct (X::B)
+       "C" is undefined
+
+    When considering a lookup context of cluster Y
+       "A" is defined as an enum (::A)
+       "B" is undefined
+       "C" is defined as an enum (Y::C)
+
+    """
+
+    def __init__(self, idl: matter_idl_types.Idl, cluster: Optional[matter_idl_types.Cluster]):
+        self.idl = idl
+        self.cluster = cluster
+
+    def find_enum(self, name) -> Optional[matter_idl_types.Enum]:
+        """
+        Find the first enumeration matching the given name for the given
+        lookup rules (searches cluster first, then global).
+        """
+        for e in self.all_enums:
+            if e.name == name:
+                return e
+
+        return None
+
+    def find_struct(self, name) -> Optional[matter_idl_types.Struct]:
+        for s in self.all_structs:
+            if s.name == name:
+                return s
+
+        return None
+
+    def find_bitmap(self, name) -> Optional[matter_idl_types.Bitmap]:
+        for s in self.all_bitmaps:
+            if s.name == name:
+                return s
+
+        return None
+
+    @property
+    def all_enums(self):
+        """
+        All enumerations, ordered by lookup priority.
+
+        If an enum A is defined both in the cluster and globally, this WILL
+        return both instances, however it will return the cluster version first.
+        """
+        if self.cluster:
+            for e in self.cluster.enums:
+                yield e
+        for e in self.idl.enums:
+            yield e
+
+    @property
+    def all_bitmaps(self):
+        """
+        All bitmaps defined within this lookup context.
+
+        bitmaps are only defined at cluster level. If lookup context does not
+        include a cluster, the bitmal list will be empty.
+        """
+        if self.cluster:
+            for b in self.cluster.bitmaps:
+                yield b
+
+    @property
+    def all_structs(self):
+        """All structs, ordered by lookup prioroty.
+
+        If a struct A is defined both in the cluster and globally, this WILL
+        return both instances, however it will return the cluster version first.
+        """
+        if self.cluster:
+            for e in self.cluster.structs:
+                yield e
+        for e in self.idl.structs:
+            yield e
+
+    def is_enum_type(self, name: str):
+        """
+        Determine if the given type name is an enumeration.
+
+        Handles both standard names (like enum8) as well as enumerations defined
+        within the current lookup context.
+        """
+        if name.lower() in ["enum8", "enum16", "enum32"]:
+            return True
+        return any(map(lambda e: e.name == name, self.all_enums))
+
+    def is_struct_type(self, name: str):
+        """
+        Determine if the given type name is type that is known to be a struct
+        """
+        return any(map(lambda s: s.name == name, self.all_structs))
+
+    def is_bitmap_type(self, name: str):
+        """
+        Determine if the given type name is type that is known to be a bitmap.
+
+        Handles both standard/zcl names (like bitmap32) and types defined within
+        the current lookup context.
+        """
+        if name.lower() in ["bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64"]:
+            return True
+
+        return any(map(lambda s: s.name == name, self.all_bitmaps))
+
+
+def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType]:
+    """
+    Given a AST data type and a lookup context, match it to a type that can be later
+    be used for generation.
+
+    AST parsing is textual, so it does not understand what "foo" means. This method
+    looks up what "foo" actually means: includes basic types (e.g. bool),
+    zcl types (like enums or bitmaps) and does lookups to find structs/enums/bitmaps/etc
+    that are defined in the given lookup context.
     """
 
     lowercase_name = data_type.name.lower()
@@ -177,15 +377,31 @@ def ParseDataType(data_type: DataType, known_enum_types: List[matter_idl_types.E
         return BasicString(idl_name=lowercase_name, is_binary=False, max_length=data_type.max_length)
     elif lowercase_name in ['octet_string', 'long_octet_string']:
         return BasicString(idl_name=lowercase_name, is_binary=True, max_length=data_type.max_length)
+    elif lowercase_name in ['enum8', 'enum16', 'enum32']:
+        return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
+    elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap24', 'bitmap32']:
+        return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
 
     int_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
     if int_type is not None:
         return int_type
 
-    # All fast checks done, now check against known enumerations
-    for e in known_enum_types:
-        if e.name == data_type.name:
-            # Valid enum found. it MUST be based on a valid data type
-            return IdlEnumType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[e.base_type.lower()])
+    # All fast checks done, now check against known data types
+    e = lookup.find_enum(data_type.name)
+    if e:
+        # Valid enum found. it MUST be based on a valid data type
+        return IdlEnumType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[e.base_type.lower()])
 
-    return IdlType(idl_name=data_type.name)
+    b = lookup.find_bitmap(data_type.name)
+    if b:
+        # Valid enum found. it MUST be based on a valid data type
+        return IdlBitmapType(idl_name=data_type.name, base_type=__CHIP_SIZED_TYPES__[b.base_type.lower()])
+
+    result = IdlType(idl_name=data_type.name, item_type=IdlItemType.UNKNOWN)
+    if lookup.find_struct(data_type.name):
+        result.item_type = IdlItemType.STRUCT
+    else:
+        logging.warn(
+            "Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
+
+    return result

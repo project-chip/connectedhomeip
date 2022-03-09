@@ -20,9 +20,11 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <credentials/examples/ExampleDACs.h>
+#include <credentials/examples/ExamplePAI.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
@@ -39,8 +41,9 @@ using namespace chip::Credentials;
 
 namespace {
 
-static const ByteSpan kExpectedDacPublicKey = TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey;
-static const ByteSpan kExpectedPaiPublicKey = TestCerts::sTestCert_PAI_FFF1_8000_PublicKey;
+// Example Credentials impl uses development certs.
+static const ByteSpan kExpectedDacPublicKey = DevelopmentCerts::kDacPublicKey;
+static const ByteSpan kExpectedPaiPublicKey = DevelopmentCerts::kPaiPublicKey;
 
 } // namespace
 
@@ -89,7 +92,7 @@ static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, 0 == memcmp(pai_public_key.ConstBytes(), kExpectedPaiPublicKey.data(), kExpectedPaiPublicKey.size()));
 
     // Check for CD presence
-    uint8_t other_data_buf[256];
+    uint8_t other_data_buf[kMaxCMSSignedCDMessage];
     MutableByteSpan other_data_span(other_data_buf);
     memset(other_data_span.data(), 0, other_data_span.size());
 
@@ -153,8 +156,6 @@ static void OnAttestationInformationVerificationCallback(void * context, Attesta
 
 static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     uint8_t attestationElementsTestVector[] = {
         0x15, 0x30, 0x01, 0xeb, 0x30, 0x81, 0xe8, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02, 0xa0, 0x81,
         0xda, 0x30, 0x81, 0xd7, 0x02, 0x01, 0x03, 0x31, 0x0d, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04,
@@ -203,30 +204,16 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
     default_verifier = GetDeviceAttestationVerifier();
     NL_TEST_ASSERT(inSuite, default_verifier == example_dac_verifier);
 
-    DeviceAttestationCredentialsProvider * example_dac_provider = Examples::GetExampleDACProvider();
-    NL_TEST_ASSERT(inSuite, example_dac_provider != nullptr);
-
-    SetDeviceAttestationCredentialsProvider(example_dac_provider);
-    DeviceAttestationCredentialsProvider * default_provider = GetDeviceAttestationCredentialsProvider();
-    NL_TEST_ASSERT(inSuite, default_provider == example_dac_provider);
-
-    uint8_t dac[kMaxDERCertLength];
-    uint8_t pai[kMaxDERCertLength];
-    MutableByteSpan dac_span(dac);
-    MutableByteSpan pai_span(pai);
-
-    err = default_provider->GetDeviceAttestationCert(dac_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = default_provider->GetProductAttestationIntermediateCert(pai_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     attestationResult = AttestationVerificationResult::kNotImplemented;
     Callback::Callback<OnAttestationInformationVerification> attestationInformationVerificationCallback(
         OnAttestationInformationVerificationCallback, &attestationResult);
 
-    default_verifier->VerifyAttestationInformation(
+    Credentials::DeviceAttestationVerifier::AttestationInfo info(
         ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
-        pai_span, dac_span, ByteSpan(attestationNonceTestVector), &attestationInformationVerificationCallback);
+        TestCerts::sTestCert_PAI_FFF1_8000_Cert, TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert, ByteSpan(attestationNonceTestVector),
+        static_cast<VendorId>(0xFFF1), 0x8000);
+    default_verifier->VerifyAttestationInformation(info, &attestationInformationVerificationCallback);
+
     NL_TEST_ASSERT(inSuite, attestationResult == AttestationVerificationResult::kSuccess);
 }
 
@@ -252,7 +239,20 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
                                                       0x30, 0x30, 0x30, 0x31, 0x2d, 0x32, 0x34, 0x24, 0x05, 0x00, 0x24,
                                                       0x06, 0x00, 0x25, 0x07, 0x94, 0x26, 0x24, 0x08, 0x00, 0x18 };
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    static constexpr uint8_t sTest_CD[] = {
+        0x30, 0x81, 0xe8, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02, 0xa0, 0x81, 0xda, 0x30, 0x81, 0xd7,
+        0x02, 0x01, 0x03, 0x31, 0x0d, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x30, 0x45,
+        0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x01, 0xa0, 0x38, 0x04, 0x36, 0x15, 0x24, 0x00, 0x01, 0x25,
+        0x01, 0xf1, 0xff, 0x36, 0x02, 0x05, 0x00, 0x80, 0x18, 0x25, 0x03, 0x34, 0x12, 0x2c, 0x04, 0x13, 0x5a, 0x49, 0x47, 0x32,
+        0x30, 0x31, 0x34, 0x31, 0x5a, 0x42, 0x33, 0x33, 0x30, 0x30, 0x30, 0x31, 0x2d, 0x32, 0x34, 0x24, 0x05, 0x00, 0x24, 0x06,
+        0x00, 0x25, 0x07, 0x94, 0x26, 0x24, 0x08, 0x00, 0x18, 0x31, 0x7c, 0x30, 0x7a, 0x02, 0x01, 0x03, 0x80, 0x14, 0x62, 0xfa,
+        0x82, 0x33, 0x59, 0xac, 0xfa, 0xa9, 0x96, 0x3e, 0x1c, 0xfa, 0x14, 0x0a, 0xdd, 0xf5, 0x04, 0xf3, 0x71, 0x60, 0x30, 0x0b,
+        0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d,
+        0x04, 0x03, 0x02, 0x04, 0x46, 0x30, 0x44, 0x02, 0x20, 0x43, 0xa6, 0x3f, 0x2b, 0x94, 0x3d, 0xf3, 0x3c, 0x38, 0xb3, 0xe0,
+        0x2f, 0xca, 0xa7, 0x5f, 0xe3, 0x53, 0x2a, 0xeb, 0xbf, 0x5e, 0x63, 0xf5, 0xbb, 0xdb, 0xc0, 0xb1, 0xf0, 0x1d, 0x3c, 0x4f,
+        0x60, 0x02, 0x20, 0x4c, 0x1a, 0xbf, 0x5f, 0x18, 0x07, 0xb8, 0x18, 0x94, 0xb1, 0x57, 0x6c, 0x47, 0xe4, 0x72, 0x4e, 0x4d,
+        0x96, 0x6c, 0x61, 0x2e, 0xd3, 0xfa, 0x25, 0xc1, 0x18, 0xc3, 0xf2, 0xb3, 0xf9, 0x03, 0x69
+    };
 
     // Replace default verifier with example verifier
     DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
@@ -262,25 +262,13 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     DeviceAttestationVerifier * default_verifier = GetDeviceAttestationVerifier();
     NL_TEST_ASSERT(inSuite, default_verifier == example_dac_verifier);
 
-    DeviceAttestationCredentialsProvider * example_dac_provider = Examples::GetExampleDACProvider();
-    NL_TEST_ASSERT(inSuite, example_dac_provider != nullptr);
-
-    SetDeviceAttestationCredentialsProvider(example_dac_provider);
-    DeviceAttestationCredentialsProvider * default_provider = GetDeviceAttestationCredentialsProvider();
-    NL_TEST_ASSERT(inSuite, default_provider == example_dac_provider);
-
     // Check for CD presence
     uint8_t cd_data_buf[kMaxCMSSignedCDMessage] = { 0 };
     MutableByteSpan cd_data_span(cd_data_buf);
 
-    err = example_dac_provider->GetCertificationDeclaration(cd_data_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, cd_data_span.size() > 0);
-    NL_TEST_ASSERT(inSuite, cd_data_span.data()[0] != 0);
-
     ByteSpan cd_payload;
     AttestationVerificationResult attestation_result =
-        default_verifier->ValidateCertificationDeclarationSignature(cd_data_span, cd_payload);
+        default_verifier->ValidateCertificationDeclarationSignature(ByteSpan(sTest_CD), cd_payload);
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
 
     NL_TEST_ASSERT(inSuite, cd_payload.data_equal(ByteSpan(sTestCMS_CDContent)));

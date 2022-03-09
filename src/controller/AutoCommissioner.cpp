@@ -25,6 +25,11 @@
 namespace chip {
 namespace Controller {
 
+AutoCommissioner::AutoCommissioner()
+{
+    SetCommissioningParameters(CommissioningParameters());
+}
+
 AutoCommissioner::~AutoCommissioner()
 {
     ReleaseDAC();
@@ -110,20 +115,14 @@ CommissioningStage AutoCommissioner::_GetNextCommissioningStage(CommissioningSta
     {
         return CommissioningStage::kCleanup;
     }
+
     switch (currentStage)
     {
     case CommissioningStage::kSecurePairing:
+        return CommissioningStage::kReadCommissioningInfo;
+    case CommissioningStage::kReadCommissioningInfo:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
-        if (mNeedsNetworkSetup)
-        {
-            return CommissioningStage::kGetNetworkTechnology;
-        }
-        else
-        {
-            return CommissioningStage::kConfigRegulatory;
-        }
-    case CommissioningStage::kGetNetworkTechnology:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
         return CommissioningStage::kSendPAICertificateRequest;
@@ -147,37 +146,35 @@ CommissioningStage AutoCommissioner::_GetNextCommissioningStage(CommissioningSta
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
         if (mNeedsNetworkSetup)
         {
-            if (mParams.GetWiFiCredentials().HasValue() &&
-                mNetworkTechnology.Has(
-                    chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
+            if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
             {
                 return CommissioningStage::kWiFiNetworkSetup;
             }
             else if (mParams.GetThreadOperationalDataset().HasValue() &&
-                     mNetworkTechnology.Has(
-                         chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
+                     mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
             {
                 return CommissioningStage::kThreadNetworkSetup;
             }
             else
             {
                 ChipLogError(Controller, "Required network information not provided in commissioning parameters");
+                ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)",
+                             mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
+                             mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
+                ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
+                             mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
+                             mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
                 lastErr = CHIP_ERROR_INVALID_ARGUMENT;
                 return CommissioningStage::kCleanup;
             }
         }
         else
         {
-            // TODO: I dont think this is to spec - not sure where we'd have a commissioner that doesn't have dnssd.
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
             return CommissioningStage::kFindOperational;
-#else
-            return CommissioningStage::kSendComplete;
-#endif
         }
     case CommissioningStage::kWiFiNetworkSetup:
         if (mParams.GetThreadOperationalDataset().HasValue() &&
-            mNetworkTechnology.Has(chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
+            mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
         {
             return CommissioningStage::kThreadNetworkSetup;
         }
@@ -186,8 +183,7 @@ CommissioningStage AutoCommissioner::_GetNextCommissioningStage(CommissioningSta
             return CommissioningStage::kWiFiNetworkEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
-        if (mParams.GetWiFiCredentials().HasValue() &&
-            mNetworkTechnology.Has(chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
+        if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
         {
             return CommissioningStage::kWiFiNetworkEnable;
         }
@@ -198,7 +194,7 @@ CommissioningStage AutoCommissioner::_GetNextCommissioningStage(CommissioningSta
 
     case CommissioningStage::kWiFiNetworkEnable:
         if (mParams.GetThreadOperationalDataset().HasValue() &&
-            mNetworkTechnology.Has(chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
+            mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
@@ -207,12 +203,7 @@ CommissioningStage AutoCommissioner::_GetNextCommissioningStage(CommissioningSta
             return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kThreadNetworkEnable:
-        // TODO: I dont think this is to spec - not sure where we'd have a commissioner that doesn't have dnssd.
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
         return CommissioningStage::kFindOperational;
-#else
-        return CommissioningStage::kSendComplete;
-#endif
     case CommissioningStage::kFindOperational:
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
@@ -229,9 +220,23 @@ CommissioningStage AutoCommissioner::_GetNextCommissioningStage(CommissioningSta
     return CommissioningStage::kError;
 }
 
+EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage)
+{
+    switch (stage)
+    {
+    case CommissioningStage::kWiFiNetworkSetup:
+    case CommissioningStage::kWiFiNetworkEnable:
+        return mDeviceCommissioningInfo.network.wifi.endpoint;
+    case CommissioningStage::kThreadNetworkSetup:
+    case CommissioningStage::kThreadNetworkEnable:
+        return mDeviceCommissioningInfo.network.thread.endpoint;
+    default:
+        return kRootEndpointId;
+    }
+}
+
 CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)
 {
-    // TODO: check that there is no commissioning in progress currently.
     if (commissioner == nullptr)
     {
         ChipLogError(Controller, "Invalid DeviceCommissioner");
@@ -250,16 +255,29 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
         Transport::Type::kBle;
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
-    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, 0, GetCommandTimeout(nextStage));
+    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage),
+                                            GetCommandTimeout(nextStage));
     return CHIP_NO_ERROR;
 }
 
 Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)
 {
-    // Per spec, all commands that are sent with the arm failsafe held need at least a 30s timeout. Using 30s everywhere for
-    // simplicity. 30s appears to be sufficient for long-running network commands (enable wifi and enable thread), but we may wish
-    // to increase the timeout for those commissioning stages at a later time.
-    return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(30)));
+    // Per spec, all commands that are sent with the arm failsafe held need at least a 30s timeout.
+    // Network clusters can indicate the time required to connect, so if we are connecting, use that time as long as it is > 30s.
+    app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType seconds = 30;
+    switch (stage)
+    {
+    case CommissioningStage::kWiFiNetworkEnable:
+        ChipLogError(Controller, "Setting wifi connection time min = %u", mDeviceCommissioningInfo.network.wifi.minConnectionTime);
+        seconds = std::max(mDeviceCommissioningInfo.network.wifi.minConnectionTime, seconds);
+        break;
+    case CommissioningStage::kThreadNetworkEnable:
+        seconds = std::max(mDeviceCommissioningInfo.network.thread.minConnectionTime, seconds);
+        break;
+    default:
+        break;
+    }
+    return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(seconds)));
 }
 
 CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk,
@@ -394,6 +412,16 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
+        if ((report.stageCompleted == CommissioningStage::kAttestationVerification) &&
+            ((report.Get<AdditionalErrorInfo>().attestationResult ==
+              Credentials::AttestationVerificationResult::kDacProductIdMismatch) ||
+             (report.Get<AdditionalErrorInfo>().attestationResult ==
+              Credentials::AttestationVerificationResult::kDacVendorIdMismatch)))
+        {
+            ChipLogError(Controller,
+                         "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
+                         "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
+        }
     }
     else
     {
@@ -402,23 +430,16 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
         switch (report.stageCompleted)
         {
-        case CommissioningStage::kGetNetworkTechnology:
-            mNetworkTechnology.SetRaw(report.Get<FeatureMap>().features);
-            // Only one of these features can be set at a time.
-            if (!mNetworkTechnology.HasOnly(
-                    chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface) &&
-                !mNetworkTechnology.HasOnly(
-                    chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface) &&
-                mNetworkTechnology.HasOnly(
-                    chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
+        case CommissioningStage::kReadCommissioningInfo:
+            mDeviceCommissioningInfo = report.Get<ReadCommissioningInfo>();
+            if (!mParams.GetFailsafeTimerSeconds().HasValue() && mDeviceCommissioningInfo.general.recommendedFailsafe > 0)
             {
-                ChipLogError(
-                    Controller,
-                    "Network Commissioning cluster is malformed - more than one network technology is specified (0x%" PRIX32 ")",
-                    report.Get<FeatureMap>().features);
-                err = CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-                break;
+                mParams.SetFailsafeTimerSeconds(mDeviceCommissioningInfo.general.recommendedFailsafe);
             }
+            mParams.SetRemoteVendorId(mDeviceCommissioningInfo.basic.vendorId)
+                .SetRemoteProductId(mDeviceCommissioningInfo.basic.productId)
+                .SetDefaultRegulatoryLocation(mDeviceCommissioningInfo.general.currentRegulatoryLocation)
+                .SetLocationCapability(mDeviceCommissioningInfo.general.locationCapability);
             break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);
@@ -441,8 +462,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             break;
         case CommissioningStage::kSendOpCertSigningRequest: {
             NOCChainGenerationParameters nocParams;
-            nocParams.nocsrElements = report.Get<AttestationResponse>().attestationElements;
-            nocParams.signature     = report.Get<AttestationResponse>().signature;
+            nocParams.nocsrElements = report.Get<CSRResponse>().nocsrElements;
+            nocParams.signature     = report.Get<CSRResponse>().signature;
             mParams.SetNOCChainGenerationParameters(nocParams);
         }
         break;
@@ -460,6 +481,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = nullptr;
             mParams                  = CommissioningParameters();
+            mDeviceCommissioningInfo = ReadCommissioningInfo();
             return CHIP_NO_ERROR;
         default:
             break;
@@ -486,8 +508,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     }
 
     mParams.SetCompletionStatus(err);
-    // TODO: Get real endpoint
-    mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, 0, GetCommandTimeout(nextStage));
+    mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage), GetCommandTimeout(nextStage));
     return CHIP_NO_ERROR;
 }
 

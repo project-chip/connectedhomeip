@@ -19,8 +19,8 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -40,7 +40,10 @@ public:
     CHIP_ERROR
     SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        size_t bytesRead = 0;
+        CHIP_ERROR err   = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+        size             = static_cast<uint16_t>(bytesRead);
+        return err;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -79,7 +82,6 @@ private:
 };
 
 ServerStorageDelegate gServerStorage;
-chip::SimpleFabricStorage gFabricStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
@@ -113,10 +115,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
-        err = gFabricStorage.Initialize(&gServerStorage);
-        SuccessOrExit(err);
-
-        factoryParams.fabricStorage = &gFabricStorage;
+        factoryParams.fabricIndependentStorage = &gServerStorage;
 
         commissionerParams.pairingDelegate = &gPairingDelegate;
         commissionerParams.storageDelegate = &gServerStorage;
@@ -139,8 +138,8 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, 0, ephemeralKey.Pubkey(), rcacSpan,
-                                                                                icacSpan, nocSpan);
+            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, /* fabricId = */ 1,
+                                                                                ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
             SuccessOrExit(err);
 
             commissionerParams.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;

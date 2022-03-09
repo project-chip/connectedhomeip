@@ -32,8 +32,13 @@ qpg_cc = "arm-none-eabi-gcc"
 qpg_cxx = "arm-none-eabi-g++"
 chip_mdns = "platform"
 
-chip_project_config_include_dirs =
-    [ "//examples/platform/qpg/project_include/" ]
+# Disable lock tracking, since our FreeRTOS configuration does not set
+# INCLUDE_xSemaphoreGetMutexHolder
+chip_stack_lock_tracking = "none"
+
+# Using lighting-app as template config
+# Application specific override to be done as cmd line arg
+chip_project_config_include_dirs = [ "//examples/lighting-app/qpg/include" ]
 chip_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
 chip_ble_project_config_include = ""

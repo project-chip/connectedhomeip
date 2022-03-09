@@ -18,6 +18,7 @@
 #include <app/OperationalDeviceProxy.h>
 #include <inet/IPAddress.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -50,12 +51,13 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     FabricTable * fabrics = Platform::New<FabricTable>();
     FabricInfo * fabric   = fabrics->FindFabricWithIndex(1);
     secure_channel::MessageCounterManager messageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
     SessionIDAllocator idAllocator;
 
     systemLayer.Init();
     udpEndPointManager.Init(systemLayer);
     transportMgr.Init(UdpListenParameters(udpEndPointManager).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(CHIP_PORT));
-    sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager);
+    sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager, &deviceStorage);
     exchangeMgr.Init(&sessionManager);
     messageCounterManager.Init(&exchangeMgr);
 

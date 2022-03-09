@@ -31,23 +31,26 @@
 
 namespace chip {
 
+using namespace app;
 using namespace app::Clusters;
 using namespace app::Clusters::OtaSoftwareUpdateProvider;
 using namespace app::Clusters::OtaSoftwareUpdateProvider::Commands;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Commands;
+using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 using app::DataModel::Nullable;
 using bdx::TransferSession;
 
 // Global instance of the OTARequestorInterface.
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
 
-constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this value when starting OTA "immediately"
+// Abort the QueryImage download request if there's been no progress for 5 minutes
+static constexpr System::Clock::Timeout kDownloadTimeoutSec = chip::System::Clock::Seconds32(5 * 60);
 
 static void LogQueryImageResponse(const QueryImageResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "QueryImageResponse:");
-    ChipLogDetail(SoftwareUpdate, "  status: %" PRIu8 "", to_underlying(response.status));
+    ChipLogDetail(SoftwareUpdate, "  status: %u", to_underlying(response.status));
     if (response.delayedActionTime.HasValue())
     {
         ChipLogDetail(SoftwareUpdate, "  delayedActionTime: %" PRIu32 " seconds", response.delayedActionTime.Value());
@@ -84,14 +87,8 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
 static void LogApplyUpdateResponse(const ApplyUpdateResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "ApplyUpdateResponse:");
-    ChipLogDetail(SoftwareUpdate, "  action: %" PRIu8 "", to_underlying(response.action));
+    ChipLogDetail(SoftwareUpdate, "  action: %u", to_underlying(response.action));
     ChipLogDetail(SoftwareUpdate, "  delayedActionTime: %" PRIu32 " seconds", response.delayedActionTime);
-}
-
-void StartDelayTimerHandler(System::Layer * systemLayer, void * appState)
-{
-    VerifyOrReturn(appState != nullptr);
-    static_cast<OTARequestor *>(appState)->ConnectToProvider(OTARequestor::kQueryImage);
 }
 
 void SetRequestorInstance(OTARequestorInterface * instance)
@@ -139,6 +136,18 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             requestorCore->mTargetVersion = update.softwareVersion;
             requestorCore->mUpdateToken   = updateToken;
 
+            // Store file designator needed for BDX transfers
+            MutableCharSpan fileDesignator(requestorCore->mFileDesignatorBuffer);
+            if (update.fileDesignator.size() > fileDesignator.size())
+            {
+                ChipLogError(SoftwareUpdate, "File designator size %zu is too large to store", update.fileDesignator.size());
+                requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, err);
+                return;
+            }
+            memcpy(fileDesignator.data(), update.fileDesignator.data(), update.fileDesignator.size());
+            fileDesignator.reduce_size(update.fileDesignator.size());
+            requestorCore->mFileDesignator = fileDesignator;
+
             requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
                                                                 System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
@@ -147,6 +156,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             ChipLogDetail(SoftwareUpdate, "Version %" PRIu32 " is older or same than current version %" PRIu32 ", not updating",
                           update.softwareVersion, requestorCore->mCurrentVersion);
 
+            requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
             requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
@@ -154,14 +164,14 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         break;
     }
     case OTAQueryStatus::kBusy:
+        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnQuery, OTAChangeReasonEnum::kDelayByProvider);
         requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::Busy,
                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnQuery, OTAChangeReasonEnum::kDelayByProvider);
         break;
     case OTAQueryStatus::kNotAvailable:
+        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::NotAvailable,
                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         break;
     default:
         requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_BAD_REQUEST);
@@ -174,7 +184,14 @@ void OTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" CHIP_ERROR_FORMAT, error.Format());
+    ChipLogError(SoftwareUpdate, "Received QueryImage failure response: %" CHIP_ERROR_FORMAT, error.Format());
+
+    if (error == CHIP_ERROR_TIMEOUT)
+    {
+        ChipLogError(SoftwareUpdate, "CASE session may be invalid, tear down session");
+        requestorCore->DisconnectFromProvider();
+    }
+
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
 }
 
@@ -191,12 +208,12 @@ void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateRespon
         requestorCore->mOtaRequestorDriver->UpdateConfirmed(System::Clock::Seconds32(response.delayedActionTime));
         break;
     case OTAApplyUpdateAction::kAwaitNextAction:
-        requestorCore->mOtaRequestorDriver->UpdateSuspended(System::Clock::Seconds32(response.delayedActionTime));
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnApply, OTAChangeReasonEnum::kDelayByProvider);
+        requestorCore->mOtaRequestorDriver->UpdateSuspended(System::Clock::Seconds32(response.delayedActionTime));
         break;
     case OTAApplyUpdateAction::kDiscontinue:
-        requestorCore->mOtaRequestorDriver->UpdateDiscontinued();
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+        requestorCore->mOtaRequestorDriver->UpdateDiscontinued();
         break;
     }
 }
@@ -225,9 +242,9 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
                                                       const app::ConcreteCommandPath & commandPath,
                                                       const AnnounceOtaProvider::DecodableType & commandData)
 {
-    auto & providerNodeId     = commandData.providerNodeId;
     auto & announcementReason = commandData.announcementReason;
-    auto & providerEndpoint   = commandData.endpoint;
+
+    ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
 
     if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
     {
@@ -235,78 +252,102 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    mProviderNodeId      = providerNodeId;
-    mProviderFabricIndex = commandObj->GetAccessingFabricIndex();
-    mProviderEndpointId  = providerEndpoint;
+    ProviderLocation::Type providerLocation = { .providerNodeID = commandData.providerNodeId,
+                                                .endpoint       = commandData.endpoint,
+                                                .fabricIndex    = commandObj->GetAccessingFabricIndex() };
 
-    ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
-    ChipLogDetail(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
-    ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(mProviderNodeId));
+    ChipLogDetail(SoftwareUpdate, "  FabricIndex: %u", providerLocation.fabricIndex);
+    ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(providerLocation.providerNodeID));
     ChipLogDetail(SoftwareUpdate, "  VendorID: 0x%" PRIx16, commandData.vendorId);
-    ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, to_underlying(announcementReason));
+    ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %u", to_underlying(announcementReason));
     if (commandData.metadataForNode.HasValue())
     {
         ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %zu", commandData.metadataForNode.Value().size());
     }
-    ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, commandData.endpoint);
+    ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, providerLocation.endpoint);
 
-    // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
-    // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
-    uint32_t msToStart = 0;
-    switch (announcementReason)
-    {
-    case OTAAnnouncementReason::kSimpleAnnouncement:
-    case OTAAnnouncementReason::kUpdateAvailable:
-        msToStart = mOtaStartDelayMs;
-        break;
-    case OTAAnnouncementReason::kUrgentUpdateAvailable:
-        msToStart = kImmediateStartDelayMs;
-        break;
-    default:
-        ChipLogError(SoftwareUpdate, "Unexpected announcementReason: %" PRIu8, static_cast<uint8_t>(announcementReason));
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(msToStart), StartDelayTimerHandler, this);
+    mOtaRequestorDriver->ProcessAnnounceOTAProviders(providerLocation, announcementReason);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
-    VerifyOrReturn(mOtaRequestorDriver != nullptr, ChipLogError(SoftwareUpdate, "OTA requestor driver not set"));
-    VerifyOrReturn(mServer != nullptr, ChipLogError(SoftwareUpdate, "Server not set"));
-    VerifyOrReturn(mProviderNodeId != kUndefinedNodeId, ChipLogError(SoftwareUpdate, "Provider Node ID not set"));
+    if (mServer == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Server not set");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
 
-    FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderFabricIndex);
-    VerifyOrReturn(fabricInfo != nullptr, ChipLogError(SoftwareUpdate, "Cannot find fabric"));
+    if (!mProviderLocation.HasValue())
+    {
+        ChipLogError(SoftwareUpdate, "Provider location not set");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
+
+    if (fabricInfo == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot find fabric");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
 
     // Set the action to take once connection is successfully established
     mOnConnectedAction = onConnectedAction;
 
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
-                  ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
-    CHIP_ERROR err = mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderNodeId),
-                                                                 &mOnConnectedCallback, &mOnConnectionFailureCallback);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format()));
+                  ChipLogValueX64(mProviderLocation.Value().providerNodeID), mProviderLocation.Value().fabricIndex);
+    CHIP_ERROR err =
+        mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID),
+                                                    &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format());
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
 }
 
-// Application directs the Requestor to cancel image update in progress. All the Requestor state is
+void OTARequestor::DisconnectFromProvider()
+{
+    if (mServer == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Server not set");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    if (!mProviderLocation.HasValue())
+    {
+        ChipLogError(SoftwareUpdate, "Provider location not set");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
+    if (fabricInfo == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot find fabric");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    mCASESessionManager->ReleaseSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID));
+}
+
+// Requestor is directed to cancel image update in progress. All the Requestor state is
 // cleared, UpdateState is reset to Idle
 void OTARequestor::CancelImageUpdate()
 {
     mBdxDownloader->EndDownload(CHIP_ERROR_CONNECTION_ABORTED);
 
-    // All Provider info should be invalidated
-    mProviderNodeId      = kUndefinedNodeId;
-    mProviderFabricIndex = kUndefinedFabricIndex;
-    mProviderEndpointId  = kRootEndpointId;
+    mOtaRequestorDriver->UpdateCancelled();
 
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
-
-    // Notify the platform, it might choose to take additional actions
-    mOtaRequestorDriver->UpdateCancelled();
 }
 
 CHIP_ERROR OTARequestor::GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
@@ -340,11 +381,9 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, err);
             return;
         }
-
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
         break;
     }
-    case kStartBDX: {
+    case kDownload: {
         CHIP_ERROR err = requestorCore->StartDownload(*deviceProxy);
 
         if (err != CHIP_NO_ERROR)
@@ -353,8 +392,6 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kDownloading, err);
             return;
         }
-
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDownloading, OTAChangeReasonEnum::kSuccess);
         break;
     }
     case kApplyUpdate: {
@@ -366,8 +403,6 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, err);
             return;
         }
-
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kApplying, OTAChangeReasonEnum::kSuccess);
         break;
     }
     case kNotifyUpdateApplied: {
@@ -379,8 +414,6 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, err);
             return;
         }
-
-        requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         break;
     }
     default:
@@ -402,7 +435,7 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
     case kQueryImage:
         requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
         break;
-    case kStartBDX:
+    case kDownload:
         requestorCore->RecordErrorUpdateState(UpdateFailureState::kDownloading, error);
         break;
     case kApplyUpdate:
@@ -411,29 +444,53 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
     default:
         break;
     }
+
+    // Give driver a chance to schedule another query
+    requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::ConnectionFailed, chip::System::Clock::Seconds32(0));
 }
 
+// Sends the QueryImage command to the Provider currently set in the OTARequestor
+void OTARequestor::TriggerImmediateQueryInternal()
+{
+    // We are now connecting to a provider for the purpose of sending a QueryImage,
+    // treat this as a move to the Querying state
+    RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
+
+    ConnectToProvider(kQueryImage);
+}
+
+// Sends the QueryImage command to the next available Provider
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
-    if (mProviderNodeId != kUndefinedNodeId)
-    {
-        ConnectToProvider(kQueryImage);
-        return kTriggerSuccessful;
-    }
-    else
+    ProviderLocation::Type providerLocation;
+    if (mOtaRequestorDriver->DetermineProviderLocation(providerLocation) != true)
     {
         ChipLogError(SoftwareUpdate, "No OTA Providers available");
         return kNoProviderKnown;
     }
+
+    SetCurrentProviderLocation(providerLocation);
+
+    // Go through the driver as it has additional logic to execute
+    mOtaRequestorDriver->SendQueryImage();
+
+    return kTriggerSuccessful;
 }
 
 void OTARequestor::DownloadUpdate()
 {
-    ConnectToProvider(kStartBDX);
+    RecordNewUpdateState(OTAUpdateStateEnum::kDownloading, OTAChangeReasonEnum::kSuccess);
+    ConnectToProvider(kDownload);
+}
+
+void OTARequestor::DownloadUpdateDelayedOnUserConsent()
+{
+    RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnUserConsent, OTAChangeReasonEnum::kSuccess);
 }
 
 void OTARequestor::ApplyUpdate()
 {
+    RecordNewUpdateState(OTAUpdateStateEnum::kApplying, OTAChangeReasonEnum::kSuccess);
     ConnectToProvider(kApplyUpdate);
 }
 
@@ -444,15 +501,54 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
 
     // Log the VersionApplied event
     uint16_t productId;
-    VerifyOrReturn(DeviceLayer::ConfigurationMgr().GetProductId(productId) == CHIP_NO_ERROR);
+    if (DeviceLayer::ConfigurationMgr().GetProductId(productId) != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot get Product ID");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
     OtaRequestorServerOnVersionApplied(version, productId);
+
+    // There is no response for a notify so consider this OTA complete
+    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
 
     ConnectToProvider(kNotifyUpdateApplied);
 }
 
+CHIP_ERROR OTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
+{
+    CHIP_ERROR error = mDefaultOtaProviderList.Delete(fabricIndex);
+
+    // Ignore the error if no entry for the associated fabric index has been found.
+    ReturnErrorCodeIf(error == CHIP_ERROR_NOT_FOUND, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(error);
+
+    return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);
+}
+
+CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocation::Type & providerLocation)
+{
+    // Look for an entry with the same fabric index indicated
+    auto iterator = mDefaultOtaProviderList.Begin();
+    while (iterator.Next())
+    {
+        ProviderLocation::Type pl = iterator.GetValue();
+        if (pl.GetFabricIndex() == providerLocation.GetFabricIndex())
+        {
+            ChipLogError(SoftwareUpdate, "Default OTA provider entry with fabric %d already exists", pl.GetFabricIndex());
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+    }
+
+    ReturnErrorOnFailure(mDefaultOtaProviderList.Add(providerLocation));
+
+    return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);
+}
+
 void OTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTAChangeReasonEnum reason)
 {
-    VerifyOrReturn(mOtaRequestorDriver != nullptr);
+    VerifyOrDie(mOtaRequestorDriver != nullptr);
 
     switch (state)
     {
@@ -462,6 +558,7 @@ void OTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTAChangeR
     case OTADownloader::State::kIdle:
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
+            // TODO: Should we call some driver API to give it a chance to reschedule?
             RecordErrorUpdateState(UpdateFailureState::kDownloading, CHIP_ERROR_CONNECTION_ABORTED, reason);
         }
 
@@ -490,15 +587,21 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
 
     // Log the StateTransition event
-    Nullable<OTAUpdateStateEnum> previousState;
-    previousState.SetNonNull(mCurrentUpdateState);
     Nullable<uint32_t> targetSoftwareVersion;
     if ((newState == OTAUpdateStateEnum::kDownloading) || (newState == OTAUpdateStateEnum::kApplying) ||
         (newState == OTAUpdateStateEnum::kRollingBack))
     {
         targetSoftwareVersion.SetNonNull(mTargetVersion);
     }
-    OtaRequestorServerOnStateTransition(previousState, newState, reason, targetSoftwareVersion);
+    OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
+
+    // Inform the driver that the OTARequestor has entered the kIdle state. A driver implementation
+    // may choose to restart the default provider timer in this case
+    if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
+    {
+        // TODO: Make this API a general state change
+        mOtaRequestorDriver->HandleIdleState();
+    }
 
     mCurrentUpdateState = newState;
 }
@@ -510,9 +613,8 @@ void OTARequestor::RecordErrorUpdateState(UpdateFailureState failureState, CHIP_
 
     // Log the DownloadError event
     OTAImageProcessorInterface * imageProcessor = mBdxDownloader->GetImageProcessorDelegate();
-    VerifyOrReturn(imageProcessor != nullptr);
-    Nullable<uint8_t> progressPercent;
-    imageProcessor->GetPercentComplete(progressPercent);
+    VerifyOrDie(imageProcessor != nullptr);
+    Nullable<uint8_t> progressPercent = imageProcessor->GetPercentComplete();
     Nullable<int64_t> platformCode;
     OtaRequestorServerOnDownloadError(mTargetVersion, imageProcessor->GetBytesDownloaded(), progressPercent, platformCode);
 
@@ -525,8 +627,9 @@ CHIP_ERROR OTARequestor::GenerateUpdateToken()
     if (mUpdateToken.empty())
     {
         VerifyOrReturnError(mServer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mProviderLocation.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
-        FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderFabricIndex);
+        FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
         VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         static_assert(sizeof(NodeId) == sizeof(uint64_t), "Unexpected NodeId size");
@@ -539,6 +642,8 @@ CHIP_ERROR OTARequestor::GenerateUpdateToken()
 
 CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & deviceProxy)
 {
+    VerifyOrReturnError(mProviderLocation.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
     constexpr OTADownloadProtocol kProtocolsSupported[] = { OTADownloadProtocol::kBDXSynchronous };
     QueryImage::Type args;
 
@@ -551,7 +656,7 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
-    args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
+    args.requestorCanConsent.SetValue(mRequestorCanConsent.ValueOr(mOtaRequestorDriver->CanConsent()));
 
     uint16_t hardwareVersion;
     if (DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
@@ -572,7 +677,7 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     }
 
     Controller::OtaSoftwareUpdateProviderCluster cluster;
-    cluster.Associate(&deviceProxy, mProviderEndpointId);
+    cluster.Associate(&deviceProxy, mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnQueryImageResponse, OnQueryImageFailure);
 }
@@ -585,11 +690,14 @@ CHIP_ERROR OTARequestor::ExtractUpdateDescription(const QueryImageResponseDecoda
 
     VerifyOrReturnError(response.imageURI.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(bdx::ParseURI(response.imageURI.Value(), nodeId, fileDesignator));
-    update.imageURI = response.imageURI.Value();
+    VerifyOrReturnError(IsSpanUsable(fileDesignator), CHIP_ERROR_INVALID_ARGUMENT);
+    update.nodeId         = nodeId;
+    update.fileDesignator = fileDesignator;
 
     VerifyOrReturnError(response.softwareVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(response.softwareVersionString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-    update.softwareVersion = response.softwareVersion.Value();
+    update.softwareVersion    = response.softwareVersion.Value();
+    update.softwareVersionStr = response.softwareVersionString.Value();
 
     VerifyOrReturnError(response.updateToken.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     update.updateToken = response.updateToken.Value();
@@ -609,9 +717,8 @@ CHIP_ERROR OTARequestor::StartDownload(OperationalDeviceProxy & deviceProxy)
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = bdx::TransferControlFlags::kReceiverDrive;
     initOptions.MaxBlockSize     = mOtaRequestorDriver->GetMaxDownloadBlockSize();
-    char testFileDes[9]          = { "test.txt" };
-    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
-    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.FileDesLength    = static_cast<uint16_t>(mFileDesignator.size());
+    initOptions.FileDesignator   = reinterpret_cast<const uint8_t *>(mFileDesignator.data());
 
     chip::Messaging::ExchangeManager * exchangeMgr = deviceProxy.GetExchangeManager();
     VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -626,12 +733,13 @@ CHIP_ERROR OTARequestor::StartDownload(OperationalDeviceProxy & deviceProxy)
     mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
     mBdxDownloader->SetStateDelegate(this);
 
-    ReturnErrorOnFailure(mBdxDownloader->SetBDXParams(initOptions));
+    ReturnErrorOnFailure(mBdxDownloader->SetBDXParams(initOptions, kDownloadTimeoutSec));
     return mBdxDownloader->BeginPrepareDownload();
 }
 
 CHIP_ERROR OTARequestor::SendApplyUpdateRequest(OperationalDeviceProxy & deviceProxy)
 {
+    VerifyOrReturnError(mProviderLocation.HasValue(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(GenerateUpdateToken());
 
     ApplyUpdateRequest::Type args;
@@ -639,13 +747,14 @@ CHIP_ERROR OTARequestor::SendApplyUpdateRequest(OperationalDeviceProxy & deviceP
     args.newVersion  = mTargetVersion;
 
     Controller::OtaSoftwareUpdateProviderCluster cluster;
-    cluster.Associate(&deviceProxy, mProviderEndpointId);
+    cluster.Associate(&deviceProxy, mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnApplyUpdateResponse, OnApplyUpdateFailure);
 }
 
 CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy)
 {
+    VerifyOrReturnError(mProviderLocation.HasValue(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(GenerateUpdateToken());
 
     NotifyUpdateApplied::Type args;
@@ -653,9 +762,23 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
     args.softwareVersion = mCurrentVersion;
 
     Controller::OtaSoftwareUpdateProviderCluster cluster;
-    cluster.Associate(&deviceProxy, mProviderEndpointId);
+    cluster.Associate(&deviceProxy, mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnNotifyUpdateAppliedResponse, OnNotifyUpdateAppliedFailure);
+}
+
+// Invoked when the device becomes commissioned
+void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    VerifyOrReturn(event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete);
+
+    ChipLogProgress(SoftwareUpdate, "Device commissioned, schedule a default provider query");
+
+    // TODO: Should we also send UpdateApplied here?
+
+    // Schedule a query. At the end of this query/update process the Default Provider timer is started
+    OTARequestorDriver * driver = (reinterpret_cast<OTARequestor *>(arg))->mOtaRequestorDriver;
+    driver->OTACommissioningCallback();
 }
 
 } // namespace chip

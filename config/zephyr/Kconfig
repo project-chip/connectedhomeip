@@ -36,7 +36,7 @@ if CHIP
 
 config CHIP_DEVICE_VENDOR_ID
 	int "Device vendor ID"
-	default 9050 # 0x235A
+	default 65521 # 0xFFF1
 	range 0 65535
 	help
 	  Identifier of the device manufacturer, assigned by Connectivity Standards
@@ -45,7 +45,7 @@ config CHIP_DEVICE_VENDOR_ID
 
 config CHIP_DEVICE_PRODUCT_ID
 	int "Device product ID"
-	default 0
+	default 32768 # 0x8000
 	range 0 65535
 	help
 	  Identifier of the product, assigned by the device manufacturer. It is used
@@ -185,14 +185,30 @@ config APP_LINK_WITH_CHIP
 config CHIP_OTA_IMAGE_BUILD
 	bool "Generate OTA image"
 	help
-	  Enable building OTA (Over-the-air update) image.
+	  Enable building Matter OTA (Over-the-air update) image.
+
+if CHIP_OTA_IMAGE_BUILD
+
+config CHIP_OTA_IMAGE_FILE_NAME
+	string "OTA image file name"
+	default "matter.ota"
+	help
+	  File name of the generated Matter OTA image.
 
 config CHIP_OTA_IMAGE_EXTRA_ARGS
 	string "OTA image creator extra arguments"
-	depends on CHIP_OTA_IMAGE_BUILD
 	help
-	  This option allows one to pass optional arguments to the
-	  ota_image_tool.py script, used for building OTA image.
+	  This option allows one to pass optional arguments to the ota_image_tool.py
+	  script, used for building OTA image.
+
+config CHIP_OTA_IMAGE_INCLUDE_MCUBOOT
+	bool "Include MCUBoot in OTA image"
+	depends on BOOTLOADER_MCUBOOT
+	help
+	  Include MCUBoot bootloader image in the generated Matter OTA image. This
+	  option can be enabled if the device supports the bootloader update.
+
+endif
 
 module = MATTER
 module-str = Matter

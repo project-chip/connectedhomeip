@@ -94,7 +94,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventFilterIB::Builder & Node(const NodeId aNode);
+    EventFilterIB::Builder & Node(const NodeId aNodeId);
 
     /**
      *  @brief Inject EventId into the TLV stream.

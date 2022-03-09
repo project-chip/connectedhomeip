@@ -16,8 +16,13 @@
  */
 #pragma once
 
+#include <app/BufferedReadCallback.h>
+#include <app/ReadClient.h>
 #include <controller/CHIPDeviceController.h>
 #include <jni.h>
+#include <lib/core/CHIPError.h>
+#include <list>
+#include <utility>
 
 namespace chip {
 namespace Controller {
@@ -25,7 +30,7 @@ namespace Controller {
 // Callback for success and failure cases of GetConnectedDevice().
 struct GetConnectedDeviceCallback
 {
-    GetConnectedDeviceCallback(jobject javaCallback);
+    GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback);
     ~GetConnectedDeviceCallback();
 
     static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
@@ -33,7 +38,45 @@ struct GetConnectedDeviceCallback
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
     Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
-    jobject mJavaCallbackRef;
+    jobject mWrapperCallbackRef = nullptr;
+    jobject mJavaCallbackRef    = nullptr;
+};
+
+struct ReportCallback : public app::ReadClient::Callback
+{
+    /** Subscription established callback can be nullptr. */
+    ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback);
+    ~ReportCallback();
+
+    void OnReportBegin() override;
+
+    void OnReportEnd() override;
+
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override;
+
+    void OnError(CHIP_ERROR aError) override;
+
+    void OnDone() override;
+
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override;
+
+    /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
+    void ReportError(jobject attributePath, CHIP_ERROR err);
+    void ReportError(jobject attributePath, Protocols::InteractionModel::Status status);
+    void ReportError(jobject attributePath, const char * message, ChipError::StorageType errorCode);
+
+    CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath, jobject & outObj);
+
+    app::ReadClient * mReadClient = nullptr;
+
+    app::BufferedReadCallback mBufferedReadAdapter;
+    jobject mWrapperCallbackRef                 = nullptr;
+    jobject mSubscriptionEstablishedCallbackRef = nullptr;
+    jobject mReportCallbackRef                  = nullptr;
+    // NodeState Java object that will be returned to the application.
+    jobject mNodeStateObj = nullptr;
+    jclass mNodeStateCls  = nullptr;
 };
 
 } // namespace Controller

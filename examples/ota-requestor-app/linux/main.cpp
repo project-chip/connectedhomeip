@@ -16,16 +16,13 @@
  *    limitations under the License.
  */
 
-#include <app/server/Server.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <platform/CHIPDeviceLayer.h>
-
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/GenericOTARequestorDriver.h"
-#include "platform/Linux/OTAImageProcessorImpl.h"
+#include "AppMain.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsentProvider.h>
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/Linux/OTAImageProcessorImpl.h>
 
 using chip::BDXDownloader;
 using chip::ByteSpan;
@@ -52,73 +49,77 @@ using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 OTARequestor gRequestorCore;
-DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestorStorage gRequestorStorage;
+DeviceLayer::ExtendedOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
+chip::ota::DefaultOTARequestorUserConsentProvider gUserConsentProvider;
+static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
-void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
 
-constexpr uint16_t kOptionProviderNodeId      = 'n';
-constexpr uint16_t kOptionProviderFabricIndex = 'f';
-constexpr uint16_t kOptionUdpPort             = 'u';
-constexpr uint16_t kOptionDiscriminator       = 'd';
-constexpr uint16_t kOptionDelayQuery          = 'q';
+constexpr uint16_t kOptionUserConsentState     = 'u';
+constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
+constexpr uint16_t kOptionRequestorCanConsent  = 'c';
+constexpr uint16_t kOptionOtaDownloadPath      = 'f';
+constexpr size_t kMaxFilePathSize              = 256;
 
-NodeId providerNodeId           = 0x0;
-FabricIndex providerFabricIndex = 1;
-uint16_t requestorSecurePort    = 0;
-uint16_t setupDiscriminator     = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
-uint16_t delayQueryTimeInSec    = 0;
+uint32_t gPeriodicQueryTimeoutSec = (24 * 60 * 60);
+chip::Optional<bool> gRequestorCanConsent;
+static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
 
 OptionDef cmdLineOptionsDef[] = {
-    { "providerNodeId", chip::ArgParser::kArgumentRequired, kOptionProviderNodeId },
-    { "providerFabricIndex", chip::ArgParser::kArgumentRequired, kOptionProviderFabricIndex },
-    { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
-    { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
-    { "delayQuery", chip::ArgParser::kArgumentRequired, kOptionDelayQuery },
+    { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
+    { "requestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
+    { "otaDownloadPath", chip::ArgParser::kArgumentRequired, kOptionOtaDownloadPath },
+    { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -n/--providerNodeId <node ID>\n"
-                             "        Node ID of the OTA Provider to connect to (hex format)\n\n"
-                             "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
-                             "  -f/--providerFabricIndex <fabric index>\n"
-                             "        Fabric index of the OTA Provider to connect to. If none is specified, default value is 1.\n\n"
-                             "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
-                             "  -u/--udpPort <UDP port number>\n"
-                             "        UDP Port that the OTA Requestor listens on for secure connections.\n"
-                             "  -d/--discriminator <discriminator>\n"
-                             "        A 12-bit value used to discern between multiple commissionable CHIP device\n"
-                             "        advertisements. If none is specified, default value is 3840.\n"
-                             "  -q/--delayQuery <Time in seconds>\n"
-                             "        From boot up, the amount of time to wait before triggering the QueryImage\n"
-                             "        command. If none or zero is supplied, QueryImage will not be triggered.\n" };
+                             "  -p/--periodicQueryTimeout <Time in seconds>\n"
+                             "        Periodic timeout for querying providers in the default OTA provider list\n"
+                             "        If none or zero is supplied the timeout is set to every 24 hours. \n"
+                             "  -c/--requestorCanConsent\n"
+                             "        If supplied, the RequestorCanConsent field of the QueryImage command is set to true.\n"
+                             "        Otherwise, the value is determined by the driver.\n "
+                             "  -f/--otaDownloadPath <file path>\n"
+                             "        If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
+                             "        Otherwise, the value defaults to /tmp/test.bin.\n "
+                             "  -u/--userConsentState <granted | denied | deferred>\n"
+                             "        granted: Authorize OTA requestor to download an OTA image\n"
+                             "        denied: Forbid OTA requestor to download an OTA image\n"
+                             "        deferred: Defer obtaining user consent \n" };
 
-HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
-
-OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
+OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
 static void InitOTARequestor(void)
 {
     // Set the global instance of the OTA requestor core component
     SetRequestorInstance(&gRequestorCore);
 
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    // Periodic query timeout must be set prior to requestor being initialized
+    gRequestorUser.SetPeriodicQueryTimeout(gPeriodicQueryTimeoutSec);
+
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
     // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
-    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
-    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
     OTAImageProcessorParams ipParams;
-    ipParams.imageFile = CharSpan("test.txt");
+    ipParams.imageFile = CharSpan::fromCharString(gOtaDownloadPath);
     gImageProcessor.SetOTAImageProcessorParams(ipParams);
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Set the image processor instance used for handling image being downloaded
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+
+    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
+    {
+        gUserConsentProvider.SetUserConsentState(gUserConsentState);
+        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
+    }
 }
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -127,41 +128,38 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
     switch (aIdentifier)
     {
-    case kOptionProviderNodeId:
-        if (1 != sscanf(aValue, "%" PRIX64, &providerNodeId))
-        {
-            PrintArgError("%s: unable to parse Node ID: %s\n", aProgram, aValue);
-        }
+    case kOptionPeriodicQueryTimeout:
+        gPeriodicQueryTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
-    case kOptionProviderFabricIndex:
-        providerFabricIndex = static_cast<uint8_t>(strtol(aValue, NULL, 0));
-
-        if (kOptionProviderFabricIndex == 0)
+    case kOptionRequestorCanConsent:
+        gRequestorCanConsent.SetValue(true);
+        break;
+    case kOptionOtaDownloadPath:
+        chip::Platform::CopyString(gOtaDownloadPath, aValue);
+        break;
+    case kOptionUserConsentState:
+        if (aValue == NULL)
         {
-            PrintArgError("%s: Input ERROR: Fabric Index may not be zero\n", aProgram);
+            PrintArgError("%s: ERROR: NULL UserConsent parameter\n", aProgram);
             retval = false;
         }
-        break;
-    case kOptionUdpPort:
-        requestorSecurePort = static_cast<uint16_t>(strtol(aValue, NULL, 0));
-
-        if (requestorSecurePort == 0)
+        else if (strcmp(aValue, "granted") == 0)
         {
-            PrintArgError("%s: Input ERROR: udpPort may not be zero\n", aProgram);
+            gUserConsentState = chip::ota::UserConsentState::kGranted;
+        }
+        else if (strcmp(aValue, "denied") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kDenied;
+        }
+        else if (strcmp(aValue, "deferred") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kObtaining;
+        }
+        else
+        {
+            PrintArgError("%s: ERROR: Invalid UserConsent parameter:  %s\n", aProgram, aValue);
             retval = false;
         }
-        break;
-    case kOptionDiscriminator:
-        setupDiscriminator = static_cast<uint16_t>(strtol(aValue, NULL, 0));
-
-        if (setupDiscriminator > 0xFFF)
-        {
-            PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
-            retval = false;
-        }
-        break;
-    case kOptionDelayQuery:
-        delayQueryTimeInSec = static_cast<uint16_t>(strtol(aValue, NULL, 0));
         break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -172,67 +170,22 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     return (retval);
 }
 
-int main(int argc, char * argv[])
+void ApplicationInit()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
-    {
-
-        ChipLogError(SoftwareUpdate, "FAILED to initialize memory");
-        return 1;
-    }
-
-    if (chip::DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "FAILED to initialize chip stack");
-        return 1;
-    }
-
-    if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
-    {
-        return 1;
-    }
-
-    chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
-
-    // Set discriminator to user specified value
-    ChipLogProgress(SoftwareUpdate, "Setting discriminator to: %d", setupDiscriminator);
-    err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT, err.Format());
-        return 1;
-    }
-
-    // Init Data Model and CHIP App Server with user specified UDP port
-    Server::GetInstance().Init(nullptr, requestorSecurePort);
     chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
-    ChipLogProgress(SoftwareUpdate, "Initializing the Application Server. Listening on UDP port %d", requestorSecurePort);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    if (gRequestorCanConsent.HasValue())
+    {
+        gRequestorCore.SetRequestorCanConsent(gRequestorCanConsent.Value());
+    }
 
     // Initialize all OTA download components
     InitOTARequestor();
-
-    // Test Mode operation: If a delay is provided, QueryImage after the timer expires
-    if (delayQueryTimeInSec > 0)
-    {
-        // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
-        gRequestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex, chip::kRootEndpointId);
-
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
-                                                    OnStartDelayTimerHandler, nullptr);
-    }
-
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-
-    return 0;
 }
 
-// Test mode operation
-void OnStartDelayTimerHandler(Layer * systemLayer, void * appState)
+int main(int argc, char * argv[])
 {
-    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
+    ChipLinuxAppMainLoop();
+    return 0;
 }

@@ -42,9 +42,11 @@ namespace Internal {
 
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
+#define STR_EXPAND(tok) #tok
+
 // Note: An external mbed parameter could be useful so an application can put
 // chip NVS values in a single place
-#define CHIP_CONFIG_KV_STORE_PARTITION "/kv/"
+#define CHIP_CONFIG_KV_STORE_PARTITION STR_EXPAND(MBED_CONF_STORAGE_DEFAULT_KV)
 
 // NVS namespaces used to store device configuration information.
 #define CHIP_CONFIG_FACTORY_PREFIX "chip-factory-"
@@ -84,6 +86,7 @@ const MbedConfig::Key MbedConfig::kConfigKey_WiFiStationSecType = { CONFIG_KEY("
 const MbedConfig::Key MbedConfig::kConfigKey_RegulatoryLocation = { CONFIG_KEY("regulatory-location") };
 const MbedConfig::Key MbedConfig::kConfigKey_CountryCode        = { CONFIG_KEY("country-code") };
 const MbedConfig::Key MbedConfig::kConfigKey_Breadcrumb         = { CONFIG_KEY("breadcrumb") };
+const MbedConfig::Key MbedConfig::kConfigKey_UniqueId           = { CONFIG_KEY("unique-id") };
 
 CHIP_ERROR MbedConfig::ReadConfigValue(Key key, bool & val)
 {

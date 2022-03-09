@@ -79,3 +79,10 @@
 
 // TODO: CHIP has redesigned the crypto interface, pending on the final version of CHIP HASH APIs
 #define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
+
+// Reserve a single dynamic endpoint that we can use to host things like OTA
+// Provider server.
+#if !defined(CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) || CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT == 0
+#undef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 1
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT

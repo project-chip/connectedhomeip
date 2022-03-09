@@ -21,12 +21,28 @@
 
 namespace chip {
 
+CHIP_ERROR CASESessionManager::Init()
+{
+    if (mConfig.dnsResolver == nullptr)
+    {
+        ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
+        mDNSResolver.SetOperationalDelegate(this);
+        mConfig.dnsResolver = &mDNSResolver;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
     Dnssd::ResolvedNodeData resolutionData;
 
-    bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
+    bool nodeIDWasResolved =
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
+#else
+        false;
+#endif
 
     ChipLogDetail(CASESessionManager,
                   "FindOrEstablishSession: PeerId = CF" ChipLogFormatX64 ":N" ChipLogFormatX64 ", NodeIdWasResolved = %d",
@@ -73,43 +89,66 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
     ReleaseSession(FindExistingSession(peerId));
 }
 
+void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId)
+{
+    mConfig.devicePool->ReleaseDevicesForFabric(compressedFabricId);
+}
+
+void CASESessionManager::ReleaseAllSessions()
+{
+    mConfig.devicePool->ReleaseAllDevices();
+}
+
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
 {
     VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
-                                              Dnssd::Resolver::CacheBypass::On);
+    return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
 }
 
-void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
+void CASESessionManager::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData)
 {
     ChipLogProgress(Controller, "Address resolved for node: 0x" ChipLogFormatX64, ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
 
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     if (mConfig.dnsCache != nullptr)
     {
-        LogErrorOnFailure(mConfig.dnsCache->Insert(nodeData));
+        CHIP_ERROR err = mConfig.dnsCache->Insert(nodeData);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "DNS Cache insert: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
+#endif
 
     OperationalDeviceProxy * session = FindExistingSession(nodeData.mPeerId);
     VerifyOrReturn(session != nullptr,
                    ChipLogDetail(Controller, "OnNodeIdResolved was called for a device with no active sessions, ignoring it."));
 
-    LogErrorOnFailure(session->UpdateDeviceData(session->ToPeerAddress(nodeData), nodeData.GetMRPConfig()));
+    CHIP_ERROR err = session->UpdateDeviceData(OperationalDeviceProxy::ToPeerAddress(nodeData), nodeData.GetMRPConfig());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Update Service Data: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
-void CASESessionManager::OnNodeIdResolutionFailed(const PeerId & peer, CHIP_ERROR error)
+void CASESessionManager::OnOperationalNodeResolutionFailed(const PeerId & peer, CHIP_ERROR error)
 {
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
 }
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr)
 {
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     if (mConfig.dnsCache != nullptr)
     {
         Dnssd::ResolvedNodeData resolutionData;
-        ReturnErrorOnFailure(mConfig.dnsCache->Lookup(peerId, resolutionData));
-        addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
-        return CHIP_NO_ERROR;
+        if (mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR)
+        {
+            addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
+            return CHIP_NO_ERROR;
+        }
     }
+#endif
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);

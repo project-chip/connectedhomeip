@@ -181,6 +181,15 @@
 [submodule "cyw30739_sdk/tools"]
 	path = third_party/cyw30739_sdk/repos/btsdk-tools
 	url = https://github.com/Infineon/btsdk-tools.git
+[submodule "third_party/p6/p6_sdk/libs/anycloud-ota"]
+	path = third_party/p6/p6_sdk/libs/anycloud-ota
+	url = https://github.com/Infineon/anycloud-ota
 [submodule "third_party/mbed-mcu-boot/repo"]
 	path = third_party/mbed-mcu-boot/repo
 	url = https://github.com/ATmobica/mcuboot.git
+[submodule "perfetto"]
+	path = third_party/perfetto/repo
+	url = https://github.com/google/perfetto
+[submodule "p6/serial-flash"]
+	path = third_party/p6/p6_sdk/libs/serial-flash
+	url = https://github.com/Infineon/serial-flash

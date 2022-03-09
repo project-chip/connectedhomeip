@@ -45,7 +45,7 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        request = static_cast<T>(value.asUInt());
+        request = static_cast<T>(value.asLargestUInt());
         return CHIP_NO_ERROR;
     }
 
@@ -58,7 +58,7 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        request = static_cast<T>(value.asInt());
+        request = static_cast<T>(value.asLargestInt());
         return CHIP_NO_ERROR;
     }
 
@@ -205,14 +205,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    static CHIP_ERROR EnsureMemberExist(const char * label, bool hasMember)
+    static CHIP_ERROR EnsureMemberExist(const char * label, const char * memberName, bool hasMember)
     {
         if (hasMember)
         {
             return CHIP_NO_ERROR;
         }
 
-        ChipLogError(chipTool, "%s is required.", label);
+        ChipLogError(chipTool, "%s is required.  Should be provided as {\"%s\": value}", label, memberName);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 

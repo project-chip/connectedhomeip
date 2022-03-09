@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,14 +20,31 @@ import("${chip_root}/build/chip/tools.gni")
 assert(chip_build_tools)
 
 executable("chip-tool-darwin") {
-  sources = [ "main.m" ]
+  sources = [
+    "${chip_root}/zzz_generated/chip-tool-darwin/zap-generated/cluster/CHIPTestClustersObjc.mm",
+    "commands/clusters/ModelCommandBridge.mm",
+    "commands/common/CHIPCommandBridge.mm",
+    "commands/common/CHIPCommandStorageDelegate.mm",
+    "commands/common/CHIPToolKeypair.mm",
+    "commands/pairing/Commands.h",
+    "commands/pairing/PairingCommandBridge.mm",
+    "commands/pairing/PairingDelegateBridge.mm",
+    "main.mm",
+  ]
+
+  include_dirs = [
+    ".",
+    "${chip_root}/zzz_generated/chip-tool-darwin",
+  ]
 
   deps = [
+    "${chip_root}/examples/chip-tool:chip-tool-utils",
     "${chip_root}/src/app/server",
     "${chip_root}/src/darwin/Framework/CHIP",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
   cflags = [

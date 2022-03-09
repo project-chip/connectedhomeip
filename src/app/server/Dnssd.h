@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <app/server/CommissioningModeProvider.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Advertiser.h>
@@ -51,11 +53,31 @@ public:
     /// Gets the unsecure Matter port
     uint16_t GetUnsecuredPort() { return mUnsecuredPort; }
 
+    /// Sets the interface id used for advertising
+    void SetInterfaceId(Inet::InterfaceId interfaceId) { mInterfaceId = interfaceId; }
+
+    /// Gets the interface id used for advertising
+    Inet::InterfaceId GetInterfaceId() { return mInterfaceId; }
+
     /// Sets the factory-new state commissionable node discovery timeout
     void SetDiscoveryTimeoutSecs(int16_t secs) { mDiscoveryTimeoutSecs = secs; }
 
     /// Gets the factory-new state commissionable node discovery timeout
     int16_t GetDiscoveryTimeoutSecs() { return mDiscoveryTimeoutSecs; }
+
+    //
+    // Override the referenced fabric table from the default that is present
+    // in Server::GetInstance().GetFabricTable() to something else.
+    //
+    void SetFabricTable(FabricTable * table)
+    {
+        VerifyOrDie(table != nullptr);
+        mFabricTable = table;
+    }
+
+    // Set the commissioning mode provider to use.  Null provider will mean we
+    // assume the commissioning mode is kDisabled.
+    void SetCommissioningModeProvider(CommissioningModeProvider * provider) { mCommissioningModeProvider = provider; }
 
     /// Callback from Discovery Expiration timer
     /// Checks if discovery has expired and if so,
@@ -78,9 +100,8 @@ public:
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
 
-    /// (Re-)starts the Dnssd server
-    /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1)
-    /// - if device has been commissioned, then commissioning mode will be disabled.
+    /// (Re-)starts the Dnssd server, using the commissioning mode from our
+    /// commissioning mode provider.
     void StartServer();
 
     /// (Re-)starts the Dnssd server, using the provided commissioning mode.
@@ -105,6 +126,12 @@ private:
     /// Set MDNS commissionable node advertisement
     CHIP_ERROR AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode mode);
 
+    //
+    // Check if we have any valid operational credentials present in the fabric table and return true
+    // if we do.
+    //
+    bool HaveOperationalCredentials();
+
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
 
     void ClearTimeouts()
@@ -115,11 +142,12 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
 
-    // Helper for StartServer.
-    void StartServer(Optional<Dnssd::CommissioningMode> mode);
+    FabricTable * mFabricTable                             = nullptr;
+    CommissioningModeProvider * mCommissioningModeProvider = nullptr;
 
-    uint16_t mSecuredPort   = CHIP_PORT;
-    uint16_t mUnsecuredPort = CHIP_UDC_PORT;
+    uint16_t mSecuredPort          = CHIP_PORT;
+    uint16_t mUnsecuredPort        = CHIP_UDC_PORT;
+    Inet::InterfaceId mInterfaceId = Inet::InterfaceId::Null();
 
     /// schedule next discovery expiration
     CHIP_ERROR ScheduleDiscoveryExpiration();

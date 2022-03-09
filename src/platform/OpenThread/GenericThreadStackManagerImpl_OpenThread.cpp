@@ -46,12 +46,14 @@
 #endif
 
 #include <app/AttributeAccessInterface.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -73,6 +75,7 @@ extern "C" void otAppCliInit(otInstance * aInstance);
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
+using namespace chip::DeviceLayer::NetworkCommissioning;
 
 using chip::Inet::IPPrefix;
 
@@ -80,6 +83,23 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+// Network commissioning
+namespace {
+#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
+Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
+#endif
+
+void initNetworkCommissioningThreadDriver(void)
+{
+#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+    sThreadNetworkCommissioningInstance.Init();
+#endif
+}
+
+NetworkCommissioning::ThreadScanResponse * sScanResult;
+otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter(sScanResult);
+} // namespace
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
 
@@ -282,6 +302,26 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadProvisioned(v
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvision(ByteSpan & netInfo)
+{
+    VerifyOrReturnError(Impl()->IsThreadProvisioned(), CHIP_ERROR_INCORRECT_STATE);
+    otOperationalDatasetTlvs datasetTlv;
+
+    Impl()->LockThreadStack();
+    otError otErr = otDatasetGetActiveTlvs(mOTInst, &datasetTlv);
+    Impl()->UnlockThreadStack();
+    if (otErr != OT_ERROR_NONE)
+    {
+        return MapOpenThreadError(otErr);
+    }
+
+    ReturnErrorOnFailure(mActiveDataset.Init(ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength)));
+    netInfo = mActiveDataset.AsByteSpan();
+
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void)
 {
     otDeviceRole curRole;
@@ -291,6 +331,89 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void
     Impl()->UnlockThreadStack();
 
     return (curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(
+    ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+{
+    // There is another ongoing connect request, reject the new one.
+    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(Impl()->SetThreadEnabled(false));
+    ReturnErrorOnFailure(Impl()->SetThreadProvision(netInfo));
+    ReturnErrorOnFailure(Impl()->SetThreadEnabled(true));
+    mpConnectCallback = callback;
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinished()
+{
+    if (mpConnectCallback != nullptr)
+    {
+        DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+            mpConnectCallback = nullptr;
+        });
+    }
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(ThreadDriver::ScanCallback * callback)
+{
+    // If there is another ongoing scan request, reject the new one.
+    VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mpScanCallback = callback;
+    CHIP_ERROR err = MapOpenThreadError(otLinkActiveScan(mOTInst, 0, /* all channels */
+                                                         0,          /* default value `kScanDurationDefault` = 300 ms. */
+                                                         _OnNetworkScanFinished, this));
+    if (err != CHIP_NO_ERROR)
+    {
+        mpScanCallback = nullptr;
+    }
+    return err;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished(otActiveScanResult * aResult, void * aContext)
+{
+    reinterpret_cast<GenericThreadStackManagerImpl_OpenThread *>(aContext)->_OnNetworkScanFinished(aResult);
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished(otActiveScanResult * aResult)
+{
+    if (aResult == nullptr) // scan completed
+    {
+        if (mpScanCallback != nullptr)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+                mpScanCallback = nullptr;
+            });
+        }
+    }
+    else
+    {
+        ChipLogProgress(
+            DeviceLayer,
+            "Thread Network: %s Panid 0x%" PRIx16 " Channel %" PRIu16 " RSSI %" PRId16 " LQI %" PRIu16 " Version %" PRIu16,
+            aResult->mNetworkName.m8, aResult->mPanId, aResult->mChannel, aResult->mRssi, aResult->mLqi, aResult->mVersion);
+
+        NetworkCommissioning::ThreadScanResponse scanResponse = { 0 };
+
+        scanResponse.panId           = aResult->mPanId;   // why is scanResponse.panID 64b
+        scanResponse.channel         = aResult->mChannel; // why is scanResponse.channel 16b
+        scanResponse.version         = aResult->mVersion;
+        scanResponse.rssi            = aResult->mRssi;
+        scanResponse.lqi             = aResult->mLqi;
+        scanResponse.extendedAddress = Encoding::BigEndian::Get64(aResult->mExtAddress.m8);
+        scanResponse.extendedPanId   = Encoding::BigEndian::Get64(aResult->mExtendedPanId.m8);
+        scanResponse.networkNameLen  = strnlen(aResult->mNetworkName.m8, OT_NETWORK_NAME_MAX_SIZE);
+        memcpy(scanResponse.networkName, aResult->mNetworkName.m8, scanResponse.networkNameLen);
+
+        mScanResponseIter.Add(&scanResponse);
+    }
 }
 
 template <class ImplClass>
@@ -719,7 +842,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
             otErr               = otThreadGetChildInfoById(mOTInst, neighbor->mRloc16, child);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
-            snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, ", Timeout: %10" PRIu32 " NetworkDataVersion: %3" PRIu8, child->mTimeout,
+            snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, ", Timeout: %10" PRIu32 " NetworkDataVersion: %3u", child->mTimeout,
                      child->mNetworkDataVersion);
         }
         else
@@ -1459,7 +1582,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
     }
 
-#if !defined(__ZEPHYR__) && !defined(ENABLE_CHIP_SHELL) && !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     otAppCliInit(otInst);
 #endif
 
@@ -1508,6 +1631,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 
         ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
     }
+
+    initNetworkCommissioningThreadDriver();
 
 exit:
     ChipLogProgress(DeviceLayer, "OpenThread started: %s", otThreadErrorToString(otErr));
@@ -2162,7 +2287,8 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchResolve(intptr_t context)
 {
     auto * dnsResult = reinterpret_cast<DnsResult *>(context);
-    ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &(dnsResult->mMdnsService), dnsResult->error);
+    ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &(dnsResult->mMdnsService), Span<Inet::IPAddress>(),
+                                             dnsResult->error);
     Platform::Delete<DnsResult>(dnsResult);
 }
 

@@ -45,7 +45,11 @@ using namespace chip::DeviceLayer;
     {                                                                                                                              \
         if (!::chip::ChipError::IsSuccess(expr))                                                                                   \
         {                                                                                                                          \
-            LogErrorOnFailure(commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::code));                      \
+            CHIP_ERROR statusErr = commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::code);                  \
+            if (statusErr != CHIP_NO_ERROR)                                                                                        \
+            {                                                                                                                      \
+                ChipLogError(Zcl, "%s: %" CHIP_ERROR_FORMAT, #expr, statusErr.Format());                                           \
+            }                                                                                                                      \
             return true;                                                                                                           \
         }                                                                                                                          \
     } while (false)
@@ -127,13 +131,29 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    CheckSuccess(server->ArmFailSafe(System::Clock::Seconds16(commandData.expiryLengthSeconds)), Failure);
-
+    FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
-    response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
-    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+
+    /*
+     * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
+     * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
+     * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
+     */
+
+    FabricIndex accessingFabricIndex = commandObj->GetAccessingFabricIndex();
+
+    if (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex))
+    {
+        CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                     Failure);
+        response.errorCode = CommissioningError::kOk;
+        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    }
+    else
+    {
+        response.errorCode = CommissioningError::kBusyWithOtherAdmin;
+        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    }
 
     return true;
 }
@@ -145,19 +165,16 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
 
     /*
-     * Pass fabric and nodeId of commissioner to DeviceControlSvr.
+     * Pass fabric of commissioner to DeviceControlSvr.
      * This allows device to send messages back to commissioner.
      * Once bindings are implemented, this may no longer be needed.
      */
     SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
-    server->SetFabricIndex(handle->AsSecureSession()->GetFabricIndex());
-    server->SetPeerNodeId(handle->AsSecureSession()->GetPeerNodeId());
 
-    CheckSuccess(server->CommissioningComplete(), Failure);
+    CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()), Failure);
 
     Commands::CommissioningCompleteResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
     return true;
@@ -174,7 +191,6 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
     Commands::SetRegulatoryConfigResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
     return true;

@@ -158,19 +158,7 @@ private:
                                    char ** txtFields, size_t & numTxtFields)
     {
         auto optionalMrp = params.GetMRPConfig();
-        // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value change or device type change.
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-        chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
-        ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
-        // Increment default MRP retry intervals by SED poll period to be on the safe side
-        // and avoid unnecessary retransmissions.
-        if (optionalMrp.HasValue())
-        {
-            auto mrp = optionalMrp.Value();
-            optionalMrp.SetValue(ReliableMessageProtocolConfig(mrp.mIdleRetransTimeout + sedPollingConfig.SlowPollingIntervalMS,
-                                                               mrp.mActiveRetransTimeout + sedPollingConfig.FastPollingIntervalMS));
-        }
-#endif
+
         if (optionalMrp.HasValue())
         {
             auto mrp = optionalMrp.Value();
@@ -432,6 +420,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     // TODO - Don't announce records that haven't been updated.
     AdvertiseRecords();
 
+    ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
+
     return CHIP_NO_ERROR;
 }
 
@@ -620,6 +610,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     // Advertise the records we just added as required by RFC 6762.
     // TODO - Don't announce records that haven't been updated.
     AdvertiseRecords();
+
+    ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
 
     return CHIP_NO_ERROR;
 }

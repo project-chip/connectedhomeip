@@ -91,7 +91,7 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     return true;
 }
 
-bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin)
+bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -99,10 +99,10 @@ bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpa
         ChipLogError(Zcl, "Unable to lock the door - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->Lock(pin);
+    return lockEndpoint->Lock(pin, err);
 }
 
-bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin)
+bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -110,7 +110,7 @@ bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteS
         ChipLogError(Zcl, "Unable to unlock the door - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->Unlock(pin);
+    return lockEndpoint->Unlock(pin, err);
 }
 
 bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)

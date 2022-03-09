@@ -33,10 +33,16 @@
 #include <string>
 #include <vector>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #include <lib/support/ErrorStr.h>
+
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -47,8 +53,25 @@ const char * TAG = "temperature-measurement-app";
 
 static DeviceCallbacks EchoCallbacks;
 
+namespace {
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+
+static void InitServer(intptr_t context)
+{
+    chip::Server::GetInstance().Init();
+    sWiFiNetworkCommissioningInstance.Init();
+}
+
+} // namespace
+
 extern "C" void app_main()
 {
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
+
     ESP_LOGI(TAG, "Temperature sensor!");
 
     /* Print chip information */
@@ -80,7 +103,7 @@ extern "C" void app_main()
         return;
     }
 
-    chip::Server::GetInstance().Init();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

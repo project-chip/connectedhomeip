@@ -16,9 +16,6 @@
  *    limitations under the License.
  */
 
-#include <iostream>
-#include <thread>
-
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -29,16 +26,16 @@
 #include <lib/core/NodeId.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
-#include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+
+#include <platform/DiagnosticDataProvider.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
@@ -51,41 +48,24 @@
 #if defined(ENABLE_CHIP_SHELL)
 #include <CommissioneeShellCommands.h>
 #include <lib/shell/Engine.h>
+#include <thread>
 #endif
 
 #if defined(PW_RPC_ENABLED)
 #include <CommonRpc.h>
 #endif
 
+#include <signal.h>
+
 #include "AppMain.h"
-#include "Options.h"
 
 using namespace chip;
+using namespace chip::ArgParser;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
-
-class GeneralStorageDelegate : public PersistentStorageDelegate
-{
-    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
-    {
-        ChipLogProgress(NotSpecified, "Retrieved value from general storage.");
-        return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
-    }
-
-    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
-    {
-        ChipLogProgress(NotSpecified, "Stored value in general storage");
-        return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
-    }
-
-    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
-    {
-        ChipLogProgress(NotSpecified, "Delete value in general storage");
-        return PersistedStorage::KeyValueStoreMgr().Delete(key);
-    }
-};
+using namespace chip::app::Clusters;
 
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
@@ -112,7 +92,56 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
-GeneralStorageDelegate gAclStorageDelegate;
+void OnSignalHandler(int signum)
+{
+    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+
+    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
+    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
+    // running process to terminate with different reasons.
+    BootReasonType bootReason = BootReasonType::Unspecified;
+    switch (signum)
+    {
+    case SIGVTALRM:
+        bootReason = BootReasonType::PowerOnReboot;
+        break;
+    case SIGALRM:
+        bootReason = BootReasonType::BrownOutReset;
+        break;
+    case SIGILL:
+        bootReason = BootReasonType::SoftwareWatchdogReset;
+        break;
+    case SIGTRAP:
+        bootReason = BootReasonType::HardwareWatchdogReset;
+        break;
+    case SIGIO:
+        bootReason = BootReasonType::SoftwareUpdateCompleted;
+        break;
+    case SIGINT:
+        bootReason = BootReasonType::SoftwareReset;
+        break;
+    default:
+        IgnoreUnusedVariable(bootReason);
+        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
+        chipDie();
+        break;
+    }
+
+    Server::GetInstance().DispatchShutDownAndStopEventLoop();
+}
+
+void SetupSignalHandlers()
+{
+    // sigaction is not used here because Tsan interceptors seems to
+    // never dispatch the signals on darwin.
+    signal(SIGALRM, OnSignalHandler);
+    signal(SIGVTALRM, OnSignalHandler);
+    signal(SIGILL, OnSignalHandler);
+    signal(SIGTRAP, OnSignalHandler);
+    signal(SIGTERM, OnSignalHandler);
+    signal(SIGIO, OnSignalHandler);
+    signal(SIGINT, OnSignalHandler);
+}
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -132,7 +161,7 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
-int ChipLinuxAppInit(int argc, char ** argv)
+int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -148,20 +177,45 @@ int ChipLinuxAppInit(int argc, char ** argv)
     err = Platform::MemoryInit();
     SuccessOrExit(err);
 
+    err = ParseArguments(argc, argv, customOptions);
+    SuccessOrExit(err);
+
+#ifdef CHIP_CONFIG_KVS_PATH
+    if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
+    {
+        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+    }
+    else
+    {
+        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
+    }
+    SuccessOrExit(err);
+#endif
+
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
-    SuccessOrExit(err);
+    if (0 != LinuxDeviceOptions::GetInstance().payload.discriminator)
+    {
+        uint16_t discriminator = LinuxDeviceOptions::GetInstance().payload.discriminator;
+        err                    = DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator);
+        SuccessOrExit(err);
+    }
 
-    err = ParseArguments(argc, argv);
+    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
-    Access::Examples::SetAccessControlDelegateStorage(&gAclStorageDelegate);
+    // For testing of manual pairing code with custom commissioning flow
+    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
+    SuccessOrExit(err);
+
+    LinuxDeviceOptions::GetInstance().payload.commissioningFlow = chip::CommissioningFlow::kCustom;
+
+    PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
 #if defined(PW_RPC_ENABLED)
     rpc::Init();
@@ -198,7 +252,7 @@ int ChipLinuxAppInit(int argc, char ** argv)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Failed to run Linux Lighting App: %s ", ErrorStr(err));
+        ChipLogProgress(NotSpecified, "Failed to init Linux App: %s ", ErrorStr(err));
         // End the program with non zero error code to indicate a error.
         return 1;
     }
@@ -219,8 +273,16 @@ class MyServerStorageDelegate : public PersistentStorageDelegate
 {
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        ChipLogProgress(AppServer, "Retrieved value from server storage.");
-        return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        ChipLogProgress(AppServer, "Retrieving value from server storage.");
+        size_t bytesRead = 0;
+        CHIP_ERROR err   = PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(AppServer, "Retrieved value from server storage.");
+        }
+        size = static_cast<uint16_t>(bytesRead);
+        return err;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -248,22 +310,19 @@ DeviceCommissioner gCommissioner;
 CommissionerDiscoveryController gCommissionerDiscoveryController;
 MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
-SimpleFabricStorage gFabricStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
-NodeId gLocalId = kPlaceholderNodeId;
+NodeId gLocalId = kMaxOperationalNodeId;
 
 CHIP_ERROR InitCommissioner()
 {
     Controller::FactoryInitParams factoryParams;
     Controller::SetupParams params;
 
-    ReturnErrorOnFailure(gFabricStorage.Initialize(&gServerStorage));
-
-    factoryParams.fabricStorage = &gFabricStorage;
     // use a different listen port for the commissioner than the default used by chip-tool.
-    factoryParams.listenPort              = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
+    factoryParams.listenPort               = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
+    factoryParams.fabricIndependentStorage = &gServerStorage;
+
     params.storageDelegate                = &gServerStorage;
-    params.deviceAddressUpdateDelegate    = nullptr;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
@@ -291,8 +350,8 @@ CHIP_ERROR InitCommissioner()
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(
-        gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, ephemeralKey.Pubkey(),
+                                                                        rcacSpan, icacSpan, nocSpan));
 
     params.operationalKeypair = &ephemeralKey;
     params.controllerRCAC     = rcacSpan;
@@ -320,10 +379,12 @@ CHIP_ERROR ShutdownCommissioner()
     return CHIP_NO_ERROR;
 }
 
-class PairingCommand : public Controller::DevicePairingDelegate, public Controller::DeviceAddressUpdateDelegate
+class PairingCommand : public Controller::DevicePairingDelegate
 {
 public:
-    PairingCommand(){};
+    PairingCommand() :
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this){};
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(Controller::DevicePairingDelegate::Status status) override;
@@ -331,15 +392,16 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
-    /////////// DeviceAddressUpdateDelegate Interface /////////
-    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
-
     CHIP_ERROR UpdateNetworkAddress();
 
-    /* Callback when command results in success */
-    static void OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &);
-    /* Callback when command results in failure */
-    static void OnFailureResponse(void * context, CHIP_ERROR error);
+private:
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
+    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 };
 
 PairingCommand gPairingCommand;
@@ -349,11 +411,6 @@ CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
     ChipLogProgress(AppServer, "Mdns: Updating NodeId: %" PRIx64 " ...", gRemoteId);
     return gCommissioner.UpdateDevice(gRemoteId);
-}
-
-void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
-{
-    ChipLogProgress(AppServer, "OnAddressUpdateComplete: %s", ErrorStr(err));
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -398,46 +455,73 @@ void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
     }
 }
 
-void PairingCommand::OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
-{
-    ChipLogProgress(Controller, "OnSuccessResponse");
-}
-
-void PairingCommand::OnFailureResponse(void * context, CHIP_ERROR error)
-{
-    ChipLogProgress(Controller, "OnFailureResponse");
-}
-
 void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+        ChipLogProgress(AppServer, "Device commissioning completed with success - getting OperationalDeviceProxy");
+
+        gCommissioner.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+#else  // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
         ChipLogProgress(AppServer, "Device commissioning completed with success");
-
-        // TODO:
-        // - this code needs to be conditional based upon Content App Platform enablement
-        // - the endpointId chosen should come from the App Platform (determined based upon vid/pid of node)
-        // - the cluster(s) chosen should come from the App Platform
-        constexpr EndpointId kBindingClusterEndpoint = 0;
-
-        GroupId groupId       = kUndefinedGroupId;
-        EndpointId endpointId = 1;
-        ClusterId clusterId   = kInvalidClusterId;
-
-        gCommissioner.CreateBindingWithCallback(nodeId, kBindingClusterEndpoint, gLocalId, groupId, endpointId, clusterId,
-                                                OnSuccessResponse, OnFailureResponse);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     }
     else
     {
         ChipLogProgress(AppServer, "Device commissioning Failure: %s", ErrorStr(err));
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->CommissioningFailed(err);
+        }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     }
 }
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+void PairingCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
+{
+    ChipLogProgress(Controller, "OnDeviceConnectedFn");
+    CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+
+    if (device == nullptr)
+    {
+        ChipLogProgress(AppServer, "No OperationalDeviceProxy returned from OnDeviceConnectedFn");
+        if (cdc != nullptr)
+        {
+            cdc->CommissioningFailed(CHIP_ERROR_INCORRECT_STATE);
+        }
+        return;
+    }
+
+    if (cdc != nullptr)
+    {
+        // TODO: get from DAC!
+        UDCClientState * udc = cdc->GetUDCClientState();
+        uint16_t vendorId    = (udc == nullptr ? 0 : udc->GetVendorId());
+        uint16_t productId   = (udc == nullptr ? 0 : udc->GetProductId());
+        cdc->CommissioningSucceeded(vendorId, productId, gRemoteId, device);
+    }
+}
+
+void PairingCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+{
+    ChipLogProgress(Controller, "OnDeviceConnectionFailureFn - attempt to get OperationalDeviceProxy failed");
+    CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+    {
+        cdc->CommissioningFailed(err);
+    }
+}
+
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, Transport::PeerAddress address)
 {
     RendezvousParameters params = RendezvousParameters().SetSetupPINCode(pincode).SetDiscriminator(disc).SetPeerAddress(address);
 
-    gCommissioner.RegisterDeviceAddressUpdateDelegate(&gPairingCommand);
     gCommissioner.RegisterPairingDelegate(&gPairingCommand);
     gCommissioner.PairDevice(gRemoteId, params);
 
@@ -490,8 +574,10 @@ void ChipLinuxAppMainLoop()
     unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+    Inet::InterfaceId interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
+
     // Init ZCL Data Model and CHIP App Server
-    Server::GetInstance().Init(nullptr, securePort, unsecurePort);
+    Server::GetInstance().Init(nullptr, securePort, unsecurePort, interfaceId);
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
@@ -504,11 +590,15 @@ void ChipLinuxAppMainLoop()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    InitCommissioner();
+    ChipLogProgress(AppServer, "Starting commissioner");
+    VerifyOrReturn(InitCommissioner() == CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Started commissioner");
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    SetupSignalHandlers();
 
     ApplicationInit();
 
@@ -521,4 +611,8 @@ void ChipLinuxAppMainLoop()
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif
+
+    Server::GetInstance().Shutdown();
+
+    DeviceLayer::PlatformMgr().Shutdown();
 }

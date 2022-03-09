@@ -1,0 +1,10 @@
+config:
+    cluster: "Basic"
+    endpoint: 0
+    testThreeVariable:
+        type: INT16U
+        defaultValue: 3
+tests:
+    - label: "Examples Test Step 1"
+      cluster: "LogCommands"
+      command: "Log"

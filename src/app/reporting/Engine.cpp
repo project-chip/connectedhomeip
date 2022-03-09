@@ -42,9 +42,31 @@ CHIP_ERROR Engine::Init()
 
 void Engine::Shutdown()
 {
+    // Flush out the event buffer synchronously
+    ScheduleUrgentEventDeliverySync();
+
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
     mGlobalDirtySet.ReleaseAll();
+}
+
+bool Engine::IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath)
+{
+    bool existPathMatch       = false;
+    bool existVersionMismatch = false;
+    for (auto filter = aDataVersionFilterList; filter != nullptr; filter = filter->mpNext)
+    {
+        if (aPath.mEndpointId == filter->mEndpointId && aPath.mClusterId == filter->mClusterId)
+        {
+            existPathMatch = true;
+            if (!IsClusterDataVersionEqual(ConcreteClusterPath(filter->mEndpointId, filter->mClusterId),
+                                           filter->mDataVersion.Value()))
+            {
+                existVersionMismatch = true;
+            }
+        }
+    }
+    return existPathMatch && !existVersionMismatch;
 }
 
 CHIP_ERROR
@@ -108,6 +130,13 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 if (!concretePathDirty)
                 {
                     // This attribute is not dirty, we just skip this one.
+                    continue;
+                }
+            }
+            else
+            {
+                if (IsClusterDataVersionMatch(apReadHandler->GetDataVersionFilterlist(), readPath))
+                {
                     continue;
                 }
             }
@@ -263,7 +292,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         EventReportIBs::Builder & eventReportIBs = aReportDataBuilder.CreateEventReports();
         SuccessOrExit(err = aReportDataBuilder.GetError());
         err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), clusterInfoList, eventMin, eventCount,
-                                            apReadHandler->GetAccessingFabricIndex());
+                                            apReadHandler->GetSubjectDescriptor());
 
         if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
         {
@@ -332,6 +361,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     uint16_t reservedSize                      = 0;
     bool hasMoreChunks                         = false;
+    bool needCloseReadHandler                  = false;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -394,8 +424,13 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         if (!hasEncodedAttributes && !hasEncodedEvents && hasMoreChunks)
         {
             ChipLogError(DataManagement,
-                         "No data actually encoded but hasMoreChunks flag is set, abort report! (attribute too big?)");
-            ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
+                         "No data actually encoded but hasMoreChunks flag is set, close read handler! (attribute too big?)");
+            err = apReadHandler->SendStatusReport(Protocols::InteractionModel::Status::ResourceExhausted);
+            if (err == CHIP_NO_ERROR)
+            {
+                needCloseReadHandler = true;
+            }
+            ExitNow();
         }
     }
 
@@ -439,7 +474,7 @@ exit:
         //
         apReadHandler->Abort();
     }
-    else if (apReadHandler->IsType(ReadHandler::InteractionType::Read) && !hasMoreChunks)
+    else if ((apReadHandler->IsType(ReadHandler::InteractionType::Read) && !hasMoreChunks) || needCloseReadHandler)
     {
         //
         // In the case of successful report generation and we're on the last chunk of a read, we don't expect
@@ -493,14 +528,19 @@ void Engine::Run()
 
     mRunScheduled = false;
 
-    while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < imEngine->mReadHandlers.Allocated()))
+    // We may be deallocating read handlers as we go.  Track how many we had
+    // initially, so we make sure to go through all of them.
+    size_t initialAllocated = imEngine->mReadHandlers.Allocated();
+    while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < initialAllocated))
     {
         ReadHandler * readHandler = imEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) imEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
         if (readHandler->IsReportable())
         {
-            CHIP_ERROR err = BuildAndSendSingleReportData(readHandler);
+            mRunningReadHandler = readHandler;
+            CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
+            mRunningReadHandler = nullptr;
             if (err != CHIP_NO_ERROR)
             {
                 return;
@@ -508,6 +548,9 @@ void Engine::Run()
         }
 
         numReadHandled++;
+        // If readHandler removed itself from our list, we also decremented
+        // mCurReadHandlerIdx to account for that removal, so it's safe to
+        // increment here.
         mCurReadHandlerIdx++;
     }
 
@@ -591,6 +634,14 @@ CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
         *clusterInfo = aClusterInfo;
     }
 
+    // Schedule work to run asynchronously on the CHIP thread. The scheduled
+    // work won't execute until the current execution context has
+    // completed. This ensures that we can 'gather up' multiple attribute
+    // changes that have occurred in the same execution context without
+    // requiring any explicit 'start' or 'end' change calls into the engine to
+    // book-end the change.
+    ScheduleRun();
+
     return CHIP_NO_ERROR;
 }
 
@@ -643,6 +694,12 @@ void Engine::OnReportConfirm()
 {
     VerifyOrDie(mNumReportsInFlight > 0);
 
+    if (mNumReportsInFlight == CHIP_IM_MAX_REPORTS_IN_FLIGHT)
+    {
+        // We could have other things waiting to go now that this report is no
+        // longer in flight.
+        ScheduleRun();
+    }
     mNumReportsInFlight--;
     ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %" PRIu32, mNumReportsInFlight);
 }
@@ -678,18 +735,21 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
+CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten)
 {
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath](ReadHandler * handler) {
+    bool isUrgentEvent = false;
+    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath, &isUrgentEvent](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;
         }
 
-        for (auto clusterInfo = handler->GetEventClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
+        for (auto * interestedPath = handler->GetEventClusterInfolist(); interestedPath != nullptr;
+             interestedPath        = interestedPath->mpNext)
         {
-            if (clusterInfo->IsEventPathSupersetOf(aPath))
+            if (interestedPath->IsEventPathSupersetOf(aPath) && interestedPath->mIsUrgentEvent)
             {
+                isUrgentEvent = true;
                 handler->UnblockUrgentEventDelivery();
                 break;
             }
@@ -698,20 +758,32 @@ CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
         return Loop::Continue;
     });
 
-    return ScheduleRun();
-}
-
-CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten)
-{
-    if (aUrgent != EventOptions::Type::kUrgent)
+    if (isUrgentEvent)
     {
-        return ScheduleBufferPressureEventDelivery(aBytesWritten);
+        ChipLogDetail(DataManagement, "urgent event schedule run");
+        return ScheduleRun();
     }
     else
     {
-        return ScheduleUrgentEventDelivery(aPath);
+        return ScheduleBufferPressureEventDelivery(aBytesWritten);
     }
     return CHIP_NO_ERROR;
+}
+
+void Engine::ScheduleUrgentEventDeliverySync()
+{
+    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([](ReadHandler * handler) {
+        if (handler->IsType(ReadHandler::InteractionType::Read))
+        {
+            return Loop::Continue;
+        }
+
+        handler->UnblockUrgentEventDelivery();
+
+        return Loop::Continue;
+    });
+
+    Run();
 }
 
 }; // namespace reporting

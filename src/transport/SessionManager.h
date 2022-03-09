@@ -27,13 +27,17 @@
 
 #include <utility>
 
+#include <credentials/FabricTable.h>
+#include <crypto/RandUtils.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/CryptoContext.h>
+#include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/SecureSessionTable.h>
@@ -183,7 +187,8 @@ public:
      * @param messageCounterManager The message counter manager
      */
     CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                    Transport::MessageCounterManagerInterface * messageCounterManager);
+                    Transport::MessageCounterManagerInterface * messageCounterManager,
+                    chip::PersistentStorageDelegate * storageDelegate, FabricTable * fabricTable);
 
     /**
      * @brief
@@ -191,6 +196,11 @@ public:
      *  of the object and reset it's state.
      */
     void Shutdown();
+
+    /**
+     * @brief Notification that a fabric was removed.
+     */
+    void FabricRemoved(FabricIndex fabricIndex);
 
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
@@ -206,19 +216,14 @@ public:
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
                                                          const ReliableMessageProtocolConfig & config)
     {
-        return mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, config);
+        // Allocate ephemeralInitiatorNodeID in Operational Node ID range
+        NodeId ephemeralInitiatorNodeID;
+        do
+        {
+            ephemeralInitiatorNodeID = static_cast<NodeId>(Crypto::GetRandU64());
+        } while (!IsOperationalNodeId(ephemeralInitiatorNodeID));
+        return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
-
-    // TODO: implements group sessions
-    Optional<SessionHandle> CreateGroupSession(GroupId group, chip::FabricIndex fabricIndex)
-    {
-        return mGroupSessions.AllocEntry(group, fabricIndex);
-    }
-    Optional<SessionHandle> FindGroupSession(GroupId group, chip::FabricIndex fabricIndex)
-    {
-        return mGroupSessions.FindEntry(group, fabricIndex);
-    }
-    void RemoveGroupSession(Transport::GroupSession * session) { mGroupSessions.DeleteEntry(session); }
 
     // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
     // and tv-casting-app that uses the TV's node ID to find the associated secure session
@@ -244,10 +249,11 @@ private:
     };
 
     System::Layer * mSystemLayer = nullptr;
+    FabricTable * mFabricTable   = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
     Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions;
-    Transport::GroupSessionTable<CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE> mGroupSessions;
     State mState; // < Initialization state of the object
+    chip::Transport::GroupOutgoingCounters mGroupClientCounter;
 
     SessionMessageDelegate * mCB = nullptr;
 
@@ -279,8 +285,8 @@ private:
     void SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle && msg);
 
-    void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                         System::PacketBufferHandle && msg);
+    void UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                        System::PacketBufferHandle && msg);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
 
