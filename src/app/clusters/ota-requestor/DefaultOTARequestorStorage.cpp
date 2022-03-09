@@ -55,21 +55,21 @@ CHIP_ERROR DefaultOTARequestorStorage::StoreDefaultProviders(const ProviderLocat
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
-    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator().OTADefaultProviders(), buffer,
+    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::OTADefaultProviders(), buffer,
                                                static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
 CHIP_ERROR DefaultOTARequestorStorage::LoadDefaultProviders(ProviderLocationList & providers)
 {
     uint8_t buffer[kProviderListMaxSerializedSize];
-    uint16_t size = sizeof(buffer);
+    MutableByteSpan bufferSpan(buffer);
 
-    ReturnErrorOnFailure(mPersistentStorage->SyncGetKeyValue(DefaultStorageKeyAllocator().OTADefaultProviders(), buffer, size));
+    ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::OTADefaultProviders(), bufferSpan));
 
     TLV::TLVReader reader;
     TLV::TLVType outerType;
 
-    reader.Init(buffer, size);
+    reader.Init(bufferSpan.data(), bufferSpan.size());
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
 
@@ -93,25 +93,25 @@ CHIP_ERROR DefaultOTARequestorStorage::StoreCurrentProviderLocation(const Provid
     writer.Init(buffer);
     ReturnErrorOnFailure(provider.EncodeForRead(writer, TLV::AnonymousTag(), provider.fabricIndex));
 
-    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator().OTACurrentProvider(), buffer,
+    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::OTACurrentProvider(), buffer,
                                                static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
 CHIP_ERROR DefaultOTARequestorStorage::ClearCurrentProviderLocation()
 {
-    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator().OTACurrentProvider());
+    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::OTACurrentProvider());
 }
 
 CHIP_ERROR DefaultOTARequestorStorage::LoadCurrentProviderLocation(ProviderLocationType & provider)
 {
     uint8_t buffer[kProviderMaxSerializedSize];
-    uint16_t size = sizeof(buffer);
+    MutableByteSpan bufferSpan(buffer);
 
-    ReturnErrorOnFailure(mPersistentStorage->SyncGetKeyValue(DefaultStorageKeyAllocator().OTACurrentProvider(), buffer, size));
+    ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::OTACurrentProvider(), bufferSpan));
 
     TLV::TLVReader reader;
 
-    reader.Init(buffer, size);
+    reader.Init(bufferSpan.data(), bufferSpan.size());
     ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
     ReturnErrorOnFailure(provider.Decode(reader));
 
@@ -120,22 +120,27 @@ CHIP_ERROR DefaultOTARequestorStorage::LoadCurrentProviderLocation(ProviderLocat
 
 CHIP_ERROR DefaultOTARequestorStorage::StoreUpdateToken(ByteSpan updateToken)
 {
-    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator().OTAUpdateToken(), updateToken.data(),
+    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::OTAUpdateToken(), updateToken.data(),
                                                static_cast<uint16_t>(updateToken.size()));
 }
 
 CHIP_ERROR DefaultOTARequestorStorage::ClearUpdateToken()
 {
-    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator().OTAUpdateToken());
+    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::OTAUpdateToken());
 }
 
 CHIP_ERROR DefaultOTARequestorStorage::LoadUpdateToken(MutableByteSpan & updateToken)
 {
-    uint16_t size    = static_cast<uint16_t>(updateToken.size());
-    CHIP_ERROR error = mPersistentStorage->SyncGetKeyValue(DefaultStorageKeyAllocator().OTAUpdateToken(), updateToken.data(), size);
+    return Load(DefaultStorageKeyAllocator::OTAUpdateToken(), updateToken);
+}
 
-    updateToken.reduce_size(size);
-    return error;
+CHIP_ERROR DefaultOTARequestorStorage::Load(const char * key, MutableByteSpan & buffer)
+{
+    uint16_t size = static_cast<uint16_t>(buffer.size());
+    ReturnErrorOnFailure(mPersistentStorage->SyncGetKeyValue(key, buffer.data(), size));
+
+    buffer = MutableByteSpan(buffer.data(), size);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

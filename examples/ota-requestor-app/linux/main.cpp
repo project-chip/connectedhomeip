@@ -18,6 +18,7 @@
 
 #include "AppMain.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsentProvider.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>

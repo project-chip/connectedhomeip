@@ -114,7 +114,7 @@ public:
     }
 
     /**
-     * Delete a provider location from the list if found
+     * Delete a provider location for the given fabric index.
      */
     CHIP_ERROR Delete(FabricIndex fabricIndex)
     {
