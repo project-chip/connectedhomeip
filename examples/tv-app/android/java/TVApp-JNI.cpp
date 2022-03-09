@@ -126,7 +126,7 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
     if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
     {
-        JNIDACProvider* p = new JNIDACProvider(provider);
+        JNIDACProvider * p = new JNIDACProvider(provider);
         chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
     }
 }

@@ -17,15 +17,15 @@
 
 #include "JNIDACProvider.h"
 #include "lib/support/logging/CHIPLogging.h"
+#include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <cstdlib>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/Span.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <credentials/CHIPCert.h>
+#include <lib/support/Span.h>
 
 using namespace chip;
 
@@ -61,7 +61,8 @@ JNIDACProvider::JNIDACProvider(jobject provider)
         env->ExceptionClear();
     }
 
-    mGetProductAttestationIntermediateCertMethod = env->GetMethodID(JNIDACProviderClass, "GetProductAttestationIntermediateCert", "()[B");
+    mGetProductAttestationIntermediateCertMethod =
+        env->GetMethodID(JNIDACProviderClass, "GetProductAttestationIntermediateCert", "()[B");
     if (mGetProductAttestationIntermediateCertMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIDACProvider 'GetProductAttestationIntermediateCert' method");
@@ -75,7 +76,8 @@ JNIDACProvider::JNIDACProvider(jobject provider)
         env->ExceptionClear();
     }
 
-    mGetDeviceAttestationCertPublicKeyKeyMethod = env->GetMethodID(JNIDACProviderClass, "GetDeviceAttestationCertPublicKeyKey", "()[B");
+    mGetDeviceAttestationCertPublicKeyKeyMethod =
+        env->GetMethodID(JNIDACProviderClass, "GetDeviceAttestationCertPublicKeyKey", "()[B");
     if (mGetDeviceAttestationCertPublicKeyKeyMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIDACProvider 'GetDeviceAttestationCertPublicKeyKey' method");
@@ -99,7 +101,8 @@ CHIP_ERROR JNIDACProvider::GetJavaByteByMethod(jmethodID method, MutableByteSpan
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (outArray == nullptr || env->GetArrayLength(outArray) <= 0) {
+    if (outArray == nullptr || env->GetArrayLength(outArray) <= 0)
+    {
         out_buffer.reduce_size(0);
         return CHIP_NO_ERROR;
     }

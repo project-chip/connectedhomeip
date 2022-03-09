@@ -81,7 +81,8 @@ void SetDeviceAttestationCredentialsProvider(DeviceAttestationCredentialsProvide
     gDacProvider = provider;
 }
 
-bool IsDeviceAttestationCredentialsProviderSet() {
+bool IsDeviceAttestationCredentialsProviderSet()
+{
     return (gDacProvider != &gDefaultDACProvider);
 }
 
