@@ -19,6 +19,8 @@
 
 #include <dns_sd.h>
 #include <lib/dnssd/platform/Dnssd.h>
+
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -48,12 +50,14 @@ struct RegisterContext : public GenericContext
     RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext)
     {
         type = ContextType::Register;
-        strncpy(mType, sType, sizeof(mType));
+        static constexpr ::std::size_t mTypeEndIdx = sizeof(mType) - 1;
+        ::std::strncpy(mType, sType, mTypeEndIdx);
+        mType[mTypeEndIdx] = '\0';
         context  = cbContext;
         callback = cb;
     }
 
-    bool matches(const char * sType) { return (strcmp(mType, sType) == 0); }
+    bool matches(const char * sType) { return (::std::strcmp(mType, sType) == 0); }
 };
 
 struct BrowseContext : public GenericContext
@@ -83,7 +87,9 @@ struct ResolveContext : public GenericContext
         type     = ContextType::Resolve;
         context  = cbContext;
         callback = cb;
-        strncpy(name, cbContextName, sizeof(name));
+        static constexpr ::std::size_t nameEndIdx = sizeof(name) - 1;
+        ::std::strncpy(name, cbContextName, nameEndIdx);
+        name[nameEndIdx] = '\0';
         addressType = cbAddressType;
     }
 };
@@ -105,7 +111,9 @@ struct GetAddrInfoContext : public GenericContext
         callback    = cb;
         interfaceId = cbInterfaceId;
         port        = cbContextPort;
-        strncpy(name, cbContextName, sizeof(name));
+        static constexpr ::std::size_t nameEndIdx = sizeof(name) - 1;
+        ::std::strncpy(name, cbContextName, nameEndIdx);
+        name[nameEndIdx] = '\0';
     }
 };
 
