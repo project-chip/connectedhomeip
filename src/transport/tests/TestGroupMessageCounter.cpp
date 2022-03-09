@@ -348,24 +348,35 @@ void ReorderPeerRemovalTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetNodeIdAt(1, 0, false) == 9);
 }
 
-// Disabled for devices with fabric count lower than 12
-#if CHIP_CONFIG_MAX_FABRICS > 12
 void ReorderFabricRemovalTest(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err                                = CHIP_NO_ERROR;
     chip::Transport::PeerMessageCounter * counter = nullptr;
     TestGroupPeerTable mGroupPeerMsgCounter;
 
-    err = mGroupPeerMsgCounter.FindOrAddPeer(1, 1, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(2, 1, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(3, 1, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(4, 1, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(5, 1, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(6, 1, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(7, 1, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(8, 1, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(9, 1, false, counter);
+    for (uint8_t i = 0; i < CHIP_CONFIG_MAX_FABRICS; i++)
+    {
+        err = mGroupPeerMsgCounter.FindOrAddPeer(static_cast<chip::FabricIndex>(i + 1), 1, false, counter);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
 
+    // Try removing last Fabric first
+    err = counter->VerifyOrTrustFirstGroup(1234);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    counter->CommitGroup(1234);
+
+    err = mGroupPeerMsgCounter.FabricRemoved(CHIP_CONFIG_MAX_FABRICS);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetFabricIndexAt(CHIP_CONFIG_MAX_FABRICS - 1) == kUndefinedFabricIndex);
+
+    err = mGroupPeerMsgCounter.FindOrAddPeer(CHIP_CONFIG_MAX_FABRICS, 1, false, counter);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Verify that the counter was indeed cleared
+    err = counter->VerifyOrTrustFirstGroup(1234);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Set a counter that will be moved around
     err = counter->VerifyOrTrustFirstGroup(5656);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     counter->CommitGroup(5656);
@@ -373,36 +384,21 @@ void ReorderFabricRemovalTest(nlTestSuite * inSuite, void * inContext)
     err = counter->VerifyOrTrustFirstGroup(4756);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
-    err = mGroupPeerMsgCounter.FindOrAddPeer(10, 1, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(11, 1, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(12, 1, false, counter);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, counter != nullptr);
-
+    // Per Spec CHIP_CONFIG_MAX_FABRICS can only be as low as 4
     err = mGroupPeerMsgCounter.RemovePeer(3, 1, false);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetFabricIndexAt(2) == 12);
-    err = mGroupPeerMsgCounter.RemovePeer(8, 1, false);
+    NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetFabricIndexAt(2) == CHIP_CONFIG_MAX_FABRICS);
+    err = mGroupPeerMsgCounter.RemovePeer(2, 1, false);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetFabricIndexAt(7) == 11);
-    err = mGroupPeerMsgCounter.RemovePeer(11, 1, false);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetFabricIndexAt(7) == 10);
-    err = mGroupPeerMsgCounter.RemovePeer(1, 1, false);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetFabricIndexAt(0) == 9);
-    err = mGroupPeerMsgCounter.RemovePeer(10, 1, false);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetFabricIndexAt(7) == 0);
+    NL_TEST_ASSERT(inSuite, mGroupPeerMsgCounter.GetFabricIndexAt(1) == CHIP_CONFIG_MAX_FABRICS - 1);
 
     // Validate that counter value were moved around correctly
-    err = mGroupPeerMsgCounter.FindOrAddPeer(9, 1, false, counter);
+    err = mGroupPeerMsgCounter.FindOrAddPeer(CHIP_CONFIG_MAX_FABRICS, 1, false, counter);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = counter->VerifyOrTrustFirstGroup(4756);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
-#endif // CHIP_CONFIG_MAX_FABRICS > 12
+
 void GroupMessageCounterTest(nlTestSuite * inSuite, void * inContext)
 {
 
@@ -471,9 +467,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Counter Rollover",       CounterCommitRolloverTest),
     NL_TEST_DEF("Counter Trust first",    CounterTrustFirstTest),
     NL_TEST_DEF("Reorder Peer removal",   ReorderPeerRemovalTest),
-    #if CHIP_CONFIG_MAX_FABRICS > 12
     NL_TEST_DEF("Reorder Fabric Removal", ReorderFabricRemovalTest),
-    #endif // CHIP_CONFIG_MAX_FABRICS > 12
     NL_TEST_DEF("Group Message Counter",  GroupMessageCounterTest),
     NL_TEST_SENTINEL()
 };
