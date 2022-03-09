@@ -23,7 +23,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/../../common/cmake/idf_flashing.cmake)
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
     "${CMAKE_CURRENT_LIST_DIR}/../../common/QRCode"
-    "${IDF_PATH}/examples/common_components"
+    "${IDF_PATH}/examples/common_components/led_strip"
 )
 
 project(chip-lighting-app)
