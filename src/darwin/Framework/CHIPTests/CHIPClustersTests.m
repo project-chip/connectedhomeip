@@ -14136,10 +14136,6 @@ NSNumber * _Nonnull MaxlevelValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 254);
-        }
-        {
-            id actualValue = value;
             MaxlevelValue = actualValue;
         }
 
@@ -14205,7 +14201,6 @@ NSNumber * _Nonnull MaxlevelValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-NSNumber * _Nonnull MinlevelValue;
 - (void)testSendClusterTest_TC_LVL_4_1_000005_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads min level attribute from DUT"];
@@ -14223,10 +14218,6 @@ NSNumber * _Nonnull MinlevelValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-        {
-            id actualValue = value;
-            MinlevelValue = actualValue;
         }
 
         [expectation fulfill];
@@ -14261,11 +14252,11 @@ NSNumber * _Nonnull MinlevelValue;
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000007_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 5000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 5000);
+    [self waitForExpectationsWithTimeout:(5000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000008_ReadAttribute
 {
@@ -14283,19 +14274,7 @@ NSNumber * _Nonnull MinlevelValue;
 
         {
             id actualValue = value;
-            XCTAssertEqualObjects(actualValue, MinlevelValue);
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
-            }
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 1);
-            }
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
         }
 
         [expectation fulfill];
@@ -14303,7 +14282,7 @@ NSNumber * _Nonnull MinlevelValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-NSNumber * _Nullable DefaultmoverateValue;
+NSNumber * _Nullable DefaultMoveRateValue;
 - (void)testSendClusterTest_TC_LVL_4_1_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads default move rate attribute from DUT"];
@@ -14320,12 +14299,7 @@ NSNumber * _Nullable DefaultmoverateValue;
 
         {
             id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
-            XCTAssertEqual([actualValue unsignedCharValue], 20);
-        }
-        {
-            id actualValue = value;
-            DefaultmoverateValue = actualValue;
+            DefaultMoveRateValue = actualValue;
         }
 
         [expectation fulfill];
@@ -14392,7 +14366,16 @@ NSNumber * _Nullable DefaultmoverateValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000013_MoveToLevel
+- (void)testSendClusterTest_TC_LVL_4_1_000013_UserPrompt
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"user prompt message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue,
+        @"Physically verify that the device moves at the rate recorded in step 3a and completes moving to its maximum level.");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_LVL_4_1_000014_MoveToLevel
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reset level to 254"];
 
@@ -14417,7 +14400,7 @@ NSNumber * _Nullable DefaultmoverateValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000014_WaitForMs
+- (void)testSendClusterTest_TC_LVL_4_1_000015_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 100ms"];
 
@@ -14455,7 +14438,7 @@ NSNumber * _Nullable DefaultmoverateValue;
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000002_Step
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition: DUT level is set to 0x80"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition: DUT level is set to its lowest point"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -14464,13 +14447,13 @@ NSNumber * _Nullable DefaultmoverateValue;
 
     __auto_type * params = [[CHIPLevelControlClusterStepParams alloc] init];
     params.stepMode = [NSNumber numberWithUnsignedChar:1];
-    params.stepSize = [NSNumber numberWithUnsignedChar:1];
+    params.stepSize = [NSNumber numberWithUnsignedChar:100];
     params.transitionTime = [NSNumber numberWithUnsignedShort:20U];
     params.optionMask = [NSNumber numberWithUnsignedChar:0];
     params.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepWithParams:params
           completionHandler:^(NSError * _Nullable err) {
-              NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
+              NSLog(@"Precondition: DUT level is set to its lowest point Error: %@", err);
 
               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -14481,11 +14464,11 @@ NSNumber * _Nullable DefaultmoverateValue;
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000003_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 4000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 4000);
-    [self waitForExpectationsWithTimeout:(4000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 3000);
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 NSNumber * _Nonnull CurrentlevelValue;
 - (void)testSendClusterTest_TC_LVL_5_1_000004_ReadAttribute
@@ -14504,10 +14487,6 @@ NSNumber * _Nonnull CurrentlevelValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 1);
-        }
-        {
-            id actualValue = value;
             CurrentlevelValue = actualValue;
         }
 
@@ -14518,7 +14497,7 @@ NSNumber * _Nonnull CurrentlevelValue;
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000005_Step
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends step down command to DUT"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends step up command to DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -14526,14 +14505,14 @@ NSNumber * _Nonnull CurrentlevelValue;
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPLevelControlClusterStepParams alloc] init];
-    params.stepMode = [NSNumber numberWithUnsignedChar:1];
+    params.stepMode = [NSNumber numberWithUnsignedChar:0];
     params.stepSize = [NSNumber numberWithUnsignedChar:64];
-    params.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:2U];
     params.optionMask = [NSNumber numberWithUnsignedChar:0];
     params.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepWithParams:params
           completionHandler:^(NSError * _Nullable err) {
-              NSLog(@"Sends step down command to DUT Error: %@", err);
+              NSLog(@"Sends step up command to DUT Error: %@", err);
 
               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -14544,11 +14523,11 @@ NSNumber * _Nonnull CurrentlevelValue;
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000006_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 4000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 5000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 4000);
-    [self waitForExpectationsWithTimeout:(4000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 5000);
+    [self waitForExpectationsWithTimeout:(5000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000007_ReadAttribute
 {
@@ -14566,7 +14545,7 @@ NSNumber * _Nonnull CurrentlevelValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 64);
+            XCTAssertNotEqualObjects(actualValue, CurrentlevelValue);
         }
 
         [expectation fulfill];
@@ -14576,7 +14555,7 @@ NSNumber * _Nonnull CurrentlevelValue;
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000008_Step
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends a Step up command"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends a Step down command"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -14586,12 +14565,12 @@ NSNumber * _Nonnull CurrentlevelValue;
     __auto_type * params = [[CHIPLevelControlClusterStepParams alloc] init];
     params.stepMode = [NSNumber numberWithUnsignedChar:1];
     params.stepSize = [NSNumber numberWithUnsignedChar:64];
-    params.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:2U];
     params.optionMask = [NSNumber numberWithUnsignedChar:0];
     params.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepWithParams:params
           completionHandler:^(NSError * _Nullable err) {
-              NSLog(@"Sends a Step up command Error: %@", err);
+              NSLog(@"Sends a Step down command Error: %@", err);
 
               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -14768,12 +14747,6 @@ NSNumber * _Nonnull CurrentLevelValue;
         }
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 1);
-            }
-        }
-        {
-            id actualValue = value;
             CurrentLevelValue = actualValue;
         }
 
@@ -14793,7 +14766,7 @@ NSNumber * _Nonnull CurrentLevelValue;
 
     __auto_type * params = [[CHIPLevelControlClusterMoveParams alloc] init];
     params.moveMode = [NSNumber numberWithUnsignedChar:0];
-    params.rate = [NSNumber numberWithUnsignedChar:10];
+    params.rate = [NSNumber numberWithUnsignedChar:1];
     params.optionMask = [NSNumber numberWithUnsignedChar:1];
     params.optionOverride = [NSNumber numberWithUnsignedChar:1];
     [cluster moveWithParams:params
@@ -14854,19 +14827,7 @@ NSNumber * _Nonnull CurrentLevelValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 2);
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 2);
-            }
-        }
-        {
-            id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 3);
-            }
+            XCTAssertNotEqualObjects(actualValue, CurrentLevelValue);
         }
 
         [expectation fulfill];
@@ -16398,11 +16359,6 @@ NSNumber * _Nonnull CurrentLevelValue;
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 65521U);
-        }
-
         [expectation fulfill];
     }];
 
@@ -16445,11 +16401,6 @@ NSNumber * _Nonnull CurrentLevelValue;
         NSLog(@"Reads the ProductID attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 32769U);
-        }
 
         [expectation fulfill];
     }];
@@ -16878,11 +16829,6 @@ NSNumber * _Nonnull OccupancyValue;
         NSLog(@"Reads back Occupancy attribute from DUT after few seconds Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 1);
-        }
 
         [expectation fulfill];
     }];

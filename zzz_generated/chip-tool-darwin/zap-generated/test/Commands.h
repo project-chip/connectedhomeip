@@ -16341,16 +16341,12 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeClusterRevision_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_3();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_2();
             break;
         }
 
@@ -16367,7 +16363,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 3;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -16380,31 +16376,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
-                                                                                                 endpoint:1
-                                                                                                    queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 3U));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
@@ -16424,7 +16396,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
@@ -18109,8 +18081,8 @@ public:
             err = TestSendsAMoveDownCommand_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 3000ms\n");
-            err = TestWait3000ms_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 5000ms\n");
+            err = TestWait5000ms_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : reads CurrentLevel attribute from DUT\n");
@@ -18133,12 +18105,16 @@ public:
             err = TestReadsCurrentLevelAttributeFromDut_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Reset level to 254\n");
-            err = TestResetLevelTo254_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : user prompt message\n");
+            err = TestUserPromptMessage_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Wait 100ms\n");
-            err = TestWait100ms_14();
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Reset level to 254\n");
+            err = TestResetLevelTo254_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Wait 100ms\n");
+            err = TestWait100ms_15();
             break;
         }
 
@@ -18155,7 +18131,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 15;
+    const uint16_t mTestCount = 16;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -18180,10 +18156,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("max level", actualValue, 254));
-            }
+            VerifyOrReturn(CheckConstraintType("maxLevel", "", "uint8"));
             {
                 MaxlevelValue = value;
             }
@@ -18244,7 +18217,6 @@ private:
 
         return CHIP_NO_ERROR;
     }
-    NSNumber * _Nonnull MinlevelValue;
 
     CHIP_ERROR TestReadsMinLevelAttributeFromDut_5()
     {
@@ -18261,10 +18233,8 @@ private:
                 id actualValue = value;
                 VerifyOrReturn(CheckValue("min level", actualValue, 0));
             }
-            {
-                MinlevelValue = value;
-            }
 
+            VerifyOrReturn(CheckConstraintType("minLevel", "", "uint8"));
             NextTest();
         }];
 
@@ -18294,9 +18264,9 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait3000ms_7()
+    CHIP_ERROR TestWait5000ms_7()
     {
-        WaitForMs(3000);
+        WaitForMs(5000);
         return CHIP_NO_ERROR;
     }
 
@@ -18313,14 +18283,7 @@ private:
 
             {
                 id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, MinlevelValue));
-            }
-
-            if (value != nil) {
-                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", [value unsignedCharValue], 0));
-            }
-            if (value != nil) {
-                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", [value unsignedCharValue], 1));
+                VerifyOrReturn(CheckValue("current level", actualValue, 1));
             }
 
             NextTest();
@@ -18328,7 +18291,7 @@ private:
 
         return CHIP_NO_ERROR;
     }
-    NSNumber * _Nullable DefaultmoverateValue;
+    NSNumber * _Nullable DefaultMoveRateValue;
 
     CHIP_ERROR TestReadsDefaultMoveRateAttributeFromDut_9()
     {
@@ -18341,13 +18304,9 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            VerifyOrReturn(CheckConstraintType("defaultMoveRate", "", "uint8"));
             {
-                id actualValue = value;
-                VerifyOrReturn(CheckValueNonNull("default move rate", actualValue));
-                VerifyOrReturn(CheckValue("default move rate", actualValue, 20));
-            }
-            {
-                DefaultmoverateValue = value;
+                DefaultMoveRateValue = value;
             }
 
             NextTest();
@@ -18406,7 +18365,14 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestResetLevelTo254_13()
+    CHIP_ERROR TestUserPromptMessage_13()
+    {
+        UserPrompt(
+            @"Physically verify that the device moves at the rate recorded in step 3a and completes moving to its maximum level.");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestResetLevelTo254_14()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18429,7 +18395,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait100ms_14()
+    CHIP_ERROR TestWait100ms_15()
     {
         WaitForMs(100);
         return CHIP_NO_ERROR;
@@ -18481,32 +18447,32 @@ public:
             err = TestSendingOnCommand_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Precondition: DUT level is set to 0x80\n");
-            err = TestPreconditionDutLevelIsSetTo0x80_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Precondition: DUT level is set to its lowest point\n");
+            err = TestPreconditionDutLevelIsSetToItsLowestPoint_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 4000ms\n");
-            err = TestWait4000ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 3000ms\n");
+            err = TestWait3000ms_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Reads current level attribute from DUT\n");
             err = TestReadsCurrentLevelAttributeFromDut_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Sends step down command to DUT\n");
-            err = TestSendsStepDownCommandToDut_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Sends step up command to DUT\n");
+            err = TestSendsStepUpCommandToDut_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 4000ms\n");
-            err = TestWait4000ms_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 5000ms\n");
+            err = TestWait5000ms_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Reads current level attribute from DUT\n");
             err = TestReadsCurrentLevelAttributeFromDut_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Sends a Step up command\n");
-            err = TestSendsAStepUpCommand_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Sends a Step down command\n");
+            err = TestSendsAStepDownCommand_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 4000ms\n");
@@ -18573,7 +18539,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestPreconditionDutLevelIsSetTo0x80_2()
+    CHIP_ERROR TestPreconditionDutLevelIsSetToItsLowestPoint_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18581,13 +18547,13 @@ private:
 
         __auto_type * params = [[CHIPLevelControlClusterStepParams alloc] init];
         params.stepMode = [NSNumber numberWithUnsignedChar:1];
-        params.stepSize = [NSNumber numberWithUnsignedChar:1];
+        params.stepSize = [NSNumber numberWithUnsignedChar:100];
         params.transitionTime = [NSNumber numberWithUnsignedShort:20U];
         params.optionMask = [NSNumber numberWithUnsignedChar:0];
         params.optionOverride = [NSNumber numberWithUnsignedChar:0];
         [cluster stepWithParams:params
               completionHandler:^(NSError * _Nullable err) {
-                  NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
+                  NSLog(@"Precondition: DUT level is set to its lowest point Error: %@", err);
 
                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -18597,9 +18563,9 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait4000ms_3()
+    CHIP_ERROR TestWait3000ms_3()
     {
-        WaitForMs(4000);
+        WaitForMs(3000);
         return CHIP_NO_ERROR;
     }
     NSNumber * _Nonnull CurrentlevelValue;
@@ -18615,10 +18581,7 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 1));
-            }
+            VerifyOrReturn(CheckConstraintType("currentLevel", "", "uint8"));
             {
                 CurrentlevelValue = value;
             }
@@ -18629,21 +18592,21 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestSendsStepDownCommandToDut_5()
+    CHIP_ERROR TestSendsStepUpCommandToDut_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         __auto_type * params = [[CHIPLevelControlClusterStepParams alloc] init];
-        params.stepMode = [NSNumber numberWithUnsignedChar:1];
+        params.stepMode = [NSNumber numberWithUnsignedChar:0];
         params.stepSize = [NSNumber numberWithUnsignedChar:64];
-        params.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+        params.transitionTime = [NSNumber numberWithUnsignedShort:2U];
         params.optionMask = [NSNumber numberWithUnsignedChar:0];
         params.optionOverride = [NSNumber numberWithUnsignedChar:0];
         [cluster stepWithParams:params
               completionHandler:^(NSError * _Nullable err) {
-                  NSLog(@"Sends step down command to DUT Error: %@", err);
+                  NSLog(@"Sends step up command to DUT Error: %@", err);
 
                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -18653,9 +18616,9 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWait4000ms_6()
+    CHIP_ERROR TestWait5000ms_6()
     {
-        WaitForMs(4000);
+        WaitForMs(5000);
         return CHIP_NO_ERROR;
     }
 
@@ -18670,9 +18633,8 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 64));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintNotValue("currentLevel", value, CurrentlevelValue));
             }
 
             NextTest();
@@ -18681,7 +18643,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestSendsAStepUpCommand_8()
+    CHIP_ERROR TestSendsAStepDownCommand_8()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18690,12 +18652,12 @@ private:
         __auto_type * params = [[CHIPLevelControlClusterStepParams alloc] init];
         params.stepMode = [NSNumber numberWithUnsignedChar:1];
         params.stepSize = [NSNumber numberWithUnsignedChar:64];
-        params.transitionTime = [NSNumber numberWithUnsignedShort:20U];
+        params.transitionTime = [NSNumber numberWithUnsignedShort:2U];
         params.optionMask = [NSNumber numberWithUnsignedChar:0];
         params.optionOverride = [NSNumber numberWithUnsignedChar:0];
         [cluster stepWithParams:params
               completionHandler:^(NSError * _Nullable err) {
-                  NSLog(@"Sends a Step up command Error: %@", err);
+                  NSLog(@"Sends a Step down command Error: %@", err);
 
                   VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -18953,9 +18915,6 @@ private:
             if (value != nil) {
                 VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", [value unsignedCharValue], 0));
             }
-            if (value != nil) {
-                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", [value unsignedCharValue], 1));
-            }
             {
                 CurrentLevelValue = value;
             }
@@ -18974,7 +18933,7 @@ private:
 
         __auto_type * params = [[CHIPLevelControlClusterMoveParams alloc] init];
         params.moveMode = [NSNumber numberWithUnsignedChar:0];
-        params.rate = [NSNumber numberWithUnsignedChar:10];
+        params.rate = [NSNumber numberWithUnsignedChar:1];
         params.optionMask = [NSNumber numberWithUnsignedChar:1];
         params.optionOverride = [NSNumber numberWithUnsignedChar:1];
         [cluster moveWithParams:params
@@ -19027,16 +18986,8 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("current level", actualValue, 2));
-            }
-
             if (value != nil) {
-                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", [value unsignedCharValue], 2));
-            }
-            if (value != nil) {
-                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", [value unsignedCharValue], 3));
+                VerifyOrReturn(CheckConstraintNotValue("currentLevel", value, CurrentLevelValue));
             }
 
             NextTest();
@@ -21195,8 +21146,6 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("vendorId", 0, UINT16_MAX, &mVendorId);
-        AddArgument("productId", 0, UINT16_MAX, &mProductId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
@@ -21276,8 +21225,6 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mVendorId;
-    chip::Optional<uint16_t> mProductId;
     chip::Optional<uint16_t> mTimeout;
 
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
@@ -21325,11 +21272,6 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("VendorID", actualValue, vendorId));
-            }
-
             VerifyOrReturn(CheckConstraintType("vendorID", "", "vendor-id"));
             NextTest();
         }];
@@ -21370,11 +21312,6 @@ private:
             NSLog(@"Reads the ProductID attribute Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("ProductID", actualValue, productId));
-            }
 
             VerifyOrReturn(CheckConstraintType("productID", "", "uint16"));
             NextTest();
@@ -22028,11 +21965,6 @@ private:
             NSLog(@"Reads back Occupancy attribute from DUT after few seconds Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("occupancy", actualValue, 1));
-            }
 
             NextTest();
         }];
