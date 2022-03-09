@@ -33,6 +33,7 @@
 #include <app/util/attribute-storage.h>
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/EFR32/OTAImageProcessorImpl.h>
@@ -98,6 +99,7 @@ using namespace ::chip::DeviceLayer;
 
 // Global OTA objects
 OTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
 DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
@@ -535,7 +537,8 @@ void AppTask::InitOTARequestor()
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
 
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 

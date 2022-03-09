@@ -38,6 +38,7 @@
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
@@ -77,6 +78,7 @@ bool sIsThreadEnabled     = false;
 bool sHaveBLEConnections  = false;
 
 #if CONFIG_CHIP_OTA_REQUESTOR
+DefaultOTARequestorStorage sRequestorStorage;
 GenericOTARequestorDriver sOTARequestorDriver;
 OTAImageProcessorImpl sOTAImageProcessor;
 chip::BDXDownloader sBDXDownloader;
@@ -181,7 +183,8 @@ void AppTask::InitOTARequestor()
     sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
     sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
     sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
-    sOTARequestor.Init(&chip::Server::GetInstance(), &sOTARequestorDriver, &sBDXDownloader);
+    sRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    sOTARequestor.Init(chip::Server::GetInstance(), sRequestorStorage, sOTARequestorDriver, sBDXDownloader);
     chip::SetRequestorInstance(&sOTARequestor);
 #endif
 }
