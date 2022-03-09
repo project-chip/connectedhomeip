@@ -20,9 +20,11 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <cstddef>
 #include <ctype.h>
 #include <string.h>
 
+using ::std::ptrdiff_t;
 using chip::FormatCHIPError;
 using chip::Platform::MemoryAlloc;
 using chip::Platform::MemoryFree;
@@ -37,9 +39,16 @@ ssize_t ReadLine(char * buffer, size_t max)
     bool done    = false;
     char * inptr = buffer;
 
-    // Read in characters until we get a new line or we hit our max size.
-    while (((inptr - buffer) < static_cast<int>(max)) && !done)
+    // Read in characters until we get a new line or EOT.
+    while (!done)
     {
+        // Stop reading if we've run out of space in the buffer (still need to null-terminate).
+        if (inptr - buffer >= static_cast<ptrdiff_t>(max - 1))
+        {
+            buffer[max - 1] = '\0';
+            break;
+        }
+
         if (read == 0)
         {
             read = streamer_read(streamer_get(), inptr, 1);
@@ -53,7 +62,7 @@ ssize_t ReadLine(char * buffer, size_t max)
             case '\r':
             case '\n':
                 streamer_printf(streamer_get(), "\r\n");
-                *inptr = 0; // null terminate
+                *inptr = '\0';
                 done   = true;
                 break;
             case 0x04:
