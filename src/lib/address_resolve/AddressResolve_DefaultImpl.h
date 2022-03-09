@@ -59,7 +59,7 @@ public:
 
     static NodeLookupAction KeepSearching() { return NodeLookupAction(NodeLookupResult::kKeepSearching); }
 
-    static NodeLookupAction Error(const CHIP_ERROR & err)
+    static NodeLookupAction Error(CHIP_ERROR err)
     {
         NodeLookupAction value(NodeLookupResult::kLookupError);
         value.mResult.error = err;
@@ -74,7 +74,7 @@ public:
     }
 
     NodeLookupResult Type() const { return mResultType; }
-    const CHIP_ERROR & ErrorResult() const { return mResult.error; }
+    CHIP_ERROR ErrorResult() const { return mResult.error; }
     const AddressResolve::ResolveResult & ResolveResult() const { return mResult.result; }
 
 private:

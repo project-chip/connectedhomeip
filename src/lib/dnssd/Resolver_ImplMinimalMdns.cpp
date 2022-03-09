@@ -580,7 +580,7 @@ CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddress
     return SendPendingResolveQueries();
 }
 
-CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
+CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 {
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&RetryCallback, this);

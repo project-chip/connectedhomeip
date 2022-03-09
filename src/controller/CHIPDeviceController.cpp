@@ -323,8 +323,7 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
                    ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
     VerifyOrReturn(session->GetSessionType() == Transport::Session::SessionType::kSecure);
 
-    OperationalDeviceProxy * proxy =
-        mCASESessionManager->FindExistingSession(mFabricInfo->GetPeerIdForNode(session->AsSecureSession()->GetPeerNodeId()));
+    OperationalDeviceProxy * proxy = GetDeviceSession(mFabricInfo->GetPeerIdForNode(session->AsSecureSession()->GetPeerNodeId()));
     if (proxy == nullptr)
     {
         ChipLogError(Controller, "Unable to find existing operational session on message delivery");

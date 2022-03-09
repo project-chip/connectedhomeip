@@ -251,6 +251,8 @@ void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
     mActiveLookups.Erase(current);
 
     // ensure action is taken AFTER the current current lookup is marked complete
+    // This allows failure handles to execute 'free' on structures that may
+    // contain the active lookup data as a member (intrusive lists members)
     switch (action.Type())
     {
     case NodeLookupResult::kLookupError:
@@ -294,7 +296,9 @@ void Resolver::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERR
         NodeListener * listener = current->GetListener();
         mActiveLookups.Erase(current);
 
-        // Failure callback only called after iterator was cleaned
+        // Failure callback only called after iterator was cleared:
+        // This allows failure handles to execute 'free' on structures that may
+        // contain the active lookup data as a member (intrusive lists members)
         listener->OnNodeAddressResolutionFailed(peerId, error);
     }
     ReArmTimer();
@@ -340,6 +344,8 @@ void Resolver::ReArmTimer()
             it = mActiveLookups.begin();
 
             // Callback only called after active lookup is cleared
+            // This allows failure handles to execute 'free' on structures that may
+            // contain the active lookup data as a member (intrusive lists members)
             listener->OnNodeAddressResolutionFailed(peerId, err);
         }
     }
