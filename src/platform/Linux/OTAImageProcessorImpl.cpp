@@ -17,7 +17,7 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
-#include <platform/OTARequestorInterface.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include "OTAImageProcessorImpl.h"
 

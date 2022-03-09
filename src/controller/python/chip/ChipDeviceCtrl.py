@@ -51,8 +51,6 @@ __all__ = ["ChipDeviceController"]
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, c_uint32)
 _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
     None, c_uint64, c_uint32)
-_DeviceAddressUpdateDelegate_OnUpdateComplete = CFUNCTYPE(
-    None, c_uint64, c_uint32)
 # void (*)(Device *, CHIP_ERROR).
 #
 # CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
@@ -119,18 +117,6 @@ class ChipDeviceController():
             self.state = DCState.IDLE
             self._ChipStack.completeEvent.set()
 
-        def HandleAddressUpdateComplete(nodeid, err):
-            if err != 0:
-                print("Failed to update node address: {}".format(err))
-                # Failed update address, don't wait for HandleCommissioningComplete
-                self.state = DCState.IDLE
-                self._ChipStack.callbackRes = err
-                self._ChipStack.completeEvent.set()
-            else:
-                print("Node address has been updated")
-                # Wait for HandleCommissioningComplete before setting
-                # self._ChipStack.callbackRes; we're not done until that happens.
-
         def HandleCommissioningComplete(nodeid, err):
             if err != 0:
                 print("Failed to commission: {}".format(err))
@@ -151,11 +137,6 @@ class ChipDeviceController():
             HandleCommissioningComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.devCtrl, self.cbHandleCommissioningCompleteFunct)
-
-        self.cbOnAddressUpdateComplete = _DeviceAddressUpdateDelegate_OnUpdateComplete(
-            HandleAddressUpdateComplete)
-        self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
-            self.cbOnAddressUpdateComplete)
 
         self.state = DCState.IDLE
         self.isActive = True
@@ -776,7 +757,7 @@ class ChipDeviceController():
             nodeid, [(endpoint, attributeType)]))
         path = ClusterAttribute.AttributePath(
             EndpointId=endpoint, Attribute=attributeType)
-        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[0][endpoint][clusterType][attributeType])
+        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[endpoint][clusterType][attributeType])
 
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, dataVersion=0, blocking=True):
         req = None
@@ -913,10 +894,6 @@ class ChipDeviceController():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnCommissioningCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = c_uint32
-
-            self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.argtypes = [
-                _DeviceAddressUpdateDelegate_OnUpdateComplete]
-            self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.restype = None
 
             self._dmLib.pychip_DeviceController_UpdateDevice.argtypes = [
                 c_void_p, c_uint64]

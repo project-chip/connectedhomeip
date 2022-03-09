@@ -22,9 +22,9 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/EventLogging.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/util/attribute-storage.h>
-#include <platform/OTARequestorInterface.h>
 
 using namespace chip;
 using namespace chip::app;

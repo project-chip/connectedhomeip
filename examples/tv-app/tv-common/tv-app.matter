@@ -347,8 +347,8 @@ server cluster Channel = 1284 {
   }
 
   response struct ChangeChannelResponse {
-    ChannelInfo channelMatch = 0;
-    StatusEnum status = 1;
+    StatusEnum status = 0;
+    optional CHAR_STRING data = 1;
   }
 
   command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
@@ -741,8 +741,8 @@ server cluster GeneralDiagnostics = 51 {
 
 server cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicy : ENUM8 {
-    kStandard = 0;
-    kTrustFirst = 1;
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
   }
 
   struct GroupKeyMapStruct {
@@ -1064,6 +1064,7 @@ server cluster MediaPlayback = 1286 {
 
   response struct PlaybackResponse {
     StatusEnum status = 0;
+    optional CHAR_STRING data = 1;
   }
 
   command FastForward(): PlaybackResponse = 7;

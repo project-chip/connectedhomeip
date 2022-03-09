@@ -40,7 +40,10 @@ public:
     CHIP_ERROR
     SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        size_t bytesRead = 0;
+        CHIP_ERROR err   = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+        size             = static_cast<uint16_t>(bytesRead);
+        return err;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -79,7 +82,6 @@ private:
 };
 
 ServerStorageDelegate gServerStorage;
-chip::SimpleFabricStorage gFabricStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
@@ -113,10 +115,6 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
-        err = gFabricStorage.Initialize(&gServerStorage);
-        SuccessOrExit(err);
-
-        factoryParams.fabricStorage            = &gFabricStorage;
         factoryParams.fabricIndependentStorage = &gServerStorage;
 
         commissionerParams.pairingDelegate = &gPairingDelegate;

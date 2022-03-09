@@ -36,9 +36,22 @@
 #include <lib/support/ErrorStr.h>
 #include <system/SystemClock.h>
 
+#if CONFIG_CHIP_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/nrfconnect/OTAImageProcessorImpl.h>
+#endif
+
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
 #include <zephyr.h>
+
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -46,22 +59,30 @@
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
 
+namespace {
+
 LOG_MODULE_DECLARE(app);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
+k_timer sFunctionTimer;
 
-static LEDWidget sStatusLED;
-static LEDWidget sPumpStateLED;
-static LEDWidget sUnusedLED;
-static LEDWidget sUnusedLED_1;
+LEDWidget sStatusLED;
+LEDWidget sPumpStateLED;
+LEDWidget sUnusedLED;
+LEDWidget sUnusedLED_1;
 
-static bool sIsThreadProvisioned = false;
-static bool sIsThreadEnabled     = false;
-static bool sHaveBLEConnections  = false;
+bool sIsThreadProvisioned = false;
+bool sIsThreadEnabled     = false;
+bool sHaveBLEConnections  = false;
 
-static k_timer sFunctionTimer;
+#if CONFIG_CHIP_OTA_REQUESTOR
+DefaultOTARequestorStorage sRequestorStorage;
+GenericOTARequestorDriver sOTARequestorDriver;
+OTAImageProcessorImpl sOTAImageProcessor;
+chip::BDXDownloader sBDXDownloader;
+chip::OTARequestor sOTARequestor;
+#endif
 
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
+} // namespace
 
 AppTask AppTask::sAppTask;
 
@@ -134,6 +155,7 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    InitOTARequestor();
     ReturnErrorOnFailure(chip::Server::GetInstance().Init());
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -150,6 +172,18 @@ CHIP_ERROR AppTask::Init()
     }
 
     return err;
+}
+
+void AppTask::InitOTARequestor()
+{
+#if CONFIG_CHIP_OTA_REQUESTOR
+    sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
+    sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
+    sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
+    sRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    sOTARequestor.Init(chip::Server::GetInstance(), sRequestorStorage, sOTARequestorDriver, sBDXDownloader);
+    chip::SetRequestorInstance(&sOTARequestor);
+#endif
 }
 
 CHIP_ERROR AppTask::StartApp()

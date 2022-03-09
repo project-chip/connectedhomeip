@@ -54,6 +54,7 @@ private:
 
 #ifdef CHIP_OTA_REQUESTOR
     chip::OTARequestor mRequestorCore;
+    chip::DefaultOTARequestorStorage mRequestorStorage;
     chip::DeviceLayer::OTARequestorDriverImpl mRequestorDriver;
     chip::BDXDownloader mDownloader;
     chip::OTAImageProcessorImpl mImageProcessor;

@@ -139,7 +139,7 @@ public:
         // Logical id provided by the Administrator that configured the entry
         uint16_t keyset_id = 0;
         // Security policy to use for groups that use this keyset
-        SecurityPolicy policy = SecurityPolicy::kStandard;
+        SecurityPolicy policy = SecurityPolicy::kCacheAndSync;
         // Number of keys present
         uint8_t num_keys_used = 0;
 
@@ -166,7 +166,7 @@ public:
         /**
          *  Callback invoked when an existing group is removed.
          *
-         *  @param[in] removed_state  GroupInfo structure of the removed group.
+         *  @param[in] old_group  GroupInfo structure of the removed group.
          */
         virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) = 0;
     };
@@ -287,9 +287,9 @@ public:
     // Key Sets
     //
 
-    virtual CHIP_ERROR SetKeySet(FabricIndex fabric_index, const KeySet & keys)               = 0;
-    virtual CHIP_ERROR GetKeySet(FabricIndex fabric_index, KeysetId keyset_id, KeySet & keys) = 0;
-    virtual CHIP_ERROR RemoveKeySet(FabricIndex fabric_index, KeysetId keyset_id)             = 0;
+    virtual CHIP_ERROR SetKeySet(FabricIndex fabric_index, const ByteSpan & compressed_fabric_id, const KeySet & keys) = 0;
+    virtual CHIP_ERROR GetKeySet(FabricIndex fabric_index, KeysetId keyset_id, KeySet & keys)                          = 0;
+    virtual CHIP_ERROR RemoveKeySet(FabricIndex fabric_index, KeysetId keyset_id)                                      = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of key sets associated with the given fabric.
      *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.

@@ -35,8 +35,10 @@ def EnsureNetworkNamespaceAvailability():
         logging.warn("Running as root and this will change global namespaces.")
         return
 
-    os.execvpe("unshare", ["unshare", "--map-root-user", "-n", "-m", "python3",
-                           sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:], test_environ)
+    os.execvpe(
+        "unshare", ["unshare", "--map-root-user", "-n", "-m", "python3",
+                    sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
+        test_environ)
 
 
 def EnsurePrivateState():
@@ -110,8 +112,9 @@ def CreateNamespacesForAppTest():
             logging.error("Are you using --privileged if running in docker?")
             sys.exit(1)
 
-    # IPv6 does Duplicate Address  Detection even though
-    # we know ULAs provided are isolated. Wait for 'tenative' address to be gone
+    # IPv6 does Duplicate Address Detection even though
+    # we know ULAs provided are isolated. Wait for 'tenative'
+    # address to be gone.
 
     logging.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
     for i in range(100):  # wait at most 10 seconds
@@ -135,11 +138,12 @@ def PrepareNamespacesForTestExecution(in_unshare: bool):
 
 def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
     """
-    Returns a copy of paths with updated command arrays to invoke the 
+    Returns a copy of paths with updated command arrays to invoke the
     commands in an appropriate network namespace.
     """
     return ApplicationPaths(
         chip_tool='ip netns exec tool'.split() + paths.chip_tool,
         all_clusters_app='ip netns exec app'.split() + paths.all_clusters_app,
+        door_lock_app='ip netns exec app'.split() + paths.door_lock_app,
         tv_app='ip netns exec app'.split() + paths.tv_app,
     )

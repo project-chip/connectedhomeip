@@ -266,6 +266,13 @@ struct AttestationResponse
     ByteSpan signature;
 };
 
+struct CSRResponse
+{
+    CSRResponse(ByteSpan elements, ByteSpan newSignature) : nocsrElements(elements), signature(newSignature) {}
+    ByteSpan nocsrElements;
+    ByteSpan signature;
+};
+
 struct NocChain
 {
     NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, AesCcm128KeySpan newIpk, NodeId newAdminSubject) :
@@ -284,17 +291,21 @@ struct OperationalNodeFoundData
     OperationalDeviceProxy * operationalProxy;
 };
 
+struct NetworkClusterInfo
+{
+    EndpointId endpoint = kInvalidEndpointId;
+    app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime;
+};
 struct NetworkClusters
 {
-    EndpointId wifi   = kInvalidEndpointId;
-    EndpointId thread = kInvalidEndpointId;
-    EndpointId eth    = kInvalidEndpointId;
+    NetworkClusterInfo wifi;
+    NetworkClusterInfo thread;
+    NetworkClusterInfo eth;
 };
 struct BasicClusterInfo
 {
-    VendorId vendorId        = VendorId::Common;
-    uint16_t productId       = 0;
-    uint32_t softwareVersion = 0;
+    VendorId vendorId  = VendorId::Common;
+    uint16_t productId = 0;
 };
 struct GeneralCommissioningInfo
 {
@@ -324,7 +335,7 @@ class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData,
+    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
                                          ReadCommissioningInfo, AdditionalErrorInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}

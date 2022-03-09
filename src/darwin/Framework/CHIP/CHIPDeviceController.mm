@@ -65,7 +65,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
-@property (readonly) chip::FabricStorage * fabricStorage;
 @property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) CHIPP256KeypairBridge keypairBridge;
 @property (readonly) chip::NodeId localDeviceId;
@@ -159,11 +158,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
         _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
-        // TODO Expose FabricStorage to CHIPFramework consumers.
-        _fabricStorage = new chip::SimpleFabricStorage(_persistentStorageDelegateBridge);
-        if ([self checkForStartError:(_fabricStorage != nullptr) logMsg:kErrorMemoryInit]) {
-            return;
-        }
         // create a CHIPP256KeypairBridge here and pass it to the operationalCredentialsDelegate
         std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge;
         if (nocSigner != nil) {
@@ -195,10 +189,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
-        params.fabricStorage = _fabricStorage;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
         commissionerParams.storageDelegate = _persistentStorageDelegateBridge;
-        commissionerParams.deviceAddressUpdateDelegate = _pairingDelegateBridge;
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
         commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
@@ -612,11 +604,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         _cppCommissioner = NULL;
     }
 
-    if (_fabricStorage) {
-        delete _fabricStorage;
-        _fabricStorage = nullptr;
-    }
-
     return YES;
 }
 
@@ -636,10 +623,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
 - (void)dealloc
 {
-    if (_fabricStorage) {
-        delete _fabricStorage;
-        _fabricStorage = nullptr;
-    }
 }
 
 @end

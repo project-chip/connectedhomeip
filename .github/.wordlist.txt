@@ -22,9 +22,11 @@ AccountLogin
 acdbc
 ACKed
 ACL
+ACLs
 AdapterAddress
 AdapterName
 adb
+AddNOC
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
 addr
@@ -117,6 +119,7 @@ BDX
 BDXDownloader
 BeagleBone
 befc
+betaprogram
 BinaryInputBasic
 bitbake
 bld
@@ -163,6 +166,7 @@ cancelled
 capacitive
 CarbonDioxideConcentrationMeasurement
 CarbonMonoxideConcentrationMeasurement
+CaseAdminNode
 CatalogVendorId
 CBB
 cbd
@@ -184,6 +188,7 @@ CharString
 checkmark
 ChipBLEMgr
 CHIPCirqueTest
+CHIPConfig
 CHIPCryptoPALHsm
 CHIPDeviceController
 ChipDeviceCtrl
@@ -197,6 +202,7 @@ ChipImResponder
 ChipLight
 ChipMessageLayer
 CHIPOBLE
+CHIPProjectAppConfig
 CHIPProjectConfig
 CHIPTest
 chiptests
@@ -279,6 +285,7 @@ CQM
 crypto
 cryptographic
 CSA
+csrrequest
 csu
 csv
 ctl
@@ -299,6 +306,7 @@ DataFrame
 DataModelRevision
 dataset
 datasets
+DataVersion
 dbf
 DBG
 dBm
@@ -630,6 +638,7 @@ JTAG
 Jupyter
 jupyterlab
 KA
+kAdminister
 kBusy
 kCase
 Kconfig
@@ -637,10 +646,13 @@ KeypadInput
 kGroup
 kInvalidCommandId
 KitProg
+kManage
 kNodeIdNotSpecified
 knownissues
+kOperate
 kPAKEParameterError
 kPase
+kView
 KVS
 kWindowNotOpen
 LabelList
@@ -667,6 +679,7 @@ libical
 libncurses
 libreadline
 libsdl
+libshell
 libssl
 libstdc
 libthread
@@ -809,6 +822,7 @@ NitrogenDioxideConcentrationMeasurement
 nl
 NLUnitTest
 NLUnitTests
+noc
 NodeId
 nongnu
 nordicsemi
@@ -855,6 +869,7 @@ optionsOverride
 orgs
 OTA
 OTADownloader
+otaDownloadPath
 otaImageList
 OTAImageProcessorDriver
 OTAImageProcessorInterface
@@ -899,11 +914,13 @@ peerNodeId
 peerSessionId
 pem
 percentageLiftValue
+periodicQueryTimeout
 pexpect
 pickString
 PID
 Pigweed
 PinCode
+pinrequest
 pkgconfig
 plaintext
 PlatformManager
@@ -938,6 +955,7 @@ providerNodeId
 ProxyConfiguration
 ProxyDiscovery
 ProxyValid
+ProxyView
 PRs
 PSCAN
 PSK
@@ -976,6 +994,7 @@ raspberryPi
 RasPi
 rAv
 RCP
+ReadAttribute
 ReadConfigValue
 readelf
 readfds
@@ -1057,6 +1076,7 @@ SetDns
 SetImageProcessorDelegate
 SetOtaRequestorDriver
 setpin
+setpoint
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
@@ -1210,6 +1230,7 @@ ttyUSB
 TurbidityConcentrationMeasurement
 TXD
 txt
+uargument
 UART
 udc
 udcport
@@ -1234,7 +1255,9 @@ updateAvailable
 updateNotAvailable
 UpdateTokens
 upstreamed
+ureverse
 URI
+urlrequest
 usbmodem
 USBtoUART
 uscif
@@ -1284,6 +1307,7 @@ wmm
 WPA
 wpan
 wra
+WriteAttribute
 writefds
 wrover
 WS
@@ -1319,6 +1343,7 @@ xFF
 xFFF
 xFFFF
 xfffff
+xFFFFFFFD
 xffffffffe
 xfffffffff
 xtensa
@@ -1349,3 +1374,18 @@ Zigbee
 zigbeealliance
 zigbeethread
 libshell
+TestGroupDemoConfig
+ACLs
+AddNOC
+CHIPConfig
+CHIPProjectAppConfig
+CaseAdminNode
+DataVersion
+ProxyView
+ReadAttribute
+WriteAttribute
+kAdminister
+kManage
+kOperate
+kView
+xFFFFFFFD

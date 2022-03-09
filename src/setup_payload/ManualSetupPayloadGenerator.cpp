@@ -46,7 +46,7 @@ static uint32_t chunk1PayloadRepresentation(const PayloadContents & payload)
                   "Discriminator won't fit");
 
     uint32_t discriminatorChunk = (payload.discriminator >> kDiscriminatorShift) & kDiscriminatorMask;
-    uint32_t vidPidPresentFlag  = payload.commissioningFlow == CommissioningFlow::kCustom ? 1 : 0;
+    uint32_t vidPidPresentFlag  = payload.commissioningFlow != CommissioningFlow::kStandard ? 1 : 0;
 
     uint32_t result = (discriminatorChunk << kManualSetupChunk1DiscriminatorMsbitsPos) |
         (vidPidPresentFlag << kManualSetupChunk1VidPidPresentBitPos);
@@ -115,7 +115,7 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(Mutab
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    bool useLongCode = (mPayloadContents.commissioningFlow == CommissioningFlow::kCustom);
+    bool useLongCode = (mPayloadContents.commissioningFlow != CommissioningFlow::kStandard);
 
     // Add two for the check digit and null terminator.
     if ((useLongCode && outBuffer.size() < kManualSetupLongCodeCharLength + 2) ||

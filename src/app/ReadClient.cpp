@@ -643,19 +643,36 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
         EventReportIB::Parser report;
         EventDataIB::Parser data;
         EventHeader header;
+        StatusIB statusIB; // Default value for statusIB is success.
 
         TLV::TLVReader reader = aEventReportIBsReader;
         ReturnErrorOnFailure(report.Init(reader));
 
-        ReturnErrorOnFailure(report.GetEventData(&data));
+        err = report.GetEventData(&data);
 
-        header.mTimestamp = mEventTimestamp;
-        ReturnErrorOnFailure(data.DecodeEventHeader(header));
-        mEventTimestamp = header.mTimestamp;
-        mEventMin       = header.mEventNumber + 1;
-        ReturnErrorOnFailure(data.GetData(&dataReader));
+        if (err == CHIP_NO_ERROR)
+        {
+            header.mTimestamp = mEventTimestamp;
+            ReturnErrorOnFailure(data.DecodeEventHeader(header));
+            mEventTimestamp = header.mTimestamp;
+            mEventMin       = header.mEventNumber + 1;
+            ReturnErrorOnFailure(data.GetData(&dataReader));
 
-        mpCallback.OnEventData(header, &dataReader, nullptr);
+            mpCallback.OnEventData(header, &dataReader, nullptr);
+        }
+        else if (err == CHIP_END_OF_TLV)
+        {
+            EventStatusIB::Parser status;
+            EventPathIB::Parser pathIB;
+            StatusIB::Parser statusIBParser;
+            ReturnErrorOnFailure(report.GetEventStatus(&status));
+            ReturnErrorOnFailure(status.GetPath(&pathIB));
+            ReturnErrorOnFailure(pathIB.GetEventPath(&header.mPath));
+            ReturnErrorOnFailure(status.GetErrorStatus(&statusIBParser));
+            ReturnErrorOnFailure(statusIBParser.DecodeStatusIB(statusIB));
+
+            mpCallback.OnEventData(header, nullptr, &statusIB);
+        }
     }
 
     if (CHIP_END_OF_TLV == err)

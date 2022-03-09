@@ -28,8 +28,10 @@
 
 #include "EventLoggingDelegate.h"
 #include "EventLoggingTypes.h"
+#include <access/SubjectDescriptor.h>
 #include <app/ClusterInfo.h>
 #include <app/MessageDef/EventDataIB.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCircularTLVBuffer.h>
 #include <lib/support/PersistedCounter.h>
@@ -324,7 +326,7 @@ public:
      *                         completion, the event number of the next one we plan to fetch.
      *
      * @param[out] aEventCount The number of fetched event
-     * @param[in] aFabricIndex fabric index for current read handler
+     * @param[in] aSubjectDescriptor Subject descriptor for current read handler
      * @retval #CHIP_END_OF_TLV             The function has reached the end of the
      *                                       available log entries at the specified
      *                                       priority level
@@ -339,7 +341,7 @@ public:
      *
      */
     CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
-                                size_t & aEventCount, FabricIndex aFabricIndex);
+                                size_t & aEventCount, const Access::SubjectDescriptor & aSubjectDescriptor);
 
     /**
      * @brief
@@ -361,6 +363,29 @@ public:
     void SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes);
 
 private:
+    /**
+     * @brief
+     *  Internal structure for traversing events.
+     */
+    struct EventEnvelopeContext
+    {
+        EventEnvelopeContext() {}
+
+        int mFieldsToRead = 0;
+        /* PriorityLevel and DeltaTime are there if that is not first event when putting events in report*/
+#if CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS & CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+        Timestamp mCurrentTime = Timestamp::System(System::Clock::kZero);
+#else
+        Timestamp mCurrentTime = Timestamp::Epoch(System::Clock::kZero);
+#endif
+        PriorityLevel mPriority  = PriorityLevel::First;
+        ClusterId mClusterId     = 0;
+        EndpointId mEndpointId   = 0;
+        EventId mEventId         = 0;
+        EventNumber mEventNumber = 0;
+        FabricIndex mFabricIndex = kUndefinedFabricIndex;
+    };
+
     void VendEventNumber();
     CHIP_ERROR CalculateEventSize(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, uint32_t & requiredSize);
     /**
@@ -423,7 +448,8 @@ private:
      * The function is used to scan through the event log to find events matching the spec in the supplied context.
      * Particularly, it would check against mStartingEventNumber, and skip fetched event.
      */
-    static CHIP_ERROR EventIterator(const TLV::TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext);
+    static CHIP_ERROR EventIterator(const TLV::TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext,
+                                    EventEnvelopeContext * event);
 
     /**
      * @brief Internal iterator function used to fetch event into EventEnvelopeContext, then EventIterator would filter event
@@ -450,9 +476,27 @@ private:
     };
 
     /**
+     * @brief Check whether the event instance represented by the EventEnvelopeContext should be included in the report.
+     *
+     * @retval CHIP_ERROR_UNEXPECTED_EVENT This path should be excluded in the generated event report.
+     * @retval CHIP_EVENT_ID_FOUND This path should be included in the generated event report.
+     * @retval CHIP_ERROR_ACCESS_DENIED This path should be included in the generated event report, but the client does not have
+     * .       enough privilege to access it.
+     *
+     * TODO: Consider using CHIP_NO_ERROR, CHIP_ERROR_SKIP_EVENT, CHIP_ERROR_ACCESS_DENINED or some enum to represent the checking
+     * result.
+     */
+    static CHIP_ERROR CheckEventContext(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
+
+    /**
      * @brief copy event from circular buffer to target buffer for report
      */
     static CHIP_ERROR CopyEvent(const TLV::TLVReader & aReader, TLV::TLVWriter & aWriter, EventLoadOutContext * apContext);
+
+    /**
+     * @brief construct EventStatusIB to target buffer for report
+     */
+    static CHIP_ERROR WriteEventStatusIB(TLV::TLVWriter & aWriter, const ConcreteEventPath & aEvent, StatusIB aStatus);
 
     /**
      * @brief

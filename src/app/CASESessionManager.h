@@ -78,7 +78,9 @@ public:
 
     void ReleaseSession(PeerId peerId);
 
-    void ReleaseSessionForFabric(CompressedFabricId compressedFabricId);
+    void ReleaseSessionsForFabric(CompressedFabricId compressedFabricId);
+
+    void ReleaseAllSessions();
 
     /**
      * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up

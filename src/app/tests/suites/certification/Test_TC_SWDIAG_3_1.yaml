@@ -41,6 +41,7 @@ tests:
           # TODO: Say something about the values?
           value: {}
 
+    #issue #830
     - label: "Reads CurrentHeapUsed attribute value from DUT"
       optional: true
       command: "readAttribute"
@@ -50,6 +51,7 @@ tests:
           constraints:
               type: uint64
 
+    #issue #830
     - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
       optional: true
       command: "readAttribute"

@@ -92,6 +92,8 @@ public:
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
+    PersistentStorageDelegate & GetPersistentStorage() { return mDeviceStorage; }
+
     /**
      * This function send the ShutDown event before stopping
      * the event loop.
@@ -111,20 +113,19 @@ private:
 
     static Server sServer;
 
-    class DeviceStorageDelegate : public PersistentStorageDelegate, public FabricStorage
+    class DeviceStorageDelegate : public PersistentStorageDelegate
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
-            size_t bytesRead;
-            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead));
-            if (!CanCastTo<uint16_t>(bytesRead))
+            size_t bytesRead = 0;
+            CHIP_ERROR err   = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+
+            if (err == CHIP_NO_ERROR)
             {
-                ChipLogDetail(AppServer, "0x%" PRIx32 " is too big to fit in uint16_t", static_cast<uint32_t>(bytesRead));
-                return CHIP_ERROR_BUFFER_TOO_SMALL;
+                ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
             }
-            ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
             size = static_cast<uint16_t>(bytesRead);
-            return CHIP_NO_ERROR;
+            return err;
         }
 
         CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -136,18 +137,6 @@ private:
         {
             return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
         }
-
-        CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
-        {
-            return SyncSetKeyValue(key, buffer, size);
-        };
-
-        CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override
-        {
-            return SyncGetKeyValue(key, buffer, size);
-        };
-
-        CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
     };
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
@@ -181,6 +170,40 @@ private:
         ServerTransportMgr * mTransports;
     };
 
+    class ServerFabricDelegate final : public FabricTableDelegate
+    {
+    public:
+        ServerFabricDelegate() {}
+
+        CHIP_ERROR Init(SessionManager * sessionManager)
+        {
+            VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+            mSessionManager = sessionManager;
+            return CHIP_NO_ERROR;
+        };
+
+        void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
+        {
+            (void) compressedId;
+            if (mSessionManager != nullptr)
+            {
+                mSessionManager->FabricRemoved(fabricIndex);
+            }
+            Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+            if (groupDataProvider != nullptr)
+            {
+                groupDataProvider->RemoveFabric(fabricIndex);
+            }
+        };
+        void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+
+        void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+
+    private:
+        SessionManager * mSessionManager = nullptr;
+    };
+
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
@@ -209,6 +232,7 @@ private:
     Credentials::GroupDataProviderImpl mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
+    ServerFabricDelegate mFabricDelegate;
 
     Access::AccessControl mAccessControl;
 

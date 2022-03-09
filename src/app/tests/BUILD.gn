@@ -52,6 +52,19 @@ source_set("binding-test-srcs") {
   ]
 }
 
+source_set("ota-requestor-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
+    "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.h",
+    "${chip_root}/src/app/clusters/ota-requestor/OTARequestorStorage.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
@@ -65,7 +78,9 @@ chip_test_suite("tests") {
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
     "TestDataModelSerialization.cpp",
+    "TestDefaultOTARequestorStorage.cpp",
     "TestEventLogging.cpp",
+    "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
@@ -92,6 +107,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":binding-test-srcs",
+    ":ota-requestor-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",

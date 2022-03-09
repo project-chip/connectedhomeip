@@ -38,8 +38,13 @@ class ZAPGenerateTarget:
         else:
             self.output_dir = None
 
-    def generate(self):
-        """Runs a ZAP generate command on the configured zap/template/outputs.
+    def log_command(self):
+        """Log the command that will get run for this target
+        """
+        logging.info("  %s" % " ".join(self.build_cmd()))
+
+    def build_cmd(self):
+        """Builds the command line we would run to generate this target.
         """
         cmd = [self.script, self.zap_config]
 
@@ -53,6 +58,12 @@ class ZAPGenerateTarget:
             cmd.append('-o')
             cmd.append(self.output_dir)
 
+        return cmd
+
+    def generate(self):
+        """Runs a ZAP generate command on the configured zap/template/outputs.
+        """
+        cmd = self.build_cmd()
         logging.info("Generating target: %s" % " ".join(cmd))
         subprocess.check_call(cmd)
 
@@ -71,6 +82,8 @@ def setupArgumentsParser():
                         help='Choose which content type to generate (default: all)')
     parser.add_argument('--tests', default='all', choices=['all', 'chip-tool', 'darwin', 'app1', 'app2'],
                         help='When generating tests only target, Choose which tests to generate (default: all)')
+    parser.add_argument('--dry-run', default=False, action='store_true',
+                        help="Don't do any generationl just log what targets would be generated (default: False)")
     return parser.parse_args()
 
 
@@ -112,7 +125,7 @@ def getGlobalTemplatesTargets():
         targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir))
 
     targets.append(ZAPGenerateTarget(
-        './src/controller/data_model/controller-clusters.zap',
+        'src/controller/data_model/controller-clusters.zap',
         output_dir=os.path.join('zzz_generated/controller-clusters/zap-generated')))
 
     return targets
@@ -163,6 +176,7 @@ def getSpecificTemplatesTargets():
     templates = {
         'src/app/common/templates/templates.json': 'zzz_generated/app-common/app-common/zap-generated',
         'examples/chip-tool/templates/templates.json': 'zzz_generated/chip-tool/zap-generated',
+        'examples/chip-tool-darwin/templates/templates.json': 'zzz_generated/chip-tool-darwin/zap-generated',
         'src/controller/python/templates/templates.json': None,
         'src/darwin/Framework/CHIP/templates/templates.json': None,
         'src/controller/java/templates/templates.json': None,
@@ -171,6 +185,7 @@ def getSpecificTemplatesTargets():
 
     targets = []
     for template, output_dir in templates.items():
+        logging.info("Found specific template %s" % template)
         targets.append(ZAPGenerateTarget(
             zap_filepath, template=template, output_dir=output_dir))
 
@@ -187,6 +202,10 @@ def getTargets(type, test_target):
     elif type == 'tests':
         targets.extend(getTestsTemplatesTargets(test_target))
 
+    logging.info("Targets to be generated:")
+    for target in targets:
+        target.log_command()
+
     return targets
 
 
@@ -200,8 +219,10 @@ def main():
     args = setupArgumentsParser()
 
     targets = getTargets(args.type, args.tests)
-    for target in targets:
-        target.generate()
+
+    if (not args.dry_run):
+        for target in targets:
+            target.generate()
 
 
 if __name__ == '__main__':

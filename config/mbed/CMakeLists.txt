@@ -371,6 +371,7 @@ target_sources(${APP_TARGET} PRIVATE
 target_include_directories(${APP_TARGET} PRIVATE
                     ${PIGWEED_ROOT}/pw_sys_io/public
                     ${PIGWEED_ROOT}/pw_assert/public
+                    ${PIGWEED_ROOT}/pw_assert/assert_lite_public_overrides
                     ${PIGWEED_ROOT}/pw_assert_log/public
                     ${PIGWEED_ROOT}/pw_assert_log/public_overrides
                     ${PIGWEED_ROOT}/pw_bytes/public
@@ -455,6 +456,7 @@ endif(CONFIG_CHIP_PW_RPC)
 
 if (CONFIG_CHIP_OTA_REQUESTOR)
     target_include_directories(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/examples/platform/mbed/ota/
         ${CHIP_ROOT}/src/app/clusters/ota-requestor
         ${CHIP_ROOT}/src/platform
         ${CHIP_ROOT}/src/platform/mbed
@@ -462,10 +464,12 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
     )
 
     target_sources(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/examples/platform/mbed/ota/OTARequestorDriverImpl.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
         ${CHIP_ROOT}/src/platform/mbed/OTAImageProcessorImpl.cpp
-        ${CHIP_ROOT}/src/platform/mbed/OTARequestorDriverImpl.cpp
     )
 
 if (NOT ${APP_TARGET} MATCHES "shell")

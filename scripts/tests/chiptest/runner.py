@@ -14,23 +14,20 @@
 
 import logging
 import os
+import pty
+import queue
+import re
 import subprocess
 import sys
 import threading
-import time
-import pty
-import re
-
-from dataclasses import dataclass
 
 
 class LogPipe(threading.Thread):
 
     def __init__(self, level, capture_delegate=None, name=None):
-        """Setup the object with a logger and a loglevel
-
-            and start the thread
-            """
+        """
+        Setup the object with a logger and a loglevel and start the thread.
+        """
         threading.Thread.__init__(self)
 
         self.daemon = False
@@ -61,7 +58,7 @@ class LogPipe(threading.Thread):
         return None
 
     def fileno(self):
-        """Return the write file descriptor of the pipe"""
+        """Return the write file descriptor of the pipe."""
         return self.fd_write
 
     def run(self):
@@ -79,15 +76,36 @@ class LogPipe(threading.Thread):
         os.close(self.fd_write)
 
 
+class RunnerWaitQueue:
+
+    def __init__(self):
+        self.queue = queue.Queue()
+
+    def __wait(self, process, userdata):
+        process.wait()
+        self.queue.put((process, userdata))
+
+    def add_process(self, process, userdata=None):
+        t = threading.Thread(target=self.__wait, args=(process, userdata))
+        t.daemon = True
+        t.start()
+
+    def get(self):
+        return self.queue.get()
+
+
 class Runner:
+
     def __init__(self, capture_delegate=None):
         self.capture_delegate = capture_delegate
 
     def RunSubprocess(self, cmd, name, wait=True, dependencies=[]):
         outpipe = LogPipe(
-            logging.DEBUG, capture_delegate=self.capture_delegate, name=name + ' OUT')
+            logging.DEBUG, capture_delegate=self.capture_delegate,
+            name=name + ' OUT')
         errpipe = LogPipe(
-            logging.INFO, capture_delegate=self.capture_delegate, name=name + ' ERR')
+            logging.INFO, capture_delegate=self.capture_delegate,
+            name=name + ' ERR')
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
@@ -99,16 +117,22 @@ class Runner:
         if not wait:
             return s, outpipe, errpipe
 
-        while s.poll() is None:
-            # dependencies MUST NOT be done
-            for dependency in dependencies:
-                if dependency.poll() is not None:
-                    s.kill()
-                    raise Exception("Unexpected return %d for %r" %
-                                    (dependency.poll(), dependency))
+        wait = RunnerWaitQueue()
+        wait.add_process(s)
 
-        code = s.wait()
-        if code != 0:
-            raise Exception('Command %r failed: %d' % (cmd, code))
-        else:
-            logging.debug('Command %r completed with error code 0', cmd)
+        for dependency in dependencies:
+            for accessory in dependency.accessories:
+                wait.add_process(accessory, dependency)
+
+        for process, userdata in iter(wait.queue.get, None):
+            if process == s:
+                break
+            # dependencies MUST NOT be done
+            s.kill()
+            raise Exception("Unexpected return %d for %r" %
+                            (process.returncode, userdata))
+
+        if s.returncode != 0:
+            raise Exception('Command %r failed: %d' % (cmd, s.returncode))
+
+        logging.debug('Command %r completed with error code 0', cmd)

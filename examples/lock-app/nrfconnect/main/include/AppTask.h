@@ -44,6 +44,7 @@ private:
     friend AppTask & GetAppTask(void);
 
     CHIP_ERROR Init();
+    void InitOTARequestor();
 
     static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor);

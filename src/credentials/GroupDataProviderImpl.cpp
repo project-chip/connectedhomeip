@@ -718,7 +718,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     bool first                     = true;
 
     uint16_t keyset_id                       = 0;
-    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kStandard;
+    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kCacheAndSync;
     uint8_t keys_count                       = 0;
     OperationalKey operational_keys[KeySet::kEpochKeysMax];
 
@@ -738,7 +738,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
 
     void Clear() override
     {
-        policy     = GroupDataProvider::SecurityPolicy::kStandard;
+        policy     = GroupDataProvider::SecurityPolicy::kCacheAndSync;
         keys_count = 0;
         memset(operational_keys, 0x00, sizeof(operational_keys));
         next = 0xffff;
@@ -1582,7 +1582,8 @@ void GroupDataProviderImpl::GroupKeyIteratorImpl::Release()
 
 constexpr size_t GroupDataProvider::EpochKey::kLengthBytes;
 
-CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, const KeySet & in_keyset)
+CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, const ByteSpan & compressed_fabric_id,
+                                            const KeySet & in_keyset)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
@@ -1609,7 +1610,7 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     {
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
         MutableByteSpan key_span(keyset.operational_keys[i].value);
-        ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, key_span));
+        ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, key_span));
         ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(key_span, keyset.operational_keys[i].hash));
     }
     if (found)

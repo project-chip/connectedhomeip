@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ CHIP_ERROR FabricInfo::SetFabricLabel(const CharSpan & fabricLabel)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::CommitToStorage(FabricStorage * storage)
+CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -51,11 +51,8 @@ CHIP_ERROR FabricInfo::CommitToStorage(FabricStorage * storage)
     StorableFabricInfo * info = chip::Platform::New<StorableFabricInfo>();
     ReturnErrorCodeIf(info == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    info->mNodeId   = Encoding::LittleEndian::HostSwap64(mOperationalId.GetNodeId());
-    info->mFabric   = Encoding::LittleEndian::HostSwap16(mFabric);
-    info->mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
-
-    info->mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
+    info->mFabricIndex = mFabric;
+    info->mVendorId    = Encoding::LittleEndian::HostSwap16(mVendorId);
 
     size_t stringLength = strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes);
     memcpy(info->mFabricLabel, mFabricLabel, stringLength);
@@ -105,7 +102,7 @@ CHIP_ERROR FabricInfo::CommitToStorage(FabricStorage * storage)
         memcpy(info->mNOCCert, mNOCCert.data(), mNOCCert.size());
     }
 
-    err = storage->SyncStore(mFabric, key, info, sizeof(StorableFabricInfo));
+    err = storage->SyncSetKeyValue(key, info, sizeof(StorableFabricInfo));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue: %s", chip::ErrorStr(err));
@@ -119,7 +116,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
+CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     char key[kKeySize];
@@ -130,17 +127,14 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
 
     uint16_t infoSize = sizeof(StorableFabricInfo);
 
-    uint16_t id;
+    FabricIndex id;
     uint16_t rootCertLen, icaCertLen, nocCertLen;
     size_t stringLength;
-
     NodeId nodeId;
 
-    SuccessOrExit(err = storage->SyncLoad(mFabric, key, info, infoSize));
+    SuccessOrExit(err = storage->SyncGetKeyValue(key, info, infoSize));
 
-    mFabricId   = Encoding::LittleEndian::HostSwap64(info->mFabricId);
-    nodeId      = Encoding::LittleEndian::HostSwap64(info->mNodeId);
-    id          = Encoding::LittleEndian::HostSwap16(info->mFabric);
+    id          = info->mFabricIndex;
     mVendorId   = Encoding::LittleEndian::HostSwap16(info->mVendorId);
     rootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
     icaCertLen  = Encoding::LittleEndian::HostSwap16(info->mICACertLen);
@@ -174,7 +168,8 @@ CHIP_ERROR FabricInfo::LoadFromStorage(FabricStorage * storage)
     // The compressed fabric ID doesn't change for a fabric over time.
     // Computing it here will save computational overhead when it's accessed by other
     // parts of the code.
-    SuccessOrExit(err = GetCompressedId(mFabricId, nodeId, &mOperationalId));
+    SuccessOrExit(err = ExtractNodeIdFabricIdFromOpCert(ByteSpan(info->mNOCCert, nocCertLen), &nodeId, &mFabricId));
+    SuccessOrExit(err = GeneratePeerId(mFabricId, nodeId, &mOperationalId));
 
     SuccessOrExit(err = SetICACert(ByteSpan(info->mICACert, icaCertLen)));
     SuccessOrExit(err = SetNOCCert(ByteSpan(info->mNOCCert, nocCertLen)));
@@ -187,7 +182,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
+CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
 {
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
@@ -215,14 +210,14 @@ CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::DeleteFromStorage(FabricStorage * storage, FabricIndex fabricIndex)
+CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     char key[kKeySize];
     ReturnErrorOnFailure(GenerateKey(fabricIndex, key, sizeof(key)));
 
-    err = storage->SyncDelete(fabricIndex, key);
+    err = storage->SyncDeleteKeyValue(key);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Discovery, "Fabric %d is not yet configured", fabricIndex);
@@ -317,16 +312,28 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     NodeId nodeId;
     ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(certificates.GetLastCert()[0], &nodeId, &fabricId));
 
+    FabricId icacFabricId = kUndefinedFabricId;
     if (!icac.empty())
     {
-        FabricId icacFabric = kUndefinedFabricId;
-        if (ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabric) == CHIP_NO_ERROR && icacFabric != kUndefinedFabricId)
+        if (ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabricId) == CHIP_NO_ERROR &&
+            icacFabricId != kUndefinedFabricId)
         {
-            ReturnErrorCodeIf(icacFabric != fabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
+            ReturnErrorCodeIf(icacFabricId != fabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
         }
     }
 
-    ReturnErrorOnFailure(GetCompressedId(fabricId, nodeId, &nocPeerId));
+    FabricId rcacFabricId = kUndefinedFabricId;
+    if (ExtractFabricIdFromCert(certificates.GetCertSet()[0], &rcacFabricId) == CHIP_NO_ERROR && rcacFabricId != kUndefinedFabricId)
+    {
+        ReturnErrorCodeIf(rcacFabricId != fabricId, CHIP_ERROR_WRONG_CERT_DN);
+        if (!icac.empty())
+        {
+            // If FabricId attribute is present in RCAC then it SHOULD be present in ICAC as well.
+            ReturnErrorCodeIf(icacFabricId == kUndefinedFabricId, CHIP_ERROR_WRONG_CERT_DN);
+        }
+    }
+
+    ReturnErrorOnFailure(GeneratePeerId(fabricId, nodeId, &nocPeerId));
     nocPubkey = P256PublicKey(certificates.GetLastCert()[0].mPublicKey);
 
     return CHIP_NO_ERROR;
@@ -392,6 +399,20 @@ CHIP_ERROR FabricInfo::MatchDestinationID(const ByteSpan & targetDestinationId, 
         }
     }
     return CHIP_ERROR_CERT_NOT_TRUSTED;
+}
+
+FabricTable::~FabricTable()
+{
+    FabricTableDelegate * delegate = mDelegate;
+    while (delegate)
+    {
+        FabricTableDelegate * temp = delegate->mNext;
+        if (delegate->mOwnedByFabricTable)
+        {
+            chip::Platform::Delete(delegate);
+        }
+        delegate = temp;
+    }
 }
 
 void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
@@ -622,6 +643,7 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
             mFabricCount--;
         }
         ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", index);
+
         FabricTableDelegate * delegate = mDelegate;
         while (delegate)
         {
@@ -641,9 +663,10 @@ void FabricTable::DeleteAllFabrics()
     }
 }
 
-CHIP_ERROR FabricTable::Init(FabricStorage * storage)
+CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     mStorage = storage;
     ChipLogDetail(Discovery, "Init fabric pairing table with server storage");
 
@@ -691,29 +714,5 @@ CHIP_ERROR formatKey(FabricIndex fabricIndex, MutableCharSpan formattedKey, cons
     }
     return err;
 }
-
-CHIP_ERROR SimpleFabricStorage::SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size)
-{
-    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    char formattedKey[MAX_KEY_SIZE] = "";
-    ReturnErrorOnFailure(formatKey(fabricIndex, MutableCharSpan(formattedKey, MAX_KEY_SIZE), key));
-    return mStorage->SyncSetKeyValue(formattedKey, buffer, size);
-};
-
-CHIP_ERROR SimpleFabricStorage::SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size)
-{
-    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    char formattedKey[MAX_KEY_SIZE] = "";
-    ReturnErrorOnFailure(formatKey(fabricIndex, MutableCharSpan(formattedKey, MAX_KEY_SIZE), key));
-    return mStorage->SyncGetKeyValue(formattedKey, buffer, size);
-};
-
-CHIP_ERROR SimpleFabricStorage::SyncDelete(FabricIndex fabricIndex, const char * key)
-{
-    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    char formattedKey[MAX_KEY_SIZE] = "";
-    ReturnErrorOnFailure(formatKey(fabricIndex, MutableCharSpan(formattedKey, MAX_KEY_SIZE), key));
-    return mStorage->SyncDeleteKeyValue(formattedKey);
-};
 
 } // namespace chip

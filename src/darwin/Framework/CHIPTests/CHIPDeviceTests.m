@@ -20,6 +20,8 @@
 
 // module headers
 #import <CHIP/CHIP.h>
+#import <CHIP/CHIPAttributeCacheContainer.h>
+#import <CHIP/CHIPClustersObjc.h>
 #import <CHIP/CHIPDevice.h>
 
 #import "CHIPErrorTestUtils.h"
@@ -604,6 +606,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
+    XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
+    NSLog(@"Deregistering report handlers...");
+    [device deregisterReportHandlersWithClientQueue:queue
+                                         completion:^{
+                                             NSLog(@"Report handlers deregistered");
+                                             [cleanSubscriptionExpectation fulfill];
+                                         }];
+    [self waitForExpectations:@[ cleanSubscriptionExpectation ] timeout:kTimeoutInSeconds];
+
     [device subscribeAttributeWithEndpointId:10000
         clusterId:6
         attributeId:0
@@ -664,6 +675,224 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              }];
 
     [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kTimeoutInSeconds];
+}
+
+- (void)test011_ReadCachedAttribute
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
+    NSLog(@"Deregistering report handlers...");
+    [device deregisterReportHandlersWithClientQueue:queue
+                                         completion:^{
+                                             NSLog(@"Report handlers deregistered");
+                                             [cleanSubscriptionExpectation fulfill];
+                                         }];
+    [self waitForExpectations:@[ cleanSubscriptionExpectation ] timeout:kTimeoutInSeconds];
+
+    __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    XCTAssertNotNil(controller);
+    XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Subscription complete"];
+
+    NSLog(@"Subscribing...");
+    [attributeCacheContainer subscribeWithDeviceController:controller
+                                                  deviceId:kDeviceId
+                                               clientQueue:queue
+                                                completion:^(NSError * _Nullable error) {
+                                                    NSLog(@"Subscription complete with error: %@", error);
+                                                    XCTAssertNil(error);
+                                                    [subscribeExpectation fulfill];
+                                                }];
+    [self waitForExpectations:[NSArray arrayWithObject:subscribeExpectation] timeout:kTimeoutInSeconds];
+
+    // Invoke command to set the attribute to a known state
+    XCTestExpectation * commandExpectation = [self expectationWithDescription:@"Command invoked"];
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    NSLog(@"Invoking command...");
+    [cluster onWithCompletionHandler:^(NSError * _Nullable err) {
+        NSLog(@"Invoked command with error: %@", err);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+        [commandExpectation fulfill];
+    }];
+    [self waitForExpectations:[NSArray arrayWithObject:commandExpectation] timeout:kTimeoutInSeconds];
+
+    // Wait till reports arrive from accessory. It turned out accessory could generate very lengthy initial reports.
+    NSLog(@"Waiting for reports from accessory...");
+    __auto_type idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
+    idleExpectation.inverted = YES;
+    [self waitForExpectations:[NSArray arrayWithObject:idleExpectation] timeout:60];
+
+    // Read cache
+    NSLog(@"Reading from cache...");
+    XCTestExpectation * cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
+    [CHIPOnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
+                                           endpoint:@1
+                                              queue:queue
+                                  completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                                      NSLog(@"Read attribute cache value: %@, error: %@", value, err);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+                                      XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:YES]]);
+                                      [cacheExpectation fulfill];
+                                  }];
+    [self waitForExpectations:[NSArray arrayWithObject:cacheExpectation] timeout:kTimeoutInSeconds];
+
+    // Add another subscriber of the attribute to verify that attribute cache still works when there are other subscribers.
+    NSLog(@"New subscription...");
+    XCTestExpectation * newSubscriptionEstablished = [self expectationWithDescription:@"New subscription established"];
+    CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+    params.keepPreviousSubscriptions = [NSNumber numberWithBool:YES];
+    [cluster subscribeAttributeOnOffWithMinInterval:[NSNumber numberWithUnsignedShort:2]
+        maxInterval:[NSNumber numberWithUnsignedShort:60]
+        params:params
+        subscriptionEstablished:^{
+            NSLog(@"New subscription was established");
+            [newSubscriptionEstablished fulfill];
+        }
+        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"New subscriber received a report: %@, error: %@", value, error);
+        }];
+    [self waitForExpectations:[NSArray arrayWithObject:newSubscriptionEstablished] timeout:kTimeoutInSeconds];
+
+    NSLog(@"Invoking another command...");
+    commandExpectation = [self expectationWithDescription:@"Command invoked"];
+    [cluster offWithCompletionHandler:^(NSError * _Nullable err) {
+        NSLog(@"Invoked command with error: %@", err);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+        [commandExpectation fulfill];
+    }];
+    [self waitForExpectations:[NSArray arrayWithObject:commandExpectation] timeout:kTimeoutInSeconds];
+
+    // Wait till reports arrive from accessory.
+    NSLog(@"Waiting for reports from accessory...");
+    idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
+    idleExpectation.inverted = YES;
+    [self waitForExpectations:[NSArray arrayWithObject:idleExpectation] timeout:3];
+
+    NSLog(@"Disconnect accessory to test cache...");
+    idleExpectation = [self expectationWithDescription:@"Must not break out of idle"];
+    idleExpectation.inverted = YES;
+    [self waitForExpectations:[NSArray arrayWithObject:idleExpectation] timeout:10];
+
+    // Read cache
+    NSLog(@"Reading from cache...");
+    cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
+    [CHIPOnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
+                                           endpoint:@1
+                                              queue:queue
+                                  completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                                      NSLog(@"Read attribute cache value: %@, error: %@", value, err);
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+                                      XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:NO]]);
+                                      [cacheExpectation fulfill];
+                                  }];
+    [self waitForExpectations:[NSArray arrayWithObject:cacheExpectation] timeout:kTimeoutInSeconds];
+
+    // Read from cache using generic path
+    NSLog(@"Reading from cache using generic path...");
+    cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
+    [attributeCacheContainer
+        readAttributeWithEndpointId:1
+                          clusterId:6
+                        attributeId:0
+                        clientQueue:queue
+                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"Read attribute cache value: %@, error %@", values, error);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+                             XCTAssertEqual([values count], 1);
+                             XCTAssertEqual([values[0][@"endpointId"] unsignedShortValue], 1);
+                             XCTAssertEqual([values[0][@"clusterId"] unsignedLongValue], 6);
+                             XCTAssertEqual([values[0][@"attributeId"] unsignedLongValue], 0);
+                             XCTAssertEqual([values[0][@"status"] intValue], 0);
+                             XCTAssertTrue([values[0][@"data"][@"type"] isEqualToString:@"Boolean"]);
+                             XCTAssertEqual([values[0][@"data"][@"value"] boolValue], NO);
+                             [cacheExpectation fulfill];
+                         }];
+    [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
+
+    // Read from cache with wildcard path
+    NSLog(@"Reading from cache using wildcard endpoint...");
+    cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
+    [attributeCacheContainer
+        readAttributeWithEndpointId:0xffff
+                          clusterId:6
+                        attributeId:0
+                        clientQueue:queue
+                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"Read attribute cache value: %@, error %@", values, error);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+                             XCTAssertTrue([values count] > 0);
+                             for (NSDictionary<NSString *, id> * value in values) {
+                                 XCTAssertEqual([value[@"clusterId"] unsignedLongValue], 6);
+                                 XCTAssertEqual([value[@"attributeId"] unsignedLongValue], 0);
+                                 XCTAssertEqual([value[@"status"] intValue], 0);
+                             }
+                             [cacheExpectation fulfill];
+                         }];
+    [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
+
+    // Read from cache with wildcard path
+    NSLog(@"Reading from cache using wildcard cluster ID...");
+    cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
+    [attributeCacheContainer
+        readAttributeWithEndpointId:1
+                          clusterId:0xffffffff
+                        attributeId:0
+                        clientQueue:queue
+                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"Read attribute cache value: %@, error %@", values, error);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+                             XCTAssertTrue([values count] > 0);
+                             for (NSDictionary<NSString *, id> * value in values) {
+                                 XCTAssertEqual([value[@"endpointId"] unsignedShortValue], 1);
+                                 XCTAssertEqual([value[@"attributeId"] unsignedLongValue], 0);
+                             }
+                             [cacheExpectation fulfill];
+                         }];
+    [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
+
+    // Read from cache with wildcard path
+    NSLog(@"Reading from cache using wildcard attribute ID...");
+    cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
+    [attributeCacheContainer
+        readAttributeWithEndpointId:1
+                          clusterId:6
+                        attributeId:0xffffffff
+                        clientQueue:queue
+                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"Read attribute cache value: %@, error %@", values, error);
+                             XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:error], 0);
+                             XCTAssertTrue([values count] > 0);
+                             for (NSDictionary<NSString *, id> * value in values) {
+                                 XCTAssertEqual([value[@"endpointId"] unsignedShortValue], 1);
+                                 XCTAssertEqual([value[@"clusterId"] unsignedLongValue], 6);
+                                 XCTAssertEqual([value[@"status"] intValue], 0);
+                             }
+                             [cacheExpectation fulfill];
+                         }];
+    [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
+
+    // Read from cache with wildcard path
+    NSLog(@"Reading from cache using wildcard endpoint ID and cluster ID...");
+    cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
+    [attributeCacheContainer
+        readAttributeWithEndpointId:0xffff
+                          clusterId:0xffffffff
+                        attributeId:0
+                        clientQueue:queue
+                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"Read attribute cache value: %@, error %@", values, error);
+                             XCTAssertNotNil(error);
+                             [cacheExpectation fulfill];
+                         }];
+    [self waitForExpectations:@[ cacheExpectation ] timeout:kTimeoutInSeconds];
 }
 
 // Report behavior is erratic on the accessory side at the moment.
