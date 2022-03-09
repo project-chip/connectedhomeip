@@ -48,6 +48,15 @@ CHIP_ERROR InitProvider()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR InitProvider(chip::PersistentStorageDelegate & storageDelegate)
+{
+    new (&sGroupsProvider) chip::Credentials::GroupDataProviderImpl(storageDelegate, kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+
+    ReturnErrorOnFailure(sGroupsProvider.Init());
+    chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR InitData(chip::FabricIndex fabric_index, const ByteSpan & compressed_fabric_id)
 {
     // Groups
