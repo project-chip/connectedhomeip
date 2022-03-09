@@ -43,17 +43,27 @@ CHIP_ERROR FabricInfo::SetFabricLabel(const CharSpan & fabricLabel)
 }
 
 namespace {
+// Tags for our metadata storage.
 constexpr TLV::Tag kVendorIdTag    = TLV::ContextTag(0);
 constexpr TLV::Tag kFabricLabelTag = TLV::ContextTag(1);
+
+// Tags for our operational keypair storage.
+constexpr TLV::Tag kOpKeyVersionTag = TLV::ContextTag(0);
+constexpr TLV::Tag kOpKeyDataTag    = TLV::ContextTag(1);
+
+// If this version grows beyond UINT16_MAX, adjust OpKeypairTLVMaxSize
+// accordingly.
+constexpr uint16_t kOpKeyVersion = 1;
 } // anonymous namespace
 
 CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
 {
     DefaultStorageKeyAllocator keyAlloc;
 
-    VerifyOrReturnError(CanCastTo<uint16_t>(mRootCert.size()) && CanCastTo<uint16_t>(mICACert.size()) &&
-                            CanCastTo<uint16_t>(mNOCCert.size()),
+    VerifyOrReturnError(mRootCert.size() <= kMaxCHIPCertLength && mICACert.size() <= kMaxCHIPCertLength &&
+                            mNOCCert.size() <= kMaxCHIPCertLength,
                         CHIP_ERROR_BUFFER_TOO_SMALL);
+    static_assert(kMaxCHIPCertLength <= UINT16_MAX, "Casting to uint16_t won't be safe");
 
     ReturnErrorOnFailure(
         storage->SyncSetKeyValue(keyAlloc.FabricRCAC(mFabric), mRootCert.data(), static_cast<uint16_t>(mRootCert.size())));
@@ -66,41 +76,58 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
     ReturnErrorOnFailure(
         storage->SyncSetKeyValue(keyAlloc.FabricNOC(mFabric), mNOCCert.data(), static_cast<uint16_t>(mNOCCert.size())));
 
-    Crypto::P256SerializedKeypair serializedOpKey;
-    if (mOperationalKey != nullptr)
     {
-        ReturnErrorOnFailure(mOperationalKey->Serialize(serializedOpKey));
+        Crypto::P256SerializedKeypair serializedOpKey;
+        if (mOperationalKey != nullptr)
+        {
+            ReturnErrorOnFailure(mOperationalKey->Serialize(serializedOpKey));
+        }
+        else
+        {
+            // Could we just not store it instead?  What would deserialize need
+            // to do then?
+            P256Keypair keypair;
+            ReturnErrorOnFailure(keypair.Initialize());
+            ReturnErrorOnFailure(keypair.Serialize(serializedOpKey));
+        }
+
+        uint8_t buf[OpKeyTLVMaxSize()];
+        TLV::TLVWriter writer;
+        writer.Init(buf);
+
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+
+        ReturnErrorOnFailure(writer.Put(kOpKeyVersionTag, kOpKeyVersion));
+
+        ReturnErrorOnFailure(writer.Put(kOpKeyDataTag, ByteSpan(serializedOpKey.Bytes(), serializedOpKey.Length())));
+
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
+
+        const auto opKeyLength = writer.GetLengthWritten();
+        VerifyOrReturnError(CanCastTo<uint16_t>(opKeyLength), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(storage->SyncSetKeyValue(keyAlloc.FabricOpKey(mFabric), buf, static_cast<uint16_t>(opKeyLength)));
     }
-    else
+
     {
-        // Could we just not store it instead?  What would deserialize need to
-        // do then?
-        P256Keypair keypair;
-        ReturnErrorOnFailure(keypair.Initialize());
-        ReturnErrorOnFailure(keypair.Serialize(serializedOpKey));
+        uint8_t buf[MetadataTLVMaxSize()];
+        TLV::TLVWriter writer;
+        writer.Init(buf);
+
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+
+        ReturnErrorOnFailure(writer.Put(kVendorIdTag, mVendorId));
+
+        ReturnErrorOnFailure(writer.PutString(kFabricLabelTag, CharSpan::fromCharString(mFabricLabel)));
+
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
+
+        const auto metadataLength = writer.GetLengthWritten();
+        VerifyOrReturnError(CanCastTo<uint16_t>(metadataLength), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(
+            storage->SyncSetKeyValue(keyAlloc.FabricMetadata(mFabric), buf, static_cast<uint16_t>(metadataLength)));
     }
-
-    const auto opKeyLength = serializedOpKey.Length();
-    VerifyOrReturnError(CanCastTo<uint16_t>(opKeyLength), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorOnFailure(
-        storage->SyncSetKeyValue(keyAlloc.FabricOpKey(mFabric), serializedOpKey.Bytes(), static_cast<uint16_t>(opKeyLength)));
-
-    uint8_t buf[MetadataTLVMaxSize()];
-    TLV::TLVWriter writer;
-    writer.Init(buf);
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-
-    ReturnErrorOnFailure(writer.Put(kVendorIdTag, mVendorId));
-
-    ReturnErrorOnFailure(writer.PutString(kFabricLabelTag, CharSpan::fromCharString(mFabricLabel)));
-
-    ReturnErrorOnFailure(writer.EndContainer(outerType));
-
-    const auto metadataLength = writer.GetLengthWritten();
-    VerifyOrReturnError(CanCastTo<uint16_t>(metadataLength), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorOnFailure(storage->SyncSetKeyValue(keyAlloc.FabricMetadata(mFabric), buf, static_cast<uint16_t>(metadataLength)));
 
     return CHIP_NO_ERROR;
 }
@@ -145,10 +172,32 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
     }
 
     {
+        uint8_t buf[OpKeyTLVMaxSize()];
+        uint16_t size = sizeof(buf);
+        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricOpKey(mFabric), buf, size));
+        TLV::ContiguousBufferTLVReader reader;
+        reader.Init(buf, size);
+
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+        TLV::TLVType containerType;
+        ReturnErrorOnFailure(reader.EnterContainer(containerType));
+
+        ReturnErrorOnFailure(reader.Next(kOpKeyVersionTag));
+        uint16_t opKeyVersion;
+        ReturnErrorOnFailure(reader.Get(opKeyVersion));
+        VerifyOrReturnError(opKeyVersion == kOpKeyVersion, CHIP_ERROR_VERSION_MISMATCH);
+
+        ReturnErrorOnFailure(reader.Next(kOpKeyDataTag));
+        ByteSpan keyData;
+        ReturnErrorOnFailure(reader.GetByteView(keyData));
+
+        // Unfortunately, we have to copy the data into a P256SerializedKeypair.
         Crypto::P256SerializedKeypair serializedOpKey;
-        uint16_t size = serializedOpKey.Capacity();
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricOpKey(mFabric), serializedOpKey.Bytes(), size));
-        serializedOpKey.SetLength(size);
+        VerifyOrReturnError(keyData.size() <= serializedOpKey.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        memcpy(serializedOpKey.Bytes(), keyData.data(), keyData.size());
+        serializedOpKey.SetLength(keyData.size());
+
         if (mOperationalKey == nullptr)
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
@@ -162,15 +211,18 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
         ReturnErrorOnFailure(mOperationalKey->Deserialize(serializedOpKey));
 #ifdef ENABLE_HSM_CASE_OPS_KEY
         // Set provisioned_key = true , so that key is not deleted from HSM.
-        // mOperationalKey->provisioned_key = true;
+        mOperationalKey->provisioned_key = true;
 #endif
+
+        ReturnErrorOnFailure(reader.ExitContainer(containerType));
+        ReturnErrorOnFailure(reader.VerifyEndOfContainer());
     }
 
     {
         uint8_t buf[MetadataTLVMaxSize()];
         uint16_t size = sizeof(buf);
         ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricMetadata(mFabric), buf, size));
-        TLV::TLVReader reader;
+        TLV::ContiguousBufferTLVReader reader;
         reader.Init(buf, size);
 
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
@@ -224,8 +276,6 @@ CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId *
 
 CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     DefaultStorageKeyAllocator keyAlloc;
 
     // Try to delete all the state even if one of the deletes fails.
@@ -233,20 +283,23 @@ CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, Fa
     constexpr KeyGetter keyGetters[] = { &DefaultStorageKeyAllocator::FabricNOC, &DefaultStorageKeyAllocator::FabricICAC,
                                          &DefaultStorageKeyAllocator::FabricRCAC, &DefaultStorageKeyAllocator::FabricMetadata,
                                          &DefaultStorageKeyAllocator::FabricOpKey };
+
+    CHIP_ERROR prevDeleteErr = CHIP_NO_ERROR;
+
     for (auto & keyGetter : keyGetters)
     {
-        CHIP_ERROR getterErr = storage->SyncDeleteKeyValue((keyAlloc.*keyGetter)(fabricIndex));
+        CHIP_ERROR deleteErr = storage->SyncDeleteKeyValue((keyAlloc.*keyGetter)(fabricIndex));
         // Keys not existing is not really an error condition.
-        if (err == CHIP_NO_ERROR && getterErr != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        if (prevDeleteErr == CHIP_NO_ERROR && deleteErr != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
-            err = getterErr;
+            prevDeleteErr = deleteErr;
         }
     }
-    if (err != CHIP_NO_ERROR)
+    if (prevDeleteErr != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Discovery, "Error deleting part of fabric %d: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
+        ChipLogDetail(Discovery, "Error deleting part of fabric %d: %" CHIP_ERROR_FORMAT, fabricIndex, prevDeleteErr.Format());
     }
-    return err;
+    return prevDeleteErr;
 }
 
 CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)

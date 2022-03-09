@@ -214,6 +214,11 @@ private:
         return TLV::EstimateStructOverhead(sizeof(VendorId), kFabricLabelMaxLengthInBytes);
     }
 
+    static constexpr size_t OpKeyTLVMaxSize()
+    {
+        return TLV::EstimateStructOverhead(sizeof(uint16_t), Crypto::P256SerializedKeypair::Capacity());
+    }
+
     PeerId mOperationalId;
 
     FabricIndex mFabric                                 = kUndefinedFabricIndex;
