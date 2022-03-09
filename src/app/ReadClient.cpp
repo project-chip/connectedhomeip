@@ -902,8 +902,8 @@ bool ReadClient::ResubscribeIfNeeded()
     else
     {
         ChipLogProgress(DataManagement,
-                        "Will try to Resubscribe to F: %" PRIx8 " - N:%" PRIx64 " at retry index %" PRIu32 " after %" PRIu32 "ms",
-                        mFabricIndex, mPeerNodeId, mNumRetries, intervalMsec);
+                        "Will try to Resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32 "ms",
+                        mFabricIndex, ChipLogValueX64(mPeerNodeId), mNumRetries, intervalMsec);
     }
     return true;
 }
