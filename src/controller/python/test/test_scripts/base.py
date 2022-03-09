@@ -380,7 +380,8 @@ class BaseTestHelper:
         try:
             err = self.devCtrl.CloseSession(nodeid)
             if err != 0:
-                self.logger.exception(f"Failed to close sessions with device {nodeid}: {err}")
+                self.logger.exception(
+                    f"Failed to close sessions with device {nodeid}: {err}")
                 return False
             return True
         except Exception as ex:
