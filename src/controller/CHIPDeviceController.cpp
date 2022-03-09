@@ -160,9 +160,11 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
-        .dnsCache          = &mDNSCache,
-        .devicePool        = &mDevicePool,
-        .dnsResolver       = &mDNSResolver,
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        .dnsCache = &mDNSCache,
+#endif
+        .devicePool  = &mDevicePool,
+        .dnsResolver = &mDNSResolver,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
@@ -1458,7 +1460,9 @@ void DeviceCommissioner::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNo
         return;
     }
 
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     mDNSCache.Insert(nodeData);
+#endif
 
     mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     DeviceController::OnOperationalNodeResolved(nodeData);
