@@ -59,7 +59,8 @@ if (chip_device_platform != "none") {
     # Enable default/generic test-mode CommissionableDataProvider in GenericConfigurationManagerImpl
     # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
     # Linux platform has already transitioned.
-    chip_use_transitional_commissionable_data_provider = (chip_device_platform != "linux")
+    chip_use_transitional_commissionable_data_provider =
+        chip_device_platform != "linux"
 
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
     chip_stack_lock_tracking = "auto"
@@ -256,13 +257,10 @@ if (chip_device_platform != "none") {
 config("platform_config") {
   defines = []
 
-  if (chip_use_transitional_commissionable_data_provider)
-  {
-    defines += ["CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1"]
-  }
-  else
-  {
-    defines += ["CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=0"]
+  if (chip_use_transitional_commissionable_data_provider) {
+    defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1" ]
+  } else {
+    defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=0" ]
   }
 }
 
@@ -278,7 +276,10 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/system",
     ]
 
-    public_configs = [ "${chip_root}/src:includes", ":platform_config" ]
+    public_configs = [
+      "${chip_root}/src:includes",
+      ":platform_config",
+    ]
   }
 
   static_library("platform") {
