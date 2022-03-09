@@ -92,6 +92,8 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  */
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
 
+- (void)setKeyValueStoreManagerPath:(const char *)keyValueStorePath;
+
 /**
  * Start the CHIP Stack. Repeated calls to startup without calls to shutdown in between are NO-OPs. Use the isRunning property to
  * check if the stack needs to be started up.
