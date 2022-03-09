@@ -35,9 +35,11 @@ namespace chip {
 struct CASESessionManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
-    OperationalDeviceProxyPoolDelegate * devicePool           = nullptr;
-    Dnssd::ResolverProxy * dnsResolver                        = nullptr;
+#endif
+    OperationalDeviceProxyPoolDelegate * devicePool = nullptr;
+    Dnssd::ResolverProxy * dnsResolver              = nullptr;
 };
 
 /**
