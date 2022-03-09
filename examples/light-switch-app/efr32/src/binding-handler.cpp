@@ -132,7 +132,6 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, DevicePro
     }
 }
 
-#define ENABLE_CHIP_SHELL 1
 #ifdef ENABLE_CHIP_SHELL
 
 /********************************************************
