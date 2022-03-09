@@ -774,6 +774,28 @@ SessionHandle SessionManager::FindSecureSessionForNode(NodeId peerNodeId)
     return SessionHandle(*found);
 }
 
+Optional<SessionHandle> SessionManager::FindSecureSessionForPeer(FabricIndex fabricIndex, NodeId peerNodeId)
+{
+    SecureSession * found = nullptr;
+    mSecureSessions.ForEachSession([&](auto session) {
+        if (session->GetPeerNodeId() == peerNodeId && session->GetFabricIndex() == fabricIndex)
+        {
+            found = session;
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
+
+    if (found)
+    {
+        return MakeOptional(SessionHandle(*found));
+    }
+    else
+    {
+        return NullOptional;
+    }
+}
+
 /**
  * Provides a means to get diagnostic information such as number of sessions.
  */
