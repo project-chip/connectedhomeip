@@ -66,6 +66,22 @@ struct ResolvedNodeData
         return false;
     }
 
+    void LogNodeIdResolved() const
+    {
+#if CHIP_PROGRESS_LOGGING
+        char addrBuffer[Inet::IPAddress::kMaxStringLength];
+
+        // Would be nice to log the interface id, but sorting out how to do so
+        // across our differnet InterfaceId implementations is a pain.
+        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+        for (unsigned i = 0; i < mNumIPs; ++i)
+        {
+            mAddress[i].ToString(addrBuffer);
+            ChipLogProgress(Discovery, "    Addr %u: [%s]:%" PRIu16, i, addrBuffer, mPort);
+        }
+#endif // CHIP_PROGRESS_LOGGING
+    }
+
     /// Sorts IP addresses in a consistent order. Specifically places
     /// Link-local IPv6 addresses at the end (e.g. mDNS reflector services in Unify will
     /// return link-local addresses that will not work) and prioritizes global IPv6 addresses

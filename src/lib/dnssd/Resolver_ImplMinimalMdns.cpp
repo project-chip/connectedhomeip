@@ -337,6 +337,7 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
     else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
     {
         activeAttempts.Complete(mNodeData.mPeerId);
+        mNodeData.LogNodeIdResolved();
         mNodeData.PrioritizeAddresses();
 
         //
