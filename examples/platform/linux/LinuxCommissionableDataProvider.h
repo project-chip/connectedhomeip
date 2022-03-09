@@ -27,7 +27,7 @@
 
 class LinuxCommissionableDataProvider : public chip::DeviceLayer::CommissionableDataProvider
 {
-  public:
+public:
     LinuxCommissionableDataProvider() {}
 
     /**
@@ -56,13 +56,8 @@ class LinuxCommissionableDataProvider : public chip::DeviceLayer::Commissionable
      *         CHIP_ERROR_INVALID_STATE if already initialized, or other CHIP_ERROR values if inner
      *         implementation dependencies fail.
      */
-    CHIP_ERROR Init(
-      chip::Optional<std::vector<uint8_t>> serializedPaseVerifier,
-      chip::Optional<std::vector<uint8_t>> paseSalt,
-      uint32_t paseIterationCount,
-      chip::Optional<uint32_t> setupPasscode,
-      uint16_t discriminator
-    );
+    CHIP_ERROR Init(chip::Optional<std::vector<uint8_t>> serializedPaseVerifier, chip::Optional<std::vector<uint8_t>> paseSalt,
+                    uint32_t paseIterationCount, chip::Optional<uint32_t> setupPasscode, uint16_t discriminator);
 
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator)
@@ -80,7 +75,7 @@ class LinuxCommissionableDataProvider : public chip::DeviceLayer::Commissionable
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-  private:
+private:
     bool mIsInitialized = false;
     std::vector<uint8_t> mSerializedPaseVerifier;
     std::vector<uint8_t> mPaseSalt;

@@ -159,7 +159,8 @@ public:
     virtual pw::Status SetPairingInfo(const chip_rpc_PairingInfo & request, pw_protobuf_Empty & response)
     {
         if (DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider()->StoreSetupPinCode(request.code) != CHIP_NO_ERROR ||
-            DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider()->SetSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)
+            DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider()->SetSetupDiscriminator(request.discriminator) !=
+                CHIP_NO_ERROR)
         {
             return pw::Status::Unknown();
         }

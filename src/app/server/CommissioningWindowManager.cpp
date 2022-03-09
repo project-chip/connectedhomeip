@@ -194,8 +194,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
         Spake2pVerifierSerialized serializedVerifier = { 0 };
         size_t serializedVerifierLen                 = 0;
         Spake2pVerifier verifier;
-        MutableByteSpan saltSpan{salt};
-        MutableByteSpan verifierSpan{serializedVerifier};
+        MutableByteSpan saltSpan{ salt };
+        MutableByteSpan verifierSpan{ serializedVerifier };
 
         auto * commissionableDataProvider = DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider();
         ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pIterationCount(iterationCount));

@@ -56,17 +56,19 @@ namespace Internal {
 // to a transition where all ConfigurationManager customers move to
 // provide their own impl of CommissionableDataProvider interface.
 
-template<class ConfigClass>
+template <class ConfigClass>
 class LegacyTemporaryCommissionableDataProvider : public CommissionableDataProvider
 {
-  public:
+public:
     // GenericConfigurationManagerImpl will own a LegacyTemporaryCommissionableDataProvider which
     // *refers back to that GenericConfigurationManagerImpl*, due to how CRTP-based
     // storage APIs are defined. This is a bit unclean, but only applicable to the
     // transition path when `CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER` is true.
     // This circular dependency is NOT needed by CommissionableDataProvider, but required
     // to keep legacy code running.
-    LegacyTemporaryCommissionableDataProvider(GenericConfigurationManagerImpl<ConfigClass> & configManager) : mGenericConfigManager(configManager) {}
+    LegacyTemporaryCommissionableDataProvider(GenericConfigurationManagerImpl<ConfigClass> & configManager) :
+        mGenericConfigManager(configManager)
+    {}
 
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override;
@@ -76,7 +78,7 @@ class LegacyTemporaryCommissionableDataProvider : public CommissionableDataProvi
     CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override;
     CHIP_ERROR SetSetupPasscode(uint32_t setupPasscode) override;
 
-  private:
+private:
     GenericConfigurationManagerImpl<ConfigClass> & mGenericConfigManager;
 };
 
@@ -130,7 +132,8 @@ exit:
 template <class ConfigClass>
 CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::SetSetupDiscriminator(uint16_t setupDiscriminator)
 {
-    return mGenericConfigManager.WriteConfigValue(ConfigClass::kConfigKey_SetupDiscriminator, static_cast<uint32_t>(setupDiscriminator));
+    return mGenericConfigManager.WriteConfigValue(ConfigClass::kConfigKey_SetupDiscriminator,
+                                                  static_cast<uint32_t>(setupDiscriminator));
 }
 
 template <class ConfigClass>
@@ -183,7 +186,8 @@ CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pSal
 }
 
 template <class ConfigClass>
-CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen)
+CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pVerifier(MutableByteSpan & verifierBuf,
+                                                                                      size_t & verifierLen)
 {
     static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
         BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
@@ -192,7 +196,8 @@ CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pVer
     char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
     size_t verifierB64Len                                     = 0;
 
-    err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64), verifierB64Len);
+    err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64),
+                                                   verifierB64Len);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -842,7 +847,8 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             setupDiscriminator = 0xFFFF;
         }
-        ChipLogProgress(DeviceLayer, "  Setup Discriminator (0xFFFF for UNKNOWN/ERROR): %" PRIu16 " (0x%" PRIX16 ")", setupDiscriminator, setupDiscriminator);
+        ChipLogProgress(DeviceLayer, "  Setup Discriminator (0xFFFF for UNKNOWN/ERROR): %" PRIu16 " (0x%" PRIX16 ")",
+                        setupDiscriminator, setupDiscriminator);
     }
 
     {

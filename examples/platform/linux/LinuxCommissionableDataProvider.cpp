@@ -21,8 +21,8 @@
 #include <string.h>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/Span.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Crypto;
@@ -38,13 +38,9 @@ CHIP_ERROR GeneratePaseSalt(std::vector<uint8_t> & paseSaltVector)
 
 } // namespace
 
-CHIP_ERROR LinuxCommissionableDataProvider::Init(
-  chip::Optional<std::vector<uint8_t>> serializedPaseVerifier,
-  chip::Optional<std::vector<uint8_t>> paseSalt,
-  uint32_t paseIterationCount,
-  chip::Optional<uint32_t> setupPasscode,
-  uint16_t discriminator
-)
+CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint8_t>> serializedPaseVerifier,
+                                                 chip::Optional<std::vector<uint8_t>> paseSalt, uint32_t paseIterationCount,
+                                                 chip::Optional<uint32_t> setupPasscode, uint16_t discriminator)
 {
     VerifyOrReturnError(mIsInitialized == false, CHIP_ERROR_INCORRECT_STATE);
 
@@ -72,7 +68,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        chip::MutableByteSpan verifierSpan{serializedPaseVerifier.Value().data(), serializedPaseVerifier.Value().size()};
+        chip::MutableByteSpan verifierSpan{ serializedPaseVerifier.Value().data(), serializedPaseVerifier.Value().size() };
         err = providedVerifier.Deserialize(verifierSpan);
         if (err != CHIP_NO_ERROR)
         {
@@ -112,7 +108,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(
     bool havePasscode = setupPasscode.HasValue();
     Spake2pVerifier passcodeVerifier;
     std::vector<uint8_t> serializedPasscodeVerifier(kSpake2p_VerifierSerialized_Length);
-    chip::MutableByteSpan saltSpan{paseSalt.Value().data(), paseSalt.Value().size()};
+    chip::MutableByteSpan saltSpan{ paseSalt.Value().data(), paseSalt.Value().size() };
     if (havePasscode)
     {
         err = passcodeVerifier.Generate(paseIterationCount, saltSpan, setupPasscode.Value());
@@ -122,7 +118,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(
             return err;
         }
 
-        chip::MutableByteSpan verifierSpan{serializedPasscodeVerifier.data(), serializedPasscodeVerifier.size()};
+        chip::MutableByteSpan verifierSpan{ serializedPasscodeVerifier.data(), serializedPasscodeVerifier.size() };
         err = passcodeVerifier.Serialize(verifierSpan);
         if (err != CHIP_NO_ERROR)
         {
@@ -161,10 +157,10 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(
         finalSerializedVerifier = serializedPasscodeVerifier;
     }
 
-    mDiscriminator = discriminator;
+    mDiscriminator          = discriminator;
     mSerializedPaseVerifier = std::move(finalSerializedVerifier);
-    mPaseSalt = std::move(paseSalt.Value());
-    mPaseIterationCount = paseIterationCount;
+    mPaseSalt               = std::move(paseSalt.Value());
+    mPaseIterationCount     = paseIterationCount;
     if (havePasscode)
     {
         mSetupPasscode.SetValue(setupPasscode.Value());

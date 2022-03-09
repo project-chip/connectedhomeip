@@ -146,7 +146,7 @@ void SetupSignalHandlers()
     signal(SIGINT, OnSignalHandler);
 }
 
-CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider& provider, LinuxDeviceOptions & options)
+CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
 {
     uint32_t defaultTestPasscode = 0;
     chip::DeviceLayer::TestCommissionableDataProvider testCommissionableDataProvider;
@@ -160,9 +160,11 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider& provi
     }
     else if (!options.paseVerifier.HasValue())
     {
-        ChipLogError(Support, "*** WARNING: Using temporary passcode %u due to no neither --passcode or --pase-verifier-base64 "
+        ChipLogError(Support,
+                     "*** WARNING: Using temporary passcode %u due to no neither --passcode or --pase-verifier-base64 "
                      "given on command line. This is temporary and will disappear. Please update your scripts "
-                     "to explicitly configure onboarding credentials. ***", static_cast<unsigned>(defaultTestPasscode));
+                     "to explicitly configure onboarding credentials. ***",
+                     static_cast<unsigned>(defaultTestPasscode));
         setupPasscode.SetValue(defaultTestPasscode);
         options.payload.setUpPINCode = defaultTestPasscode;
     }
@@ -181,13 +183,7 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider& provi
     }
     ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(paseIterationCount));
 
-    return provider.Init(
-        options.paseVerifier,
-        options.paseSalt,
-        paseIterationCount,
-        setupPasscode,
-        options.payload.discriminator
-    );
+    return provider.Init(options.paseVerifier, options.paseSalt, paseIterationCount, setupPasscode, options.payload.discriminator);
 }
 
 // To hold SPAKE2+ verifier, discriminator, passcode

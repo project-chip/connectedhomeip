@@ -32,8 +32,8 @@
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
-#include <setup_payload/SetupPayload.h>
 #include <credentials/FabricTable.h>
+#include <setup_payload/SetupPayload.h>
 #include <system/TimeSource.h>
 
 #include <app/server/Server.h>
@@ -339,17 +339,20 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     }
 
     uint16_t discriminator = 0;
-    CHIP_ERROR error = DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
+    CHIP_ERROR error       = DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Setup discriminator read error (%" CHIP_ERROR_FORMAT ")! Critical error, will not be commissionable.", error.Format());
+        ChipLogError(Discovery,
+                     "Setup discriminator read error (%" CHIP_ERROR_FORMAT ")! Critical error, will not be commissionable.",
+                     error.Format());
         return error;
     }
 
     // Override discriminator with temporary one if one is set
     discriminator = mEphemeralDiscriminator.ValueOr(discriminator);
 
-    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>((discriminator >> 8) & 0x0F)).SetLongDiscriminator(discriminator);
+    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>((discriminator >> 8) & 0x0F))
+        .SetLongDiscriminator(discriminator);
 
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
         DeviceLayer::ConfigurationMgr().GetDeviceTypeId(value) == CHIP_NO_ERROR)

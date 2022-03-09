@@ -16,10 +16,9 @@
  *    limitations under the License.
  */
 
-
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
 #include "Options.h"
 
@@ -163,7 +162,7 @@ const char * sDeviceOptionHelp =
     "       A interface id to advertise on.\n"
     "\n";
 
-bool Base64ArgToVector(const char* arg, size_t maxSize, std::vector<uint8_t> & outVector)
+bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
 {
     size_t maxBase64Size = BASE64_ENCODED_LEN(maxSize);
     outVector.resize(maxSize);
@@ -245,8 +244,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
         break;
 
-    case kDeviceOption_PaseSaltBase64:
-    {
+    case kDeviceOption_PaseSaltBase64: {
         constexpr size_t kMaxSize = chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length;
         std::vector<uint8_t> saltVector;
 
@@ -259,11 +257,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             break;
         }
 
-        if ( (saltVector.size() < chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length) ||
-             (saltVector.size() > chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) )
+        if ((saltVector.size() < chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length) ||
+            (saltVector.size() > chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length))
         {
             PrintArgError("%s: ERROR: argument %s not in range [%zu, %zu]\n", aProgram, aName,
-              chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length, chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
+                          chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length, chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
             retval = false;
             break;
         }
@@ -272,8 +270,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 
-    case kDeviceOption_PaseVerifierBase64:
-    {
+    case kDeviceOption_PaseVerifierBase64: {
         constexpr size_t kMaxSize = chip::Crypto::kSpake2p_VerifierSerialized_Length;
         std::vector<uint8_t> serializedVerifier;
 
@@ -289,7 +286,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         if (serializedVerifier.size() != chip::Crypto::kSpake2p_VerifierSerialized_Length)
         {
             PrintArgError("%s: ERROR: argument %s should contain base64 for a %zu bytes octet string \n", aProgram, aName,
-              chip::Crypto::kSpake2p_VerifierSerialized_Length);
+                          chip::Crypto::kSpake2p_VerifierSerialized_Length);
             retval = false;
             break;
         }
@@ -298,9 +295,8 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 
-    case kDeviceOption_PaseIterations:
-    {
-        errno = 0;
+    case kDeviceOption_PaseIterations: {
+        errno              = 0;
         uint32_t iterCount = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         if (errno == ERANGE)
         {
@@ -312,7 +308,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
                  (iterCount > chip::Crypto::kSpake2p_Max_PBKDF_Iterations))
         {
             PrintArgError("%s: ERROR: argument %s not in range [%zu, %zu]\n", aProgram, aName,
-              chip::Crypto::kSpake2p_Min_PBKDF_Iterations, chip::Crypto::kSpake2p_Max_PBKDF_Iterations);
+                          chip::Crypto::kSpake2p_Min_PBKDF_Iterations, chip::Crypto::kSpake2p_Max_PBKDF_Iterations);
             retval = false;
             break;
         }
