@@ -160,9 +160,13 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
-        .dnsCache          = &mDNSCache,
-        .devicePool        = &mDevicePool,
-        .dnsResolver       = &mDNSResolver,
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        .dnsCache = &mDNSCache,
+#else
+        .dnsCache = nullptr,
+#endif
+        .devicePool  = &mDevicePool,
+        .dnsResolver = &mDNSResolver,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
@@ -617,12 +621,12 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv6)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv4)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
                                                     ));
 
@@ -1447,7 +1451,9 @@ void DeviceCommissioner::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNo
         return;
     }
 
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     mDNSCache.Insert(nodeData);
+#endif
 
     mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     DeviceController::OnOperationalNodeResolved(nodeData);
