@@ -209,8 +209,8 @@ public:
      *   Once the connection is successfully establishes (or if it's already connected), it calls `onConnectedDevice`
      *   callback. If it fails to establish the connection, it calls `onError` callback.
      */
-    virtual CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                          chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
@@ -327,6 +327,11 @@ public:
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
+
+    /**
+     * Returns success if a session with the given peer does not exist yet.
+     */
+    CHIP_ERROR CloseSession(NodeId nodeId);
 
 protected:
     enum class State
@@ -518,9 +523,6 @@ public:
     CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
-
-    CHIP_ERROR GetConnectedDevice(NodeId deviceId, chip::Callback::Callback<OnDeviceConnected> * onConnection,
-                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure) override;
 
     /**
      * @brief

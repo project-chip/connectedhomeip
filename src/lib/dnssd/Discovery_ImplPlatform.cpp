@@ -156,7 +156,6 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
         FillNodeDataFromTxt(key, val, nodeData);
     }
 
-    nodeData.LogNodeIdResolved();
     nodeData.PrioritizeAddresses();
     proxy->OnOperationalNodeResolved(nodeData);
     proxy->Release();

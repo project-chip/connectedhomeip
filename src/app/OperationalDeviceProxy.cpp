@@ -94,6 +94,13 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
 {
     VerifyOrReturnLogError(mState != State::Uninitialized, CHIP_ERROR_INCORRECT_STATE);
 
+#if CHIP_DETAIL_LOGGING
+    char peerAddrBuff[Transport::PeerAddress::kMaxToStringSize];
+    addr.ToString(peerAddrBuff);
+
+    ChipLogDetail(Controller, "Updating device address to %s while in state %d", peerAddrBuff, static_cast<int>(mState));
+#endif
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     mDeviceAddress = addr;
 

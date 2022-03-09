@@ -87,9 +87,13 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddr
     if (mConfig.dnsCache != nullptr)
     {
         Dnssd::ResolvedNodeData resolutionData;
-        ReturnErrorOnFailure(mConfig.dnsCache->Lookup(peerId, resolutionData));
-        addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
-        return CHIP_NO_ERROR;
+        // TODO(andy31415): DNS caching is generally not populated, need to move
+        // caching into a the address resolve layer and not have a global one anymore.
+        if (mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR)
+        {
+            addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
+            return CHIP_NO_ERROR;
+        }
     }
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);

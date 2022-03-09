@@ -289,6 +289,34 @@ void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
     mCASESessionManager->ReleaseSession(mFabricInfo->GetPeerIdForNode(remoteDeviceId));
 }
 
+CHIP_ERROR DeviceController::CloseSession(NodeId nodeId)
+{
+    ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
+
+    OperationalDeviceProxy * proxy = mCASESessionManager->FindExistingSession(mFabricInfo->GetPeerIdForNode(nodeId));
+    if (proxy == nullptr)
+    {
+        ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
+        return CHIP_NO_ERROR;
+    }
+
+    if (proxy->IsConnected())
+    {
+        return proxy->Disconnect();
+    }
+
+    if (proxy->IsConnecting())
+    {
+        ChipLogError(Controller, "Attempting to disconnect while connection in progress");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // TODO: logic here is unclear. Possible states are "uninitialized, needs address, initialized"
+    // and disconnecting in those states is unclear (especially for needds-address).
+    ChipLogProgress(Controller, "Disconnect attempt while not in connected/connecting state");
+    return CHIP_NO_ERROR;
+}
+
 void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & session)
 {
     VerifyOrReturn(mState == State::Initialized,
@@ -711,12 +739,6 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
     *out_device = device;
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, chip::Callback::Callback<OnDeviceConnected> * onConnection,
-                                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
-{
-    return DeviceController::GetConnectedDevice(deviceId, onConnection, onFailure);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode)
@@ -2054,7 +2076,7 @@ CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
 {
     VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    OperationalDeviceProxy * proxy = mCASESessionManager->FindExistingSession(mFabricInfo->GetPeerIdForNode(deviceId));
+    OperationalDeviceProxy * proxy = GetDeviceSession(mFabricInfo->GetPeerIdForNode(deviceId));
     VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_NOT_FOUND);
 
     return proxy->LookupPeerAddress();

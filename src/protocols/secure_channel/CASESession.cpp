@@ -232,6 +232,12 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_PROGRESS_LOGGING
+    char peerAddrBuff[Transport::PeerAddress::kMaxToStringSize];
+    peerAddress.ToString(peerAddrBuff);
+    ChipLogProgress(SecureChannel, "Establishing CASE session to %s", peerAddrBuff);
+#endif
+
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -310,11 +316,11 @@ CHIP_ERROR CASESession::SendSigma1()
     TRACE_EVENT_SCOPE("SendSigma1", "CASESession");
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
-                                                  sizeof(uint16_t),            // initiatorSessionId,
-                                                  kSHA256_Hash_Length,         // destinationId
-                                                  kP256_PublicKey_Length,      // InitiatorEphPubKey,
-                                                  mrpParamsSize,               // initiatorMRPParams
-                                                  kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+                                                             sizeof(uint16_t),            // initiatorSessionId,
+                                                             kSHA256_Hash_Length,         // destinationId
+                                                             kP256_PublicKey_Length,      // InitiatorEphPubKey,
+                                                             mrpParamsSize,               // initiatorMRPParams
+                                                             kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R1;
@@ -619,7 +625,7 @@ CHIP_ERROR CASESession::SendSigma2()
     // Construct Sigma2 Msg
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
-                                                  msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, mrpParamsSize);
+                                                             msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, mrpParamsSize);
 
     System::PacketBufferHandle msg_R2 = System::PacketBufferHandle::New(data_len);
     VerifyOrReturnError(!msg_R2.IsNull(), CHIP_ERROR_NO_MEMORY);
