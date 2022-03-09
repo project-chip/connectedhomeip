@@ -52,6 +52,16 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
 
+            - name: Detect changed paths
+              uses: dorny/paths-filter@v2
+              id: changed_paths
+              with:
+                  filters: |
+                      mbed:
+                        - '**/mbed/**'
+                      pigweedapp:
+                        - 'examples/pigweed-app/mbed/**'
+
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
               env:
@@ -81,6 +91,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build lighting-app example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
               timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=lighting-app -b=$APP_TARGET -p=$APP_PROFILE
@@ -90,6 +101,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build pigweed-app example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.pigweedapp == 'true'
               timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=pigweed-app -b=$APP_TARGET -p=$APP_PROFILE
@@ -99,6 +111,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build all-clusters-app example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
               timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=all-clusters-app -b=$APP_TARGET -p=$APP_PROFILE
@@ -108,6 +121,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build shell example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
               timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=shell -b=$APP_TARGET -p=$APP_PROFILE
@@ -117,6 +131,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: Build ota-requestor-app example
+              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
               timeout-minutes: 20
               run: |
                   scripts/examples/mbed_example.sh -a=ota-requestor-app -b=$APP_TARGET -p=$APP_PROFILE
