@@ -225,6 +225,8 @@ public:
         return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
 
+    Optional<SessionHandle> FindSecureSessionForPeer(chip::FabricIndex fabricIndex, NodeId nodeId);
+
     // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
     // and tv-casting-app that uses the TV's node ID to find the associated secure session
     SessionHandle FindSecureSessionForNode(NodeId peerNodeId);

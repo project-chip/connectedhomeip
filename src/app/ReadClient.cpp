@@ -538,7 +538,7 @@ exit:
     {
         bool noResponseExpected = IsSubscriptionIdle() && !mPendingMoreChunks;
         err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                                        : Protocols::InteractionModel::Status::InvalidSubscription,
+                                                                            : Protocols::InteractionModel::Status::InvalidSubscription,
                                    mpExchangeCtx, !noResponseExpected);
 
         if (noResponseExpected || (err != CHIP_NO_ERROR))
@@ -853,6 +853,9 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
     mFabricIndex = aReadPrepareParams.mSessionHolder->GetFabricIndex();
 
+    // We will try to get an up-to-date session when resubscribe.
+    aReadPrepareParams.mSessionHolder->Release();
+
     MoveToState(ClientState::AwaitingInitialReport);
 
     return CHIP_NO_ERROR;
@@ -862,8 +865,19 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
 {
     ReadClient * const _this = reinterpret_cast<ReadClient *>(apAppState);
     assert(_this != nullptr);
-    _this->SendSubscribeRequest(_this->mReadPrepareParams);
+
     _this->mNumRetries++;
+
+    // Get an up-to-date session from session manager.
+    auto session = _this->mpExchangeMgr->GetSessionManager()->FindSecureSessionForPeer(_this->mFabricIndex, _this->mPeerNodeId);
+    if (!session.HasValue())
+    {
+        return;
+    }
+
+    _this->mReadPrepareParams.mSessionHolder.Grab(session.Value());
+
+    _this->SendSubscribeRequest(_this->mReadPrepareParams);
 }
 
 bool ReadClient::ResubscribeIfNeeded()
