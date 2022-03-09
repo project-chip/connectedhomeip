@@ -46,5 +46,5 @@ tests:
       attribute: "occupancy"
       PICS: A_OCCUPANCY
       response:
-          value: 1
-          notvalue: OccupancyValue
+          constraints:
+              notvalue: OccupancyValue

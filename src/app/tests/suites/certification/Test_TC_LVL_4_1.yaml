@@ -32,8 +32,9 @@ tests:
       command: "readAttribute"
       attribute: "max level"
       response:
-          value: 254
           saveAs: MaxlevelValue
+          constraints:
+              type: uint8
 
     - label: "sends a Move up command"
       command: "Move"
@@ -67,7 +68,8 @@ tests:
       attribute: "min level"
       response:
           value: 0
-          saveAs: MinlevelValue
+          constraints:
+              type: uint8
 
     - label: "sends a Move down command"
       command: "Move"
@@ -82,30 +84,28 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 3000ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 5000
 
     # For lighting Device type current level minimal value is 1
     - label: "reads CurrentLevel attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: MinlevelValue
-          constraints:
-              minValue: 0
-              maxValue: 1
+          value: 1
 
     - label: "reads default move rate attribute from DUT"
       command: "readAttribute"
       attribute: "default move rate"
       response:
-          value: 20
-          saveAs: DefaultmoverateValue
+          saveAs: DefaultMoveRateValue
+          constraints:
+              type: uint8
 
     - label: "sends a Move up command at default move rate"
       command: "Move"
@@ -134,6 +134,17 @@ tests:
       response:
           constraints:
               notValue: 255
+
+    - label: "user prompt message"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Physically verify that the device moves at the rate
+                    recorded in step 3a and completes moving to its maximum
+                    level."
 
     - label: "Reset level to 254"
       command: "MoveToLevel"

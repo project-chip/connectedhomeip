@@ -61,7 +61,6 @@ tests:
           saveAs: CurrentLevelValue
           constraints:
               minValue: 0
-              maxValue: 1
 
     - label: "Sends a move up command to DUT"
       command: "Move"
@@ -70,7 +69,7 @@ tests:
               - name: "moveMode"
                 value: 0
               - name: "rate"
-                value: 10
+                value: 1
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
@@ -97,10 +96,8 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 2
           constraints:
-              minValue: 2
-              maxValue: 3
+              notValue: CurrentLevelValue
 
     - label: "Reset level to 254"
       command: "MoveToLevel"
