@@ -1273,13 +1273,12 @@ CHIP_ERROR CASESession::ValidatePeerIdentity(const ByteSpan & peerNOC, const Byt
 
     ReturnErrorOnFailure(SetEffectiveTime());
 
-    PeerId peerId;
     FabricId peerNOCFabricId;
-    ReturnErrorOnFailure(mFabricInfo->VerifyCredentials(peerNOC, peerICAC, mValidContext, peerId, peerNOCFabricId, peerPublicKey));
+    CompressedFabricId compressedFabricId;
+    ReturnErrorOnFailure(mFabricInfo->VerifyCredentials(peerNOC, peerICAC, mValidContext, peerNOCFabricId, peerNodeId,
+                                                        compressedFabricId, peerPublicKey));
 
     VerifyOrReturnError(mFabricInfo->GetFabricId() == peerNOCFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
-
-    peerNodeId = peerId.GetNodeId();
 
     return CHIP_NO_ERROR;
 }

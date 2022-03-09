@@ -38,6 +38,9 @@ class PeerId
 {
 public:
     PeerId() {}
+    constexpr PeerId(NodeId nodeId, CompressedFabricId compressedFabricId) :
+        mNodeId(nodeId), mCompressedFabricId(compressedFabricId)
+    {}
 
     NodeId GetNodeId() const { return mNodeId; }
     PeerId & SetNodeId(NodeId id)
