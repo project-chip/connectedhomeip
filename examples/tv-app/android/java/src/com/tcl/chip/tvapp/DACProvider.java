@@ -18,10 +18,15 @@
 package com.tcl.chip.tvapp;
 
 public interface DACProvider {
-    byte[] GetCertificationDeclaration();
-    byte[] GetFirmwareInformation();
-    byte[] GetDeviceAttestationCert();
-    byte[] GetProductAttestationIntermediateCert();
-    byte[] GetDeviceAttestationCertPrivateKey();
-    byte[] GetDeviceAttestationCertPublicKeyKey();
+  byte[] GetCertificationDeclaration();
+
+  byte[] GetFirmwareInformation();
+
+  byte[] GetDeviceAttestationCert();
+
+  byte[] GetProductAttestationIntermediateCert();
+
+  byte[] GetDeviceAttestationCertPrivateKey();
+
+  byte[] GetDeviceAttestationCertPublicKeyKey();
 }
