@@ -175,7 +175,7 @@ void TestGetDeviceType(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, GetDeviceType(GetSpan(dt)) == 1234);
 
     // overflow a uint32
-    sprintf(dt, "%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint32_t>::max()) + 1);
+    sprintf(dt, "%" PRIu64, static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1);
     NL_TEST_ASSERT(inSuite, GetDeviceType(GetSpan(dt)) == 0);
 }
 
