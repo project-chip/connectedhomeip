@@ -19,7 +19,7 @@
 #import <CHIP/CHIPError_Internal.h>
 #import <Foundation/Foundation.h>
 
-#import "CHIP/zap-generated/CHIPCallbackBridge_internal.h"
+#import "CHIPCallbackBridge_internal.h"
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
