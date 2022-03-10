@@ -76,17 +76,14 @@ public:
      * @brief Obtain the default PAKE verifier's PBKDF2 salt in the provided `saltBuf`
      *
      * The `saltBuf` must be large enough to contain the salt. It will be resized on success to
-     * reflect the actual size of the salt and match the value in outSaltLen.
+     * reflect the actual size of the salt.
      *
      * @param[inout] saltBuf  Reference to buffer where the salt value will be copied.
-     * @param[out] outSaltLen Reference to location where the length of the salt will be stored,
-     *                        including if the buffer provided is too small. This value is valid
-     *                        if the return value is either CHIP_NO_ERROR or CHIP_ERROR_BUFFER_TOO_SMALL.
      *
      * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if saltBuf was too small, or another
      *          CHIP_ERROR from the underlying implementation if access fails.
      */
-    virtual CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf, size_t & outSaltLen) = 0;
+    virtual CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf) = 0;
 
     /**
      * @brief Obtain the default PAKE verifier in the provided `verifierBuf`
@@ -174,19 +171,19 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf, size_t & outSaltLen) override
+    CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf) override
     {
         const uint8_t kDefaultTestVerifierSalt[16] = {
             0x53, 0x50, 0x41, 0x4b, 0x45, 0x32, 0x50, 0x20, 0x4b, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6c, 0x74,
         };
 
-        outSaltLen = sizeof(kDefaultTestVerifierSalt);
-        if (saltBuf.size() < outSaltLen)
+        size_t saltLen = sizeof(kDefaultTestVerifierSalt);
+        if (saltBuf.size() < saltLen)
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        memcpy(saltBuf.data(), &kDefaultTestVerifierSalt[0], outSaltLen);
-        saltBuf.reduce_size(outSaltLen);
+        memcpy(saltBuf.data(), &kDefaultTestVerifierSalt[0], saltLen);
+        saltBuf.reduce_size(saltLen);
         return CHIP_NO_ERROR;
     }
 

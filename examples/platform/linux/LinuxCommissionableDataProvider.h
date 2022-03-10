@@ -67,7 +67,7 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override;
-    CHIP_ERROR GetSpake2pSalt(chip::MutableByteSpan & saltBuf, size_t & outSaltLen) override;
+    CHIP_ERROR GetSpake2pSalt(chip::MutableByteSpan & saltBuf) override;
     CHIP_ERROR GetSpake2pVerifier(chip::MutableByteSpan & verifierBuf, size_t & outVerifierLen) override;
     CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override;
     CHIP_ERROR SetSetupPasscode(uint32_t setupPasscode) override

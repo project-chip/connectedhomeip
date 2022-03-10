@@ -189,7 +189,6 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     {
         uint32_t iterationCount                      = 0;
         uint8_t salt[kSpake2p_Max_PBKDF_Salt_Length] = { 0 };
-        size_t saltLen                               = 0;
         Spake2pVerifierSerialized serializedVerifier = { 0 };
         size_t serializedVerifierLen                 = 0;
         Spake2pVerifier verifier;
@@ -198,15 +197,14 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
 
         auto * commissionableDataProvider = DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider();
         ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pIterationCount(iterationCount));
-        ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pSalt(saltSpan, saltLen));
-        VerifyOrReturnError(saltSpan.size() == saltLen, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pSalt(saltSpan));
         ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pVerifier(verifierSpan, serializedVerifierLen));
         VerifyOrReturnError(Crypto::kSpake2p_VerifierSerialized_Length == serializedVerifierLen, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(verifierSpan.size() == serializedVerifierLen, CHIP_ERROR_INTERNAL);
 
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(verifier, iterationCount, ByteSpan(salt, saltLen), keyID,
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(verifier, iterationCount, saltSpan, keyID,
                                                             Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
                                                             this));
     }

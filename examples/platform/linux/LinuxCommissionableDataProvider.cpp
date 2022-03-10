@@ -186,12 +186,11 @@ CHIP_ERROR LinuxCommissionableDataProvider::GetSpake2pIterationCount(uint32_t & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxCommissionableDataProvider::GetSpake2pSalt(chip::MutableByteSpan & saltBuf, size_t & outSaltLen)
+CHIP_ERROR LinuxCommissionableDataProvider::GetSpake2pSalt(chip::MutableByteSpan & saltBuf)
 {
     VerifyOrReturnError(mIsInitialized == true, CHIP_ERROR_INCORRECT_STATE);
 
-    outSaltLen = mPaseSalt.size();
-    VerifyOrReturnError(saltBuf.size() >= outSaltLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(saltBuf.size() >= kSpake2p_Max_PBKDF_Salt_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltBuf.data(), mPaseSalt.data(), mPaseSalt.size());
     saltBuf.reduce_size(mPaseSalt.size());
 

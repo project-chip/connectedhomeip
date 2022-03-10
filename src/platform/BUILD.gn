@@ -141,6 +141,12 @@ if (chip_device_platform != "none") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
     }
 
+    if (chip_use_transitional_commissionable_data_provider) {
+      defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1" ]
+    } else {
+      defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=0" ]
+    }
+
     if (chip_device_platform == "cc13x2_26x2") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_CC13X2_26X2=1",
@@ -278,7 +284,6 @@ if (chip_device_platform != "none") {
 
     public_configs = [
       "${chip_root}/src:includes",
-      ":platform_config",
     ]
   }
 

@@ -73,7 +73,7 @@ public:
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override;
     CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override;
-    CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf, size_t & outSaltLen) override;
+    CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf) override;
     CHIP_ERROR GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & outVerifierLen) override;
     CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override;
     CHIP_ERROR SetSetupPasscode(uint32_t setupPasscode) override;
@@ -155,7 +155,7 @@ exit:
 }
 
 template <class ConfigClass>
-CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pSalt(MutableByteSpan & saltBuf, size_t & outSaltLen)
+CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pSalt(MutableByteSpan & saltBuf)
 {
     static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 
@@ -176,11 +176,11 @@ CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pSal
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
 
     ReturnErrorOnFailure(err);
-    outSaltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
+    size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
 
-    ReturnErrorCodeIf(outSaltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(saltBuf.data(), saltB64, outSaltLen);
-    saltBuf.reduce_size(outSaltLen);
+    ReturnErrorCodeIf(saltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(saltBuf.data(), saltB64, saltLen);
+    saltBuf.reduce_size(saltLen);
 
     return CHIP_NO_ERROR;
 }
