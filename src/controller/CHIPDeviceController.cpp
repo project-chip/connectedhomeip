@@ -1498,13 +1498,11 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
 
-    if (commissioner->mDeviceBeingCommissioned != nullptr && commissioner->mDeviceBeingCommissioned->GetPeerId() == peerId)
+    // Ensure that commissioning stage advancement is done based on seeing an error.
+    if (error != CHIP_NO_ERROR)
     {
-        // NOTE: this is NOT calling commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
-        // since CommissioningStageComplete/CommissioningStepFinished is expected to do the cleanup of memory.
-        //
-        // Just mark the device as not in use anymore
-        commissioner->mDeviceBeingCommissioned = nullptr;
+        ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
+        error = CHIP_ERROR_INTERNAL;
     }
 
     commissioner->mCASESessionManager->ReleaseSession(peerId);
@@ -1516,6 +1514,19 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     else
     {
         commissioner->mPairingDelegate->OnPairingComplete(error);
+    }
+
+    if (commissioner->mDeviceBeingCommissioned != nullptr && commissioner->mDeviceBeingCommissioned->GetPeerId() == peerId)
+    {
+        // This prevents a leak when commissioning fails in the middle. To simulate a failure,
+        // comment out SendSigma2 on the device side.
+        //
+        // TODO: Need to double-check and handle use after free in case DNSSD lookup times out.
+        // To simulate a failure there, set kMinLookupTimeMsDefault (and max) in AddressResolve.h
+        // to a very low value to quickly fail (e.g. 1 or 10 ms, not enough time for the device
+        // to actually become operational.)
+        commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
+        commissioner->mDeviceBeingCommissioned = nullptr;
     }
 }
 
