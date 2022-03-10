@@ -5713,18 +5713,32 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)changeToModeWithParams:(CHIPModeSelectClusterChangeToModeParams *)params
              completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeCurrentModeWithCompletionHandler:(void (^)(
-                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeCurrentModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+- (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
+                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(CHIPSubscribeParams * _Nullable)params
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeCurrentModeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeDescriptionWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
                                           endpoint:(NSNumber *)endpoint
                                              queue:(dispatch_queue_t)queue
                                  completionHandler:
-                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+                                     (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeStandardNamespaceWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeStandardNamespaceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeStandardNamespaceWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                endpoint:(NSNumber *)endpoint
+                                                   queue:(dispatch_queue_t)queue
+                                       completionHandler:
+                                           (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeSupportedModesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
@@ -5740,17 +5754,18 @@ NS_ASSUME_NONNULL_BEGIN
                                     completionHandler:
                                         (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeOnModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)writeAttributeOnModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeOnModeWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                    maxInterval:(NSNumber * _Nonnull)maxInterval
-                                         params:(CHIPSubscribeParams * _Nullable)params
-                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeOnModeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                     endpoint:(NSNumber *)endpoint
-                                        queue:(dispatch_queue_t)queue
-                            completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeCurrentModeWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeCurrentModeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                          endpoint:(NSNumber *)endpoint
+                                             queue:(dispatch_queue_t)queue
+                                 completionHandler:
+                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeStartUpModeWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -5765,18 +5780,17 @@ NS_ASSUME_NONNULL_BEGIN
                                  completionHandler:
                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeDescriptionWithCompletionHandler:(void (^)(
-                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                         maxInterval:(NSNumber * _Nonnull)maxInterval
-                                              params:(CHIPSubscribeParams * _Nullable)params
-                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeDescriptionWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
-                                          endpoint:(NSNumber *)endpoint
-                                             queue:(dispatch_queue_t)queue
-                                 completionHandler:
-                                     (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeOnModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeOnModeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                         params:(CHIPSubscribeParams * _Nullable)params
+                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeOnModeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                     endpoint:(NSNumber *)endpoint
+                                        queue:(dispatch_queue_t)queue
+                            completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
@@ -5821,6 +5835,19 @@ NS_ASSUME_NONNULL_BEGIN
                                                queue:(dispatch_queue_t)queue
                                    completionHandler:
                                        (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(CHIPSubscribeParams * _Nullable)params
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeFeatureMapWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                         endpoint:(NSNumber *)endpoint
+                                            queue:(dispatch_queue_t)queue
+                                completionHandler:
+                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -12307,6 +12334,10 @@ typedef NS_ENUM(NSInteger, CHIPOperationalCredentialsOperationalCertStatus) {
 typedef NS_ENUM(NSInteger, CHIPGroupKeyManagementGroupKeySecurityPolicy) {
     CHIPGroupKeyManagementGroupKeySecurityPolicyTrustFirst = 0x00,
     CHIPGroupKeyManagementGroupKeySecurityPolicyCacheAndSync = 0x01,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPModeSelectFeature) {
+    CHIPModeSelectFeatureDEPONOFF = 0x1,
 };
 
 typedef NS_ENUM(NSInteger, CHIPDoorLockDlAlarmCode) {
