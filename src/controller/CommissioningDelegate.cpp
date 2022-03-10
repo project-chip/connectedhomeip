@@ -21,7 +21,7 @@
 namespace chip {
 namespace Controller {
 
-const char *StageToString(CommissioningStage stage)
+const char * StageToString(CommissioningStage stage)
 {
     switch (stage)
     {

@@ -55,7 +55,7 @@ enum CommissioningStage : uint8_t
     kConfigACL,
 };
 
-const char *StageToString(CommissioningStage stage);
+const char * StageToString(CommissioningStage stage);
 
 struct WiFiCredentials
 {

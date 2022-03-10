@@ -73,7 +73,8 @@ struct ResolvedNodeData
 
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64, ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
+        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
+                        ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
         for (unsigned i = 0; i < mNumIPs; ++i)
         {
             mAddress[i].ToString(addrBuffer);

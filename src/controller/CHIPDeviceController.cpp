@@ -1446,8 +1446,10 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
 
 void DeviceCommissioner::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
-    ChipLogProgress(Controller, "[" ChipLogFormatX64 "] OperationalDiscoveryComplete for device " ChipLogFormatX64 ":" ChipLogFormatX64,
-                    ChipLogValueX64(mFabricId), ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
+    ChipLogProgress(Controller,
+                    "[" ChipLogFormatX64 "] OperationalDiscoveryComplete for device " ChipLogFormatX64 ":" ChipLogFormatX64,
+                    ChipLogValueX64(mFabricId), ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()),
+                    ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
     VerifyOrReturn(mState == State::Initialized);
 
     // TODO: minimal mdns is buggy and violates the API contract for the
@@ -1751,8 +1753,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
 {
-    ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'",
-                    StageToString(step), params.GetCompletionStatus().AsString());
+    ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
+                    params.GetCompletionStatus().AsString());
 
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.
