@@ -95,14 +95,6 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & extraIPs, CHIP_ERROR error)
 {
     ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
-    if (CHIP_NO_ERROR != error)
-    {
-        proxy->OnOperationalNodeResolutionFailed(PeerId(), error);
-        proxy->Release();
-        return;
-    }
-
-    VerifyOrDie(proxy != nullptr);
 
     if (result == nullptr)
     {
@@ -114,10 +106,19 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     VerifyOrDie(proxy != nullptr);
 
     PeerId peerId;
-    error = ExtractIdFromInstanceName(result->mName, &peerId);
+    CHIP_ERROR err = ExtractIdFromInstanceName(result->mName, &peerId);
+    if (CHIP_NO_ERROR != err)
+    {
+        proxy->OnOperationalNodeResolutionFailed(PeerId(), err);
+        proxy->Release();
+        return;
+    }
+
+    VerifyOrDie(proxy != nullptr);
+
     if (CHIP_NO_ERROR != error)
     {
-        proxy->OnOperationalNodeResolutionFailed(PeerId(), error);
+        proxy->OnOperationalNodeResolutionFailed(peerId, error);
         proxy->Release();
         return;
     }

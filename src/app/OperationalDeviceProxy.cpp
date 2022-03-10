@@ -292,6 +292,15 @@ void OperationalDeviceProxy::CloseCASESession()
     }
 }
 
+void OperationalDeviceProxy::OnSessionEstablishmentError(CHIP_ERROR error)
+{
+    mState = State::Initialized;
+
+    DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
+    DequeueConnectionFailureCallbacks(error, /* executeCallback */ true);
+    CloseCASESession();
+}
+
 void OperationalDeviceProxy::OnSessionReleased()
 {
     mState = State::Initialized;

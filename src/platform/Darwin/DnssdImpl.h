@@ -124,6 +124,7 @@ public:
     CHIP_ERROR Remove(GenericContext * context);
     CHIP_ERROR Removes(ContextType type);
     CHIP_ERROR Get(ContextType type, GenericContext ** context);
+    bool Has(GenericContext * context);
     CHIP_ERROR GetRegisterType(const char * type, GenericContext ** context);
 
     void SetHostname(const char * name) { mHostname = name; }

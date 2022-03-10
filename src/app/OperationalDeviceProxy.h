@@ -124,6 +124,8 @@ public:
      */
     void OnSessionReleased() override;
 
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeResolutionData)
     {
         mDeviceAddress = ToPeerAddress(nodeResolutionData);

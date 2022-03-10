@@ -37,6 +37,7 @@ constexpr const char * kLocalDot    = "local.";
 constexpr const char * kProtocolTcp = "._tcp";
 constexpr const char * kProtocolUdp = "._udp";
 constexpr uint8_t kDnssdKeyMaxSize  = 32;
+constexpr int64_t kResolveTimeout   = 5.0 * NSEC_PER_SEC;
 
 bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 {
@@ -178,6 +179,21 @@ CHIP_ERROR MdnsContexts::Get(ContextType type, GenericContext ** context)
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
+bool MdnsContexts::Has(GenericContext * context)
+{
+    std::vector<GenericContext *>::iterator iter;
+
+    for (iter = mContexts.begin(); iter != mContexts.end(); iter++)
+    {
+        if ((*iter) == context)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 CHIP_ERROR MdnsContexts::GetRegisterType(const char * type, GenericContext ** context)
 {
     bool found = false;
@@ -248,12 +264,16 @@ bool CheckForSuccess(GenericContext * context, const char * name, DNSServiceErro
             }
             case ContextType::Resolve: {
                 ResolveContext * resolveContext = reinterpret_cast<ResolveContext *>(context);
-                resolveContext->callback(resolveContext->context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
+                DnssdService service            = {};
+                Platform::CopyString(service.mName, resolveContext->name);
+                resolveContext->callback(resolveContext->context, &service, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 break;
             }
             case ContextType::GetAddrInfo: {
                 GetAddrInfoContext * resolveContext = reinterpret_cast<GetAddrInfoContext *>(context);
-                resolveContext->callback(resolveContext->context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
+                DnssdService service                = {};
+                Platform::CopyString(service.mName, resolveContext->name);
+                resolveContext->callback(resolveContext->context, &service, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 break;
             }
             }
@@ -549,8 +569,17 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     err   = DNSServiceResolve(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
 
-    err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+    dispatch_queue_t dispatchQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+
+    err = DNSServiceSetDispatchQueue(sdRef, dispatchQueue);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kResolveTimeout), dispatchQueue, ^{
+        if (MdnsContexts::GetInstance().Has(sdCtx))
+        {
+            OnResolve(sdRef, 0 /* flags */, interfaceId, kDNSServiceErr_Timeout, name, "", 0 /* port */, 0, nullptr, sdCtx);
+        }
+    });
 
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }

@@ -127,7 +127,15 @@ void CASESessionManager::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData
 
 void CASESessionManager::OnOperationalNodeResolutionFailed(const PeerId & peer, CHIP_ERROR error)
 {
+    OperationalDeviceProxy * session = FindExistingSession(peer);
+    VerifyOrReturn(
+        session != nullptr,
+        ChipLogDetail(Controller,
+                      "OnOperationalNodeResolutionFailed was called for a device with no active sessions, ignoring it."));
+
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
+    session->OnSessionEstablishmentError(error);
+    ReleaseSession(peer);
 }
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr)
