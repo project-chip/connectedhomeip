@@ -114,7 +114,7 @@ private:
 
     uint32_t mRefCount;
 
-    void AddRef() { mRefCount++; }
+    void AddRef();
     void Release();
 
     // Private data members:

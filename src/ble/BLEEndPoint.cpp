@@ -586,6 +586,16 @@ CHIP_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj,
     return CHIP_NO_ERROR;
 }
 
+void BLEEndPoint::AddRef()
+{
+    if (mRefCount == UINT32_MAX)
+    {
+        return;
+    }
+
+    mRefCount++;
+}
+
 void BLEEndPoint::Release()
 {
     // Decrement the ref count.  When it reaches zero, NULL out the pointer to the chip::System::Layer
