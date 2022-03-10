@@ -1116,8 +1116,7 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
 namespace {
 
 static chip::TestPersistentStorageDelegate sDelegate;
-static GroupDataProviderImpl sProvider(sDelegate, chip::app::TestGroups::kMaxGroupsPerFabric,
-                                       chip::app::TestGroups::kMaxGroupKeysPerFabric);
+static GroupDataProviderImpl sProvider(chip::app::TestGroups::kMaxGroupsPerFabric, chip::app::TestGroups::kMaxGroupKeysPerFabric);
 
 static EpochKey kEpochKeys0[] = {
     { 0x0000000000000000, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
@@ -1145,12 +1144,13 @@ static EpochKey kEpochKeys3[] = {
  */
 int Test_Setup(void * inContext)
 {
-    SetGroupDataProvider(&sProvider);
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
-    VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
 
+    // Initialize Group Data Provider
+    VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(&sDelegate), FAILURE);
     // Event listener
     sProvider.SetListener(&chip::app::TestGroups::sListener);
+    SetGroupDataProvider(&sProvider);
 
     memcpy(chip::app::TestGroups::kKeySet0.epoch_keys, kEpochKeys0, sizeof(kEpochKeys0));
     memcpy(chip::app::TestGroups::kKeySet1.epoch_keys, kEpochKeys1, sizeof(kEpochKeys1));

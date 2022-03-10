@@ -27,7 +27,7 @@ constexpr uint16_t kMaxGroupsPerFabric    = 5;
 constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 
 static chip::TestPersistentStorageDelegate sDeviceStorage;
-static chip::Credentials::GroupDataProviderImpl sGroupsProvider(sDeviceStorage, kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+static chip::Credentials::GroupDataProviderImpl sGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
 static const chip::GroupId kGroup1   = 0x0101;
 static const chip::GroupId kGroup2   = 0x0102;
@@ -42,7 +42,7 @@ namespace GroupTesting {
 
 CHIP_ERROR InitProvider()
 {
-    ReturnErrorOnFailure(sGroupsProvider.Init());
+    ReturnErrorOnFailure(sGroupsProvider.Init(&sDeviceStorage));
     chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
     return CHIP_NO_ERROR;
 }

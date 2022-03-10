@@ -106,30 +106,26 @@ Server::Server() :
 #endif
         .devicePool        = &mDevicePool,
     }),
-    mGroupsProvider(mDeviceStorage)
+    mCommissioningWindowManager(this), mGroupsProvider(), mAttributePersister(mDeviceStorage),
+    mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
                         Inet::InterfaceId interfaceId)
 {
-    Access::AccessControl::Delegate * accessDelegate = nullptr;
-
     mSecuredServicePort   = secureServicePort;
     mUnsecuredServicePort = unsecureServicePort;
     mInterfaceId          = interfaceId;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
 
-    SuccessOrExit(err = mCommissioningWindowManager.Init(this));
     mCommissioningWindowManager.SetAppDelegate(delegate);
     mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
-    SuccessOrExit(mAttributePersister.Init(&mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
     InitDataModelHandler(&mExchangeMgr);
@@ -141,15 +137,13 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
     // Group data provider must be initialized after mDeviceStorage
+    mGroupsProvider.SetStorageDelegate(&mDeviceStorage);
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
     SetGroupDataProvider(&mGroupsProvider);
 
     // Access control must be initialized after mDeviceStorage.
-    accessDelegate = Access::Examples::GetAccessControlDelegate(&mDeviceStorage);
-    VerifyOrExit(accessDelegate != nullptr, ChipLogError(AppServer, "Invalid access delegate found."));
-
-    err = mAccessControl.Init(accessDelegate);
+    err = mAccessControl.Init();
     SuccessOrExit(err);
     Access::SetAccessControl(mAccessControl);
 
@@ -343,12 +337,8 @@ void Server::Shutdown()
     }
     mSessions.Shutdown();
     mTransports.Close();
-
-    mAttributePersister.Shutdown();
     mCommissioningWindowManager.Shutdown();
     mCASESessionManager.Shutdown();
-
-    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }
 

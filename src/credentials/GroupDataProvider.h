@@ -24,6 +24,7 @@
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 namespace Credentials {
@@ -227,8 +228,8 @@ public:
      *  @retval #CHIP_ERROR_INCORRECT_STATE if called when already initialized.
      *  @retval #CHIP_NO_ERROR on success
      */
-    virtual CHIP_ERROR Init() = 0;
-    virtual void Finish()     = 0;
+    virtual CHIP_ERROR Init(PersistentStorageDelegate * storage) = 0;
+    virtual void Finish()                                        = 0;
 
     //
     // Group Table
