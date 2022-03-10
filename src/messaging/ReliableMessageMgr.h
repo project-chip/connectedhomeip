@@ -103,6 +103,16 @@ public:
     CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry);
 
     /**
+     *  Calculate the backoff timer for the retransmission.
+     *
+     *  @param[in]   baseInterval   The base interval to use for the backoff calculation, either the active or idle interval.
+     *  @param[in]   sendCount      Count of how many times this message has been sent, including the current attempt.
+     *
+     *  @retval  The backoff time value, including jitter.
+     */
+    System::Clock::Timestamp GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount);
+
+    /**
      *  Start retranmisttion of cached encryped packet for current entry.
      *
      *  @param[in]   entry    A pointer to a retransmission table entry added into the table.
