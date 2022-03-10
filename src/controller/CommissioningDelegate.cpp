@@ -110,6 +110,6 @@ const char *StageToString(CommissioningStage stage)
         break;
     }
 }
-    
+
 } // namespace Controller
 } // namespace chip
