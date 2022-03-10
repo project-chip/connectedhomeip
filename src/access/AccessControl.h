@@ -360,7 +360,7 @@ public:
     ~AccessControl()
     {
         // Never-initialized AccessControl instances will not have the delegate set.
-        if (mIsInitialized && mDelegate != nullptr)
+        if (IsInitialized())
         {
             mDelegate->Release();
         }
@@ -384,14 +384,14 @@ public:
     // Capabilities
     CHIP_ERROR GetMaxEntryCount(size_t & value) const
     {
-        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->GetMaxEntryCount(value);
     }
 
     // Actualities
     CHIP_ERROR GetEntryCount(size_t & value) const
     {
-        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->GetEntryCount(value);
     }
 
@@ -404,7 +404,7 @@ public:
      */
     CHIP_ERROR PrepareEntry(Entry & entry)
     {
-        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->PrepareEntry(entry);
     }
 
@@ -418,7 +418,7 @@ public:
     CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex = nullptr)
     {
         ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->CreateEntry(index, entry, fabricIndex);
     }
 
@@ -431,7 +431,7 @@ public:
      */
     CHIP_ERROR ReadEntry(size_t index, Entry & entry, const FabricIndex * fabricIndex = nullptr) const
     {
-        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->ReadEntry(index, entry, fabricIndex);
     }
 
@@ -445,7 +445,7 @@ public:
     CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
     {
         ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->UpdateEntry(index, entry, fabricIndex);
     }
 
@@ -457,7 +457,7 @@ public:
      */
     CHIP_ERROR DeleteEntry(size_t index, const FabricIndex * fabricIndex = nullptr)
     {
-        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->DeleteEntry(index, fabricIndex);
     }
 
@@ -469,7 +469,7 @@ public:
      */
     CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex = nullptr) const
     {
-        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->Entries(iterator, fabricIndex);
     }
 
@@ -484,11 +484,11 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
 
 private:
+    bool IsInitialized() const { return (mDelegate != nullptr); }
+
     bool IsValid(const Entry & entry);
 
     Delegate * mDelegate = nullptr;
-
-    bool mIsInitialized = false;
 };
 
 /**

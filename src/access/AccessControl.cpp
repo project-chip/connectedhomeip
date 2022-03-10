@@ -164,32 +164,34 @@ AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDel
 
 CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate)
 {
-    VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogProgress(DataManagement, "AccessControl: initializing");
 
     // delegate can never be null. This was already checked
-    mDelegate         = delegate;
-    CHIP_ERROR retval = mDelegate->Init();
-    mIsInitialized    = (CHIP_NO_ERROR == retval);
+    CHIP_ERROR retval = delegate->Init();
+    if (retval == CHIP_NO_ERROR)
+    {
+        mDelegate = delegate;
+    }
+
     return retval;
 }
 
 CHIP_ERROR AccessControl::Finish()
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     ChipLogProgress(DataManagement, "AccessControl: finishing");
     CHIP_ERROR retval = mDelegate->Finish();
-
-    mIsInitialized = false;
+    mDelegate = nullptr;
     return retval;
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
 #if CHIP_PROGRESS_LOGGING
     {
