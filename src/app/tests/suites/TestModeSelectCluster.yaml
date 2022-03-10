@@ -31,28 +31,28 @@ tests:
       command: "readAttribute"
       attribute: "Description"
       response:
-        value: "Coffee"
+          value: "Coffee"
 
     - label: "Read StandardNamespace"
       command: "readAttribute"
       attribute: "StandardNamespace"
       response:
-        value: 0
+          value: 0
 
     - label: "Read SupportedModes"
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
-        value:
-          [
-            { Label: "Black", Mode: 0, SemanticTag: 0 },
-            { Label: "Cappuccino", Mode: 4, SemanticTag: 0 },
-            { Label: "Espresso", Mode: 7, SemanticTag: 0 },
-          ]
-        constraints:
-          - type: list
-          - minLength: 3
-          - maxLength: 3
+          value:
+              [
+                  { Label: "Black", Mode: 0, SemanticTag: 0 },
+                  { Label: "Cappuccino", Mode: 4, SemanticTag: 0 },
+                  { Label: "Espresso", Mode: 7, SemanticTag: 0 },
+              ]
+          constraints:
+              - type: list
+              - minLength: 3
+              - maxLength: 3
 
     - label: "Read CurrentMode"
       command: "readAttribute"
@@ -64,13 +64,13 @@ tests:
       command: "readAttribute"
       attribute: "StartUpMode"
       response:
-        value: 0
+          value: 0
 
     - label: "Read OnMode"
       command: "readAttribute"
       attribute: "OnMode"
       response:
-        value: null
+          value: null
 
     - label: "Change to Supported Mode"
       command: "changeToMode"
@@ -107,20 +107,20 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
-        value: currentModeBeforeToggle
+          value: currentModeBeforeToggle
 
     - label: "Change OnMode"
       command: "writeAttribute"
       attribute: "OnMode"
       arguments:
-        value: 7
+          value: 7
 
     - label: "Verify OnMode"
       command: "readAttribute"
       attribute: "OnMode"
       response:
-        saveAs: OnModeValue
-        value: 7
+          saveAs: OnModeValue
+          value: 7
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
@@ -134,4 +134,4 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
-        value: OnModeValue
+          value: OnModeValue
