@@ -44,6 +44,7 @@ static_library("controller") {
       "CHIPDeviceControllerFactory.h",
       "CommissioneeDeviceProxy.cpp",
       "CommissioneeDeviceProxy.h",
+      "CommissioningDelegate.cpp",
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
       "DeviceDiscoveryDelegate.h",

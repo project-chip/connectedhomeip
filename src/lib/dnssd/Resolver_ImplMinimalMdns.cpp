@@ -691,6 +691,8 @@ Resolver & chip::Dnssd::Resolver::Instance()
 CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Discovery, "Resolving " ChipLogFormatX64 ":" ChipLogFormatX64" ...", ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
     chip::Dnssd::Resolver::Instance().SetOperationalDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type);
 }
