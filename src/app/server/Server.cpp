@@ -106,7 +106,8 @@ Server::Server() :
 #endif
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
-    }), mGroupsProvider(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
+    }),
+    mGroupsProvider(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
@@ -342,7 +343,6 @@ void Server::Shutdown()
     mAttributePersister.Shutdown();
     mCommissioningWindowManager.Shutdown();
     mCASESessionManager.Shutdown();
-
 
     // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
