@@ -176,14 +176,14 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
     }
 
     // Default to minimum PBKDF iterations
-    uint32_t paseIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
+    uint32_t spake2pIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
     if (options.spake2pIterations != 0)
     {
-        paseIterationCount = options.spake2pIterations;
+        spake2pIterationCount = options.spake2pIterations;
     }
-    ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(paseIterationCount));
+    ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(spake2pIterationCount));
 
-    return provider.Init(options.spake2pVerifier, options.spake2pSalt, paseIterationCount, setupPasscode,
+    return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
                          options.payload.discriminator);
 }
 

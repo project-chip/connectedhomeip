@@ -38,8 +38,8 @@ CHIP_ERROR GeneratePaseSalt(std::vector<uint8_t> & spake2pSaltVector)
 
 } // namespace
 
-CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint8_t>> serializedPaseVerifier,
-                                                 chip::Optional<std::vector<uint8_t>> spake2pSalt, uint32_t paseIterationCount,
+CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint8_t>> serializedSpake2pVerifier,
+                                                 chip::Optional<std::vector<uint8_t>> spake2pSalt, uint32_t spake2pIterationCount,
                                                  chip::Optional<uint32_t> setupPasscode, uint16_t discriminator)
 {
     VerifyOrReturnError(mIsInitialized == false, CHIP_ERROR_INCORRECT_STATE);
@@ -50,25 +50,25 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if ((paseIterationCount < kSpake2p_Min_PBKDF_Iterations) || (paseIterationCount > kSpake2p_Max_PBKDF_Iterations))
+    if ((spake2pIterationCount < kSpake2p_Min_PBKDF_Iterations) || (spake2pIterationCount > kSpake2p_Max_PBKDF_Iterations))
     {
-        ChipLogError(Support, "PASE Iteration count invalid: %u", static_cast<unsigned>(paseIterationCount));
+        ChipLogError(Support, "PASE Iteration count invalid: %u", static_cast<unsigned>(spake2pIterationCount));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    bool havePaseVerifier = serializedPaseVerifier.HasValue();
+    bool havePaseVerifier = serializedSpake2pVerifier.HasValue();
     Spake2pVerifier providedVerifier;
     CHIP_ERROR err;
     std::vector<uint8_t> finalSerializedVerifier(kSpake2p_VerifierSerialized_Length);
     if (havePaseVerifier)
     {
-        if (serializedPaseVerifier.Value().size() != kSpake2p_VerifierSerialized_Length)
+        if (serializedSpake2pVerifier.Value().size() != kSpake2p_VerifierSerialized_Length)
         {
-            ChipLogError(Support, "PASE verifier size invalid: %u", static_cast<unsigned>(serializedPaseVerifier.Value().size()));
+            ChipLogError(Support, "PASE verifier size invalid: %u", static_cast<unsigned>(serializedSpake2pVerifier.Value().size()));
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        chip::MutableByteSpan verifierSpan{ serializedPaseVerifier.Value().data(), serializedPaseVerifier.Value().size() };
+        chip::MutableByteSpan verifierSpan{ serializedSpake2pVerifier.Value().data(), serializedSpake2pVerifier.Value().size() };
         err = providedVerifier.Deserialize(verifierSpan);
         if (err != CHIP_NO_ERROR)
         {
@@ -112,7 +112,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
     chip::MutableByteSpan saltSpan{ spake2pSalt.Value().data(), spake2pSalt.Value().size() };
     if (havePasscode)
     {
-        err = passcodeVerifier.Generate(paseIterationCount, saltSpan, setupPasscode.Value());
+        err = passcodeVerifier.Generate(spake2pIterationCount, saltSpan, setupPasscode.Value());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Support, "Failed to generate PASE verifier from passcode: %" CHIP_ERROR_FORMAT, err.Format());
@@ -139,7 +139,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
     // it's ambiguous.
     if (havePasscode && havePaseVerifier)
     {
-        if (serializedPasscodeVerifier != serializedPaseVerifier.Value())
+        if (serializedPasscodeVerifier != serializedSpake2pVerifier.Value())
         {
             ChipLogError(Support, "Mismatching verifier between passcode and external verifier. Validate inputs.");
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -151,7 +151,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
     // one when the latter is present).
     if (havePaseVerifier)
     {
-        finalSerializedVerifier = serializedPaseVerifier.Value();
+        finalSerializedVerifier = serializedSpake2pVerifier.Value();
     }
     else
     {
@@ -161,7 +161,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
     mDiscriminator          = discriminator;
     mSerializedPaseVerifier = std::move(finalSerializedVerifier);
     mPaseSalt               = std::move(spake2pSalt.Value());
-    mPaseIterationCount     = paseIterationCount;
+    mPaseIterationCount     = spake2pIterationCount;
     if (havePasscode)
     {
         mSetupPasscode.SetValue(setupPasscode.Value());

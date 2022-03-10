@@ -43,24 +43,24 @@ public:
      * configurations where the passcode is maintained separately than the
      * verifier for security purposes.
      *
-     * @param serializedPaseVerifier - Optional serialized verifier that will
-     *                                 override computation from setupPasscode if provided
+     * @param serializedSpake2pVerifier - Optional serialized verifier that will
+     *                                    override computation from setupPasscode if provided
      * @param spake2pSalt               - Optional salt to use. A random one will be generated
-     *                                 otherwise.
-     * @param paseIterationCount     - Iteration count to use. If not in range of the
-     *                                 spec bounds, CHIP_ERROR_INVALID_ARGUMENT will be returned.
-     * @param setupPasscode          - Optional setup passcode to store, and to use to generate
-     *                                 PASE verifier if `serializedPaseVerifier` argument empty.
-     * @param discriminator          - Discriminator to use for advertising.
+     *                                    otherwise.
+     * @param spake2pIterationCount     - Iteration count to use. If not in range of the
+     *                                    spec bounds, CHIP_ERROR_INVALID_ARGUMENT will be returned.
+     * @param setupPasscode             - Optional setup passcode to store, and to use to generate
+     *                                    PASE verifier if `serializedSpake2pVerifier` argument empty.
+     * @param discriminator             - Discriminator to use for advertising.
      * @return CHIP_ERROR_OK on success, CHIP_ERROR_INVALID_ARGUMENT on any invalid argument combinations,
      *         CHIP_ERROR_INVALID_STATE if already initialized, or other CHIP_ERROR values if inner
      *         implementation dependencies fail.
      */
-    CHIP_ERROR Init(chip::Optional<std::vector<uint8_t>> serializedPaseVerifier, chip::Optional<std::vector<uint8_t>> spake2pSalt,
-                    uint32_t paseIterationCount, chip::Optional<uint32_t> setupPasscode, uint16_t discriminator);
+    CHIP_ERROR Init(chip::Optional<std::vector<uint8_t>> serializedSpake2pVerifier, chip::Optional<std::vector<uint8_t>> spake2pSalt,
+                    uint32_t spake2pIterationCount, chip::Optional<uint32_t> setupPasscode, uint16_t discriminator);
 
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
-    CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator)
+    CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override
     {
         // We don't support overriding the discriminator post-init (it is deprecated!)
         return CHIP_ERROR_NOT_IMPLEMENTED;
