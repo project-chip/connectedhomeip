@@ -39,7 +39,7 @@ public:
     /**
      * @brief Obtain the default setup discriminator for the device used for commissionable advertising
      *
-     * @param[inout] setupDiscriminator Reference to location where discriminator will be copied
+     * @param[in,out] setupDiscriminator Reference to location where discriminator will be copied
      * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
      *          if access fails.
      */
@@ -66,7 +66,7 @@ public:
     /**
      * @brief Obtain the default PAKE verifier's PBKDF2 iteration count
      *
-     * @param[inout] iterationCount Reference to location where the iteration count will be stored
+     * @param[in,out] iterationCount Reference to location where the iteration count will be stored
      * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
      *          if access fails.
      */
@@ -78,7 +78,7 @@ public:
      * The `saltBuf` must be large enough to contain the salt. It will be resized on success to
      * reflect the actual size of the salt.
      *
-     * @param[inout] saltBuf  Reference to buffer where the salt value will be copied.
+     * @param[in,out] saltBuf  Reference to buffer where the salt value will be copied.
      *
      * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if saltBuf was too small, or another
      *          CHIP_ERROR from the underlying implementation if access fails.
@@ -91,7 +91,7 @@ public:
      * The `verifierBuf` must be large enough to contain the verifier. It will be resized on
      * success to reflect the actual size of the verifier and match the value in verifierLen.
      *
-     * @param[inout] verifierBuf  Reference to buffer where the verifier value will be copied.
+     * @param[in,out] verifierBuf  Reference to buffer where the verifier value will be copied.
      * @param[out] outVerifierLen Reference to location where the length of the verifier will be stored,
      *                            including if the buffer provided is too small. This value is valid
      *                            if the return value is either CHIP_NO_ERROR or CHIP_ERROR_BUFFER_TOO_SMALL.
@@ -113,7 +113,7 @@ public:
      *
      * If not supported, return CHIP_ERROR_NOT_IMPLEMENTED.
      *
-     * @param[inout] setupPasscode Reference to location where passcode will be copied
+     * @param[in,out] setupPasscode Reference to location where passcode will be copied
      * @returns CHIP_NO_ERROR on success, CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      *          or not available, or another CHIP_ERROR from the underlying implementation
      *          if access fails.
