@@ -38,7 +38,7 @@ struct LinuxDeviceOptions
     chip::SetupPayload payload;
     chip::Optional<std::vector<uint8_t>> spake2pVerifier;
     chip::Optional<std::vector<uint8_t>> spake2pSalt;
-    uint32_t spake2pIterations          = 0;  // When not provided (0), will default elsewhere
+    uint32_t spake2pIterations          = 0; // When not provided (0), will default elsewhere
     uint32_t mBleDevice                 = 0;
     bool mWiFi                          = false;
     bool mThread                        = false;

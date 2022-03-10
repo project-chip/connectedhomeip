@@ -87,7 +87,8 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
     }
 
     size_t spake2pSaltLength = havePaseSalt ? spake2pSalt.Value().size() : 0;
-    if (havePaseSalt && ((spake2pSaltLength < kSpake2p_Min_PBKDF_Salt_Length) || (spake2pSaltLength > kSpake2p_Max_PBKDF_Salt_Length)))
+    if (havePaseSalt &&
+        ((spake2pSaltLength < kSpake2p_Min_PBKDF_Salt_Length) || (spake2pSaltLength > kSpake2p_Max_PBKDF_Salt_Length)))
     {
         ChipLogError(Support, "PASE salt length invalid: %u", static_cast<unsigned>(spake2pSaltLength));
         return CHIP_ERROR_INVALID_ARGUMENT;

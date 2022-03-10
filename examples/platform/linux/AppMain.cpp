@@ -183,7 +183,8 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
     }
     ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(paseIterationCount));
 
-    return provider.Init(options.spake2pVerifier, options.spake2pSalt, paseIterationCount, setupPasscode, options.payload.discriminator);
+    return provider.Init(options.spake2pVerifier, options.spake2pSalt, paseIterationCount, setupPasscode,
+                         options.payload.discriminator);
 }
 
 // To hold SPAKE2+ verifier, discriminator, passcode
