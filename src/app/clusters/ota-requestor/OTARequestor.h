@@ -84,11 +84,10 @@ public:
         mProviderLocation.SetValue(providerLocation);
     }
 
-    void ClearCurrentProviderLocation() override { mProviderLocation.ClearValue(); }
+    void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override { providerLocation = mProviderLocation; }
 
     // Add a default OTA provider to the cached list
-    CHIP_ERROR AddDefaultOtaProvider(
-        const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) override;
+    CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override;
 
     // Retrieve an iterator to the cached default OTA provider list
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
@@ -313,7 +312,7 @@ private:
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
     ProviderLocationList mDefaultOtaProviderList;
-    Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current update in progress
+    Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current/last update in progress
 };
 
 } // namespace chip
