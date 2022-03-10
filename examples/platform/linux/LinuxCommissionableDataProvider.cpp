@@ -29,22 +29,22 @@ using namespace chip::Crypto;
 
 namespace {
 
-CHIP_ERROR GeneratePaseSalt(std::vector<uint8_t> & paseSaltVector)
+CHIP_ERROR GeneratePaseSalt(std::vector<uint8_t> & spake2pSaltVector)
 {
     constexpr size_t kSaltLen = kSpake2p_Max_PBKDF_Salt_Length;
-    paseSaltVector.resize(kSaltLen);
-    return DRBG_get_bytes(paseSaltVector.data(), paseSaltVector.size());
+    spake2pSaltVector.resize(kSaltLen);
+    return DRBG_get_bytes(spake2pSaltVector.data(), spake2pSaltVector.size());
 }
 
 } // namespace
 
 CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint8_t>> serializedPaseVerifier,
-                                                 chip::Optional<std::vector<uint8_t>> paseSalt, uint32_t paseIterationCount,
+                                                 chip::Optional<std::vector<uint8_t>> spake2pSalt, uint32_t paseIterationCount,
                                                  chip::Optional<uint32_t> setupPasscode, uint16_t discriminator)
 {
     VerifyOrReturnError(mIsInitialized == false, CHIP_ERROR_INCORRECT_STATE);
 
-    if (discriminator > 0xFFF)
+    if (discriminator > chip::kMaxDiscriminatorValue)
     {
         ChipLogError(Support, "Discriminator value invalid: %u", static_cast<unsigned>(discriminator));
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -79,36 +79,36 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
         ChipLogProgress(Support, "Got externally provided verifier, using it.");
     }
 
-    bool havePaseSalt = paseSalt.HasValue();
+    bool havePaseSalt = spake2pSalt.HasValue();
     if (havePaseVerifier && !havePaseSalt)
     {
         ChipLogError(Support, "LinuxCommissionableDataProvider didn't get a PASE salt, but got a verifier: ambiguous data");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    size_t paseSaltLength = havePaseSalt ? paseSalt.Value().size() : 0;
-    if (havePaseSalt && ((paseSaltLength < kSpake2p_Min_PBKDF_Salt_Length) || (paseSaltLength > kSpake2p_Max_PBKDF_Salt_Length)))
+    size_t spake2pSaltLength = havePaseSalt ? spake2pSalt.Value().size() : 0;
+    if (havePaseSalt && ((spake2pSaltLength < kSpake2p_Min_PBKDF_Salt_Length) || (spake2pSaltLength > kSpake2p_Max_PBKDF_Salt_Length)))
     {
-        ChipLogError(Support, "PASE salt length invalid: %u", static_cast<unsigned>(paseSaltLength));
+        ChipLogError(Support, "PASE salt length invalid: %u", static_cast<unsigned>(spake2pSaltLength));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     else if (!havePaseSalt)
     {
         ChipLogProgress(Support, "LinuxCommissionableDataProvider didn't get a PASE salt, generating one.");
-        std::vector<uint8_t> paseSaltVector;
-        err = GeneratePaseSalt(paseSaltVector);
+        std::vector<uint8_t> spake2pSaltVector;
+        err = GeneratePaseSalt(spake2pSaltVector);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Support, "Failed to generate PASE salt: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
-        paseSalt.SetValue(std::move(paseSaltVector));
+        spake2pSalt.SetValue(std::move(spake2pSaltVector));
     }
 
     bool havePasscode = setupPasscode.HasValue();
     Spake2pVerifier passcodeVerifier;
     std::vector<uint8_t> serializedPasscodeVerifier(kSpake2p_VerifierSerialized_Length);
-    chip::MutableByteSpan saltSpan{ paseSalt.Value().data(), paseSalt.Value().size() };
+    chip::MutableByteSpan saltSpan{ spake2pSalt.Value().data(), spake2pSalt.Value().size() };
     if (havePasscode)
     {
         err = passcodeVerifier.Generate(paseIterationCount, saltSpan, setupPasscode.Value());
@@ -159,7 +159,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
 
     mDiscriminator          = discriminator;
     mSerializedPaseVerifier = std::move(finalSerializedVerifier);
-    mPaseSalt               = std::move(paseSalt.Value());
+    mPaseSalt               = std::move(spake2pSalt.Value());
     mPaseIterationCount     = paseIterationCount;
     if (havePasscode)
     {

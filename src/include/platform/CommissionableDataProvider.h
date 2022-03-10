@@ -20,6 +20,10 @@
 #include <lib/support/Span.h>
 
 namespace chip {
+
+// The largest value of the 12-bit Payload discriminator
+constexpr uint16_t kMaxDiscriminatorValue = 0xFFF;
+
 namespace DeviceLayer {
 
 class CommissionableDataProvider

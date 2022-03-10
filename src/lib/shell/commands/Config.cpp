@@ -124,7 +124,7 @@ static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
     {
         streamer_printf(sout, "Discriminator:   ");
     }
-    streamer_printf(sout, "%03x\r\n", setupDiscriminator & 0xFFF);
+    streamer_printf(sout, "%03x\r\n", setupDiscriminator & chip::kMaxDiscriminatorValue);
     return CHIP_NO_ERROR;
 }
 
@@ -134,7 +134,7 @@ static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
     streamer_t * sout           = streamer_get();
     uint16_t setupDiscriminator = strtoull(argv, NULL, 10);
 
-    VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < 0xFFF, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < chip::kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
 
     error = ConfigurationMgr().GetCommissionableDataProvider()->SetSetupDiscriminator(setupDiscriminator);
 

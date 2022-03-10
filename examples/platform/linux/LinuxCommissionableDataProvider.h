@@ -45,7 +45,7 @@ public:
      *
      * @param serializedPaseVerifier - Optional serialized verifier that will
      *                                 override computation from setupPasscode if provided
-     * @param paseSalt               - Optional salt to use. A random one will be generated
+     * @param spake2pSalt               - Optional salt to use. A random one will be generated
      *                                 otherwise.
      * @param paseIterationCount     - Iteration count to use. If not in range of the
      *                                 spec bounds, CHIP_ERROR_INVALID_ARGUMENT will be returned.
@@ -56,7 +56,7 @@ public:
      *         CHIP_ERROR_INVALID_STATE if already initialized, or other CHIP_ERROR values if inner
      *         implementation dependencies fail.
      */
-    CHIP_ERROR Init(chip::Optional<std::vector<uint8_t>> serializedPaseVerifier, chip::Optional<std::vector<uint8_t>> paseSalt,
+    CHIP_ERROR Init(chip::Optional<std::vector<uint8_t>> serializedPaseVerifier, chip::Optional<std::vector<uint8_t>> spake2pSalt,
                     uint32_t paseIterationCount, chip::Optional<uint32_t> setupPasscode, uint16_t discriminator);
 
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;

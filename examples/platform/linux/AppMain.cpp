@@ -148,20 +148,20 @@ void SetupSignalHandlers()
 
 CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
 {
-    uint32_t defaultTestPasscode = 0;
-    chip::DeviceLayer::TestCommissionableDataProvider testCommissionableDataProvider;
-    VerifyOrDie(testCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
-
     chip::Optional<uint32_t> setupPasscode;
 
     if (options.payload.setUpPINCode != 0)
     {
         setupPasscode.SetValue(options.payload.setUpPINCode);
     }
-    else if (!options.paseVerifier.HasValue())
+    else if (!options.spake2pVerifier.HasValue())
     {
+        uint32_t defaultTestPasscode = 0;
+        chip::DeviceLayer::TestCommissionableDataProvider testCommissionableDataProvider;
+        VerifyOrDie(testCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
+
         ChipLogError(Support,
-                     "*** WARNING: Using temporary passcode %u due to no neither --passcode or --pase-verifier-base64 "
+                     "*** WARNING: Using temporary passcode %u due to no neither --passcode or --spake2p-verifier-base64 "
                      "given on command line. This is temporary and will disappear. Please update your scripts "
                      "to explicitly configure onboarding credentials. ***",
                      static_cast<unsigned>(defaultTestPasscode));
@@ -177,13 +177,13 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
 
     // Default to minimum PBKDF iterations
     uint32_t paseIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
-    if (options.paseIterations != 0)
+    if (options.spake2pIterations != 0)
     {
-        paseIterationCount = options.paseIterations;
+        paseIterationCount = options.spake2pIterations;
     }
     ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(paseIterationCount));
 
-    return provider.Init(options.paseVerifier, options.paseSalt, paseIterationCount, setupPasscode, options.payload.discriminator);
+    return provider.Init(options.spake2pVerifier, options.spake2pSalt, paseIterationCount, setupPasscode, options.payload.discriminator);
 }
 
 // To hold SPAKE2+ verifier, discriminator, passcode

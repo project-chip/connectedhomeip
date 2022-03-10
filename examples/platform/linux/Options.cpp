@@ -54,9 +54,9 @@ enum
     kDeviceOption_PICS                      = 0x100e,
     kDeviceOption_KVS                       = 0x100f,
     kDeviceOption_InterfaceId               = 0x1010,
-    kDeviceOption_PaseVerifierBase64        = 0x1011,
-    kDeviceOption_PaseSaltBase64            = 0x1012,
-    kDeviceOption_PaseIterations            = 0x1013,
+    kDeviceOption_Spake2pVerifierBase64     = 0x1011,
+    kDeviceOption_Spake2pSaltBase64         = 0x1012,
+    kDeviceOption_Spake2pIterations         = 0x1013,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -78,9 +78,9 @@ OptionDef sDeviceOptionDefs[] = {
     { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
     { "discriminator", kArgumentRequired, kDeviceOption_Discriminator },
     { "passcode", kArgumentRequired, kDeviceOption_Passcode },
-    { "pase-verifier-base64", kArgumentRequired, kDeviceOption_PaseVerifierBase64 },
-    { "pase-salt-base64", kArgumentRequired, kDeviceOption_PaseSaltBase64 },
-    { "pase-iterations", kArgumentRequired, kDeviceOption_PaseIterations },
+    { "spake2p-verifier-base64", kArgumentRequired, kDeviceOption_Spake2pVerifierBase64 },
+    { "spake2p-salt-base64", kArgumentRequired, kDeviceOption_Spake2pSaltBase64 },
+    { "spake2p-iterations", kArgumentRequired, kDeviceOption_Spake2pIterations },
     { "secured-device-port", kArgumentRequired, kDeviceOption_SecuredDevicePort },
     { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
     { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
@@ -126,18 +126,22 @@ const char * sDeviceOptionHelp =
     "       A 12-bit unsigned integer match the value which a device advertises during commissioning.\n"
     "\n"
     "  --passcode <passcode>\n"
-    "       A 27-bit unsigned integer, which serves as proof of possession during commissioning.\n"
+    "       A 27-bit unsigned integer, which serves as proof of possession during commissioning. \n"
+    "       If not provided to compute a verifier, the --spake2p-verifier-base64 must be provided. \n"
     "\n"
-    "  --pase-verifier-base64 <PASE verifier as base64>\n"
+    "  --spake2p-verifier-base64 <PASE verifier as base64>\n"
     "       A raw concatenation of 'W0' and 'L' (67 bytes) as base64 to override the verifier\n"
     "       auto-computed from the passcode, if provided.\n"
     "\n"
-    "  --pase-salt-base64 <PASE salt as base64>\n"
-    "       16-32 bytes of salt to use for the PASE verifier, as base64. If omitted, will"
-    "       be generated randomly.\n"
+    "  --spake2p-salt-base64 <PASE salt as base64>\n"
+    "       16-32 bytes of salt to use for the PASE verifier, as base64. If omitted, will be generated\n"
+    "       randomly. If a --spake2p-verifier-base64 is passed, it must match against the salt otherwise\n"
+    "       failure will arise.\n"
     "\n"
-    "  --pase-iterations <PASE PBKDF iterations>\n"
-    "       Number of PBKDF iterations to use. If omitted, will be 1000.\n"
+    "  --spake2p-iterations <PASE PBKDF iterations>\n"
+    "       Number of PBKDF iterations to use. If omitted, will be 1000. If a --spake2p-verifier-base64 is\n"
+    "       passed, the iteration counts must match that used to generate the verifier otherwise failure will\n"
+    "       arise.\n"
     "\n"
     "  --secured-device-port <port>\n"
     "       A 16-bit unsigned integer specifying the listen port to use for secure device messages (default is 5540).\n"
@@ -244,7 +248,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
         break;
 
-    case kDeviceOption_PaseSaltBase64: {
+    case kDeviceOption_Spake2pSaltBase64: {
         constexpr size_t kMaxSize = chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length;
         std::vector<uint8_t> saltVector;
 
@@ -266,11 +270,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             break;
         }
 
-        LinuxDeviceOptions::GetInstance().paseSalt.SetValue(std::move(saltVector));
+        LinuxDeviceOptions::GetInstance().spake2pSalt.SetValue(std::move(saltVector));
         break;
     }
 
-    case kDeviceOption_PaseVerifierBase64: {
+    case kDeviceOption_Spake2pVerifierBase64: {
         constexpr size_t kMaxSize = chip::Crypto::kSpake2p_VerifierSerialized_Length;
         std::vector<uint8_t> serializedVerifier;
 
@@ -291,11 +295,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             break;
         }
 
-        LinuxDeviceOptions::GetInstance().paseVerifier.SetValue(std::move(serializedVerifier));
+        LinuxDeviceOptions::GetInstance().spake2pVerifier.SetValue(std::move(serializedVerifier));
         break;
     }
 
-    case kDeviceOption_PaseIterations: {
+    case kDeviceOption_Spake2pIterations: {
         errno              = 0;
         uint32_t iterCount = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         if (errno == ERANGE)
@@ -313,7 +317,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             break;
         }
 
-        LinuxDeviceOptions::GetInstance().paseIterations = iterCount;
+        LinuxDeviceOptions::GetInstance().spake2pIterations = iterCount;
         break;
     }
 
