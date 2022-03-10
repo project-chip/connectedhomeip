@@ -204,9 +204,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
 
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(verifier, iterationCount, saltSpan, keyID,
-                                                            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
-                                                            this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
+            verifier, iterationCount, saltSpan, keyID, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());
