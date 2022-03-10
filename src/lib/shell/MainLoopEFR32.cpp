@@ -50,34 +50,36 @@ void ReadLine(char * buffer, size_t max)
         }
 
         chip::WaitForShellActivity();
-
-        if (streamer_read(streamer_get(), buffer + line_sz, 1) == 1)
+        if (streamer_read(streamer_get(), buffer + line_sz, 1) != 1)
         {
-            switch (buffer[line_sz])
+            continue;
+        }
+
+        // Process character we just read.
+        switch (buffer[line_sz])
+        {
+        case '\r':
+        case '\n':
+            streamer_printf(streamer_get(), "\r\n");
+            buffer[line_sz] = '\0';
+            line_sz++;
+            done = true;
+            break;
+        case 0x7F:
+            // Do not accept backspace character (i.e. don't increment line_sz) and remove 1 additional character if it exists.
+            if (line_sz >= 1u)
             {
-            case '\r':
-            case '\n':
-                streamer_printf(streamer_get(), "\r\n");
-                buffer[line_sz] = '\0';
-                line_sz++;
-                done = true;
-                break;
-            case 0x7F:
-                // Do not accept backspace character (i.e. don't increment line_sz) and remove 1 additional character if it exists.
-                if (line_sz >= 1u)
-                {
-                    streamer_printf(streamer_get(), "\b \b");
-                    line_sz--;
-                }
-                break;
-            default:
-                if (isprint(static_cast<int>(buffer[line_sz])) || buffer[line_sz] == '\t')
-                {
-                    streamer_printf(streamer_get(), "%c", buffer[line_sz]);
-                    line_sz++;
-                }
-                break;
+                streamer_printf(streamer_get(), "\b \b");
+                line_sz--;
             }
+            break;
+        default:
+            if (isprint(static_cast<int>(buffer[line_sz])) || buffer[line_sz] == '\t')
+            {
+                streamer_printf(streamer_get(), "%c", buffer[line_sz]);
+                line_sz++;
+            }
+            break;
         }
     }
 }
