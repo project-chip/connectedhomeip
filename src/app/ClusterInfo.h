@@ -95,6 +95,7 @@ public:
      * Changing order to something more natural (e.g. endpoint id before cluster id) will result
      * in extra memory alignment padding.
      */
+    uint64_t mTickTouched    = 0;                   // uint64, the tinestamp when the attribute is added to the dirty set.
     NodeId mNodeId           = kUndefinedNodeId;    // uint64
     ClusterInfo * mpNext     = nullptr;             // pointer width (32/64 bits)
     ClusterId mClusterId     = kInvalidClusterId;   // uint32

@@ -140,6 +140,25 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const ClusterInfo &
     }
 }
 
+void AttributePathExpandIterator::ResetCurrentCluster()
+{
+    // If this is a null iterator, or the attribute id of current cluster info is not a wildcard attribute id, then this function
+    // will do nothing, since we won't be expanding the wildcard attribute ids under a cluster. Back to the beginning of reporting
+    // current cluster.
+    VerifyOrReturn(mpClusterInfo != nullptr && mpClusterInfo->HasWildcardAttributeId());
+
+    // Otherwise, we will reset the index for iterating the attributes, note, when Next() is returned, we must be in one of the
+    // following states:
+    // - This is not a wildcard path
+    // - We just expanded some attribute id field
+    // - We have exhausted all paths
+    // Only the second case will happen here since the above check will fail for 1 and 3, so the following check must result in a
+    // valid path, which is the first attribute id we will emit for the current cluster.
+    mAttributeIndex       = UINT16_MAX;
+    mGlobalAttributeIndex = UINT8_MAX;
+    Next();
+}
+
 bool AttributePathExpandIterator::Next()
 {
     for (; mpClusterInfo != nullptr; (mpClusterInfo = mpClusterInfo->mpNext, mEndpointIndex = UINT16_MAX))

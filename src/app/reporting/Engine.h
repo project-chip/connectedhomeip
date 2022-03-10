@@ -120,6 +120,8 @@ public:
 
     uint32_t GetNumReportsInFlight() { return mNumReportsInFlight; }
 
+    uint64_t GetDirtyTick() const { return mDirtyTick; }
+
     void ScheduleUrgentEventDeliverySync();
 
 private:
@@ -175,6 +177,8 @@ private:
      */
     bool MergeOverlappedAttributePath(ClusterInfo & aAttributePath);
 
+    inline void BumpDirtyTick() { mDirtyTick++; }
+
     /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
      * within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
@@ -204,6 +208,16 @@ private:
      *
      */
     ObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
+
+    /**
+     * A ticker for recording when an attribute is makred as dirty. Acts as a monotonic timestamp for attributes.
+     * ReadHandlers can save the tick value when it is generating reports, then we can tell if an attribute is not reported by
+     * checking this timestamp.
+     *
+     * mDirtyTick will increase by one when SetDirty is called.
+     * Count it from 1, so 0 will be used to indicate "the read handler has never been reported"
+     */
+    uint64_t mDirtyTick = 1;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     uint32_t mReservedSize = 0;

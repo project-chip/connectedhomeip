@@ -110,6 +110,16 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         // vs write paths.
         ConcreteAttributePath readPath;
 
+        ChipLogDetail(DataManagement, "Building Reports for ReadHandler with LastReportTick = %" PRIu64 " DirtyTick = %" PRIu64,
+                      apReadHandler->mLastReportTick, apReadHandler->mDirtyTick);
+
+        // IsChunkedReport also indicated if we are in the middle of chunks.
+        // If this is the first chunk of the report, reset the path iterator for a clean start.
+        if (!apReadHandler->IsChunkedReport())
+        {
+            apReadHandler->ResetPathIterator();
+        }
+
         // For each path included in the interested path of the read handler...
         for (; apReadHandler->GetAttributePathExpandIterator()->Get(readPath);
              apReadHandler->GetAttributePathExpandIterator()->Next())
@@ -121,8 +131,11 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 mGlobalDirtySet.ForEachActiveObject([&](auto * dirtyPath) {
                     if (dirtyPath->IsAttributePathSupersetOf(readPath))
                     {
-                        concretePathDirty = true;
-                        return Loop::Break;
+                        if (dirtyPath->mTickTouched > apReadHandler->mLastReportTick)
+                        {
+                            concretePathDirty = true;
+                            return Loop::Break;
+                        }
                     }
                     return Loop::Continue;
                 });
@@ -579,6 +592,8 @@ void Engine::Run()
 
     if (allReadClean)
     {
+        ChipLogDetail(DataManagement, "All ReadHandler-s are clean, clear GlobalDirtySet");
+
         mGlobalDirtySet.ReleaseAll();
     }
 }
@@ -588,10 +603,12 @@ bool Engine::MergeOverlappedAttributePath(ClusterInfo & aAttributePath)
     return Loop::Break == mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
         if (path->IsAttributePathSupersetOf(aAttributePath))
         {
+            path->mTickTouched = GetDirtyTick();
             return Loop::Break;
         }
         if (aAttributePath.IsAttributePathSupersetOf(*path))
         {
+            path->mTickTouched = GetDirtyTick();
             path->mListIndex   = aAttributePath.mListIndex;
             path->mAttributeId = aAttributePath.mAttributeId;
             return Loop::Break;
@@ -602,6 +619,8 @@ bool Engine::MergeOverlappedAttributePath(ClusterInfo & aAttributePath)
 
 CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
 {
+    BumpDirtyTick();
+
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aClusterInfo](ReadHandler * handler) {
         // We call SetDirty for both read interactions and subscribe interactions, since we may sent inconsistent attribute data
         // between two chunks. SetDirty will be ignored automatically by read handlers which is waiting for response to last message
@@ -613,7 +632,7 @@ CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
             {
                 if (aClusterInfo.IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(aClusterInfo))
                 {
-                    handler->SetDirty();
+                    handler->SetDirty(&aClusterInfo);
                     break;
                 }
             }
@@ -631,7 +650,8 @@ CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
             ChipLogError(DataManagement, "mGlobalDirtySet pool full, cannot handle more entries!");
             return CHIP_ERROR_NO_MEMORY;
         }
-        *clusterInfo = aClusterInfo;
+        *clusterInfo              = aClusterInfo;
+        clusterInfo->mTickTouched = GetDirtyTick();
     }
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled
@@ -661,7 +681,8 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     for (auto clusterInfo = aReadHandler.GetAttributeClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
     {
         mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
-            if (path->IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(*path))
+            if ((path->IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(*path)) &&
+                aReadHandler.mLastReportTick < path->mTickTouched)
             {
                 intersected = true;
                 return Loop::Break;
@@ -675,8 +696,8 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     }
     if (!intersected)
     {
-        ChipLogDetail(InteractionModel, "clear read handler dirty in UpdateReadHandlerDirty!");
         aReadHandler.ClearDirty();
+        ChipLogDetail(InteractionModel, "clear read handler dirty in UpdateReadHandlerDirty!");
     }
 }
 

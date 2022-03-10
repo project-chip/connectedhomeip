@@ -128,9 +128,10 @@ public:
      */
     bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext);
 
-    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (mDirty || !mHoldSync); }
+    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (IsDirty() || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
+    void ResetPathIterator();
 
     CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
     ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
@@ -152,16 +153,13 @@ public:
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
-    void SetDirty()
-    {
-        mDirty = true;
-        // If the contents of the global dirty set have changed, we need to reset the iterator since the paths
-        // we've sent up till now are no longer valid and need to be invalidated.
-        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
-        mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
-    }
-    void ClearDirty() { mDirty = false; }
-    bool IsDirty() { return mDirty; }
+
+    /**
+     * Marked the attribute as dirty, and reset the internal path iterator when required.
+     */
+    void SetDirty(const ClusterInfo * apAttributeChanged);
+    bool IsDirty() const { return (mDirtyTick > mLastReportTick) || mOverrideDirty; }
+    void ClearDirty() { mOverrideDirty = false; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
 
@@ -169,8 +167,8 @@ public:
 
     void UnblockUrgentEventDelivery()
     {
-        mHoldReport = false;
-        mDirty      = true;
+        mHoldReport    = false;
+        mOverrideDirty = true;
     }
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
@@ -267,8 +265,10 @@ private:
     // waiting for the min reporting interval to elapse.  If we have to send a
     // report immediately due to an urgent event being queued,
     // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
-    bool mHoldReport         = false;
-    bool mDirty              = false;
+    bool mHoldReport = false;
+    // The timestamp when this read handler was marked as a dirty read handler.
+    uint64_t mDirtyTick      = 0;
+    bool mOverrideDirty      = false;
     bool mActiveSubscription = false;
     // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during sending
     // last chunked message.
@@ -280,7 +280,13 @@ private:
     // are waiting for the max reporting interval to elaps.  When mHoldSync
     // becomes false, we are allowed to send an empty report to keep the
     // subscription alive on the client.
-    bool mHoldSync                   = false;
+    bool mHoldSync = false;
+    // For subscriptions, we record the timestamp when we started to generate the last report.
+    // The mCurrentReportTick records the timestamp for the current report, which won;t be used for checking if this
+    // ReadHandler is dirty.
+    // mLastReportTick will be set to mCurrentReportTick after we sent the last chunk of the current report.
+    uint64_t mLastReportTick         = 0;
+    uint64_t mCurrentReportTick      = 0;
     uint32_t mLastWrittenEventsBytes = 0;
     SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.
