@@ -34,12 +34,6 @@ uint32_t OTAImageProcessorImpl::mWriteOffset;
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    if (mParams.imageFile.empty())
-    {
-        ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
-        return CHIP_ERROR_INTERNAL;
-    }
-
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
@@ -49,43 +43,14 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
     DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
-
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    uint32_t err = SL_BOOTLOADER_OK;
-
-    ChipLogError(SoftwareUpdate, "OTAImageProcessorImpl::Apply()");
-
-    // Assuming that bootloader_verifyImage() call is not too expensive and
-    // doesn't need to be offloaded to a different task. Revisit if necessary.
-    err = bootloader_verifyImage(mSlotId, NULL);
-    if (err != SL_BOOTLOADER_OK)
-    {
-        ChipLogError(SoftwareUpdate, "bootloader_verifyImage error %ld", err);
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    err = bootloader_setImageToBootload(mSlotId);
-    if (err != SL_BOOTLOADER_OK)
-    {
-        ChipLogError(SoftwareUpdate, "setImageToBootload error %ld", err);
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    // This reboots the device
-    bootloader_rebootAndInstall();
-
+    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    if (mParams.imageFile.empty())
-    {
-        ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
-        return CHIP_ERROR_INTERNAL;
-    }
-
     DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
@@ -145,7 +110,29 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
     imageProcessor->ReleaseBlock();
 
-    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mParams.imageFile.data());
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
+}
+
+void OTAImageProcessorImpl::HandleApply(intptr_t context)
+{
+    uint32_t err = SL_BOOTLOADER_OK;
+
+    ChipLogProgress(SoftwareUpdate, "OTAImageProcessorImpl::HandleApply()");
+
+    err = bootloader_verifyImage(mSlotId, NULL);
+    if (err != SL_BOOTLOADER_OK)
+    {
+        ChipLogError(SoftwareUpdate, "bootloader_verifyImage error %ld", err);
+    }
+
+    err = bootloader_setImageToBootload(mSlotId);
+    if (err != SL_BOOTLOADER_OK)
+    {
+        ChipLogError(SoftwareUpdate, "setImageToBootload error %ld", err);
+    }
+
+    // This reboots the device
+    bootloader_rebootAndInstall();
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
