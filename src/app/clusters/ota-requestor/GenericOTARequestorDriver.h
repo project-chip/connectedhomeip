@@ -71,8 +71,7 @@ public:
     void SendQueryImage() override;
 
     // Returns the next available Provider location
-    bool DetermineProviderLocation(
-        app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) override;
+    bool DetermineProviderLocation(ProviderLocationType & providerLocation) override;
 
 protected:
     void StartDefaultProviderTimer();
@@ -86,7 +85,6 @@ protected:
     uint32_t mOtaStartDelaySec                   = 0;
     uint32_t mPeriodicQueryTimeInterval = (24 * 60 * 60); // Timeout for querying providers on the default OTA provider list
 
-    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     Optional<ProviderLocationType> mLastUsedProvider; // Provider location used for the last query or update
 };
 
