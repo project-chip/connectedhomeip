@@ -42,7 +42,7 @@ ReadHandler::ReadHandler(Callback & apCallback, Messaging::ExchangeContext * apE
     mpExchangeMgr           = apExchangeContext->GetExchangeMgr();
     mpExchangeCtx           = apExchangeContext;
     mInteractionType        = aInteractionType;
-    mInitiatorNodeId        = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
+    mInitiatorPeer          = apExchangeContext->GetSessionHandle()->GetPeer();
     mSubjectDescriptor      = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
     mLastWrittenEventsBytes = 0;
     if (apExchangeContext != nullptr)
@@ -275,9 +275,7 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
 bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext)
 {
-    return (IsType(InteractionType::Subscribe) &&
-            GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
-            GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->GetFabricIndex());
+    return IsType(InteractionType::Subscribe) && apExchangeContext.GetSessionHandle()->GetPeer() == mInitiatorPeer;
 }
 
 CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,

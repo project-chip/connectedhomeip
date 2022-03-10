@@ -265,8 +265,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
-    mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
-    mFabricIndex = aReadPrepareParams.mSessionHolder->GetFabricIndex();
+    mPeer = aReadPrepareParams.mSessionHolder->GetPeer();
 
     MoveToState(ClientState::AwaitingInitialReport);
 
@@ -728,8 +727,8 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
     //
     VerifyOrDie(_this->mpImEngine->InActiveReadClientList(_this));
 
-    ChipLogError(DataManagement, "Subscription Liveness timeout with subscription id 0x%" PRIx64 " peer node 0x%" PRIx64,
-                 _this->mSubscriptionId, _this->mPeerNodeId);
+    ChipLogError(DataManagement, "Subscription Liveness timeout with subscription id 0x%" PRIx64 " peer " ChipLogFormatScopedNodeId,
+                 _this->mSubscriptionId, ChipLogValueScopedNodeId(_this->mPeer));
 
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).
@@ -850,8 +849,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
-    mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
-    mFabricIndex = aReadPrepareParams.mSessionHolder->GetFabricIndex();
+    mPeer = aReadPrepareParams.mSessionHolder->GetPeer();
 
     MoveToState(ClientState::AwaitingInitialReport);
 

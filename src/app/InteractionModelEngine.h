@@ -108,7 +108,7 @@ public:
      * @retval #CHIP_ERROR_KEY_NOT_FOUND If no active subscription is found.
      * @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
+    CHIP_ERROR ShutdownSubscriptions(const ScopedNodeId & aPeer);
 
     /**
      * Expire active transactions and release related objects for the given fabric index.

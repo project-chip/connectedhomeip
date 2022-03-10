@@ -162,7 +162,7 @@ public:
     }
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
-    NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
+    ScopedNodeId GetInitiatorPeer() const { return mInitiatorPeer; }
     FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
 
     const SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
@@ -272,8 +272,8 @@ private:
     bool mActiveSubscription = false;
     // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during sending
     // last chunked message.
-    bool mIsChunkedReport                                    = false;
-    NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
+    bool mIsChunkedReport = false;
+    ScopedNodeId mInitiatorPeer;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
     // mHoldSync is used to prevent subscription empty report delivery while we
