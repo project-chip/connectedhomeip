@@ -282,9 +282,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/system",
     ]
 
-    public_configs = [
-      "${chip_root}/src:includes",
-    ]
+    public_configs = [ "${chip_root}/src:includes" ]
   }
 
   static_library("platform") {
