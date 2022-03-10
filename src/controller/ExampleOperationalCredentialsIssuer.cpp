@@ -52,11 +52,14 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     ReturnErrorOnFailure(ASN1ToChipEpochTime(effectiveTime, mNow));
 
     Crypto::P256SerializedKeypair serializedKey;
-    uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
+    {
+        // Scope for keySize, because we use it as an in/out param.
+        uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
-    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
-                      err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-    serializedKey.SetLength(keySize);
+        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
+                          err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
+        serializedKey.SetLength(keySize);
+    }
 
     if (err != CHIP_NO_ERROR)
     {
@@ -65,10 +68,9 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIssuer.Initialize());
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
-        keySize = static_cast<uint16_t>(serializedKey.Capacity());
-
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
-                          ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(), keySize)));
+                          ReturnErrorOnFailure(
+                              storage.SyncSetKeyValue(key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
     }
     else
     {
@@ -76,11 +78,14 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
     }
 
-    keySize = static_cast<uint16_t>(serializedKey.Capacity());
+    {
+        // Scope for keySize, because we use it as an in/out param.
+        uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
-    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
-                      err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-    serializedKey.SetLength(keySize);
+        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
+                          err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
+        serializedKey.SetLength(keySize);
+    }
 
     if (err != CHIP_NO_ERROR)
     {
@@ -90,10 +95,9 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIntermediateIssuer.Initialize());
         ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
 
-        keySize = static_cast<uint16_t>(serializedKey.Capacity());
-
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
-                          ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(), keySize)));
+                          ReturnErrorOnFailure(
+                              storage.SyncSetKeyValue(key, serializedKey.Bytes(), static_cast<uint16_t>(serializedKey.Length()))));
     }
     else
     {
