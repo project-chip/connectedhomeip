@@ -130,11 +130,6 @@ public:
                                                                     reinterpret_cast<intptr_t>(this));
     }
 
-    /**
-     * Called to set optional requestorCanConsent value provided by Requestor.
-     */
-    void SetRequestorCanConsent(bool requestorCanConsent) { mRequestorCanConsent.SetValue(requestorCanConsent); }
-
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
@@ -242,11 +237,16 @@ private:
     };
 
     /**
-     * Called to establish a session to mProviderLocation.
+     * Called to establish a session to provider indicated by mProviderLocation
      *
      * @param onConnectedAction  The action to take once session to provider has been established
      */
     void ConnectToProvider(OnConnectedAction onConnectedAction);
+
+    /**
+     * Called to tear down a session to provider indicated by mProviderLocation
+     */
+    void DisconnectFromProvider();
 
     /**
      * Start download of the software image returned in QueryImageResponse
@@ -309,7 +309,6 @@ private:
     CharSpan mFileDesignator;
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
-    chip::Optional<bool> mRequestorCanConsent;
     ProviderLocationList mDefaultOtaProviderList;
     Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current update in progress
 };

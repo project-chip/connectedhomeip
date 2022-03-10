@@ -4243,7 +4243,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
 {
     ChipLogProgress(
-        chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI "DataVersion: %" PRIu32,
+        chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI " DataVersion: %" PRIu32,
         path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId), path.mDataVersion.ValueOr(0));
 
     switch (path.mClusterId)
@@ -8464,22 +8464,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("boolean", 1, value);
         }
         case TestCluster::Attributes::Bitmap8::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap8", 1, value);
         }
         case TestCluster::Attributes::Bitmap16::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap16", 1, value);
         }
         case TestCluster::Attributes::Bitmap32::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap32", 1, value);
         }
         case TestCluster::Attributes::Bitmap64::Id: {
-            uint64_t value;
+            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap64", 1, value);
         }
@@ -8707,22 +8707,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("nullable_boolean", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap8::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap8", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap16::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
+            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap16", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap32::Id: {
-            chip::app::DataModel::Nullable<uint32_t> value;
+            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap32", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap64::Id: {
-            chip::app::DataModel::Nullable<uint64_t> value;
+            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap64", 1, value);
         }

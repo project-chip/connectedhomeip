@@ -150,10 +150,8 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     constexpr uint32_t kIterations = chip::kSpake2p_Min_PBKDF_Iterations;
     uint8_t salt[chip::kSpake2p_Min_PBKDF_Salt_Length];
     chip::ByteSpan saltData(salt);
-    constexpr chip::PasscodeId kPasscodeID = 1;
 
-    err = commissionMgr.OpenEnhancedCommissioningWindow(kNoCommissioningTimeout, newDiscriminator, verifier, kIterations, saltData,
-                                                        kPasscodeID);
+    err = commissionMgr.OpenEnhancedCommissioningWindow(kNoCommissioningTimeout, newDiscriminator, verifier, kIterations, saltData);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatus() ==

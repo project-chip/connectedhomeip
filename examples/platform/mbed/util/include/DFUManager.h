@@ -28,6 +28,7 @@
 
 #ifdef CHIP_OTA_REQUESTOR
 #include <BDXDownloader.h>
+#include <DefaultOTARequestorStorage.h>
 #include <OTAImageProcessorImpl.h>
 #include <OTARequestor.h>
 #include <OTARequestorDriverImpl.h>

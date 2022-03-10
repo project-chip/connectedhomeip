@@ -103,6 +103,7 @@ public:
     ListIndex mListIndex     = kInvalidListIndex;   // uint16
     EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
     Optional<DataVersion> mDataVersion;             // uint32
+    bool mIsUrgentEvent = false;                    // uint8
 };
 } // namespace app
 } // namespace chip

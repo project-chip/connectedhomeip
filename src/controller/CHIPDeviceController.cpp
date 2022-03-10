@@ -160,9 +160,11 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
-        .dnsCache          = &mDNSCache,
-        .devicePool        = &mDevicePool,
-        .dnsResolver       = &mDNSResolver,
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        .dnsCache = &mDNSCache,
+#endif
+        .devicePool  = &mDevicePool,
+        .dnsResolver = &mDNSResolver,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
@@ -442,11 +444,10 @@ void DeviceController::OnOpenPairingWindowFailureResponse(void * context, CHIP_E
 }
 
 CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
-                                                 Spake2pVerifier & outVerifier, PasscodeId & outPasscodeId)
+                                                 Spake2pVerifier & outVerifier)
 {
     ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(outVerifier, iterations, salt, /* useRandomPIN= */ false, setupPincode));
 
-    outPasscodeId = mPAKEVerifierID++;
     return CHIP_NO_ERROR;
 }
 
@@ -529,7 +530,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
         request.discriminator        = mSetupPayload.discriminator;
         request.iterations           = mCommissioningWindowIteration;
         request.salt                 = salt;
-        request.passcodeID           = mPAKEVerifierID++;
 
         // TODO: What should the timed invoke timeout here be?
         uint16_t timedInvokeTimeoutMs = 10000;
@@ -725,15 +725,21 @@ CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, chip::Callbac
     return DeviceController::GetConnectedDevice(deviceId, onConnection, onFailure);
 }
 
+CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params)
+{
+    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
+}
+
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode)
 {
-    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode);
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
 {
-    CommissioningParameters commissioningParams;
-    return PairDevice(remoteDeviceId, params, commissioningParams);
+    ReturnErrorOnFailure(EstablishPASEConnection(remoteDeviceId, params));
+    return Commission(remoteDeviceId);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
@@ -741,6 +747,11 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 {
     ReturnErrorOnFailure(EstablishPASEConnection(remoteDeviceId, rendezvousParams));
     return Commission(remoteDeviceId, commissioningParams);
+}
+
+CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode)
+{
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly);
 }
 
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
@@ -834,8 +845,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    // TODO: Need to determine how PasscodeId is provided for a non-default case. i.e. ECM
-    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), kDefaultCommissioningPasscodeId, keyID,
+    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID,
                                     Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), exchangeCtxt, this);
     SuccessOrExit(err);
 
@@ -854,6 +864,12 @@ exit:
 
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningParameters & params)
 {
+    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
+    return Commission(remoteDeviceId);
+}
+
+CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
+{
     // TODO(cecille): Can we get rid of mDeviceBeingCommissioned and use the remote id instead? Would require storing the
     // commissioning stage in the device.
     CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
@@ -869,18 +885,12 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    if (!params.GetWiFiCredentials().HasValue() && !params.GetThreadOperationalDataset().HasValue() && !mIsIPRendezvous)
-    {
-        ChipLogError(Controller, "Network commissioning parameters are required for BLE auto commissioning.");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
     ChipLogProgress(Controller, "Commission called for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
 
     mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
                                             OnSessionEstablishmentTimeoutCallback, this);
 
     mDefaultCommissioner->SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
-    ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
     if (device->IsSecureConnected())
     {
         mDefaultCommissioner->StartCommissioning(this, device);
@@ -1447,7 +1457,9 @@ void DeviceCommissioner::OnOperationalNodeResolved(const chip::Dnssd::ResolvedNo
         return;
     }
 
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     mDNSCache.Insert(nodeData);
+#endif
 
     mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     DeviceController::OnOperationalNodeResolved(nodeData);

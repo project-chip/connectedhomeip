@@ -84,6 +84,12 @@ protected:
     }
 
     template <typename T>
+    bool CheckValue(const char * itemName, chip::BitFlags<T> current, chip::BitFlags<T> expected)
+    {
+        return CheckValue(itemName, current.Raw(), expected.Raw());
+    }
+
+    template <typename T>
     bool CheckValuePresent(const char * itemName, const chip::Optional<T> & value)
     {
         if (value.HasValue())

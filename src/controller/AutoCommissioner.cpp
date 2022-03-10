@@ -25,6 +25,11 @@
 namespace chip {
 namespace Controller {
 
+AutoCommissioner::AutoCommissioner()
+{
+    SetCommissioningParameters(CommissioningParameters());
+}
+
 AutoCommissioner::~AutoCommissioner()
 {
     ReleaseDAC();

@@ -49,7 +49,6 @@ limitations under the License.
       <arg name="Discriminator" type="INT16U"/>
       <arg name="Iterations" type="INT32U"/>
       <arg name="Salt" type="OCTET_STRING"/>
-      <arg name="PasscodeID" type="INT16U"/>
     </command>
 
     <command source="client" code="0x01" name="OpenBasicCommissioningWindow" mustUseTimedInvoke="true" optional="false">

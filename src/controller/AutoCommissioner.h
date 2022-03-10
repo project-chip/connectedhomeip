@@ -28,7 +28,7 @@ class DeviceCommissioner;
 class AutoCommissioner : public CommissioningDelegate
 {
 public:
-    AutoCommissioner() {}
+    AutoCommissioner();
     virtual ~AutoCommissioner();
     CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
     void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;

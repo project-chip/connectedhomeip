@@ -33,9 +33,10 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode)
+CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission)
 {
     SetupPayload payload;
+    mConnectionType = commission;
 
     bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
     ReturnErrorOnFailure(isQRCode ? QRCodeSetupPayloadParser(setUpCode).populatePayload(payload)
@@ -134,7 +135,14 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 void SetUpCodePairer::OnDeviceDiscovered(RendezvousParameters & params)
 {
-    LogErrorOnFailure(mCommissioner->PairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    if (mConnectionType == SetupCodePairerBehaviour::kCommission)
+    {
+        LogErrorOnFailure(mCommissioner->PairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    }
+    else
+    {
+        LogErrorOnFailure(mCommissioner->EstablishPASEConnection(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    }
 }
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -145,9 +153,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj)
 
     Transport::PeerAddress peerAddress = Transport::PeerAddress::BLE();
     RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress).SetConnectionObject(connObj);
-    // We don't have network credentials, so can't do the entire pairing flow.  Just establish a PASE session to the
-    //  device and let our consumer deal with the rest.
-    LogErrorOnFailure(mCommissioner->EstablishPASEConnection(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    OnDeviceDiscovered(params);
 }
 
 void SetUpCodePairer::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)

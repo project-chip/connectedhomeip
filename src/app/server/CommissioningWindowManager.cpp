@@ -85,7 +85,6 @@ void CommissioningWindowManager::ResetState()
     mUseECM = false;
 
     mECMDiscriminator = 0;
-    mECMPasscodeID    = 0;
     mECMIterations    = 0;
     mECMSaltLength    = 0;
     mWindowStatus     = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
@@ -183,8 +182,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     {
         ReturnErrorOnFailure(SetTemporaryDiscriminator(mECMDiscriminator));
         ReturnErrorOnFailure(
-            mPairingSession.WaitForPairing(mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength), mECMPasscodeID,
-                                           keyID, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
+            mPairingSession.WaitForPairing(mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength), keyID,
+                                           Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
     }
     else
     {
@@ -207,9 +206,9 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
 
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
-        ReturnErrorOnFailure(
-            mPairingSession.WaitForPairing(verifier, iterationCount, ByteSpan(salt, saltLen), kDefaultCommissioningPasscodeId,
-                                           keyID, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()), this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(verifier, iterationCount, ByteSpan(salt, saltLen), keyID,
+                                                            Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
+                                                            this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());
@@ -246,7 +245,7 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t com
 
 CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
                                                                        Spake2pVerifier & verifier, uint32_t iterations,
-                                                                       ByteSpan salt, PasscodeId passcodeID)
+                                                                       ByteSpan salt)
 {
     // Once a device is operational, it shall be commissioned into subsequent fabrics using
     // the operational network only.
@@ -261,7 +260,6 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
     mCommissioningTimeoutSeconds = commissioningTimeoutSeconds;
 
     mECMDiscriminator = discriminator;
-    mECMPasscodeID    = passcodeID;
     mECMIterations    = iterations;
 
     memcpy(&mECMPASEVerifier, &verifier, sizeof(Spake2pVerifier));

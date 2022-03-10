@@ -196,14 +196,14 @@ struct ReportEventParams : public app::ReadPrepareParams
 
 template <typename DecodableEventType>
 CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId endpointId,
-                       ReportEventParams<DecodableEventType> && readParams)
+                       ReportEventParams<DecodableEventType> && readParams, bool aIsUrgentEvent)
 {
     ClusterId clusterId                  = DecodableEventType::GetClusterId();
     EventId eventId                      = DecodableEventType::GetEventId();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
     CHIP_ERROR err                       = CHIP_NO_ERROR;
 
-    auto readPaths = Platform::MakeUnique<app::EventPathParams>(endpointId, clusterId, eventId);
+    auto readPaths = Platform::MakeUnique<app::EventPathParams>(endpointId, clusterId, eventId, aIsUrgentEvent);
     VerifyOrReturnError(readPaths != nullptr, CHIP_ERROR_NO_MEMORY);
 
     readParams.mpEventPathParamsList = readPaths.get();
@@ -262,7 +262,7 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHand
     detail::ReportEventParams<DecodableEventType> params(sessionHandle);
     params.mOnReportCb = onSuccessCb;
     params.mOnErrorCb  = onErrorCb;
-    return detail::ReportEvent(exchangeMgr, endpointId, std::move(params));
+    return detail::ReportEvent(exchangeMgr, endpointId, std::move(params), false /*aIsUrgentEvent*/);
 }
 
 /**
@@ -276,7 +276,7 @@ CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const Sessio
                           uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                           typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType
                               onSubscriptionEstablishedCb = nullptr,
-                          bool keepPreviousSubscriptions  = false)
+                          bool keepPreviousSubscriptions = false, bool aIsUrgentEvent = false)
 {
     detail::ReportEventParams<DecodableEventType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
@@ -286,7 +286,7 @@ CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const Sessio
     params.mMaxIntervalCeilingSeconds   = maxIntervalCeilingSeconds;
     params.mKeepSubscriptions           = keepPreviousSubscriptions;
     params.mReportType                  = app::ReadClient::InteractionType::Subscribe;
-    return detail::ReportEvent(exchangeMgr, endpointId, std::move(params));
+    return detail::ReportEvent(exchangeMgr, endpointId, std::move(params), aIsUrgentEvent);
 }
 
 } // namespace Controller

@@ -25,7 +25,7 @@ tests:
       verification:
           "./chip-tool descriptor read device-list 1 1
           C[1646119893.830333][3487:3492] CHIP:TOO: Endpoint: 1 Cluster:
-          0x0000_001D Attribute 0x0000_0000DataVersion: 4007324196
+          0x0000_001D Attribute 0x0000_0000 DataVersion: 4007324196
           [1646119893.830428][3487:3492] CHIP:TOO: device list: 1 entries
           [1646119893.830500][3487:3492] CHIP:TOO: [1]: {
           [1646119893.830531][3487:3492] CHIP:TOO: Type: 256

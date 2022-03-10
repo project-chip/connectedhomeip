@@ -735,18 +735,21 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
+CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten)
 {
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath](ReadHandler * handler) {
+    bool isUrgentEvent = false;
+    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath, &isUrgentEvent](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;
         }
 
-        for (auto clusterInfo = handler->GetEventClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
+        for (auto * interestedPath = handler->GetEventClusterInfolist(); interestedPath != nullptr;
+             interestedPath        = interestedPath->mpNext)
         {
-            if (clusterInfo->IsEventPathSupersetOf(aPath))
+            if (interestedPath->IsEventPathSupersetOf(aPath) && interestedPath->mIsUrgentEvent)
             {
+                isUrgentEvent = true;
                 handler->UnblockUrgentEventDelivery();
                 break;
             }
@@ -755,18 +758,14 @@ CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
         return Loop::Continue;
     });
 
-    return ScheduleRun();
-}
-
-CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten)
-{
-    if (aUrgent != EventOptions::Type::kUrgent)
+    if (isUrgentEvent)
     {
-        return ScheduleBufferPressureEventDelivery(aBytesWritten);
+        ChipLogDetail(DataManagement, "urgent event schedule run");
+        return ScheduleRun();
     }
     else
     {
-        return ScheduleUrgentEventDelivery(aPath);
+        return ScheduleBufferPressureEventDelivery(aBytesWritten);
     }
     return CHIP_NO_ERROR;
 }
