@@ -162,7 +162,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
         .dnsCache = &mDNSCache,
 #endif
-        .devicePool        = &mDevicePool,
+        .devicePool = &mDevicePool,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
