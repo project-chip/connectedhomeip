@@ -80,7 +80,6 @@ public:
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
 
-    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     void SetCurrentProviderLocation(ProviderLocationType providerLocation) override
     {
         mProviderLocation.SetValue(providerLocation);

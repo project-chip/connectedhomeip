@@ -142,7 +142,8 @@ private:
 class OTARequestorInterface
 {
 public:
-    using OTAUpdateStateEnum = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using OTAUpdateStateEnum   = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
 
     // Return value for various trigger-type APIs
     enum OTATriggerResult
@@ -194,8 +195,6 @@ public:
 
     // Clear all entries with the specified fabric index in the default OTA provider list
     virtual CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) = 0;
-
-    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
 
     // Set the provider location to be used in the next query and OTA update process
     virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
