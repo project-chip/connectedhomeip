@@ -107,7 +107,8 @@ Server::Server() :
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
     }),
-    mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage), mAttributePersister(mDeviceStorage) {}
+    mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage), mAttributePersister(mDeviceStorage)
+{}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
                         Inet::InterfaceId interfaceId)

@@ -2133,7 +2133,7 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 
 int Setup(void * inContext)
 {
-    AccessControl::Delegate *delegate = Examples::GetAccessControlDelegate(nullptr);
+    AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate(nullptr);
     accessControl.SetDelegate(delegate);
     SetAccessControl(accessControl);
     GetAccessControl().Init();
