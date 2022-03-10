@@ -206,7 +206,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode)
+    CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override
     {
         constexpr uint32_t kDefaultTestPasscode = 20202021;
         setupPasscode                           = kDefaultTestPasscode;
