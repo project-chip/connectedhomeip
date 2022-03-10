@@ -106,9 +106,7 @@ Server::Server() :
 #endif
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
-    }),
-    mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage), mAttributePersister(mDeviceStorage),
-    mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
+    }), mGroupsProvider(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
@@ -120,13 +118,16 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
 
+    SuccessOrExit(err = mCommissioningWindowManager.Init(this));
     mCommissioningWindowManager.SetAppDelegate(delegate);
     mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
+    SuccessOrExit(mAttributePersister.Init(&mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
     InitDataModelHandler(&mExchangeMgr);
@@ -337,8 +338,13 @@ void Server::Shutdown()
     }
     mSessions.Shutdown();
     mTransports.Close();
+
+    mAttributePersister.Shutdown();
     mCommissioningWindowManager.Shutdown();
     mCASESessionManager.Shutdown();
+
+
+    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }
 
