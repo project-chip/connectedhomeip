@@ -33,7 +33,7 @@ using Entry         = AccessControl::Entry;
 using EntryIterator = AccessControl::EntryIterator;
 using Target        = Entry::Target;
 
-AccessControl accessControl(Examples::GetAccessControlDelegate(nullptr));
+AccessControl accessControl;
 
 constexpr ClusterId kOnOffCluster         = 0x0000'0006;
 constexpr ClusterId kLevelControlCluster  = 0x0000'0008;
@@ -2133,6 +2133,8 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 
 int Setup(void * inContext)
 {
+    AccessControl::Delegate *delegate = Examples::GetAccessControlDelegate(nullptr);
+    accessControl.SetDelegate(delegate);
     SetAccessControl(accessControl);
     GetAccessControl().Init();
     return SUCCESS;

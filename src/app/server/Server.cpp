@@ -107,13 +107,13 @@ Server::Server() :
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
     }),
-    mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage), mAttributePersister(mDeviceStorage),
-    mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
-{}
+    mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage), mAttributePersister(mDeviceStorage) {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
                         Inet::InterfaceId interfaceId)
 {
+    Access::AccessControl::Delegate * accessDelegate = nullptr;
+
     mSecuredServicePort   = secureServicePort;
     mUnsecuredServicePort = unsecureServicePort;
     mInterfaceId          = interfaceId;
@@ -143,6 +143,10 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SetGroupDataProvider(&mGroupsProvider);
 
     // Access control must be initialized after mDeviceStorage.
+    accessDelegate = Access::Examples::GetAccessControlDelegate(&mDeviceStorage);
+    VerifyOrExit(accessDelegate != nullptr, ChipLogError(AppServer, "Invalid access delegate found."));
+    mAccessControl.SetDelegate(accessDelegate);
+
     err = mAccessControl.Init();
     SuccessOrExit(err);
     Access::SetAccessControl(mAccessControl);

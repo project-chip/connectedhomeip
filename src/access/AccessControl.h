@@ -23,6 +23,7 @@
 #include "SubjectDescriptor.h"
 
 #include <lib/core/CHIPCore.h>
+#include "lib/support/CodeUtils.h"
 
 namespace chip {
 namespace Access {
@@ -353,12 +354,35 @@ public:
 
     AccessControl() = default;
 
-    AccessControl(Delegate & delegate) : mDelegate(delegate) {}
-
     AccessControl(const AccessControl &) = delete;
     AccessControl & operator=(const AccessControl &) = delete;
 
-    ~AccessControl() { mDelegate.Release(); }
+    ~AccessControl() { mDelegate->Release(); }
+
+    /**
+     * @brief Set the delegate that will handle access control entries. Must be called before Init().
+     *
+     * @param delegate - The delegate to use
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INCORRECT_STATE if set after Init(), and
+     *         CHIP_ERROR_INVALID_ARGUMENT if delegate is null.
+     */
+    CHIP_ERROR SetDelegate(Delegate * delegate)
+    {
+        if (mIsInitialized)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        else if (delegate == nullptr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        // De-initialize the default-set delegate.
+        mDelegate->Release();
+
+        mDelegate = delegate;
+        return CHIP_NO_ERROR;
+    }
 
     /**
      * Initialize the access control module. Must be called before first use.
@@ -373,10 +397,18 @@ public:
     CHIP_ERROR Finish();
 
     // Capabilities
-    CHIP_ERROR GetMaxEntryCount(size_t & value) const { return mDelegate.GetMaxEntryCount(value); }
+    CHIP_ERROR GetMaxEntryCount(size_t & value) const
+    {
+        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->GetMaxEntryCount(value);
+    }
 
     // Actualities
-    CHIP_ERROR GetEntryCount(size_t & value) const { return mDelegate.GetEntryCount(value); }
+    CHIP_ERROR GetEntryCount(size_t & value) const
+    {
+        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->GetEntryCount(value);
+    }
 
     /**
      * Prepares an entry.
@@ -385,7 +417,11 @@ public:
      *
      * @param [in] entry        Entry to prepare.
      */
-    CHIP_ERROR PrepareEntry(Entry & entry) { return mDelegate.PrepareEntry(entry); }
+    CHIP_ERROR PrepareEntry(Entry & entry)
+    {
+        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->PrepareEntry(entry);
+    }
 
     /**
      * Creates an entry in the access control list.
@@ -397,7 +433,8 @@ public:
     CHIP_ERROR CreateEntry(size_t * index, const Entry & entry, FabricIndex * fabricIndex = nullptr)
     {
         ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
-        return mDelegate.CreateEntry(index, entry, fabricIndex);
+        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->CreateEntry(index, entry, fabricIndex);
     }
 
     /**
@@ -409,7 +446,8 @@ public:
      */
     CHIP_ERROR ReadEntry(size_t index, Entry & entry, const FabricIndex * fabricIndex = nullptr) const
     {
-        return mDelegate.ReadEntry(index, entry, fabricIndex);
+        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->ReadEntry(index, entry, fabricIndex);
     }
 
     /**
@@ -422,7 +460,8 @@ public:
     CHIP_ERROR UpdateEntry(size_t index, const Entry & entry, const FabricIndex * fabricIndex = nullptr)
     {
         ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
-        return mDelegate.UpdateEntry(index, entry, fabricIndex);
+        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->UpdateEntry(index, entry, fabricIndex);
     }
 
     /**
@@ -433,7 +472,8 @@ public:
      */
     CHIP_ERROR DeleteEntry(size_t index, const FabricIndex * fabricIndex = nullptr)
     {
-        return mDelegate.DeleteEntry(index, fabricIndex);
+        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->DeleteEntry(index, fabricIndex);
     }
 
     /**
@@ -444,7 +484,8 @@ public:
      */
     CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex = nullptr) const
     {
-        return mDelegate.Entries(iterator, fabricIndex);
+        VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->Entries(iterator, fabricIndex);
     }
 
     /**
@@ -461,7 +502,9 @@ private:
     bool IsValid(const Entry & entry);
 
     static Delegate mDefaultDelegate;
-    Delegate & mDelegate = mDefaultDelegate;
+    Delegate * mDelegate = &mDefaultDelegate;
+
+    bool mIsInitialized = false;
 };
 
 /**

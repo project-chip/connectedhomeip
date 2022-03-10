@@ -24,7 +24,7 @@
 
 namespace {
 
-chip::Access::AccessControl permissiveAccessControl(chip::Access::Examples::GetPermissiveAccessControlDelegate());
+chip::Access::AccessControl gPermissiveAccessControl;
 
 } // namespace
 
@@ -36,7 +36,8 @@ CHIP_ERROR AppContext::Init()
     ReturnErrorOnFailure(Super::Init());
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager()));
 
-    Access::SetAccessControl(permissiveAccessControl);
+    gPermissiveAccessControl.SetDelegate(chip::Access::Examples::GetPermissiveAccessControlDelegate());
+    Access::SetAccessControl(gPermissiveAccessControl);
     ReturnErrorOnFailure(Access::GetAccessControl().Init());
 
     return CHIP_NO_ERROR;

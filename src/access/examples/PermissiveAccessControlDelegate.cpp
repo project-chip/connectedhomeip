@@ -69,10 +69,10 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
-AccessControl::Delegate & GetPermissiveAccessControlDelegate()
+AccessControl::Delegate * GetPermissiveAccessControlDelegate()
 {
     static AccessControlDelegate accessControlDelegate;
-    return accessControlDelegate;
+    return &accessControlDelegate;
 }
 
 } // namespace Examples
