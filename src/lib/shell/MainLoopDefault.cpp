@@ -20,11 +20,9 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <cstddef>
 #include <ctype.h>
 #include <string.h>
 
-using ::std::ptrdiff_t;
 using chip::FormatCHIPError;
 using chip::Platform::MemoryAlloc;
 using chip::Platform::MemoryFree;
@@ -33,78 +31,61 @@ using chip::Shell::streamer_get;
 
 namespace {
 
+// max > 1
 ssize_t ReadLine(char * buffer, size_t max)
 {
-    ssize_t read = 0;
-    bool done    = false;
-    char * inptr = buffer;
+    size_t line_sz = 0;
 
-    // Read in characters until we get a new line or EOT.
-    while (!done)
+    // Read in characters until we get a line ending or EOT.
+    for (bool done = false; !done;)
     {
         // Stop reading if we've run out of space in the buffer (still need to null-terminate).
-        if (inptr - buffer >= static_cast<ptrdiff_t>(max - 1))
+        if (line_sz >= max - 1u)
         {
             buffer[max - 1] = '\0';
             break;
         }
 
-        if (read == 0)
+        if (streamer_read(streamer_get(), buffer + line_sz, 1) == 1)
         {
-            read = streamer_read(streamer_get(), inptr, 1);
-        }
-
-        // Process any characters we just read in.
-        while (read > 0)
-        {
-            switch (*inptr)
+            switch (buffer[line_sz])
             {
             case '\r':
             case '\n':
                 streamer_printf(streamer_get(), "\r\n");
-                *inptr = '\0';
-                done   = true;
+                buffer[line_sz] = '\0';
+                line_sz++;
+                done = true;
                 break;
             case 0x04:
-                // Delete EOT character.
-                inptr -= 1;
+                // Do not accept EOT character (i.e. don't increment line_sz).
                 // Stop the read loop if the input is still empty.
-                if (inptr == buffer - 1)
+                if (line_sz == 0u)
                 {
                     done = true;
                 }
                 break;
             case 0x7F:
-                // delete backspace character + 1 more
-                inptr -= 2;
-                if (inptr >= buffer - 1)
+                // Do not accept backspace character (i.e. don't increment line_sz) and remove 1 additional character if it exists.
+                if (line_sz >= 1u)
                 {
                     streamer_printf(streamer_get(), "\b \b");
-                }
-                else
-                {
-                    inptr = buffer - 1;
+                    line_sz--;
                 }
                 break;
             default:
-                if (isprint(static_cast<int>(*inptr)) || *inptr == '\t')
+                if (isprint(static_cast<int>(buffer[line_sz])) || buffer[line_sz] == '\t')
                 {
-                    streamer_printf(streamer_get(), "%c", *inptr);
-                }
-                else
-                {
-                    inptr--;
+                    streamer_printf(streamer_get(), "%c", buffer[line_sz]);
+                    line_sz++;
                 }
                 break;
             }
-
-            inptr++;
-            read--;
         }
     }
 
     // Return the length of the buffer including the terminating null byte.
-    return inptr - buffer;
+    return line_sz;
 }
 
 bool IsSeparator(char ch)
