@@ -184,7 +184,7 @@ CHIP_ERROR AccessControl::Finish()
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     ChipLogProgress(DataManagement, "AccessControl: finishing");
     CHIP_ERROR retval = mDelegate->Finish();
-    mDelegate = nullptr;
+    mDelegate         = nullptr;
     return retval;
 }
 
