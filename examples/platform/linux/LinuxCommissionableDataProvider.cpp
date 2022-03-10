@@ -64,7 +64,8 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
     {
         if (serializedSpake2pVerifier.Value().size() != kSpake2p_VerifierSerialized_Length)
         {
-            ChipLogError(Support, "PASE verifier size invalid: %u", static_cast<unsigned>(serializedSpake2pVerifier.Value().size()));
+            ChipLogError(Support, "PASE verifier size invalid: %u",
+                         static_cast<unsigned>(serializedSpake2pVerifier.Value().size()));
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 

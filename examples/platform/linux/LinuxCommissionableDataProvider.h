@@ -56,8 +56,9 @@ public:
      *         CHIP_ERROR_INVALID_STATE if already initialized, or other CHIP_ERROR values if inner
      *         implementation dependencies fail.
      */
-    CHIP_ERROR Init(chip::Optional<std::vector<uint8_t>> serializedSpake2pVerifier, chip::Optional<std::vector<uint8_t>> spake2pSalt,
-                    uint32_t spake2pIterationCount, chip::Optional<uint32_t> setupPasscode, uint16_t discriminator);
+    CHIP_ERROR Init(chip::Optional<std::vector<uint8_t>> serializedSpake2pVerifier,
+                    chip::Optional<std::vector<uint8_t>> spake2pSalt, uint32_t spake2pIterationCount,
+                    chip::Optional<uint32_t> setupPasscode, uint16_t discriminator);
 
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override
