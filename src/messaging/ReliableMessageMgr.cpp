@@ -190,6 +190,7 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
 System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount)
 {
 #define MRP_BACKOFF_JITTER_BASE 1000
+#define MRP_BACKOFF_JITTER_MAX 250
 #define MRP_BACKOFF_BASE_NUMERATOR 16
 #define MRP_BACKOFF_BASE_DENOMENATOR 10
 
@@ -213,7 +214,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     backoff = backoff * backoffNum / backoffDenom;
 
     // Generate jitter as random multiplier from 1.000 to 1.250:
-    unsigned jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU8() % 250;
+    unsigned jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU16() % MRP_BACKOFF_JITTER_MAX;
     backoff         = backoff * jitter / MRP_BACKOFF_JITTER_BASE;
 
     return backoff;
@@ -223,7 +224,7 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
     // TODO(#15800): Choose active/idle timeout corresponding to the ActiveState of peer in session.
     System::Clock::Timestamp backoff =
-        GetBackoff(entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout, entry->sendCount);
+        GetBackoff(entry->ec->GetSessionHandle()->GetMRPConfig().mActiveRetransTimeout, entry->sendCount);
     entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + backoff;
     StartTimer();
 }
