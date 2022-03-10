@@ -66,7 +66,7 @@ void BDXDownloader::Reset()
 
 bool BDXDownloader::HasTransferTimedOut()
 {
-    uint32_t curBlockCounter = mBdxTransfer.GetNextBlockNum();
+    uint32_t curBlockCounter = mBdxTransfer.GetNextQueryNum();
 
     if (curBlockCounter > mPrevBlockCounter)
     {
