@@ -357,39 +357,23 @@ public:
     AccessControl(const AccessControl &) = delete;
     AccessControl & operator=(const AccessControl &) = delete;
 
-    ~AccessControl() { mDelegate->Release(); }
-
-    /**
-     * @brief Set the delegate that will handle access control entries. Must be called before Init().
-     *
-     * @param delegate - The delegate to use
-     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INCORRECT_STATE if set after Init(), and
-     *         CHIP_ERROR_INVALID_ARGUMENT if delegate is null.
-     */
-    CHIP_ERROR SetDelegate(Delegate * delegate)
-    {
-        if (mIsInitialized)
+    ~AccessControl() {
+        // Never-initialized AccessControl instances will not have the delegate set.
+        if (mIsInitialized && mDelegate != nullptr)
         {
-            return CHIP_ERROR_INCORRECT_STATE;
+            mDelegate->Release();
         }
-        else if (delegate == nullptr)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
-        // De-initialize the default-set delegate.
-        mDelegate->Release();
-
-        mDelegate = delegate;
-        return CHIP_NO_ERROR;
     }
 
     /**
      * Initialize the access control module. Must be called before first use.
      *
-     * @retval various errors, probably fatal.
+     * @param delegate - The delegate to use for acces control
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INCORRECT_STATE if called more than once,
+     *         CHIP_ERROR_INVALID_ARGUMENT if delegate is null, or other fatal error.
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(AccessControl::Delegate * delegate);
 
     /**
      * Deinitialize the access control module. Must be called when finished.
@@ -501,8 +485,7 @@ public:
 private:
     bool IsValid(const Entry & entry);
 
-    static Delegate mDefaultDelegate;
-    Delegate * mDelegate = &mDefaultDelegate;
+    Delegate * mDelegate = nullptr;
 
     bool mIsInitialized = false;
 };

@@ -2134,9 +2134,8 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 int Setup(void * inContext)
 {
     AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate(nullptr);
-    accessControl.SetDelegate(delegate);
     SetAccessControl(accessControl);
-    GetAccessControl().Init();
+    VerifyOrDie(GetAccessControl().Init(delegate) == CHIP_NO_ERROR);
     return SUCCESS;
 }
 

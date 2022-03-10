@@ -146,9 +146,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     // Access control must be initialized after mDeviceStorage.
     accessDelegate = Access::Examples::GetAccessControlDelegate(&mDeviceStorage);
     VerifyOrExit(accessDelegate != nullptr, ChipLogError(AppServer, "Invalid access delegate found."));
-    mAccessControl.SetDelegate(accessDelegate);
 
-    err = mAccessControl.Init();
+    err = mAccessControl.Init(accessDelegate);
     SuccessOrExit(err);
     Access::SetAccessControl(mAccessControl);
 

@@ -36,9 +36,8 @@ CHIP_ERROR AppContext::Init()
     ReturnErrorOnFailure(Super::Init());
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager()));
 
-    gPermissiveAccessControl.SetDelegate(chip::Access::Examples::GetPermissiveAccessControlDelegate());
     Access::SetAccessControl(gPermissiveAccessControl);
-    ReturnErrorOnFailure(Access::GetAccessControl().Init());
+    ReturnErrorOnFailure(Access::GetAccessControl().Init(chip::Access::Examples::GetPermissiveAccessControlDelegate()));
 
     return CHIP_NO_ERROR;
 }

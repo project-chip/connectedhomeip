@@ -161,19 +161,18 @@ namespace Access {
 
 AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
 AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
-AccessControl::Delegate AccessControl::mDefaultDelegate;
 
-CHIP_ERROR AccessControl::Init()
+CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate)
 {
     VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogProgress(DataManagement, "AccessControl: initializing");
-    CHIP_ERROR retval = mDelegate->Init();
 
-    if (retval == CHIP_NO_ERROR)
-    {
-        mIsInitialized = true;
-    }
+    // delegate can never be null. This was already checked
+    mDelegate = delegate;
+    CHIP_ERROR retval = mDelegate->Init();
+    mIsInitialized = (CHIP_NO_ERROR == retval);
     return retval;
 }
 
