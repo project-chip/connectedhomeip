@@ -187,21 +187,24 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     return CHIP_NO_ERROR;
 }
 
-void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
+System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount)
 {
 #define MRP_BACKOFF_JITTER_BASE 1000
 #define MRP_BACKOFF_BASE_NUMERATOR 16
 #define MRP_BACKOFF_BASE_DENOMENATOR 10
 
-    // TODO(#15800): Choose active/idle timeout corresponding to the activity of exchanges of the session.
-    System::Clock::Timestamp backoff = entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout;
+    System::Clock::Timestamp backoff = baseInterval;
 
     // Generate fixed point equivalent of 1.6^retryCount
-    unsigned retryCount   = entry->sendCount - 1;
+    int retryCount = sendCount - 1;
+    if (retryCount < 0)
+        retryCount = 0; // Enforce floor
+    if (retryCount > 5)
+        retryCount = 5; // Enforce reasonable maximum
     unsigned backoffNum   = 1;
     unsigned backoffDenom = 1;
 
-    for (unsigned i = 0; i < retryCount; i++)
+    for (int i = 0; i < retryCount; i++)
     {
         backoffNum *= MRP_BACKOFF_BASE_NUMERATOR;
         backoffDenom *= MRP_BACKOFF_BASE_DENOMENATOR;
@@ -210,9 +213,17 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
     backoff = backoff * backoffNum / backoffDenom;
 
     // Generate jitter as random multiplier from 1.000 to 1.250:
-    unsigned jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU16() % 250;
+    unsigned jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU8() % 250;
     backoff         = backoff * jitter / MRP_BACKOFF_JITTER_BASE;
 
+    return backoff;
+}
+
+void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
+{
+    // TODO(#15800): Choose active/idle timeout corresponding to the ActiveState of peer in session.
+    System::Clock::Timestamp backoff =
+        GetBackoff(entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout, entry->sendCount);
     entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + backoff;
     StartTimer();
 }
