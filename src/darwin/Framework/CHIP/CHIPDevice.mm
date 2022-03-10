@@ -17,6 +17,7 @@
 
 #import "CHIPAttributeTLVValueDecoder_Internal.h"
 #import "CHIPCallbackBridgeBase_internal.h"
+#import "CHIPCluster.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
@@ -717,9 +718,10 @@ private:
     Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
-- (void)readAttributeWithEndpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                        attributeId:(NSUInteger)attributeId
+- (void)readAttributeWithEndpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                        attributeId:(NSNumber *)attributeId
+                             params:(CHIPReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(CHIPDeviceResponseHandler)completion
 {
@@ -755,17 +757,23 @@ private:
                 }
             };
 
-            auto chipEndpointId = static_cast<chip::EndpointId>(endpointId);
-            auto chipClusterId = static_cast<chip::ClusterId>(clusterId);
-            auto chipAttributeId = static_cast<chip::AttributeId>(attributeId);
-
-            app::AttributePathParams attributePath(chipEndpointId, chipClusterId, chipAttributeId);
+            app::AttributePathParams attributePath;
+            if (endpointId) {
+                attributePath.mEndpointId = static_cast<chip::EndpointId>([endpointId unsignedShortValue]);
+            }
+            if (clusterId) {
+                attributePath.mClusterId = static_cast<chip::ClusterId>([clusterId unsignedLongValue]);
+            }
+            if (attributeId) {
+                attributePath.mAttributeId = static_cast<chip::AttributeId>([attributeId unsignedLongValue]);
+            }
             app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
             CHIP_ERROR err = CHIP_NO_ERROR;
 
             chip::app::ReadPrepareParams readParams([self internalDevice]->GetSecureSession().Value());
             readParams.mpAttributePathParamsList = &attributePath;
             readParams.mAttributePathParamsListSize = 1;
+            readParams.mIsFabricFiltered = params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue];
 
             auto onDone = [resultArray, resultSuccess, resultFailure, context, successCb, failureCb](
                               BufferedReadAttributeCallback<NSObjectData> * callback) {
@@ -790,7 +798,7 @@ private:
             };
 
             auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<NSObjectData>>(
-                chipClusterId, chipAttributeId, onSuccessCb, onFailureCb, onDone, nullptr);
+                attributePath.mClusterId, attributePath.mAttributeId, onSuccessCb, onFailureCb, onDone, nullptr);
             VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
             auto readClient = chip::Platform::MakeUnique<app::ReadClient>(engine, [self internalDevice]->GetExchangeManager(),
@@ -814,10 +822,11 @@ private:
         });
 }
 
-- (void)writeAttributeWithEndpointId:(NSUInteger)endpointId
-                           clusterId:(NSUInteger)clusterId
-                         attributeId:(NSUInteger)attributeId
+- (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
                                value:(id)value
+                   timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                          clientQueue:(dispatch_queue_t)clientQueue
                           completion:(CHIPDeviceResponseHandler)completion
 {
@@ -873,9 +882,10 @@ private:
                   };
 
             return chip::Controller::WriteAttribute<NSObjectData>([self internalDevice]->GetSecureSession().Value(),
-                static_cast<chip::EndpointId>(endpointId), static_cast<chip::ClusterId>(clusterId),
-                static_cast<chip::AttributeId>(attributeId), NSObjectData(value), onSuccessCb, onFailureCb, NullOptional, onDoneCb,
-                NullOptional);
+                static_cast<chip::EndpointId>([endpointId unsignedShortValue]),
+                static_cast<chip::ClusterId>([clusterId unsignedLongValue]),
+                static_cast<chip::AttributeId>([attributeId unsignedLongValue]), NSObjectData(value), onSuccessCb, onFailureCb,
+                (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]), onDoneCb, NullOptional);
         });
 }
 
@@ -944,10 +954,11 @@ exit:
     }
 }
 
-- (void)invokeCommandWithEndpointId:(NSUInteger)endpointId
-                          clusterId:(NSUInteger)clusterId
-                          commandId:(NSUInteger)commandId
+- (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
                       commandFields:(id)commandFields
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(CHIPDeviceResponseHandler)completion
 {
@@ -982,8 +993,9 @@ exit:
                 }
             };
 
-            app::CommandPathParams commandPath = { (chip::EndpointId) endpointId, 0, (chip::ClusterId) clusterId,
-                (chip::CommandId) commandId, (app::CommandPathFlags::kEndpointIdValid) };
+            app::CommandPathParams commandPath = { static_cast<chip::EndpointId>([endpointId unsignedShortValue]), 0,
+                static_cast<chip::ClusterId>([clusterId unsignedLongValue]),
+                static_cast<chip::CommandId>([commandId unsignedLongValue]), (app::CommandPathFlags::kEndpointIdValid) };
 
             auto decoder = chip::Platform::MakeUnique<NSObjectCommandCallback>(
                 commandPath.mClusterId, commandPath.mCommandId, onSuccessCb, onFailureCb);
@@ -1017,7 +1029,8 @@ exit:
                 = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), [self internalDevice]->GetExchangeManager(), false);
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, NSObjectData(commandFields), chip::NullOptional));
+            ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, NSObjectData(commandFields),
+                (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue])));
             ReturnErrorOnFailure(commandSender->SendCommandRequest([self internalDevice]->GetSecureSession().Value()));
 
             decoder.release();
@@ -1026,11 +1039,12 @@ exit:
         });
 }
 
-- (void)subscribeAttributeWithEndpointId:(NSUInteger)endpointId
-                               clusterId:(NSUInteger)clusterId
-                             attributeId:(NSUInteger)attributeId
-                             minInterval:(NSUInteger)minInterval
-                             maxInterval:(NSUInteger)maxInterval
+- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(CHIPSubscribeParams * _Nullable)params
                              clientQueue:(dispatch_queue_t)clientQueue
                            reportHandler:(CHIPDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(SubscriptionEstablishedHandler)subscriptionEstablishedHandler
@@ -1074,13 +1088,18 @@ exit:
             }
         };
 
-        auto chipEndpointId = static_cast<chip::EndpointId>(endpointId);
-        auto chipClusterId = static_cast<chip::ClusterId>(clusterId);
-        auto chipAttributeId = static_cast<chip::AttributeId>(attributeId);
-
         CHIPReadClientContainer * container = [[CHIPReadClientContainer alloc] init];
         container.deviceId = self.cppDevice->GetDeviceId();
-        container.pathParams = Platform::New<app::AttributePathParams>(chipEndpointId, chipClusterId, chipAttributeId);
+        container.pathParams = Platform::New<app::AttributePathParams>();
+        if (endpointId) {
+            container.pathParams->mEndpointId = static_cast<chip::EndpointId>([endpointId unsignedShortValue]);
+        }
+        if (clusterId) {
+            container.pathParams->mClusterId = static_cast<chip::ClusterId>([clusterId unsignedLongValue]);
+        }
+        if (attributeId) {
+            container.pathParams->mAttributeId = static_cast<chip::AttributeId>([attributeId unsignedLongValue]);
+        }
 
         app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1088,6 +1107,11 @@ exit:
         chip::app::ReadPrepareParams readParams([self internalDevice]->GetSecureSession().Value());
         readParams.mpAttributePathParamsList = container.pathParams;
         readParams.mAttributePathParamsListSize = 1;
+        readParams.mMinIntervalFloorSeconds = static_cast<uint16_t>([minInterval unsignedShortValue]);
+        readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>([maxInterval unsignedShortValue]);
+        readParams.mIsFabricFiltered = (params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]);
+        readParams.mKeepSubscriptions
+            = (params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
 
         auto onDone = [container](BufferedReadAttributeCallback<NSObjectData> * callback) {
             chip::Platform::Delete(callback);
@@ -1095,7 +1119,7 @@ exit:
         };
 
         auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<NSObjectData>>(
-            chipClusterId, chipAttributeId, onReportCb, onFailureCb, onDone, onEstablishedCb);
+            container.pathParams->mClusterId, container.pathParams->mAttributeId, onReportCb, onFailureCb, onDone, onEstablishedCb);
 
         auto readClient = Platform::New<app::ReadClient>(engine, [self internalDevice]->GetExchangeManager(),
             callback -> GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
