@@ -33,9 +33,9 @@ namespace app {
 class DefaultAttributePersistenceProvider : public AttributePersistenceProvider
 {
 public:
-    // aStorage must outlive this object.
     DefaultAttributePersistenceProvider() {}
 
+    // Passed-in storage must outlive this object.
     CHIP_ERROR Init(PersistentStorageDelegate * storage)
     {
         if (storage == nullptr)
