@@ -56,8 +56,7 @@ public:
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
     CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
-                                               PasscodeId passcodeID);
+                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt);
 
     void CloseCommissioningWindow();
 
@@ -113,7 +112,6 @@ private:
     bool mUseECM = false;
     Spake2pVerifier mECMPASEVerifier;
     uint16_t mECMDiscriminator = 0;
-    PasscodeId mECMPasscodeID  = kDefaultCommissioningPasscodeId;
     // mListeningForPASE is true only when we are listening for
     // PBKDFParamRequest messages.
     bool mListeningForPASE  = false;

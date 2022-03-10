@@ -347,7 +347,7 @@ public class ChipDeviceController {
   public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
 
   /**
-   * Generates a new PASE verifier and passcode ID for the given setup PIN code.
+   * Generates a new PASE verifier for the given setup PIN code.
    *
    * @param devicePtr a pointer to the device object for which to generate the PASE verifier
    * @param setupPincode the PIN code to use
