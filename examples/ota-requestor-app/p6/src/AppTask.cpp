@@ -65,7 +65,6 @@ using chip::GetRequestorInstance;
 using chip::NodeId;
 using chip::OTADownloader;
 using chip::OTAImageProcessorImpl;
-using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
 using chip::System::Layer;
 

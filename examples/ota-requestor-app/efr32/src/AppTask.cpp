@@ -542,9 +542,7 @@ void AppTask::InitOTARequestor()
 
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    OTAImageProcessorParams ipParams;
-    ipParams.imageFile = CharSpan("test.txt");
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTAImageFile(CharSpan("test.txt"));
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Connect the Downloader and Image Processor objects

@@ -50,7 +50,6 @@ using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
 using chip::OTADownloader;
-using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
 using chip::PeerId;
 using chip::Server;
@@ -107,12 +106,6 @@ static void InitOTARequestor(void)
     // Set server instance used for session establishment
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
 
-    // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
-    // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
-    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
-    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
-    OTAImageProcessorParams ipParams;
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Connect the Downloader and Image Processor objects
