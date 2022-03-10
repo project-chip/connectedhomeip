@@ -103,7 +103,7 @@ CHIP_ERROR GetSetupPayload(chip::SetupPayload & aSetupPayload, chip::RendezvousI
         ChipLogError(AppServer, "ConfigurationMgr().GetCommissionableDataProvider()->GetSetupPasscode() failed: %s",
                      chip::ErrorStr(err));
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
-        ChipLogProgress(AppServer, "*** Using default EXAMPLE passcode %u " ***",
+        ChipLogProgress(AppServer, "*** Using default EXAMPLE passcode %u ***",
                         static_cast<unsigned>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));
         aSetupPayload.setUpPINCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
 #else
