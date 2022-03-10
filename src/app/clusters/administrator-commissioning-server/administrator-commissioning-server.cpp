@@ -95,7 +95,6 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     auto & discriminator        = commandData.discriminator;
     auto & iterations           = commandData.iterations;
     auto & salt                 = commandData.salt;
-    auto & passcodeID           = commandData.passcodeID;
 
     Optional<StatusCode> status = Optional<StatusCode>::Missing();
     Spake2pVerifier verifier;
@@ -124,7 +123,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenEnhancedCommissioningWindow(
-                     commissioningTimeout, discriminator, verifier, iterations, salt, passcodeID) == CHIP_NO_ERROR,
+                     commissioningTimeout, discriminator, verifier, iterations, salt) == CHIP_NO_ERROR,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 

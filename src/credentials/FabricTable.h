@@ -274,6 +274,7 @@ class DLL_EXPORT FabricTableDelegate
     friend class FabricTable;
 
 public:
+    FabricTableDelegate(bool ownedByFabricTable = false) : mOwnedByFabricTable(ownedByFabricTable) {}
     virtual ~FabricTableDelegate() {}
     /**
      * Gets called when a fabric is deleted from KVS store.
@@ -292,6 +293,7 @@ public:
 
 private:
     FabricTableDelegate * mNext = nullptr;
+    bool mOwnedByFabricTable    = false;
 };
 
 /**
@@ -365,6 +367,8 @@ class DLL_EXPORT FabricTable
 {
 public:
     FabricTable() { Reset(); }
+    ~FabricTable();
+
     CHIP_ERROR Store(FabricIndex index);
     CHIP_ERROR LoadFromStorage(FabricInfo * info);
 

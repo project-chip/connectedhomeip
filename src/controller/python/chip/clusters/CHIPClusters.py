@@ -148,7 +148,6 @@ class ChipClusters:
                         "discriminator": "int",
                         "iterations": "int",
                         "salt": "bytes",
-                        "passcodeID": "int",
                     },
                 },
             0x00000002: {

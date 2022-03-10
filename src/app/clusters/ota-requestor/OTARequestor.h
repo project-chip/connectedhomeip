@@ -25,11 +25,12 @@
 #include <app/CASESessionManager.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/server/Server.h>
-#include <platform/OTARequestorDriver.h>
 #include <protocols/bdx/BdxMessages.h>
 
 #include "BDXDownloader.h"
+#include "OTARequestorDriver.h"
 #include "OTARequestorInterface.h"
+#include "OTARequestorStorage.h"
 
 namespace chip {
 
@@ -106,21 +107,21 @@ public:
      *   - Set the OTA requestor driver instance used to communicate download progress and errors
      *   - Set the BDX downloader instance used for initiating BDX downloads
      */
-    CHIP_ERROR Init(Server * server, OTARequestorDriver * driver, BDXDownloader * downloader)
+    CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader)
     {
-        mServer             = server;
-        mCASESessionManager = server->GetCASESessionManager();
-        mOtaRequestorDriver = driver;
-        mBdxDownloader      = downloader;
+        mServer             = &server;
+        mCASESessionManager = server.GetCASESessionManager();
+        mStorage            = &storage;
+        mOtaRequestorDriver = &driver;
+        mBdxDownloader      = &downloader;
 
         uint32_t version;
         ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
         mCurrentVersion = version;
 
+        storage.LoadDefaultProviders(mDefaultOtaProviderList);
         OtaRequestorServerSetUpdateState(mCurrentUpdateState);
-        app::DataModel::Nullable<uint8_t> percent;
-        percent.SetNull();
-        OtaRequestorServerSetUpdateStateProgress(percent);
+        OtaRequestorServerSetUpdateStateProgress(app::DataModel::NullNullable);
 
         // This results in the initial periodic timer kicking off
         RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
@@ -128,11 +129,6 @@ public:
         return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor,
                                                                     reinterpret_cast<intptr_t>(this));
     }
-
-    /**
-     * Called to set optional requestorCanConsent value provided by Requestor.
-     */
-    void SetRequestorCanConsent(bool requestorCanConsent) { mRequestorCanConsent.SetValue(requestorCanConsent); }
 
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
@@ -241,11 +237,16 @@ private:
     };
 
     /**
-     * Called to establish a session to mProviderLocation.
+     * Called to establish a session to provider indicated by mProviderLocation
      *
      * @param onConnectedAction  The action to take once session to provider has been established
      */
     void ConnectToProvider(OnConnectedAction onConnectedAction);
+
+    /**
+     * Called to tear down a session to provider indicated by mProviderLocation
+     */
+    void DisconnectFromProvider();
 
     /**
      * Start download of the software image returned in QueryImageResponse
@@ -293,6 +294,7 @@ private:
      */
     static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
+    OTARequestorStorage * mStorage            = nullptr;
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;
@@ -307,7 +309,6 @@ private:
     CharSpan mFileDesignator;
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
-    chip::Optional<bool> mRequestorCanConsent;
     ProviderLocationList mDefaultOtaProviderList;
     Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current update in progress
 };

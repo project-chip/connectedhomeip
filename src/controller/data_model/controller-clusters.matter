@@ -125,7 +125,6 @@ client cluster AdministratorCommissioning = 60 {
     INT16U discriminator = 2;
     INT32U iterations = 3;
     OCTET_STRING salt = 4;
-    INT16U passcodeID = 5;
   }
 
   timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
@@ -3279,6 +3278,34 @@ client cluster TestCluster = 1295 {
     kValueC = 3;
   }
 
+  bitmap Bitmap16MaskMap : BITMAP16 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x4000;
+  }
+
+  bitmap Bitmap32MaskMap : BITMAP32 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x40000000;
+  }
+
+  bitmap Bitmap64MaskMap : BITMAP64 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x4000000000000000;
+  }
+
+  bitmap Bitmap8MaskMap : BITMAP8 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x40;
+  }
+
   bitmap SimpleBitmap : BITMAP8 {
     kValueA = 0x1;
     kValueB = 0x2;
@@ -3357,10 +3384,10 @@ client cluster TestCluster = 1295 {
   }
 
   attribute boolean boolean = 0;
-  attribute bitmap8 bitmap8 = 1;
-  attribute bitmap16 bitmap16 = 2;
-  attribute bitmap32 bitmap32 = 3;
-  attribute bitmap64 bitmap64 = 4;
+  attribute Bitmap8MaskMap bitmap8 = 1;
+  attribute Bitmap16MaskMap bitmap16 = 2;
+  attribute Bitmap32MaskMap bitmap32 = 3;
+  attribute Bitmap64MaskMap bitmap64 = 4;
   attribute int8u int8u = 5;
   attribute int16u int16u = 6;
   attribute int24u int24u = 7;
@@ -3405,10 +3432,10 @@ client cluster TestCluster = 1295 {
   attribute boolean clusterErrorBoolean = 50;
   attribute boolean unsupported = 255;
   attribute nullable boolean nullableBoolean = 32768;
-  attribute nullable bitmap8 nullableBitmap8 = 32769;
-  attribute nullable bitmap16 nullableBitmap16 = 32770;
-  attribute nullable bitmap32 nullableBitmap32 = 32771;
-  attribute nullable bitmap64 nullableBitmap64 = 32772;
+  attribute nullable Bitmap8MaskMap nullableBitmap8 = 32769;
+  attribute nullable Bitmap16MaskMap nullableBitmap16 = 32770;
+  attribute nullable Bitmap32MaskMap nullableBitmap32 = 32771;
+  attribute nullable Bitmap64MaskMap nullableBitmap64 = 32772;
   attribute nullable int8u nullableInt8u = 32773;
   attribute nullable int16u nullableInt16u = 32774;
   attribute nullable int24u nullableInt24u = 32775;

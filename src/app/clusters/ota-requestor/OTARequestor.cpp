@@ -184,7 +184,14 @@ void OTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" CHIP_ERROR_FORMAT, error.Format());
+    ChipLogError(SoftwareUpdate, "Received QueryImage failure response: %" CHIP_ERROR_FORMAT, error.Format());
+
+    if (error == CHIP_ERROR_TIMEOUT)
+    {
+        ChipLogError(SoftwareUpdate, "CASE session may be invalid, tear down session");
+        requestorCore->DisconnectFromProvider();
+    }
+
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
 }
 
@@ -303,6 +310,33 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
         RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
+}
+
+void OTARequestor::DisconnectFromProvider()
+{
+    if (mServer == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Server not set");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    if (!mProviderLocation.HasValue())
+    {
+        ChipLogError(SoftwareUpdate, "Provider location not set");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
+    if (fabricInfo == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot find fabric");
+        RecordErrorUpdateState(UpdateFailureState::kUnknown, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    mCASESessionManager->ReleaseSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID));
 }
 
 // Requestor is directed to cancel image update in progress. All the Requestor state is
@@ -484,18 +518,13 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
 
 CHIP_ERROR OTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
 {
-    // Remove all entries for the fabric index indicated
-    auto iterator = mDefaultOtaProviderList.Begin();
-    while (iterator.Next())
-    {
-        ProviderLocation::Type pl = iterator.GetValue();
-        if (pl.GetFabricIndex() == fabricIndex)
-        {
-            mDefaultOtaProviderList.Delete(pl);
-        }
-    }
+    CHIP_ERROR error = mDefaultOtaProviderList.Delete(fabricIndex);
 
-    return CHIP_NO_ERROR;
+    // Ignore the error if no entry for the associated fabric index has been found.
+    ReturnErrorCodeIf(error == CHIP_ERROR_NOT_FOUND, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(error);
+
+    return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);
 }
 
 CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocation::Type & providerLocation)
@@ -514,7 +543,7 @@ CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocation::Type & pr
 
     ReturnErrorOnFailure(mDefaultOtaProviderList.Add(providerLocation));
 
-    return CHIP_NO_ERROR;
+    return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);
 }
 
 void OTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTAChangeReasonEnum reason)
@@ -627,7 +656,7 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
-    args.requestorCanConsent.SetValue(mRequestorCanConsent.ValueOr(mOtaRequestorDriver->CanConsent()));
+    args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
     if (DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)

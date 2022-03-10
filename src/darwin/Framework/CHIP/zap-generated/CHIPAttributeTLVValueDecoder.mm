@@ -9598,7 +9598,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
             return value;
         }
         case Attributes::Bitmap16::Id: {
@@ -9609,7 +9609,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::Bitmap32::Id: {
@@ -9620,7 +9620,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
             return value;
         }
         case Attributes::Bitmap64::Id: {
@@ -9631,7 +9631,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedLongLong:cppValue];
+            value = [NSNumber numberWithUnsignedLongLong:cppValue.Raw()];
             return value;
         }
         case Attributes::Int8u::Id: {
@@ -10463,7 +10463,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value().Raw()];
             }
             return value;
         }
@@ -10478,7 +10478,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value().Raw()];
             }
             return value;
         }
@@ -10493,7 +10493,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+                value = [NSNumber numberWithUnsignedInt:cppValue.Value().Raw()];
             }
             return value;
         }
@@ -10508,7 +10508,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+                value = [NSNumber numberWithUnsignedLongLong:cppValue.Value().Raw()];
             }
             return value;
         }

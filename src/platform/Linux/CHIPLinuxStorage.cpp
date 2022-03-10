@@ -53,6 +53,13 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
+    ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Using KVS config file: %s", configFile);
+    if (mInitialized)
+    {
+        ChipLogError(DeviceLayer, "ChipLinuxStorage::Init: Attempt to re-initialize with KVS config file: %s", configFile);
+        return CHIP_NO_ERROR;
+    }
+
     mConfigPath.assign(configFile);
     retval = ChipLinuxStorageIni::Init();
 
@@ -75,6 +82,8 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
     {
         retval = ChipLinuxStorageIni::AddConfig(mConfigPath);
     }
+
+    mInitialized = true;
 
     return retval;
 }

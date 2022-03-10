@@ -10033,7 +10033,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDiscriminator)), discriminator));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIterations)), iterations));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSalt)), salt));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPasscodeID)), passcodeID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10063,9 +10062,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kSalt):
             ReturnErrorOnFailure(DataModel::Decode(reader, salt));
-            break;
-        case to_underlying(Fields::kPasscodeID):
-            ReturnErrorOnFailure(DataModel::Decode(reader, passcodeID));
             break;
         default:
             break;

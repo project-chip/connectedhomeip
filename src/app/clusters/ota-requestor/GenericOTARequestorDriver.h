@@ -17,9 +17,10 @@
 
 #pragma once
 
-#include <platform/OTARequestorDriver.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
+
+#include "OTARequestorDriver.h"
 
 namespace chip {
 
@@ -86,7 +87,7 @@ protected:
     uint32_t mPeriodicQueryTimeInterval = (24 * 60 * 60); // Timeout for querying providers on the default OTA provider list
 
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-    ProviderLocationType mLastUsedProvider; // Provider location used for the last query or update
+    Optional<ProviderLocationType> mLastUsedProvider; // Provider location used for the last query or update
 };
 
 } // namespace DeviceLayer

@@ -16,8 +16,9 @@
  */
 #pragma once
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/GenericOTARequestorDriver.h>
 #include <platform/OTARequestorUserConsentDelegate.h>
+
+#include "GenericOTARequestorDriver.h"
 
 namespace chip {
 namespace DeviceLayer {

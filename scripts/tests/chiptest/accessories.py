@@ -35,6 +35,11 @@ class AppsRegister:
     def uninit(self):
         self.__stopXMLRPCServer()
 
+    @property
+    def accessories(self):
+        """List of registered accessory applications."""
+        return self.__accessories.values()
+
     def add(self, name, accessory):
         self.__accessories[name] = accessory
 
@@ -43,13 +48,6 @@ class AppsRegister:
 
     def removeAll(self):
         self.__accessories = {}
-
-    def poll(self):
-        for accessory in self.__accessories.values():
-            status = accessory.poll()
-            if status is not None:
-                return status
-        return None
 
     def kill(self, name):
         accessory = self.__accessories[name]

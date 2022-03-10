@@ -316,15 +316,6 @@ if (chip_device_platform != "none") {
       ]
     }
 
-    if (chip_enable_ota_requestor) {
-      sources += [
-        "ExtendedOTARequestorDriver.cpp",
-        "ExtendedOTARequestorDriver.h",
-        "GenericOTARequestorDriver.cpp",
-        "GenericOTARequestorDriver.h",
-      ]
-    }
-
     cflags = [ "-Wconversion" ]
 
     public_deps = [

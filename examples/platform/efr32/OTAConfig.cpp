@@ -62,6 +62,7 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 
 // Global OTA objects
 chip::OTARequestor gRequestorCore;
+chip::DefaultOTARequestorStorage gRequestorStorage;
 chip::DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 chip::BDXDownloader gDownloader;
 chip::OTAImageProcessorImpl gImageProcessor;
@@ -71,13 +72,12 @@ void OTAConfig::Init()
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
 
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    chip::OTAImageProcessorParams ipParams;
-    ipParams.imageFile = chip::CharSpan("test.txt");
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTAImageFile(chip::CharSpan("test.txt"));
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Connect the Downloader and Image Processor objects

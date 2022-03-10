@@ -166,7 +166,7 @@ public:
         /**
          *  Callback invoked when an existing group is removed.
          *
-         *  @param[in] removed_state  GroupInfo structure of the removed group.
+         *  @param[in] old_group  GroupInfo structure of the removed group.
          */
         virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) = 0;
     };

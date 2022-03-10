@@ -68,9 +68,7 @@ class {{filename}}: public TestCommandBridge
       }
     }
 
-  {{#if timeout}}
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.HasValue() ? mTimeout.Value() : {{timeout}}); }
-  {{/if}}
+  chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr({{chip_tests_config_get_default_value "timeout"}})); }
 
   private:
     std::atomic_uint16_t mTestIndex;

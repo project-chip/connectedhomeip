@@ -1531,8 +1531,6 @@ NS_ASSUME_NONNULL_BEGIN
         _iterations = @(0);
 
         _salt = [NSData data];
-
-        _passcodeID = @(0);
     }
     return self;
 }

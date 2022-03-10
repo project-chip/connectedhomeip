@@ -112,7 +112,7 @@ public:
     {
         auto & attribute = this->attribute();
         auto & value     = std::get<1>(attribute);
-        return value == "On" || value == "Off";
+        return value == "On" || value == "Off" || value == "Yes" || value == "No";
     }
     virtual std::string GetTitle()
     {
@@ -169,19 +169,40 @@ public:
                 ESP_LOGI(TAG, "Saturation changed to : %d", n * 100 / 254);
                 app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, n);
             }
+            else if (name == "Illuminance")
+            {
+                // update the current illuminance here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Illuminance changed to : %d", n);
+                app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n));
+            }
+            else if (name == "Humidity")
+            {
+                // update the current humidity here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Humidity changed to : %d", n);
+                app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+            }
             value = buffer;
         }
         else if (IsBooleanAttribute())
         {
             auto & name    = std::get<0>(attribute);
             auto & cluster = std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]);
-            value          = (value == "On") ? "Off" : "On";
 
             if (name == "OnOff" && cluster == "OnOff")
             {
+                value                  = (value == "On") ? "Off" : "On";
                 uint8_t attributeValue = (value == "On") ? 1 : 0;
                 emberAfWriteServerAttribute(endpointIndex + 1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
                                             (uint8_t *) &attributeValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+            }
+
+            if (name == "Occupancy" && cluster == "Occupancy Sensor")
+            {
+                value                  = (value == "Yes") ? "No" : "Yes";
+                uint8_t attributeValue = (value == "Yes") ? 1 : 0;
+                ESP_LOGI(TAG, "Occupancy changed to : %s", value.c_str());
+                // update the current occupancy here for hardcoded endpoint 1
+                app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
             }
         }
         else
@@ -437,13 +458,13 @@ void SetupPretendDevices()
     AddDevice("Occupancy Sensor");
     AddEndpoint("External");
     AddCluster("Occupancy Sensor");
-    AddAttribute("Occupancy", "1");
+    AddAttribute("Occupancy", "Yes");
     app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, 1);
 
     AddDevice("Contact Sensor");
     AddEndpoint("External");
     AddCluster("Contact Sensor");
-    AddAttribute("BooleanState", "true");
+    AddAttribute("Contact", "true");
     app::Clusters::BooleanState::Attributes::StateValue::Set(1, true);
 
     AddDevice("Thermostat");
@@ -461,13 +482,13 @@ void SetupPretendDevices()
     AddDevice("Humidity Sensor");
     AddEndpoint("External");
     AddCluster("Humidity Sensor");
-    AddAttribute("MeasuredValue", "30");
+    AddAttribute("Humidity", "30");
     app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
 
     AddDevice("Light Sensor");
     AddEndpoint("External");
     AddCluster("Illuminance Measurement");
-    AddAttribute("MeasuredValue", "1000");
+    AddAttribute("Illuminance", "1000");
     app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
 
     AddDevice("Color Light");

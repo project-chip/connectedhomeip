@@ -135,8 +135,8 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         break;
     case DiscoveryFilterType::kCompressedFabricId:
         requiredSize = snprintf(buffer, bufferLen, "_I");
-        return Encoding::BytesToHex(subtype.code, &buffer[requiredSize], bufferLen - requiredSize,
-                                    Encoding::HexFlags::kUppercaseAndNullTerminate);
+        return Encoding::Uint64ToHex(subtype.code, &buffer[requiredSize], bufferLen - requiredSize,
+                                     Encoding::HexFlags::kUppercaseAndNullTerminate);
         break;
     case DiscoveryFilterType::kInstanceName:
         requiredSize = snprintf(buffer, bufferLen, "%s", subtype.instanceName);
