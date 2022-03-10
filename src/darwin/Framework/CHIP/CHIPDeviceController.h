@@ -70,6 +70,12 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
                                        setupPIN:(NSUInteger)setupPIN
                                           error:(NSError * __autoreleasing *)error;
 
+/**
+ * Temporary until PairingDelegate is fixed to clearly communicate this
+ * information to consumers.
+ */
+- (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
+
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
