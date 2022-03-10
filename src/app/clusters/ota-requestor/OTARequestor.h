@@ -61,7 +61,7 @@ public:
     void ApplyUpdate() override;
 
     // Initiate the session to send NotifyUpdateApplied command
-    void NotifyUpdateApplied(uint32_t version) override;
+    void NotifyUpdateApplied() override;
 
     // Get image update progress in percents unit
     CHIP_ERROR GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress) override;
@@ -114,11 +114,22 @@ public:
         mOtaRequestorDriver = &driver;
         mBdxDownloader      = &downloader;
 
-        uint32_t version;
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
-        mCurrentVersion = version;
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(mCurrentVersion));
 
         storage.LoadDefaultProviders(mDefaultOtaProviderList);
+
+        ProviderLocationType providerLocation;
+        if (storage.LoadCurrentProviderLocation(providerLocation) == CHIP_NO_ERROR)
+        {
+            mProviderLocation.SetValue(providerLocation);
+        }
+
+        MutableByteSpan updateToken(mUpdateTokenBuffer);
+        if (storage.LoadUpdateToken(updateToken) == CHIP_NO_ERROR)
+        {
+            mUpdateToken = updateToken;
+        }
+
 
         // Schedule the initializations that needs to be performed in the CHIP context
         DeviceLayer::PlatformMgr().ScheduleWork(InitState, reinterpret_cast<intptr_t>(this));
@@ -264,6 +275,11 @@ private:
      * Send NotifyUpdateApplied request
      */
     CHIP_ERROR SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy);
+
+    /**
+     * Store current update information to KVS
+     */
+    void StoreCurrentUpdateInfo();
 
     /**
      * Session connection callbacks

@@ -39,20 +39,40 @@ namespace chip {
 namespace DeviceLayer {
 namespace {
 
-constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
-constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
-
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
+
+constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
+constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
+constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
 
 GenericOTARequestorDriver * ToDriver(void * context)
 {
     return static_cast<GenericOTARequestorDriver *>(context);
 }
 
-constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
-
 } // namespace
+
+void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
+{
+    mRequestor      = requestor;
+    mImageProcessor = processor;
+
+    if (mImageProcessor->IsFirstImageRun())
+    {
+        SystemLayer().ScheduleLambda([this] {
+            CHIP_ERROR error = mImageProcessor->ConfirmCurrentImage();
+
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(SoftwareUpdate, "Failed to confirm image: %" CHIP_ERROR_FORMAT, error.Format());
+                return;
+            }
+
+            mRequestor->NotifyUpdateApplied();
+        });
+    }
+}
 
 bool GenericOTARequestorDriver::CanConsent()
 {

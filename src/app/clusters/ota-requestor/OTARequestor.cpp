@@ -159,6 +159,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             memcpy(fileDesignator.data(), update.fileDesignator.data(), update.fileDesignator.size());
             fileDesignator.reduce_size(update.fileDesignator.size());
             requestorCore->mFileDesignator = fileDesignator;
+            requestorCore->StoreCurrentUpdateInfo();
 
             requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
                                                                 System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
@@ -506,11 +507,8 @@ void OTARequestor::ApplyUpdate()
     ConnectToProvider(kApplyUpdate);
 }
 
-void OTARequestor::NotifyUpdateApplied(uint32_t version)
+void OTARequestor::NotifyUpdateApplied()
 {
-    // New version is executing so update where applicable
-    mCurrentVersion = version;
-
     // Log the VersionApplied event
     uint16_t productId;
     if (DeviceLayer::ConfigurationMgr().GetProductId(productId) != CHIP_NO_ERROR)
@@ -520,7 +518,7 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
         return;
     }
 
-    OtaRequestorServerOnVersionApplied(version, productId);
+    OtaRequestorServerOnVersionApplied(mCurrentVersion, productId);
 
     // There is no response for a notify so consider this OTA complete
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
@@ -777,6 +775,22 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
     cluster.Associate(&deviceProxy, mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnNotifyUpdateAppliedResponse, OnNotifyUpdateAppliedFailure);
+}
+
+void OTARequestor::StoreCurrentUpdateInfo()
+{
+    // TODO: change OTA requestor storage interface to store both values at once
+    CHIP_ERROR error = mStorage->StoreCurrentProviderLocation(mProviderLocation.Value());
+
+    if (error == CHIP_NO_ERROR)
+    {
+        mStorage->StoreUpdateToken(mUpdateToken);
+    }
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to store current update: %" CHIP_ERROR_FORMAT, error.Format());
+    }
 }
 
 // Invoked when the device becomes commissioned

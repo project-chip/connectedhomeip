@@ -134,8 +134,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor != nullptr)
     {
-        // TODO: Use software version from Configuration Manager
-        requestor->NotifyUpdateApplied(imageProcessor->mSoftwareVersion);
+        // TODO: Implement restarting into new image instead of changing the version
+        ConfigurationMgr().StoreSoftwareVersion(imageProcessor->mSoftwareVersion);
+        requestor->NotifyUpdateApplied();
     }
 }
 
