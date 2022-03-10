@@ -34,7 +34,7 @@ uint32_t OTAImageProcessorImpl::mWriteOffset;
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    if (mParams.imageFile.empty())
+    if (mImageFile.empty())
     {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
@@ -80,7 +80,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    if (mParams.imageFile.empty())
+    if (mImageFile.empty())
     {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
@@ -143,7 +143,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
     imageProcessor->ReleaseBlock();
 
-    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mParams.imageFile.data());
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mImageFile.data());
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)

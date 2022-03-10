@@ -240,7 +240,7 @@ tests:
           [5094:213098] CHIP: [DMG] SuppressResponse = true, [1646261193889]
           [5094:213098] CHIP: [DMG] InteractionModelRevision = 1 [1646261193889]
           [5094:213098] CHIP: [DMG] } [1646261193889] [5094:213098] CHIP: [TOO]
-          Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF9DataVersion:
+          Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFF9 DataVersion:
           759594214 [1646261193889] [5094:213098] CHIP: [TOO]
           ClientGeneratedCommandList: 0 entries"
       disabled: true

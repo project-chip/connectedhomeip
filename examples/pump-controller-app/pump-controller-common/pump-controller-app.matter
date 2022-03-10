@@ -96,7 +96,6 @@ server cluster AdministratorCommissioning = 60 {
     INT16U discriminator = 2;
     INT32U iterations = 3;
     OCTET_STRING salt = 4;
-    INT16U passcodeID = 5;
   }
 
   timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
@@ -1025,110 +1024,6 @@ client cluster PumpConfigurationAndControl = 512 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
-server cluster Scenes = 5 {
-  bitmap ScenesCopyMode : BITMAP8 {
-    kCopyAllScenes = 0x1;
-  }
-
-  struct SceneExtensionFieldSet {
-    CLUSTER_ID clusterId = 0;
-    INT8U length = 1;
-    INT8U value = 2;
-  }
-
-  readonly attribute int8u sceneCount = 0;
-  readonly attribute int8u currentScene = 1;
-  readonly attribute int16u currentGroup = 2;
-  readonly attribute boolean sceneValid = 3;
-  readonly attribute bitmap8 nameSupport = 4;
-  readonly global attribute int16u clusterRevision = 65533;
-
-  request struct AddSceneRequest {
-    INT16U groupId = 0;
-    INT8U sceneId = 1;
-    INT16U transitionTime = 2;
-    CHAR_STRING sceneName = 3;
-    SceneExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  request struct GetSceneMembershipRequest {
-    INT16U groupId = 0;
-  }
-
-  request struct RecallSceneRequest {
-    INT16U groupId = 0;
-    INT8U sceneId = 1;
-    INT16U transitionTime = 2;
-  }
-
-  request struct RemoveAllScenesRequest {
-    INT16U groupId = 0;
-  }
-
-  request struct RemoveSceneRequest {
-    INT16U groupId = 0;
-    INT8U sceneId = 1;
-  }
-
-  request struct StoreSceneRequest {
-    INT16U groupId = 0;
-    INT8U sceneId = 1;
-  }
-
-  request struct ViewSceneRequest {
-    INT16U groupId = 0;
-    INT8U sceneId = 1;
-  }
-
-  response struct AddSceneResponse {
-    ENUM8 status = 0;
-    INT16U groupId = 1;
-    INT8U sceneId = 2;
-  }
-
-  response struct GetSceneMembershipResponse {
-    ENUM8 status = 0;
-    INT8U capacity = 1;
-    INT16U groupId = 2;
-    INT8U sceneCount = 3;
-    INT8U sceneList[] = 4;
-  }
-
-  response struct RemoveAllScenesResponse {
-    ENUM8 status = 0;
-    INT16U groupId = 1;
-  }
-
-  response struct RemoveSceneResponse {
-    ENUM8 status = 0;
-    INT16U groupId = 1;
-    INT8U sceneId = 2;
-  }
-
-  response struct StoreSceneResponse {
-    ENUM8 status = 0;
-    INT16U groupId = 1;
-    INT8U sceneId = 2;
-  }
-
-  response struct ViewSceneResponse {
-    ENUM8 status = 0;
-    INT16U groupId = 1;
-    INT8U sceneId = 2;
-    INT16U transitionTime = 3;
-    CHAR_STRING sceneName = 4;
-    SceneExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  command AddScene(AddSceneRequest): AddSceneResponse = 0;
-  command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  command RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  command RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  command StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-}
-
 server cluster SoftwareDiagnostics = 52 {
   struct ThreadMetrics {
     INT64U id = 0;
@@ -1378,7 +1273,6 @@ endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
   server  cluster OtaSoftwareUpdateRequestor;
   server  cluster OperationalCredentials;
-  server  cluster Scenes;
   server  cluster SoftwareDiagnostics;
   server  cluster ThreadNetworkDiagnostics;
   server  cluster TimeFormatLocalization;

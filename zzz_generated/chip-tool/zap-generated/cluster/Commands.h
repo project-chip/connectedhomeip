@@ -6453,7 +6453,6 @@ public:
         AddArgument("Discriminator", 0, UINT16_MAX, &mRequest.discriminator);
         AddArgument("Iterations", 0, UINT32_MAX, &mRequest.iterations);
         AddArgument("Salt", &mRequest.salt);
-        AddArgument("PasscodeID", 0, UINT16_MAX, &mRequest.passcodeID);
         ClusterCommand::AddArguments();
     }
 

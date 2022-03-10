@@ -26,9 +26,8 @@
 
 namespace chip {
 
-struct OTAImageProcessorParams
+struct OTAImageProgress
 {
-    CharSpan imageFile;
     uint64_t downloadedBytes = 0;
     uint64_t totalFileBytes  = 0;
 };
@@ -77,11 +76,6 @@ public:
     virtual CHIP_ERROR ProcessBlock(ByteSpan & block) = 0;
 
     /**
-     * Called to setup params for the OTA image download
-     */
-    virtual void SetOTAImageProcessorParams(OTAImageProcessorParams & params) { mParams = params; };
-
-    /**
      * Called to check the current download status of the OTA image download.
      */
     virtual app::DataModel::Nullable<uint8_t> GetPercentComplete()
@@ -97,7 +91,7 @@ public:
     virtual uint64_t GetBytesDownloaded() { return mParams.downloadedBytes; }
 
 protected:
-    OTAImageProcessorParams mParams;
+    OTAImageProgress mParams;
 };
 
 } // namespace chip
