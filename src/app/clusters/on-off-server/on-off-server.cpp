@@ -176,7 +176,8 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
             emberAfOnOffClusterPrintln("ERR: reading onMode %x", status);
             return status;
         }
-        if (!onMode.IsNull() && onMode.HasValidValue()) {
+        if (!onMode.IsNull() && onMode.HasValidValue())
+        {
             emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
             status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
         }

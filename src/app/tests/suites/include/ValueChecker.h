@@ -94,8 +94,7 @@ protected:
     {
         auto nullableName = std::string(itemName);
         nullableName += " expected value";
-        return CheckValueNonNull(nullableName.c_str(), expected) &&
-            CheckValue(itemName, current, expected.Value());
+        return CheckValueNonNull(nullableName.c_str(), expected) && CheckValue(itemName, current, expected.Value());
     }
 
     template <typename T>
