@@ -60,7 +60,7 @@ tests:
           SuppressResponse = true, [1646201945.126404][2860:2865] CHIP:DMG:
           InteractionModelRevision = 1 [1646201945.126437][2860:2865] CHIP:DMG:
           } [1646201945.126644][2860:2865] CHIP:TOO: Endpoint: 0 Cluster:
-          0x0000_0030 Attribute 0x0000_0002DataVersion: 1894223167
+          0x0000_0030 Attribute 0x0000_0002 DataVersion: 1894223167
           [1646201945.126728][2860:2865] CHIP:TOO: RegulatoryConfig: 0
           [1646201945.126810][2860:2865] CHIP:EM: Sending Standalone Ack for
           MessageCounter:2750188 on exchange 60766ii"
@@ -73,7 +73,7 @@ tests:
           SuppressResponse = true, [1646201921.080530][2848:2853] CHIP:DMG:
           InteractionModelRevision = 1 [1646201921.080561][2848:2853] CHIP:DMG:
           } [1646201921.080735][2848:2853] CHIP:TOO: Endpoint: 0 Cluster:
-          0x0000_0030 Attribute 0x0000_0003DataVersion: 1894223167
+          0x0000_0030 Attribute 0x0000_0003 DataVersion: 1894223167
           [1646201921.080821][2848:2853] CHIP:TOO: LocationCapability: 0
           [1646201921.080903][2848:2853] CHIP:EM: Sending Standalone Ack for
           MessageCounter:13587220 on exchange 43838ii"
@@ -83,7 +83,7 @@ tests:
       verification:
           "ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning read
           basic-commissioning-info 1 0 [1646201777.003556][2827:2832] CHIP:TOO:
-          Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0001DataVersion:
+          Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0001 DataVersion:
           1894223167 [1646201777.006423][2827:2832] CHIP:TOO:
           BasicCommissioningInfo: { [1646201777.006478][2827:2832] CHIP:TOO:
           FailSafeExpiryLengthSeconds: 60 [1646201777.006512][2827:2832]
@@ -127,7 +127,7 @@ tests:
           CHIP:DMG: SuppressResponse = true,[1646202241.425668][2879:2884]
           CHIP:DMG: InteractionModelRevision = 1 [1646202241.425702][2879:2884]
           CHIP:DMG: } [1646202241.426186][2879:2884] CHIP:TOO: Endpoint: 0
-          Cluster: 0x0000_0030 Attribute 0x0000_FFF8DataVersion: 1894223167
+          Cluster: 0x0000_0030 Attribute 0x0000_FFF8 DataVersion: 1894223167
           [1646202241.426293][2879:2884] CHIP:TOO: ServerGeneratedCommandList: 2
           entries [1646202241.426379][2879:2884] CHIP:TOO: [1]:
           1[1646202241.426420][2879:2884] CHIP:TOO: [2]: 5
@@ -142,7 +142,7 @@ tests:
           CHIP:DMG: SuppressResponse = true, [1646202324.586156][2908:2913]
           CHIP:DMG: InteractionModelRevision = 1 [1646202324.586198][2908:2913]
           CHIP:DMG: } [1646202324.587108][2908:2913] CHIP:TOO: Endpoint: 0
-          Cluster: 0x0000_0030 Attribute 0x0000_FFF9DataVersion: 1894223167
+          Cluster: 0x0000_0030 Attribute 0x0000_FFF9 DataVersion: 1894223167
           [1646202324.587242][2908:2913] CHIP:TOO: ClientGeneratedCommandList: 4
           entries [1646202324.587385][2908:2913] CHIP:TOO: [1]: 0
           [1646202324.587438][2908:2913] CHIP:TOO: [2]: 2

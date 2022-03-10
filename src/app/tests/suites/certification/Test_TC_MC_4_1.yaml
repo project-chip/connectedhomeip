@@ -24,7 +24,7 @@ tests:
       verification:
           "./chip-tool wakeonlan read macaddress 1 1 [1646140497523]
           [83791:3722553] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0503 Attribute
-          0x0000_0000DataVersion: 937942620 [1646140497523] [83791:3722553]
+          0x0000_0000 DataVersion: 937942620 [1646140497523] [83791:3722553]
           CHIP: [TOO] MACAddress: 00:00:00:00:00"
       disabled: true
 
