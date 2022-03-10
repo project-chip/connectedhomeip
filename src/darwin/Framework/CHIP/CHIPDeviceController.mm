@@ -299,7 +299,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         }
         if ([self isRunning]) {
             _operationalCredentialsDelegate->SetDeviceID(deviceID);
-            errorCode = self.cppCommissioner->PairDevice(deviceID, manualPairingCode.c_str());
+            errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, manualPairingCode.c_str());
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
@@ -350,7 +350,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             _operationalCredentialsDelegate->SetDeviceID(deviceID);
-            errorCode = self.cppCommissioner->PairDevice(deviceID, [onboardingPayload UTF8String]);
+            errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
@@ -639,6 +639,23 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
 - (void)dealloc
 {
+}
+
+- (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId
+{
+    CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    if (![self isRunning]) {
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
+        return NO;
+    }
+
+    chip::CommissioneeDeviceProxy * deviceProxy;
+    errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
+    if (errorCode != CHIP_NO_ERROR) {
+        return NO;
+    }
+
+    return deviceProxy->GetDeviceTransportType() == chip::Transport::Type::kBle;
 }
 
 @end
