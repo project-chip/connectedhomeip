@@ -161,37 +161,53 @@ namespace Access {
 
 AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
 AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
-AccessControl::Delegate AccessControl::mDefaultDelegate;
 
-CHIP_ERROR AccessControl::Init()
+CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate)
 {
+    VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     ChipLogProgress(DataManagement, "AccessControl: initializing");
-    return mDelegate.Init();
+
+    // delegate can never be null. This was already checked
+    CHIP_ERROR retval = delegate->Init();
+    if (retval == CHIP_NO_ERROR)
+    {
+        mDelegate = delegate;
+    }
+
+    return retval;
 }
 
 CHIP_ERROR AccessControl::Finish()
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     ChipLogProgress(DataManagement, "AccessControl: finishing");
-    return mDelegate.Finish();
+    CHIP_ERROR retval = mDelegate->Finish();
+    mDelegate         = nullptr;
+    return retval;
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
 #if CHIP_PROGRESS_LOGGING
     {
-        char buf[6 * kCharsPerCatForLogging];
+        constexpr size_t kMaxCatsToLog = 6;
+        char catLogBuf[kMaxCatsToLog * kCharsPerCatForLogging];
         ChipLogProgress(DataManagement,
                         "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%" PRIu16 " p=%c",
                         subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
                         ChipLogValueX64(subjectDescriptor.subject),
-                        GetCatStringForLogging(buf, sizeof(buf), subjectDescriptor.cats), ChipLogValueMEI(requestPath.cluster),
-                        requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
+                        GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),
+                        ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
     }
 #endif
 
     // TODO(#13867): this will go away
-    if (mDelegate.TemporaryCheckOverride())
+    if (mDelegate->TemporaryCheckOverride())
     {
         ChipLogProgress(DataManagement, "AccessControl: temporary check override (this will go away)");
         return CHIP_NO_ERROR;
