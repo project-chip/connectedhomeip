@@ -170,9 +170,9 @@ CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate)
     ChipLogProgress(DataManagement, "AccessControl: initializing");
 
     // delegate can never be null. This was already checked
-    mDelegate = delegate;
+    mDelegate         = delegate;
     CHIP_ERROR retval = mDelegate->Init();
-    mIsInitialized = (CHIP_NO_ERROR == retval);
+    mIsInitialized    = (CHIP_NO_ERROR == retval);
     return retval;
 }
 

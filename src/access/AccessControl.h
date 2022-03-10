@@ -357,7 +357,8 @@ public:
     AccessControl(const AccessControl &) = delete;
     AccessControl & operator=(const AccessControl &) = delete;
 
-    ~AccessControl() {
+    ~AccessControl()
+    {
         // Never-initialized AccessControl instances will not have the delegate set.
         if (mIsInitialized && mDelegate != nullptr)
         {
