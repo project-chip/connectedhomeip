@@ -1518,13 +1518,14 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
 
     if (commissioner->mDeviceBeingCommissioned != nullptr && commissioner->mDeviceBeingCommissioned->GetPeerId() == peerId)
     {
-        // This prevents a leak when commissioning fails in the middle. To simulate a failure,
-        // comment out SendSigma2 on the device side.
+        // This prevents a leak when commissioning fails in the middle.
+        // Can use one of the following to simulate a failure:
+        //   - comment out SendSigma2 on the device side (chip-tool will timeout in 1m or so)
+        //   - set kMinLookupTimeMsDefault (and max) in AddressResolve.h
+        //     to a very low value to quickly fail (e.g. 10 ms and 11ms), not enough time for the device
+        //     to actually become operational. Chiptool should fail fast after PASE
         //
-        // TODO: Need to double-check and handle use after free in case DNSSD lookup times out.
-        // To simulate a failure there, set kMinLookupTimeMsDefault (and max) in AddressResolve.h
-        // to a very low value to quickly fail (e.g. 1 or 10 ms, not enough time for the device
-        // to actually become operational.)
+        // Run the above cases under valgrind/asan to validate no additional leaks.
         commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
         commissioner->mDeviceBeingCommissioned = nullptr;
     }
