@@ -64,7 +64,7 @@ template("gen_flashing_script") {
                            "gbl_file"
                          ])
 
-  action(target_name) {   
+  action(target_name) {
     outputs = [ flashing_script_name ]
 
     args = flashing_options

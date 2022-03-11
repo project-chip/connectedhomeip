@@ -14,7 +14,7 @@
 # limitations under the License.
 """Generate script to flash or erase a device. Also creates a bootloader for the device"""
 
-import importlib 
+import importlib
 import sys
 
 platform = importlib.import_module(sys.argv[1] + '_firmware_utils')
