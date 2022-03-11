@@ -224,7 +224,8 @@ void OperationalDeviceProxy::HandleCASEConnectionFailure(void * context, CASECli
     device->CloseCASESession();
     device->DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
     device->DequeueConnectionFailureCallbacks(error, /* executeCallback */ true);
-    // Do not touch device anymore; it might have been destroyed by a failure callback.
+    // Do not touch device anymore; it might have been destroyed by a failure
+    // callback.
 }
 
 void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * client)
@@ -238,14 +239,18 @@ void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * cl
     if (err != CHIP_NO_ERROR)
     {
         device->HandleCASEConnectionFailure(context, client, err);
+        // Do not touch device anymore; it might have been destroyed by a
+        // HandleCASEConnectionFailure.
     }
     else
     {
         device->mState = State::SecureConnected;
 
+        device->CloseCASESession();
         device->DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, /* executeCallback */ false);
         device->DequeueConnectionSuccessCallbacks(/* executeCallback */ true);
-        device->CloseCASESession();
+        // Do not touch device anymore; it might have been destroyed by a
+        // success callback.
     }
 }
 
