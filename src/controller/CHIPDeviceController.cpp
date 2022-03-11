@@ -291,7 +291,7 @@ void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
     mCASESessionManager->ReleaseSession(mFabricInfo->GetPeerIdForNode(remoteDeviceId));
 }
 
-CHIP_ERROR DeviceController::CloseSession(NodeId nodeId)
+CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
 {
     ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
 
@@ -324,15 +324,7 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
     VerifyOrReturn(session->GetSessionType() == Transport::Session::SessionType::kSecure);
-
-    OperationalDeviceProxy * proxy = GetDeviceSession(mFabricInfo->GetPeerIdForNode(session->AsSecureSession()->GetPeerNodeId()));
-    if (proxy == nullptr)
-    {
-        ChipLogError(Controller, "Unable to find existing operational session on message delivery");
-        return;
-    }
-
-    CHIP_ERROR err = proxy->LookupPeerAddress();
+    CHIP_ERROR err = UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller,
@@ -1499,7 +1491,7 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
                    ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
 
     // Ensure that commissioning stage advancement is done based on seeing an error.
-    if (error != CHIP_NO_ERROR)
+    if (error == CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
         error = CHIP_ERROR_INTERNAL;
@@ -2051,16 +2043,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kFindOperational: {
-        const PeerId peerId              = mFabricInfo->GetPeerIdForNode(proxy->GetDeviceId());
-        OperationalDeviceProxy * session = GetDeviceSession(peerId);
-        if (session == nullptr)
-        {
-            ChipLogError(Controller, "No active session to find an operational address for.");
-            CommissioningStageComplete(CHIP_ERROR_NOT_FOUND);
-            return;
-        }
-
-        CHIP_ERROR err = session->LookupPeerAddress();
+        CHIP_ERROR err = UpdateDevice(proxy->GetDeviceId());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to proceed to operational discovery\n");

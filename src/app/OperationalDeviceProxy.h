@@ -80,7 +80,7 @@ typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ER
  *    - Discover the device using DNSSD (find out what IP address to use and what
  *      communication parameters are appropriate for it)
  *    - Establish a secure channel to it via CASE
- *    - Generally hold members for sending messages back and forth for this device.
+ *    - Expose to consumers the secure session for talking to the device.
  */
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
                                           SessionReleaseDelegate,

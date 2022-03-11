@@ -221,9 +221,10 @@ void OperationalDeviceProxy::HandleCASEConnectionFailure(void * context, CASECli
 
     device->mState = State::Initialized;
 
-    // Device failure callbacks are expected to cleanup any CASE sessions.
+    device->CloseCASESession();
     device->DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
     device->DequeueConnectionFailureCallbacks(error, /* executeCallback */ true);
+    // Do not touch device anymore; it might have been destroyed by a failure callback.
 }
 
 void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * client)
