@@ -52,7 +52,7 @@ public:
 
 private:
     bool mUseGlobalConsent = false;
-    
+
     UserConsentState mGlobalConsentState = UserConsentState::kGranted;
 };
 
