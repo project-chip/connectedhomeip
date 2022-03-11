@@ -36,12 +36,7 @@ public:
         UserConsentState curUserConsentState = mUserConsentState;
 
         subject.Log();
-
-        if (mUserConsentStateCount > 0)
-        {
-            mUserConsentStateCount--;
-            mUserConsentState = chip::ota::UserConsentState::kGranted;
-        }
+        mUserConsentState = chip::ota::UserConsentState::kGranted;
 
         return curUserConsentState;
     }
@@ -50,11 +45,8 @@ public:
 
     void SetUserConsentState(UserConsentState state) { mUserConsentState = state; }
 
-    void SetUserConsentStateCount(uint8_t count) { mUserConsentStateCount = count; }
-
 private:
     UserConsentState mUserConsentState = UserConsentState::kGranted;
-    uint8_t mUserConsentStateCount = 0; // # of times to respond with value of mGlobalConsentState before resorting to the success response.
 };
 
 } // namespace ota
