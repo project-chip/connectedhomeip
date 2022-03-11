@@ -61,9 +61,10 @@ template("gen_flashing_script") {
                            "flashing_options",
                            "deps",
                            "data_deps",
+                           "gbl_file"
                          ])
 
-  action(target_name) {
+  action(target_name) {   
     outputs = [ flashing_script_name ]
 
     args = flashing_options
@@ -71,10 +72,36 @@ template("gen_flashing_script") {
       "--output",
       rebase_path(flashing_script_name, root_build_dir),
     ]
+    args += [ gbl_file ]
 
     script = flashing_script_generator
     inputs = flashing_script_inputs
   }
+}
+
+template("gen_gbl_script") {
+
+  if (defined(invoker.gbl_file_image_name)) {
+    gbl_file_image_name = "$root_out_dir/${invoker.gbl_file_image_name}"
+    gbl_script_generator = invoker.gbl_script_generator
+    gbl_script_name = "$root_out_dir/${invoker.gbl_script_name}"
+    flashing_script_inputs = invoker.flashing_script_inputs
+    gbl_options = invoker.gbl_options
+
+  }
+
+  executable_target = "$target_name.executable"
+  action(target_name) {
+    outputs = [ gbl_file_image_name ]
+    args = gbl_options
+    args += [
+      rebase_path(gbl_script_name, root_build_dir),
+    ]
+
+    script = gbl_script_generator
+    inputs = flashing_script_inputs
+  }
+
 }
 
 # Build target for an executable, optionally converted to the preferred form
@@ -142,6 +169,7 @@ template("flashable_executable") {
       flashing_script_generator = invoker.flashing_script_generator
       flashing_script_inputs = invoker.flashing_script_inputs
       flashing_script_name = "$root_out_dir/${invoker.flashing_script_name}"
+      gbl_file = invoker.gbl_file_image_name
       if (defined(invoker.flashing_options)) {
         flashing_options = invoker.flashing_options
       } else {

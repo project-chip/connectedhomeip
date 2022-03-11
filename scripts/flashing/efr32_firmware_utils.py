@@ -138,6 +138,15 @@ class Flasher(firmware_utils.Flasher):
             ['flash', self.DEVICE_ARGUMENTS, image],
             name='Flash')
 
+    def gbl_create(self, argv):
+        """Create gbl file"""
+        self.parser.description = 'Generate a flashing script.'
+
+        return self.run_tool(
+            'commander',
+            ['gbl', 'create', self.DEVICE_ARGUMENTS, argv[5], '--app', argv[2]],
+            name='GblCreate')
+
     def reset(self):
         """Reset the device."""
         return self.run_tool(

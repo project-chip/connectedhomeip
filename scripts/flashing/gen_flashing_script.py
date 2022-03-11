@@ -12,13 +12,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Generate script to flash or erase a device."""
+"""Generate script to flash or erase a device. Also creates a bootloader for the device"""
 
-import importlib
+import importlib 
 import sys
 
 platform = importlib.import_module(sys.argv[1] + '_firmware_utils')
 del sys.argv[1]
 
 if __name__ == '__main__':
+    platform.Flasher().gbl_create(sys.argv)
     sys.exit(platform.Flasher().make_wrapper(sys.argv))
