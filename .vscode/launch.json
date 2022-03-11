@@ -8,7 +8,7 @@
             "name": "Attach to running process",
             "type": "lldb",
             "request": "attach",
-            "pid":"${command:pickProcess}"
+            "pid": "${command:pickProcess}"
         },
         {
             "name": "QRCode Tests",
@@ -362,7 +362,14 @@
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/out/ota-requestor/chip-ota-requestor-app",
-            "args": ["--discriminator", "18", "--secured-device-port", "5560", "--KVS", "/tmp/chip_kvs_requestor"],
+            "args": [
+                "--discriminator",
+                "18",
+                "--secured-device-port",
+                "5560",
+                "--KVS",
+                "/tmp/chip_kvs_requestor"
+            ],
             "cwd": "${workspaceFolder}"
         },
 
@@ -371,7 +378,14 @@
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/out/ota-provider/chip-ota-provider-app",
-            "args": ["--discriminator", "22", "--KVS", "/tmp/chip_kvs_provider", "--filepath", "/tmp/ota-image.bin"],
+            "args": [
+                "--discriminator",
+                "22",
+                "--KVS",
+                "/tmp/chip_kvs_provider",
+                "--filepath",
+                "/tmp/ota-image.bin"
+            ],
             "cwd": "${workspaceFolder}"
         }
     ],
