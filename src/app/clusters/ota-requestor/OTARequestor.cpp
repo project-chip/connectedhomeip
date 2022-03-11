@@ -132,8 +132,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             return;
         }
 
-        if (update.softwareVersion > 0)
-        //if (update.softwareVersion > requestorCore->mCurrentVersion)
+        if (update.softwareVersion > requestorCore->mCurrentVersion)
         {
             ChipLogDetail(SoftwareUpdate, "Update available from %" PRIu32 " to %" PRIu32 " version",
                           requestorCore->mCurrentVersion, update.softwareVersion);

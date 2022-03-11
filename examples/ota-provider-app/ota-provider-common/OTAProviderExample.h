@@ -70,14 +70,12 @@ public:
     } DeviceSoftwareVersionModel;
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
-    void SetQueryImageBehaviorCount(uint8_t count) { mQueryImageBehaviorCount = count; }
     void SetIgnoreQueryImageCount(uint32_t count) { mIgnoreQueryImageCount = count; }
     void SetIgnoreApplyUpdateCount(uint32_t count) { mIgnoreApplyUpdateCount = count; }
     void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
     {
         mUpdateAction = action;
     }
-    void SetUpdateActionCount(uint8_t count) { mUpdateActionCount = count; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
     void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
     void SetSoftwareVersion(uint32_t softwareVersion) { mSoftwareVersion.SetValue(softwareVersion); }
@@ -90,11 +88,9 @@ private:
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     QueryImageBehaviorType mQueryImageBehavior;
-    uint8_t mQueryImageBehaviorCount = 0; // # of times to respond with value of mQueryImageBehavior before resorting to the success response.
     uint32_t mIgnoreQueryImageCount  = 0;
     uint32_t mIgnoreApplyUpdateCount = 0;
     chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction mUpdateAction;
-    uint8_t mUpdateActionCount = 0; // # of times to respond with value of mUpdateAction before resorting to the success response.
     uint32_t mDelayedActionTimeSec = 0;
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
