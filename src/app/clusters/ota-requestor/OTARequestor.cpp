@@ -264,9 +264,9 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    ProviderLocation::Type providerLocation = { .providerNodeID = commandData.providerNodeId,
-                                                .endpoint       = commandData.endpoint,
-                                                .fabricIndex    = commandObj->GetAccessingFabricIndex() };
+    ProviderLocationType providerLocation = { .providerNodeID = commandData.providerNodeId,
+                                              .endpoint       = commandData.endpoint,
+                                              .fabricIndex    = commandObj->GetAccessingFabricIndex() };
 
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %u", providerLocation.fabricIndex);
     ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(providerLocation.providerNodeID));
@@ -474,7 +474,7 @@ void OTARequestor::TriggerImmediateQueryInternal()
 // Sends the QueryImage command to the next available Provider
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
-    ProviderLocation::Type providerLocation;
+    ProviderLocationType providerLocation;
     if (mOtaRequestorDriver->DetermineProviderLocation(providerLocation) != true)
     {
         ChipLogError(SoftwareUpdate, "No OTA Providers available");
@@ -539,13 +539,13 @@ CHIP_ERROR OTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
     return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);
 }
 
-CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocation::Type & providerLocation)
+CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocationType & providerLocation)
 {
     // Look for an entry with the same fabric index indicated
     auto iterator = mDefaultOtaProviderList.Begin();
     while (iterator.Next())
     {
-        ProviderLocation::Type pl = iterator.GetValue();
+        ProviderLocationType pl = iterator.GetValue();
         if (pl.GetFabricIndex() == providerLocation.GetFabricIndex())
         {
             ChipLogError(SoftwareUpdate, "Default OTA provider entry with fabric %d already exists", pl.GetFabricIndex());

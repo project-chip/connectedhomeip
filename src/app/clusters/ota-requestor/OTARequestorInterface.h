@@ -199,12 +199,12 @@ public:
     // Set the provider location to be used in the next query and OTA update process
     virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
 
-    // Clear the provider location to indicate that no OTA update may be in progress
-    virtual void ClearCurrentProviderLocation() = 0;
+    // If there is an OTA update in progress, returns the provider location for the current OTA update, otherwise, returns the
+    // provider location that was last used
+    virtual void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) = 0;
 
     // Add a default OTA provider to the cached list
-    virtual CHIP_ERROR
-    AddDefaultOtaProvider(const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) = 0;
+    virtual CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) = 0;
 
     // Retrieve an iterator to the cached default OTA provider list
     virtual ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) = 0;
