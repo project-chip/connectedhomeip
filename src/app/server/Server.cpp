@@ -105,27 +105,32 @@ Server::Server() :
         .dnsCache          = nullptr,
 #endif
         .devicePool        = &mDevicePool,
+        .dnsResolver       = nullptr,
     }),
-    mCommissioningWindowManager(this), mGroupsProvider(), mAttributePersister(mDeviceStorage),
-    mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
+    mGroupsProvider(mDeviceStorage)
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
                         Inet::InterfaceId interfaceId)
 {
+    Access::AccessControl::Delegate * accessDelegate = nullptr;
+
     mSecuredServicePort   = secureServicePort;
     mUnsecuredServicePort = unsecureServicePort;
     mInterfaceId          = interfaceId;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
 
+    SuccessOrExit(err = mCommissioningWindowManager.Init(this));
     mCommissioningWindowManager.SetAppDelegate(delegate);
     mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
+    SuccessOrExit(mAttributePersister.Init(&mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
     InitDataModelHandler(&mExchangeMgr);
@@ -137,13 +142,15 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
     // Group data provider must be initialized after mDeviceStorage
-    mGroupsProvider.SetStorageDelegate(&mDeviceStorage);
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
     SetGroupDataProvider(&mGroupsProvider);
 
     // Access control must be initialized after mDeviceStorage.
-    err = mAccessControl.Init();
+    accessDelegate = Access::Examples::GetAccessControlDelegate(&mDeviceStorage);
+    VerifyOrExit(accessDelegate != nullptr, ChipLogError(AppServer, "Invalid access delegate found."));
+
+    err = mAccessControl.Init(accessDelegate);
     SuccessOrExit(err);
     Access::SetAccessControl(mAccessControl);
 
@@ -251,7 +258,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                                                     &mSessions, &mFabrics);
     SuccessOrExit(err);
 
-    err = mCASESessionManager.Init(&DeviceLayer::SystemLayer());
+    err = mCASESessionManager.Init();
 
     // This code is necessary to restart listening to existing groups after a reboot
     // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them
@@ -337,8 +344,12 @@ void Server::Shutdown()
     }
     mSessions.Shutdown();
     mTransports.Close();
+
+    mAttributePersister.Shutdown();
     mCommissioningWindowManager.Shutdown();
     mCASESessionManager.Shutdown();
+
+    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }
 

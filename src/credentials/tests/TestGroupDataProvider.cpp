@@ -1147,9 +1147,9 @@ int Test_Setup(void * inContext)
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
 
     // Initialize Group Data Provider
-    VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(&sDelegate), FAILURE);
-    // Event listener
+    sProvider.SetStorageDelegate(&sDelegate);
     sProvider.SetListener(&chip::app::TestGroups::sListener);
+    VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
     SetGroupDataProvider(&sProvider);
 
     memcpy(chip::app::TestGroups::kKeySet0.epoch_keys, kEpochKeys0, sizeof(kEpochKeys0));

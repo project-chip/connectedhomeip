@@ -33,8 +33,9 @@ public:
     {}
     virtual ~GroupDataProviderImpl() {}
 
-    CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
+    CHIP_ERROR Init() override;
     void Finish() override;
+    void SetStorageDelegate(PersistentStorageDelegate * storage) override;
 
     //
     // Group Info
@@ -210,10 +211,10 @@ protected:
         bool mFirstMap           = true;
         GroupKeyContext mKeyContext;
     };
+    bool IsInitialized() { return (mStorage == nullptr); }
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
 
     chip::PersistentStorageDelegate * mStorage = nullptr;
-    bool mInitialized                          = false;
     ObjectPool<GroupInfoIteratorImpl, kIteratorsMax> mGroupInfoIterators;
     ObjectPool<GroupKeyIteratorImpl, kIteratorsMax> mGroupKeyIterators;
     ObjectPool<EndpointIteratorImpl, kIteratorsMax> mEndpointIterators;

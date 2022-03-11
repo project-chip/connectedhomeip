@@ -42,7 +42,8 @@ namespace GroupTesting {
 
 CHIP_ERROR InitProvider()
 {
-    ReturnErrorOnFailure(sGroupsProvider.Init(&sDeviceStorage));
+    sGroupsProvider.SetStorageDelegate(&sDeviceStorage);
+    ReturnErrorOnFailure(sGroupsProvider.Init());
     chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
     return CHIP_NO_ERROR;
 }
