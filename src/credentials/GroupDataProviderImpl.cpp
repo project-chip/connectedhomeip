@@ -904,6 +904,7 @@ void GroupDataProviderImpl::Finish()
 
 void GroupDataProviderImpl::SetStorageDelegate(PersistentStorageDelegate * storage)
 {
+    VerifyOrDie(storage != nullptr);
     mStorage = storage;
 }
 

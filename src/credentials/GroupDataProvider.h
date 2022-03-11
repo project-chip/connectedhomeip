@@ -24,7 +24,6 @@
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 namespace Credentials {
@@ -222,15 +221,15 @@ public:
     uint16_t GetMaxGroupKeysPerFabric() { return mMaxGroupKeysPerFabric; }
 
     /**
-     *  Initialize the GroupDataProvider, including any persistent data store
-     *  initialization. Must be called once before any other API succeeds.
+     *  Initialize the GroupDataProvider, including possilby any persistent
+     *  data store initialization done by the implementation. Must be called once
+     *  before any other API succeeds.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE if called when already initialized.
      *  @retval #CHIP_NO_ERROR on success
      */
     virtual CHIP_ERROR Init()                                            = 0;
     virtual void Finish()                                                = 0;
-    virtual void SetStorageDelegate(PersistentStorageDelegate * storage) = 0;
 
     //
     // Group Table

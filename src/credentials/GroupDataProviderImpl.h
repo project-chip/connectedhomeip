@@ -17,6 +17,7 @@
 #pragma once
 
 #include <credentials/GroupDataProvider.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/Pool.h>
 
 namespace chip {
@@ -33,9 +34,16 @@ public:
     {}
     virtual ~GroupDataProviderImpl() {}
 
+    /**
+     * @brief Set the storage implementation used for non-volatile storage of configuration data.
+     *        This method MUST be called before Init().
+     *
+     * @param storage Pointer to storage instance to set. Cannot be nullptr, will assert.
+     */
+    void SetStorageDelegate(PersistentStorageDelegate * storage);
+
     CHIP_ERROR Init() override;
     void Finish() override;
-    void SetStorageDelegate(PersistentStorageDelegate * storage) override;
 
     //
     // Group Info
@@ -211,7 +219,7 @@ protected:
         bool mFirstMap           = true;
         GroupKeyContext mKeyContext;
     };
-    bool IsInitialized() { return (mStorage == nullptr); }
+    bool IsInitialized() { return (mStorage != nullptr); }
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
 
     chip::PersistentStorageDelegate * mStorage = nullptr;
