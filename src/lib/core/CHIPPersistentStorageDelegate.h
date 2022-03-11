@@ -62,11 +62,15 @@ public:
 
     /**
      * @brief
-     *   Set the value for the key to a byte buffer.
+     *   Set the value for the key to a byte buffer. Empty keys can be stored
+     *   with size == 0.
      *
      * @param[in] key Key to be set
-     * @param[in] value Value to be set
-     * @param[in] size Size of the Value
+     * @param[in] value Pointer to buytes of value to be set. `value` can only be `nullptr` if size == 0.
+     * @param[in] size Size of the `value` to store.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT on bad assumptions, other
+     *         CHIP_ERROR value from implementation on failure.
      */
     virtual CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) = 0;
 

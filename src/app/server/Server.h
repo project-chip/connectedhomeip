@@ -128,6 +128,18 @@ private:
 
         CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
         {
+            uint8_t placeholderForEmpty = 0;
+            if (value == nullptr)
+            {
+                if (size == 0)
+                {
+                    value = &placeholderForEmpty;
+                }
+                else
+                {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+            }
             return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
         }
 

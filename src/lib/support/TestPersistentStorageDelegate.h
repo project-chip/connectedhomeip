@@ -59,9 +59,27 @@ public:
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
+
         const uint8_t * bytes = static_cast<const uint8_t *>(value);
-        mStorage[key]         = std::vector<uint8_t>(bytes, bytes + size);
-        return CHIP_NO_ERROR;
+
+        // Handle empty values
+        if (value == nullptr)
+        {
+            if (size == 0)
+            {
+                mStorage[key] = std::vector<uint8_t>();
+                return CHIP_NO_ERROR;
+            }
+            else
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+        else
+        {
+            mStorage[key] = std::vector<uint8_t>(bytes, bytes + size);
+            return CHIP_NO_ERROR;
+        }
     }
 
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override
