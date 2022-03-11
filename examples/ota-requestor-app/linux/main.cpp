@@ -93,6 +93,8 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
                              "        Otherwise, the value defaults to /tmp/test.bin.\n "
                              "  -u/--userConsentState <granted | denied | deferred>\n"
+                             "        The following is applied to the next QueryImage and will revert back to\n"
+                             "        the behavior of granted on subsequent QueryImage commands.\n"
                              "        granted: Authorize OTA requestor to download an OTA image\n"
                              "        denied: Forbid OTA requestor to download an OTA image\n"
                              "        deferred: Defer obtaining user consent \n" };
