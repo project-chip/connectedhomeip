@@ -109,9 +109,6 @@ private:
 
     bool mIsBLE = true;
 
-    bool mOriginalDiscriminatorCached = false;
-    uint16_t mOriginalDiscriminator   = 0;
-
     SessionIDAllocator * mIDAllocator = nullptr;
     PASESession mPairingSession;
 

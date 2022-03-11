@@ -1799,9 +1799,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
 
     {
         otJoinerDiscerner discerner;
-        uint16_t discriminator;
+        // This is dead code to remove, so the placeholder value is OK.
+        // See ThreadStackManagerImpl.
+        uint16_t discriminator = 3840;
 
-        SuccessOrExit(error = ConfigurationMgr().GetSetupDiscriminator(discriminator));
         discerner.mLength = 12;
         discerner.mValue  = discriminator;
 
@@ -1811,9 +1812,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(voi
 
     {
         otJoinerPskd pskd;
-        uint32_t pincode;
+        // This is dead code to remove, so the placeholder value is OK.d
+        // See ThreadStackManagerImpl.
+        uint32_t pincode = 20202021;
 
-        SuccessOrExit(error = ConfigurationMgr().GetSetupPinCode(pincode));
         snprintf(pskd.m8, sizeof(pskd.m8) - 1, "%09" PRIu32, pincode);
 
         ChipLogProgress(DeviceLayer, "Joiner PSKd: %s", pskd.m8);
