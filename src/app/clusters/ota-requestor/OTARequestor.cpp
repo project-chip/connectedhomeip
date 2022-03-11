@@ -132,7 +132,8 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             return;
         }
 
-        if (update.softwareVersion > requestorCore->mCurrentVersion)
+        if (update.softwareVersion > 0)
+        //if (update.softwareVersion > requestorCore->mCurrentVersion)
         {
             ChipLogDetail(SoftwareUpdate, "Update available from %" PRIu32 " to %" PRIu32 " version",
                           requestorCore->mCurrentVersion, update.softwareVersion);
@@ -601,6 +602,8 @@ IdleStateReason OTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
 
 void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
 {
+    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::RecordErrorUpdateState newState %d", (int)newState);
+
     // Set server UpdateState attribute
     OtaRequestorServerSetUpdateState(newState);
 
@@ -634,6 +637,8 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
 
 void OTARequestor::RecordErrorUpdateState(UpdateFailureState failureState, CHIP_ERROR error, OTAChangeReasonEnum reason)
 {
+    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::RecordErrorUpdateState");
+
     // Inform driver of the error
     mOtaRequestorDriver->HandleError(failureState, error);
 
