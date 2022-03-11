@@ -139,7 +139,7 @@ public:
 
 private:
     static constexpr uint32_t kMinLookupTimeMsDefault = 200;
-    static constexpr uint32_t kMaxLookupTimeMsDefault = 3000;
+    static constexpr uint32_t kMaxLookupTimeMsDefault = 10000;
 
     PeerId mPeerId;
     System::Clock::Milliseconds32 mMinLookupTimeMs{ kMinLookupTimeMsDefault };
@@ -170,8 +170,14 @@ class Resolver
 public:
     virtual ~Resolver();
 
-    /// Expected to be called exactly once before the resolver is ever
+    /// Expected to be called at least once before the resolver is ever
     /// used.
+    ///
+    /// Expected to override global setting of DNSSD callback for addres resolution
+    /// and may use the underlying system layer for timers and other functionality.
+    ///
+    /// If called multiple times, it is expected that the input systemLayer does
+    /// not change.
     virtual CHIP_ERROR Init(System::Layer * systemLayer) = 0;
 
     /// Initiate a node lookup for a particular node and use the specified

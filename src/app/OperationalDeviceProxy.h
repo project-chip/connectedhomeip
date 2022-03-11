@@ -31,6 +31,7 @@
 #include <app/DeviceProxy.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
@@ -42,8 +43,6 @@
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
-
-#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
@@ -74,7 +73,19 @@ class OperationalDeviceProxy;
 typedef void (*OnDeviceConnected)(void * context, OperationalDeviceProxy * device);
 typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ERROR error);
 
-class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public SessionEstablishmentDelegate
+/**
+ * Represents a connection path to a device that is in an operational state.
+ *
+ * Handles the lifetime of communicating with such a device:
+ *    - Discover the device using DNSSD (find out what IP address to use and what
+ *      communication parameters are appropriate for it)
+ *    - Establish a secure channel to it via CASE
+ *    - Expose to consumers the secure session for talking to the device.
+ */
+class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
+                                          SessionReleaseDelegate,
+                                          public SessionEstablishmentDelegate,
+                                          public AddressResolve::NodeListener
 {
 public:
     virtual ~OperationalDeviceProxy();
@@ -86,13 +97,14 @@ public:
         mInitParams  = params;
         mPeerId      = peerId;
         mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
-
-        mState = State::NeedsAddress;
+        mState       = State::NeedsAddress;
+        mAddressLookupHandle.SetListener(this);
     }
 
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId, const Dnssd::ResolvedNodeData & nodeResolutionData) :
         OperationalDeviceProxy(params, peerId)
     {
+        mAddressLookupHandle.SetListener(this);
         OnNodeIdResolved(nodeResolutionData);
     }
 
@@ -112,7 +124,7 @@ public:
      * returned.
      */
     CHIP_ERROR Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                       Callback::Callback<OnDeviceConnectionFailure> * onFailure, Dnssd::ResolverProxy * resolver);
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
     bool IsConnected() const { return mState == State::SecureConnected; }
 
@@ -205,6 +217,15 @@ public:
         return kUndefinedFabricIndex;
     }
 
+    /**
+     * Triggers a DNSSD lookup to find a usable peer address for this operational device.
+     */
+    CHIP_ERROR LookupPeerAddress();
+
+    // AddressResolve::NodeListener - notifications when dnssd finds a node IP address
+    void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
+    void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override;
+
 private:
     enum class State
     {
@@ -233,6 +254,9 @@ private:
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
+
+    /// This is used when a node address is required.
+    chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
     CHIP_ERROR EstablishConnection();
 
