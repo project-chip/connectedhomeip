@@ -221,7 +221,7 @@ public:
     uint16_t GetMaxGroupKeysPerFabric() { return mMaxGroupKeysPerFabric; }
 
     /**
-     *  Initialize the GroupDataProvider, including possilby any persistent
+     *  Initialize the GroupDataProvider, including possibly any persistent
      *  data store initialization done by the implementation. Must be called once
      *  before any other API succeeds.
      *
