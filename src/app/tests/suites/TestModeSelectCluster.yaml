@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Mode Select"
     endpoint: 1
+    discriminator:
+        type: INT16U
+        defaultValue: 3840
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -135,3 +138,52 @@ tests:
       attribute: "CurrentMode"
       response:
           value: OnModeValue
+
+    - label: "Change to Unsupported StartUp Mode"
+      command: "writeAttribute"
+      attribute: "StartUpMode"
+      arguments:
+          value: 2
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Change to Supported StartUp Mode"
+      command: "writeAttribute"
+      attribute: "StartUpMode"
+      arguments:
+          value: 7
+
+    - label: "Verify StartUp Mode Change"
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          value: 7
+
+    - label: "Change CurrentMode to another value"
+      command: "changeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: 0
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Verify Current Mode Change based on new StartUp Mode"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 7
