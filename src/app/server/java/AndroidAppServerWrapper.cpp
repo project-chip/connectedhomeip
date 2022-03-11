@@ -54,6 +54,8 @@ CHIP_ERROR ChipAndroidAppInit(void)
     // TODO: move load DAC to java
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
+    ApplicationInit();
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -67,4 +69,9 @@ void ChipAndroidAppShutdown(void)
 {
     chip::Server::GetInstance().Shutdown();
     chip::Platform::MemoryShutdown();
+}
+
+void __attribute__((weak)) ApplicationInit()
+{
+    
 }

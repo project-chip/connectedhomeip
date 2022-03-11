@@ -50,6 +50,8 @@ static_library("android") {
     "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "NetworkCommissioningImpl.cpp",
+    "NetworkCommissioningImpl.h"
   ]
 
   deps = [

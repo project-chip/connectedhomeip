@@ -25,6 +25,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/GeneralFaults.h>
+#include <inet/InetInterface.h>
 
 namespace chip {
 namespace DeviceLayer {
