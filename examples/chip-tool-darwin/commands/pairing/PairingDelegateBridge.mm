@@ -18,6 +18,7 @@
 
 #include "PairingDelegateBridge.h"
 #import <CHIP/CHIPError_Internal.h>
+#import <CHIP/CHIPCommissioningParameters.h>
 
 @interface CHIPToolPairingDelegate ()
 @end
@@ -41,10 +42,21 @@
 
 - (void)onPairingComplete:(NSError *)error
 {
+    NSError * __block commissionError;
     CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    if (err != CHIP_NO_ERROR) {
+        _commandBridge->SetCommandExitStatus(err);
+        return;
+    }
     ChipLogProgress(chipTool, "Pairing Complete: %s", chip::ErrorStr(err));
-
-    _commandBridge->SetCommandExitStatus(err);
+    [_commissioner commissionDevice:_deviceID
+                 commissioningParams:_params
+                               error:&commissionError];
+    err = [CHIPError errorToCHIPErrorCode:commissionError];
+    if (err != CHIP_NO_ERROR) {
+        _commandBridge->SetCommandExitStatus(err);
+        return;
+    }
 }
 
 - (void)onPairingDeleted:(NSError *)error

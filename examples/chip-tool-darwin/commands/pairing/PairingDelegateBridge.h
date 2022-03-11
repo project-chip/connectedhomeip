@@ -21,6 +21,9 @@
 @interface CHIPToolPairingDelegate : NSObject <CHIPDevicePairingDelegate>
 @property PairingCommandBridge * commandBridge;
 @property chip::NodeId deviceID;
+@property CHIPDeviceController * commissioner;
+@property CHIPCommissioningParameters * params;
+
 - (void)onPairingComplete:(NSError *)error;
 - (void)onPairingDeleted:(NSError *)error;
 - (void)onCommissioningComplete:(NSError *)error;
