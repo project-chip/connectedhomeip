@@ -32,6 +32,7 @@ static_library("framework") {
     "CHIPCluster.mm",
     "CHIPControllerAccessControl.h",
     "CHIPControllerAccessControl.mm",
+    "CHIPCommissioningParameters.m",
     "CHIPDevice.h",
     "CHIPDevice.mm",
     "CHIPDeviceConnectionBridge.mm",
