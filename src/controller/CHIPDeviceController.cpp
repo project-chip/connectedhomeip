@@ -668,6 +668,9 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
+    // Release everything from the commissionee device pool here. DeviceController::Shutdown releasese operational.
+    mCommissioneeDevicePool.ReleaseAll();
+
     DeviceController::Shutdown();
     return CHIP_NO_ERROR;
 }
