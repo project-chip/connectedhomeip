@@ -588,8 +588,6 @@ void OTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
 
 void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::RecordErrorUpdateState newState %d", (int)newState);
-
     // Set server UpdateState attribute
     OtaRequestorServerSetUpdateState(newState);
 
@@ -623,8 +621,6 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
 
 void OTARequestor::RecordErrorUpdateState(UpdateFailureState failureState, CHIP_ERROR error, OTAChangeReasonEnum reason)
 {
-    ChipLogDetail(SoftwareUpdate, "//is: OTARequestor::RecordErrorUpdateState");
-
     // Inform driver of the error
     mOtaRequestorDriver->HandleError(failureState, error);
 

@@ -95,7 +95,7 @@ private:
     uint32_t mIgnoreApplyUpdateCount = 0;
     chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction mUpdateAction;
     uint8_t mUpdateActionCount = 0; // # of times to respond with value of mUpdateAction before resorting to the success response.
-    uint32_t mDelayedActionTimeSec;
+    uint32_t mDelayedActionTimeSec = 0;
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
                             OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);

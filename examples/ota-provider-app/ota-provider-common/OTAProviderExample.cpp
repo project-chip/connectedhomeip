@@ -246,11 +246,8 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         break;
     }
 
-    if (mQueryImageBehaviorCount > 0)
-    {
-        mQueryImageBehaviorCount--;
-        mQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
-    }
+    // Reset with default success behavior
+    mQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
 
     if (queryStatus == OTAQueryStatus::kUpdateAvailable)
     {
@@ -331,11 +328,10 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     response.action            = mUpdateAction;
     response.delayedActionTime = mDelayedActionTimeSec;
 
-    if (mUpdateActionCount > 0)
-    {
-        mUpdateActionCount--;
-        mUpdateAction = OTAApplyUpdateAction::kProceed;
-    }
+    // Reset delay back to 0 for subsequent uses
+    mDelayedActionTimeSec = 0;
+    // Reset back to success case for subsequent uses
+    mUpdateAction = OTAApplyUpdateAction::kProceed;
 
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
 
