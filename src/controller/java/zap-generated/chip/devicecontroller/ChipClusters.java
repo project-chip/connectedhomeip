@@ -478,7 +478,6 @@ public class ChipClusters {
         Integer discriminator,
         Long iterations,
         byte[] salt,
-        Integer passcodeID,
         int timedInvokeTimeoutMs) {
       openCommissioningWindow(
           chipClusterPtr,
@@ -488,7 +487,6 @@ public class ChipClusters {
           discriminator,
           iterations,
           salt,
-          passcodeID,
           timedInvokeTimeoutMs);
     }
 
@@ -511,7 +509,6 @@ public class ChipClusters {
         Integer discriminator,
         Long iterations,
         byte[] salt,
-        Integer passcodeID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void revokeCommissioning(

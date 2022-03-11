@@ -167,8 +167,9 @@ class EventPath:
     EndpointId: int = None
     ClusterId: int = None
     EventId: int = None
+    Urgent: int = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, Event=None, ClusterId=None, EventId=None):
+    def __init__(self, EndpointId: int = None, Cluster=None, Event=None, ClusterId=None, EventId=None, Urgent=None):
         self.EndpointId = EndpointId
         if Cluster is not None:
             # Wildcard read for a specific cluster
@@ -186,9 +187,10 @@ class EventPath:
             return
         self.ClusterId = ClusterId
         self.EventId = EventId
+        self.Urgent = Urgent
 
     def __str__(self) -> str:
-        return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}"
+        return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/{self.Urgent}"
 
     def __hash__(self):
         return str(self).__hash__()
@@ -202,22 +204,24 @@ class AttributePathWithListIndex(AttributePath):
 @dataclass
 class EventHeader:
     EndpointId: int = None
-    Event: ClusterEvent = None
+    ClusterId: int = None
+    EventId: int = None
     EventNumber: int = None
     Priority: EventPriority = None
     Timestamp: int = None
     TimestampType: EventTimestampType = None
 
-    def __init__(self, EndpointId: int = None, Event=None, EventNumber=None, Priority=None, Timestamp=None, TimestampType=None):
+    def __init__(self, EndpointId: int = None, ClusterId: int = None, EventId: int = None, EventNumber=None, Priority=None, Timestamp=None, TimestampType=None):
         self.EndpointId = EndpointId
-        self.Event = Event
+        self.ClusterId = ClusterId
+        self.EventId = EventId
         self.EventNumber = EventNumber
         self.Priority = Priority
         self.Timestamp = Timestamp
-        self.Timestamp = TimestampType
+        self.TimestampType = TimestampType
 
     def __str__(self) -> str:
-        return f"{self.EndpointId}/{self.Event.cluster_id}/{self.Event.event_id}/{self.EventNumber}/{self.Priority}/{self.Timestamp}/{self.TimestampType}"
+        return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/{self.EventNumber}/{self.Priority}/{self.Timestamp}/{self.TimestampType}"
 
 
 @dataclass
@@ -742,7 +746,7 @@ _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32, c_uint16, c_uint32, c_uint32, c_uint8, c_void_p, c_size_t)
 _OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint64)
 _OnReadEventDataCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint16, c_uint32, c_uint32, c_uint32, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t, c_uint8)
+    None, py_object, c_uint16, c_uint32, c_uint32, c_uint64, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t, c_uint8)
 _OnReadErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32)
 _OnReadDoneCallbackFunct = CFUNCTYPE(
@@ -761,11 +765,11 @@ def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, clust
 
 
 @_OnReadEventDataCallbackFunct
-def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: int, number: int, priority: int, timestamp: int, timestampType: int, data, len, status):
+def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: c_uint64, number: int, priority: int, timestamp: int, timestampType: int, data, len, status):
     dataBytes = ctypes.string_at(data, len)
     path = EventPath(ClusterId=cluster, EventId=event)
     closure.handleEventData(EventHeader(
-        EndpointId=endpoint, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), path, dataBytes[:], status)
+        EndpointId=endpoint, ClusterId=cluster, EventId=event, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), path, dataBytes[:], status)
 
 
 @_OnSubscriptionEstablishedCallbackFunct
@@ -940,15 +944,19 @@ def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPat
         future, eventLoop, devCtrl, TransactionType.READ_EVENTS, False)
 
     readargs = []
-    for attr in events:
+    for event in events:
         path = chip.interaction_model.EventPathIBstruct.parse(
             b'\xff' * chip.interaction_model.EventPathIBstruct.sizeof())
-        if attr.EndpointId is not None:
-            path.EndpointId = attr.EndpointId
-        if attr.ClusterId is not None:
-            path.ClusterId = attr.ClusterId
-        if attr.EventId is not None:
-            path.EventId = attr.EventId
+        if event.EndpointId is not None:
+            path.EndpointId = event.EndpointId
+        if event.ClusterId is not None:
+            path.ClusterId = event.ClusterId
+        if event.EventId is not None:
+            path.EventId = event.EventId
+        if event.Urgent is not None and subscriptionParameters is not None:
+            path.Urgent = event.Urgent
+        else:
+            path.Urgent = 0
         path = chip.interaction_model.EventPathIBstruct.build(path)
         readargs.append(ctypes.c_char_p(path))
 

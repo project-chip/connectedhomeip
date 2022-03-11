@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/DataModelRevision.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
@@ -329,10 +330,10 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
 
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
-    // Gets called by the current Node after completing a boot or reboot process
     void OnStartUp(uint32_t softwareVersion) override
     {
-        ChipLogProgress(Zcl, "PlatformMgrDelegate: OnStartUp");
+        // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
+        ChipLogDetail(Zcl, "Emitting StartUp event");
 
         for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
         {
@@ -340,18 +341,18 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
             Events::StartUp::Type event{ softwareVersion };
             EventNumber eventNumber;
 
-            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent);
+            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
             if (CHIP_NO_ERROR != err)
             {
-                ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record StartUp event: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(Zcl, "Failed to emit StartUp event: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
     }
 
-    // Gets called by the current Node prior to any orderly shutdown sequence on a best-effort basis.
     void OnShutDown() override
     {
-        ChipLogProgress(Zcl, "PlatformMgrDelegate: OnShutDown");
+        // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
+        ChipLogDetail(Zcl, "Emitting ShutDown event");
 
         for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
         {
@@ -359,12 +360,15 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
             Events::ShutDown::Type event;
             EventNumber eventNumber;
 
-            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent);
+            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
             if (CHIP_NO_ERROR != err)
             {
-                ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record ShutDown event: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(Zcl, "Failed to emit ShutDown event: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
+
+        // Flush the events to increase chances that they get sent before the shutdown
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
     }
 };
 

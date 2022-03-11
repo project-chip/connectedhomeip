@@ -226,6 +226,8 @@ public:
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
 
+    Transport::Type GetDeviceTransportType() const { return mDeviceAddress.GetTransportType(); }
+
 private:
     enum class ConnectionState
     {

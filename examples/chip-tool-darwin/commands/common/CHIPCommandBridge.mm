@@ -39,6 +39,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
     }
 
     [mController setListenPort:kListenPort];
+    [mController setKeyValueStoreManagerPath:"/tmp/chip_kvs_darwin"];
 
     [nocSigner createOrLoadKeys:storage];
 

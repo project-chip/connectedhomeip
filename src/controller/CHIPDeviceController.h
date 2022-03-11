@@ -243,12 +243,11 @@ public:
      * @param[in] setupPincode    The desired PIN code to use
      * @param[in] salt            The 16-byte salt for verifier computation
      * @param[out] outVerifier    The Spake2pVerifier to be populated on success
-     * @param[out] outPasscodeId  The passcode ID to be populated on success
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, Spake2pVerifier & outVerifier,
-                                   PasscodeId & outPasscodeId);
+    CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
+                                   Spake2pVerifier & outVerifier);
 
     /**
      * @brief
@@ -347,7 +346,9 @@ protected:
 
     CASESessionManager * mCASESessionManager = nullptr;
 
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> mDNSCache;
+#endif
     CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
     OperationalDeviceProxyPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES> mDevicePool;
 
@@ -411,7 +412,6 @@ private:
     static void OnOpenPairingWindowFailureResponse(void * context, CHIP_ERROR error);
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
-    PasscodeId mPAKEVerifierID = 1;
 };
 
 /**
@@ -467,6 +467,7 @@ public:
      * @param[in] setUpCode             The setup code for connecting to the device
      */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & CommissioningParameters);
 
     /**
      * @brief
@@ -512,6 +513,26 @@ public:
 
     /**
      * @brief
+     *   Start establishing a PASE connection with a node for the purposes of commissioning.
+     *   Commissioners that wish to use the auto-commissioning functions should use the
+     *   supplied "PairDevice" functions above to automatically establish a connection then
+     *   perform commissioning. This function is intended to be used by commissioners that
+     *   are not using the supplied auto-commissioner.
+     *
+     *   This function is non-blocking. PASE is established once the DevicePairingDelegate
+     *   receives the OnPairingComplete call.
+     *
+     *   PASE connections can only be established with nodes that have their commissioning
+     *   window open. The PASE connection will fail if this window is not open and in that case
+     *   OnPairingComplete will be called with an error.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] setUpCode             The setup code for connecting to the device
+     */
+    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode);
+
+    /**
+     * @brief
      *   Start the auto-commissioning process on a node after establishing a PASE connection.
      *   This function is intended to be used in conjunction with the EstablishPASEConnection
      *   function. It can be called either before or after the DevicePairingDelegate receives
@@ -523,6 +544,7 @@ public:
      * @param[in] params                The commissioning parameters
      */
     CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
+    CHIP_ERROR Commission(NodeId remoteDeviceId);
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 

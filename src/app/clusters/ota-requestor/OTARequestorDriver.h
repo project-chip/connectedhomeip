@@ -67,6 +67,8 @@ enum class UpdateNotFoundReason
 class OTARequestorDriver
 {
 public:
+    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+
     virtual ~OTARequestorDriver() = default;
 
     /// Return if the device provides UI for asking a user for consent before downloading a software image
@@ -105,7 +107,6 @@ public:
     /// Inform the driver that the device commissioning has completed
     virtual void OTACommissioningCallback() = 0;
 
-    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     virtual void
     /// Driver portion of the logic for processing the AnnounceOTAProviders command
     ProcessAnnounceOTAProviders(const ProviderLocationType & providerLocation,
@@ -120,8 +121,7 @@ public:
     // Driver picks the OTA Provider that should be used for the next query and update. The Provider is picked according to
     // the driver's internal logic such as, for example, traversing the default providers list.
     // Returns true if there is a Provider available for the next query, returns false otherwise.
-    virtual bool
-    DetermineProviderLocation(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) = 0;
+    virtual bool DetermineProviderLocation(ProviderLocationType & providerLocation) = 0;
 };
 
 } // namespace chip

@@ -13208,6 +13208,34 @@ typedef NS_ENUM(NSInteger, CHIPTestClusterSimple) {
     CHIPTestClusterSimpleValueC = 0x03,
 };
 
+typedef NS_OPTIONS(NSUInteger, CHIPTestClusterBitmap16MaskMap) {
+    CHIPTestClusterBitmap16MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap16MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap16MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap16MaskMapMaskVal4 = 0x4000,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPTestClusterBitmap32MaskMap) {
+    CHIPTestClusterBitmap32MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap32MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap32MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap32MaskMapMaskVal4 = 0x40000000,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPTestClusterBitmap64MaskMap) {
+    CHIPTestClusterBitmap64MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap64MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap64MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap64MaskMapMaskVal4 = 0x4000000000000000,
+};
+
+typedef NS_OPTIONS(NSUInteger, CHIPTestClusterBitmap8MaskMap) {
+    CHIPTestClusterBitmap8MaskMapMaskVal1 = 0x1,
+    CHIPTestClusterBitmap8MaskMapMaskVal2 = 0x2,
+    CHIPTestClusterBitmap8MaskMapMaskVal3 = 0x4,
+    CHIPTestClusterBitmap8MaskMapMaskVal4 = 0x40,
+};
+
 typedef NS_OPTIONS(NSUInteger, CHIPTestClusterSimpleBitmap) {
     CHIPTestClusterSimpleBitmapValueA = 0x1,
     CHIPTestClusterSimpleBitmapValueB = 0x2,

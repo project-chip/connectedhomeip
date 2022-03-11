@@ -61,9 +61,14 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_done(true)));
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
-    return DeviceLayer::SystemLayer().StartTimer(
+    return SystemLayer().StartTimer(
         System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS),
-        [](System::Layer *, void * /* context */) { sys_reboot(SYS_REBOOT_WARM); }, nullptr /* context */);
+        [](System::Layer *, void * /* context */) {
+            PlatformMgr().HandleServerShuttingDown();
+            k_msleep(CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS);
+            sys_reboot(SYS_REBOOT_WARM);
+        },
+        nullptr /* context */);
 #else
     return CHIP_NO_ERROR;
 #endif

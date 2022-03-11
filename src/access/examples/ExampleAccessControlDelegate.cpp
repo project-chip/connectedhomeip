@@ -1310,11 +1310,11 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
-AccessControl::Delegate & GetAccessControlDelegate(PersistentStorageDelegate * storageDelegate)
+AccessControl::Delegate * GetAccessControlDelegate(PersistentStorageDelegate * storageDelegate)
 {
     static AccessControlDelegate accessControlDelegate;
     accessControlDelegate.SetStorageDelegate(storageDelegate);
-    return accessControlDelegate;
+    return &accessControlDelegate;
 }
 
 } // namespace Examples

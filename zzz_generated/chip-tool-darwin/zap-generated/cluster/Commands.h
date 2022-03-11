@@ -1128,7 +1128,6 @@ public:
         AddArgument("CommissioningTimeout", 0, UINT16_MAX, &mCommissioningTimeout);
         AddArgument("Discriminator", 0, UINT16_MAX, &mDiscriminator);
         AddArgument("Iterations", 0, UINT32_MAX, &mIterations);
-        AddArgument("PasscodeID", 0, UINT16_MAX, &mPasscodeID);
         ModelCommand::AddArguments();
     }
 
@@ -1147,7 +1146,6 @@ public:
         params.discriminator = [NSNumber numberWithUnsignedShort:mDiscriminator];
         params.iterations = [NSNumber numberWithUnsignedInt:mIterations];
         params.salt = [[NSData alloc] initWithBytes:mSalt.data() length:mSalt.size()];
-        params.passcodeID = [NSNumber numberWithUnsignedShort:mPasscodeID];
         [cluster openCommissioningWindowWithParams:params
                                  completionHandler:^(NSError * _Nullable error) {
                                      err = [CHIPError errorToCHIPErrorCode:error];
@@ -1163,7 +1161,6 @@ private:
     uint16_t mDiscriminator;
     uint32_t mIterations;
     chip::ByteSpan mSalt;
-    uint16_t mPasscodeID;
 };
 
 /*

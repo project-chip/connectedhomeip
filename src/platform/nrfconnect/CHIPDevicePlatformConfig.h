@@ -67,6 +67,12 @@
 #define CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS 1000
 #endif // CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS
 
+#ifndef CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS
+/// Time to sleep after running server shutdown actions to let lower layers complete the actions.
+/// This may include transmitting packets created by the actions.
+#define CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS 10
+#endif // CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS
+
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY

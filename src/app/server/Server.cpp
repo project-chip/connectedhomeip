@@ -45,6 +45,8 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
 
+using namespace chip::DeviceLayer;
+
 using chip::kMinValidFabricIndex;
 using chip::RendezvousInformationFlag;
 using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
@@ -75,16 +77,6 @@ void StopEventLoop(intptr_t arg)
     }
 }
 
-void DispatchShutDownEvent(intptr_t arg)
-{
-    // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
-    chip::DeviceLayer::PlatformManagerDelegate * platformManagerDelegate = chip::DeviceLayer::PlatformMgr().GetDelegate();
-    if (platformManagerDelegate != nullptr)
-    {
-        platformManagerDelegate->OnShutDown();
-    }
-}
-
 } // namespace
 
 namespace chip {
@@ -109,29 +101,36 @@ Server::Server() :
             .fabricTable    = &mFabrics,
             .clientPool     = &mCASEClientPool,
         },
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
         .dnsCache          = nullptr,
+#endif
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
-    }), mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage),
-    mAttributePersister(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
+    }),
+    mGroupsProvider(mDeviceStorage)
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
                         Inet::InterfaceId interfaceId)
 {
+    Access::AccessControl::Delegate * accessDelegate = nullptr;
+
     mSecuredServicePort   = secureServicePort;
     mUnsecuredServicePort = unsecureServicePort;
     mInterfaceId          = interfaceId;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
 
+    SuccessOrExit(err = mCommissioningWindowManager.Init(this));
     mCommissioningWindowManager.SetAppDelegate(delegate);
     mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
+    SuccessOrExit(mAttributePersister.Init(&mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
     InitDataModelHandler(&mExchangeMgr);
@@ -148,7 +147,10 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SetGroupDataProvider(&mGroupsProvider);
 
     // Access control must be initialized after mDeviceStorage.
-    err = mAccessControl.Init();
+    accessDelegate = Access::Examples::GetAccessControlDelegate(&mDeviceStorage);
+    VerifyOrExit(accessDelegate != nullptr, ChipLogError(AppServer, "Invalid access delegate found."));
+
+    err = mAccessControl.Init(accessDelegate);
     SuccessOrExit(err);
     Access::SetAccessControl(mAccessControl);
 
@@ -267,6 +269,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     RejoinExistingMulticastGroups();
 #endif // !CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+    PlatformMgr().HandleServerStarted();
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -314,27 +318,18 @@ void Server::RejoinExistingMulticastGroups()
 
 void Server::DispatchShutDownAndStopEventLoop()
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(DispatchShutDownEvent);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
+    PlatformMgr().ScheduleWork(StopEventLoop);
 }
 
 void Server::ScheduleFactoryReset()
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(FactoryReset);
-}
-
-void Server::FactoryReset(intptr_t arg)
-{
-    // Delete all fabrics and emit Leave event.
-    GetInstance().GetFabricTable().DeleteAllFabrics();
-
-    // Emit Shutdown event, as shutdown will come after factory reset.
-    DispatchShutDownEvent(0);
-
-    // Flush all dispatched events.
-    chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
-
-    chip::DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
+    PlatformMgr().ScheduleWork([](intptr_t) {
+        // Delete all fabrics and emit Leave event.
+        GetInstance().GetFabricTable().DeleteAllFabrics();
+        PlatformMgr().HandleServerShuttingDown();
+        ConfigurationMgr().InitiateFactoryReset();
+    });
 }
 
 void Server::Shutdown()
@@ -349,8 +344,12 @@ void Server::Shutdown()
     }
     mSessions.Shutdown();
     mTransports.Close();
+
+    mAttributePersister.Shutdown();
     mCommissioningWindowManager.Shutdown();
     mCASESessionManager.Shutdown();
+
+    // TODO: Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }
 

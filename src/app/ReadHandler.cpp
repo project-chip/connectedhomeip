@@ -515,6 +515,13 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
         }
         ReturnErrorOnFailure(err);
 
+        err = path.GetIsUrgent(&(clusterInfo.mIsUrgentEvent));
+        if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
         ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo));
     }
 
