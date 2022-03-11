@@ -135,7 +135,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     if (requestor != nullptr)
     {
         // TODO: Implement restarting into new image instead of changing the version
-        ConfigurationMgr().StoreSoftwareVersion(imageProcessor->mSoftwareVersion);
+        DeviceLayer::ConfigurationMgr().StoreSoftwareVersion(imageProcessor->mSoftwareVersion);
         requestor->NotifyUpdateApplied();
     }
 }
