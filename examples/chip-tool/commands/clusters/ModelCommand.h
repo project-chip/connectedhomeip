@@ -47,11 +47,7 @@ public:
 
     virtual CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) { return CHIP_ERROR_BAD_REQUEST; };
 
-    void Shutdown() override
-    {
-        mOnDeviceConnectedCallback.Cancel();
-        mOnDeviceConnectionFailureCallback.Cancel();
-    }
+    void Shutdown() override;
 
 protected:
     chip::Optional<uint16_t> mTimeout;

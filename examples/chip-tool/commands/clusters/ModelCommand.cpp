@@ -56,3 +56,10 @@ void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CH
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectionFailureFn: context is null"));
     command->SetCommandExitStatus(err);
 }
+
+void ModelCommand::Shutdown()
+{
+    ResetArguments();
+    mOnDeviceConnectedCallback.Cancel();
+    mOnDeviceConnectionFailureCallback.Cancel();
+}
