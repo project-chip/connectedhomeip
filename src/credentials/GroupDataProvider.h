@@ -228,8 +228,8 @@ public:
      *  @retval #CHIP_ERROR_INCORRECT_STATE if called when already initialized.
      *  @retval #CHIP_NO_ERROR on success
      */
-    virtual CHIP_ERROR Init()                                            = 0;
-    virtual void Finish()                                                = 0;
+    virtual CHIP_ERROR Init() = 0;
+    virtual void Finish()     = 0;
 
     //
     // Group Table
