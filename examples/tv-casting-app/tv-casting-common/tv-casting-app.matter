@@ -113,7 +113,6 @@ server cluster AdministratorCommissioning = 60 {
     INT16U discriminator = 2;
     INT32U iterations = 3;
     OCTET_STRING salt = 4;
-    INT16U passcodeID = 5;
   }
 
   timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
@@ -666,6 +665,19 @@ client cluster ContentLauncher = 1290 {
 
   command LaunchContent(LaunchContentRequest): LaunchResponse = 0;
   command LaunchURL(LaunchURLRequest): LaunchResponse = 1;
+}
+
+client cluster Descriptor = 29 {
+  struct DeviceType {
+    DEVTYPE_ID type = 0;
+    INT16U revision = 1;
+  }
+
+  readonly attribute DeviceType deviceList[] = 0;
+  readonly attribute CLUSTER_ID serverList[] = 1;
+  readonly attribute CLUSTER_ID clientList[] = 2;
+  readonly attribute ENDPOINT_NO partsList[] = 3;
+  readonly global attribute int16u clusterRevision = 65533;
 }
 
 server cluster Descriptor = 29 {
@@ -1675,6 +1687,92 @@ client cluster KeypadInput = 1289 {
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
+client cluster LevelControl = 8 {
+  enum MoveMode : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  enum StepMode : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap LevelControlFeature : BITMAP32 {
+    kOnOff = 0x1;
+    kLighting = 0x2;
+    kFrequency = 0x4;
+  }
+
+  readonly attribute int8u currentLevel = 0;
+  readonly attribute int16u remainingTime = 1;
+  readonly attribute int8u minLevel = 2;
+  readonly attribute int8u maxLevel = 3;
+  readonly attribute int16u currentFrequency = 4;
+  readonly attribute int16u minFrequency = 5;
+  readonly attribute int16u maxFrequency = 6;
+  attribute bitmap8 options = 15;
+  attribute int16u onOffTransitionTime = 16;
+  attribute nullable int8u onLevel = 17;
+  attribute nullable int16u onTransitionTime = 18;
+  attribute nullable int16u offTransitionTime = 19;
+  attribute nullable int8u defaultMoveRate = 20;
+  attribute nullable int8u startUpCurrentLevel = 16384;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct MoveRequest {
+    MoveMode moveMode = 0;
+    INT8U rate = 1;
+    BITMAP8 optionMask = 2;
+    BITMAP8 optionOverride = 3;
+  }
+
+  request struct MoveToLevelRequest {
+    INT8U level = 0;
+    INT16U transitionTime = 1;
+    BITMAP8 optionMask = 2;
+    BITMAP8 optionOverride = 3;
+  }
+
+  request struct MoveToLevelWithOnOffRequest {
+    INT8U level = 0;
+    INT16U transitionTime = 1;
+  }
+
+  request struct MoveWithOnOffRequest {
+    MoveMode moveMode = 0;
+    INT8U rate = 1;
+  }
+
+  request struct StepRequest {
+    StepMode stepMode = 0;
+    INT8U stepSize = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionMask = 3;
+    BITMAP8 optionOverride = 4;
+  }
+
+  request struct StepWithOnOffRequest {
+    StepMode stepMode = 0;
+    INT8U stepSize = 1;
+    INT16U transitionTime = 2;
+  }
+
+  request struct StopRequest {
+    BITMAP8 optionMask = 0;
+    BITMAP8 optionOverride = 1;
+  }
+
+  command Move(MoveRequest): DefaultSuccess = 1;
+  command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
+  command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
+  command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
+  command Step(StepRequest): DefaultSuccess = 2;
+  command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
+  command Stop(StopRequest): DefaultSuccess = 3;
+  command StopWithOnOff(): DefaultSuccess = 7;
+}
+
 server cluster LevelControl = 8 {
   enum MoveMode : ENUM8 {
     kUp = 0;
@@ -2053,6 +2151,43 @@ server cluster OccupancySensing = 1030 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
+client cluster OnOff = 6 {
+  enum OnOffDelayedAllOffEffectVariant : enum8 {
+    kFadeToOffIn0p8Seconds = 0;
+    kNoFade = 1;
+    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+  }
+
+  enum OnOffDyingLightEffectVariant : enum8 {
+    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  }
+
+  enum OnOffEffectIdentifier : enum8 {
+    kDelayedAllOff = 0;
+    kDyingLight = 1;
+  }
+
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
+  }
+
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
+  }
+
+  readonly attribute boolean onOff = 0;
+  readonly attribute boolean globalSceneControl = 16384;
+  attribute int16u onTime = 16385;
+  attribute int16u offWaitTime = 16386;
+  attribute enum8 startUpOnOff = 16387;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  command Off(): DefaultSuccess = 0;
+  command On(): DefaultSuccess = 1;
+  command Toggle(): DefaultSuccess = 2;
+}
+
 server cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : enum8 {
     kFadeToOffIn0p8Seconds = 0;
@@ -2416,6 +2551,34 @@ server cluster TestCluster = 1295 {
     kValueC = 3;
   }
 
+  bitmap Bitmap16MaskMap : BITMAP16 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x4000;
+  }
+
+  bitmap Bitmap32MaskMap : BITMAP32 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x40000000;
+  }
+
+  bitmap Bitmap64MaskMap : BITMAP64 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x4000000000000000;
+  }
+
+  bitmap Bitmap8MaskMap : BITMAP8 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x40;
+  }
+
   bitmap SimpleBitmap : BITMAP8 {
     kValueA = 0x1;
     kValueB = 0x2;
@@ -2441,10 +2604,10 @@ server cluster TestCluster = 1295 {
   }
 
   attribute boolean boolean = 0;
-  attribute bitmap8 bitmap8 = 1;
-  attribute bitmap16 bitmap16 = 2;
-  attribute bitmap32 bitmap32 = 3;
-  attribute bitmap64 bitmap64 = 4;
+  attribute Bitmap8MaskMap bitmap8 = 1;
+  attribute Bitmap16MaskMap bitmap16 = 2;
+  attribute Bitmap32MaskMap bitmap32 = 3;
+  attribute Bitmap64MaskMap bitmap64 = 4;
   attribute int8u int8u = 5;
   attribute int16u int16u = 6;
   attribute int32u int32u = 8;
@@ -2916,6 +3079,7 @@ endpoint 1 {
   binding cluster Channel;
   server  cluster ColorControl;
   binding cluster ContentLauncher;
+  binding cluster Descriptor;
   server  cluster Descriptor;
   server  cluster DoorLock;
   server  cluster FixedLabel;
@@ -2924,9 +3088,11 @@ endpoint 1 {
   server  cluster IasZone;
   server  cluster Identify;
   binding cluster KeypadInput;
+  binding cluster LevelControl;
   server  cluster LevelControl;
   binding cluster MediaInput;
   binding cluster MediaPlayback;
+  binding cluster OnOff;
   server  cluster OnOff;
   server  cluster PressureMeasurement;
   server  cluster RelativeHumidityMeasurement;

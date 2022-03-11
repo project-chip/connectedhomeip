@@ -84,7 +84,7 @@ tests:
           true, [1646143737358] [87142:3768651] CHIP: [DMG]
           InteractionModelRevision = 1 [1646143737358] [87142:3768651] CHIP:
           [DMG] } [1646143737359] [87142:3768651] CHIP: [TOO] Endpoint: 1
-          Cluster: 0x0000_050A Attribute 0x0000_0000DataVersion: 1291728690
+          Cluster: 0x0000_050A Attribute 0x0000_0000 DataVersion: 1291728690
           [1646143737360] [87142:3768651] CHIP: [TOO] AcceptHeader: 2 entries
           [1646143737360] [87142:3768651] CHIP: [TOO] [1]: example
           [1646143737360] [87142:3768651] CHIP: [TOO] [2]: example
@@ -131,7 +131,7 @@ tests:
           true, [1646143780979] [87181:3769324] CHIP: [DMG]
           InteractionModelRevision = 1 [1646143780979] [87181:3769324] CHIP:
           [DMG] } [1646143780979] [87181:3769324] CHIP: [TOO] Endpoint: 1
-          Cluster: 0x0000_050A Attribute 0x0000_0001DataVersion: 1291728690
+          Cluster: 0x0000_050A Attribute 0x0000_0001 DataVersion: 1291728690
           [1646143780980] [87181:3769324] CHIP: [TOO]
           SupportedStreamingProtocols: 0 [1646143780980] [87181:3769324] CHIP:
           [EM] Sending Standalone Ack for MessageCounter:6010019 on exchange

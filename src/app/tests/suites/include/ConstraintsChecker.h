@@ -257,6 +257,18 @@ protected:
         return true;
     }
 
+    template <typename T>
+    bool CheckConstraintNotValue(const char * itemName, chip::BitFlags<T> current, chip::BitFlags<T> expected)
+    {
+        if (current == expected)
+        {
+            Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current.Raw()));
+            return false;
+        }
+
+        return true;
+    }
+
     template <typename T, typename U>
     bool CheckConstraintNotValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current, U expected)
     {

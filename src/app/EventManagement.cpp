@@ -319,7 +319,6 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     eventPathBuilder.Endpoint(apOptions->mPath.mEndpointId)
         .Cluster(apOptions->mPath.mClusterId)
         .Event(apOptions->mPath.mEventId)
-        .IsUrgent(apOptions->mUrgent == EventOptions::Type::kUrgent)
         .EndOfEventPathIB();
     ReturnErrorOnFailure(eventPathBuilder.GetError());
     eventDataIBBuilder.EventNumber(apContext->mCurrentEventNumber).Priority(chip::to_underlying(apContext->mPriority));
@@ -476,7 +475,6 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
     // Create all event specific data
     // Timestamp; encoded as a delta time
 
-    opts.mUrgent      = aEventOptions.mUrgent;
     opts.mPath        = aEventOptions.mPath;
     opts.mFabricIndex = aEventOptions.mFabricIndex;
 
@@ -533,8 +531,7 @@ exit:
                       opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch", ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
-        err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleEventDelivery(opts.mPath, opts.mUrgent,
-                                                                                                mBytesWritten);
+        err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleEventDelivery(opts.mPath, mBytesWritten);
     }
 
     return err;

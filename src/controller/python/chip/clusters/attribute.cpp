@@ -51,6 +51,7 @@ struct __attribute__((packed)) EventPath
     chip::EndpointId endpointId;
     chip::ClusterId clusterId;
     chip::EventId eventId;
+    uint8_t urgentEvent;
 };
 
 struct __attribute__((packed)) DataVersionFilter
@@ -472,7 +473,7 @@ chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, Rea
             python::EventPath pathObj;
             memcpy(&pathObj, path, sizeof(python::EventPath));
 
-            readPaths[i] = EventPathParams(pathObj.endpointId, pathObj.clusterId, pathObj.eventId);
+            readPaths[i] = EventPathParams(pathObj.endpointId, pathObj.clusterId, pathObj.eventId, pathObj.urgentEvent == 1);
         }
     }
 

@@ -86,14 +86,13 @@ public:
      * @param verifier        PASE verifier to be used for SPAKE2P pairing
      * @param pbkdf2IterCount Iteration count for PBKDF2 function
      * @param salt            Salt to be used for SPAKE2P operation
-     * @param passcodeID      Passcode ID assigned by the administrator to this PASE verifier
      * @param mySessionId     Session ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(const Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                              PasscodeId passcodeID, uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                              uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
                               SessionEstablishmentDelegate * delegate);
 
     /**
@@ -102,7 +101,6 @@ public:
      *
      * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
-     * @param passcodeID       Passcode ID assigned by the administrator to this PASE verifier
      * @param mySessionId      Session ID to be assigned to the secure session on the peer node
      * @param exchangeCtxt     The exchange context to send and receive messages with the peer
      *                         Note: It's expected that the caller of this API hands over the
@@ -112,9 +110,9 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, PasscodeId passcodeID,
-                    uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
-                    Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
+                    Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
+                    SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -248,8 +246,6 @@ private:
 #endif
 
     Spake2pVerifier mPASEVerifier;
-
-    PasscodeId mPasscodeID = kDefaultCommissioningPasscodeId;
 
     uint32_t mSetupPINCode;
 

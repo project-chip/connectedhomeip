@@ -79,9 +79,7 @@ void OTAConfig::Init()
     gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_TIMEOUT);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    chip::OTAImageProcessorParams ipParams;
-    ipParams.imageFile = chip::CharSpan("test.txt");
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTAImageFile(chip::CharSpan("test.txt"));
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Connect the Downloader and Image Processor objects

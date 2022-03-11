@@ -105,7 +105,7 @@ tests:
           [1645777197.118618][4759:4764] CHIP:DMG: InteractionModelRevision = 1
           [1645777197.118647][4759:4764] CHIP:DMG: }
           [1645777197.118795][4759:4764] CHIP:TOO: Endpoint: 1 Cluster:
-          0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469720
+          0x0000_0050 Attribute 0x0000_0000 DataVersion: 3781469720
           [1645777197.118866][4759:4764] CHIP:TOO: CurrentMode: 4"
       disabled: true
 

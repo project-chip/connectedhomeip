@@ -38,6 +38,7 @@ public:
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
+    void SetOTAImageFile(CharSpan name) { mImageFile = name; }
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -63,6 +64,7 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
+    CharSpan mImageFile;
 };
 
 } // namespace chip

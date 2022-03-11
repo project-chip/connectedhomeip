@@ -242,6 +242,10 @@ CHIP_ERROR EventPathIB::Builder::Encode(const EventPathParams & aEventPathParams
         Event(aEventPathParams.mEventId);
     }
 
+    if (aEventPathParams.mIsUrgentEvent)
+    {
+        IsUrgent(aEventPathParams.mIsUrgentEvent);
+    }
     EndOfEventPathIB();
     return GetError();
 }
