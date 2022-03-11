@@ -1196,7 +1196,7 @@ static void TestChipCert_ExtractNodeIdFabricId(nlTestSuite * inSuite, void * inC
 
         FabricId fabricId;
         err = ExtractFabricIdFromCert(cert, &fabricId);
-        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
     }
 
     // Test extraction from the parsed form of ICA Cert that doesn't have FabricId.
@@ -1209,7 +1209,7 @@ static void TestChipCert_ExtractNodeIdFabricId(nlTestSuite * inSuite, void * inC
 
         FabricId fabricId;
         err = ExtractFabricIdFromCert(certSet.GetCertSet()[0], &fabricId);
-        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
         certSet.Release();
     }
 }

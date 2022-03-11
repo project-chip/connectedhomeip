@@ -1013,7 +1013,7 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
     }
     if (!foundNodeId || !foundFabricId)
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     *outNodeId   = nodeId;
@@ -1054,7 +1054,7 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
         }
     }
 
-    return CHIP_ERROR_INVALID_ARGUMENT;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats)

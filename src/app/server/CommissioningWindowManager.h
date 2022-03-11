@@ -39,7 +39,17 @@ class Server;
 class CommissioningWindowManager : public SessionEstablishmentDelegate, public app::CommissioningModeProvider
 {
 public:
-    CommissioningWindowManager(Server * server) : mAppDelegate(nullptr), mServer(server) {}
+    CommissioningWindowManager() {}
+
+    CHIP_ERROR Init(Server * server)
+    {
+        if (server == nullptr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        mServer = server;
+        return CHIP_NO_ERROR;
+    }
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
 

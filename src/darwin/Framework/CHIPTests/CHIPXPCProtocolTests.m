@@ -1823,4 +1823,39 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     XCTAssertNil(_xpcConnection);
 }
 
+- (void)testXPCConnectionFailure
+{
+    uint64_t myNodeId = 9876543210;
+    NSUInteger myEndpointId = 100;
+    NSUInteger myClusterId = 200;
+    NSUInteger myAttributeId = 300;
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"Read response received"];
+
+    // Test with a device controller which wouldn't connect to XPC listener successfully
+    __auto_type failingDeviceController = [CHIPDeviceController sharedControllerWithId:_controllerUUID
+                                                                       xpcConnectBlock:^NSXPCConnection * {
+                                                                           return nil;
+                                                                       }];
+
+    [failingDeviceController getConnectedDevice:myNodeId
+                                          queue:dispatch_get_main_queue()
+                              completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                                  XCTAssertNotNil(device);
+                                  XCTAssertNil(error);
+                                  NSLog(@"Device acquired. Reading...");
+                                  [device readAttributeWithEndpointId:myEndpointId
+                                                            clusterId:myClusterId
+                                                          attributeId:myAttributeId
+                                                          clientQueue:dispatch_get_main_queue()
+                                                           completion:^(id _Nullable value, NSError * _Nullable error) {
+                                                               NSLog(@"Read value: %@", value);
+                                                               XCTAssertNil(value);
+                                                               XCTAssertNotNil(error);
+                                                               [responseExpectation fulfill];
+                                                           }];
+                              }];
+
+    [self waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds];
+}
+
 @end

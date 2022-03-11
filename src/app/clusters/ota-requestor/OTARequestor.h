@@ -23,7 +23,6 @@
 #pragma once
 
 #include <app/CASESessionManager.h>
-#include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/server/Server.h>
 #include <protocols/bdx/BdxMessages.h>
 
@@ -80,17 +79,15 @@ public:
     // Clear all entries with the specified fabric index in the default OTA provider list
     CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override;
 
-    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
     void SetCurrentProviderLocation(ProviderLocationType providerLocation) override
     {
         mProviderLocation.SetValue(providerLocation);
     }
 
-    void ClearCurrentProviderLocation() override { mProviderLocation.ClearValue(); }
+    void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override { providerLocation = mProviderLocation; }
 
     // Add a default OTA provider to the cached list
-    CHIP_ERROR AddDefaultOtaProvider(
-        const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & providerLocation) override;
+    CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override;
 
     // Retrieve an iterator to the cached default OTA provider list
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
@@ -99,6 +96,8 @@ public:
     void OnDownloadStateChanged(OTADownloader::State state,
                                 app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason) override;
     void OnUpdateProgressChanged(app::DataModel::Nullable<uint8_t> percent) override;
+
+    //////////// OTARequestor public APIs ///////////////
 
     /**
      * Called to perform some initialization including:
@@ -120,11 +119,9 @@ public:
         mCurrentVersion = version;
 
         storage.LoadDefaultProviders(mDefaultOtaProviderList);
-        OtaRequestorServerSetUpdateState(mCurrentUpdateState);
-        OtaRequestorServerSetUpdateStateProgress(app::DataModel::NullNullable);
 
-        // This results in the initial periodic timer kicking off
-        RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+        // Schedule the initializations that needs to be performed in the CHIP context
+        DeviceLayer::PlatformMgr().ScheduleWork(InitState, reinterpret_cast<intptr_t>(this));
 
         return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor,
                                                                     reinterpret_cast<intptr_t>(this));
@@ -200,6 +197,11 @@ private:
         chip::Messaging::ExchangeContext * mExchangeCtx;
         chip::BDXDownloader * mDownloader;
     };
+
+    /**
+     * Callback to initialize states and server attributes in the CHIP context
+     */
+    static void InitState(intptr_t context);
 
     /**
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
@@ -310,7 +312,7 @@ private:
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
     Server * mServer                       = nullptr;
     ProviderLocationList mDefaultOtaProviderList;
-    Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current update in progress
+    Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current/last update in progress
 };
 
 } // namespace chip
