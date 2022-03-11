@@ -17,12 +17,13 @@ scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug 
 In addition to the general options available to all Linux applications, the
 following command line options are available for the OTA Requestor application.
 
-| Directory                                           | Description                                                                                                                                 |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| -p/--periodicQueryTimeout <Time in seconds>         | Periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours. |
-| -c/--requestorCanConsent                            | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.      |
-| -f/--otaDownloadPath <file path>                    | If supplied, the OTA image is downloaded to the given fully-qualified file-path. Otherwise, the value defaults to /tmp/test.bin.            |
-| -u/--userConsentState <granted | denied | deferred> | The following is applied to the next QueryImage and will revert back to the behavior of granted on subsequent QueryImage commands. <li> granted: Authorize OTA requestor to download an OTA image. <li> denied: Forbid OTA requestor to download an OTA image. <li> deferred: Defer obtaining user consent.
+| Directory                                   | Description                                                                                                                                 |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| -p/--periodicQueryTimeout <Time in seconds> | Periodic timeout for querying providers in the default OTA provider list. If none or zero is supplied the timeout is set to every 24 hours. |
+| -c/--requestorCanConsent                    | If supplied, the RequestorCanConsent field of the QueryImage command is set to true. Otherwise, the value is determined by the driver.      |
+| -f/--otaDownloadPath <file path>            | If supplied, the OTA image is downloaded to the given fully-qualified file-path. Otherwise, the value defaults to /tmp/test.bin.            |
+| -u/--userConsentState <granted              | denied                                                                                                                                      | deferred> | The following is applied to the next QueryImage and will revert back to the behavior of granted on subsequent QueryImage commands. <li> granted: Authorize OTA requestor to download an OTA image. <li> denied: Forbid OTA requestor to download an OTA image. <li> deferred: Defer obtaining user consent. |
+
 ## Software Image Header
 
 All Matter software images must contain a header as defined in section 11.21.1

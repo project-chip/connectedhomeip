@@ -28,7 +28,7 @@ UserConsentState DefaultUserConsentProvider::GetUserConsentState(const UserConse
     {
         // Reset mGlobalConsentState to success case after returning other possible values once.
         UserConsentState curGlobalConsentState = mGlobalConsentState;
-        mGlobalConsentState = UserConsentState::kGranted;
+        mGlobalConsentState                    = UserConsentState::kGranted;
         return curGlobalConsentState;
     }
 
