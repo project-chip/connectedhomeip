@@ -36,7 +36,6 @@ public:
     // If this is set to true, all the user consent requests will be replied with global consent.
     void SetGlobalUserConsentState(UserConsentState state)
     {
-        ChipLogDetail(SoftwareUpdate, "//is: SetGlobalUserConsentState");
         mUseGlobalConsent   = true;
         mGlobalConsentState = state;
     }
@@ -44,15 +43,8 @@ public:
     // state is only valid if isGlobalConsentSet is true
     void GetGlobalUserConsentState(bool & isGlobalConsentSet, UserConsentState & state)
     {
-        ChipLogDetail(SoftwareUpdate, "//is: GetGlobalUserConsentState");
         isGlobalConsentSet = mUseGlobalConsent;
         state              = mGlobalConsentState;
-
-        if (mUserConsentStateCount > 0)
-        {
-            mUserConsentStateCount--;
-            mGlobalConsentState = chip::ota::UserConsentState::kGranted;
-        }
     }
 
     // Clear the global user consent state
@@ -61,7 +53,6 @@ public:
 private:
     bool mUseGlobalConsent = false;
     UserConsentState mGlobalConsentState = UserConsentState::kGranted;
-    uint8_t mUserConsentStateCount = 0; // # of times to respond with value of mGlobalConsentState before resorting to the success response.
 };
 
 } // namespace ota

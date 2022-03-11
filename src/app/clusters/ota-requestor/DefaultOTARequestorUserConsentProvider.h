@@ -33,16 +33,28 @@ public:
     // This method returns kGranted unless explicitly set by the user by calling SetUserConsentState()
     UserConsentState GetUserConsentState(const UserConsentSubject & subject) override
     {
+        UserConsentState curUserConsentState = mUserConsentState;
+
         subject.Log();
-        return mUserConsentState;
+
+        if (mUserConsentStateCount > 0)
+        {
+            mUserConsentStateCount--;
+            mUserConsentState = chip::ota::UserConsentState::kGranted;
+        }
+
+        return curUserConsentState;
     }
 
     UserConsentState CheckDeferredUserConsentState() override { return mUserConsentState; }
 
     void SetUserConsentState(UserConsentState state) { mUserConsentState = state; }
 
+    void SetUserConsentStateCount(uint8_t count) { mUserConsentStateCount = count; }
+
 private:
     UserConsentState mUserConsentState = UserConsentState::kGranted;
+    uint8_t mUserConsentStateCount = 0; // # of times to respond with value of mGlobalConsentState before resorting to the success response.
 };
 
 } // namespace ota

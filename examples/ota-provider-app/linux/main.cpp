@@ -70,9 +70,6 @@ static chip::Optional<uint32_t> gSoftwareVersion;
 static const char * gSoftwareVersionString = nullptr;
 static uint32_t gIgnoreQueryImageCount     = 0;
 static uint32_t gIgnoreApplyUpdateCount    = 0;
-static uint8_t gQueryImageBehaviorCount    = 0;
-static uint8_t gUpdateActionCount          = 0;
-static uint8_t gUserConsentStateCount      = 0;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -182,12 +179,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         else if (strcmp(aValue, "busy") == 0)
         {
             gQueryImageBehavior = OTAProviderExample::kRespondWithBusy;
-            gQueryImageBehaviorCount = 1;
         }
         else if (strcmp(aValue, "updateNotAvailable") == 0)
         {
             gQueryImageBehavior = OTAProviderExample::kRespondWithNotAvailable;
-            gQueryImageBehaviorCount = 1;
         }
         else
         {
@@ -214,12 +209,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         else if (strcmp(aValue, "awaitNextAction") == 0)
         {
             gOptionUpdateAction = OTAApplyUpdateAction::kAwaitNextAction;
-            gUpdateActionCount = 1;
         }
         else if (strcmp(aValue, "discontinue") == 0)
         {
             gOptionUpdateAction = OTAApplyUpdateAction::kDiscontinue;
-            gUpdateActionCount = 1;
         }
         else
         {
@@ -243,12 +236,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         else if (strcmp(aValue, "denied") == 0)
         {
             gUserConsentState = chip::ota::UserConsentState::kDenied;
-            gUserConsentStateCount = 1;
         }
         else if (strcmp(aValue, "deferred") == 0)
         {
             gUserConsentState = chip::ota::UserConsentState::kObtaining;
-            gUserConsentStateCount = 1;
         }
         else
         {
@@ -358,11 +349,9 @@ void ApplicationInit()
     }
 
     gOtaProvider.SetQueryImageBehavior(gQueryImageBehavior);
-    gOtaProvider.SetQueryImageBehaviorCount(gQueryImageBehaviorCount);
     gOtaProvider.SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
     gOtaProvider.SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
     gOtaProvider.SetApplyUpdateAction(gOptionUpdateAction);
-    gOtaProvider.SetUpdateActionCount(gUpdateActionCount);
     gOtaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
     if (gSoftwareVersion.HasValue())
     {
