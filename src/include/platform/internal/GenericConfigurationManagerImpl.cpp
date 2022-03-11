@@ -236,10 +236,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     // implementation properly, without loss of functionality for legacy in the meantime.
     static LegacyTemporaryCommissionableDataProvider<ConfigClass> sLegacyTemporaryCommissionableDataProvider(*this);
 
-    if (mCommissionableDataProvider == nullptr)
-    {
-        SetCommissionableDataProvider(&sLegacyTemporaryCommissionableDataProvider);
-    }
+    SetCommissionableDataProvider(&sLegacyTemporaryCommissionableDataProvider);
 #endif
 
     char uniqueId[kMaxUniqueIDLength + 1];
