@@ -9,10 +9,16 @@ client cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
+  struct ApplicationBasicApplication {
+    INT16U catalogVendorId = 0;
+    CHAR_STRING applicationId = 1;
+  }
+
   readonly attribute char_string<32> vendorName = 0;
   readonly attribute int16u vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
+  readonly attribute ApplicationBasicApplication application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
@@ -30,10 +36,16 @@ server cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
+  struct ApplicationBasicApplication {
+    INT16U catalogVendorId = 0;
+    CHAR_STRING applicationId = 1;
+  }
+
   readonly attribute char_string<32> vendorName = 0;
   readonly attribute int16u vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
+  readonly attribute ApplicationBasicApplication application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
@@ -1122,6 +1134,57 @@ server cluster NetworkCommissioning = 49 {
   command ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
 }
 
+client cluster OnOff = 6 {
+  enum OnOffDelayedAllOffEffectVariant : enum8 {
+    kFadeToOffIn0p8Seconds = 0;
+    kNoFade = 1;
+    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+  }
+
+  enum OnOffDyingLightEffectVariant : enum8 {
+    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  }
+
+  enum OnOffEffectIdentifier : enum8 {
+    kDelayedAllOff = 0;
+    kDyingLight = 1;
+  }
+
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
+  }
+
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
+  }
+
+  readonly attribute boolean onOff = 0;
+  readonly attribute boolean globalSceneControl = 16384;
+  attribute int16u onTime = 16385;
+  attribute int16u offWaitTime = 16386;
+  attribute enum8 startUpOnOff = 16387;
+  readonly global attribute bitmap32 featureMap = 65532;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct OffWithEffectRequest {
+    OnOffEffectIdentifier effectId = 0;
+    OnOffDelayedAllOffEffectVariant effectVariant = 1;
+  }
+
+  request struct OnWithTimedOffRequest {
+    OnOffControl onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
+  }
+
+  command Off(): DefaultSuccess = 0;
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  command On(): DefaultSuccess = 1;
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
+  command Toggle(): DefaultSuccess = 2;
+}
+
 server cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : enum8 {
     kFadeToOffIn0p8Seconds = 0;
@@ -1833,6 +1896,7 @@ endpoint 0 {
   binding cluster KeypadInput;
   server  cluster KeypadInput;
   server  cluster NetworkCommissioning;
+  binding cluster OnOff;
   server  cluster OnOff;
   binding cluster OperationalCredentials;
   server  cluster OperationalCredentials;
@@ -1851,6 +1915,7 @@ endpoint 1 {
   server  cluster Groups;
   server  cluster Identify;
   server  cluster LevelControl;
+  binding cluster OnOff;
   server  cluster OnOff;
   server  cluster Scenes;
 }
