@@ -26,6 +26,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -339,7 +340,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     }
 
     uint16_t discriminator = 0;
-    CHIP_ERROR error       = DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
+    CHIP_ERROR error       = DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery,

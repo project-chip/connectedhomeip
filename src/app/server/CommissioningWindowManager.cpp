@@ -21,6 +21,7 @@
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 
 using namespace chip::app::Clusters;
 
@@ -195,7 +196,7 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
         MutableByteSpan saltSpan{ salt };
         MutableByteSpan verifierSpan{ serializedVerifier };
 
-        auto * commissionableDataProvider = DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider();
+        auto * commissionableDataProvider = DeviceLayer::GetCommissionableDataProvider();
         ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pIterationCount(iterationCount));
         ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pSalt(saltSpan));
         ReturnErrorOnFailure(commissionableDataProvider->GetSpake2pVerifier(verifierSpan, serializedVerifierLen));

@@ -24,6 +24,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 
 using chip::DeviceLayer::ConfigurationMgr;
 
@@ -100,7 +101,7 @@ static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
     streamer_t * sout = streamer_get();
     uint32_t setupPinCode;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetCommissionableDataProvider()->GetSetupPasscode(setupPinCode));
+    ReturnErrorOnFailure(DeviceLayer::GetCommissionableDataProvider()->GetSetupPasscode(setupPinCode));
     if (printHeader)
     {
         streamer_printf(sout, "PinCode:         ");
@@ -119,7 +120,7 @@ static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t setupDiscriminator;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(setupDiscriminator));
+    ReturnErrorOnFailure(DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(setupDiscriminator));
     if (printHeader)
     {
         streamer_printf(sout, "Discriminator:   ");
@@ -136,7 +137,7 @@ static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
 
     VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < chip::kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = ConfigurationMgr().GetCommissionableDataProvider()->SetSetupDiscriminator(setupDiscriminator);
+    error = DeviceLayer::GetCommissionableDataProvider()->SetSetupDiscriminator(setupDiscriminator);
 
     if (error == CHIP_NO_ERROR)
     {

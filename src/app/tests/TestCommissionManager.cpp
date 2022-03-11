@@ -25,6 +25,7 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/PlatformManager.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 #include <protocols/secure_channel/PASESession.h>
 
 #include <nlunit-test.h>
@@ -49,8 +50,8 @@ void InitializeChip(nlTestSuite * suite)
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
 
-    static chip::DeviceLayer::TestCommissionableDataProvider commissionableDataProvider;
-    chip::DeviceLayer::ConfigurationMgr().SetCommissionableDataProvider(&commissionableDataProvider);
+    static chip::DeviceLayer::TestOnlyCommissionableDataProvider commissionableDataProvider;
+    chip::DeviceLayer::SetCommissionableDataProvider(&commissionableDataProvider);
 
     err = Server::GetInstance().Init();
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
@@ -143,7 +144,7 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     uint16_t originDiscriminator;
     CHIP_ERROR err =
-        chip::DeviceLayer::ConfigurationMgr().GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator);
+        chip::DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
     chip::Spake2pVerifier verifier;

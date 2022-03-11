@@ -37,7 +37,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
@@ -157,8 +159,8 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
     else if (!options.spake2pVerifier.HasValue())
     {
         uint32_t defaultTestPasscode = 0;
-        chip::DeviceLayer::TestCommissionableDataProvider testCommissionableDataProvider;
-        VerifyOrDie(testCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
+        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
 
         ChipLogError(Support,
                      "*** WARNING: Using temporary passcode %u due to no neither --passcode or --spake2p-verifier-base64 "
@@ -246,7 +248,7 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
     // to handle custom verifiers, discriminators, etc.
     err = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
-    DeviceLayer::ConfigurationMgr().SetCommissionableDataProvider(&gCommissionableDataProvider);
+    DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);

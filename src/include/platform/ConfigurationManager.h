@@ -29,7 +29,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
-#include <platform/CommissionableDataProvider.h>
 #include <platform/PersistedStorage.h>
 #include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 
@@ -163,17 +162,6 @@ public:
 
     virtual CHIP_ERROR GetLocationCapability(uint8_t & location);
 
-    virtual void SetCommissionableDataProvider(CommissionableDataProvider * dataProvider)
-    {
-        mCommissionableDataProvider = dataProvider;
-    }
-
-    virtual CommissionableDataProvider * GetCommissionableDataProvider()
-    {
-        VerifyOrDie(mCommissionableDataProvider != nullptr);
-        return mCommissionableDataProvider;
-    }
-
 protected:
     // ===== Members for internal use by the following friends.
 
@@ -201,8 +189,6 @@ protected:
     ConfigurationManager(const ConfigurationManager &)  = delete;
     ConfigurationManager(const ConfigurationManager &&) = delete;
     ConfigurationManager & operator=(const ConfigurationManager &) = delete;
-
-    CommissionableDataProvider * mCommissionableDataProvider = nullptr;
 };
 
 /**
