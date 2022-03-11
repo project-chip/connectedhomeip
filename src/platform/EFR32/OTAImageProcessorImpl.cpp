@@ -123,12 +123,14 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_verifyImage() error %ld", err);
+        return;
     }
 
     err = bootloader_setImageToBootload(mSlotId);
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err);
+        return;
     }
 
     // This reboots the device
@@ -176,7 +178,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     if (err)
     {
-        ChipLogError(SoftwareUpdate, "ERROR writing image: bootloader_eraseWriteStorage() error %ld", err);
+        ChipLogError(SoftwareUpdate, "ERROR (possible wrong bootloader version): bootloader_eraseWriteStorage() error %ld", err);
 
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
