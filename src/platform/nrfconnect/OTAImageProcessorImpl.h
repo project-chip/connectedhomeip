@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,6 +49,46 @@ private:
     OTAImageContentHeaderParser mContentHeaderParser;
     uint8_t mBuffer[kBufferSize];
 };
+
+class ExtFlashHandler
+{
+public:
+    enum class Action : uint8_t
+    {
+        WAKE_UP,
+        SLEEP
+    };
+    virtual ~ExtFlashHandler() {}
+    virtual void DoAction(Action action);
+};
+
+class OTAImageProcessorImplPMDevice : public OTAImageProcessorImpl
+{
+public:
+    explicit OTAImageProcessorImplPMDevice(ExtFlashHandler & aHandler);
+    CHIP_ERROR PrepareDownload() override;
+    CHIP_ERROR Abort() override;
+    CHIP_ERROR Apply() override;
+
+private:
+    ExtFlashHandler & mHandler;
+};
+
+#ifdef CONFIG_CHIP_OTA_REQUESTOR
+namespace OTAImageProcessorNrf {
+// compile-time factory method
+inline OTAImageProcessorImpl & Get()
+{
+#if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR
+    static ExtFlashHandler sQSPIHandler;
+    static OTAImageProcessorImplPMDevice sOTAImageProcessor{ sQSPIHandler };
+#else
+    static OTAImageProcessorImpl sOTAImageProcessor;
+#endif
+    return sOTAImageProcessor;
+}
+} // namespace OTAImageProcessorNrf
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

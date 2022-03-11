@@ -146,9 +146,9 @@ CHIP_ERROR AppTask::Init()
 void AppTask::InitOTARequestor()
 {
 #if CONFIG_CHIP_OTA_REQUESTOR
-    mOTAImageProcessor.SetOTADownloader(&mBDXDownloader);
-    mBDXDownloader.SetImageProcessorDelegate(&mOTAImageProcessor);
-    mOTARequestorDriver.Init(&mOTARequestor, &mOTAImageProcessor);
+    OTAImageProcessorNrf::Get().SetOTADownloader(&mBDXDownloader);
+    mBDXDownloader.SetImageProcessorDelegate(&OTAImageProcessorNrf::Get());
+    mOTARequestorDriver.Init(&mOTARequestor, &OTAImageProcessorNrf::Get());
     mOTARequestor.Init(&chip::Server::GetInstance(), &mOTARequestorDriver, &mBDXDownloader);
     chip::SetRequestorInstance(&mOTARequestor);
 #endif

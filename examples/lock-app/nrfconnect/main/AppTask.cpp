@@ -75,7 +75,6 @@ bool sHaveBLEConnections  = false;
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 GenericOTARequestorDriver sOTARequestorDriver;
-OTAImageProcessorImpl sOTAImageProcessor;
 chip::BDXDownloader sBDXDownloader;
 chip::OTARequestor sOTARequestor;
 #endif
@@ -181,9 +180,9 @@ CHIP_ERROR AppTask::Init()
 void AppTask::InitOTARequestor()
 {
 #if CONFIG_CHIP_OTA_REQUESTOR
-    sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
-    sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
-    sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
+    OTAImageProcessorNrf::Get().SetOTADownloader(&sBDXDownloader);
+    sBDXDownloader.SetImageProcessorDelegate(&OTAImageProcessorNrf::Get());
+    sOTARequestorDriver.Init(&sOTARequestor, &OTAImageProcessorNrf::Get());
     sOTARequestor.Init(&chip::Server::GetInstance(), &sOTARequestorDriver, &sBDXDownloader);
     chip::SetRequestorInstance(&sOTARequestor);
 #endif

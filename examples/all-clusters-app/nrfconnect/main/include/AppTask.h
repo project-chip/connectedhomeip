@@ -74,7 +74,6 @@ private:
 
 #if CONFIG_CHIP_OTA_REQUESTOR
     chip::DeviceLayer::GenericOTARequestorDriver mOTARequestorDriver;
-    chip::DeviceLayer::OTAImageProcessorImpl mOTAImageProcessor;
     chip::BDXDownloader mBDXDownloader;
     chip::OTARequestor mOTARequestor;
 #endif
