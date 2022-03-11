@@ -84,28 +84,17 @@ void SignalHandler(int signum)
 }
 
 #if CHIP_WITH_GIO
-void * GDBus_Thread(void * arg)
+void GDBus_Thread(GMainLoop * gdbusLoop)
 {
-    GMainLoop * loop = g_main_loop_new(nullptr, false);
-
-    g_main_loop_run(loop);
-    g_main_loop_unref(loop);
-
-    return nullptr;
+    g_main_loop_run(gdbusLoop);
+    g_main_loop_unref(gdbusLoop);
 }
 #endif
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-void * PlatformManagerImpl::WiFIIPChangeListener(void * arg)
+void PlatformManagerImpl::WiFIIPChangeListener(int sock)
 {
-    int sock;
-    if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to init netlink socket for ip addresses.");
-        return nullptr;
-    }
-
     struct sockaddr_nl addr;
     memset(&addr, 0, sizeof(addr));
     addr.nl_family = AF_NETLINK;
@@ -114,7 +103,7 @@ void * PlatformManagerImpl::WiFIIPChangeListener(void * arg)
     if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to bind netlink socket for ip addresses.");
-        return nullptr;
+        return;
     }
 
     ssize_t len;
@@ -168,8 +157,6 @@ void * PlatformManagerImpl::WiFIIPChangeListener(void * arg)
             }
         }
     }
-
-    return nullptr;
 }
 #endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
@@ -204,19 +191,18 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
 #if CHIP_WITH_GIO
     this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
-
-    // Check if GDBus thread is created sucessfuly
-    if (pthread_create(&mGdbusThread, NULL, &GDBus_Thread, NULL))
-    {
-        ChipLogError(DeviceLayer, "GDBus thread creation failed");
-    }
+    mGdbusLoop              = g_main_loop_new(nullptr, false);
+    mGdbusThread            = std::thread(GDBus_Thread, mGdbusLoop);
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    // Check if WiFi IP thread is created sucessfuly
-    if (pthread_create(&mWifiIPThread, NULL, &WiFIIPChangeListener, NULL))
+    if ((mWiFiSocket = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
     {
-        ChipLogError(DeviceLayer, "WiFi IP thread creation failed");
+        ChipLogError(DeviceLayer, "Failed to init netlink socket for ip addresses.");
+    }
+    else
+    {
+        mWifiIPThread = std::thread(WiFIIPChangeListener, mWiFiSocket);
     }
 #endif
 
@@ -247,27 +233,16 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     }
 
 #if CHIP_WITH_GIO
-    if (pthread_cancel(mGdbusThread) != 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to cancel GDBus thread");
-    }
+    g_main_loop_quit(mGdbusLoop);
 
-    if (pthread_join(mGdbusThread, NULL) != 0)
+    if (mGdbusThread.joinable())
     {
-        ChipLogError(DeviceLayer, "Failed to join GDBus thread");
+        mGdbusThread.join();
     }
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    if (pthread_cancel(mWifiIPThread) != 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to cancel WiFi IP thread");
-    }
-
-    if (pthread_join(mWifiIPThread, NULL) != 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to join WiFi IP thread");
-    }
+    // TODO: Find a proper way to shutdown the wifi thread and recycle it.
 #endif
 
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();

@@ -176,7 +176,7 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 }
 
 void InteractionModelEngine::CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex)
-{ 
+{
     //
     // Walk through all existing subscriptions and shut down those whose subscriber matches
     // that which just came in.
