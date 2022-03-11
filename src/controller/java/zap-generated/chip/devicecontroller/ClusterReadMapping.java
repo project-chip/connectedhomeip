@@ -5228,7 +5228,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ModeSelectCluster) cluster)
-                  .readStartUpModeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readStartUpModeAttribute(
+                      (ChipClusters.ModeSelectCluster.StartUpModeAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readModeSelectStartUpModeCommandParams);

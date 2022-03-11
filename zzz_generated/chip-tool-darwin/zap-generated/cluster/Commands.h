@@ -35068,6 +35068,40 @@ public:
     }
 };
 
+class WriteModeSelectStartUpMode : public ModelCommand {
+public:
+    WriteModeSelectStartUpMode()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "start-up-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) WriteAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+
+        NSNumber * _Nullable value = [NSNumber numberWithUnsignedChar:mValue];
+
+        [cluster writeAttributeStartUpModeWithValue:value
+                                  completionHandler:^(NSError * _Nullable error) {
+                                      err = [CHIPError errorToCHIPErrorCode:error];
+                                      ChipLogError(chipTool, "ModeSelect StartUpMode Error: %s", chip::ErrorStr(err));
+                                      SetCommandExitStatus(err);
+                                  }];
+        return err;
+    }
+
+private:
+    uint8_t mValue;
+};
+
 class SubscribeAttributeModeSelectStartUpMode : public ModelCommand {
 public:
     SubscribeAttributeModeSelectStartUpMode()
@@ -73995,6 +74029,7 @@ void registerClusterModeSelect(Commands & commands)
         make_unique<WriteModeSelectOnMode>(), //
         make_unique<SubscribeAttributeModeSelectOnMode>(), //
         make_unique<ReadModeSelectStartUpMode>(), //
+        make_unique<WriteModeSelectStartUpMode>(), //
         make_unique<SubscribeAttributeModeSelectStartUpMode>(), //
         make_unique<ReadModeSelectDescription>(), //
         make_unique<SubscribeAttributeModeSelectDescription>(), //

@@ -2396,8 +2396,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace OnMode
 
 namespace StartUpMode {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
 } // namespace StartUpMode
 
 namespace Description {

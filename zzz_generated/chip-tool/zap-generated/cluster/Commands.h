@@ -7223,6 +7223,32 @@ private:
     uint8_t mValue;
 };
 
+class WriteModeSelectStartUpMode : public WriteAttribute
+{
+public:
+    WriteModeSelectStartUpMode(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("StartUpMode", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "start-up-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteModeSelectStartUpMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000003, mValue);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    {
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, senderNodeId, 0x00000050, 0x00000003, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<uint8_t> mValue;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster ShadeConfiguration                                          | 0x0100 |
 |------------------------------------------------------------------------------|
@@ -21985,6 +22011,7 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),    //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                        //
         make_unique<WriteModeSelectOnMode>(credsIssuerConfig),                                                     //
+        make_unique<WriteModeSelectStartUpMode>(credsIssuerConfig),                                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                    //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig), //

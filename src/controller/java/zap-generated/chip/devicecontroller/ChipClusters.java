@@ -11205,6 +11205,14 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
+    public interface StartUpModeAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface ServerGeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -11265,12 +11273,21 @@ public class ChipClusters {
       subscribeOnModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readStartUpModeAttribute(IntegerAttributeCallback callback) {
+    public void readStartUpModeAttribute(StartUpModeAttributeCallback callback) {
       readStartUpModeAttribute(chipClusterPtr, callback);
     }
 
+    public void writeStartUpModeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeStartUpModeAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeStartUpModeAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeStartUpModeAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
     public void subscribeStartUpModeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        StartUpModeAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeStartUpModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -11350,10 +11367,19 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readStartUpModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, StartUpModeAttributeCallback callback);
+
+    private native void writeStartUpModeAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeStartUpModeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        StartUpModeAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readDescriptionAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);

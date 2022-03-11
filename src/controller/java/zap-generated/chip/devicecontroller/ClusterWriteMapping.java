@@ -792,6 +792,22 @@ public class ClusterWriteMapping {
             writeModeSelectOnModeCommandParams);
     writeModeSelectInteractionInfo.put(
         "writeOnModeAttribute", writeModeSelectOnModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeModeSelectStartUpModeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo modeSelectstartUpModeCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class);
+    writeModeSelectStartUpModeCommandParams.put("value", modeSelectstartUpModeCommandParameterInfo);
+    InteractionInfo writeModeSelectStartUpModeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ModeSelectCluster) cluster)
+                  .writeStartUpModeAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeModeSelectStartUpModeCommandParams);
+    writeModeSelectInteractionInfo.put(
+        "writeStartUpModeAttribute", writeModeSelectStartUpModeAttributeInteractionInfo);
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
     Map<String, InteractionInfo> writeNetworkCommissioningInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeNetworkCommissioningInterfaceEnabledCommandParams =

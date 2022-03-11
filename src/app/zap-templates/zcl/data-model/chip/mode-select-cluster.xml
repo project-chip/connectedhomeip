@@ -43,8 +43,8 @@ limitations under the License.
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="CURRENT_MODE"    type="INT8U"                                            writable="false" optional="false" reportable="true">CurrentMode</attribute>
     <attribute side="server" code="0x0001" define="SUPPORTED_MODES" type="ARRAY" entryType="ModeOptionStruct" length="255"  writable="false" optional="false">SupportedModes</attribute>
-    <attribute side="server" code="0x0002" define="ON_MODE"         type="INT8U"                                            writable="true"  optional="true" default="255">OnMode</attribute>
-    <attribute side="server" code="0x0003" define="START_UP_MODE"   type="INT8U"                                            writable="false" optional="false">StartUpMode</attribute>
+    <attribute side="server" code="0x0002" define="ON_MODE"         type="INT8U"                                            writable="true" optional="true" default="255">OnMode</attribute>
+    <attribute side="server" code="0x0003" define="START_UP_MODE"   type="INT8U"                                            writable="true" isNullable="true" optional="true">StartUpMode</attribute>
     <attribute side="server" code="0x0004" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false" length="32">Description</attribute>
 
     <!-- Test Commands -->

@@ -48801,6 +48801,7 @@ NSNumber * _Nonnull ourFabricIndex;
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedCharValue], 0);
         }
 
@@ -48930,6 +48931,74 @@ NSNumber * _Nonnull ourFabricIndex;
                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
                       [expectation fulfill];
                   }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestModeSelectCluster_000009_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Change to Unsupported StartUp Mode"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id startUpModeArgument;
+    startUpModeArgument = [NSNumber numberWithUnsignedChar:2];
+    [cluster writeAttributeStartUpModeWithValue:startUpModeArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Change to Unsupported StartUp Mode Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestModeSelectCluster_000010_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Change to Supported StartUp Mode"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id startUpModeArgument;
+    startUpModeArgument = [NSNumber numberWithUnsignedChar:4];
+    [cluster writeAttributeStartUpModeWithValue:startUpModeArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Change to Supported StartUp Mode Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestModeSelectCluster_000011_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Verify StartUp Mode Change"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Verify StartUp Mode Change Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertEqual([actualValue unsignedCharValue], 4);
+        }
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }

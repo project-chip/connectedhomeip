@@ -55862,6 +55862,18 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Change to Unsupported Mode\n");
             err = TestChangeToUnsupportedMode_8();
             break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Change to Unsupported StartUp Mode\n");
+            err = TestChangeToUnsupportedStartUpMode_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Change to Supported StartUp Mode\n");
+            err = TestChangeToSupportedStartUpMode_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Verify StartUp Mode Change\n");
+            err = TestVerifyStartUpModeChange_11();
+            break;
         }
 
         if (CHIP_NO_ERROR != err) {
@@ -55877,7 +55889,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
+    const uint16_t mTestCount = 12;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -55947,6 +55959,7 @@ private:
 
             {
                 id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("StartUpMode", actualValue));
                 VerifyOrReturn(CheckValue("StartUpMode", actualValue, 0));
             }
 
@@ -56072,6 +56085,68 @@ private:
                           VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
                           NextTest();
                       }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestChangeToUnsupportedStartUpMode_9()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id startUpModeArgument;
+        startUpModeArgument = [NSNumber numberWithUnsignedChar:2];
+        [cluster writeAttributeStartUpModeWithValue:startUpModeArgument
+                                  completionHandler:^(NSError * _Nullable err) {
+                                      NSLog(@"Change to Unsupported StartUp Mode Error: %@", err);
+
+                                      VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+                                      NextTest();
+                                  }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestChangeToSupportedStartUpMode_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id startUpModeArgument;
+        startUpModeArgument = [NSNumber numberWithUnsignedChar:4];
+        [cluster writeAttributeStartUpModeWithValue:startUpModeArgument
+                                  completionHandler:^(NSError * _Nullable err) {
+                                      NSLog(@"Change to Supported StartUp Mode Error: %@", err);
+
+                                      VerifyOrReturn(CheckValue("status", err, 0));
+
+                                      NextTest();
+                                  }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestVerifyStartUpModeChange_11()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestModeSelect * cluster = [[CHIPTestModeSelect alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeStartUpModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Verify StartUp Mode Change Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("StartUpMode", actualValue));
+                VerifyOrReturn(CheckValue("StartUpMode", actualValue, 4));
+            }
+
+            NextTest();
+        }];
 
         return CHIP_NO_ERROR;
     }
