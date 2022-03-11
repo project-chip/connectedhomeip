@@ -23,6 +23,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/SafeInt.h>
 #include <map>
 #include <set>
 #include <string>
@@ -45,12 +46,19 @@ public:
         VerifyOrReturnError(contains, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
         std::vector<uint8_t> & value = mStorage[key];
-        uint16_t value_size          = static_cast<uint16_t>(value.size());
-        VerifyOrReturnError(value_size <= size, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        size = std::min(value_size, size);
-        memcpy(buffer, value.data(), size);
-        return CHIP_NO_ERROR;
+        size_t valueSize             = value.size();
+        if (size < valueSize)
+        {
+            size = CanCastTo<uint16_t>(valueSize) ? static_cast<uint16_t>(valueSize) : 0;
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        else
+        {
+            size = static_cast<uint16_t>(valueSize);
+            VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+            memcpy(buffer, value.data(), size);
+            return CHIP_NO_ERROR;
+        }
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
