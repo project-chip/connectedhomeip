@@ -29,7 +29,7 @@ tests:
                 value: nodeId
 
     #issue #12884 Media cluster commands and precondition not supported
-    - labe: "Precondition: Connect media content available for playback"
+    - label: "Precondition: Connect media content available for playback"
       disabled: true
 
     - label:
