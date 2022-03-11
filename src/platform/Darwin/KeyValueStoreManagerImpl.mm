@@ -288,8 +288,7 @@ namespace DeviceLayer {
             KeyValueItem * item = FindItemForKey(itemKey, nil);
             if (!item) {
                 [gContext performBlockAndWait:^{
-                    KeyValueItem * item = [[KeyValueItem alloc] initWithContext:gContext key:itemKey value:data];
-                    [gContext insertObject:item];
+                    [gContext insertObject:[[KeyValueItem alloc] initWithContext:gContext key:itemKey value:data]];
                 }];
             } else {
                 [gContext performBlockAndWait:^{
