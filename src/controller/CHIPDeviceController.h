@@ -341,7 +341,7 @@ public:
      *
      * Returns success if a session with the given peer does not exist yet.
      */
-    CHIP_ERROR CloseSession(NodeId nodeId);
+    CHIP_ERROR DisconnectDevice(NodeId nodeId);
 
 protected:
     enum class State
