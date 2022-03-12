@@ -321,10 +321,34 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
 
 void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & session)
 {
-    VerifyOrReturn(mState == State::Initialized,
-                   ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
-    VerifyOrReturn(session->GetSessionType() == Transport::Session::SessionType::kSecure);
-    CHIP_ERROR err = UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
+    if (session->GetSessionType() != Session::SessionType::kSecure)
+    {
+        // Definitely not a CASE session.
+        return;
+    }
+
+    auto * secureSession = session->AsSecureSession();
+    if (secureSession->GetSecureSessionType() != SecureSession::Type::kCASE)
+    {
+        // Still not CASE.
+        return;
+    }
+
+    FabricIndex ourIndex;
+    CHIP_ERROR err = GetFabricIndex(&ourIndex);
+    if (err != CHIP_NO_ERROR)
+    {
+        // We can't really do CASE, now can we?
+        return;
+    }
+
+    if (ourIndex != session->GetFabricIndex())
+    {
+        // Not one of our sessions.
+        return;
+    }
+
+    err = UpdateDevice(secureSession->GetPeerNodeId());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller,

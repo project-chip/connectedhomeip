@@ -42,7 +42,8 @@ public:
      *   Called when the first message delivery in a session failed,
      *   so actions aiming to recover connection can be performed.
      *
-     * @param session   The handle to the secure session
+     * @param session   The handle to the session.  This may be any session type
+     *                  that supports MRP.
      */
     virtual void OnFirstMessageDeliveryFailed(const SessionHandle & session) = 0;
 };
