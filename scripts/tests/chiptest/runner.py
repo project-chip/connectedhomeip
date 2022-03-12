@@ -69,7 +69,7 @@ class LogPipe(threading.Thread):
         while True:
             try:
                 line = self.reader.readline()
-                # It seems that Darwin platfrom returns empty string in case
+                # It seems that Darwin platform returns empty string in case
                 # when writing side of PTY is closed (Linux raises OSError).
                 if line == '':
                     break
