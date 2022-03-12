@@ -105,8 +105,7 @@ Server::Server() :
         .dnsCache          = nullptr,
 #endif
         .devicePool        = &mDevicePool,
-    }),
-    mGroupsProvider(mDeviceStorage)
+    })
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort,
@@ -141,6 +140,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
     // Group data provider must be initialized after mDeviceStorage
+    mGroupsProvider.SetStorageDelegate(&mDeviceStorage);
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
     SetGroupDataProvider(&mGroupsProvider);
