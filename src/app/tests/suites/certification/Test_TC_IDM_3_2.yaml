@@ -27,7 +27,7 @@ tests:
           Specific Attribute. On receipt of this message, DUT should send a
           write response action with the modified attribute value to the TH."
       verification:
-          "In case of chip tool, here is an example command to use sudo
+          "In case of chip tool, here is an example command to use
           ./chip-tool levelcontrol write on-level 2 1 1"
       disabled: true
 
@@ -36,7 +36,7 @@ tests:
           receipt of this message, DUT should send a Write Response action with
           the attribute value to the DUT."
       verification:
-          "In case of chip tool, here is an example command to use sudo
+          "In case of chip tool, here is an example command to use
           ./chip-tool any write-by-id 0x0008 0x0010 1 1 0xffff"
       disabled: true
 
@@ -45,7 +45,7 @@ tests:
           attribute of data type bool. DUT responds with the Write Response
           action with the right attribute value."
       verification:
-          "In case of chip tool, here is an example command to use sudo
+          "In case of chip tool, here is an example command to use
           ./chip-tool basic write local-config-disabled 1 1 0"
       disabled: true
 
@@ -54,7 +54,7 @@ tests:
           attribute of data type string. DUT responds with the Write Response
           action with the right attribute value."
       verification:
-          "In case of chip tool, here is an example command to use sudo
+          "In case of chip tool, here is an example command to use
           ./chip-tool basic write node-label 1 1 0"
       disabled: true
 
@@ -63,7 +63,7 @@ tests:
           attribute of data type unsigned integer. DUT responds with the Write
           Response action with the right attribute value."
       verification:
-          "In case of chip tool, here is an example command to use sudo
+          "In case of chip tool, here is an example command to use
           ./chip-tool any write-by-id 0x0008 0x0010 1 1 1"
       disabled: true
 
@@ -72,35 +72,35 @@ tests:
           attribute of data type signed integer. DUT responds with the Write
           Response action with the right attribute value."
       verification:
-          "wirte to an attribute of type signed integer to the Harness"
+          "write to an attribute of type signed integer to the Harness"
       disabled: true
 
     - label:
           "[Optional] TH sends the Write Request Message to the DUT to write an
           attribute of data type floating point. DUT responds with the Write
           Response action with the right attribute value."
-      verification: "wirte to an attribute of type floating to the Harness"
+      verification: "write to an attribute of type floating to the Harness"
       disabled: true
 
     - label:
           "[Optional] TH sends the Write Request Message to the DUT to write an
           attribute of data type Octet String. DUT responds with the Write
           Response action with the right attribute value."
-      verification: "wirte to an attribute of type oct string to the Harness"
+      verification: "write to an attribute of type oct string to the Harness"
       disabled: true
 
     - label:
           "[Optional] TH sends the Write Request Message to the DUT to write an
           attribute of data type Struct. DUT responds with the Write Response
           action with the right attribute value."
-      verification: "wirte to an attribute of type Struct to the Harness"
+      verification: "write to an attribute of type Struct to the Harness"
       disabled: true
 
     - label:
           "[Optional] TH sends the Write Request Message to the DUT to write an
           attribute of data type List. DUT responds with the Write Response
           action with the right attribute value."
-      verification: "wirte to an attribute of type list to the Harness"
+      verification: "write to an attribute of type list to the Harness"
       disabled: true
 
     - label:
@@ -108,7 +108,7 @@ tests:
           attribute of data type enum. DUT responds with the Write Response
           action with the right attribute value."
       verification:
-          "In case of chip tool, here is an example command to use sudo
+          "In case of chip tool, here is an example command to use
           ./chip-tool any write-by-id 0x0204 0 1 1 1"
       disabled: true
 
@@ -117,7 +117,7 @@ tests:
           attribute of data type bitmap. DUT responds with the Write Response
           action with the right attribute value."
       verification:
-          "In case of chip tool, here is an example command to use sudo
+          "In case of chip tool, here is an example command to use
           ./chip-tool colorcontrol write-by-id 0x000f 1 1 1"
       disabled: true
 
@@ -150,7 +150,7 @@ tests:
           "TH sends the Write Request Message to the DUT to read an unsupported
           attribute DUT responds with the Write Response action"
       verification:
-          "In case of chip tool, here is an example command to use sudo
+          "In case of chip tool, here is an example command to use
           ./chip-tool any read-by-id 0x03 -900 1 1"
       disabled: true
 
@@ -158,7 +158,7 @@ tests:
           "TH sends the Write Request Message to the DUT to read an attribute
           which is not writable. DUT responds with the Write Response action"
       verification:
-          "In case of chip tool, here is an example command to use sudo
+          "In case of chip tool, here is an example command to use
           ./out/debug/chip-tool any write-by-id 0x0028 1 test 5 0"
       disabled: true
 
@@ -186,9 +186,9 @@ tests:
           write response action with the modified attribute value to the TH.
           Repeat the above steps 3 times."
       verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool basic write node-label TE8 1 1 sudo ./chip-tool basic
-          write node-label TE7 1 1 sudo ./chip-tool basic write node-label TE6 1
+          "In case of chip tool, here is an example command to use
+          ./chip-tool basic write node-label TE8 1 1 ./chip-tool basic
+          write node-label TE7 1 1 ./chip-tool basic write node-label TE6 1
           1"
       disabled: true
 
