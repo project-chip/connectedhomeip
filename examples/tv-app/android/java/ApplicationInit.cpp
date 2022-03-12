@@ -23,7 +23,7 @@ using namespace chip::app;
 using namespace chip::DeviceLayer::NetworkCommissioning;
 
 namespace {
-constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
+constexpr EndpointId kNetworkCommissioningEndpointMain = 0;
 
 AndroidEthernetDriver sAndroidEthernetDriverDriver;
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
