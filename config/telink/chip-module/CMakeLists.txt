@@ -105,8 +105,13 @@ if (CONFIG_POSIX_API)
     )
 endif()
 
+# Add MbedTLS config file
+list(APPEND CHIP_CFLAGS -DMBEDTLS_CONFIG_FILE=CONFIG_MBEDTLS_CFG_FILE)
+
 zephyr_include_directories(${ZEPHYR_BASE}/../modules/crypto/mbedtls/include)
+zephyr_include_directories(${ZEPHYR_BASE}/modules/mbedtls/configs)
 zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/)
+zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/crypto/)
 
 zephyr_get_compile_flags(CHIP_CFLAGS_C C)
 zephyr_get_compile_flags(CHIP_CFLAGS_CC CXX)
