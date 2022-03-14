@@ -114,9 +114,9 @@ class Flasher(firmware_utils.Flasher):
         self.define_options(EFR32_OPTIONS)
         self.run_tool(
             'commander',
-            ['gbl', 'create', self.DEVICE_ARGUMENTS, 'chip-efr32-lighting-example.gbl', '--app',  glob.glob("*.s37")],
+            ['gbl', 'create', self.DEVICE_ARGUMENTS,
+                'chip-efr32-lighting-example.gbl', '--app',  glob.glob("*.s37")],
             name='GblCreate')
-        
 
     # Common command line arguments for commander device subcommands.
     DEVICE_ARGUMENTS = [{'optional': 'serialno'}, {
