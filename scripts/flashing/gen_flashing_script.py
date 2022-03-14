@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Generate script to flash or erase a device. Also creates a bootloader for the device"""
+"""Generate script to flash or erase a device.""
 
 import importlib
 import sys

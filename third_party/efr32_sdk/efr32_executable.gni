@@ -46,7 +46,6 @@ template("efr32_executable") {
 
   flash_target_name = target_name + ".flash_executable"
   flashbundle_name = "${target_name}.flashbundle.txt"
-  gbl_file_image_name = output_base_name + ".gbl"
   flashable_executable(flash_target_name) {
     forward_variables_from(invoker, "*")
     data_deps = [ ":${flashing_runtime_target}" ]

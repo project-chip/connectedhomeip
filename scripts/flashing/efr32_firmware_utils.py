@@ -174,5 +174,8 @@ class Flasher(firmware_utils.Flasher):
             if self.reset().err:
                 return self
 
+        return self
+
+
 if __name__ == '__main__':
     sys.exit(Flasher().flash_command(sys.argv))
