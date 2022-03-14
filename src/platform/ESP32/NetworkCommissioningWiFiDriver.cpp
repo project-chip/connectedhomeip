@@ -92,6 +92,22 @@ bool ESPWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId
 
 Status ESPWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
 {
+    // If device is already connected to WiFi with default credentials provided using menuconfig options, then disconnect the WiFi,
+    // clear the WiFi configurations and add the newly provided WiFi configurations.
+    if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
+    {
+        ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
+        esp_err_t err = esp_wifi_disconnect();
+        if (err != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "esp_wifi_disconnect() failed: %s", esp_err_to_name(err));
+        }
+        CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
+        }
+    }
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
