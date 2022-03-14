@@ -61,7 +61,7 @@ template("gen_flashing_script") {
                            "flashing_options",
                            "deps",
                            "data_deps",
-                           "gbl_file"
+                           "gbl_file",
                          ])
 
   action(target_name) {
