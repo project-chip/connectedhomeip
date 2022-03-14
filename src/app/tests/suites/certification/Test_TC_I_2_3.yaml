@@ -20,7 +20,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "1.Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -60,7 +60,7 @@ tests:
               - name: "EffectVariant"
                 value: 0
 
-    - label: "Manually check DUT executes a breathe effect"
+    - label: "check DUT executes a breathe effect"
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -80,7 +80,7 @@ tests:
               - name: "EffectVariant"
                 value: 0
 
-    - label: "Manually check DUT executes an okay effect"
+    - label: "check DUT executes an okay effect"
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -100,7 +100,7 @@ tests:
               - name: "EffectVariant"
                 value: 0
 
-    - label: "Manually check DUT executes a channel change effect"
+    - label: "check DUT executes a channel change effect"
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -120,7 +120,7 @@ tests:
               - name: "EffectVariant"
                 value: 0
 
-    - label: "Manually check DUT executes a breathe effect"
+    - label: "check DUT executes a breathe effect"
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -184,7 +184,7 @@ tests:
               - name: "EffectVariant"
                 value: 0
 
-    - label: "Manually check DUT stops the breathe effect as soon as possible."
+    - label: "Check DUT stops the breathe effect as soon as possible."
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -193,9 +193,9 @@ tests:
                 value: "DUT stops the breathe effect as soon as possible"
 
     - label:
-          "9.TH sends TriggerEffect command to DUT, with the effect identifier
-          field set to 0x00 (blink) and the effect variant field set to 0x42
-          (unknown)."
+          "TH sends TriggerEffect command to DUT with the effect identifier
+          field set to 0x00 blink and the effect variant field set to 0x42
+          unknown"
       command: "TriggerEffect"
       arguments:
           values:
@@ -204,7 +204,7 @@ tests:
               - name: "EffectVariant"
                 value: 66
 
-    - label: "Manually check DUT executes a blink effect."
+    - label: "Check DUT executes a blink effect."
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -225,8 +225,8 @@ tests:
                 value: 0
 
     - label:
-          "Manually check DUT stops any effect that may be still running as soon
-          as possible."
+          "Check DUT stops any effect that may be still running as soon as
+          possible"
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
