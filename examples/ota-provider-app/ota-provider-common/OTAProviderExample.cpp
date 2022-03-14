@@ -266,18 +266,27 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         // Initialize the transfer session in prepartion for a BDX transfer
         BitFlags<TransferControlFlags> bdxFlags;
         bdxFlags.Set(TransferControlFlags::kReceiverDrive);
-        CHIP_ERROR err = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
-                                                          bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
-        if (err != CHIP_NO_ERROR)
+        if (mBdxOtaSender.InitializeTransfer(commandObj->GetSubjectDescriptor().fabricIndex,
+                                             commandObj->GetSubjectDescriptor().subject) == CHIP_NO_ERROR)
         {
-            ChipLogError(BDX, "Failed to initialize BDX transfer session: %s", chip::ErrorStr(err));
-            return EMBER_ZCL_STATUS_FAILURE;
-        }
+            CHIP_ERROR err = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
+                                                              bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(BDX, "Failed to initialize BDX transfer session: %s", chip::ErrorStr(err));
+                return EMBER_ZCL_STATUS_FAILURE;
+            }
 
-        response.imageURI.Emplace(chip::CharSpan::fromCharString(uriBuf));
-        response.softwareVersion.Emplace(newSoftwareVersion);
-        response.softwareVersionString.Emplace(chip::CharSpan::fromCharString(newSoftwareVersionString));
-        response.updateToken.Emplace(chip::ByteSpan(updateToken));
+            response.imageURI.Emplace(chip::CharSpan::fromCharString(uriBuf));
+            response.softwareVersion.Emplace(newSoftwareVersion);
+            response.softwareVersionString.Emplace(chip::CharSpan::fromCharString(newSoftwareVersionString));
+            response.updateToken.Emplace(chip::ByteSpan(updateToken));
+        }
+        else
+        {
+            // Another BDX transfer in progress
+            queryStatus = OTAQueryStatus::kBusy;
+        }
     }
 
     response.status = queryStatus;

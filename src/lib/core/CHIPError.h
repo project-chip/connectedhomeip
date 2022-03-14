@@ -2401,6 +2401,15 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INVALID_FILE_IDENTIFIER                     CHIP_CORE_ERROR(0xda)
 
 /**
+ * @def CHIP_ERROR_BUSY
+ *
+ * @brief
+ *   The Resource is busy and cannot process the request. Trying again might work.
+ */
+#define CHIP_ERROR_BUSY                     CHIP_CORE_ERROR(0xdb)
+
+
+/**
  *  @}
  */
 
