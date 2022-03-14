@@ -805,8 +805,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     mDeviceBeingCommissioned = device;
 
-    mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
-
     {
         FabricIndex fabricIndex = mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
         device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, fabricIndex);

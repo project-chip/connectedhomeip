@@ -700,12 +700,6 @@ private:
 
     CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
 
-    /* TODO: BLE rendezvous and IP rendezvous should share the same procedure, so this is just a
-       workaround-like flag and should be removed in the future.
-       When using IP rendezvous, we need to disable network provisioning. In the future, network
-       provisioning will no longer be a part of rendezvous procedure. */
-    bool mIsIPRendezvous;
-
     /* This field is true when device pairing information changes, e.g. a new device is paired, or
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
        persist the device list */
