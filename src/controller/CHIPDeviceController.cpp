@@ -334,7 +334,7 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
         return;
     }
 
-    FabricIndex ourIndex;
+    FabricIndex ourIndex = kUndefinedFabricIndex;
     CHIP_ERROR err = GetFabricIndex(&ourIndex);
     if (err != CHIP_NO_ERROR)
     {
