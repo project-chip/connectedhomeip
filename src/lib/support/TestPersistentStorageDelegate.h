@@ -23,6 +23,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/SafeInt.h>
 #include <map>
 #include <set>
 #include <string>
@@ -30,6 +31,16 @@
 
 namespace chip {
 
+/**
+ * Implementation of PersistentStorageDelegate suitable for unit tests,
+ * where persistence lasts for the object's lifetime and where all data is retained
+ * is memory.
+ *
+ * This version also has "poison keys" which, if accessed, yield an error. This can
+ * be used in unit tests to make sure a module making use of the PersistentStorageDelegate
+ * does not access some particular keys which should remain untouched by underlying
+ * logic.
+ */
 class TestPersistentStorageDelegate : public PersistentStorageDelegate
 {
 public:
@@ -37,52 +48,96 @@ public:
 
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        if (mErrorKeys.find(std::string(key)) != mErrorKeys.end())
+        if ((buffer == nullptr) && (size != 0))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        // Making sure poison keys are not accessed
+        if (mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
+
         bool contains = mStorage.find(key) != mStorage.end();
         VerifyOrReturnError(contains, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
         std::vector<uint8_t> & value = mStorage[key];
-        uint16_t value_size          = static_cast<uint16_t>(value.size());
-        VerifyOrReturnError(value_size <= size, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        size = std::min(value_size, size);
-        memcpy(buffer, value.data(), size);
-        return CHIP_NO_ERROR;
+        size_t valueSize             = value.size();
+        if (size < valueSize)
+        {
+            size = CanCastTo<uint16_t>(valueSize) ? static_cast<uint16_t>(valueSize) : 0;
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        else
+        {
+            size = static_cast<uint16_t>(valueSize);
+            memcpy(buffer, value.data(), size);
+            return CHIP_NO_ERROR;
+        }
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
-        if (mErrorKeys.find(std::string(key)) != mErrorKeys.end())
+        // Make sure poison keys are not accessed
+        if (mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
-        const uint8_t * bytes = static_cast<const uint8_t *>(value);
-        mStorage[key]         = std::vector<uint8_t>(bytes, bytes + size);
-        return CHIP_NO_ERROR;
+
+        // Handle empty values
+        if (value == nullptr)
+        {
+            if (size == 0)
+            {
+                mStorage[key] = std::vector<uint8_t>();
+                return CHIP_NO_ERROR;
+            }
+            else
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+        // Handle non-empty values
+        else
+        {
+            const uint8_t * bytes = static_cast<const uint8_t *>(value);
+            mStorage[key]         = std::vector<uint8_t>(bytes, bytes + size);
+            return CHIP_NO_ERROR;
+        }
     }
 
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override
     {
-        if (mErrorKeys.find(std::string(key)) != mErrorKeys.end())
+        // Make sure poison keys are not accessed
+        if (mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
         {
             return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
+
         bool contains = mStorage.find(key) != mStorage.end();
         VerifyOrReturnError(contains, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         mStorage.erase(key);
         return CHIP_NO_ERROR;
     }
 
-    void AddErrorKey(const std::string & key) { mErrorKeys.insert(key); }
+    /**
+     * @brief Adds a "poison key": a key that, if read/written, implies some bad
+     *        behavior occurred.
+     *
+     * @param key - Poison key to add to the set.
+     */
+    void AddPoisonKey(const std::string & key) { mPoisonKeys.insert(key); }
 
-    void ClearErrorKey() { mErrorKeys.clear(); }
+    /**
+     * @brief Clear all "poison keys"
+     *
+     */
+    void ClearPoisonKeys() { mPoisonKeys.clear(); }
 
 protected:
     std::map<std::string, std::vector<uint8_t>> mStorage;
-    std::set<std::string> mErrorKeys;
+    std::set<std::string> mPoisonKeys;
 };
 
 } // namespace chip
