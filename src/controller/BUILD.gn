@@ -70,6 +70,8 @@ static_library("controller") {
     "${chip_root}/src/transport",
   ]
 
+  deps = [ "${chip_root}/src/lib/address_resolve" ]
+
   public_configs = [ ":config" ]
 
   defines = []

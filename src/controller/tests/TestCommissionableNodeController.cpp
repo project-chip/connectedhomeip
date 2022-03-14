@@ -38,7 +38,6 @@ public:
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override { return ResolveNodeIdStatus; }
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return FindCommissionersStatus; }
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) override { return false; }
 
     CHIP_ERROR InitStatus              = CHIP_NO_ERROR;
     CHIP_ERROR ResolveNodeIdStatus     = CHIP_NO_ERROR;

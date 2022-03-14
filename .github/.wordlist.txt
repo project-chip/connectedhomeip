@@ -334,6 +334,8 @@ depottools
 deps
 desc
 descheduled
+detokenization
+detokenizer
 dev
 devcontainer
 devCtrl
@@ -1035,6 +1037,7 @@ RGB
 riscv
 rloc
 rmw
+rodata
 Rollershade
 rootfs
 RPC
@@ -1178,6 +1181,7 @@ TestCluster
 TestConstraints
 TestEmptyString
 TestGenExample
+TestGroupDemoConfig
 TestMultiRead
 TESTPASSWD
 TestPICS
@@ -1211,6 +1215,7 @@ tngvndl
 TODO
 toJson
 tokenized
+tokenizer
 toolchain
 toolchains
 topologies

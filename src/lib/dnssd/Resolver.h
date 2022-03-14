@@ -413,17 +413,6 @@ public:
     virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
 
     /**
-     * Explicit attempt to resolve a NodeID without performing network operations.
-     *
-     * If the required entry exists in an internal cache, this will call the
-     * underlying delegate `OnNodeIdResolved` and will return true;
-     *
-     * Returns false if the corresponding entry does not exist in the internal cache.
-     * This will NEVER call `OnNodeIdResolutionFailed` and this method does not block.
-     */
-    virtual bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) = 0;
-
-    /**
      * Finds all commissionable nodes matching the given filter.
      *
      * Whenever a new matching node is found and a resolver delegate has been registered,

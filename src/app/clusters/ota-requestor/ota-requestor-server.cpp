@@ -200,7 +200,7 @@ void OtaRequestorServerOnStateTransition(OTAUpdateStateEnum previousState, OTAUp
 {
     if (previousState == newState)
     {
-        ChipLogError(Zcl, "Previous state and new state are the same, no event to log");
+        ChipLogError(Zcl, "Previous state and new state are the same (%d), no event to log", to_underlying(newState));
         return;
     }
 

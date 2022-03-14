@@ -69,6 +69,7 @@ static_library("framework") {
     "${chip_root}/src/controller",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:default_attestation_verifier",
+    "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

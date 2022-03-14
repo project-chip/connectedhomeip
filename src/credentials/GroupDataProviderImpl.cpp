@@ -45,8 +45,10 @@ struct PersistentData
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)        = 0;
     virtual void Clear()                                           = 0;
 
-    virtual CHIP_ERROR Save(chip::PersistentStorageDelegate & storage)
+    virtual CHIP_ERROR Save(PersistentStorageDelegate * storage)
     {
+        VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
+
         uint8_t buffer[kMaxSerializedSize] = { 0 };
         DefaultStorageKeyAllocator key;
         // Update storage key
@@ -58,11 +60,13 @@ struct PersistentData
         ReturnErrorOnFailure(Serialize(writer));
 
         // Save serialized data
-        return storage.SyncSetKeyValue(key.KeyName(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+        return storage->SyncSetKeyValue(key.KeyName(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
     }
 
-    CHIP_ERROR Load(chip::PersistentStorageDelegate & storage)
+    CHIP_ERROR Load(PersistentStorageDelegate * storage)
     {
+        VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
+
         uint8_t buffer[kMaxSerializedSize] = { 0 };
         DefaultStorageKeyAllocator key;
 
@@ -74,7 +78,7 @@ struct PersistentData
 
         // Load the serialized data
         uint16_t size  = static_cast<uint16_t>(sizeof(buffer));
-        CHIP_ERROR err = storage.SyncGetKeyValue(key.KeyName(), buffer, size);
+        CHIP_ERROR err = storage->SyncGetKeyValue(key.KeyName(), buffer, size);
         VerifyOrReturnError(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND != err, CHIP_ERROR_NOT_FOUND);
         ReturnErrorOnFailure(err);
 
@@ -84,13 +88,15 @@ struct PersistentData
         return Deserialize(reader);
     }
 
-    virtual CHIP_ERROR Delete(chip::PersistentStorageDelegate & storage)
+    virtual CHIP_ERROR Delete(PersistentStorageDelegate * storage)
     {
+        VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
+
         DefaultStorageKeyAllocator key;
         // Update storage key
         ReturnErrorOnFailure(UpdateKey(key));
         // Delete stored data
-        return storage.SyncDeleteKeyValue(key.KeyName());
+        return storage->SyncDeleteKeyValue(key.KeyName());
     }
 };
 
@@ -248,7 +254,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     }
 
     // Register the fabric in the fabrics' linked-list
-    CHIP_ERROR Register(chip::PersistentStorageDelegate & storage)
+    CHIP_ERROR Register(PersistentStorageDelegate * storage)
     {
         FabricList fabric_list;
         CHIP_ERROR err = fabric_list.Load(storage);
@@ -285,7 +291,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     }
 
     // Remove the fabric from the fabrics' linked list
-    CHIP_ERROR Unregister(chip::PersistentStorageDelegate & storage)
+    CHIP_ERROR Unregister(PersistentStorageDelegate * storage)
     {
         FabricList fabric_list;
         CHIP_ERROR err = fabric_list.Load(storage);
@@ -328,7 +334,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     }
 
     // Check the fabric is registered in the fabrics' linked list
-    CHIP_ERROR Validate(chip::PersistentStorageDelegate & storage)
+    CHIP_ERROR Validate(PersistentStorageDelegate * storage)
     {
         FabricList fabric_list;
         ReturnErrorOnFailure(fabric_list.Load(storage));
@@ -349,13 +355,13 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    CHIP_ERROR Save(chip::PersistentStorageDelegate & storage) override
+    CHIP_ERROR Save(PersistentStorageDelegate * storage) override
     {
         ReturnErrorOnFailure(Register(storage));
         return PersistentData::Save(storage);
     }
 
-    CHIP_ERROR Delete(chip::PersistentStorageDelegate & storage) override
+    CHIP_ERROR Delete(PersistentStorageDelegate * storage) override
     {
         ReturnErrorOnFailure(Unregister(storage));
         return PersistentData::Delete(storage);
@@ -434,7 +440,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
         return reader.ExitContainer(container);
     }
 
-    bool Get(chip::PersistentStorageDelegate & storage, const FabricData & fabric, size_t target_index)
+    bool Get(PersistentStorageDelegate * storage, const FabricData & fabric, size_t target_index)
     {
         fabric_index = fabric.fabric_index;
         group_id     = fabric.first_group;
@@ -462,7 +468,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
         return false;
     }
 
-    bool Find(chip::PersistentStorageDelegate & storage, const FabricData & fabric, chip::GroupId target_group)
+    bool Find(PersistentStorageDelegate * storage, const FabricData & fabric, chip::GroupId target_group)
     {
         fabric_index = fabric.fabric_index;
         group_id     = fabric.first_group;
@@ -545,7 +551,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
         return reader.ExitContainer(container);
     }
 
-    bool Get(chip::PersistentStorageDelegate & storage, const FabricData & fabric, size_t target_index)
+    bool Get(PersistentStorageDelegate * storage, const FabricData & fabric, size_t target_index)
     {
         fabric_index = fabric.fabric_index;
         id           = fabric.first_map;
@@ -575,7 +581,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
         return false;
     }
 
-    bool Find(chip::PersistentStorageDelegate & storage, const FabricData & fabric, const GroupKey & map)
+    bool Find(PersistentStorageDelegate * storage, const FabricData & fabric, const GroupKey & map)
     {
         fabric_index = fabric.fabric_index;
         id           = fabric.first_map;
@@ -661,8 +667,7 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersiste
         return reader.ExitContainer(container);
     }
 
-    bool Find(chip::PersistentStorageDelegate & storage, const FabricData & fabric, const GroupData & group,
-              chip::EndpointId target_id)
+    bool Find(PersistentStorageDelegate * storage, const FabricData & fabric, const GroupData & group, chip::EndpointId target_id)
     {
         fabric_index = fabric.fabric_index;
         group_id     = group.group_id;
@@ -841,7 +846,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
         return reader.ExitContainer(container);
     }
 
-    bool Find(chip::PersistentStorageDelegate & storage, const FabricData & fabric, size_t target_id)
+    bool Find(PersistentStorageDelegate * storage, const FabricData & fabric, size_t target_id)
     {
         uint16_t count = 0;
 
@@ -880,13 +885,15 @@ constexpr size_t GroupDataProviderImpl::kIteratorsMax;
 
 CHIP_ERROR GroupDataProviderImpl::Init()
 {
-    mInitialized = true;
+    if (mStorage == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
     return CHIP_NO_ERROR;
 }
 
 void GroupDataProviderImpl::Finish()
 {
-    mInitialized = false;
     mGroupInfoIterators.ReleaseAll();
     mGroupKeyIterators.ReleaseAll();
     mEndpointIterators.ReleaseAll();
@@ -895,13 +902,19 @@ void GroupDataProviderImpl::Finish()
     mKeyContexPool.ReleaseAll();
 }
 
+void GroupDataProviderImpl::SetStorageDelegate(PersistentStorageDelegate * storage)
+{
+    VerifyOrDie(storage != nullptr);
+    mStorage = storage;
+}
+
 //
 // Group Info
 //
 
 CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, const GroupInfo & info)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     GroupData group;
@@ -951,7 +964,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfo(chip::FabricIndex fabric_index
 
 CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, const GroupInfo & info)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     GroupData group;
@@ -1016,7 +1029,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
 
 CHIP_ERROR GroupDataProviderImpl::GetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, GroupInfo & info)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     GroupData group;
@@ -1032,7 +1045,7 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupInfoAt(chip::FabricIndex fabric_index,
 
 CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_index, size_t index)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     GroupData group;
@@ -1079,7 +1092,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
 
 bool GroupDataProviderImpl::HasEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id, chip::EndpointId endpoint_id)
 {
-    VerifyOrReturnError(mInitialized, false);
+    VerifyOrReturnError(IsInitialized(), false);
 
     FabricData fabric(fabric_index);
     GroupData group;
@@ -1092,7 +1105,7 @@ bool GroupDataProviderImpl::HasEndpoint(chip::FabricIndex fabric_index, chip::Gr
 
 CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id, chip::EndpointId endpoint_id)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     GroupData group;
@@ -1150,7 +1163,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
 CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id,
                                                  chip::EndpointId endpoint_id)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     GroupData group;
@@ -1185,7 +1198,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
 
 CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
 
@@ -1243,7 +1256,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
 
 GroupDataProvider::GroupInfoIterator * GroupDataProviderImpl::IterateGroupInfo(chip::FabricIndex fabric_index)
 {
-    VerifyOrReturnError(mInitialized, nullptr);
+    VerifyOrReturnError(IsInitialized(), nullptr);
     return mGroupInfoIterators.CreateObject(*this, fabric_index);
 }
 
@@ -1287,7 +1300,7 @@ void GroupDataProviderImpl::GroupInfoIteratorImpl::Release()
 
 GroupDataProvider::EndpointIterator * GroupDataProviderImpl::IterateEndpoints(chip::FabricIndex fabric_index)
 {
-    VerifyOrReturnError(mInitialized, nullptr);
+    VerifyOrReturnError(IsInitialized(), nullptr);
     return mEndpointIterators.CreateObject(*this, fabric_index);
 }
 
@@ -1381,7 +1394,7 @@ void GroupDataProviderImpl::EndpointIteratorImpl::Release()
 
 CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index, chip::GroupId group_id)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     GroupData group;
@@ -1411,7 +1424,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
 
 CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & in_map)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     KeyMapData map(fabric_index);
@@ -1461,7 +1474,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
 
 CHIP_ERROR GroupDataProviderImpl::GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & out_map)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     KeyMapData map;
@@ -1477,7 +1490,7 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupKeyAt(chip::FabricIndex fabric_index, 
 
 CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     KeyMapData map;
@@ -1509,7 +1522,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeyAt(chip::FabricIndex fabric_inde
 
 CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeys(chip::FabricIndex fabric_index)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_ID);
@@ -1534,7 +1547,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeys(chip::FabricIndex fabric_index
 
 GroupDataProvider::GroupKeyIterator * GroupDataProviderImpl::IterateGroupKeys(chip::FabricIndex fabric_index)
 {
-    VerifyOrReturnError(mInitialized, nullptr);
+    VerifyOrReturnError(IsInitialized(), nullptr);
     return mGroupKeyIterators.CreateObject(*this, fabric_index);
 }
 
@@ -1585,7 +1598,7 @@ constexpr size_t GroupDataProvider::EpochKey::kLengthBytes;
 CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, const ByteSpan & compressed_fabric_id,
                                             const KeySet & in_keyset)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     KeySetData keyset;
@@ -1632,7 +1645,7 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
 
 CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint16_t target_id, KeySet & out_keyset)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     KeySetData keyset;
@@ -1654,7 +1667,7 @@ CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint
 
 CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, uint16_t target_id)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     KeySetData keyset;
@@ -1686,7 +1699,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, u
 
 GroupDataProvider::KeySetIterator * GroupDataProviderImpl::IterateKeySets(chip::FabricIndex fabric_index)
 {
-    VerifyOrReturnError(mInitialized, nullptr);
+    VerifyOrReturnError(IsInitialized(), nullptr);
     return mKeySetIterators.CreateObject(*this, fabric_index);
 }
 
@@ -1850,7 +1863,7 @@ CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptPrivacy(MutableByteSpa
 
 GroupDataProviderImpl::GroupSessionIterator * GroupDataProviderImpl::IterateGroupSessions(uint16_t session_id)
 {
-    VerifyOrReturnError(mInitialized, nullptr);
+    VerifyOrReturnError(IsInitialized(), nullptr);
     return mGroupSessionsIterator.CreateObject(*this, session_id);
 }
 

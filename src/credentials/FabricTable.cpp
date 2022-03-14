@@ -68,10 +68,23 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
     ReturnErrorOnFailure(
         storage->SyncSetKeyValue(keyAlloc.FabricRCAC(mFabric), mRootCert.data(), static_cast<uint16_t>(mRootCert.size())));
 
-    // If we stop storing ICA certs when empty, update LoadFromStorage
-    // accordingly to check for CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND.
-    ReturnErrorOnFailure(
-        storage->SyncSetKeyValue(keyAlloc.FabricICAC(mFabric), mICACert.data(), static_cast<uint16_t>(mICACert.size())));
+    // Workaround for the fact that some storage backends do not allow storing
+    // a nullptr with 0 length.  See
+    // https://github.com/project-chip/connectedhomeip/issues/16030.
+    if (!mICACert.empty())
+    {
+        ReturnErrorOnFailure(
+            storage->SyncSetKeyValue(keyAlloc.FabricICAC(mFabric), mICACert.data(), static_cast<uint16_t>(mICACert.size())));
+    }
+    else
+    {
+        // Make sure there is no stale data.
+        CHIP_ERROR err = storage->SyncDeleteKeyValue(keyAlloc.FabricICAC(mFabric));
+        if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            ReturnErrorOnFailure(err);
+        }
+    }
 
     ReturnErrorOnFailure(
         storage->SyncSetKeyValue(keyAlloc.FabricNOC(mFabric), mNOCCert.data(), static_cast<uint16_t>(mNOCCert.size())));
@@ -149,11 +162,17 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
 
     {
         uint8_t buf[Credentials::kMaxCHIPCertLength];
-        uint16_t size = sizeof(buf);
-        // For now we always store an ICA cert buffer (possibly empty).  If we
-        // stop doing that, check for
-        // CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND here.
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricICAC(mFabric), buf, size));
+        uint16_t size  = sizeof(buf);
+        CHIP_ERROR err = storage->SyncGetKeyValue(keyAlloc.FabricICAC(mFabric), buf, size);
+        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            // That's OK; that just means no ICAC.
+            size = 0;
+        }
+        else
+        {
+            ReturnErrorOnFailure(err);
+        }
         ReturnErrorOnFailure(SetICACert(ByteSpan(buf, size)));
     }
 
