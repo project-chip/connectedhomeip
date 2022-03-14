@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@
 
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/tests/echo/common.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/PlatformManager.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 #include <protocols/secure_channel/PASESession.h>
 
 #include <nlunit-test.h>
@@ -46,10 +49,36 @@ void InitializeChip(nlTestSuite * suite)
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
+
+    static chip::DeviceLayer::TestOnlyCommissionableDataProvider commissionableDataProvider;
+    chip::DeviceLayer::SetCommissionableDataProvider(&commissionableDataProvider);
+
     err = Server::GetInstance().Init();
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
+
     Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+}
+
+void ShutdownChipTest()
+{
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+
+    auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
+    mdnsAdvertiser.RemoveServices();
+    mdnsAdvertiser.Shutdown();
+
+    // Server shudown will be called in TearDownTask
+
+    // TODO: At this point UDP endpoits still seem leaked and the sanitizer
+    // builds will attempt a memory free. As a result, we keep Memory initialized
+    // so that the global UDPManager can still be destructed without a coredump.
+    //
+    // This is likely either a missing shutdown or an actual UDP endpoint leak
+    // which I have not been able to track down yet.
+    //
+    // chip::Platform::MemoryShutdown();
 }
 
 void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
@@ -114,34 +143,26 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     nlTestSuite * suite                        = reinterpret_cast<nlTestSuite *>(context);
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     uint16_t originDiscriminator;
-    CHIP_ERROR err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(originDiscriminator);
+    CHIP_ERROR err =
+        chip::DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
-    chip::PASEVerifier verifier;
-    constexpr uint32_t kIterations = chip::kPBKDFMinimumIterations;
-    uint8_t salt[chip::kPBKDFMinimumSaltLen];
+    chip::Spake2pVerifier verifier;
+    constexpr uint32_t kIterations = chip::kSpake2p_Min_PBKDF_Iterations;
+    uint8_t salt[chip::kSpake2p_Min_PBKDF_Salt_Length];
     chip::ByteSpan saltData(salt);
-    constexpr uint16_t kPasscodeID = 1;
-    uint16_t currentDiscriminator;
 
-    err = commissionMgr.OpenEnhancedCommissioningWindow(kNoCommissioningTimeout, newDiscriminator, verifier, kIterations, saltData,
-                                                        kPasscodeID);
+    err = commissionMgr.OpenEnhancedCommissioningWindow(kNoCommissioningTimeout, newDiscriminator, verifier, kIterations, saltData);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatus() ==
                        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen);
     NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
-    err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(currentDiscriminator);
-    NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(suite, currentDiscriminator == newDiscriminator);
 
     commissionMgr.CloseCommissioningWindow();
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatus() ==
                        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
-    err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(currentDiscriminator);
-    NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(suite, currentDiscriminator == originDiscriminator);
 }
 
 void CheckCommissioningWindowManagerEnhancedWindow(nlTestSuite * suite, void *)
@@ -182,8 +203,7 @@ int TestCommissioningWindowManager()
     // TODO: The platform memory was intentionally left not deinitialized so that minimal mdns can destruct
     chip::DeviceLayer::PlatformMgr().ScheduleWork(TearDownTask, 0);
     sleep(kTestTaskWaitSeconds);
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
+    ShutdownChipTest();
 
     return (nlTestRunnerStats(&theSuite));
 }

@@ -47,28 +47,28 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{
 {{/zcl_clusters}}
 
 {{#chip_client_clusters}}
-{{#chip_cluster_responses}}
+{{#zcl_commands_source_server}}
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & value)
 {
   DataModelLogger::LogString(label, indent, "{");
-  {{#chip_cluster_response_arguments}}
+  {{#zcl_command_arguments}}
   ReturnErrorOnFailure(DataModelLogger::LogValue("{{asLowerCamelCase label}}", indent + 1, value.{{asLowerCamelCase label}}));
-  {{/chip_cluster_response_arguments}}
+  {{/zcl_command_arguments}}
   DataModelLogger::LogString(indent, "}");
   return CHIP_NO_ERROR;
 }
-{{/chip_cluster_responses}}
+{{/zcl_commands_source_server}}
 {{/chip_client_clusters}}
 
 CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
 {
-    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI, path.mEndpointId,
-                    ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI " DataVersion: %" PRIu32, path.mEndpointId,
+                    ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId), path.mDataVersion.ValueOr(0));
 
     switch (path.mClusterId)
     {
 {{#chip_client_clusters}}
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
         {
@@ -77,19 +77,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
 {{/first}}
             case {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::Id:
             {
-                {{zapTypeToDecodableClusterObjectType type ns=parent.name}} value;
+                {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true}} value;
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
                 return DataModelLogger::LogValue("{{name}}", 1, value);
             }
 {{#last}}
           }
+          break;
         }
 {{/last}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 {{/chip_client_clusters}}
         default:
-          return CHIP_NO_ERROR;
+          break;
     }
+    ChipLogProgress(chipTool, "  Don't know how to log atribute value");
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data)
@@ -100,7 +103,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
     switch (path.mClusterId)
     {
 {{#chip_client_clusters}}
-{{#chip_cluster_responses}}
+{{#zcl_commands_source_server}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
         {
@@ -115,13 +118,16 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             }
 {{#last}}
           }
+          break;
         }
 {{/last}}
-{{/chip_cluster_responses}}
+{{/zcl_commands_source_server}}
 {{/chip_client_clusters}}
         default:
-          return CHIP_NO_ERROR;
+          break;
     }
+    ChipLogProgress(chipTool, "  Don't know how to log command response data");
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip::TLV::TLVReader * data)
@@ -168,11 +174,14 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             }
 {{#last}}
           }
+          break;
         }
 {{/last}}
 {{/chip_server_cluster_events}}
 {{/chip_client_clusters}}
         default:
-          return CHIP_NO_ERROR;
+          break;
     }
+    ChipLogProgress(chipTool, "  Don't know how to log event data");
+    return CHIP_NO_ERROR;
 }

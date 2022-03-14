@@ -18,9 +18,11 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <ota-provider-common/BdxOtaSender.h>
+#include <platform/UserConsentDelegate.h>
 #include <vector>
 
 /**
@@ -47,6 +49,7 @@ public:
 
     enum QueryImageBehaviorType
     {
+        kRespondWithUnknown,
         kRespondWithUpdateAvailable,
         kRespondWithBusy,
         kRespondWithNotAvailable
@@ -67,7 +70,17 @@ public:
     } DeviceSoftwareVersionModel;
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
+    void SetIgnoreQueryImageCount(uint32_t count) { mIgnoreQueryImageCount = count; }
+    void SetIgnoreApplyUpdateCount(uint32_t count) { mIgnoreApplyUpdateCount = count; }
+    void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
+    {
+        mUpdateAction = action;
+    }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
+    void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
+    void SetSoftwareVersion(uint32_t softwareVersion) { mSoftwareVersion.SetValue(softwareVersion); }
+    void SetSoftwareVersionString(const char * versionString) { mSoftwareVersionString = versionString; }
+    void SetUserConsentNeeded(bool needed) { mUserConsentNeeded = needed; }
 
 private:
     BdxOtaSender mBdxOtaSender;
@@ -75,8 +88,20 @@ private:
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     QueryImageBehaviorType mQueryImageBehavior;
+    uint32_t mIgnoreQueryImageCount  = 0;
+    uint32_t mIgnoreApplyUpdateCount = 0;
+    chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction mUpdateAction;
     uint32_t mDelayedActionTimeSec;
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
                             OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);
+    chip::ota::UserConsentDelegate * mUserConsentDelegate = nullptr;
+
+    chip::ota::UserConsentSubject
+    GetUserConsentSubject(const chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                          const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
+                          uint32_t targetVersion);
+    chip::Optional<uint32_t> mSoftwareVersion;
+    const char * mSoftwareVersionString = nullptr;
+    bool mUserConsentNeeded             = false;
 };

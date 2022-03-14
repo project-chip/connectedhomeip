@@ -25,7 +25,6 @@
 #pragma once
 
 #include <app/ConcreteCommandPath.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -37,6 +36,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
+#include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -75,9 +75,13 @@ public:
                                      TLV::TLVReader & apPayload) = 0;
 
         /*
-         * Check to see if a command implementation exists for a specific concrete command path.
+         * Check to see if a command implementation exists for a specific
+         * concrete command path.  If it does, Success will be returned.  If
+         * not, one of UnsupportedEndpoint, UnsupportedCluster, or
+         * UnsupportedCommand will be returned, depending on how the command
+         * fails to exist.
          */
-        virtual bool CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
+        virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
     };
 
     class Handle
@@ -152,7 +156,7 @@ public:
 
     CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
-    CHIP_ERROR FinishCommand(bool aStartDataStruct = true);
+    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
     CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
@@ -193,6 +197,8 @@ public:
      *         has been released.
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const { return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
 
 private:
     friend class TestCommandInteraction;

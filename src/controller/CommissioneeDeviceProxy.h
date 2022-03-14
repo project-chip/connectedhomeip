@@ -28,10 +28,8 @@
 
 #include <app/CommandSender.h>
 #include <app/DeviceProxy.h>
-#include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
-#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <lib/core/CHIPCallback.h>
@@ -76,8 +74,6 @@ struct ControllerDeviceInitParams
     Ble::BleLayer * bleLayer = nullptr;
 #endif
     FabricTable * fabricsTable = nullptr;
-
-    Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
 class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
@@ -125,7 +121,6 @@ public:
         mUDPEndPointManager = params.udpEndPointManager;
         mFabricIndex        = fabric;
         mIDAllocator        = params.idAllocator;
-        mpIMDelegate        = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -161,8 +156,6 @@ public:
      *   Called when the associated session is released
      *
      *   The receiver should release all resources associated with the connection.
-     *
-     * @param session A handle to the secure session
      */
     void OnSessionReleased() override;
 
@@ -233,7 +226,7 @@ public:
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
 
-    Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mpIMDelegate; };
+    Transport::Type GetDeviceTransportType() const { return mDeviceAddress.GetTransportType(); }
 
 private:
     enum class ConnectionState
@@ -272,8 +265,6 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
     SessionHolderWithDelegate mSecureSession;
-
-    Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 
     uint8_t mSequenceNumber = 0;
 

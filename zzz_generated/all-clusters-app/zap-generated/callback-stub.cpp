@@ -65,9 +65,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BRIDGED_ACTIONS_CLUSTER_ID:
         emberAfBridgedActionsClusterInitCallback(endpoint);
         break;
-    case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID:
-        emberAfBridgedDeviceBasicClusterInitCallback(endpoint);
-        break;
     case ZCL_CHANNEL_CLUSTER_ID:
         emberAfChannelClusterInitCallback(endpoint);
         break;
@@ -283,11 +280,6 @@ void __attribute__((weak)) emberAfBooleanStateClusterInitCallback(EndpointId end
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfBridgedActionsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfBridgedDeviceBasicClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -590,14 +582,14 @@ bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestinati
 }
 
 EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
+emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                      uint8_t * buffer, uint16_t maxReadLength)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
 EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
+emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                       uint8_t * buffer)
 {
     return EMBER_ZCL_STATUS_FAILURE;

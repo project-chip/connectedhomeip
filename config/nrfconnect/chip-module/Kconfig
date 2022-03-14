@@ -44,7 +44,24 @@ config CHIP_OTA_REQUESTOR_BUFFER_SIZE
 	  Configures size of the buffer used by OTA Requestor when downloading and
 	  writing a new firmware image to flash.
 
+config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+	bool "Auto-reboot when firmware update is applied"
+	default y
+	depends on CHIP_OTA_REQUESTOR
+	imply REBOOT
+	help
+	  When a user consents to apply a firmware update, and the update package is
+	  downloaded, reboot the device automatically to swap the old and the new
+	  firmware images.
+
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_IMAGE_BUILD
 	bool
+	default y if CHIP_OTA_REQUESTOR
 	depends on SIGN_IMAGES
+
+config CHIP_DEBUG_SYMBOLS
+	bool "Generate debug symbols"
+	default y
+	help
+	  Build the application with debug symbols.

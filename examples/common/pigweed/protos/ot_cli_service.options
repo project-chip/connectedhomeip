@@ -1,0 +1,2 @@
+chip.rpc.OtCliResponse.response max_size:128
+chip.rpc.OtCliCommand.command max_size:128

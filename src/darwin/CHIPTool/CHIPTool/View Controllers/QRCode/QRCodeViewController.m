@@ -32,8 +32,8 @@
 #define QR_CODE_FREEZE 1.0 * NSEC_PER_SEC
 
 // The expected Vendor ID for CHIP demos
-// 0x235A: Chip's Vendor Id
-#define EXAMPLE_VENDOR_ID 0x235A
+// 0xFFF1: Chip's Vendor Id
+#define EXAMPLE_VENDOR_ID 0xFFF1
 
 #define EXAMPLE_VENDOR_TAG_IP 1
 #define MAX_IP_LEN 46
@@ -479,10 +479,20 @@
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
     } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self->_deviceList refreshDeviceList];
-            [self retrieveAndSendWiFiCredentials];
-        });
+        CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+        uint64_t deviceId = CHIPGetLastPairedDeviceId();
+        if ([controller deviceBeingCommissionedOverBLE:deviceId]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self->_deviceList refreshDeviceList];
+                [self retrieveAndSendWiFiCredentials];
+            });
+        } else {
+            CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
+            NSError * error;
+            if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
+                NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
+            }
+        }
     }
 }
 
@@ -692,6 +702,9 @@
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }
+    // track this device
+    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
+    CHIPSetDevicePaired(deviceId, YES);
     [self setVendorIDOnAccessory];
 }
 
@@ -785,10 +798,18 @@
     return peripheralFullName;
 }
 
+- (void)_restartMatterStack
+{
+    CHIPRestartController(self.chipController);
+}
+
 - (void)handleRendezVousDefault:(NSString *)payload
 {
     NSError * error;
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
+
+    // restart the Matter Stack before pairing (for reliability + testing restarts)
+    [self _restartMatterStack];
 
     if ([self.chipController pairDevice:deviceID onboardingPayload:payload error:&error]) {
         deviceID++;

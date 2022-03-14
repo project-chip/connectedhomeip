@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2022 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -100,6 +100,16 @@ menu "Demo"
         depends on DEVICE_TYPE_M5STACK
         help
             To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
+
+    config STATUS_LED_GPIO_NUM
+        int 
+        range 0 40
+        default 2 if DEVICE_TYPE_ESP32_DEVKITC         #Use LED1 (blue LED) as status LED on DevKitC      
+        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM
+        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT     
+        default 40 if DEVICE_TYPE_M5STACK
+        help
+            Each board has a status led, define its pin number.
 
 endmenu
 

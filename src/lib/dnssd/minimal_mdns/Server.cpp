@@ -356,7 +356,7 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
                 return chip::Loop::Continue;
             }
 
-            CHIP_ERROR err;
+            CHIP_ERROR err = CHIP_NO_ERROR;
 
             /// The same packet needs to be sent over potentially multiple interfaces.
             /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy

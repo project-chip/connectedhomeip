@@ -29,7 +29,6 @@
 #include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/AttributePathIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
 #include <lib/core/CHIPCore.h>
@@ -122,7 +121,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool mMoreChunks);
+    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks);
 
     /**
      *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.
@@ -133,8 +132,10 @@ public:
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
+    CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
     ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
     ClusterInfo * GetEventClusterInfolist() { return mpEventClusterInfoList; }
+    ClusterInfo * GetDataVersionFilterlist() const { return mpDataVersionFilterList; }
     EventNumber & GetEventMin() { return mEventMin; }
     PriorityLevel GetCurrentPriority() { return mCurrentPriority; }
 
@@ -175,6 +176,7 @@ public:
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
     uint32_t GetLastWrittenEventsBytes() { return mLastWrittenEventsBytes; }
+    CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
 private:
     friend class TestReadInteraction;
@@ -241,6 +243,7 @@ private:
     HandlerState mState                      = HandlerState::Idle;
     ClusterInfo * mpAttributeClusterInfoList = nullptr;
     ClusterInfo * mpEventClusterInfoList     = nullptr;
+    ClusterInfo * mpDataVersionFilterList    = nullptr;
 
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 

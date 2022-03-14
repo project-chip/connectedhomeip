@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -49,15 +49,18 @@ namespace Internal {
 #define NAMESPACE_COUNTERS CHIP_DEVICE_CONFIG_SETTINGS_KEY "/ctr/"
 
 // Keys stored in the chip factory nam
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_SerialNum           = CONFIG_KEY(NAMESPACE_FACTORY "serial-num");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceId         = CONFIG_KEY(NAMESPACE_FACTORY "device-id");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceCert       = CONFIG_KEY(NAMESPACE_FACTORY "device-cert");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceICACerts   = CONFIG_KEY(NAMESPACE_FACTORY "device-ca-certs");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDevicePrivateKey = CONFIG_KEY(NAMESPACE_FACTORY "device-key");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_HardwareVersion     = CONFIG_KEY(NAMESPACE_FACTORY "hardware-ver");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_ManufacturingDate   = CONFIG_KEY(NAMESPACE_FACTORY "mfg-date");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupPinCode        = CONFIG_KEY(NAMESPACE_FACTORY "pin-code");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupDiscriminator  = CONFIG_KEY(NAMESPACE_FACTORY "discriminator");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_SerialNum             = CONFIG_KEY(NAMESPACE_FACTORY "serial-num");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceId           = CONFIG_KEY(NAMESPACE_FACTORY "device-id");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceCert         = CONFIG_KEY(NAMESPACE_FACTORY "device-cert");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceICACerts     = CONFIG_KEY(NAMESPACE_FACTORY "device-ca-certs");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDevicePrivateKey   = CONFIG_KEY(NAMESPACE_FACTORY "device-key");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_HardwareVersion       = CONFIG_KEY(NAMESPACE_FACTORY "hardware-ver");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_ManufacturingDate     = CONFIG_KEY(NAMESPACE_FACTORY "mfg-date");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupPinCode          = CONFIG_KEY(NAMESPACE_FACTORY "pin-code");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupDiscriminator    = CONFIG_KEY(NAMESPACE_FACTORY "discriminator");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pIterationCount = CONFIG_KEY(NAMESPACE_FACTORY "iteration-count");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pSalt           = CONFIG_KEY(NAMESPACE_FACTORY "salt");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pVerifier       = CONFIG_KEY(NAMESPACE_FACTORY "verifier");
 // Keys stored in the chip config namespace
 // NOTE: update sAllResettableConfigKeys definition when adding a new entry below
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_FabricId           = CONFIG_KEY(NAMESPACE_CONFIG "fabric-id");
@@ -71,6 +74,7 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_FailSafeArmed      = CONFIG_KEY
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode        = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb         = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_UniqueId           = CONFIG_KEY(NAMESPACE_CONFIG "unique-id");
 
 // Keys stored in the counters namespace
 const ZephyrConfig::Key ZephyrConfig::kCounterKey_RebootCount           = CONFIG_KEY(NAMESPACE_COUNTERS "reboot-count");

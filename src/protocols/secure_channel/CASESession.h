@@ -194,8 +194,8 @@ private:
 
     CHIP_ERROR ConstructSaltSigma2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                    MutableByteSpan & salt);
-    CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderNOC, const ByteSpan & responderICAC,
-                                                Crypto::P256PublicKey & responderID);
+    CHIP_ERROR ValidatePeerIdentity(const ByteSpan & peerNOC, const ByteSpan & peerICAC, NodeId & peerNodeId,
+                                    Crypto::P256PublicKey & peerPublicKey);
     CHIP_ERROR ConstructTBSData(const ByteSpan & senderNOC, const ByteSpan & senderICAC, const ByteSpan & senderPubKey,
                                 const ByteSpan & receiverPubKey, uint8_t * tbsData, size_t & tbsDataLen);
     CHIP_ERROR ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpan & salt);
@@ -212,7 +212,7 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
-    void CloseExchange();
+    void AbortExchange();
 
     /**
      * Clear our reference to our exchange context pointer so that it can close
@@ -225,7 +225,7 @@ private:
     CHIP_ERROR SetEffectiveTime();
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                       System::PacketBufferHandle & msg);
+                                       const System::PacketBufferHandle & msg);
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 

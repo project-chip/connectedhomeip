@@ -330,7 +330,6 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     });
 
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
-
     // Let's drop the initial message
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 1;
@@ -514,6 +513,106 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+}
+
+void CheckDuplicateOldMessageClosedExchange(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockReceiver;
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    mockReceiver.mTestSuite = inSuite;
+
+    MockAppDelegate mockSender;
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+
+    exchange->GetSessionHandle()->AsSecureSession()->SetMRPConfig({
+        64_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    });
+
+    // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
+    gLoopback.mSentMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 0;
+    gLoopback.mDroppedMessageCount = 0;
+
+    // Drop the ack, and also close the peer exchange
+    mockReceiver.mDropAckResponse = true;
+    mockReceiver.mRetainExchange  = false;
+
+    // Ensure the retransmit table is empty right now
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
+    // Ensure the message was sent
+    // The ack was dropped, and message was added to the retransmit table
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    // Make sure we don't accidentally retransmit before we are done with our
+    // message counter incrementing.
+    rm->StopTimer();
+
+    // Now send CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE + 2 messages to make
+    // sure our original message is out of the message counter window.  These
+    // messages can be sent withour MRP, because we are not expecting acks for
+    // them anyway.
+    size_t extraMessages = CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE + 2;
+    for (size_t i = 0; i < extraMessages; ++i)
+    {
+        buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+        NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+        ExchangeContext * newExchange = ctx.NewExchangeToAlice(&mockSender);
+        NL_TEST_ASSERT(inSuite, newExchange != nullptr);
+
+        mockReceiver.mRetainExchange = false;
+
+        // Ensure the retransmit table has our one message right now
+        NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+        // Send without MRP.
+        err = newExchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kNoAutoRequestAck);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        ctx.DrainAndServiceIO();
+
+        // Ensure the message was sent, but not added to the retransmit table.
+        NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1 + (i + 1));
+        NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+        NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+    }
+
+    // Let's not drop the duplicate message's ack.
+    mockReceiver.mDropAckResponse = false;
+
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Wait for the first re-transmit and ack (should take 64ms)
+    rm->StartTimer();
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [extraMessages] { return gLoopback.mSentMessageCount >= 3 + extraMessages; });
+    ctx.DrainAndServiceIO();
+
+    // Ensure the retransmit message was sent and the ack was sent
+    // and retransmit table was cleared
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3 + extraMessages);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
@@ -1347,8 +1446,8 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
 int InitializeTestCase(void * inContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(inContext);
-    ctx.GetSessionAliceToBob()->AsSecureSession()->SetMRPConfig(gDefaultMRPConfig);
-    ctx.GetSessionBobToAlice()->AsSecureSession()->SetMRPConfig(gDefaultMRPConfig);
+    ctx.GetSessionAliceToBob()->AsSecureSession()->SetMRPConfig(GetLocalMRPConfig());
+    ctx.GetSessionBobToAlice()->AsSecureSession()->SetMRPConfig(GetLocalMRPConfig());
     return SUCCESS;
 }
 
@@ -1383,6 +1482,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendSessionEstablishmentMessageWithPeerExchange", CheckResendSessionEstablishmentMessageWithPeerExchange),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessage", CheckDuplicateMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessageClosedExchange", CheckDuplicateMessageClosedExchange),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateOldMessageClosedExchange", CheckDuplicateOldMessageClosedExchange),
     NL_TEST_DEF("Test that a reply after a standalone ack comes through correctly", CheckReceiveAfterStandaloneAck),
     NL_TEST_DEF("Test that a reply to a non-MRP message piggybacks an ack if there were MRP things happening on the context before", CheckPiggybackAfterPiggyback),
     NL_TEST_DEF("Test sending an unsolicited ack-soliciting 'standalone ack' message", CheckSendUnsolicitedStandaloneAckMessage),

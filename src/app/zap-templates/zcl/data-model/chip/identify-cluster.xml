@@ -59,7 +59,7 @@ limitations under the License.
       </description>
       <arg name="identifyTime" type="INT16U"/>
     </command>
-    <command source="client" code="0x01" name="IdentifyQuery" optional="false">
+    <command source="client" code="0x01" name="IdentifyQuery" response="IdentifyQueryResponse" optional="false">
       <description>
         Command description for IdentifyQuery
       </description>

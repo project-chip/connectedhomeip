@@ -19,7 +19,11 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include <app/tests/suites/commands/commissioner/CommissionerCommands.h>
+#include <app/tests/suites/commands/delay/DelayCommands.h>
+#include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
+#include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
 #include <app/tests/suites/include/ValueChecker.h>
@@ -28,14 +32,21 @@
 
 constexpr uint16_t kTimeoutInSeconds = 90;
 
-class TestCommand : public CHIPCommand, public ValueChecker, public ConstraintsChecker, public PICSChecker, public LogCommands
+class TestCommand : public CHIPCommand,
+                    public ValueChecker,
+                    public ConstraintsChecker,
+                    public PICSChecker,
+                    public LogCommands,
+                    public CommissionerCommands,
+                    public DiscoveryCommands,
+                    public SystemCommands,
+                    public DelayCommands
 {
 public:
-    TestCommand(const char * commandName) :
-        CHIPCommand(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+    TestCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
+        CHIPCommand(commandName, credsIssuerConfig), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
-        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
     }
@@ -44,24 +55,29 @@ public:
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(kTimeoutInSeconds); }
-
     virtual void NextTest() = 0;
 
-    /////////// GlobalCommands Interface /////////
-    CHIP_ERROR Wait(chip::System::Clock::Timeout ms);
-    CHIP_ERROR WaitForMs(uint16_t ms) { return Wait(chip::System::Clock::Milliseconds32(ms)); }
-    CHIP_ERROR WaitForCommissionee();
-
 protected:
+    /////////// DelayCommands Interface /////////
+    CHIP_ERROR WaitForCommissionee(chip::NodeId nodeId) override;
+    void OnWaitForMs() override { NextTest(); };
+
     std::map<std::string, ChipDevice *> mDevices;
-    chip::NodeId mNodeId;
 
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
-    static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
 
-    CHIP_ERROR ContinueOnChipMainThread() override { return WaitForMs(0); };
+    CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
+    {
+        if (CHIP_NO_ERROR == err)
+        {
+            return WaitForMs(0);
+        }
+        Exit(chip::ErrorStr(err));
+        return CHIP_NO_ERROR;
+    }
+
+    chip::Controller::DeviceCommissioner & GetCurrentCommissioner() override { return CurrentCommissioner(); };
 
     void Exit(std::string message) override;
     void ThrowFailureResponse();
@@ -79,6 +95,5 @@ protected:
     };
     chip::Optional<uint64_t> mDelayInMs;
     chip::Optional<char *> mPICSFilePath;
-    chip::Optional<chip::EndpointId> mEndpointId;
     chip::Optional<uint16_t> mTimeout;
 };

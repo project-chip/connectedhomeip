@@ -40,7 +40,6 @@
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
-#include <app/InteractionModelDelegate.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -211,6 +210,11 @@ uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId cluster, 
         }
     }
     return UINT8_MAX;
+}
+
+bool emberAfEndpointIndexIsEnabled(uint16_t index)
+{
+    return index < ArraySize(endpoints);
 }
 
 // This duplication of basic utilities is really unfortunate, but we can't link

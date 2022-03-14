@@ -21,18 +21,22 @@
 #include "DeviceCallbacks.h"
 #include "chip_porting.h"
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <lib/support/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/Ameba/AmebaOTAImageProcessor.h"
-#include "platform/GenericOTARequestorDriver.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/Ameba/AmebaOTAImageProcessor.h>
 
 void * __dso_handle = 0;
 
@@ -46,7 +50,6 @@ using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
 using chip::OTADownloader;
-using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
 using chip::PeerId;
 using chip::Server;
@@ -62,19 +65,27 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
+} // namespace
+
+void NetWorkCommissioningInstInit()
+{
+    sWiFiNetworkCommissioningInstance.Init();
+}
+
 static DeviceCallbacks EchoCallbacks;
 
 OTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 AmebaOTAImageProcessor gImageProcessor;
 
-extern "C" void amebaQueryImageCmdHandler(uint32_t nodeId, uint32_t fabricId)
+extern "C" void amebaQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd
-    gRequestorCore.TestModeSetProviderParameters(nodeId, fabricId, chip::kRootEndpointId);
-
     static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
 
@@ -90,15 +101,11 @@ static void InitOTARequestor(void)
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    // Set server instance used for session establishment
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
 
-    // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
-    // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
-    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
-    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
-    OTAImageProcessorParams ipParams;
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    // Set server instance used for session establishment
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+
     gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Connect the Downloader and Image Processor objects
@@ -106,6 +113,18 @@ static void InitOTARequestor(void)
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // Initialize and interconnect the Requestor and Image Processor objects -- END
+}
+
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model and CHIP App Server
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    NetWorkCommissioningInstInit();
+
+    InitOTARequestor();
 }
 
 extern "C" void ChipTest(void)
@@ -126,17 +145,5 @@ extern "C" void ChipTest(void)
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
     }
 
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    InitOTARequestor();
-
-    while (true)
-        vTaskDelay(pdMS_TO_TICKS(50));
-
-exit:
-    ChipLogProgress(SoftwareUpdate, "Exited");
-    return;
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 }

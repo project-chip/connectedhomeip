@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2022 Project CHIP Authors
 #    Copyright (c) 2018 Nest Labs, Inc.
 #    All rights reserved.
 #
@@ -46,6 +46,16 @@ menu "CHIP Core"
 
                 A Binding object is used to configure how the local device communicates with
                 a remote entity, be it a cloud service, a mobile application, or another device.
+
+        config MAX_FABRICS
+            int "Max Fabrics"
+            range 5 255
+            default 5
+            help
+                The maxinum number of fabrics the device can participate in.
+
+                Each fabric can provision the device with its unique operational credentials and
+                manage its own access control lists.
 
         config MAX_PEER_NODES
             int "Max Peer Nodes"
@@ -166,125 +176,6 @@ menu "CHIP Core"
             help
                 The maximum number of simultaneously active session keys.
 
-        config DEFAULT_SECURITY_SESSION_ESTABLISHMENT_TIMEOUT
-            int "Default Security Session Establishment Timeout (ms)"
-            range 0 65535
-            default 30000
-            help
-                The default amount of time, in milliseconds, after which an in-progess
-                session establishment will fail due to a timeout.
-
-                This value can be overridden by the application at runtime.
-
-        config DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT
-            int "Default Security Session Idle Timeout (ms)"
-            range 0 65535
-            default 15000
-            help
-                The default minimum amount of time, in milliseconds, that an unreserved
-                and idle security session will be allowed to exist before being destroyed.
-                In practice, unreserved idle sessions can exist for up to twice this value.
-
-                This value can be overridden by the application at runtime.
-
-        menu "Protocols"
-
-            config ENABLE_PASE_INITIATOR
-                bool "Enable PASE Initiator"
-                default n
-                help
-                    Enable support for initiating PASE security sessions with a remote node.
-
-                    This feature is rarely needed in device applications of CHIP.
-
-                    (PASE = Password Authenticated Session Establishment).
-
-            config ENABLE_PASE_RESPONDER
-                bool "Enable PASE Responder"
-                default y
-                help
-                    Enable support for responding to a request from a remote node to initiate
-                    a PASE security session.
-
-                    This feature is necessary to support standard CHIP pairing.
-
-                    (PASE = Password Authenticated Session Establishment).
-
-            config ENABLE_CASE_INITIATOR
-                bool "Enable CASE Initiator"
-                default y
-                help
-                    Enable support for initiating CASE security sessions with a remote node.
-
-                    This feature is necessary to support interacting with CHIP cloud services.
-
-                    (CASE = Certificate Authenticated Session Establishment).
-
-            config ENABLE_CASE_RESPONDER
-                bool "Enable CASE Responder"
-                default y
-                help
-                    Enable support for responding to a request from a remote note to initiate
-                    a CASE security session.
-
-                    This feature is necessary to support standard CHIP pairing.
-
-                    (CASE = Certificate Authenticated Session Establishment).
-
-        endmenu # "Protocols"
-
-        menu "Group Keys"
-
-            config USE_APP_GROUP_KEYS_FOR_MSG_ENC
-                bool "Enable Group Keys for CHIP Message Encryption"
-                default y
-                help
-                    Enable the use of application group keys for CHIP message encryption.
-
-            config MAX_CACHED_MSG_ENC_APP_KEYS
-                int "Group Key Cache Size"
-                range 0 255
-                default 5
-                depends on USE_APP_GROUP_KEYS_FOR_MSG_ENC
-                help
-                    The size of the cache (in number of keys) used to store derived application
-                    group encryption keys.
-
-                    This value is only meaningful when group keys are enabled for CHIP message
-                    encryption.
-
-            config MAX_APPLICATION_EPOCH_KEYS
-                int "Max Application Epoch Keys"
-                range 0 8
-                default 4
-                help
-                    The maximum number of simultaneously supported application epoch keys.
-
-                    (Epoch keys are a kind of symmetric key that gets mixed together with
-                    other key material to form a group encryption key which can be used
-                    for private communication amongst a set of related CHIP nodes).
-
-                    This value should be set to the maximum number of epoch keys that
-                    can be simultaneously provisioned on the local CHIP node.  The
-                    maximum supported value is 8, however, in most cases only two such
-                    keys will exist at any given point in time.
-
-            config MAX_APPLICATION_GROUPS
-                int "Max Application Master Keys"
-                range 0 255
-                default 4
-                help
-                    The maximum number of simultaneously supported application group master keys.
-
-                    (Application group master keys are a kind of symmetric key that gets mixed
-                    together with other key material to form a group encryption key which can
-                    be used for private communication amongst a set of related CHIP nodes).
-
-                    This value should be set to the number of CHIP application groups
-                    in which the local CHIP device will be a member.
-
-        endmenu # "Group Keys"
-
         menu "Debugging"
 
             config SECURITY_TEST_MODE
@@ -306,12 +197,6 @@ menu "CHIP Core"
 
                     WARNING: This option makes it possible to circumvent basic CHIP security functionality.
                     Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
-
-            config DEBUG_CERT_VALIDATION
-                bool "Enable Certificate Validation Debugging"
-                default n
-                help
-                    Enable support for debugging output from certificate validation.
 
         endmenu # "Debugging"
 
@@ -382,15 +267,15 @@ menu "CHIP Device Layer"
         config DEVICE_VENDOR_ID
             hex "Device Vendor Id"
             range 1 0xFFFE
-            default 0x235A
+            default 0xFFF1
             help
                 The device vendor id (in hex). This a CHIP-assigned id for the organization responsible for producing the device.
-                Defaults to CHIP (0x235A).
+                Defaults to test VID 0xFFF1.
 
         config DEVICE_PRODUCT_ID
             hex "Device Product Id"
             range 1 0xFFFE
-            default 0xFEFF
+            default 0x8000
             help
                 The device product id (in hex).  This is a unique id assigned by the device vendor to identify the product or device type.
                 Defaults to a CHIP-assigned id designating a non-production or test "product".
@@ -411,10 +296,16 @@ menu "CHIP Device Layer"
                 persistent storage (e.g. by a factory provisioning process).
 
         config DEVICE_SOFTWARE_VERSION
-            string "Device Software Version"
-            default ""
+            string "Device Software Version String"
+            default "v1.0"
             help
                 A string identifying the software version running on the device.
+
+        config DEVICE_SOFTWARE_VERSION_NUMBER
+            int "Device Software Version Number"
+            default 1
+            help
+                Software version number running on the device.
 
         config DEVICE_TYPE
             int "Default Device type"
@@ -729,29 +620,14 @@ menu "CHIP Device Layer"
 
                 This option is for testing only and should not be enabled in production releases.
 
-        config USE_TEST_SETUP_PIN_CODE
-            int "Use Test Setup Pin Code"
-            range 0 99999999
-            default 20202021
+        config ENABLE_TEST_SETUP_PARAMS
+            bool "Enable Test Setup Parameters"
+            default y
             help
-                Specifies a hard-coded device setup pin code to be used if none is found in CHIP NV storage.
-                Setting the value to 0 disables the feature.
+                Enable use of test setup parameters for testing purposes only.
 
-                Note that any decimal integer number between 00000000 and 99999999 can be used here.
-
-                This option is for testing only and should not be enabled in production releases.
-
-        config USE_TEST_SETUP_DISCRIMINATOR
-            hex "Use Test Setup discriminator"
-            range 0x000 0xFFF
-            default 0xF00
-            help
-                Specifies a hard-coded device discriminator to be used if none is found in CHIP NV storage.
-                Setting the value to 0x0 disables the feature.
-
-                Note that any integer number between 0x000 and 0xFFF can be used here.
-
-                This option is for testing only and should not be enabled in production releases.
+                WARNING: This option makes it possible to circumvent basic chip security functionality.
+                Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
 
         config ENABLE_FIXED_TUNNEL_SERVER
             bool "Use Fixed Tunnel Server"
@@ -850,6 +726,25 @@ menu "CHIP Device Layer"
 
                 When size is set to 0, the debug event buffer and all support
                 for the debug level events are disabled.
+
+    endmenu
+
+    menu "Matter OTA Image"
+
+        config CHIP_OTA_IMAGE_BUILD
+            bool "Generate Matter OTA image"
+            help
+              Enable building OTA (Over-the-air update) image which includes Matter OTA header.
+
+        config CHIP_OTA_IMAGE_EXTRA_ARGS
+            string "OTA image creator extra arguments"
+            depends on CHIP_OTA_IMAGE_BUILD
+            help
+              ota_image_tool.py is used to create the OTA image.
+              Mandatory arguments(Version, VersionString, VID, PID) are picked up from the config options.
+              This option allows us to pass optional arguments(MinApplicableSoftwareVersion, MaxApplicableSoftwareVersion,
+              and ReleaseNotesURL) to the ota_image_tool.py script.
+              eg: "-mi 2 -ma 4 -rn https://github.com/espressif/esp-idf/releases/tag/v4.4"
 
     endmenu
 

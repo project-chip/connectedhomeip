@@ -31,7 +31,9 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     mIOContext = ioContext;
     mTransport = transport;
 
-    ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager));
+    ReturnErrorOnFailure(PlatformMemoryUser::Init());
+    ReturnErrorOnFailure(mFabricTable.Init(&mStorage));
+    ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager, &mStorage, &mFabricTable));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
@@ -82,7 +84,7 @@ CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 
 CHIP_ERROR MessagingContext::CreateSessionBobToFriends()
 {
-    mSessionBobToFriends.Grab(mSessionManager.CreateGroupSession(GetFriendsGroupId(), mSrcFabricIndex).Value());
+    mSessionBobToFriends.Emplace(GetFriendsGroupId(), mSrcFabricIndex, GetBobNodeId());
     return CHIP_NO_ERROR;
 }
 
@@ -98,7 +100,7 @@ SessionHandle MessagingContext::GetSessionAliceToBob()
 
 SessionHandle MessagingContext::GetSessionBobToFriends()
 {
-    return mSessionBobToFriends.Get();
+    return SessionHandle(mSessionBobToFriends.Value());
 }
 
 void MessagingContext::ExpireSessionBobToAlice()
@@ -113,18 +115,18 @@ void MessagingContext::ExpireSessionAliceToBob()
 
 void MessagingContext::ExpireSessionBobToFriends()
 {
-    mSessionManager.RemoveGroupSession(mSessionBobToFriends.Get()->AsGroupSession());
+    mSessionBobToFriends.ClearValue();
 }
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
-    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress, gDefaultMRPConfig).Value(),
+    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress, GetLocalMRPConfig()).Value(),
                                        delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
-    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mBobAddress, gDefaultMRPConfig).Value(),
+    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mBobAddress, GetLocalMRPConfig()).Value(),
                                        delegate);
 }
 

@@ -51,5 +51,10 @@
 // overrides CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT in CHIPProjectConfig
 #define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 16
 
+// For casting, we need to allow more ACL entries, and more complex entries
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY 20
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY 20
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 20
+
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>

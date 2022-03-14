@@ -24,6 +24,7 @@
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
 #include "lib/core/CHIPError.h"
+#include "platform/CHIPDeviceLayer.h"
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "lib/shell/Engine.h"
@@ -66,18 +67,19 @@ static void RegisterSwitchCommands()
 }
 #endif // defined(ENABLE_CHIP_SHELL)
 
-static void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, chip::DeviceProxy * peer_device, void * context)
+static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device, void * context)
 {
     using namespace chip;
     using namespace chip::app;
 
-    if (binding->type == EMBER_MULTICAST_BINDING)
+    if (binding.type == EMBER_MULTICAST_BINDING)
     {
         ChipLogError(NotSpecified, "Group binding is not supported now");
         return;
     }
 
-    if (binding->type == EMBER_UNICAST_BINDING && binding->local == 1 && binding->clusterId == Clusters::OnOff::Id)
+    if (binding.type == EMBER_UNICAST_BINDING && binding.local == 1 &&
+        (!binding.clusterId.HasValue() || binding.clusterId.Value() == Clusters::OnOff::Id))
     {
         auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
             ChipLogProgress(NotSpecified, "OnOff command succeeds");
@@ -90,21 +92,32 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, ch
         {
             Clusters::OnOff::Commands::On::Type onCommand;
             Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding->remote, onCommand, onSuccess, onFailure);
+                                             binding.remote, onCommand, onSuccess, onFailure);
         }
         else
         {
             Clusters::OnOff::Commands::Off::Type offCommand;
             Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding->remote, offCommand, onSuccess, onFailure);
+                                             binding.remote, offCommand, onSuccess, onFailure);
         }
     }
 }
 
+static void InitBindingHandlerInternal(intptr_t arg)
+{
+    auto & server = chip::Server::GetInstance();
+    chip::BindingManager::GetInstance().Init(
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
+}
+
 CHIP_ERROR InitBindingHandlers()
 {
-    chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
+    // The initialization of binding manager will try establishing connection with unicast peers
+    // so it requires the Server instance to be correctly initialized. Post the init function to
+    // the event queue so that everything is ready when initialization is conducted.
+    // TODO: Fix initialization order issue in Matter server.
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
 #if defined(ENABLE_CHIP_SHELL)
     RegisterSwitchCommands();
 #endif

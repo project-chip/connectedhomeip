@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -72,313 +72,6 @@
 #include CHIP_PLATFORM_CONFIG_INCLUDE
 #endif
 
-// Profile-specific Configuration Headers
-
-/**
- *  @def CHIP_CONFIG_USE_OPENSSL_ECC
- *
- *  @brief
- *    Use the OpenSSL implementation of the elliptic curve primitives
- *    for chip communication.
- *
- *    Note that this option is mutually exclusive with
- *    #CHIP_CONFIG_USE_MICRO_ECC.
- */
-#ifndef CHIP_CONFIG_USE_OPENSSL_ECC
-#define CHIP_CONFIG_USE_OPENSSL_ECC 1
-#endif // CHIP_CONFIG_USE_OPENSSL_ECC
-
-/**
- *  @def CHIP_CONFIG_USE_MICRO_ECC
- *
- *  @brief
- *    Use the Micro ECC implementation of the elliptic curve primitives
- *    for chip communication.
- *
- *    Note that this option is mutually exclusive with
- *    #CHIP_CONFIG_USE_OPENSSL_ECC.
- *
- */
-#ifndef CHIP_CONFIG_USE_MICRO_ECC
-#define CHIP_CONFIG_USE_MICRO_ECC 0
-#endif // CHIP_CONFIG_USE_MICRO_ECC
-
-#if CHIP_CONFIG_USE_MICRO_ECC && CHIP_CONFIG_USE_OPENSSL_ECC
-#error "Please assert one of either CHIP_CONFIG_USE_MICRO_ECC or CHIP_CONFIG_USE_OPENSSL_ECC, but not both."
-#endif // CHIP_CONFIG_USE_MICRO_ECC && CHIP_CONFIG_USE_OPENSSL_ECC
-
-/**
- *  @name chip Elliptic Curve Security Configuration
- *
- *  @brief
- *    The following definitions enable one or more of four potential
- *    elliptic curves:
- *
- *      * #CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP160R1
- *      * #CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
- *      * #CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
- *      * #CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
- *
- *  @{
- */
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP160R1
- *
- *  @brief
- *    Enable (1) or disable (0) support for the Standards for
- *    Efficient Cryptography Group (SECG) secp160r1 elliptic curve.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP160R1
-#define CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP160R1 0
-#endif // CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP160R1
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
- *
- *  @brief
- *    Enable (1) or disable (0) support for the Standards for
- *    Efficient Cryptography Group (SECG) secp192r1 elliptic curve.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
-#define CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1 1
-#endif // CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
- *
- *  @brief
- *    Enable (1) or disable (0) support for the Standards for
- *    Efficient Cryptography Group (SECG) secp224r1 / National
- *    Institute of Standards (NIST) P-224 elliptic curve.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
-#define CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1 1
-#endif // CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
- *
- *  @brief
- *    Enable (1) or disable (0) support for the Standards for
- *    Efficient Cryptography Group (SECG) secp256r1 / American
- *    National Standards Institute (ANSI) prime256v1 / National
- *    Institute of Standards (NIST) P-256 elliptic curve.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1 1
-#endif // CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-
-/**
- *  @}
- */
-
-/**
- *  @name chip Password Authenticated Session Establishment (PASE) Configuration
- *
- *  @brief
- *    The following definitions define the configurations supported
- *    for chip's Password Authenticated Session Establishment (PASE)
- *    protocol.
- *
- *    This protocol is used primarily for establishing a secure
- *    session for provisioning. chip supports the following PASE
- *    configurations:
- *
- *    * #CHIP_CONFIG_SUPPORT_PASE_CONFIG0_TEST_ONLY
- *    * #CHIP_CONFIG_SUPPORT_PASE_CONFIG1
- *    * #CHIP_CONFIG_SUPPORT_PASE_CONFIG2
- *    * #CHIP_CONFIG_SUPPORT_PASE_CONFIG3
- *    * #CHIP_CONFIG_SUPPORT_PASE_CONFIG4
- *    * #CHIP_CONFIG_SUPPORT_PASE_CONFIG5
- *
- *    which are summarized in the table below:
- *
- *    | Configuration  |  J-PAKE Style   |   Curve   |  Test Only  | Notes                                |
- *    | :------------: | :-------------- | :-------: | :---------: | :----------------------------------- |
- *    | 0              | -               | -         | Y           | Test-only                            |
- *    | 1              | Finite Field    | -         | N           | Original chip default configuration |
- *    | 2              | Elliptic Curve  | secp160r1 | N           |                                      |
- *    | 3              | Elliptic Curve  | secp192r1 | N           |                                      |
- *    | 4              | Elliptic Curve  | secp224r1 | N           | Future chip default configuration   |
- *    | 5              | Elliptic Curve  | secp256r1 | N           |                                      |
- *
- *  @{
- *
- */
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_PASE_CONFIG0_TEST_ONLY
- *
- *  @brief
- *    This chip PASE configuration does not use the J-PAKE algorithm
- *    and sends deterministic messages over the communications
- *    channel. The size and structure of the messages are similar to
- *    #CHIP_CONFIG_SUPPORT_PASE_CONFIG5.
- *
- *  @note The results of this configuration are insecure because the
- *        computational overhead of the cryptography has largely been
- *        disabled since the focus of this configuration is testing
- *        the overall PASE protocol exchange, independently of the
- *        cryptography.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_PASE_CONFIG0_TEST_ONLY
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG0_TEST_ONLY 0
-#endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG0_TEST_ONLY
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_PASE_CONFIG1
- *
- *  @brief
- *    This chip PASE configuration uses Finite Field J-PAKE and is
- *    the original, default chip PASE configuration.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_PASE_CONFIG1
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG1 1
-#endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG1
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_PASE_CONFIG2
- *
- *  @brief
- *    This chip PASE configuration uses Elliptic Curve J-PAKE with a
- *    SECG secp160r1 curve.
- *
- *    @note When this PASE configuration is enabled, the corresponding
- *          elliptic curve (i.e. #CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP160R1)
- *          should also be enabled.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_PASE_CONFIG2
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG2 0
-#endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG2
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_PASE_CONFIG3
- *
- *  @brief
- *    This chip PASE configuration uses Elliptic Curve J-PAKE with a
- *    SECG secp192r1 curve.
- *
- *    @note When this PASE configuration is enabled, the corresponding
- *          elliptic curve (i.e. #CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1)
- *          should also be enabled.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_PASE_CONFIG3
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG3 0
-#endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG3
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_PASE_CONFIG4
- *
- *  @brief
- *    This chip PASE configuration uses Elliptic Curve J-PAKE with a
- *    SECG secp224r1 curve and will be the new, default chip PASE
- *    configuration.
- *
- *    @note When this PASE configuration is enabled, the corresponding
- *          elliptic curve (i.e. #CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1)
- *          should also be enabled.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_PASE_CONFIG4
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG4 1
-#endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG4
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_PASE_CONFIG5
- *
- *  @brief
- *    This chip PASE configuration uses Elliptic Curve J-PAKE with a
- *    SECG secp256r1 curve.
- *
- *    @note When this PASE configuration is enabled, the corresponding
- *          elliptic curve (i.e. #CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1)
- *          should also be enabled.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_PASE_CONFIG5
-#define CHIP_CONFIG_SUPPORT_PASE_CONFIG5 0
-#endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG5
-
-/**
- *  @}
- */
-
-#if CHIP_CONFIG_SUPPORT_PASE_CONFIG2 && !CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP160R1
-#error "Please assert CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP160R1 when CHIP_CONFIG_SUPPORT_PASE_CONFIG2 is asserted"
-#endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG2 && !CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP160R1
-
-#if CHIP_CONFIG_SUPPORT_PASE_CONFIG3 && !CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
-#error "Please assert CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1 when CHIP_CONFIG_SUPPORT_PASE_CONFIG3 is asserted"
-#endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG3 && !CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
-
-#if CHIP_CONFIG_SUPPORT_PASE_CONFIG4 && !CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
-#error "Please assert CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1 when CHIP_CONFIG_SUPPORT_PASE_CONFIG4 is asserted"
-#endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG4 && !CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
-
-#if CHIP_CONFIG_SUPPORT_PASE_CONFIG5 && !CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#error "Please assert CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1 when CHIP_CONFIG_SUPPORT_PASE_CONFIG5 is asserted"
-#endif // CHIP_CONFIG_SUPPORT_PASE_CONFIG5 && !CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-
-/**
- *  @def CHIP_CONFIG_PASE_MESSAGE_PAYLOAD_ALIGNMENT
- *
- *  @brief
- *    Align payload on 4-byte boundary for PASE messages.
- *    Currently, payload alignment is required only when micro-ecc
- *    library is used and it is compiled with ARM assembly.
- *    If implementation guarantees that payload is always 4-byte
- *    aligned this option should stay deasserted to save code size.
- *
- */
-#ifndef CHIP_CONFIG_PASE_MESSAGE_PAYLOAD_ALIGNMENT
-#if CHIP_CONFIG_USE_MICRO_ECC
-#define CHIP_CONFIG_PASE_MESSAGE_PAYLOAD_ALIGNMENT 1
-#else
-#define CHIP_CONFIG_PASE_MESSAGE_PAYLOAD_ALIGNMENT 0
-#endif // CHIP_CONFIG_USE_MICRO_ECC
-#endif // CHIP_CONFIG_PASE_MESSAGE_PAYLOAD_ALIGNMENT
-
-/**
- *  @def CHIP_CONFIG_PASE_RATE_LIMITER_TIMEOUT
- *
- *  @brief
- *    The amount of time (in milliseconds) in which the Security Manager
- *    is allowed to have maximum #CHIP_CONFIG_PASE_RATE_LIMITER_MAX_ATTEMPTS
- *    counted PASE attempts.
- *
- */
-#ifndef CHIP_CONFIG_PASE_RATE_LIMITER_TIMEOUT
-#define CHIP_CONFIG_PASE_RATE_LIMITER_TIMEOUT 15000
-#endif // CHIP_CONFIG_PASE_RATE_LIMITER_TIMEOUT
-
-/**
- *  @def CHIP_CONFIG_PASE_RATE_LIMITER_MAX_ATTEMPTS
- *
- *  @brief
- *    The maximum number of PASE attempts after which the
- *    next PASE session establishment attempt will be allowed
- *    only after #CHIP_CONFIG_PASE_RATE_LIMITER_TIMEOUT expires.
- *     * For PASE negotiations with key confirmation option enabled:
- *       only attempts that failed with key confirmation error are counted.
- *       Successful PASE negotiations do not reset the rate limiter.
- *     * For PASE negotiations with key confirmation option disabled:
- *       every PASE negotiation, successful or otherwise, is added
- *       to the rate limiter.
- *
- */
-#ifndef CHIP_CONFIG_PASE_RATE_LIMITER_MAX_ATTEMPTS
-#define CHIP_CONFIG_PASE_RATE_LIMITER_MAX_ATTEMPTS 3
-#endif // CHIP_CONFIG_PASE_RATE_LIMITER_MAX_ATTEMPTS
-
 /**
  *  @name chip Security Manager Memory Management Configuration
  *
@@ -405,31 +98,12 @@
  *    functions.
  *
  *  @note This configuration is mutual exclusive with
- *        #CHIP_CONFIG_MEMORY_MGMT_SIMPLE and
  *        #CHIP_CONFIG_MEMORY_MGMT_MALLOC.
  *
  */
 #ifndef CHIP_CONFIG_MEMORY_MGMT_PLATFORM
 #define CHIP_CONFIG_MEMORY_MGMT_PLATFORM 0
 #endif // CHIP_CONFIG_MEMORY_MGMT_PLATFORM
-
-/**
- *  @def CHIP_CONFIG_MEMORY_MGMT_SIMPLE
- *
- *  @brief
- *    Enable (1) or disable (0) support for a chip-provided
- *    implementation of chip Security Manager memory-management
- *    functions based on temporary network buffer allocation /
- *    release.
- *
- *  @note This configuration is mutual exclusive with
- *        #CHIP_CONFIG_MEMORY_MGMT_PLATFORM and
- *        #CHIP_CONFIG_MEMORY_MGMT_MALLOC.
- *
- */
-#ifndef CHIP_CONFIG_MEMORY_MGMT_SIMPLE
-#define CHIP_CONFIG_MEMORY_MGMT_SIMPLE 0
-#endif // CHIP_CONFIG_MEMORY_MGMT_SIMPLE
 
 /**
  *  @def CHIP_CONFIG_MEMORY_MGMT_MALLOC
@@ -441,8 +115,7 @@
  *    functions.
  *
  *  @note This configuration is mutual exclusive with
- *        #CHIP_CONFIG_MEMORY_MGMT_PLATFORM and
- *        #CHIP_CONFIG_MEMORY_MGMT_SIMPLE.
+ *        #CHIP_CONFIG_MEMORY_MGMT_PLATFORM.
  *
  */
 #ifndef CHIP_CONFIG_MEMORY_MGMT_MALLOC
@@ -453,32 +126,13 @@
  *  @}
  */
 
-#if ((CHIP_CONFIG_MEMORY_MGMT_PLATFORM + CHIP_CONFIG_MEMORY_MGMT_SIMPLE + CHIP_CONFIG_MEMORY_MGMT_MALLOC) != 1)
-#error                                                                                                                             \
-    "Please assert exactly one of CHIP_CONFIG_MEMORY_MGMT_PLATFORM, CHIP_CONFIG_MEMORY_MGMT_SIMPLE, or CHIP_CONFIG_MEMORY_MGMT_MALLOC."
-#endif // ((CHIP_CONFIG_MEMORY_MGMT_PLATFORM + CHIP_CONFIG_MEMORY_MGMT_SIMPLE + CHIP_CONFIG_MEMORY_MGMT_MALLOC) != 1)
+#if ((CHIP_CONFIG_MEMORY_MGMT_PLATFORM + CHIP_CONFIG_MEMORY_MGMT_MALLOC) != 1)
+#error "Please assert exactly one of CHIP_CONFIG_MEMORY_MGMT_PLATFORM or CHIP_CONFIG_MEMORY_MGMT_MALLOC."
+#endif // ((CHIP_CONFIG_MEMORY_MGMT_PLATFORM + CHIP_CONFIG_MEMORY_MGMT_MALLOC) != 1)
 
 #if !CHIP_CONFIG_MEMORY_MGMT_MALLOC && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 #error "!CHIP_CONFIG_MEMORY_MGMT_MALLOC but getifaddrs() uses malloc()"
 #endif
-
-/**
- *  @def CHIP_CONFIG_SIMPLE_ALLOCATOR_USE_SMALL_BUFFERS
- *
- *  @brief
- *    Enable (1) or disable (0) simple memory allocator support
- *    for small size network buffers. When enabled, this configuration
- *    requires 4 network buffers with minimum available payload size of
- *    600 bytes.
- *
- *  @note This configuration is only relevant when
- *        #CHIP_CONFIG_MEMORY_MGMT_SIMPLE is set and
- *        ignored otherwise.
- *
- */
-#ifndef CHIP_CONFIG_SIMPLE_ALLOCATOR_USE_SMALL_BUFFERS
-#define CHIP_CONFIG_SIMPLE_ALLOCATOR_USE_SMALL_BUFFERS 0
-#endif // CHIP_CONFIG_SIMPLE_ALLOCATOR_USE_SMALL_BUFFERS
 
 /**
  *  @def CHIP_CONFIG_MEMORY_DEBUG_CHECKS
@@ -567,303 +221,6 @@
 #endif // ((CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY + CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_PLATFORM) != 1)
 
 /**
- *  @name chip Random Number Generator (RNG) Implementation Configuration
- *
- *  @brief
- *    The following definitions enable one of three potential chip
- *    RNG implementation options:
- *
- *      * #CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM
- *      * #CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
- *      * #CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL
- *
- *    Note that these options are mutually exclusive and only one of
- *    these options should be set.
- *
- *  @{
- */
-
-/**
- *  @def CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM
- *
- *  @brief
- *    Enable (1) or disable (0) support for platform-specific
- *    implementation of the chip Random Number Generator.
- *
- *  @note This configuration is mutual exclusive with
- *        #CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG and
- *        #CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL.
- *
- */
-#ifndef CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM
-#define CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM 0
-#endif // CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM
-
-/**
- *  @def CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
- *
- *  @brief
- *    Enable (1) or disable (0) support for a chip-provided
- *    implementation of the chip Random Number Generator.
- *    This implementation is based on AES-CTR DRBG as
- *    specified in the NIST SP800-90A document.
- *
- *  @note This configuration is mutual exclusive with
- *        #CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM and
- *        #CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL.
- *
- */
-#ifndef CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
-#define CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG 0
-#endif // CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
-
-/**
- *  @def CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL
- *
- *  @brief
- *    Enable (1) or disable (0) support for a standard OpenSSL
- *    implementation of the chip Random Number Generator.
- *
- *  @note This configuration is mutual exclusive with
- *        #CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM and
- *        #CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG.
- *
- */
-#ifndef CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL
-#define CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL 1
-#endif // CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL
-
-/**
- *  @}
- */
-
-#if ((CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM + CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG +                                          \
-      CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL) != 1)
-#error                                                                                                                             \
-    "Please assert exactly one of CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM, CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG, or CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL."
-#endif // ((CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM + CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG +
-       // CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL) != 1)
-
-/**
- *  @def CHIP_CONFIG_DEV_RANDOM_DRBG_SEED
- *
- *  @brief
- *    Enable (1) or disable (0) a function for seeding the DRBG with
- *    entropy from the /dev/(u)random device.
- *
- *  @note When enabled along with #CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG
- *        this function becomes the default seeding function for the DRBG if
- *        another isn't specified at initialization time.
- *
- */
-#ifndef CHIP_CONFIG_DEV_RANDOM_DRBG_SEED
-#define CHIP_CONFIG_DEV_RANDOM_DRBG_SEED 0
-#endif // CHIP_CONFIG_DEV_RANDOM_DRBG_SEED
-
-/**
- *  @def CHIP_CONFIG_DEV_RANDOM_DEVICE_NAME
- *
- *  @brief
- *    The device name used by the dev random entropy function.
- *
- *  @note Only meaningful when #CHIP_CONFIG_DEV_RANDOM_DRBG_SEED is enabled.
- *
- */
-#ifndef CHIP_CONFIG_DEV_RANDOM_DEVICE_NAME
-#define CHIP_CONFIG_DEV_RANDOM_DEVICE_NAME "/dev/urandom"
-#endif // CHIP_CONFIG_DEV_RANDOM_DEVICE_NAME
-
-/**
- *  @name chip AES Block Cipher Algorithm Implementation Configuration.
- *
- *  @brief
- *    The following definitions enable one of the potential chip
- *    AES implementation options:
- *
- *      * #CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM
- *      * #CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL
- *
- *    Note that these options are mutually exclusive and only one of
- *    these options should be set.
- *
- *  @{
- */
-
-/**
- *  @def CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM
- *
- *  @brief
- *    Enable (1) or disable (0) support for platform-specific
- *    implementation of the chip AES functions.
- *
- *  @note This configuration is mutual exclusive with
- *        #CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL and
- *        #CHIP_CONFIG_AES_IMPLEMENTATION_AESNI
- *
- */
-#ifndef CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM
-#define CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM 0
-#endif // CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM
-
-/**
- *  @def CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL
- *
- *  @brief
- *    Enable (1) or disable (0) support for the OpenSSL
- *    implementation of the chip AES functions.
- *
- *  @note This configuration is mutual exclusive with other
- *        CHIP_CONFIG_AES_IMPLEMENTATION options.
- *
- */
-#ifndef CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL
-#define CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL 1
-#endif // CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL
-
-/**
- *  @def CHIP_CONFIG_AES_IMPLEMENTATION_AESNI
- *
- *  @brief
- *    Enable (1) or disable (0) support for an implementation
- *    of the chip AES functions using Intel AES-NI intrinsics.
- *
- *  @note This configuration is mutual exclusive with other
- *        CHIP_CONFIG_AES_IMPLEMENTATION options.
- *
- */
-#ifndef CHIP_CONFIG_AES_IMPLEMENTATION_AESNI
-#define CHIP_CONFIG_AES_IMPLEMENTATION_AESNI 0
-#endif // CHIP_CONFIG_AES_IMPLEMENTATION_AESNI
-
-/**
- *  @def CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS
- *
- *  @brief
- *    Enable (1) or disable (0) support the mbed TLS
- *    implementation of the chip AES functions.
- *
- *  @note This configuration is mutual exclusive with other
- *        CHIP_CONFIG_AES_IMPLEMENTATION options.
- *
- */
-#ifndef CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS
-#define CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS 0
-#endif // CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS
-
-/**
- *  @}
- */
-
-#if ((CHIP_CONFIG_AES_IMPLEMENTATION_PLATFORM + CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL + CHIP_CONFIG_AES_IMPLEMENTATION_AESNI +    \
-      CHIP_CONFIG_AES_IMPLEMENTATION_MBEDTLS) != 1)
-#error "Please assert exactly one CHIP_CONFIG_AES_IMPLEMENTATION_... option."
-#endif
-
-/**
- *  @def CHIP_CONFIG_AES_USE_EXPANDED_KEY
- *
- *  @brief
- *    Defines whether AES key is used in its expanded (1) or native (0) form.
- *
- *  @note OpenSSL AES implementation uses its own AES key declaration
- *        and this configuration option is ignored when
- *        #CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL is set.
- *
- */
-#ifndef CHIP_CONFIG_AES_USE_EXPANDED_KEY
-#define CHIP_CONFIG_AES_USE_EXPANDED_KEY 0
-#endif // CHIP_CONFIG_AES_USE_EXPANDED_KEY
-
-/**
- *  @name chip SHA1 and SHA256 Hash Algorithms Implementation Configuration.
- *
- *  @brief
- *    The following definitions enable one of three potential chip
- *    hash implementation options:
- *
- *      * #CHIP_CONFIG_HASH_IMPLEMENTATION_PLATFORM
- *      * #CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT
- *      * #CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL
- *      * #CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS
- *
- *    Note that these options are mutually exclusive and only one of
- *    these options should be set.
- *
- *  @{
- */
-
-/**
- *  @def CHIP_CONFIG_HASH_IMPLEMENTATION_PLATFORM
- *
- *  @brief
- *    Enable (1) or disable (0) support for platform-specific
- *    implementation of the chip SHA1 and SHA256 hashes.
- *
- *  @note This configuration is mutual exclusive with other
- *        CHIP_CONFIG_HASH_IMPLEMENTATION options.
- *
- */
-#ifndef CHIP_CONFIG_HASH_IMPLEMENTATION_PLATFORM
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_PLATFORM 0
-#endif // CHIP_CONFIG_HASH_IMPLEMENTATION_PLATFORM
-
-/**
- *  @def CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT
- *
- *  @brief
- *    Enable (1) or disable (0) support for a chip-provided
- *    implementation of the chip SHA1 and SHA256 hash functions.
- *    This implementation is using sha1 and sha256 engines from
- *    mincrypt library of Android core.
- *
- *  @note This configuration is mutual exclusive with other
- *        CHIP_CONFIG_HASH_IMPLEMENTATION options.
- *
- */
-#ifndef CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT 0
-#endif // CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT
-
-/**
- *  @def CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL
- *
- *  @brief
- *    Enable (1) or disable (0) support for the OpenSSL
- *    implementation of the chip SHA1 and SHA256 hash functions.
- *
- *  @note This configuration is mutual exclusive with other
- *        CHIP_CONFIG_HASH_IMPLEMENTATION options.
- *
- */
-#ifndef CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL 1
-#endif // CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL
-
-/**
- *  @def CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS
- *
- *  @brief
- *    Enable (1) or disable (0) support for the mbedTLS
- *    implementation of the chip SHA1 and SHA256 hash functions.
- *
- *  @note This configuration is mutual exclusive with other
- *        CHIP_CONFIG_HASH_IMPLEMENTATION options.
- *
- */
-#ifndef CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS 0
-#endif // CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS
-
-/**
- *  @}
- */
-
-#if ((CHIP_CONFIG_HASH_IMPLEMENTATION_PLATFORM + CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT +                                        \
-      CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL + CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS) != 1)
-#error "Please assert exactly one CHIP_CONFIG_HASH_IMPLEMENTATION_... option."
-#endif
-
-/**
  *  @def CHIP_CONFIG_SHA256_CONTEXT_SIZE
  *
  *  @brief
@@ -884,92 +241,6 @@
 #ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t))
 #endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
-
-/**
- *  @name chip key export protocol configuration.
- *
- *  @brief
- *    The following definitions define the configurations supported
- *    for chip's key export protocol.
- *
- *    This protocol is used to export secret key material from chip device.
- *    chip supports the following protocol configurations:
- *
- *    * #CHIP_CONFIG_SUPPORT_KEY_EXPORT_CONFIG1
- *    * #CHIP_CONFIG_SUPPORT_KEY_EXPORT_CONFIG2
- *
- *    which are summarized in the table below:
- *
- *    | Configuration  |   Curve   | Notes                   |
- *    | :------------: | :-------: | :---------------------- |
- *    | 1              | secp224r1 | Default configuration   |
- *    | 2              | secp256r1 |                         |
- *
- *  @{
- *
- */
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_KEY_EXPORT_CONFIG1
- *
- *  @brief
- *    This chip key export protocol configuration uses secp224r1
- *    Elliptic Curve.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_KEY_EXPORT_CONFIG1
-#define CHIP_CONFIG_SUPPORT_KEY_EXPORT_CONFIG1 1
-#endif // CHIP_CONFIG_SUPPORT_KEY_EXPORT_CONFIG1
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_KEY_EXPORT_CONFIG2
- *
- *  @brief
- *    This chip key export protocol configuration uses secp256r1
- *    Elliptic Curve.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_KEY_EXPORT_CONFIG2
-#define CHIP_CONFIG_SUPPORT_KEY_EXPORT_CONFIG2 1
-#endif // CHIP_CONFIG_SUPPORT_KEY_EXPORT_CONFIG2
-
-/**
- *  @}
- */
-
-/**
- *  @def CHIP_CONFIG_ALLOW_NON_STANDARD_ELLIPTIC_CURVES
- *
- *  @brief
- *    Allow the use of elliptic curves beyond the standard ones
- *    supported by chip.
- *
- */
-#ifndef CHIP_CONFIG_ALLOW_NON_STANDARD_ELLIPTIC_CURVES
-#define CHIP_CONFIG_ALLOW_NON_STANDARD_ELLIPTIC_CURVES 0
-#endif // CHIP_CONFIG_ALLOW_NON_STANDARD_ELLIPTIC_CURVES
-
-/**
- *  @def CHIP_CONFIG_MAX_EC_BITS
- *
- *  @brief
- *    The maximum size elliptic curve supported, in bits.
- *
- */
-#ifndef CHIP_CONFIG_MAX_EC_BITS
-#define CHIP_CONFIG_MAX_EC_BITS 256
-#endif // CHIP_CONFIG_MAX_EC_BITS
-
-/**
- *  @def CHIP_CONFIG_MAX_RSA_BITS
- *
- *  @brief
- *    The maximum size RSA modulus supported, in bits.
- *
- */
-#ifndef CHIP_CONFIG_MAX_RSA_BITS
-#define CHIP_CONFIG_MAX_RSA_BITS 4096
-#endif // CHIP_CONFIG_MAX_RSA_BITS
 
 /**
  *  @def CHIP_CONFIG_MAX_PEER_NODES
@@ -1035,161 +306,6 @@
 #ifndef CHIP_CONFIG_MAX_SESSION_KEYS
 #define CHIP_CONFIG_MAX_SESSION_KEYS CHIP_CONFIG_MAX_CONNECTIONS
 #endif // CHIP_CONFIG_MAX_SESSION_KEYS
-
-/**
- *  @def CHIP_CONFIG_MAX_APPLICATION_EPOCH_KEYS
- *
- *  @brief
- *    Maximum number of simultaneously supported application epoch keys.
- *    This define should be set to the maximum number of epoch keys
- *    that can be simultaneously provisioned on chip node by chip
- *    service. The maximum supported value is 8, however, in most cases
- *    only two such keys will exist on device at any given point in time.
- *
- */
-#ifndef CHIP_CONFIG_MAX_APPLICATION_EPOCH_KEYS
-#define CHIP_CONFIG_MAX_APPLICATION_EPOCH_KEYS 4
-#endif // CHIP_CONFIG_MAX_APPLICATION_EPOCH_KEYS
-
-/**
- *  @def CHIP_CONFIG_MAX_APPLICATION_GROUPS
- *
- *  @brief
- *    Maximum number of simultaneously supported application groups.
- *    This define should be set to the number of chip application
- *    groups, in which associated chip node has membership.
- *
- */
-#ifndef CHIP_CONFIG_MAX_APPLICATION_GROUPS
-#define CHIP_CONFIG_MAX_APPLICATION_GROUPS 8
-#endif // CHIP_CONFIG_MAX_APPLICATION_GROUPS
-
-/**
- *  @def CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
- *
- *  @brief
- *    Enable (1) or disable (0) support for the application group keys
- *    used for chip message encryption.
- *
- */
-#ifndef CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-#define CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC 1
-#endif // CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
-
-/**
- *  @def CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS
- *
- *  @brief
- *    Maximum number of simultaneously cached chip message encryption
- *    application keys.
- *    Caching these keys speeds up message encoding/decoding processes
- *    and eliminates the need to retrieve constituent key material from
- *    the platform memory every time we derive these keys.
- *    This define can be set equal to the number of application groups
- *    (#CHIP_CONFIG_MAX_APPLICATION_GROUPS) supported by the chip node
- *    such that exactly one key can be cached for each application group.
- *    It might be a good idea to allocate few more entries in the key
- *    cache for the corner cases, where application group is having
- *    simultaneous conversations using an 'old' and a 'new' epoch key.
- *
- *  @note This configuration is only relevant when
- *        #CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC is set and
- *        ignored otherwise.
- *
- */
-#ifndef CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS
-#define CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS (CHIP_CONFIG_MAX_APPLICATION_GROUPS + 1)
-#endif // CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS
-
-#if !(CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS > 0 && CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS < 256)
-#error "Please set CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS to a value greater than zero and smaller than 256."
-#endif // !(CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS > 0 && CHIP_CONFIG_MAX_CACHED_MSG_ENC_APP_KEYS < 256)
-
-/**
- *  @name chip Encrypted Passcode Configuration
- *
- *  @brief
- *    The following definitions enable (1) or disable (0) supported for
- *    chip encrypted passcode configurations. Each configuration
- *    uniquely specifies how chip passcode was encrypted, authenticated,
- *    and structured. chip supports the following passcode
- *    configurations:
- *
- *    * #CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG1_TEST_ONLY
- *    * #CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG2
- *
- *    which are summarized in the table below:
- *
- *    | Configuration | Encryption | Authentication | Fingerprint | Notes                 |
- *    | :-----------: | :--------: | :------------: | :---------: | :-------------------- |
- *    | 1             | -          | SHA1 Hash      | SHA1 Hash   | Test-only             |
- *    | 2             | AES128-ECB | SHA1 HMAC      | SHA1 HMAC   | Default configuration |
- *
- *  @{
- *
- */
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG1_TEST_ONLY
- *
- *  @brief
- *    This chip passcode configuration does not encrypt the passcode
- *    and doesn't use secret keys to authenticate and uniquely identify
- *    (fingerprint) the passcode.
- *
- *  @note For this configuration the computational overhead of the
- *        cryptography has largely been disabled since the focus
- *        of this configuration is testing the overall passcode
- *        encryption/decryption protocol, independently of the
- *        cryptography.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG1_TEST_ONLY
-#define CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG1_TEST_ONLY 0
-#endif // CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG1_TEST_ONLY
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG2
- *
- *  @brief
- *    This chip passcode configuration uses AES128 algorithm in ECB
- *    mode to encrypt passcodes. It also uses SHA1 Hash-based Message
- *    Authentication Code (HMAC) to authenticate and uniquely identify
- *    (fingerprint) the passcode.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG2
-#define CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG2 1
-#endif // CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG2
-
-/**
- *  @}
- */
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_SECURITY_SESSION_ESTABLISHMENT_TIMEOUT
- *
- *  @brief
- *    The default amount of time, in milliseconds, after which an in-progess
- *    session establishment will fail due to a timeout.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_SECURITY_SESSION_ESTABLISHMENT_TIMEOUT
-#define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_ESTABLISHMENT_TIMEOUT 30000
-#endif // CHIP_CONFIG_DEFAULT_SECURITY_SESSION_ESTABLISHMENT_TIMEOUT
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT
- *
- *  @brief
- *    The default minimum amount of time, in milliseconds, that an unreserved and idle
- *    security session will be allowed to exist before being destroyed.  In practice,
- *    unreserved idle sessions can exist for up to twice this value.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT
-#define CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT 15000
-#endif // CHIP_CONFIG_DEFAULT_SECURITY_SESSION_IDLE_TIMEOUT
 
 /**
  *  @def CHIP_CONFIG_NUM_MESSAGE_BUFS
@@ -1482,206 +598,9 @@
 #define CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES 5
 #endif // CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES
 
-/**
- *  @def CHIP_CONFIG_DEBUG_CERT_VALIDATION
- *
- *  @brief
- *    Enable support for debugging output from certificate validation.
- *
- */
-#ifndef CHIP_CONFIG_DEBUG_CERT_VALIDATION
-#define CHIP_CONFIG_DEBUG_CERT_VALIDATION 1
-#endif // CHIP_CONFIG_DEBUG_CERT_VALIDATION
-
-/**
- *  @def CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_BEFORE
- *
- *  @brief
- *    This is a packed valid date to be encoded in the chip
- *    operational device certificate. Any date before
- *    that date the certificate is considered invalid.
- *    The following functions can be used to calculate packed
- *    date/time: PackCertTime() and PackedCertTimeToDate().
- *    chip packed certificate dates are limited to representing
- *    dates that are on or after 2000/01/01.
- *    Mathematical expression to calculate packed date is:
- *        (((year - 2000) * 12 + (mon - 1)) * 31 + (day - 1))
- *    Currently encoded value corresponds to 2019/01/01.
- *
- */
-#ifndef CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_BEFORE
-#define CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_BEFORE 0x1B9C
-#endif // CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_BEFORE
-
-/**
- *  @def CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_AFTER
- *
- *  @brief
- *    This is the valid date to be encoded in the chip
- *    operational device certificate. Any date after
- *    that date the certificate is considered invalid.
- *    The following functions can be used to calculate packed
- *    date/time: PackCertTime() and PackedCertTimeToDate().
- *    chip packed certificate dates are limited to representing
- *    dates that are on or after 2000/01/01.
- *    Mathematical expression to calculate packed date is:
- *        (((year - 2000) * 12 + (mon - 1)) * 31 + (day - 1))
- *    Currently encoded value corresponds to 2069/01/01.
- *
- */
-#ifndef CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_AFTER
-#define CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_AFTER 0x6444
-#endif // CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_AFTER
-
-/**
- *  @def CHIP_CONFIG_ENABLE_PASE_INITIATOR
- *
- *  @brief
- *    Enable support for initiating PASE sessions.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_PASE_INITIATOR
-#define CHIP_CONFIG_ENABLE_PASE_INITIATOR 1
-#endif // CHIP_CONFIG_ENABLE_PASE_INITIATOR
-
-/**
- *  @def CHIP_CONFIG_ENABLE_PASE_RESPONDER
- *
- *  @brief
- *    Enable support for responding to PASE sessions initiated by
- *    other nodes.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_PASE_RESPONDER
-#define CHIP_CONFIG_ENABLE_PASE_RESPONDER 1
-#endif // CHIP_CONFIG_ENABLE_PASE_RESPONDER
-
-/**
- *  @def CHIP_CONFIG_ENABLE_CASE_INITIATOR
- *
- *  @brief
- *    Enable support for initiating CASE sessions.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_CASE_INITIATOR
-#define CHIP_CONFIG_ENABLE_CASE_INITIATOR 1
-#endif // CHIP_CONFIG_ENABLE_CASE_INITIATOR
-
-/**
- *  @def CHIP_CONFIG_ENABLE_CASE_RESPONDER
- *
- *  @brief
- *    Enable support for responding to CASE sessions initiated by other nodes.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_CASE_RESPONDER
-#define CHIP_CONFIG_ENABLE_CASE_RESPONDER 1
-#endif // CHIP_CONFIG_ENABLE_CASE_RESPONDER
-
-/**
- *  @def CHIP_CONFIG_SUPPORT_CASE_CONFIG1
- *
- *  @brief
- *    Enable use of CASE protocol configuration 1.
- *
- *  @note CASE config 1 uses SHA-1 for message signatures, which is deprecated.
- *
- */
-#ifndef CHIP_CONFIG_SUPPORT_CASE_CONFIG1
-#define CHIP_CONFIG_SUPPORT_CASE_CONFIG1 1
-#endif // CHIP_CONFIG_SUPPORT_CASE_CONFIG1
-
 #ifndef CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER "GlobalMCTR"
 #endif // CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
-
-/**
- * @def CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE
- *
- * @brief
- *   Enable use of the legacy chipCASEAuthDelegate interface.
- */
-#ifndef CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE
-#define CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE 1
-#endif
-
-/**
- *  @def CHIP_CONFIG_MAX_SHARED_SESSIONS_END_NODES
- *
- *  @brief
- *    The maximum number of end nodes simultaneously supported
- *    for all active shared sessions.
- *
- */
-#ifndef CHIP_CONFIG_MAX_SHARED_SESSIONS_END_NODES
-#define CHIP_CONFIG_MAX_SHARED_SESSIONS_END_NODES 10
-#endif // CHIP_CONFIG_MAX_SHARED_SESSIONS_END_NODES
-
-/**
- *  @def CHIP_CONFIG_MAX_END_NODES_PER_SHARED_SESSION
- *
- *  @brief
- *    The maximum number of end nodes simultaneously supported
- *    per active shared session.
- *
- */
-#ifndef CHIP_CONFIG_MAX_END_NODES_PER_SHARED_SESSION
-#define CHIP_CONFIG_MAX_END_NODES_PER_SHARED_SESSION 10
-#endif // CHIP_CONFIG_MAX_END_NODES_PER_SHARED_SESSION
-
-/**
- *  @def CHIP_CONFIG_ENABLE_TAKE_INITIATOR
- *
- *  @brief
- *    Enable support for initiating TAKE sessions.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_TAKE_INITIATOR
-#define CHIP_CONFIG_ENABLE_TAKE_INITIATOR 0
-#endif // CHIP_CONFIG_ENABLE_TAKE_INITIATOR
-
-/**
- *  @def CHIP_CONFIG_ENABLE_TAKE_RESPONDER
- *
- *  @brief
- *    Enable support for responding to TAKE sessions initiated by other nodes.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_TAKE_RESPONDER
-#define CHIP_CONFIG_ENABLE_TAKE_RESPONDER 0
-#endif // CHIP_CONFIG_ENABLE_TAKE_RESPONDER
-
-/**
- *  @def CHIP_CONFIG_ENABLE_KEY_EXPORT_INITIATOR
- *
- *  @brief
- *    Enable support for initiating key export request.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_KEY_EXPORT_INITIATOR
-#define CHIP_CONFIG_ENABLE_KEY_EXPORT_INITIATOR 1
-#endif // CHIP_CONFIG_ENABLE_KEY_EXPORT_INITIATOR
-
-/**
- *  @def CHIP_CONFIG_ENABLE_KEY_EXPORT_RESPONDER
- *
- *  @brief
- *    Enable support for responding to key export request initiated by other nodes.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_KEY_EXPORT_RESPONDER
-#define CHIP_CONFIG_ENABLE_KEY_EXPORT_RESPONDER 1
-#endif // CHIP_CONFIG_ENABLE_KEY_EXPORT_RESPONDER
-
-/**
- * @def CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE
- *
- * @brief
- *   Enable use of the legacy chipKeyExportDelegate interface.
- */
-#ifndef CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE
-#define CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE 1
-#endif
 
 /**
  *  @def CHIP_CONFIG_REQUIRE_AUTH
@@ -1776,27 +695,6 @@
 #ifndef CHIP_CONFIG_REQUIRE_AUTH_SERVICE_PROV
 #define CHIP_CONFIG_REQUIRE_AUTH_SERVICE_PROV CHIP_CONFIG_REQUIRE_AUTH
 #endif // CHIP_CONFIG_REQUIRE_AUTH_SERVICE_PROV
-
-/**
- *  @def CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT
- *
- *  @brief
- *    Enable (1) or disable (0) support for the handling of chip
- *    Provisioning Bundles.
- *
- *    chip Provisioning Bundles are a chip TLV payload containing
- *    the chip certificate, corresponding private key, and pairing
- *    code / entry key that a chip device would have otherwise
- *    received at its time of manufacture.
- *
- *    Enable this if your family of device needs to support in-field
- *    provisioning (IFP). IFP for chip devices is neither generally
- *    supported nor recommended.
- *
- */
-#ifndef CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT
-#define CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT 1
-#endif // CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT
 
 /**
  *  @def CHIP_ERROR_LOGGING
@@ -2307,15 +1205,6 @@
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 
 /**
- * @def CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
- *
- * @brief Define the size of the pool used for tracking CHIP groups.
- */
-#ifndef CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
-#define CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE 8
-#endif // CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
-
-/**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking CHIP
@@ -2361,16 +1250,37 @@
 #endif // CHIP_CONFIG_MAX_BINDINGS
 
 /**
- *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
- *    Maximum number of administrators that can provision the device. Each admin
- *    can provision the device with their unique operational credentials and manage
- *    their access control lists.
+ *    Maximum number of fabrics the device can participate in.  Each fabric can
+ *    provision the device with its unique operational credentials and manage
+ *    its own access control lists.
  */
-#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 16
-#endif // CHIP_CONFIG_MAX_DEVICE_ADMINS
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 16
+#endif // CHIP_CONFIG_MAX_FABRICS
+
+/**
+ *  @def CHIP_CONFIG_MAX_GROUP_DATA_PEERS
+ *
+ *  @brief
+ *    Maximum number of Peer within a fabric that can send group data message to a device.
+ *
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_DATA_PEERS
+#define CHIP_CONFIG_MAX_GROUP_DATA_PEERS 15
+#endif // CHIP_CONFIG_MAX_GROUP_DATA_PEERS
+
+/**
+ *  @def CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS
+ *
+ *  @brief
+ *   Maximum number of Peer within a fabric that can send group control message to a device.
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS
+#define CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS 2
+#endif // CHIP_CONFIG_MAX_GROUP_CONTROL_PEER
 
 /**
  * @def CHIP_NON_PRODUCTION_MARKER
@@ -2379,8 +1289,7 @@
  * includes development/testing features that should never be used in production contexts.
  */
 #ifndef CHIP_NON_PRODUCTION_MARKER
-#if (CHIP_CONFIG_SECURITY_TEST_MODE || CHIP_CONFIG_SUPPORT_PASE_CONFIG0_TEST_ONLY ||                                               \
-     CHIP_CONFIG_SUPPORT_PASSCODE_CONFIG1_TEST_ONLY || (!CHIP_CONFIG_REQUIRE_AUTH) || CHIP_FUZZING_ENABLED)
+#if (CHIP_CONFIG_SECURITY_TEST_MODE || (!CHIP_CONFIG_REQUIRE_AUTH) || CHIP_FUZZING_ENABLED)
 #define CHIP_NON_PRODUCTION_MARKER WARNING__DO_NOT_SHIP__CONTAINS_NON_PRODUCTION_CHIP_CODE
 #endif
 #endif
@@ -2421,7 +1330,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  */
 #ifndef CHIP_CONFIG_MDNS_CACHE_SIZE
-#define CHIP_CONFIG_MDNS_CACHE_SIZE 20
+#define CHIP_CONFIG_MDNS_CACHE_SIZE 0
 #endif
 /**
  *  @name Interaction Model object pool configuration.
@@ -2431,7 +1340,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
  *      * #CHIP_IM_MAX_NUM_READ_HANDLER
- *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *      * #CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
@@ -2458,15 +1366,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_READ_HANDLER
 #define CHIP_IM_MAX_NUM_READ_HANDLER 4
-#endif
-
-/**
- * @def CHIP_IM_MAX_NUM_READ_CLIENT
- *
- * @brief Defines the maximum number of ReadClient, limits the number of active read transactions on client.
- */
-#ifndef CHIP_IM_MAX_NUM_READ_CLIENT
-#define CHIP_IM_MAX_NUM_READ_CLIENT 4
 #endif
 
 /**
@@ -2606,7 +1505,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of GroupState entries to support per fabric
  */
 #ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 1
+#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 3
 #endif
 
 /**
@@ -2617,7 +1516,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of GroupState entries to support per fabric
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 1
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 2
 #endif
 
 /**
@@ -2797,6 +1696,81 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 1
 #endif
+
+/**
+ *  @def CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
+ *
+ *  @brief
+ *    If auto resubscribe is enabled & default resubscription policy is used,
+ *    specify the max wait time.
+ *    This value was chosen so that the average wait time is 3600000
+ *    ((100 - CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP) % of CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS) / 2 +
+ *    (CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP % of CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS) = average wait is
+ * 3600000
+ */
+#ifndef CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
+#define CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS 5538000
+#endif
+
+/**
+ *  @def CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX
+ *
+ *  @brief
+ *    If auto resubscribe is enabled & default resubscription policy is used,
+ *    specify the max fibonacci step index.
+ *    This index must satisfy below conditions:
+ *    1 . Fibonacci(CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX + 1) * CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS >
+ * CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS 2 . Fibonacci(CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX) *
+ * CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS < CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
+ *
+ */
+#ifndef CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX
+#define CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX 14
+#endif
+
+/**
+ *  @def CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP
+ *
+ *  @brief
+ *    If auto resubscribe is enabled & default resubscription policy is used,
+ *    specify the minimum wait
+ *    time as a percentage of the max wait interval for that step.
+ *
+ */
+#ifndef CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP
+#define CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP 30
+#endif
+
+/**
+ *  @def CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS
+ *
+ *  @brief
+ *    If auto resubscribe is enabled & default resubscription policy is used,
+ *    specify the multiplier that multiplies the result of a fibonacci computation
+ *    based on a specific index to provide a max wait time for
+ *    a step.
+ *
+ */
+#ifndef CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS
+#define CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS 10000
+#endif
+
+/*
+ * @def CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+ *
+ * @brief Safety limit to ensure that we don't end up with a
+ * larger-than-expected buffer for temporary attribute storage (on the stack or
+ * in .bss).  The SDK will fail to compile if this value is set below the value
+ * it thinks it needs for a buffer size that can store any simple (not list or
+ * struct) attribute value.
+ */
+#ifndef CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+// I can't figure out how to get all-clusters-app to sanely use a different
+// value here, and that app includes TestCluster, which has very large string
+// attributes (1000 octets, leading to a 1003 octet buffer).
+#define CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE 1003
+#endif // CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+
 /**
  * @}
  */

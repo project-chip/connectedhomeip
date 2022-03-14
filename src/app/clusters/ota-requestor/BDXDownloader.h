@@ -63,7 +63,7 @@ public:
     void SetStateDelegate(StateDelegate * delegate) { mStateDelegate = delegate; }
 
     // Initialize a BDX transfer session but will not proceed until OnPreparedForDownload() is called.
-    CHIP_ERROR SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData);
+    CHIP_ERROR SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData, System::Clock::Timeout timeout);
 
     // OTADownloader Overrides
     CHIP_ERROR BeginPrepareDownload() override;
@@ -75,14 +75,24 @@ public:
     CHIP_ERROR FetchNextData() override;
     // TODO: override SkipData
 
+    System::Clock::Timeout GetTimeout();
+    // If True, there's been a timeout in the transfer as measured by no download progress after 'mTimeout' seconds.
+    // If False, there's been progress in the transfer.
+    bool HasTransferTimedOut();
+
 private:
     void PollTransferSession();
     CHIP_ERROR HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent);
     void SetState(State state, app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);
+    void Reset();
 
     chip::bdx::TransferSession mBdxTransfer;
     MessagingDelegate * mMsgDelegate = nullptr;
     StateDelegate * mStateDelegate   = nullptr;
+    // Timeout value in seconds to abort the download if there's no progress in the transfer session.
+    System::Clock::Timeout mTimeout = System::Clock::kZero;
+    // Tracks the last block counter used during the transfer session as of the previous check.
+    uint32_t mPrevBlockCounter = 0;
 };
 
 } // namespace chip

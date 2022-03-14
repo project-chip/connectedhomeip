@@ -21,8 +21,11 @@ PICS:
     - label: "Does the device support discovery over WiFi?"
       id: WIFI
 
-    - label: "Does the device support discover over THREAD"
+    - label: "Does the device support discovery over THREAD"
       id: THREAD
+
+    - label: "Does the device support discovery over Ethernet?"
+      id: ETH
 
     - label: "Does the device support manufacturing date"
       id: MANF_DATE
@@ -187,14 +190,47 @@ PICS:
       id: MANUAL_OCCUPANCY_CHANGE
 
       # Window covering cluster
-    - label: "Does the device implement the Type"
+      ## WC-Features
+    - label: "Does the device implement the Lift feature?"
+      id: WNCV_LF
+
+    - label: "Does the device implement the Position Aware Lift feature?"
+      id: WNCV_PA_LF
+
+    - label: "Does the device implement the Lift feature?"
+      id: WNCV_TL
+
+    - label: "Does the device implement the Position Aware Lift feature?"
+      id: WNCV_PA_TL
+
+      ## WC-Attributes
+    - label: "Does the device implement the Type attribute?"
       id: A_TYPE
 
-    - label: "Does the device implement the ConfigStatus"
+    - label: "Does the device implement the ConfigStatus attribute?"
       id: A_CONFIGSTATUS
 
-    - label: "Does the device implement the EndProductType"
+    - label: "Does the device implement the EndProductType attribute?"
       id: A_ENDPRODUCTTYPE
+
+    - label:
+          "Does the device implement the CurrentPositionLiftPercentage
+          attribute?"
+      id: A_CURRENTPOSITIONLIFTPERCENTAGE
+
+    - label:
+          "Does the device implement the CurrentPositionTiltPercentage
+          attribute?"
+      id: A_CURRENTPOSITIONTILTPERCENTAGE
+
+      ## WC-Commands received
+    - label:
+          "Does the device implement receiving the GoToLiftPercentage command?"
+      id: PICS_CR_GOTOLIFTPERCENTAGE
+
+    - label:
+          "Does the device implement receiving the GoToTiltPercentage command?"
+      id: PICS_CR_GOTOTILTPERCENTAGE
 
       # On/Off Cluster
     - label: "Does the device implement the OnOff attribute?"
@@ -225,3 +261,41 @@ PICS:
 
     - label: "Does the device implement receiving the OnWithTimedOff command?"
       id: CR_ONWITHTIMEOFF
+
+    - label: "Does Dnssd advertisment broadcast Vendor ID"
+      id: VENDOR_SUBTYPE
+
+    - label: "Does Dnssd advertisment broadcast Device Type ID"
+      id: DEVTYPE_SUBTYPE
+
+    - label:
+          "The optional key CRI indicates the MRP_RETRY_INTERVAL_IDLE of the
+          Node"
+      id: CRI_COMM_DISCOVERY_KEY
+
+    - label:
+          "The optional key CRA indicates the MRP_RETRY_INTERVAL_ACTIVE of the
+          Node"
+      id: CRA_COMM_DISCOVERY_KEY
+
+    - label:
+          "The optional key VP, if present, MAY provide Vendor ID and Product ID
+          information of the device"
+      id: VP_KEY
+
+    - label:
+          "The optional key DT MAY provide the publisher’s primary device type."
+      id: DT_KEY
+
+    - label: "The optional key DN MAY provide a device advertisement name."
+      id: DN_KEY
+
+    - label: "The optional key RI MAY provide a Rotating Device Identifier."
+      id: RI_KEY
+
+    - label: "The optional key PH MAY provide a pairing hint."
+      id: PH_KEY
+
+    - label:
+          "The optional key PI MAY provide additional information for pairing."
+      id: PI_KEY

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -55,10 +55,12 @@ public:
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
+    static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_MfrDeviceId;
     static const Key kConfigKey_MfrDeviceCert;
     static const Key kConfigKey_MfrDeviceICACerts;
     static const Key kConfigKey_MfrDevicePrivateKey;
+    static const Key kConfigKey_SoftwareVersion;
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
@@ -79,6 +81,9 @@ public:
     static const Key kConfigKey_WiFiPassword;
     static const Key kConfigKey_WiFiSecurity;
     static const Key kConfigKey_WiFiMode;
+    static const Key kConfigKey_Spake2pIterationCount;
+    static const Key kConfigKey_Spake2pSalt;
+    static const Key kConfigKey_Spake2pVerifier;
 
     // CHIP Counter keys
     static const Key kCounterKey_RebootCount;

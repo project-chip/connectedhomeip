@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,15 +67,18 @@ public:
 
     // Key definitions for well-known configuration values.
     // Factory Config Keys
-    static constexpr Key kConfigKey_SerialNum           = K32WConfigKey(kPDMId_ChipFactory, 0x00);
-    static constexpr Key kConfigKey_MfrDeviceId         = K32WConfigKey(kPDMId_ChipFactory, 0x01);
-    static constexpr Key kConfigKey_MfrDeviceCert       = K32WConfigKey(kPDMId_ChipFactory, 0x02);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey = K32WConfigKey(kPDMId_ChipFactory, 0x03);
-    static constexpr Key kConfigKey_ManufacturingDate   = K32WConfigKey(kPDMId_ChipFactory, 0x04);
-    static constexpr Key kConfigKey_SetupPinCode        = K32WConfigKey(kPDMId_ChipFactory, 0x05);
-    static constexpr Key kConfigKey_MfrDeviceICACerts   = K32WConfigKey(kPDMId_ChipFactory, 0x06);
-    static constexpr Key kConfigKey_HardwareVersion     = K32WConfigKey(kPDMId_ChipFactory, 0x07);
-    static constexpr Key kConfigKey_SetupDiscriminator  = K32WConfigKey(kPDMId_ChipFactory, 0x08);
+    static constexpr Key kConfigKey_SerialNum             = K32WConfigKey(kPDMId_ChipFactory, 0x00);
+    static constexpr Key kConfigKey_MfrDeviceId           = K32WConfigKey(kPDMId_ChipFactory, 0x01);
+    static constexpr Key kConfigKey_MfrDeviceCert         = K32WConfigKey(kPDMId_ChipFactory, 0x02);
+    static constexpr Key kConfigKey_MfrDevicePrivateKey   = K32WConfigKey(kPDMId_ChipFactory, 0x03);
+    static constexpr Key kConfigKey_ManufacturingDate     = K32WConfigKey(kPDMId_ChipFactory, 0x04);
+    static constexpr Key kConfigKey_SetupPinCode          = K32WConfigKey(kPDMId_ChipFactory, 0x05);
+    static constexpr Key kConfigKey_MfrDeviceICACerts     = K32WConfigKey(kPDMId_ChipFactory, 0x06);
+    static constexpr Key kConfigKey_HardwareVersion       = K32WConfigKey(kPDMId_ChipFactory, 0x07);
+    static constexpr Key kConfigKey_SetupDiscriminator    = K32WConfigKey(kPDMId_ChipFactory, 0x08);
+    static constexpr Key kConfigKey_Spake2pIterationCount = K32WConfigKey(kPDMId_ChipFactory, 0x09);
+    static constexpr Key kConfigKey_Spake2pSalt           = K32WConfigKey(kPDMId_ChipFactory, 0x0A);
+    static constexpr Key kConfigKey_Spake2pVerifier       = K32WConfigKey(kPDMId_ChipFactory, 0x0B);
 
     // CHIP Config Keys
     static constexpr Key kConfigKey_FabricId           = K32WConfigKey(kPDMId_ChipConfig, 0x00);
@@ -88,6 +91,7 @@ public:
     static constexpr Key kConfigKey_RegulatoryLocation = K32WConfigKey(kPDMId_ChipConfig, 0x07);
     static constexpr Key kConfigKey_CountryCode        = K32WConfigKey(kPDMId_ChipConfig, 0x08);
     static constexpr Key kConfigKey_Breadcrumb         = K32WConfigKey(kPDMId_ChipConfig, 0x09);
+    static constexpr Key kConfigKey_UniqueId           = K32WConfigKey(kPDMId_ChipConfig, 0x0A);
 
     // CHIP Counter Keys
     static constexpr Key kCounterKey_RebootCount           = K32WConfigKey(kPDMId_ChipCounter, 0x00);
@@ -97,7 +101,7 @@ public:
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0x00);
-    static constexpr Key kMaxConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0x08);
+    static constexpr Key kMaxConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0x0B);
     static constexpr Key kMinConfigKey_ChipConfig  = K32WConfigKey(kPDMId_ChipConfig, 0x00);
     static constexpr Key kMaxConfigKey_ChipConfig  = K32WConfigKey(kPDMId_ChipConfig, 0x1E);
     static constexpr Key kMinConfigKey_ChipCounter = K32WConfigKey(kPDMId_ChipCounter, 0x00);

@@ -17,16 +17,26 @@
  */
 
 #include <app/CASESessionManager.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <lib/address_resolve/AddressResolve.h>
 
 namespace chip {
+
+CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer)
+{
+    return AddressResolve::Resolver::Instance().Init(systemLayer);
+}
 
 CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
     Dnssd::ResolvedNodeData resolutionData;
 
-    bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
+    bool nodeIDWasResolved =
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+        (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
+#else
+        false;
+#endif
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
@@ -52,7 +62,7 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
         session->OnNodeIdResolved(resolutionData);
     }
 
-    CHIP_ERROR err = session->Connect(onConnection, onFailure, mConfig.dnsResolver);
+    CHIP_ERROR err = session->Connect(onConnection, onFailure);
     if (err != CHIP_NO_ERROR)
     {
         // Release the peer rather than the pointer in case the failure handler has already released the session.
@@ -67,43 +77,31 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
     ReleaseSession(FindExistingSession(peerId));
 }
 
-CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
+void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId)
 {
-    VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
-                                              Dnssd::Resolver::CacheBypass::On);
+    mConfig.devicePool->ReleaseDevicesForFabric(compressedFabricId);
 }
 
-void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
+void CASESessionManager::ReleaseAllSessions()
 {
-    ChipLogProgress(Controller, "Address resolved for node: 0x" ChipLogFormatX64, ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-
-    if (mConfig.dnsCache != nullptr)
-    {
-        LogErrorOnFailure(mConfig.dnsCache->Insert(nodeData));
-    }
-
-    OperationalDeviceProxy * session = FindExistingSession(nodeData.mPeerId);
-    VerifyOrReturn(session != nullptr,
-                   ChipLogDetail(Controller, "OnNodeIdResolved was called for a device with no active sessions, ignoring it."));
-
-    LogErrorOnFailure(session->UpdateDeviceData(session->ToPeerAddress(nodeData), nodeData.GetMRPConfig()));
-}
-
-void CASESessionManager::OnNodeIdResolutionFailed(const PeerId & peer, CHIP_ERROR error)
-{
-    ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
+    mConfig.devicePool->ReleaseAllDevices();
 }
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr)
 {
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     if (mConfig.dnsCache != nullptr)
     {
         Dnssd::ResolvedNodeData resolutionData;
-        ReturnErrorOnFailure(mConfig.dnsCache->Lookup(peerId, resolutionData));
-        addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
-        return CHIP_NO_ERROR;
+        // TODO(andy31415): DNS caching is generally not populated, need to move
+        // caching into a the address resolve layer and not have a global one anymore.
+        if (mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR)
+        {
+            addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
+            return CHIP_NO_ERROR;
+        }
     }
+#endif
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);

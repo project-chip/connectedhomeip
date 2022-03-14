@@ -32,6 +32,9 @@
 #include <platform/ConfigurationManager.h>
 #endif
 
+#include <app/server/Dnssd.h>
+#include <protocols/secure_channel/CASEServer.h>
+
 using namespace chip::Inet;
 using namespace chip::System;
 using namespace chip::Credentials;
@@ -50,8 +53,8 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
         return CHIP_NO_ERROR;
     }
 
-    mListenPort    = params.listenPort;
-    mFabricStorage = params.fabricStorage;
+    mListenPort               = params.listenPort;
+    mFabricIndependentStorage = params.fabricIndependentStorage;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -70,6 +73,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.bleLayer = mSystemState->BleLayer();
 #endif
     }
+
+    params.fabricIndependentStorage = mFabricIndependentStorage;
 
     return InitSystemState(params);
 }
@@ -116,6 +121,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     stateParams.transportMgr = chip::Platform::New<DeviceTransportMgr>();
 
+    //
+    // The logic below expects IPv6 to be at index 0 of this tuple. Please do not alter that.
+    //
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
                                                             .SetListenPort(mListenPort)
@@ -131,30 +139,67 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    if (params.imDelegate == nullptr)
-    {
-        params.imDelegate = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
-    }
-
     stateParams.fabricTable           = chip::Platform::New<FabricTable>();
     stateParams.sessionMgr            = chip::Platform::New<SessionManager>();
     stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
-    ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
-    ReturnErrorOnFailure(
-        stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr, stateParams.messageCounterManager));
+    ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+
+    auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>(stateParams.sessionMgr);
+    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(delegate.get()));
+    delegate.release();
+
+    ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
+                                                      stateParams.messageCounterManager, params.fabricIndependentStorage,
+                                                      stateParams.fabricTable));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
     InitDataModelHandler(stateParams.exchangeMgr);
 
-    stateParams.imDelegate = params.imDelegate;
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr));
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+
+    if (params.enableServerInteractions)
+    {
+        stateParams.caseServer = chip::Platform::New<CASEServer>();
+
+        //
+        // Enable listening for session establishment messages.
+        //
+        // We pass in a nullptr for the BLELayer since we're not permitting usage of BLE in this server modality for the controller,
+        // especially since it will interrupt other potential usages of BLE by the controller acting in a commissioning capacity.
+        //
+        ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
+            stateParams.exchangeMgr, stateParams.transportMgr, nullptr, stateParams.sessionMgr, stateParams.fabricTable));
+
+        //
+        // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
+        // and IPv6 endpoint to pick from. Given that the listen port passed in may be set to 0 (which then has the kernel select
+        // a valid port at bind time), that will result in two possible ports being provided back from the resultant endpoint
+        // initializations. Since IPv6 is POR for Matter, let's go ahead and pick that port.
+        //
+        app::DnssdServer::Instance().SetSecuredPort(stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
+
+        //
+        // TODO: This is a hack to workaround the fact that we have a bi-polar stack that has controller and server modalities that
+        // are mutually exclusive in terms of initialization of key stack singletons. Consequently, DnssdServer accesses
+        // Server::GetInstance().GetFabricTable() to access the fabric table, but we don't want to do that when we're initializing
+        // the controller logic since the factory here has its own fabric table.
+        //
+        // Consequently, reach in set the fabric table pointer to point to the right version.
+        //
+        app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
+
+        //
+        // Start up the DNS-SD server.  We are not giving it a
+        // CommissioningModeProvider, so it will not claim we are in
+        // commissioning mode.
+        //
+        chip::app::DnssdServer::Instance().StartServer();
+    }
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(stateParams);
@@ -164,9 +209,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    controllerParams.deviceAddressUpdateDelegate = params.deviceAddressUpdateDelegate;
-#endif
     controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;
     controllerParams.operationalKeypair             = params.operationalKeypair;
     controllerParams.controllerNOC                  = params.controllerNOC;
@@ -176,6 +218,8 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
+
+    controllerParams.enableServerInteractions = params.enableServerInteractions;
 }
 
 CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceController & controller)
@@ -197,7 +241,8 @@ CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, Device
 
     CommissionerInitParams commissionerParams;
     PopulateInitParams(commissionerParams, params);
-    commissionerParams.pairingDelegate = params.pairingDelegate;
+    commissionerParams.pairingDelegate     = params.pairingDelegate;
+    commissionerParams.defaultCommissioner = params.defaultCommissioner;
 
     CHIP_ERROR err = commissioner.Init(commissionerParams);
     return err;
@@ -216,13 +261,18 @@ CHIP_ERROR DeviceControllerFactory::ServiceEvents()
 
 DeviceControllerFactory::~DeviceControllerFactory()
 {
+    Shutdown();
+}
+
+void DeviceControllerFactory::Shutdown()
+{
     if (mSystemState != nullptr)
     {
         mSystemState->Release();
         chip::Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
-    mFabricStorage = nullptr;
+    mFabricIndependentStorage = nullptr;
 }
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
@@ -231,9 +281,13 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    if (mCASEServer != nullptr)
+    {
+        chip::Platform::Delete(mCASEServer);
+        mCASEServer = nullptr;
+    }
+
     Dnssd::Resolver::Instance().Shutdown();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     // Shut down the interaction model
     app::InteractionModelEngine::GetInstance()->Shutdown();
@@ -290,10 +344,10 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mSessionMgr = nullptr;
     }
 
-    if (mIMDelegate != nullptr)
+    if (mFabrics != nullptr)
     {
-        chip::Platform::Delete(mIMDelegate);
-        mIMDelegate = nullptr;
+        chip::Platform::Delete(mFabrics);
+        mFabrics = nullptr;
     }
 
     return CHIP_NO_ERROR;

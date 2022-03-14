@@ -27,7 +27,7 @@ from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.k32w import K32WApp, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
-from builders.qpg import QpgBuilder
+from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 
@@ -200,6 +200,13 @@ def HostTargets():
 
                 yield variant_target
 
+    # Without extra build variants
+    yield targets[0].Extend('chip-cert', app=HostApp.CERT_TOOL)
+    yield targets[0].Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
+    yield targets[0].Extend('address-resolve-tool-clang', app=HostApp.ADDRESS_RESOLVE, use_clang=True).GlobBlacklist("Reduce default build variants")
+    yield targets[0].Extend('address-resolve-tool-platform-mdns', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
+    yield targets[0].Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE, use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
+
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     for board in [HostBoard.NATIVE, HostBoard.FAKE]:
         yield test_target.Extend(board.BoardName() + '-tests', board=board, app=HostApp.TESTS)
@@ -224,6 +231,7 @@ def Esp32Targets():
     yield devkitc.Extend('lock', app=Esp32App.LOCK)
     yield devkitc.Extend('bridge', app=Esp32App.BRIDGE)
     yield devkitc.Extend('temperature-measurement', app=Esp32App.TEMPERATURE_MEASUREMENT)
+    yield devkitc.Extend('temperature-measurement-rpc', app=Esp32App.TEMPERATURE_MEASUREMENT, enable_rpcs=True)
 
     yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
 
@@ -251,6 +259,7 @@ def Efr32Targets():
 
     for board_target in board_targets:
         yield board_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
+        yield board_target.Extend('switch', app=Efr32App.SWITCH)
         yield board_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
 
         rpc_aware_targets = [
@@ -359,6 +368,7 @@ def K32WTargets():
     yield target.Extend('light', app=K32WApp.LIGHT).GlobBlacklist("Debug builds broken due to LWIP_DEBUG redefition")
 
     yield target.Extend('light-release', app=K32WApp.LIGHT, release=True)
+    yield target.Extend('light-tokenizer-release', app=K32WApp.LIGHT, tokenizer=True, release=True).GlobBlacklist("Only on demand build")
     yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK, low_power=True, release=True).GlobBlacklist("Only on demand build")
@@ -367,6 +377,17 @@ def K32WTargets():
 def Cyw30739Targets():
     yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LIGHT)
     yield Target('cyw30739-cyw930739m2evb_01-lock', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LOCK)
+    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR).GlobBlacklist("Running out of XIP flash space")
+    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR, progress_logging=False)
+
+
+def QorvoTargets():
+    target = Target('qpg', QpgBuilder)
+
+    yield target.Extend('lock', board=QpgBoard.QPG6105, app=QpgApp.LOCK)
+    yield target.Extend('light', board=QpgBoard.QPG6105, app=QpgApp.LIGHT)
+    yield target.Extend('shell', board=QpgBoard.QPG6105, app=QpgApp.SHELL)
+    yield target.Extend('persistent-storage', board=QpgBoard.QPG6105, app=QpgApp.PERSISTENT_STORAGE)
 
 
 ALL = []
@@ -382,6 +403,7 @@ target_generators = [
     AmebaTargets(),
     K32WTargets(),
     Cyw30739Targets(),
+    QorvoTargets(),
 ]
 
 for generator in target_generators:
@@ -389,7 +411,6 @@ for generator in target_generators:
         ALL.append(target)
 
 # Simple targets added one by one
-ALL.append(Target('qpg-qpg6100-lock', QpgBuilder))
 ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
 ALL.append(Target('tizen-arm-light', TizenBuilder,

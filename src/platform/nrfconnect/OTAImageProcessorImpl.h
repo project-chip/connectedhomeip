@@ -17,8 +17,10 @@
 
 #pragma once
 
+#include <lib/core/OTAImageHeader.h>
 #include <lib/support/Span.h>
 #include <platform/OTAImageProcessor.h>
+#include <platform/nrfconnect/OTAImageContentHeader.h>
 
 namespace chip {
 
@@ -38,11 +40,16 @@ public:
     CHIP_ERROR Abort() override;
     CHIP_ERROR Apply() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
+    bool IsFirstImageRun() override;
+    CHIP_ERROR ConfirmCurrentImage() override;
 
 private:
     CHIP_ERROR PrepareDownloadImpl();
+    CHIP_ERROR ProcessHeader(ByteSpan & block);
 
     OTADownloader * mDownloader = nullptr;
+    OTAImageHeaderParser mHeaderParser;
+    OTAImageContentHeaderParser mContentHeaderParser;
     uint8_t mBuffer[kBufferSize];
 };
 

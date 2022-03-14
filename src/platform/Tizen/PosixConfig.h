@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ public:
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
+    static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_MfrDeviceId;
     static const Key kConfigKey_MfrDeviceCert;
     static const Key kConfigKey_MfrDeviceICACerts;
@@ -73,6 +74,9 @@ public:
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_Spake2pIterationCount;
+    static const Key kConfigKey_Spake2pSalt;
+    static const Key kConfigKey_Spake2pVerifier;
 
     static const char kGroupKeyNamePrefix[];
 

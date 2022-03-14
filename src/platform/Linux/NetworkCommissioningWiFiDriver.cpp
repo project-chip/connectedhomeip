@@ -32,9 +32,9 @@ namespace DeviceLayer {
 namespace NetworkCommissioning {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-// TODO: Here, most interfaces are just calling ConnectivityManager interfaces, this is because the ConnectivityProvides some
-// bootstrap code for the wpa_supplicant. However, we can wrap the wpa_supplicant dbus api directly (and remove the related code in
-// ConnectivityManagerImpl).
+// TODO(#14172): Here, most interfaces are just calling ConnectivityManager interfaces, this is because the ConnectivityProvides
+// some bootstrap code for the wpa_supplicant. However, we can wrap the wpa_supplicant dbus api directly (and remove the related
+// code in ConnectivityManagerImpl).
 namespace {
 constexpr char kWiFiSSIDKeyName[]        = "wifi-ssid";
 constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";

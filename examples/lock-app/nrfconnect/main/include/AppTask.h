@@ -34,7 +34,7 @@ struct k_timer;
 class AppTask
 {
 public:
-    int StartApp();
+    CHIP_ERROR StartApp();
 
     void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
     void PostEvent(AppEvent * event);
@@ -43,7 +43,8 @@ public:
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
+    void InitOTARequestor();
 
     static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor);

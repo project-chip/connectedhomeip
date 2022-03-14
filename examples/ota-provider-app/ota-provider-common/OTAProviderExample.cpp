@@ -43,6 +43,8 @@ using chip::Server;
 using chip::Span;
 using chip::app::Clusters::OTAProviderDelegate;
 using chip::bdx::TransferControlFlags;
+using namespace chip;
+using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
@@ -125,116 +127,177 @@ bool OTAProviderExample::SelectOTACandidate(const uint16_t requestorVendorID, co
     return candidateFound;
 }
 
+UserConsentSubject OTAProviderExample::GetUserConsentSubject(const app::CommandHandler * commandObj,
+                                                             const app::ConcreteCommandPath & commandPath,
+                                                             const QueryImage::DecodableType & commandData, uint32_t targetVersion)
+{
+    UserConsentSubject subject;
+    subject.fabricIndex             = commandObj->GetSubjectDescriptor().fabricIndex;
+    subject.requestorNodeId         = commandObj->GetSubjectDescriptor().subject;
+    subject.providerEndpointId      = commandPath.mEndpointId;
+    subject.requestorVendorId       = commandData.vendorId;
+    subject.requestorProductId      = commandData.productId;
+    subject.requestorCurrentVersion = commandData.softwareVersion;
+    subject.requestorTargetVersion  = targetVersion;
+    if (commandData.metadataForProvider.HasValue())
+    {
+        subject.metadata = commandData.metadataForProvider.Value();
+    }
+    return subject;
+}
+
 EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
                                                    const chip::app::ConcreteCommandPath & commandPath,
                                                    const QueryImage::DecodableType & commandData)
 {
-    // TODO: add confiuration for returning BUSY status
-
     OTAQueryStatus queryStatus = OTAQueryStatus::kNotAvailable;
     OTAProviderExample::DeviceSoftwareVersionModel candidate;
-    bool otaAvailable                     = false;
-    uint32_t newSoftwareVersion           = 0;
-    const char * newSoftwareVersionString = nullptr;
-    const char * otaFilePath              = nullptr;
-    bool userConsentNeeded                = false;
+    uint32_t newSoftwareVersion           = commandData.softwareVersion + 1;
+    const char * newSoftwareVersionString = "Example-Image-V0.1";
+    const char * otaFilePath              = mOTAFilePath;
     uint8_t updateToken[kUpdateTokenLen]  = { 0 };
     char strBuf[kUpdateTokenStrLen]       = { 0 };
     char uriBuf[kUriMaxLen]               = { 0 };
+    uint32_t delayedActionTimeSec         = mDelayedActionTimeSec;
+    bool requestorCanConsent              = commandData.requestorCanConsent.ValueOr(false);
+    QueryImageResponse::Type response;
 
-    // This use-case is a subset of the ota-candidates-file option.
-    // Can be removed once all other platforms (ESP, etc.)
-    // start using the ota-candidates-file method.
-    if (strlen(mOTAFilePath)) // If OTA file is directly provided
+    if (mIgnoreQueryImageCount > 0)
     {
-        otaAvailable       = true;
-        newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
-                                                              // available (if the user provides a file).
-        newSoftwareVersionString = "Example-Image-V0.1";
-        otaFilePath              = mOTAFilePath;
+        ChipLogDetail(SoftwareUpdate, "Skip HandleQueryImage response. mIgnoreQueryImageCount %" PRIu32, mIgnoreQueryImageCount);
+        mIgnoreQueryImageCount--;
+        return EMBER_ZCL_STATUS_SUCCESS;
     }
-    else if (!mCandidates.empty()) // If list of OTA candidates is supplied instead
+
+    switch (mQueryImageBehavior)
     {
-        otaAvailable = SelectOTACandidate(commandData.vendorId, commandData.productId, commandData.softwareVersion, candidate);
-        if (otaAvailable)
+    case kRespondWithUnknown:
+        // This use-case is a subset of the ota-candidates-file option.
+        // Can be removed once all other platforms start using the ota-candidates-file method.
+        if (strlen(mOTAFilePath) > 0) // If OTA file is directly provided
         {
-            newSoftwareVersion       = candidate.softwareVersion;
-            newSoftwareVersionString = candidate.softwareVersionString;
-            otaFilePath              = candidate.otaURL;
+            // TODO: Following details shall be read from the OTA file
+
+            // If software version is provided using command line then use it
+            if (mSoftwareVersion.HasValue())
+            {
+                newSoftwareVersion = mSoftwareVersion.Value();
+            }
+
+            // If software version string is provided using command line then use it
+            if (mSoftwareVersionString)
+            {
+                newSoftwareVersionString = mSoftwareVersionString;
+            }
+
+            queryStatus = OTAQueryStatus::kUpdateAvailable;
         }
+        else if (!mCandidates.empty()) // If list of OTA candidates is supplied instead
+        {
+            if (SelectOTACandidate(commandData.vendorId, commandData.productId, commandData.softwareVersion, candidate))
+            {
+                newSoftwareVersion       = candidate.softwareVersion;
+                newSoftwareVersionString = candidate.softwareVersionString;
+                otaFilePath              = candidate.otaURL;
+                queryStatus              = OTAQueryStatus::kUpdateAvailable;
+            }
+        }
+
+        // If mUserConsentNeeded (set by the CLI) is true and requestor is capable of taking user consent
+        // then delegate obtaining user consent to the requestor
+        if (mUserConsentDelegate && queryStatus == OTAQueryStatus::kUpdateAvailable &&
+            (requestorCanConsent && mUserConsentNeeded) == false)
+        {
+            UserConsentState state = mUserConsentDelegate->GetUserConsentState(
+                GetUserConsentSubject(commandObj, commandPath, commandData, newSoftwareVersion));
+            ChipLogProgress(SoftwareUpdate, "User Consent state: %s", mUserConsentDelegate->UserConsentStateToString(state));
+            switch (state)
+            {
+            case UserConsentState::kGranted:
+                queryStatus = OTAQueryStatus::kUpdateAvailable;
+                break;
+
+            case UserConsentState::kObtaining:
+                queryStatus = OTAQueryStatus::kBusy;
+                break;
+
+            case UserConsentState::kDenied:
+            case UserConsentState::kUnknown:
+                queryStatus = OTAQueryStatus::kNotAvailable;
+                break;
+            }
+        }
+        break;
+
+    case kRespondWithUpdateAvailable:
+        queryStatus = OTAQueryStatus::kUpdateAvailable;
+        break;
+
+    case kRespondWithBusy:
+        queryStatus = OTAQueryStatus::kBusy;
+        break;
+
+    case kRespondWithNotAvailable:
+        queryStatus = OTAQueryStatus::kNotAvailable;
+        break;
+
+    default:
+        queryStatus = OTAQueryStatus::kNotAvailable;
+        break;
     }
 
-    GenerateUpdateToken(updateToken, kUpdateTokenLen);
-    GetUpdateTokenString(ByteSpan(updateToken), strBuf, kUpdateTokenStrLen);
-    ChipLogDetail(SoftwareUpdate, "generated updateToken: %s", strBuf);
-
-    if (otaAvailable)
+    if (queryStatus == OTAQueryStatus::kUpdateAvailable)
     {
-        // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the provider
-        // supplying the response is not the provider supplying the OTA image.
+        GenerateUpdateToken(updateToken, kUpdateTokenLen);
+        GetUpdateTokenString(ByteSpan(updateToken), strBuf, kUpdateTokenStrLen);
+        ChipLogDetail(SoftwareUpdate, "generated updateToken: %s", strBuf);
+
+        // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the
+        // provider supplying the response is not the provider supplying the OTA image.
         FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
         FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
         NodeId nodeId           = fabricInfo->GetPeerId().GetNodeId();
 
         // Only doing BDX transport for now
         MutableCharSpan uri(uriBuf, kUriMaxLen);
-        chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(mOTAFilePath), uri);
+        chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(otaFilePath), uri);
         ChipLogDetail(SoftwareUpdate, "Generated URI: %.*s", static_cast<int>(uri.size()), uri.data());
-    }
 
-    // Set Status for the Query Image Response
-    switch (mQueryImageBehavior)
-    {
-    case kRespondWithUpdateAvailable: {
-        if (otaAvailable)
+        // Initialize the transfer session in prepartion for a BDX transfer
+        BitFlags<TransferControlFlags> bdxFlags;
+        bdxFlags.Set(TransferControlFlags::kReceiverDrive);
+        CHIP_ERROR err = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
+                                                          bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
+        if (err != CHIP_NO_ERROR)
         {
-            queryStatus = OTAQueryStatus::kUpdateAvailable;
-
-            // Initialize the transfer session in prepartion for a BDX transfer
-            mBdxOtaSender.SetFilepath(otaFilePath);
-            BitFlags<TransferControlFlags> bdxFlags;
-            bdxFlags.Set(TransferControlFlags::kReceiverDrive);
-            CHIP_ERROR err = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
-                                                              bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(BDX, "Failed to initialize BDX transfer session: %s", chip::ErrorStr(err));
-                return EMBER_ZCL_STATUS_FAILURE;
-            }
+            ChipLogError(BDX, "Failed to initialize BDX transfer session: %s", chip::ErrorStr(err));
+            return EMBER_ZCL_STATUS_FAILURE;
         }
-        else
-        {
-            queryStatus = OTAQueryStatus::kNotAvailable;
-            ChipLogError(SoftwareUpdate, "No OTA file configured on the Provider");
-        }
-        break;
-    }
-    case kRespondWithBusy: {
-        queryStatus = OTAQueryStatus::kBusy;
-        break;
-    }
-    case kRespondWithNotAvailable: {
-        queryStatus = OTAQueryStatus::kNotAvailable;
-        break;
-    }
-    default:
-        queryStatus = OTAQueryStatus::kNotAvailable;
-    }
 
-    QueryImageResponse::Type response;
-    response.status = queryStatus;
-    response.delayedActionTime.Emplace(mDelayedActionTimeSec);
-    if (queryStatus == OTAQueryStatus::kUpdateAvailable)
-    {
         response.imageURI.Emplace(chip::CharSpan::fromCharString(uriBuf));
         response.softwareVersion.Emplace(newSoftwareVersion);
         response.softwareVersionString.Emplace(chip::CharSpan::fromCharString(newSoftwareVersionString));
         response.updateToken.Emplace(chip::ByteSpan(updateToken));
-        response.userConsentNeeded.Emplace(userConsentNeeded);
-        // Could also just not send metadataForRequestor at all.
+    }
+
+    response.status = queryStatus;
+    response.delayedActionTime.Emplace(delayedActionTimeSec);
+    if (mUserConsentNeeded && requestorCanConsent)
+    {
+        response.userConsentNeeded.Emplace(true);
+    }
+    else
+    {
+        response.userConsentNeeded.Emplace(false);
+    }
+    // For test coverage, sending empty metadata when (requestorNodeId % 2) == 0 and not sending otherwise.
+    if (commandObj->GetSubjectDescriptor().subject % 2 == 0)
+    {
         response.metadataForRequestor.Emplace(chip::ByteSpan());
     }
+
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
@@ -242,9 +305,15 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
                                                            const chip::app::ConcreteCommandPath & commandPath,
                                                            const ApplyUpdateRequest::DecodableType & commandData)
 {
-    // TODO: handle multiple transfers by tracking updateTokens
+    if (mIgnoreApplyUpdateCount > 0)
+    {
+        ChipLogDetail(SoftwareUpdate, "Skip HandleApplyUpdateRequest response. mIgnoreApplyUpdateCount %" PRIu32,
+                      mIgnoreApplyUpdateCount);
+        mIgnoreApplyUpdateCount--;
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
 
-    OTAApplyUpdateAction updateAction = OTAApplyUpdateAction::kProceed; // For now, just allow any update request
+    // TODO: handle multiple transfers by tracking updateTokens
     char tokenBuf[kUpdateTokenStrLen] = { 0 };
 
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
@@ -253,7 +322,7 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     VerifyOrReturnError(commandObj != nullptr, EMBER_ZCL_STATUS_INVALID_VALUE);
 
     ApplyUpdateResponse::Type response;
-    response.action            = updateAction;
+    response.action            = mUpdateAction;
     response.delayedActionTime = mDelayedActionTimeSec;
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
 

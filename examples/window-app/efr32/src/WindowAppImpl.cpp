@@ -235,6 +235,11 @@ void WindowAppImpl::PostEvent(const WindowApp::Event & event)
     }
 }
 
+void WindowAppImpl::PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
+{
+    Instance().PostEvent(WindowApp::Event(WindowApp::EventId::AttributeChange, endpoint, attributeId));
+}
+
 void WindowAppImpl::ProcessEvents()
 {
     WindowApp::Event event = EventId::None;
@@ -258,11 +263,43 @@ WindowApp::Button * WindowAppImpl::CreateButton(WindowApp::Button::Id id, const 
     return new Button(id, name);
 }
 
+void WindowAppImpl::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute)
+{
+    switch (attribute)
+    {
+    /* RO OperationalStatus */
+    case Attributes::OperationalStatus::Id:
+        UpdateLEDs();
+        break;
+    /* RO Type: not supposed to dynamically change -> Cycling Window Covering Demo */
+    case Attributes::Type::Id:
+    /* ============= Positions for Position Aware ============= */
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
+        UpdateLCD();
+        break;
+    /* ### ATTRIBUTEs CHANGEs IGNORED ### */
+    /* RO EndProductType: not supposed to dynamically change */
+    case Attributes::EndProductType::Id:
+    /* RO ConfigStatus: set by WC server */
+    case Attributes::ConfigStatus::Id:
+    /* RO SafetyStatus: set by WC server */
+    case Attributes::SafetyStatus::Id:
+    /* RW Mode: User can change */
+    case Attributes::Mode::Id:
+    default:
+        break;
+    }
+}
+
 void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
 {
     WindowApp::DispatchEvent(event);
     switch (event.mId)
     {
+    case EventId::AttributeChange:
+        DispatchEventAttributeChange(event.mEndpoint, event.mAttributeId);
+        break;
     case EventId::ResetWarning:
         EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", LONG_PRESS_TIMEOUT);
         // Turn off all LEDs before starting blink to make sure blink is
@@ -288,8 +325,6 @@ void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
         UpdateLEDs();
         break;
     case EventId::CoverTypeChange:
-    case EventId::LiftChanged:
-    case EventId::TiltChanged:
         UpdateLCD();
         break;
     case EventId::CoverChange:
@@ -341,7 +376,9 @@ void WindowAppImpl::UpdateLEDs()
         NPercent100ths current;
         LimitStatus liftLimit = LimitStatus::Intermediate;
 
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
         Attributes::CurrentPositionLiftPercent100ths::Get(cover.mEndpoint, current);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
         if (!current.IsNull())
         {
@@ -349,7 +386,7 @@ void WindowAppImpl::UpdateLEDs()
             liftLimit             = CheckLimitState(current.Value(), limits);
         }
 
-        if (EventId::None != cover.mLiftAction || EventId::None != cover.mTiltAction)
+        if (OperationalState::Stall != cover.mLiftOpState)
         {
             mActionLED.Blink(100);
         }
@@ -378,12 +415,16 @@ void WindowAppImpl::UpdateLCD()
     if (mState.isWiFiProvisioned)
 #endif
     {
-        Cover & cover      = GetCover();
-        EmberAfWcType type = TypeGet(cover.mEndpoint);
+        Cover & cover = GetCover();
         chip::app::DataModel::Nullable<uint16_t> lift;
         chip::app::DataModel::Nullable<uint16_t> tilt;
+
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        EmberAfWcType type = TypeGet(cover.mEndpoint);
+
         Attributes::CurrentPositionLift::Get(cover.mEndpoint, lift);
         Attributes::CurrentPositionTilt::Get(cover.mEndpoint, tilt);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
         if (!tilt.IsNull() && !lift.IsNull())
         {

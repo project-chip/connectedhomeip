@@ -36,6 +36,8 @@ if (chip_device_platform == "auto") {
     chip_device_platform = "tizen"
   } else if (current_os == "android") {
     chip_device_platform = "android"
+  } else if (current_os == "webos") {
+    chip_device_platform = "webos"
   } else {
     chip_device_platform = "none"
   }
@@ -55,7 +57,8 @@ declare_args() {
   chip_enable_wifi =
       chip_device_platform == "linux" || chip_device_platform == "esp32" ||
       chip_device_platform == "mbed" || chip_device_platform == "tizen" ||
-      chip_device_platform == "android" || chip_device_platform == "ameba"
+      chip_device_platform == "android" || chip_device_platform == "ameba" ||
+      chip_device_platform == "webos"
 
   # Enable ble support.
   if (chip_device_platform == "fake") {
@@ -73,7 +76,7 @@ declare_args() {
   # Select DNS-SD implementation
   if (chip_device_platform == "linux" || chip_device_platform == "esp32" ||
       chip_device_platform == "mbed" || chip_device_platform == "p6" ||
-      chip_device_platform == "ameba") {
+      chip_device_platform == "ameba" || chip_device_platform == "webos") {
     chip_mdns = "minimal"
   } else if (chip_device_platform == "darwin" ||
              chip_device_platform == "cc13x2_26x2" || current_os == "android" ||
@@ -116,6 +119,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "Ameba"
 } else if (chip_device_platform == "cyw30739") {
   _chip_device_layer = "CYW30739"
+} else if (chip_device_platform == "webos") {
+  _chip_device_layer = "webos"
 }
 
 if (chip_device_platform != "external") {
@@ -124,6 +129,7 @@ if (chip_device_platform != "external") {
   chip_platform_config_include = ""
   chip_inet_platform_config_include = ""
   chip_system_platform_config_include = ""
+  chip_system_layer_impl_config_file = ""
 } else {
   declare_args() {
     chip_ble_platform_config_include = ""
@@ -131,6 +137,7 @@ if (chip_device_platform != "external") {
     chip_platform_config_include = ""
     chip_inet_platform_config_include = ""
     chip_system_platform_config_include = ""
+    chip_system_layer_impl_config_file = ""
   }
 }
 
@@ -158,5 +165,6 @@ assert(
         chip_device_platform == "k32w0" || chip_device_platform == "qpg" ||
         chip_device_platform == "telink" || chip_device_platform == "mbed" ||
         chip_device_platform == "p6" || chip_device_platform == "android" ||
-        chip_device_platform == "ameba" || chip_device_platform == "cyw30739",
+        chip_device_platform == "ameba" || chip_device_platform == "cyw30739" ||
+        chip_device_platform == "webos",
     "Please select a valid value for chip_device_platform")

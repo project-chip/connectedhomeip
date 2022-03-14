@@ -46,7 +46,6 @@
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
@@ -58,6 +57,7 @@
 
 namespace chip {
 namespace app {
+
 /**
  * @class InteractionModelEngine
  *
@@ -82,7 +82,6 @@ public:
      *  Initialize the InteractionModel Engine.
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
@@ -110,6 +109,12 @@ public:
      * @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
+
+    /**
+     * Expire active transactions and release related objects for the given fabric index.
+     * This is used for releasing transactions that won't be closed when a fabric is removed.
+     */
+    void CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex);
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
@@ -178,6 +183,12 @@ public:
      * Return the number of active read clients being tracked by the engine.
      */
     size_t GetNumActiveReadClients();
+
+    /**
+     * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
+     * transaction is in the middle of processing the chunked value of the given path.)
+     */
+    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
@@ -273,7 +284,7 @@ private:
 
     void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
-    bool CommandExists(const ConcreteCommandPath & aCommandPath) override;
+    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
     bool HasActiveRead();
 
@@ -284,12 +295,12 @@ private:
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;
 
-    BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
-    BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
+    ObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
+    ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
-    BitMapObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mClusterInfoPool;
+    ObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mClusterInfoPool;
 
     ReadClient * mpActiveReadClientList = nullptr;
 
@@ -304,20 +315,14 @@ private:
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj);
-void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                          CommandSender * apCommandObj);
 
 /**
- *  Check whether the given cluster exists on the given endpoint and supports the given command.
- *  TODO: The implementation lives in ember-compatibility-functions.cpp, this should be replaced by IM command catalog look up
- * function after we have a cluster catalog in interaction model engine.
- *  TODO: The endpoint id on response command (client side command) is unclear, so we don't have a ClientClusterCommandExists
- * function. (Spec#3258)
- *
- *  @retval  True if the endpoint contains the server side of the given cluster and that cluster implements the given command, false
- * otherwise.
+ *  Check whether the given cluster exists on the given endpoint and supports
+ *  the given command.  If it does, Success will be returned.  If it does not,
+ *  one of UnsupportedEndpoint, UnsupportedCluster, or UnsupportedCommand
+ *  will be returned, depending on how the command fails to exist.
  */
-bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
+Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
 
 /**
  *  Fetch attribute value and version info and write to the AttributeReport provided.
@@ -344,7 +349,13 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 /**
  * TODO: Document.
  */
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                  const ConcreteDataAttributePath & aAttributePath, TLV::TLVReader & aReader,
+                                  WriteHandler * apWriteHandler);
+
+/**
+ * Check if the given cluster has the given DataVersion.
+ */
+bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
 } // namespace app
 } // namespace chip

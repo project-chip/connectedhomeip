@@ -184,10 +184,15 @@ static EmberStatus sendToClient(EndpointId endpoint)
     // emberAfSendCommandUnicastToBindings()
     emberAfSetCommandEndpoints(endpoint, 0);
 
+    // TODO: Figure out how this sending should actually work in Matter.
+#if 0
     // A binding table entry is created on Zone Enrollment for each endpoint, so
     // a simple call to SendCommandUnicastToBinding will handle determining the
     // destination endpoint, address, etc for us.
     status = emberAfSendCommandUnicastToBindings();
+#else
+    status     = EMBER_ERR_FATAL;
+#endif
 
     if (EMBER_SUCCESS != status)
     {
@@ -221,7 +226,6 @@ MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttribu
     uint8_t i;
     bool zeroAddress;
     EmberBindingTableEntry bindingEntry;
-    EmberBindingTableEntry currentBind;
     NodeId destNodeId;
     EndpointId endpoint   = attributePath.mEndpointId;
     uint8_t ieeeAddress[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -244,36 +248,28 @@ MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttribu
     // currently existing in the field.
     bindingEntry.type      = EMBER_UNICAST_BINDING;
     bindingEntry.local     = endpoint;
-    bindingEntry.clusterId = ZCL_IAS_ZONE_CLUSTER_ID;
+    bindingEntry.clusterId = MakeOptional(ZCL_IAS_ZONE_CLUSTER_ID);
     bindingEntry.remote    = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
     bindingEntry.nodeId    = destNodeId;
 
+    bool foundSameEntry = false;
     // Cycle through the binding table until we find a valid entry that is not
     // being used, then use the created entry to make the bind.
-    for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    for (const auto & currentBind : BindingTable::GetInstance())
     {
-        if (emberGetBinding(i, &currentBind) != EMBER_SUCCESS)
+        // If the binding table entry created based on the response already exists
+        // do nothing.
+        if ((currentBind.local == bindingEntry.local) && (currentBind.clusterId == bindingEntry.clusterId) &&
+            (currentBind.remote == bindingEntry.remote) && (currentBind.type == bindingEntry.type))
         {
-            // break out of the loop to ensure that an error message still prints
+            foundSameEntry = true;
             break;
         }
-        if (currentBind.type != EMBER_UNUSED_BINDING)
-        {
-            // If the binding table entry created based on the response already exists
-            // do nothing.
-            if ((currentBind.local == bindingEntry.local) && (currentBind.clusterId == bindingEntry.clusterId) &&
-                (currentBind.remote == bindingEntry.remote) && (currentBind.type == bindingEntry.type))
-            {
-                break;
-            }
-            // If this spot in the binding table already exists, move on to the next
-            continue;
-        }
-        else
-        {
-            emberSetBinding(i, &bindingEntry);
-            break;
-        }
+    }
+
+    if (!foundSameEntry)
+    {
+        BindingTable::GetInstance().Add(bindingEntry);
     }
 
     zeroAddress = true;
@@ -632,7 +628,6 @@ static void unenrollSecurityDevice(EndpointId endpoint)
 void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status)
 {
     EndpointId endpoint;
-    uint8_t networkIndex;
     uint8_t i;
 
     // If the device has left the network, unenroll all endpoints on the device
@@ -641,9 +636,8 @@ void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status)
     {
         for (i = 0; i < emberAfEndpointCount(); i++)
         {
-            endpoint     = emberAfEndpointFromIndex(i);
-            networkIndex = emberAfNetworkIndexFromEndpointIndex(i);
-            if (networkIndex == 0 /* emberGetCurrentNetwork() */ && emberAfContainsServer(endpoint, ZCL_IAS_ZONE_CLUSTER_ID))
+            endpoint = emberAfEndpointFromIndex(i);
+            if (emberAfContainsServer(endpoint, ZCL_IAS_ZONE_CLUSTER_ID))
             {
                 unenrollSecurityDevice(endpoint);
             }

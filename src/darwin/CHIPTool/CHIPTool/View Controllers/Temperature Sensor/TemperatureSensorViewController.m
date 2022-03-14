@@ -199,27 +199,31 @@
 
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                CHIPTemperatureMeasurement * cluster =
-                    [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
-                // TODO - Fix temperature reporting in iOS CHIPTool
-                /*
-                [cluster
-                    subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds
-                                                       maxInterval:maxIntervalSeconds
-                                                   responseHandler:^(NSError * error, NSDictionary * values) {
-                                                       if (error == nil)
-                                                           return;
-                                                       NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
-                                                           [error description]);
-                                                   }];
+                // Use a wildcard subscription
+                [chipDevice subscribeWithQueue:dispatch_get_main_queue()
+                                   minInterval:minIntervalSeconds
+                                   maxInterval:maxIntervalSeconds
+                                 reportHandler:^(NSArray<CHIPAttributeReport *> * _Nullable reports, NSError * _Nullable error) {
+                                     if (error) {
+                                         NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
+                                             [error description]);
+                                         return;
+                                     }
+                                     for (CHIPAttributeReport * report in reports) {
+                                         // These should be exposed by the SDK
+                                         if ([report.path.cluster isEqualToNumber:@(1026)] &&
+                                             [report.path.attribute isEqualToNumber:@(0)]) {
+                                             if (report.error != nil) {
+                                                 NSLog(@"Error reading temperature: %@", report.error);
+                                             } else {
+                                                 [self updateTempInUI:((NSNumber *) report.value).shortValue];
+                                             }
+                                         }
+                                     }
+                                 }
+                       subscriptionEstablished:^ {
 
-                [cluster reportAttributeMeasuredValueWithResponseHandler:^(NSError * error, NSDictionary * values) {
-                    if (error != nil)
-                        return;
-                    NSNumber * value = values[@"value"];
-                    [self updateTempInUI:value.shortValue];
-                }];
-                 */
+                       }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }

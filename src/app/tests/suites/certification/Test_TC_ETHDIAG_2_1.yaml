@@ -15,6 +15,7 @@
 name: 48.1.3. [TC-ETHDIAG-2.1] Command received functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Ethernet Network Diagnostics"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #Below steps disabled due to issue #13648
     - label: "Sends ResetCounts command"

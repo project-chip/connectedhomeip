@@ -14,22 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import coloredlogs
-import click
 import logging
 import os
 import shutil
 import sys
-import typing
 import time
-
-from pathlib import Path
+import typing
 from dataclasses import dataclass
+from pathlib import Path
 
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+import click
+import coloredlogs
 
-import chiptest  # noqa: E402
-from chiptest.glob_matcher import GlobMatcher  # noqa: E402
+import chiptest
+from chiptest.accessories import AppsRegister
+from chiptest.glob_matcher import GlobMatcher
+
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -107,7 +107,8 @@ class RunContext:
     default=FindBinaryPath('chip-tool'),
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context, log_level, target, target_glob, target_skip_glob, no_log_timestamps, root, internal_inside_unshare, chip_tool):
+def main(context, log_level, target, target_glob, target_skip_glob,
+         no_log_timestamps, root, internal_inside_unshare, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -151,7 +152,7 @@ def main(context, log_level, target, target_glob, target_skip_glob, no_log_times
 @main.command(
     'list', help='List available test suites')
 @click.pass_context
-def cmd_generate(context):
+def cmd_list(context):
     for test in context.obj.tests:
         print(test.name)
 
@@ -167,17 +168,22 @@ def cmd_generate(context):
     default=FindBinaryPath('chip-all-clusters-app'),
     help='what all clusters app to use')
 @click.option(
+    '--door-lock-app',
+    default=FindBinaryPath('chip-door-lock-app'),
+    help='what door lock app to use')
+@click.option(
     '--tv-app',
     default=FindBinaryPath('chip-tv-app'),
     help='what tv app to use')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, tv_app):
+def cmd_run(context, iterations, all_clusters_app, door_lock_app, tv_app):
     runner = chiptest.runner.Runner()
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
         all_clusters_app=[all_clusters_app],
+        door_lock_app=[door_lock_app],
         tv_app=[tv_app]
     )
 
@@ -189,34 +195,43 @@ def cmd_run(context, iterations, all_clusters_app, tv_app):
     # Testing prerequisites: tv app requires a config. Copy it just in case
     shutil.copyfile(
         os.path.join(
-            context.obj.root, 'examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini'),
+            context.obj.root, ('examples/tv-app/linux/include/'
+                               'endpoint-configuration/chip_tv_config.ini')),
         '/tmp/chip_tv_config.ini'
     )
 
     logging.info("Each test will be executed %d times" % iterations)
+
+    apps_register = AppsRegister()
+    apps_register.init()
 
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
             test_start = time.time()
             try:
-                test.Run(runner, paths)
+                test.Run(runner, apps_register, paths)
                 test_end = time.time()
                 logging.info('%-20s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))
-            except:
+            except Exception:
                 test_end = time.time()
                 logging.exception('%s - FAILED in %0.2f seconds' %
                                   (test.name, (test_end - test_start)))
+                apps_register.uninit()
                 sys.exit(2)
+
+    apps_register.uninit()
 
 
 # On linux, allow an execution shell to be prepared
 if sys.platform == 'linux':
     @main.command(
-        'shell', help='Execute a bash shell in the environment (useful to test network namespaces)')
+        'shell',
+        help=('Execute a bash shell in the environment (useful to test '
+              'network namespaces)'))
     @click.pass_context
-    def cmd_run(context):
+    def cmd_shell(context):
         chiptest.linux.PrepareNamespacesForTestExecution(
             context.obj.in_unshare)
         os.execvpe("bash", ["bash"], os.environ.copy())

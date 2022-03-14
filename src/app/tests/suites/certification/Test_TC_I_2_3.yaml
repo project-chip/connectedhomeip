@@ -1,0 +1,455 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 57.2.3. [TC-I-2.3] Secondary functionality with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: ""
+      disabled: true
+
+    - label:
+          "TH sends TriggerEffect command to DUT, with the effect identifier
+          field set to 0x00 (blink) and the effect variant field set to 0x00
+          (default)."
+      verification:
+          "./chip-tool identify trigger-effect 0 0 1 1 CHIP:EM: Flushed pending
+          ack for MessageCounter:1227491753 on exchange 19185i
+          [1635610688.408485][3693:3698] CHIP:EM: Received message of type 0x9
+          with protocolId (0, 1) and MessageCounter:1 on exchange 19186i
+          [1635610688.408543][3693:3698] CHIP:EM: Rxd Ack; Removing
+          MessageCounter:0 from Retrans Table on exchange 19186i
+          [1635610688.408576][3693:3698] CHIP:EM: Removed CHIP MessageCounter:0
+          from RetransTable on exchange 19186i [1635610688.408623][3693:3698]
+          CHIP:DMG: InvokeCommand = [1635610688.408657][3693:3698] CHIP:DMG: {
+          [1635610688.408686][3693:3698] CHIP:DMG: CommandList =
+          [1635610688.408721][3693:3698] CHIP:DMG: [
+          [1635610688.408754][3693:3698] CHIP:DMG: CommandDataIB =
+          [1635610688.408794][3693:3698] CHIP:DMG: {
+          [1635610688.408831][3693:3698] CHIP:DMG: CommandPathIB =
+          [1635610688.408917][3693:3698] CHIP:DMG: {
+          [1635610688.408965][3693:3698] CHIP:DMG: EndpointId = 0x1,
+          [1635610688.409044][3693:3698] CHIP:DMG: ClusterId = 0x0,
+          [1635610688.409093][3693:3698] CHIP:DMG: CommandId = 0x40,
+          [1635610688.409135][3693:3698] CHIP:DMG: },
+          [1635610688.409182][3693:3698] CHIP:DMG:
+          [1635610688.409251][3693:3698] CHIP:DMG: StatusIB =
+          [1635610688.409298][3693:3698] CHIP:DMG: {
+          [1635610688.409374][3693:3698] CHIP:DMG: status = 0x85,
+          [1635610688.409418][3693:3698] CHIP:DMG: },
+          [1635610688.409462][3693:3698] CHIP:DMG:
+          [1635610688.409499][3693:3698] CHIP:DMG: },
+          [1635610688.409576][3693:3698] CHIP:DMG:
+          [1635610688.409609][3693:3698] CHIP:DMG: ],
+          [1635610688.409647][3693:3698] CHIP:DMG:
+          [1635610688.409713][3693:3698] CHIP:DMG: }
+          [1635610688.409771][3693:3698] CHIP:DMG: Received Command Response
+          Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0040
+          Status=0x85 [1635610688.409808][3693:3698] CHIP:TOO: Default Failure
+          Response: 0x85 [1635610688.409902][3693:3698] CHIP:DMG: ICR moving to
+          [AwaitingDe] [1635610688.409944][3693:3698] CHIP:EM: Sending
+          Standalone Ack for MessageCounter:1 on exchange 19186i"
+      disabled: true
+
+    - label:
+          "TH sends TriggerEffect command to DUT, with the effect identifier
+          field set to 0x01 (breathe) and the effect variant field set to 0x00
+          (default)."
+      verification:
+          "./chip-tool identify trigger-effect 1 0 1 1 CHIP:EM: Flushed pending
+          ack for MessageCounter:1227491755 on exchange 49192i
+          [1635610759.207089][3701:3706] CHIP:EM: Received message of type 0x9
+          with protocolId (0, 1) and MessageCounter:1 on exchange 49193i
+          [1635610759.207152][3701:3706] CHIP:EM: Rxd Ack; Removing
+          MessageCounter:0 from Retrans Table on exchange 49193i
+          [1635610759.207189][3701:3706] CHIP:EM: Removed CHIP MessageCounter:0
+          from RetransTable on exchange 49193i [1635610759.207239][3701:3706]
+          CHIP:DMG: InvokeCommand = [1635610759.207277][3701:3706] CHIP:DMG: {
+          [1635610759.207323][3701:3706] CHIP:DMG: CommandList =
+          [1635610759.207362][3701:3706] CHIP:DMG: [
+          [1635610759.207413][3701:3706] CHIP:DMG: CommandDataIB =
+          [1635610759.207456][3701:3706] CHIP:DMG: {
+          [1635610759.207494][3701:3706] CHIP:DMG: CommandPathIB =
+          [1635610759.207664][3701:3706] CHIP:DMG: {
+          [1635610759.207725][3701:3706] CHIP:DMG: EndpointId = 0x1,
+          [1635610759.207791][3701:3706] CHIP:DMG: ClusterId = 0x0,
+          [1635610759.207846][3701:3706] CHIP:DMG: CommandId = 0x40,
+          [1635610759.207892][3701:3706] CHIP:DMG: },
+          [1635610759.207961][3701:3706] CHIP:DMG:
+          [1635610759.208003][3701:3706] CHIP:DMG: StatusIB =
+          [1635610759.208059][3701:3706] CHIP:DMG: {
+          [1635610759.208109][3701:3706] CHIP:DMG: status = 0x85,
+          [1635610759.208193][3701:3706] CHIP:DMG: },
+          [1635610759.208240][3701:3706] CHIP:DMG:
+          [1635610759.208280][3701:3706] CHIP:DMG: },
+          [1635610759.208338][3701:3706] CHIP:DMG:
+          [1635610759.208374][3701:3706] CHIP:DMG: ],
+          [1635610759.208416][3701:3706] CHIP:DMG:
+          [1635610759.208461][3701:3706] CHIP:DMG: }
+          [1635610759.208522][3701:3706] CHIP:DMG: Received Command Response
+          Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0040
+          Status=0x85 [1635610759.208576][3701:3706] CHIP:TOO: Default Failure
+          Response: 0x85 [1635610759.208651][3701:3706] CHIP:DMG: ICR moving to
+          [AwaitingDe] [1635610759.208709][3701:3706] CHIP:EM: Sending
+          Standalone Ack for MessageCounter:1 on exchange 49193i"
+      disabled: true
+
+    - label:
+          "TH sends TriggerEffect command to DUT, with the effect identifier
+          field set to 0x02 (okay) and the effect variant field set to 0x00
+          (default)."
+      verification:
+          "./chip-tool identify trigger-effect 2 0 1 1 CHIP:EM: Flushed pending
+          ack for MessageCounter:1227491757 on exchange 2957i
+          [1635610776.032805][3707:3712] CHIP:EM: Received message of type 0x9
+          with protocolId (0, 1) and MessageCounter:1 on exchange 2958i
+          [1635610776.032869][3707:3712] CHIP:EM: Rxd Ack; Removing
+          MessageCounter:0 from Retrans Table on exchange 2958i
+          [1635610776.032906][3707:3712] CHIP:EM: Removed CHIP MessageCounter:0
+          from RetransTable on exchange 2958i [1635610776.032959][3707:3712]
+          CHIP:DMG: InvokeCommand = [1635610776.032997][3707:3712] CHIP:DMG: {
+          [1635610776.033045][3707:3712] CHIP:DMG: CommandList =
+          [1635610776.033085][3707:3712] CHIP:DMG: [
+          [1635610776.033136][3707:3712] CHIP:DMG: CommandDataIB =
+          [1635610776.033178][3707:3712] CHIP:DMG: {
+          [1635610776.033232][3707:3712] CHIP:DMG: CommandPathIB =
+          [1635610776.033285][3707:3712] CHIP:DMG: {
+          [1635610776.033343][3707:3712] CHIP:DMG: EndpointId = 0x1,
+          [1635610776.033406][3707:3712] CHIP:DMG: ClusterId = 0x0,
+          [1635610776.033452][3707:3712] CHIP:DMG: CommandId = 0x40,
+          [1635610776.033506][3707:3712] CHIP:DMG: },
+          [1635610776.033557][3707:3712] CHIP:DMG:
+          [1635610776.033611][3707:3712] CHIP:DMG: StatusIB =
+          [1635610776.033663][3707:3712] CHIP:DMG: {
+          [1635610776.033722][3707:3712] CHIP:DMG: status = 0x85,
+          [1635610776.033784][3707:3712] CHIP:DMG: },
+          [1635610776.033833][3707:3712] CHIP:DMG:
+          [1635610776.033886][3707:3712] CHIP:DMG: },
+          [1635610776.033933][3707:3712] CHIP:DMG:
+          [1635610776.033981][3707:3712] CHIP:DMG: ],
+          [1635610776.034023][3707:3712] CHIP:DMG:
+          [1635610776.034070][3707:3712] CHIP:DMG: }
+          [1635610776.034144][3707:3712] CHIP:DMG: Received Command Response
+          Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0040
+          Status=0x85 [1635610776.034185][3707:3712] CHIP:TOO: Default Failure
+          Response: 0x85 [1635610776.034267][3707:3712] CHIP:DMG: ICR moving to
+          [AwaitingDe] [1635610776.034312][3707:3712] CHIP:EM: Sending
+          Standalone Ack for MessageCounter:1 on exchange 2958i"
+      disabled: true
+
+    - label:
+          "TH sends TriggerEffect command to DUT, with the effect identifier
+          field set to 0x0b (channel change) and the effect variant field set to
+          0x00 (default)."
+      verification:
+          "./chip-tool identify trigger-effect 11 0 1 1 CHIP:EM: Flushed pending
+          ack for MessageCounter:1227491759 on exchange 64944i
+          [1635610789.012888][3713:3718] CHIP:EM: Received message of type 0x9
+          with protocolId (0, 1) and MessageCounter:1 on exchange 64945i
+          [1635610789.012948][3713:3718] CHIP:EM: Rxd Ack; Removing
+          MessageCounter:0 from Retrans Table on exchange 64945i
+          [1635610789.012983][3713:3718] CHIP:EM: Removed CHIP MessageCounter:0
+          from RetransTable on exchange 64945i [1635610789.013031][3713:3718]
+          CHIP:DMG: InvokeCommand = [1635610789.013065][3713:3718] CHIP:DMG: {
+          [1635610789.013094][3713:3718] CHIP:DMG: CommandList =
+          [1635610789.013129][3713:3718] CHIP:DMG: [
+          [1635610789.013161][3713:3718] CHIP:DMG: CommandDataIB =
+          [1635610789.013250][3713:3718] CHIP:DMG: {
+          [1635610789.013320][3713:3718] CHIP:DMG: CommandPathIB =
+          [1635610789.013399][3713:3718] CHIP:DMG: {
+          [1635610789.013479][3713:3718] CHIP:DMG: EndpointId = 0x1,
+          [1635610789.013561][3713:3718] CHIP:DMG: ClusterId = 0x0,
+          [1635610789.013643][3713:3718] CHIP:DMG: CommandId = 0x40,
+          [1635610789.013687][3713:3718] CHIP:DMG: },
+          [1635610789.013804][3713:3718] CHIP:DMG:
+          [1635610789.013874][3713:3718] CHIP:DMG: StatusIB =
+          [1635610789.013921][3713:3718] CHIP:DMG: {
+          [1635610789.013996][3713:3718] CHIP:DMG: status = 0x85,
+          [1635610789.014070][3713:3718] CHIP:DMG: },
+          [1635610789.014111][3713:3718] CHIP:DMG:
+          [1635610789.014177][3713:3718] CHIP:DMG: },
+          [1635610789.014284][3713:3718] CHIP:DMG:
+          [1635610789.014321][3713:3718] CHIP:DMG: ],
+          [1635610789.014394][3713:3718] CHIP:DMG:
+          [1635610789.014459][3713:3718] CHIP:DMG: }
+          [1635610789.014519][3713:3718] CHIP:DMG: Received Command Response
+          Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0040
+          Status=0x85 [1635610789.014580][3713:3718] CHIP:TOO: Default Failure
+          Response: 0x85 [1635610789.014703][3713:3718] CHIP:DMG: ICR moving to
+          [AwaitingDe] [1635610789.014746][3713:3718] CHIP:EM: Sending
+          Standalone Ack for MessageCounter:1 on exchange 64945i"
+      disabled: true
+
+    - label:
+          "TH sends TriggerEffect command to DUT, with the effect identifier
+          field set to 0x01 (breathe) and the effect variant field set to 0x00
+          (default)."
+      verification:
+          "./chip-tool identify trigger-effect 1 0 1 1 CHIP:EM: Flushed pending
+          ack for MessageCounter:1227491761 on exchange 24930i
+          [1635610798.117653][3720:3725] CHIP:EM: Received message of type 0x9
+          with protocolId (0, 1) and MessageCounter:1 on exchange 24931i
+          [1635610798.117701][3720:3725] CHIP:EM: Rxd Ack; Removing
+          MessageCounter:0 from Retrans Table on exchange 24931i
+          [1635610798.117727][3720:3725] CHIP:EM: Removed CHIP MessageCounter:0
+          from RetransTable on exchange 24931i [1635610798.117766][3720:3725]
+          CHIP:DMG: InvokeCommand = [1635610798.117793][3720:3725] CHIP:DMG: {
+          [1635610798.117816][3720:3725] CHIP:DMG: CommandList =
+          [1635610798.117843][3720:3725] CHIP:DMG: [
+          [1635610798.117868][3720:3725] CHIP:DMG: CommandDataIB =
+          [1635610798.117900][3720:3725] CHIP:DMG: {
+          [1635610798.117929][3720:3725] CHIP:DMG: CommandPathIB =
+          [1635610798.117963][3720:3725] CHIP:DMG: {
+          [1635610798.118000][3720:3725] CHIP:DMG: EndpointId = 0x1,
+          [1635610798.118074][3720:3725] CHIP:DMG: ClusterId = 0x0,
+          [1635610798.118111][3720:3725] CHIP:DMG: CommandId = 0x40,
+          [1635610798.118170][3720:3725] CHIP:DMG: },
+          [1635610798.118236][3720:3725] CHIP:DMG:
+          [1635610798.118268][3720:3725] CHIP:DMG: StatusIB =
+          [1635610798.118304][3720:3725] CHIP:DMG: {
+          [1635610798.118357][3720:3725] CHIP:DMG: status = 0x85,
+          [1635610798.118391][3720:3725] CHIP:DMG: },
+          [1635610798.118425][3720:3725] CHIP:DMG:
+          [1635610798.118477][3720:3725] CHIP:DMG: },
+          [1635610798.118542][3720:3725] CHIP:DMG:
+          [1635610798.118571][3720:3725] CHIP:DMG: ],
+          [1635610798.118601][3720:3725] CHIP:DMG:
+          [1635610798.118650][3720:3725] CHIP:DMG: }
+          [1635610798.118699][3720:3725] CHIP:DMG: Received Command Response
+          Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0040
+          Status=0x85 [1635610798.118728][3720:3725] CHIP:TOO: Default Failure
+          Response: 0x85 [1635610798.118920][3720:3725] CHIP:DMG: ICR moving to
+          [AwaitingDe] [1635610798.118981][3720:3725] CHIP:EM: Sending
+          Standalone Ack for MessageCounter:1 on exchange 24931i"
+      disabled: true
+
+    - label:
+          "TH sends TriggerEffect command to DUT, with the effect identifier
+          field set to 0xfe (finish effect) and the effect variant field set to
+          0x00 (default)."
+      verification:
+          "./chip-tool identify trigger-effect 254 0 1 1 CHIP:EM: Flushed
+          pending ack for MessageCounter:1227491763 on exchange 48728i
+          [1635610807.211077][3727:3732] CHIP:EM: Received message of type 0x9
+          with protocolId (0, 1) and MessageCounter:1 on exchange 48729i
+          [1635610807.211138][3727:3732] CHIP:EM: Rxd Ack; Removing
+          MessageCounter:0 from Retrans Table on exchange 48729i
+          [1635610807.211175][3727:3732] CHIP:EM: Removed CHIP MessageCounter:0
+          from RetransTable on exchange 48729i [1635610807.211226][3727:3732]
+          CHIP:DMG: InvokeCommand = [1635610807.211264][3727:3732] CHIP:DMG: {
+          [1635610807.211296][3727:3732] CHIP:DMG: CommandList =
+          [1635610807.211339][3727:3732] CHIP:DMG: [
+          [1635610807.211374][3727:3732] CHIP:DMG: CommandDataIB =
+          [1635610807.211460][3727:3732] CHIP:DMG: {
+          [1635610807.211500][3727:3732] CHIP:DMG: CommandPathIB =
+          [1635610807.211587][3727:3732] CHIP:DMG: {
+          [1635610807.211641][3727:3732] CHIP:DMG: EndpointId = 0x1,
+          [1635610807.211728][3727:3732] CHIP:DMG: ClusterId = 0x0,
+          [1635610807.211811][3727:3732] CHIP:DMG: CommandId = 0x40,
+          [1635610807.211891][3727:3732] CHIP:DMG: },
+          [1635610807.211976][3727:3732] CHIP:DMG:
+          [1635610807.212055][3727:3732] CHIP:DMG: StatusIB =
+          [1635610807.212181][3727:3732] CHIP:DMG: {
+          [1635610807.212234][3727:3732] CHIP:DMG: status = 0x85,
+          [1635610807.212315][3727:3732] CHIP:DMG: },
+          [1635610807.212399][3727:3732] CHIP:DMG:
+          [1635610807.212440][3727:3732] CHIP:DMG: },
+          [1635610807.212581][3727:3732] CHIP:DMG:
+          [1635610807.212620][3727:3732] CHIP:DMG: ],
+          [1635610807.212699][3727:3732] CHIP:DMG:
+          [1635610807.212767][3727:3732] CHIP:DMG: }
+          [1635610807.212866][3727:3732] CHIP:DMG: Received Command Response
+          Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0040
+          Status=0x85 [1635610807.212940][3727:3732] CHIP:TOO: Default Failure
+          Response: 0x85 [1635610807.213045][3727:3732] CHIP:DMG: ICR moving to
+          [AwaitingDe] [1635610807.213089][3727:3732] CHIP:EM: Sending
+          Standalone Ack for MessageCounter:1 on exchange 48729i"
+      disabled: true
+
+    - label:
+          "TH sends TriggerEffect command to DUT, with the effect identifier
+          field set to 0x01 (breathe) and the effect variant field set to 0x00
+          (default)."
+      verification:
+          "./chip-tool identify trigger-effect 1 0 1 1 CHIP:EM: Flushed pending
+          ack for MessageCounter:1227491765 on exchange 1621i
+          [1635610817.958201][3733:3738] CHIP:EM: Received message of type 0x9
+          with protocolId (0, 1) and MessageCounter:1 on exchange 1622i
+          [1635610817.958266][3733:3738] CHIP:EM: Rxd Ack; Removing
+          MessageCounter:0 from Retrans Table on exchange 1622i
+          [1635610817.958304][3733:3738] CHIP:EM: Removed CHIP MessageCounter:0
+          from RetransTable on exchange 1622i [1635610817.958355][3733:3738]
+          CHIP:DMG: InvokeCommand = [1635610817.958393][3733:3738] CHIP:DMG: {
+          [1635610817.958425][3733:3738] CHIP:DMG: CommandList =
+          [1635610817.958463][3733:3738] CHIP:DMG: [
+          [1635610817.958498][3733:3738] CHIP:DMG: CommandDataIB =
+          [1635610817.958583][3733:3738] CHIP:DMG: {
+          [1635610817.958660][3733:3738] CHIP:DMG: CommandPathIB =
+          [1635610817.958733][3733:3738] CHIP:DMG: {
+          [1635610817.958787][3733:3738] CHIP:DMG: EndpointId = 0x1,
+          [1635610817.958870][3733:3738] CHIP:DMG: ClusterId = 0x0,
+          [1635610817.958927][3733:3738] CHIP:DMG: CommandId = 0x40,
+          [1635610817.959031][3733:3738] CHIP:DMG: },
+          [1635610817.959193][3733:3738] CHIP:DMG:
+          [1635610817.959237][3733:3738] CHIP:DMG: StatusIB =
+          [1635610817.959313][3733:3738] CHIP:DMG: {
+          [1635610817.959360][3733:3738] CHIP:DMG: status = 0x0,
+          [1635610817.959444][3733:3738] CHIP:DMG: },
+          [1635610817.959524][3733:3738] CHIP:DMG:
+          [1635610817.959594][3733:3738] CHIP:DMG: },
+          [1635610817.959644][3733:3738] CHIP:DMG:
+          [1635610817.959679][3733:3738] CHIP:DMG: ],
+          [1635610817.959761][3733:3738] CHIP:DMG:
+          [1635610817.959794][3733:3738] CHIP:DMG: }
+          [1635610817.959917][3733:3738] CHIP:DMG: Received Command Response
+          Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0040
+          Status=0x85 [1635610817.959960][3733:3738] CHIP:TOO: Default success
+          Response: 0x0 [1635610817.960064][3733:3738] CHIP:DMG: ICR moving to
+          [AwaitingDe] [1635610817.960253][3733:3738] CHIP:EM: Sending
+          Standalone Ack for MessageCounter:1 on exchange 1622i"
+      disabled: true
+
+    - label:
+          "TH sends TriggerEffect command to DUT, with the effect identifier
+          field set to 0xff (stop effect) and the effect variant field set to
+          0x00 (default)."
+      verification:
+          "./chip-tool identify trigger-effect 255 0 1 1 CHIP:EM: Flushed
+          pending ack for MessageCounter:1227491767 on exchange 56449i
+          [1635610825.761513][3740:3745] CHIP:EM: Received message of type 0x9
+          with protocolId (0, 1) and MessageCounter:1 on exchange 56450i
+          [1635610825.761576][3740:3745] CHIP:EM: Rxd Ack; Removing
+          MessageCounter:0 from Retrans Table on exchange 56450i
+          [1635610825.761612][3740:3745] CHIP:EM: Removed CHIP MessageCounter:0
+          from RetransTable on exchange 56450i [1635610825.761661][3740:3745]
+          CHIP:DMG: InvokeCommand = [1635610825.761699][3740:3745] CHIP:DMG: {
+          [1635610825.761730][3740:3745] CHIP:DMG: CommandList =
+          [1635610825.761768][3740:3745] CHIP:DMG: [
+          [1635610825.761803][3740:3745] CHIP:DMG: CommandDataIB =
+          [1635610825.761894][3740:3745] CHIP:DMG: {
+          [1635610825.761960][3740:3745] CHIP:DMG: CommandPathIB =
+          [1635610825.762008][3740:3745] CHIP:DMG: {
+          [1635610825.762086][3740:3745] CHIP:DMG: EndpointId = 0x1,
+          [1635610825.762138][3740:3745] CHIP:DMG: ClusterId = 0x0,
+          [1635610825.762227][3740:3745] CHIP:DMG: CommandId = 0x40,
+          [1635610825.762305][3740:3745] CHIP:DMG: },
+          [1635610825.762358][3740:3745] CHIP:DMG:
+          [1635610825.762456][3740:3745] CHIP:DMG: StatusIB =
+          [1635610825.762512][3740:3745] CHIP:DMG: {
+          [1635610825.762586][3740:3745] CHIP:DMG: status = 0x85,
+          [1635610825.762636][3740:3745] CHIP:DMG: },
+          [1635610825.762717][3740:3745] CHIP:DMG:
+          [1635610825.762761][3740:3745] CHIP:DMG: },
+          [1635610825.762844][3740:3745] CHIP:DMG:
+          [1635610825.762912][3740:3745] CHIP:DMG: ],
+          [1635610825.762957][3740:3745] CHIP:DMG:
+          [1635610825.762989][3740:3745] CHIP:DMG: }
+          [1635610825.763078][3740:3745] CHIP:DMG: Received Command Response
+          Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0040
+          Status=0x85 [1635610825.763119][3740:3745] CHIP:TOO: Default Failure
+          Response: 0x85 [1635610825.763248][3740:3745] CHIP:DMG: ICR moving to
+          [AwaitingDe] [1635610825.763293][3740:3745] CHIP:EM: Sending
+          Standalone Ack for MessageCounter:1 on exchange 56450i"
+      disabled: true
+
+    - label:
+          "TH sends TriggerEffect command to DUT, with the effect identifier
+          field set to 0x00 (blink) and the effect variant field set to 0x42
+          (unknown)."
+      verification:
+          "./chip-tool identify trigger-effect 0 66 1 1 CHIP:EM: Flushed pending
+          ack for MessageCounter:1227491769 on exchange 39087i
+          [1635610859.943177][3746:3751] CHIP:EM: Received message of type 0x9
+          with protocolId (0, 1) and MessageCounter:1 on exchange 39088i
+          [1635610859.943242][3746:3751] CHIP:EM: Rxd Ack; Removing
+          MessageCounter:0 from Retrans Table on exchange 39088i
+          [1635610859.943278][3746:3751] CHIP:EM: Removed CHIP MessageCounter:0
+          from RetransTable on exchange 39088i [1635610859.943329][3746:3751]
+          CHIP:DMG: InvokeCommand = [1635610859.943367][3746:3751] CHIP:DMG: {
+          [1635610859.943399][3746:3751] CHIP:DMG: CommandList =
+          [1635610859.943435][3746:3751] CHIP:DMG: [
+          [1635610859.943471][3746:3751] CHIP:DMG: CommandDataIB =
+          [1635610859.943556][3746:3751] CHIP:DMG: {
+          [1635610859.943632][3746:3751] CHIP:DMG: CommandPathIB =
+          [1635610859.943713][3746:3751] CHIP:DMG: {
+          [1635610859.943809][3746:3751] CHIP:DMG: EndpointId = 0x1,
+          [1635610859.943856][3746:3751] CHIP:DMG: ClusterId = 0x0,
+          [1635610859.943897][3746:3751] CHIP:DMG: CommandId = 0x40,
+          [1635610859.943974][3746:3751] CHIP:DMG: },
+          [1635610859.944026][3746:3751] CHIP:DMG:
+          [1635610859.944065][3746:3751] CHIP:DMG: StatusIB =
+          [1635610859.944166][3746:3751] CHIP:DMG: {
+          [1635610859.944238][3746:3751] CHIP:DMG: status = 0x85,
+          [1635610859.944313][3746:3751] CHIP:DMG: },
+          [1635610859.944362][3746:3751] CHIP:DMG:
+          [1635610859.944403][3746:3751] CHIP:DMG: },
+          [1635610859.944447][3746:3751] CHIP:DMG:
+          [1635610859.944481][3746:3751] CHIP:DMG: ],
+          [1635610859.944566][3746:3751] CHIP:DMG:
+          [1635610859.944599][3746:3751] CHIP:DMG: }
+          [1635610859.944727][3746:3751] CHIP:DMG: Received Command Response
+          Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0040
+          Status=0x85 [1635610859.944801][3746:3751] CHIP:TOO: Default Failure
+          Response: 0x85 [1635610859.944903][3746:3751] CHIP:DMG: ICR moving to
+          [AwaitingDe] [1635610859.944973][3746:3751] CHIP:EM: Sending
+          Standalone Ack for MessageCounter:1 on exchange 39088i"
+      disabled: true
+
+    - label:
+          "TH sends TriggerEffect command to DUT, with the effect identifier
+          field set to 0xff (stop effect) and the effect variant field set to
+          0x00 (default)."
+      verification:
+          "./chip-tool identify trigger-effect 255 0 1 1 CHIP:EM: Flushed
+          pending ack for MessageCounter:1227491771 on exchange 37044i
+          [1635610873.859371][3754:3759] CHIP:EM: Received message of type 0x9
+          with protocolId (0, 1) and MessageCounter:1 on exchange 37045i
+          [1635610873.859433][3754:3759] CHIP:EM: Rxd Ack; Removing
+          MessageCounter:0 from Retrans Table on exchange 37045i
+          [1635610873.859470][3754:3759] CHIP:EM: Removed CHIP MessageCounter:0
+          from RetransTable on exchange 37045i [1635610873.859522][3754:3759]
+          CHIP:DMG: InvokeCommand = [1635610873.859560][3754:3759] CHIP:DMG: {
+          [1635610873.859592][3754:3759] CHIP:DMG: CommandList =
+          [1635610873.859630][3754:3759] CHIP:DMG: [
+          [1635610873.859667][3754:3759] CHIP:DMG: CommandDataIB =
+          [1635610873.859712][3754:3759] CHIP:DMG: {
+          [1635610873.859751][3754:3759] CHIP:DMG: CommandPathIB =
+          [1635610873.859802][3754:3759] CHIP:DMG: {
+          [1635610873.859854][3754:3759] CHIP:DMG: EndpointId = 0x1,
+          [1635610873.859905][3754:3759] CHIP:DMG: ClusterId = 0x0,
+          [1635610873.859959][3754:3759] CHIP:DMG: CommandId = 0x40,
+          [1635610873.860005][3754:3759] CHIP:DMG: },
+          [1635610873.860057][3754:3759] CHIP:DMG:
+          [1635610873.860098][3754:3759] CHIP:DMG: StatusIB =
+          [1635610873.860171][3754:3759] CHIP:DMG: {
+          [1635610873.860209][3754:3759] CHIP:DMG: status = 0x85,
+          [1635610873.860245][3754:3759] CHIP:DMG: },
+          [1635610873.860282][3754:3759] CHIP:DMG:
+          [1635610873.860313][3754:3759] CHIP:DMG: },
+          [1635610873.860358][3754:3759] CHIP:DMG:
+          [1635610873.860393][3754:3759] CHIP:DMG: ],
+          [1635610873.860434][3754:3759] CHIP:DMG:
+          [1635610873.860467][3754:3759] CHIP:DMG: }
+          [1635610873.860527][3754:3759] CHIP:DMG: Received Command Response
+          Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0040
+          Status=0x85 [1635610873.860568][3754:3759] CHIP:TOO: Default Failure
+          Response: 0x85 [1635610873.860636][3754:3759] CHIP:DMG: ICR moving to
+          [AwaitingDe] [1635610873.860683][3754:3759] CHIP:EM: Sending
+          Standalone Ack for MessageCounter:1 on exchange 37045i"
+      disabled: true

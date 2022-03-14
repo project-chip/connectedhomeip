@@ -56,6 +56,10 @@
 #include "matter_shell.h"
 #endif
 
+#ifdef EFR32_OTA_ENABLED
+#include "OTAConfig.h"
+#endif // EFR32_OTA_ENABLED
+
 #include <mbedtls/platform.h>
 #if CHIP_ENABLE_OPENTHREAD
 #include <openthread/cli.h>
@@ -161,6 +165,11 @@ int main(void)
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // Init ZCL Data Model
+    chip::Server::GetInstance().Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
     EFR32_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
@@ -187,6 +196,11 @@ int main(void)
     wfx_securelink_task_start(); // start securelink key renegotiation task
 #endif                           // SL_WFX_USE_SECURE_LINK
 #endif                           /* WF200_WIFI */
+#ifdef EFR32_OTA_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    OTAConfig::Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif // EFR32_OTA_ENABLED
 
     EFR32_LOG("Starting App Task");
     ret = GetAppTask().StartAppTask();

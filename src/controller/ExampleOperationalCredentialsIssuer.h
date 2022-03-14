@@ -42,6 +42,16 @@ namespace Controller {
 class DLL_EXPORT ExampleOperationalCredentialsIssuer : public OperationalCredentialsDelegate
 {
 public:
+    //
+    // Constructor to create an instance of this object that vends out operational credentials for a given fabric.
+    //
+    // An index should be provided to numerically identify this instance relative to others in a multi-fabric deployment. This is
+    // needed given the interactions of this object with persistent storage. Consequently, the index is used to scope the entries
+    // read/written to/from storage.
+    //
+    // It is recommended that this index track the fabric index within which this issuer is operating.
+    //
+    ExampleOperationalCredentialsIssuer(uint32_t index = 0) { mIndex = index; }
     virtual ~ExampleOperationalCredentialsIssuer() {}
 
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
@@ -107,8 +117,9 @@ private:
     PersistentStorageDelegate * mStorage = nullptr;
 
     NodeId mNextRequestedNodeId = 1;
-    FabricId mNextFabricId      = 0;
+    FabricId mNextFabricId      = 1;
     bool mNodeIdRequested       = false;
+    uint64_t mIndex             = 0;
 };
 
 } // namespace Controller

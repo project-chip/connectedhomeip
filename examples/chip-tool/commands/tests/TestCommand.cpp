@@ -30,9 +30,10 @@ CHIP_ERROR TestCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestCommand::WaitForCommissionee()
+CHIP_ERROR TestCommand::WaitForCommissionee(chip::NodeId nodeId)
 {
-    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    CurrentCommissioner().ReleaseOperationalDevice(nodeId);
+    return CurrentCommissioner().GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
@@ -42,7 +43,7 @@ void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDevicePro
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
     command->mDevices[command->GetIdentity()] = device;
 
-    command->NextTest();
+    LogErrorOnFailure(command->ContinueOnChipMainThread(CHIP_NO_ERROR));
 }
 
 void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
@@ -51,18 +52,8 @@ void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHI
                     peerId.GetNodeId(), error.Format());
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
-    command->SetCommandExitStatus(error);
-}
 
-void TestCommand::OnWaitForMsFn(chip::System::Layer * systemLayer, void * context)
-{
-    auto * command = static_cast<TestCommand *>(context);
-    command->NextTest();
-}
-
-CHIP_ERROR TestCommand::Wait(chip::System::Clock::Timeout duration)
-{
-    return chip::DeviceLayer::SystemLayer().StartTimer(duration, OnWaitForMsFn, this);
+    LogErrorOnFailure(command->ContinueOnChipMainThread(CHIP_NO_ERROR));
 }
 
 void TestCommand::Exit(std::string message)

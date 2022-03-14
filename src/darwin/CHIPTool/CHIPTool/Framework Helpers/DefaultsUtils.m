@@ -22,6 +22,7 @@ NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
 NSString * const kNetworkPasswordDefaultsKey = @"networkPassword";
 NSString * const kCHIPNextAvailableDeviceIDKey = @"nextDeviceID";
 NSString * const kFabricIdKey = @"fabricId";
+NSString * const kDevicePairedKey = @"Paired";
 
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
 {
@@ -63,9 +64,10 @@ void CHIPSetNextAvailableDeviceID(uint64_t id)
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
 }
 
+static CHIPToolPersistentStorageDelegate * storage = nil;
+
 CHIPDeviceController * InitializeCHIP(void)
 {
-    static CHIPToolPersistentStorageDelegate * storage = nil;
     static dispatch_once_t onceToken;
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
@@ -74,6 +76,14 @@ CHIPDeviceController * InitializeCHIP(void)
     });
 
     return controller;
+}
+
+void CHIPRestartController(CHIPDeviceController * controller)
+{
+    NSLog(@"Shutting down the stack");
+    [controller shutdown];
+    NSLog(@"Starting up the stack");
+    [controller startup:storage vendorId:0 nocSigner:nil];
 }
 
 uint64_t CHIPGetLastPairedDeviceId(void)
@@ -115,23 +125,50 @@ BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallbac
 
 BOOL CHIPIsDevicePaired(uint64_t deviceId)
 {
-    CHIPDeviceController * controller = InitializeCHIP();
-
-    NSError * error;
-    bool paired = [controller isDevicePaired:deviceId error:&error];
-    if (error != nil) {
-        NSLog(@"Error retrieving device info for deviceId %llu", deviceId);
-        paired = NO;
-    }
-    return paired;
+    NSString * PairedString = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, KeyForPairedDevice(deviceId));
+    return [PairedString boolValue];
 }
+
+void CHIPSetDevicePaired(uint64_t deviceId, BOOL paired)
+{
+    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, KeyForPairedDevice(deviceId), paired ? @"YES" : @"NO");
+}
+
+NSString * KeyForPairedDevice(uint64_t deviceId) { return [NSString stringWithFormat:@"%@%llu", kDevicePairedKey, deviceId]; }
 
 void CHIPUnpairDeviceWithID(uint64_t deviceId)
 {
-    CHIPDeviceController * controller = InitializeCHIP();
-
-    NSError * error;
-    [controller unpairDevice:deviceId error:&error];
+    CHIPSetDevicePaired(deviceId, NO);
+    CHIPGetConnectedDeviceWithID(deviceId, ^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"Failed to unpair device %llu still removing from CHIPTool. %@", deviceId, error);
+            return;
+        }
+        NSLog(@"Attempting to unpair device %llu", deviceId);
+        CHIPOperationalCredentials * opCredsCluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
+                                                                                                endpoint:0
+                                                                                                   queue:dispatch_get_main_queue()];
+        [opCredsCluster
+            readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                if (error) {
+                    NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
+                    return;
+                }
+                CHIPOperationalCredentialsClusterRemoveFabricParams * params =
+                    [[CHIPOperationalCredentialsClusterRemoveFabricParams alloc] init];
+                params.fabricIndex = value;
+                [opCredsCluster removeFabricWithParams:params
+                                     completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                         NSError * _Nullable error) {
+                                         if (error) {
+                                             NSLog(@"Failed to remove current fabric index %@ for device %llu. %@",
+                                                 params.fabricIndex, deviceId, error);
+                                             return;
+                                         }
+                                         NSLog(@"Successfully unpaired deviceId %llu", deviceId);
+                                     }];
+            }];
+    });
 }
 
 @implementation CHIPToolPersistentStorageDelegate

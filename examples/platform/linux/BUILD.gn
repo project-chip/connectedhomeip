@@ -30,6 +30,8 @@ source_set("app-main") {
     "CommissioneeShellCommands.h",
     "ControllerShellCommands.cpp",
     "ControllerShellCommands.h",
+    "LinuxCommissionableDataProvider.cpp",
+    "LinuxCommissionableDataProvider.h",
     "Options.cpp",
     "Options.h",
   ]
@@ -45,6 +47,7 @@ source_set("app-main") {
 
   public_deps = [
     "${chip_root}/src/app/server",
+    "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/lib/shell:shell_core",

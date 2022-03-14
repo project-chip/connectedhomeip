@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
-#include <platform/OTARequestorInterface.h>
 
 using namespace chip::DeviceLayer;
 
@@ -34,13 +34,7 @@ Shell::Engine sSubShell;
 CHIP_ERROR QueryImageHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
-
-    const FabricIndex fabricIndex       = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
-    const NodeId providerNodeId         = static_cast<NodeId>(strtoull(argv[1], nullptr, 10));
-    const EndpointId providerEndpointId = static_cast<EndpointId>(strtoul(argv[2], nullptr, 10));
-
-    GetRequestorInstance()->TestModeSetProviderParameters(providerNodeId, fabricIndex, providerEndpointId);
+    VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
     PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
     return CHIP_NO_ERROR;
 }
@@ -48,13 +42,7 @@ CHIP_ERROR QueryImageHandler(int argc, char ** argv)
 CHIP_ERROR ApplyImageHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
-
-    const FabricIndex fabricIndex       = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
-    const NodeId providerNodeId         = static_cast<NodeId>(strtoull(argv[1], nullptr, 10));
-    const EndpointId providerEndpointId = static_cast<EndpointId>(strtoul(argv[2], nullptr, 10));
-
-    GetRequestorInstance()->TestModeSetProviderParameters(providerNodeId, fabricIndex, providerEndpointId);
+    VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
     PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
     return CHIP_NO_ERROR;
 }
@@ -62,16 +50,9 @@ CHIP_ERROR ApplyImageHandler(int argc, char ** argv)
 CHIP_ERROR NotifyImageHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(argc == 4, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(argc == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    const FabricIndex fabricIndex       = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
-    const NodeId providerNodeId         = static_cast<NodeId>(strtoull(argv[1], nullptr, 10));
-    const EndpointId providerEndpointId = static_cast<EndpointId>(strtoul(argv[2], nullptr, 10));
-    const intptr_t version              = static_cast<intptr_t>(strtoul(argv[3], nullptr, 10));
-
-    GetRequestorInstance()->TestModeSetProviderParameters(providerNodeId, fabricIndex, providerEndpointId);
-    PlatformMgr().ScheduleWork([](intptr_t arg) { GetRequestorInstance()->NotifyUpdateApplied(static_cast<uint32_t>(arg)); },
-                               version);
+    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->NotifyUpdateApplied(); });
     return CHIP_NO_ERROR;
 }
 
@@ -137,7 +118,7 @@ static void HandleProgress(intptr_t context)
         }
         else
         {
-            streamer_printf(streamer_get(), "Update progress: %d %%\r\n", progress);
+            streamer_printf(streamer_get(), "Update progress: %d %%\r\n", progress.Value());
         }
     }
     else
@@ -189,11 +170,9 @@ void RegisterOtaCommands()
 {
     // Register subcommands of the `ota` commands.
     static const shell_command_t subCommands[] = {
-        { &QueryImageHandler, "query", "Query for a new image. Usage: ota query <fabric-index> <provider-node-id> <endpoint-id>" },
-        { &ApplyImageHandler, "apply",
-          "Apply the current update. Usage: ota apply <fabric-index> <provider-node-id> <endpoint-id>" },
-        { &NotifyImageHandler, "notify",
-          "Notify the new image has been applied. Usage: ota notify <fabric-index> <provider-node-id> <endpoint-id>" },
+        { &QueryImageHandler, "query", "Query for a new image. Usage: ota query" },
+        { &ApplyImageHandler, "apply", "Apply the current update. Usage: ota apply" },
+        { &NotifyImageHandler, "notify", "Notify the new image has been applied. Usage: ota notify <version>" },
         { &StateHandler, "state", "Gets state of a current image update process. Usage: ota state" },
         { &ProgressHandler, "progress", "Gets progress of a current image update process. Usage: ota progress" }
     };

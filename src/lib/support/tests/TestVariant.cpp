@@ -178,7 +178,7 @@ void TestVariantMove(nlTestSuite * inSuite, void * inContext)
     Variant<Simple, Movable> v1;
     v1.Set<Movable>(5, 10);
     Variant<Simple, Movable> v2 = std::move(v1);
-    NL_TEST_ASSERT(inSuite, !v1.Valid());
+    NL_TEST_ASSERT(inSuite, !v1.Valid()); // NOLINT(bugprone-use-after-move)
     NL_TEST_ASSERT(inSuite, v2.Valid());
     NL_TEST_ASSERT(inSuite, v2.Get<Movable>().m1 == 5);
     NL_TEST_ASSERT(inSuite, v2.Get<Movable>().m2 == 10);
@@ -204,7 +204,7 @@ void TestVariantMoveAssign(nlTestSuite * inSuite, void * inContext)
     Variant<Simple, Pod> v2;
     v1.Set<Pod>(5, 10);
     v2 = std::move(v1);
-    NL_TEST_ASSERT(inSuite, !v1.Valid());
+    NL_TEST_ASSERT(inSuite, !v1.Valid()); // NOLINT(bugprone-use-after-move)
     NL_TEST_ASSERT(inSuite, v2.Valid());
     NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m1 == 5);
     NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m2 == 10);

@@ -291,6 +291,9 @@ void StartPinging(streamer_t * stream, char * destination)
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
+    err = gFabricTable.Init(&gStorage);
+    SuccessOrExit(err);
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(DeviceLayer::TCPEndPointManager())
                                .SetAddressType(gDestAddr.Type())
@@ -306,7 +309,7 @@ void StartPinging(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager, &gStorage, &gFabricTable);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -315,7 +318,7 @@ void StartPinging(streamer_t * stream, char * destination)
     else
 #endif
     {
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager, &gStorage, &gFabricTable);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);

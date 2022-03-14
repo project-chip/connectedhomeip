@@ -58,7 +58,7 @@ defined:
     application's `main.cpp` for an example of this implementation.
 
 `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName)`
-`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs)`
+`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)`
 `DECLARE_DYNAMIC_CLUSTER_LIST_END`
 
 -   These three macros are used to declare a list of clusters for use within a
@@ -66,7 +66,9 @@ defined:
     `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN` macro which will define the name of the
     allocated cluster structure. Each cluster is then added by the
     `DECLARE_DYNAMIC_CLUSTER` macro referencing attribute list previously
-    defined by the `DECLARE_DYNAMIC_ATTRIBUTE...` macros. Finally,
+    defined by the `DECLARE_DYNAMIC_ATTRIBUTE...` macros and the lists of
+    incoming/outgoing commands terminated by kInvalidCommandId (or nullptr if
+    there aren't any commands in the list). Finally,
     `DECLARE_DYNAMIC_CLUSTER_LIST_END` macro should be used to close the
     definition.
 
@@ -84,13 +86,13 @@ The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
 -   Clone the Espressif ESP-IDF and checkout
-    [v4.4-beta1 pre-release](https://github.com/espressif/esp-idf/releases/tag/v4.4-beta1)
+    [v4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout v4.4-beta1
+          $ git checkout v4.4
           $ git submodule update --init
           $ ./install.sh
 

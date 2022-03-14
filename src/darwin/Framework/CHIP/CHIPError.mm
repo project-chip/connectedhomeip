@@ -26,6 +26,8 @@
 
 NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 
+NSString * const MatterInteractionErrorDomain = @"MatterInteractionErrorDomain";
+
 @implementation CHIPError
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
@@ -36,8 +38,7 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 
     if (errorCode.IsIMStatus()) {
         chip::app::StatusIB status(errorCode);
-        // TODO: What about the cluster-specific part of the status?
-        return [CHIPError errorForZCLErrorCode:chip::app::ToEmberAfStatus(status.mStatus)];
+        return [CHIPError errorForIMStatus:status];
     }
 
     if (errorCode == CHIP_ERROR_INVALID_STRING_LENGTH) {
@@ -76,84 +77,153 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
     }
 
-    if (errorCode == CHIP_ERROR_IM_CONSTRAINT_ERROR) {
+    if (errorCode == CHIP_ERROR_TIMEOUT) {
         return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeConstraintError
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Value out of range.", nil) }];
+                                   code:CHIPErrorCodeTimeout
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Transaction timed out.", nil) }];
     }
 
     return [NSError errorWithDomain:CHIPErrorDomain
-                               code:CHIPErrorCodeUndefinedError
+                               code:CHIPErrorCodeGeneralError
                            userInfo:@{
-                               NSLocalizedDescriptionKey :
-                                   [NSString stringWithFormat:NSLocalizedString(@"Undefined error:%u.", nil), errorCode.AsInteger()]
+                               NSLocalizedDescriptionKey : [NSString
+                                   stringWithFormat:NSLocalizedString(@"Undefined error:%u.", nil), errorCode.AsInteger()],
+                               @"errorCode" : @(errorCode.AsInteger()),
                            }];
     ;
 }
 
-+ (NSError *)errorForZCLErrorCode:(uint8_t)errorCode
++ (NSError *)errorForIMStatus:(const chip::app::StatusIB &)status
 {
-    switch (errorCode) {
-    case EMBER_ZCL_STATUS_DUPLICATE_EXISTS:
-        return [NSError
-            errorWithDomain:CHIPErrorDomain
-                       code:CHIPErrorCodeDuplicateExists
-                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A Duplicate entry or setting exists.", nil) }];
-    case EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT:
-        return
-            [NSError errorWithDomain:CHIPErrorDomain
-                                code:CHIPErrorCodeUnsupportedEndpoint
-                            userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Target endpoint does not exist.", nil) }];
-    case EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND:
-        return
-            [NSError errorWithDomain:CHIPErrorDomain
-                                code:CHIPErrorCodeUnsupportedCommand
-                            userInfo:@{
-                                NSLocalizedDescriptionKey : NSLocalizedString(@"Command is not supported on target cluster.", nil)
-                            }];
-    case EMBER_ZCL_STATUS_INVALID_COMMAND:
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeInvalidCommand
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Command payload is invalid.", nil) }];
-    case EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE:
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeUnsupportedAttribute
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Attribute is not supported.", nil) }];
-    case EMBER_ZCL_STATUS_CONSTRAINT_ERROR:
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeConstraintError
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Value out of range.", nil) }];
-    case EMBER_ZCL_STATUS_UNSUPPORTED_WRITE:
-        return [NSError
-            errorWithDomain:CHIPErrorDomain
-                       code:CHIPErrorCodeUnsupportedWrite
-                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Attempt to write read-only attribute.", nil) }];
-    case EMBER_ZCL_STATUS_INVALID_DATA_TYPE:
-        return [NSError
-            errorWithDomain:CHIPErrorDomain
-                       code:CHIPErrorCodeInvalidDataType
-                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Data type is not correct for a field.", nil) }];
-    case EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER:
-        return
-            [NSError errorWithDomain:CHIPErrorDomain
-                                code:CHIPErrorCodeUnsupportedCluster
-                            userInfo:@{
-                                NSLocalizedDescriptionKey : NSLocalizedString(@"Cluster is not supported on target endpoint.", nil)
-                            }];
-    default:
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPErrorCodeUndefinedError
-                               userInfo:@{
-                                   NSLocalizedDescriptionKey : [NSString
-                                       stringWithFormat:NSLocalizedString(@"Undefined data model error:%u.", nil), errorCode]
-                               }];
+    if (status.IsSuccess()) {
+        return nil;
     }
+
+    NSString * description;
+    using chip::Protocols::InteractionModel::Status;
+    switch (status.mStatus) {
+    case Status::Failure:
+    default: {
+        description = NSLocalizedString(@"Operation was not successful.", nil);
+        break;
+    }
+    case Status::InvalidSubscription: {
+        description = NSLocalizedString(@"Subscription ID is not active.", nil);
+        break;
+    }
+    case Status::UnsupportedAccess: {
+        description = NSLocalizedString(@"The sender of the action or command does not have authorization or access.", nil);
+        break;
+    }
+    case Status::UnsupportedEndpoint: {
+        description = NSLocalizedString(@"The endpoint indicated is unsupported on the node.", nil);
+        break;
+    }
+    case Status::InvalidAction: {
+        description = NSLocalizedString(
+            @"The action is malformed, has missing fields, or fields with invalid values. Action not carried out.", nil);
+        break;
+    }
+    case Status::UnsupportedCommand: {
+        description = NSLocalizedString(
+            @"The specified action or command indicated is not supported on the device. Command or action not carried out.", nil);
+        break;
+    }
+    case Status::InvalidCommand: {
+        description = NSLocalizedString(
+            @"The cluster command is malformed, has missing fields, or fields with invalid values. Command not carried out.", nil);
+        break;
+    }
+    case Status::UnsupportedAttribute: {
+        description
+            = NSLocalizedString(@"The specified attribute or attribute data field or entry does not exist on the device.", nil);
+        break;
+    }
+    case Status::ConstraintError: {
+        description = NSLocalizedString(@"Out of range error or set to a reserved value.", nil);
+        break;
+    }
+    case Status::UnsupportedWrite: {
+        description = NSLocalizedString(@"Attempt to write a read-only attribute.", nil);
+        break;
+    }
+    case Status::ResourceExhausted: {
+        description = NSLocalizedString(@"An action or operation failed due to insufficient available resources. ", nil);
+        break;
+    }
+    case Status::NotFound: {
+        description = NSLocalizedString(@"The indicated data field or entry could not be found.", nil);
+        break;
+    }
+    case Status::UnreportableAttribute: {
+        description = NSLocalizedString(@"Reports cannot be issued for this attribute.", nil);
+        break;
+    }
+    case Status::InvalidDataType: {
+        description = NSLocalizedString(
+            @"The data type indicated is undefined or invalid for the indicated data field. Command or action not carried out.",
+            nil);
+        break;
+    }
+    case Status::UnsupportedRead: {
+        description = NSLocalizedString(@"Attempt to read a write-only attribute.", nil);
+        break;
+    }
+    case Status::DataVersionMismatch: {
+        description = NSLocalizedString(@"Cluster instance data version did not match request path.", nil);
+        break;
+    }
+    case Status::Timeout: {
+        description = NSLocalizedString(@"The transaction was aborted due to time being exceeded.", nil);
+        break;
+    }
+    case Status::Busy: {
+        description = NSLocalizedString(
+            @"The receiver is busy processing another action that prevents the execution of the incoming action.", nil);
+        break;
+    }
+    case Status::UnsupportedCluster: {
+        description = NSLocalizedString(@"The cluster indicated is not supported", nil);
+        break;
+    }
+    // Gap in values is intentional.
+    case Status::NoUpstreamSubscription: {
+        description = NSLocalizedString(@"Proxy does not have a subscription to the source.", nil);
+        break;
+    }
+    case Status::NeedsTimedInteraction: {
+        description = NSLocalizedString(@"An Untimed Write or Untimed Invoke interaction was used for an attribute or command that "
+                                        @"requires a Timed Write or Timed Invoke.",
+            nil);
+        break;
+    }
+    case Status::UnsupportedEvent: {
+        description = NSLocalizedString(@"The event indicated is unsupported on the cluster.", nil);
+        break;
+    }
+    }
+
+    NSMutableDictionary * userInfo = [[NSMutableDictionary alloc] init];
+    userInfo[NSLocalizedDescriptionKey] = description;
+    if (status.mClusterStatus.HasValue()) {
+        userInfo[@"clusterStatus"] = @(status.mClusterStatus.Value());
+    }
+
+    return [NSError errorWithDomain:MatterInteractionErrorDomain code:chip::to_underlying(status.mStatus) userInfo:userInfo];
 }
 
 + (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error
 {
     if (error == nil) {
         return CHIP_NO_ERROR;
+    }
+
+    if (error.domain == MatterInteractionErrorDomain) {
+        chip::app::StatusIB status(static_cast<chip::Protocols::InteractionModel::Status>(error.code));
+        if (error.userInfo[@"clusterStatus"] != nil) {
+            status.mClusterStatus.Emplace([error.userInfo[@"clusterStatus"] unsignedCharValue]);
+        }
+        return status.ToChipError();
     }
 
     if (error.domain != CHIPErrorDomain) {
@@ -173,44 +243,11 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return CHIP_ERROR_INCORRECT_STATE;
     case CHIPErrorCodeIntegrityCheckFailed:
         return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-    case CHIPErrorCodeConstraintError:
-        return CHIP_ERROR_IM_CONSTRAINT_ERROR;
+    case CHIPErrorCodeTimeout:
+        return CHIP_ERROR_TIMEOUT;
     default:
         return CHIP_ERROR_INTERNAL;
     }
 }
 
-+ (uint8_t)errorToZCLErrorCode:(NSError * _Nullable)error
-{
-    // If this is changed, change CHIPErrorTestUtils' version of
-    // errorToZCLErrorCode too.
-    if (error == nil) {
-        return EMBER_ZCL_STATUS_SUCCESS;
-    }
-
-    if (error.domain != CHIPErrorDomain) {
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    switch (error.code) {
-    case CHIPErrorCodeDuplicateExists:
-        return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
-    case CHIPErrorCodeUnsupportedEndpoint:
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
-    case CHIPErrorCodeUnsupportedCommand:
-        return EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND;
-    case CHIPErrorCodeInvalidCommand:
-        return EMBER_ZCL_STATUS_INVALID_COMMAND;
-    case CHIPErrorCodeUnsupportedAttribute:
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
-    case CHIPErrorCodeConstraintError:
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    case CHIPErrorCodeUnsupportedWrite:
-        return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
-    case CHIPErrorCodeUnsupportedCluster:
-        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
-    default:
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-}
 @end

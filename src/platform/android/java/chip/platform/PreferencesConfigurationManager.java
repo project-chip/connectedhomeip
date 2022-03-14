@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,7 +59,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
          * src/include/platform/CHIPDeviceConfig.h for debug
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_ProductId:
-        return 65278;
+        return 0x8003;
 
         /**
          * The default hardware version number assigned to the device or product by the device

@@ -23,6 +23,15 @@ if (current_os == "mac") {
   import("${build_root}/config/mac/mac_sdk.gni")
 }
 
+if (current_os == "webos") {
+  import("${build_root}/config/webos/webos_sdk.gni")
+  target_defines += []
+  target_cflags += [ "--sysroot=" + sysroot_webos ]
+  target_cflags_cc += []
+  target_cflags_c += []
+  target_ldflags += [ "--sysroot=" + sysroot_webos ]
+}
+
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
   # with unfixed or unsupported wanings.
@@ -191,7 +200,7 @@ config("warnings_common") {
   }
 
   if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
-      current_os != "win" && current_os != "tizen") {
+      current_os != "win" && current_os != "tizen" && current_os != "webos") {
     cflags += [ "-Wstack-usage=8192" ]
   }
 }
@@ -206,6 +215,13 @@ config("strict_warnings") {
     "-Wformat-nonliteral",
     "-Wformat-security",
   ]
+
+  if (current_os == "webos") {
+    cflags -= [
+      "-Wshadow",
+      "-Wvla",
+    ]
+  }
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
@@ -271,7 +287,7 @@ config("runtime_default") {
       "$dir_pw_toolchain/host_clang:xcode_sysroot",
     ]
   }
-  if (current_os == "linux" || current_os == "tizen") {
+  if (current_os == "linux" || current_os == "tizen" || current_os == "webos") {
     libs = [
       "dl",
       "pthread",

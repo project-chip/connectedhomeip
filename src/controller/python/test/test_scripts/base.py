@@ -30,6 +30,9 @@ import time
 import ctypes
 import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
+from chip.ChipStack import *
+import chip.FabricAdmin
+import copy
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -101,11 +104,13 @@ class TestResult:
 
 
 class BaseTestHelper:
-    def __init__(self, nodeid: int):
-        self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
-            controllerNodeId=nodeid)
+    def __init__(self, nodeid: int, testCommissioner: bool = False):
+        self.chipStack = ChipStack('/tmp/repl_storage.json')
+        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
+            fabricId=1, fabricIndex=1)
+        self.devCtrl = self.fabricAdmin.NewController(nodeid, testCommissioner)
+        self.controllerNodeId = nodeid
         self.logger = logger
-        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController()
 
     def _WaitForOneDiscoveredDevice(self, timeoutSeconds: int = 2):
         print("Waiting for device responses...")
@@ -133,17 +138,251 @@ class BaseTestHelper:
 
     def TestKeyExchange(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Conducting key exchange with device {}".format(ip))
-        if not self.devCtrl.ConnectIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(ip))
             return False
         self.logger.info("Device finished key exchange.")
         return True
 
+    def TestUsedTestCommissioner(self):
+        return self.devCtrl.GetTestCommissionerUsed()
+
+    async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
+        self.logger.info("Opening Commissioning Window")
+
+        await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(100), timedRequestTimeoutMs=10000)
+
+        self.logger.info("Creating 2nd Fabric Admin")
+        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
+
+        self.logger.info("Creating Device Controller on 2nd Fabric")
+        devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
+
+        if not devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+            self.logger.info(
+                "Failed to finish key exchange with device {}".format(ip))
+            return False
+
+        #
+        # Shutting down controllers results in races where the resolver still delivers
+        # resolution results to a now destroyed controller. Add a sleep for now to work around
+        # it while #14555 is being resolved.
+        time.sleep(1)
+
+        #
+        # Shut-down all the controllers (which will free them up as well as de-initialize the
+        # stack as well.
+        #
+        self.logger.info(
+            "Shutting down controllers & fabrics and re-initing stack...")
+
+        ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
+        chip.FabricAdmin.FabricAdmin.ShutdownAll()
+
+        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
+            fabricId=1, fabricIndex=1)
+        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
+
+        self.devCtrl = self.fabricAdmin.NewController(self.controllerNodeId)
+        self.devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
+
+        data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
+        data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
+
+        # Read out noclist from each fabric, and each should contain two NOCs.
+        nocList1 = data1[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
+        nocList2 = data2[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
+
+        if (len(nocList1) != 2 or len(nocList2) != 2):
+            self.logger.error("Got back invalid nocList")
+            return False
+
+        data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=False)
+        data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=False)
+
+        # Read out current fabric from each fabric, and both should be different.
+        currentFabric1 = data1[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        currentFabric2 = data2[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        if (self.currentFabric1 == self.currentFabric2):
+            self.logger.error(
+                "Got back fabric indices that match for two different fabrics!")
+            return False
+
+        # devCtrl2.Shutdown()
+        # fabricAdmin2.Shutdown()
+
+        return True
+
+    async def TestFabricSensitive(self, nodeid: int):
+        expectedDataFabric1 = [
+            Clusters.TestCluster.Structs.TestFabricScoped(),
+            Clusters.TestCluster.Structs.TestFabricScoped()
+        ]
+
+        expectedDataFabric1[0].fabricIndex = 100
+        expectedDataFabric1[0].fabricSensitiveInt8u = 33
+        expectedDataFabric1[0].optionalFabricSensitiveInt8u = 34
+        expectedDataFabric1[0].nullableFabricSensitiveInt8u = 35
+        expectedDataFabric1[0].nullableOptionalFabricSensitiveInt8u = Clusters.Types.NullValue
+        expectedDataFabric1[0].fabricSensitiveCharString = "alpha1"
+        expectedDataFabric1[0].fabricSensitiveStruct.a = 36
+        expectedDataFabric1[0].fabricSensitiveInt8uList = [1, 2, 3, 4]
+
+        expectedDataFabric1[1].fabricIndex = 100
+        expectedDataFabric1[1].fabricSensitiveInt8u = 43
+        expectedDataFabric1[1].optionalFabricSensitiveInt8u = 44
+        expectedDataFabric1[1].nullableFabricSensitiveInt8u = 45
+        expectedDataFabric1[1].nullableOptionalFabricSensitiveInt8u = Clusters.Types.NullValue
+        expectedDataFabric1[1].fabricSensitiveCharString = "alpha2"
+        expectedDataFabric1[1].fabricSensitiveStruct.a = 46
+        expectedDataFabric1[1].fabricSensitiveInt8uList = [2, 3, 4, 5]
+
+        self.logger.info("Writing data from fabric1...")
+
+        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped(expectedDataFabric1))])
+
+        expectedDataFabric2 = copy.deepcopy(expectedDataFabric1)
+
+        expectedDataFabric2[0].fabricSensitiveInt8u = 133
+        expectedDataFabric2[0].optionalFabricSensitiveInt8u = 134
+        expectedDataFabric2[0].nullableFabricSensitiveInt8u = 135
+        expectedDataFabric2[0].fabricSensitiveCharString = "beta1"
+        expectedDataFabric2[0].fabricSensitiveStruct.a = 136
+        expectedDataFabric2[0].fabricSensitiveInt8uList = [11, 12, 13, 14]
+
+        expectedDataFabric2[1].fabricSensitiveInt8u = 143
+        expectedDataFabric2[1].optionalFabricSensitiveInt8u = 144
+        expectedDataFabric2[1].nullableFabricSensitiveInt8u = 145
+        expectedDataFabric2[1].fabricSensitiveCharString = "beta2"
+        expectedDataFabric2[1].fabricSensitiveStruct.a = 146
+        expectedDataFabric2[1].fabricSensitiveStruct.f = 147
+        expectedDataFabric2[1].fabricSensitiveInt8uList = [12, 13, 14, 15]
+
+        self.logger.info("Writing data from fabric2...")
+
+        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped(expectedDataFabric2))])
+
+        #
+        # Now read the data back filtered from fabric1 and ensure it matches.
+        #
+        self.logger.info("Reading back data from fabric1...")
+
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
+        readListDataFabric1 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+
+        #
+        # Update the expected data's fabric index to that we just read back
+        # before we attempt to compare the data
+        #
+        expectedDataFabric1[0].fabricIndex = self.currentFabric1
+        expectedDataFabric1[1].fabricIndex = self.currentFabric1
+
+        self.logger.info("Comparing data on fabric1...")
+        if (expectedDataFabric1 != readListDataFabric1):
+            raise AssertionError("Got back mismatched data")
+
+        self.logger.info("Reading back data from fabric2...")
+
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
+        readListDataFabric2 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+
+        #
+        # Update the expected data's fabric index to that we just read back
+        # before we attempt to compare the data
+        #
+        expectedDataFabric2[0].fabricIndex = self.currentFabric2
+        expectedDataFabric2[1].fabricIndex = self.currentFabric2
+
+        self.logger.info("Comparing data on fabric2...")
+        if (expectedDataFabric2 != readListDataFabric2):
+            raise AssertionError("Got back mismatched data")
+
+        self.logger.info(
+            "Reading back unfiltered data across all fabrics from fabric1...")
+
+        def CompareUnfilteredData(accessingFabric, otherFabric, expectedData):
+            index = 0
+
+            self.logger.info(
+                f"Comparing data from accessing fabric {accessingFabric}...")
+
+            for item in readListDataFabric:
+                if (item.fabricIndex == accessingFabric):
+                    if (index == 2):
+                        raise AssertionError(
+                            "Got back more data than expected")
+
+                    if (item != expectedData[index]):
+                        raise AssertionError("Got back mismatched data")
+
+                    index = index + 1
+                else:
+                    #
+                    # We should not be able to see any fabric sensitive data from the non accessing fabric.
+                    # Aside from the fabric index, everything else in TestFabricScoped is marked sensitive so we should
+                    # only see defaults for that data. Instantiate an instance of that struct
+                    # which should automatically be initialized with defaults and compare that
+                    # against what we got back.
+                    #
+                    expectedDefaultData = Clusters.TestCluster.Structs.TestFabricScoped()
+                    expectedDefaultData.fabricIndex = otherFabric
+
+                    if (item != expectedDefaultData):
+                        raise AssertionError("Got back mismatched data")
+
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
+        readListDataFabric = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        CompareUnfilteredData(self.currentFabric1,
+                              self.currentFabric2, expectedDataFabric1)
+
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
+        readListDataFabric = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        CompareUnfilteredData(self.currentFabric2,
+                              self.currentFabric1, expectedDataFabric2)
+
+        self.logger.info("Writing smaller list from alpha (again)")
+
+        expectedDataFabric1[0].fabricIndex = 100
+        expectedDataFabric1[0].fabricSensitiveInt8u = 53
+        expectedDataFabric1[0].optionalFabricSensitiveInt8u = 54
+        expectedDataFabric1[0].nullableFabricSensitiveInt8u = 55
+        expectedDataFabric1[0].nullableOptionalFabricSensitiveInt8u = Clusters.Types.NullValue
+        expectedDataFabric1[0].fabricSensitiveCharString = "alpha3"
+        expectedDataFabric1[0].fabricSensitiveStruct.a = 56
+        expectedDataFabric1[0].fabricSensitiveInt8uList = [51, 52, 53, 54]
+
+        expectedDataFabric1.pop(1)
+
+        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped(expectedDataFabric1))])
+
+        self.logger.info(
+            "Reading back data (again) from fabric2 to ensure it hasn't changed")
+
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
+        readListDataFabric2 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        if (expectedDataFabric2 != readListDataFabric2):
+            raise AssertionError("Got back mismatched data")
+
+        self.logger.info(
+            "Reading back data (again) from fabric1 to ensure it hasn't changed")
+
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
+        readListDataFabric1 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+
+        self.logger.info("Comparing data on fabric1...")
+        expectedDataFabric1[0].fabricIndex = self.currentFabric1
+        if (expectedDataFabric1 != readListDataFabric1):
+            raise AssertionError("Got back mismatched data")
+
     def TestCloseSession(self, nodeid: int):
         self.logger.info(f"Closing sessions with device {nodeid}")
         try:
-            self.devCtrl.CloseSession(nodeid)
+            err = self.devCtrl.CloseSession(nodeid)
+            if err != 0:
+                self.logger.exception(
+                    f"Failed to close sessions with device {nodeid}: {err}")
+                return False
             return True
         except Exception as ex:
             self.logger.exception(
@@ -210,8 +449,20 @@ class BaseTestHelper:
             "Resolve: node id = {:08x}".format(nodeid))
         try:
             self.devCtrl.ResolveNode(nodeid=nodeid)
-            addr = self.devCtrl.GetAddressAndPort(nodeid)
+            addr = None
+
+            start = time.time()
+            while not addr:
+                addr = self.devCtrl.GetAddressAndPort(nodeid)
+                if time.time() - start > 10:
+                    self.logger.exception(f"Timeout waiting for address...")
+                    break
+
+                if not addr:
+                    time.sleep(0.2)
+
             if not addr:
+                self.logger.exception(f"Addr is missing...")
                 return False
             self.logger.info(f"Resolved address: {addr[0]}:{addr[1]}")
             return True
@@ -222,9 +473,9 @@ class BaseTestHelper:
     def TestReadBasicAttributes(self, nodeid: int, endpoint: int, group: int):
         basic_cluster_attrs = {
             "VendorName": "TEST_VENDOR",
-            "VendorID": 9050,
+            "VendorID": 0xFFF1,
             "ProductName": "TEST_PRODUCT",
-            "ProductID": 65279,
+            "ProductID": 0x8001,
             "NodeLabel": "Test",
             "Location": "XX",
             "HardwareVersion": 0,

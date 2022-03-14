@@ -35,6 +35,8 @@
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
+#include <sys/reboot.h>
+
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
 
 namespace chip {
@@ -46,6 +48,7 @@ System::LayerSocketsLoop & SystemLayerSocketsLoop()
 {
     return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
 }
+
 } // anonymous namespace
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
@@ -106,7 +109,12 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 {
+#if CONFIG_REBOOT
+    sys_reboot(SYS_REBOOT_WARM);
+    return CHIP_NO_ERROR;
+#else
     return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 template <class ImplClass>
@@ -174,7 +182,10 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::EventLoopTaskMain(void * this
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartEventLoopTask(void)
 {
-    const auto tid = k_thread_create(&mChipThread, mChipThreadStack, K_THREAD_STACK_SIZEOF(mChipThreadStack), EventLoopTaskMain,
+    if (!mChipThreadStack)
+        return CHIP_ERROR_WELL_UNINITIALIZED;
+
+    const auto tid = k_thread_create(&mChipThread, mChipThreadStack, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE, EventLoopTaskMain,
                                      this, nullptr, nullptr, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, 0, K_NO_WAIT);
 
 #ifdef CONFIG_THREAD_NAME

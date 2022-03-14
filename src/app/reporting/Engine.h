@@ -94,12 +94,33 @@ public:
      *  Schedule the event delivery
      *
      */
-    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten);
+    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten);
 
     /*
      * Resets the tracker that tracks the currently serviced read handler.
+     * apReadHandler can be non-null to indicate that the reset is due to a
+     * specific ReadHandler being deallocated.
      */
-    void ResetReadHandlerTracker() { mCurReadHandlerIdx = 0; }
+    void ResetReadHandlerTracker(ReadHandler * apReadHandlerBeingDeleted)
+    {
+        if (apReadHandlerBeingDeleted == mRunningReadHandler)
+        {
+            // Just decrement, so our increment after we finish running it will
+            // do the right thing.
+            --mCurReadHandlerIdx;
+        }
+        else
+        {
+            // No idea what to do here to make the indexing sane.  Just start at
+            // the beginning.  We need to do better here; see
+            // https://github.com/project-chip/connectedhomeip/issues/13809
+            mCurReadHandlerIdx = 0;
+        }
+    }
+
+    uint32_t GetNumReportsInFlight() { return mNumReportsInFlight; }
+
+    void ScheduleUrgentEventDeliverySync();
 
 private:
     friend class TestReportingEngine;
@@ -117,6 +138,13 @@ private:
                                    AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteReadAttributePath & aClusterInfo,
                                    AttributeValueEncoder::AttributeEncodeState * apEncoderState);
+
+    // If version match, it means don't send, if version mismatch, it means send.
+    // If client sends the same path with multiple data versions, client will get the data back per the spec, because at least one
+    // of those will fail to match.  This function should return false if either nothing in the list matches the given
+    // endpoint+cluster in the path or there is an entry in the list that matches the endpoint+cluster in the path but does not
+    // match the current data version of that cluster.
+    bool IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath);
 
     /**
      * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
@@ -136,7 +164,6 @@ private:
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState);
 
-    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
     CHIP_ERROR ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten);
     void GetMinEventLogPosition(uint32_t & aMinLogPosition);
 
@@ -168,10 +195,15 @@ private:
     uint32_t mCurReadHandlerIdx = 0;
 
     /**
+     * The read handler we're calling BuildAndSendSingleReportData on right now.
+     */
+    ReadHandler * mRunningReadHandler = nullptr;
+
+    /**
      *  mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
      *
      */
-    BitMapObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
+    ObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     uint32_t mReservedSize = 0;

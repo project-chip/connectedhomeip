@@ -665,7 +665,6 @@ CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Cry
  * @brief Generate a new X.509 DER encoded Node operational certificate
  *
  * @param requestParams   Certificate request parameters.
- * @param issuerLevel     Indicates if the issuer is a root CA or an intermediate CA
  * @param subjectPubkey   The public key of subject
  * @param issuerKeypair   The certificate signing key
  * @param x509Cert        Buffer to store signed certificate in X.509 DER format.
@@ -782,7 +781,7 @@ CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::T
  * These certificates may not contain a NodeID, so ExtractNodeIdFabricIdFromOpCert()
  * cannot be used for such certificates.
  *
- * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have RDN
+ * @return CHIP_ERROR_NOT_FOUND if the passed-in cert does not have RDN
  * corresponding to FabricID.
  */
 CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * fabricId);
@@ -791,7 +790,7 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
  * Extract Node ID and Fabric ID from an operational certificate that has already been
  * parsed.
  *
- * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have at
+ * @return CHIP_ERROR_NOT_FOUND if the passed-in cert does not have at
  * least one NodeId RDN and one FabricId RDN in the Subject DN.  No other
  * validation (e.g. checkign that there is exactly one RDN of each type) is
  * performed.

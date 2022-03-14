@@ -1,0 +1,224 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    7.3.13. [TC-DD-3.13] Commissioning Flow - Manual Pairing Code [DUT -
+    Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "If (PICS_11_MANUAL_PC), VERSION: Use an 11 digit Manual pairing code
+          from a commissionee that has their Manual pairing code VERSION bit
+          string set to 0"
+      verification:
+          "Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
+          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
+          [1645845935.798853][8925:8925] CHIP:DL: Serial Number: TEST_SN
+          [1645845935.798875][8925:8925] CHIP:DL: Vendor Id: 65521 (0xFFF1)
+          [1645845935.798904][8925:8925] CHIP:DL: Product Id: 32769 (0x8001)
+          [1645845935.798929][8925:8925] CHIP:DL: Hardware Version: 0
+          [1645845935.798960][8925:8925] CHIP:DL: Setup Pin Code: 20202021
+          [1645845935.798984][8925:8925] CHIP:DL: Setup Discriminator: 3840
+          (0xF00) [1645845935.799008][8925:8925] CHIP:DL: Manufacturing Date:
+          (not set) [1645845935.799038][8925:8925] CHIP:DL: Device Type: 65535
+          (0xFFFF) [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode:
+          [MT:-24J042C00KA0648G00] [1645845935.799135][8925:8925] CHIP:SVR:
+          Copy/paste the below URL in a browser to see the QR Code:
+          [1645845935.799164][8925:8925] CHIP:SVR:
+          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code:
+          [34970112332] [1645845935.799236][8925:8925] CHIP:SVR: Long manual
+          pairing code: [749701123365521327694]"
+      disabled: true
+
+    - label:
+          "If (PICS_11_MANUAL_PC), Provide the manual pairing code, generated in
+          the previous step, to the DUT in any format supported by the DUT.
+          Follow any steps needed for the Commissioner/Commissionee to complete
+          the commissioning process."
+      verification:
+          "DUT Commissioner: sudo ./examples/chip-tool/out/debug/chip-tool
+          pairing manualcode 1234 34970112332 ... [1646267353060]
+          [53689:29437234] CHIP: [TOO] Device commissioning completed with
+          success Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
+          [1646267353.273560][28656:28656] CHIP:DL:
+          HandlePlatformSpecificBLEEvent 32784 [1646267353.273586][28656:28656]
+          CHIP:SVR: Commissioning completed successfully"
+      disabled: true
+
+    - label:
+          "If (PICS_21_MANUAL_PC), VERSION: Use a 21 digit Manual pairing code
+          from a commissionee that has their Manual pairing code VERSION bit
+          string set to 0"
+      verification:
+          "Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
+          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
+          [1645845935.798853][8925:8925] CHIP:DL: Serial Number: TEST_SN
+          [1645845935.798875][8925:8925] CHIP:DL: Vendor Id: 65521 (0xFFF1)
+          [1645845935.798904][8925:8925] CHIP:DL: Product Id: 32769 (0x8001)
+          [1645845935.798929][8925:8925] CHIP:DL: Hardware Version: 0
+          [1645845935.798960][8925:8925] CHIP:DL: Setup Pin Code: 20202021
+          [1645845935.798984][8925:8925] CHIP:DL: Setup Discriminator: 3840
+          (0xF00) [1645845935.799008][8925:8925] CHIP:DL: Manufacturing Date:
+          (not set) [1645845935.799038][8925:8925] CHIP:DL: Device Type: 65535
+          (0xFFFF) [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode:
+          [MT:-24J042C00KA0648G00] [1645845935.799135][8925:8925] CHIP:SVR:
+          Copy/paste the below URL in a browser to see the QR Code:
+          [1645845935.799164][8925:8925] CHIP:SVR:
+          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code:
+          [34970112332] [1645845935.799236][8925:8925] CHIP:SVR: Long manual
+          pairing code: [749701123365521327694]"
+      disabled: true
+
+    - label:
+          "If (PICS_21_MANUAL_PC), Provide the manual pairing code, generated in
+          the previous step, to the DUT in any format supported by the DUT.
+          Follow any steps needed for the Commissioner/Commissionee to complete
+          the commissioning process."
+      verification:
+          "DUT Commissioner: sudo ./examples/chip-tool/out/debug/chip-tool
+          pairing manualcode 1234 34970112332 ... [1646267665776]
+          [53714:29441244] CHIP: [TOO] Device commissioning completed with
+          success Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
+          [1646267665.929519][28709:28709] CHIP:DL:
+          HandlePlatformSpecificBLEEvent 32784 [1646267665.929545][28709:28709]
+          CHIP:SVR: Commissioning completed successfully"
+      disabled: true
+
+    - label:
+          "If (PICS_11_MANUAL_PC), VID_PID_PRESENT: Use an 11 digit Manual
+          pairing code from a commissionee that has their VID_PID_PRESENT bit
+          string set to 0"
+      verification:
+          "Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
+          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
+          [1645845935.798853][8925:8925] CHIP:DL: Serial Number: TEST_SN
+          [1645845935.798875][8925:8925] CHIP:DL: Vendor Id: 65521 (0xFFF1)
+          [1645845935.798904][8925:8925] CHIP:DL: Product Id: 32769 (0x8001)
+          [1645845935.798929][8925:8925] CHIP:DL: Hardware Version: 0
+          [1645845935.798960][8925:8925] CHIP:DL: Setup Pin Code: 20202021
+          [1645845935.798984][8925:8925] CHIP:DL: Setup Discriminator: 3840
+          (0xF00) [1645845935.799008][8925:8925] CHIP:DL: Manufacturing Date:
+          (not set) [1645845935.799038][8925:8925] CHIP:DL: Device Type: 65535
+          (0xFFFF) [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode:
+          [MT:-24J042C00KA0648G00] [1645845935.799135][8925:8925] CHIP:SVR:
+          Copy/paste the below URL in a browser to see the QR Code:
+          [1645845935.799164][8925:8925] CHIP:SVR:
+          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code:
+          [34970112332] [1645845935.799236][8925:8925] CHIP:SVR: Long manual
+          pairing code: [749701123365521327694]"
+      disabled: true
+
+    - label:
+          "If (PICS_11_MANUAL_PC), Provide the manual pairing code, generated in
+          the previous step, to the DUT in any format supported by the DUT.
+          Follow any steps needed for the Commissioner/Commissionee to complete
+          the commissioning process."
+      verification:
+          "DUT Commissioner: sudo ./examples/chip-tool/out/debug/chip-tool
+          pairing manualcode 1234 34970112332 ... [1646267353060]
+          [53689:29437234] CHIP: [TOO] Device commissioning completed with
+          success Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
+          [1646267353.273560][28656:28656] CHIP:DL:
+          HandlePlatformSpecificBLEEvent 32784 [1646267353.273586][28656:28656]
+          CHIP:SVR: Commissioning completed successfully"
+      disabled: true
+
+    - label:
+          "If (PICS_21_MANUAL_PC), VID_PID_PRESENT: Use a 21 digit Manual
+          pairing code from a commissionee that has their VID_PID_PRESENT bit
+          string set to 1"
+      verification:
+          "Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
+          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
+          [1645845935.798853][8925:8925] CHIP:DL: Serial Number: TEST_SN
+          [1645845935.798875][8925:8925] CHIP:DL: Vendor Id: 65521 (0xFFF1)
+          [1645845935.798904][8925:8925] CHIP:DL: Product Id: 32769 (0x8001)
+          [1645845935.798929][8925:8925] CHIP:DL: Hardware Version: 0
+          [1645845935.798960][8925:8925] CHIP:DL: Setup Pin Code: 20202021
+          [1645845935.798984][8925:8925] CHIP:DL: Setup Discriminator: 3840
+          (0xF00) [1645845935.799008][8925:8925] CHIP:DL: Manufacturing Date:
+          (not set) [1645845935.799038][8925:8925] CHIP:DL: Device Type: 65535
+          (0xFFFF) [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode:
+          [MT:-24J042C00KA0648G00] [1645845935.799135][8925:8925] CHIP:SVR:
+          Copy/paste the below URL in a browser to see the QR Code:
+          [1645845935.799164][8925:8925] CHIP:SVR:
+          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code:
+          [34970112332] [1645845935.799236][8925:8925] CHIP:SVR: Long manual
+          pairing code: [749701123365521327694]"
+      disabled: true
+
+    - label:
+          "If (PICS_21_MANUAL_PC), Provide the manual pairing code, generated in
+          the previous step, to the DUT in any format supported by the DUT.
+          Follow any steps needed for the Commissioner/Commissionee to complete
+          the commissioning process."
+      verification:
+          "DUT Commissioner: sudo ./examples/chip-tool/out/debug/chip-tool
+          pairing manualcode 1234 34970112332 ... [1646267665776]
+          [53714:29441244] CHIP: [TOO] Device commissioning completed with
+          success Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
+          [1646267665.929519][28709:28709] CHIP:DL:
+          HandlePlatformSpecificBLEEvent 32784 [1646267665.929545][28709:28709]
+          CHIP:SVR: Commissioning completed successfully"
+      disabled: true
+
+    - label:
+          "If (PICS_21_MANUAL_PC), VENDOR_ID and PRODUCT_ID: Use a 21 digit
+          Manual pairing code from a commissionee that has a valid VENDOR_ID (as
+          defined in section 2.5.2. 'Vendor Identifier') and PRODUCT_ID (as
+          defined in section 2.5.3. 'Product Identifier')"
+      verification:
+          "Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
+          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
+          [1645845935.798853][8925:8925] CHIP:DL: Serial Number: TEST_SN
+          [1645845935.798875][8925:8925] CHIP:DL: Vendor Id: 65521 (0xFFF1)
+          [1645845935.798904][8925:8925] CHIP:DL: Product Id: 32769 (0x8001)
+          [1645845935.798929][8925:8925] CHIP:DL: Hardware Version: 0
+          [1645845935.798960][8925:8925] CHIP:DL: Setup Pin Code: 20202021
+          [1645845935.798984][8925:8925] CHIP:DL: Setup Discriminator: 3840
+          (0xF00) [1645845935.799008][8925:8925] CHIP:DL: Manufacturing Date:
+          (not set) [1645845935.799038][8925:8925] CHIP:DL: Device Type: 65535
+          (0xFFFF) [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode:
+          [MT:-24J042C00KA0648G00] [1645845935.799135][8925:8925] CHIP:SVR:
+          Copy/paste the below URL in a browser to see the QR Code:
+          [1645845935.799164][8925:8925] CHIP:SVR:
+          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code:
+          [34970112332] [1645845935.799236][8925:8925] CHIP:SVR: Long manual
+          pairing code: [749701123365521327694]"
+      disabled: true
+
+    - label:
+          "Provide the manual pairing code, generated in the previous step, to
+          the DUT in any format supported by the DUT. Follow any steps needed
+          for the Commissioner/Commissionee to complete the commissioning
+          process."
+      verification:
+          "DUT Commissioner: sudo ./examples/chip-tool/out/debug/chip-tool
+          pairing manualcode 1234 34970112332 ... [1646267665776]
+          [53714:29441244] CHIP: [TOO] Device commissioning completed with
+          success Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
+          [1646267665.929519][28709:28709] CHIP:DL:
+          HandlePlatformSpecificBLEEvent 32784 [1646267665.929545][28709:28709]
+          CHIP:SVR: Commissioning completed successfully"
+      disabled: true

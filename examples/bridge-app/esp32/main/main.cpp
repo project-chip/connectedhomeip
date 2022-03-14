@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -30,6 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/ErrorStr.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #include <app/server/Server.h>
 
@@ -42,6 +44,11 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Platform;
 
 static DeviceCallbacks AppCallback;
+
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+} // namespace
 
 static const int kNodeLabelSize = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
@@ -97,13 +104,31 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_LABEL_LIST_ATTRIBUTE_ID, ARRAY, kFixedLabelAttribu
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Cluster List for Bridged Light endpoint
+// TODO: It's not clear whether it would be better to get the command lists from
+// the ZAP config on our last fixed endpoint instead.
+constexpr CommandId onOffIncomingCommands[] = {
+    app::Clusters::OnOff::Commands::Off::Id,
+    app::Clusters::OnOff::Commands::On::Id,
+    app::Clusters::OnOff::Commands::Toggle::Id,
+    app::Clusters::OnOff::Commands::OffWithEffect::Id,
+    app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id,
+    app::Clusters::OnOff::Commands::OnWithTimedOff::Id,
+    kInvalidCommandId,
+};
+
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
-DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs), DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_FIXED_LABEL_CLUSTER_ID, fixedLabelAttrs) DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs, onOffIncomingCommands, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_FIXED_LABEL_CLUSTER_ID, fixedLabelAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
+
+DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
 
 /* REVISION definitions:
  */
@@ -113,16 +138,18 @@ DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 
-CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceType)
+CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceType,
+                             const Span<DataVersion> & dataVersionStorage)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (NULL == gDevices[index])
         {
+            dev->SetEndpointId(gCurrentEndpointId);
             gDevices[index] = dev;
             EmberAfStatus ret;
-            ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT);
+            ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT, dataVersionStorage);
             if (ret == EMBER_ZCL_STATUS_SUCCESS)
             {
                 ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
@@ -174,7 +201,8 @@ uint8_t * ToZclCharString(uint8_t * zclString, const char * cString, uint8_t max
 }
 
 // Converted into bytes and mapped the (label, value)
-void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, uint16_t length, EmberAfAttributeMetadata * am)
+void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, uint16_t length,
+                      const EmberAfAttributeMetadata * am)
 {
     _LabelStruct labelStruct;
 
@@ -209,7 +237,8 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength)
+EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, const EmberAfAttributeMetadata * am, uint8_t * buffer,
+                                            uint16_t maxReadLength)
 {
     if ((am->attributeId == ZCL_LABEL_LIST_ATTRIBUTE_ID) && (maxReadLength <= kFixedLabelAttributeArraySize))
     {
@@ -257,7 +286,7 @@ EmberAfStatus HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attribut
 }
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                    uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
@@ -284,7 +313,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 }
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -347,6 +376,8 @@ static void InitServer(intptr_t context)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
+    sWiFiNetworkCommissioningInstance.Init();
+
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
     gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
@@ -358,18 +389,18 @@ static void InitServer(intptr_t context)
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
-    AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
-    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
-    AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight1DataVersions));
+    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight2DataVersions));
+    AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight3DataVersions));
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 2 & 4
     RemoveDeviceEndpoint(&gLight2);
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 5
-    AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight4DataVersions));
 
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 6
-    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
+    AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT, Span<DataVersion>(gLight2DataVersions));
 }
 
 extern "C" void app_main()

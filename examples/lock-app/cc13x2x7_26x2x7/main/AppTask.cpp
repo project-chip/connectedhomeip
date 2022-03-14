@@ -27,9 +27,15 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <platform/CHIPDeviceLayer.h>
+
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 
@@ -43,6 +49,7 @@
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
+using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -55,6 +62,24 @@ static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 
 AppTask AppTask::sAppTask;
+
+static OTARequestor sRequestorCore;
+static DefaultOTARequestorStorage sRequestorStorage;
+static GenericOTARequestorDriver sRequestorUser;
+static BDXDownloader sDownloader;
+static OTAImageProcessorImpl sImageProcessor;
+
+void InitializeOTARequestor(void)
+{
+    // Initialize and interconnect the Requestor and Image Processor objects
+    SetRequestorInstance(&sRequestorCore);
+
+    sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    sImageProcessor.SetOTADownloader(&sDownloader);
+    sDownloader.SetImageProcessorDelegate(&sImageProcessor);
+    sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
+}
 
 int AppTask::StartAppTask()
 {
@@ -87,7 +112,7 @@ int AppTask::Init()
     cc13x2_26x2LogInit();
 
     // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    Platform::MemoryInit();
 
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
@@ -131,7 +156,7 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
-    chip::Server::GetInstance().Init();
+    Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -172,8 +197,10 @@ int AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
+    InitializeOTARequestor();
+
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
     return 0;
 }
@@ -322,7 +349,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             // Enable BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
-                if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
+                if (Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
                 {
                     PLAT_LOG("Enabled BLE Advertisement");
                 }

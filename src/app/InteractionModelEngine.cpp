@@ -106,7 +106,7 @@ void InteractionModelEngine::Shutdown()
 
     for (auto & writeHandler : mWriteHandlers)
     {
-        VerifyOrDie(writeHandler.IsFree());
+        writeHandler.Abort();
     }
 
     mReportingEngine.Shutdown();
@@ -175,6 +175,24 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     return numActive;
 }
 
+void InteractionModelEngine::CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex)
+{
+    //
+    // Walk through all existing subscriptions and shut down those whose subscriber matches
+    // that which just came in.
+    //
+    mReadHandlers.ForEachActiveObject([this, aFabricIndex](ReadHandler * handler) {
+        if (handler->GetAccessingFabricIndex() == aFabricIndex)
+        {
+            ChipLogProgress(InteractionModel, "Deleting expired ReadHandler for NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                            ChipLogValueX64(handler->GetInitiatorNodeId()), aFabricIndex);
+            mReadHandlers.ReleaseObject(handler);
+        }
+
+        return Loop::Continue;
+    });
+}
+
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
@@ -210,14 +228,14 @@ void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 
 void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
 {
-    mReadHandlers.ReleaseObject(&apReadObj);
-
     //
     // Deleting an item can shift down the contents of the underlying pool storage,
-    // rendering any tracker using positional indexes invalid. Let's reset it and
-    // have it start from index 0.
+    // rendering any tracker using positional indexes invalid. Let's reset it,
+    // based on which readHandler we are getting rid of.
     //
-    mReportingEngine.ResetReadHandlerTracker();
+    mReportingEngine.ResetReadHandlerTracker(&apReadObj);
+
+    mReadHandlers.ReleaseObject(&apReadObj);
 }
 
 CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -257,7 +275,6 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         bool keepExistingSubscriptions = true;
 
         reader.Init(aPayload.Retain());
-        ReturnErrorOnFailure(reader.Next());
 
         SubscribeRequestMessage::Parser subscribeRequestParser;
         ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
@@ -274,9 +291,9 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
                 if (handler->IsFromSubscriber(*apExchangeContext))
                 {
                     ChipLogProgress(InteractionModel,
-                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %" PRIu8,
+                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
                                     ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
-                                    apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex());
+                                    apExchangeContext->GetSessionHandle()->GetFabricIndex());
                     mReadHandlers.ReleaseObject(handler);
                 }
 
@@ -371,13 +388,13 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
 {
     System::PacketBufferTLVReader reader;
     reader.Init(aPayload.Retain());
-    ReturnLogErrorOnFailure(reader.Next());
 
     ReportDataMessage::Parser report;
-    ReturnLogErrorOnFailure(report.Init(reader));
+    ReturnErrorOnFailure(report.Init(reader));
 
     uint64_t subscriptionId = 0;
-    ReturnLogErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
+    ReturnErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
+    ReturnErrorOnFailure(report.ExitContainer());
 
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
@@ -404,6 +421,15 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
     CHIP_ERROR err                             = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
+
+    // Group Message can only be an InvokeCommandRequest or WriteRequest
+    if (apExchangeContext->IsGroupExchangeContext() &&
+        !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest) &&
+        !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
+    {
+        ChipLogProgress(InteractionModel, "Msg type %d not supported for group message", aPayloadHeader.GetMessageType());
+        return err;
+    }
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
@@ -517,6 +543,22 @@ bool InteractionModelEngine::InActiveReadClientList(ReadClient * apReadClient)
     return false;
 }
 
+bool InteractionModelEngine::HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath)
+{
+    for (auto & writeHandler : mWriteHandlers)
+    {
+        if (writeHandler.IsFree() || &writeHandler == apWriteHandler)
+        {
+            continue;
+        }
+        if (writeHandler.IsCurrentlyProcessingWritePath(aPath))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
 {
     ClusterInfo * current = aClusterInfo;
@@ -572,9 +614,6 @@ void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, cons
 
     if (handler)
     {
-        // TODO: Figure out who is responsible for handling checking
-        // apCommandObj->IsTimedInvoke() for commands that require a timed
-        // invoke and have a CommandHandlerInterface handling them.
         CommandHandlerInterface::HandlerContext context(apCommandObj, aCommandPath, apPayload);
         handler->InvokeCommand(context);
 
@@ -590,7 +629,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, cons
     DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
 }
 
-bool InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
 {
     return ServerClusterCommandExists(aCommandPath);
 }

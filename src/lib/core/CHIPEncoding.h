@@ -33,9 +33,18 @@
 
 #pragma once
 
+// The nlio headers use [inout] instead of [in,out], which makes the clang
+// documentation warning unhappy.  Suppress it for those headers.
+#pragma GCC diagnostic push
+#ifdef __clang__
+#pragma GCC diagnostic ignored "-Wdocumentation"
+#endif // __clang__
+
 #include <nlbyteorder.hpp>
 #include <nlio-byteorder.hpp>
 #include <nlio.hpp>
+
+#pragma GCC diagnostic pop
 
 #include <stdint.h>
 

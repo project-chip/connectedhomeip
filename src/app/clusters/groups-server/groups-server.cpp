@@ -83,8 +83,11 @@ static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, Gr
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
 
-    provider->SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupId, groupName));
-    CHIP_ERROR err = provider->AddEndpoint(fabricIndex, groupId, endpointId);
+    CHIP_ERROR err = provider->SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupId, groupName));
+    if (CHIP_NO_ERROR == err)
+    {
+        err = provider->AddEndpoint(fabricIndex, groupId, endpointId);
+    }
     if (CHIP_NO_ERROR == err)
     {
         return EMBER_ZCL_STATUS_SUCCESS;
@@ -193,8 +196,8 @@ exit:
 
 struct GroupMembershipResponse
 {
-    // A capacity of 0xFF means that it is unknown if any further groups MAY be added.
-    static constexpr uint8_t kCapacityUnknown = 0xff;
+    // A null capacity means that it is unknown if any further groups MAY be added.
+    const chip::app::DataModel::Nullable<uint8_t> kCapacityUnknown;
 
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }

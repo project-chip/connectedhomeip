@@ -47,7 +47,7 @@ string(APPEND CHIP_GN_ARGS)
 
 # C/C++ compiler flags which should not be forwarded to CHIP
 # build system (e.g. because CHIP configures them on its own)
-set(CHIP_CFLAG_EXCLUDES 
+set(CHIP_CFLAG_EXCLUDES
     "-fno-asynchronous-unwind-tables"
     "-fno-common"
     "-fno-defer-pop"
@@ -149,7 +149,7 @@ list(APPEND CHIP_CFLAGS_CC ${CMAKE_CXX_FLAGS_INIT})
 mbed_get_target_common_compile_flags(CHIP_MBEDCMSISCM_CFLAGS mbed-cmsis-cortex-m)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDCMSISCM_CFLAGS})
 if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
-    mbed_get_target_common_compile_flags(CHIP_MBEDCMSISCY8_CFLAGS mbed-cy8cproto-062-4343w) 
+    mbed_get_target_common_compile_flags(CHIP_MBEDCMSISCY8_CFLAGS mbed-cy8cproto-062-4343w)
     list(APPEND CHIP_CFLAGS ${CHIP_MBEDCMSISCY8_CFLAGS})
     mbed_get_target_common_compile_flags(CHIP_MBEDPSOC6_CFLAGS mbed-psoc6)
     list(APPEND CHIP_CFLAGS ${CHIP_MBEDPSOC6_CFLAGS})
@@ -159,7 +159,7 @@ if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
     list(APPEND CHIP_CFLAGS ${CHIP_MBEDCMSISCY8MODUS_CFLAGS})
 endif()
 
-# Add support for Mbed Posix Socket 
+# Add support for Mbed Posix Socket
 mbed_get_target_common_compile_flags(CHIP_MBEDPOSIXSOCKET_CFLAGS mbed-os-posix-socket)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDPOSIXSOCKET_CFLAGS})
 
@@ -167,7 +167,7 @@ list(APPEND CHIP_CFLAGS ${CHIP_MBEDPOSIXSOCKET_CFLAGS})
 mbed_get_target_common_compile_flags(CHIP_MBEDBLE_CFLAGS mbed-ble)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDBLE_CFLAGS})
 
-# Add support for Mbed event 
+# Add support for Mbed event
 mbed_get_target_common_compile_flags(CHIP_MBEDEVENTS_CFLAGS mbed-events)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDEVENTS_CFLAGS})
 
@@ -179,7 +179,7 @@ list(APPEND CHIP_CFLAGS ${CHIP_MBEDRTOS_CFLAGS})
 mbed_get_target_common_compile_flags(CHIP_MBEDSTORAGE_CFLAGS mbed-storage-kv-global-api)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDSTORAGE_CFLAGS})
 
-# Add support for Mbed Socket 
+# Add support for Mbed Socket
 mbed_get_target_common_compile_flags(CHIP_MBEDNETSOCKET_CFLAGS mbed-netsocket)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDNETSOCKET_CFLAGS})
 
@@ -190,12 +190,16 @@ endif()
 
 mbed_get_gnu_cpp_standard(CHIP_CFLAGS_CC)
 
-list(APPEND CHIP_CFLAGS 
+list(APPEND CHIP_CFLAGS
     \"-D__LINUX_ERRNO_EXTENSIONS__=1\"
 )
 
+list(APPEND CHIP_CFLAGS
+    \"-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>\"
+)
+
 if (CONFIG_MBED_BSD_SOCKET_TRACE)
-    list(APPEND CHIP_CFLAGS 
+    list(APPEND CHIP_CFLAGS
         \"-DMBED_BSD_SOCKET_TRACE=1\"
     )
 endif()
@@ -240,7 +244,7 @@ set(CHIP_DEFAULT_CONFIG_FILE "<${CHIP_ROOT}/config/mbed/CHIPProjectConfig.h>")
 set(CHIP_PROJECT_CONFIG         ${CHIP_DEFAULT_CONFIG_FILE})
 
 if (CONFIG_CHIP_PROJECT_CONFIG)
-    get_filename_component(CHIP_PROJECT_CONFIG 
+    get_filename_component(CHIP_PROJECT_CONFIG
         ${CONFIG_CHIP_PROJECT_CONFIG}
         REALPATH
         BASE_DIR ${CMAKE_SOURCE_DIR}
@@ -273,6 +277,7 @@ chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_with_platform_mbedtls"           CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
 chip_gn_arg_bool  ("chip_bypass_rendezvous"               CONFIG_CHIP_BYPASS_RENDEZVOUS)
 chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                CONFIG_CHIP_PW_RPC)
+chip_gn_arg_bool  ("chip_enable_data_model"               CONFIG_CHIP_DATA_MODEL)
 if (CONFIG_CHIP_PW_RPC)
     chip_gn_arg_bool  ("chip_build_pw_rpc_echo_proto"         CONFIG_CHIP_PW_RPC_ECHO_PROTO)
     chip_gn_arg_bool  ("chip_build_pw_rpc_common_proto"       CONFIG_CHIP_PW_RPC_COMMON_PROTO)
@@ -298,7 +303,7 @@ ExternalProject_Add(
     BUILD_COMMAND           ninja
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
-    CONFIGURE_ALWAYS        TRUE   
+    CONFIGURE_ALWAYS        TRUE
     BUILD_ALWAYS            TRUE
     USES_TERMINAL_CONFIGURE TRUE
     USES_TERMINAL_BUILD     TRUE
@@ -335,23 +340,27 @@ if("capsense" IN_LIST MBED_TARGET_LABELS)
     target_link_libraries(${APP_TARGET} capsense)
 endif()
 
-list(APPEND CHIP_INCLUDES 
+list(APPEND CHIP_INCLUDES
     ${CHIP_ROOT}/config/mbed/mbedtls
 )
 
-list(APPEND CHIP_DEFINES 
+list(APPEND CHIP_DEFINES
     __LINUX_ERRNO_EXTENSIONS__=1
 )
 
+list(APPEND CHIP_DEFINES
+    CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>
+)
+
 if (CONFIG_MBED_BSD_SOCKET_TRACE)
-    list(APPEND CHIP_DEFINES 
+    list(APPEND CHIP_DEFINES
         MBED_BSD_SOCKET_TRACE=1
     )
 endif()
 
 if (CONFIG_CHIP_PW_RPC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17" PARENT_SCOPE)
-    list(APPEND CHIP_DEFINES 
+    list(APPEND CHIP_DEFINES
         CHIP_PW_RPC=1
     )
 endif()
@@ -370,6 +379,7 @@ target_sources(${APP_TARGET} PRIVATE
 target_include_directories(${APP_TARGET} PRIVATE
                     ${PIGWEED_ROOT}/pw_sys_io/public
                     ${PIGWEED_ROOT}/pw_assert/public
+                    ${PIGWEED_ROOT}/pw_assert/assert_lite_public_overrides
                     ${PIGWEED_ROOT}/pw_assert_log/public
                     ${PIGWEED_ROOT}/pw_assert_log/public_overrides
                     ${PIGWEED_ROOT}/pw_bytes/public
@@ -412,7 +422,7 @@ if (CONFIG_CHIP_PW_RPC_ECHO_PROTO)
         ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb_rpc
         ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb
     )
-    list(APPEND CHIP_DEFINES 
+    list(APPEND CHIP_DEFINES
         CHIP_PW_RPC_ECHO_PROTO=1
     )
 endif(CONFIG_CHIP_PW_RPC_ECHO_PROTO)
@@ -425,7 +435,7 @@ if (CONFIG_CHIP_PW_RPC_COMMON_PROTO)
         ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/device_service.proto_library/nanopb
         ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/device_service.proto_library/nanopb_rpc
     )
-    list(APPEND CHIP_DEFINES 
+    list(APPEND CHIP_DEFINES
         CHIP_PW_RPC_COMMON_PROTO=1
     )
 endif(CONFIG_CHIP_PW_RPC_COMMON_PROTO)
@@ -435,7 +445,7 @@ if (CONFIG_CHIP_PW_RPC_LIGHTING_PROTO)
         ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/lighting_service.proto_library/nanopb
         ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/lighting_service.proto_library/nanopb_rpc
     )
-    list(APPEND CHIP_DEFINES 
+    list(APPEND CHIP_DEFINES
         CHIP_PW_RPC_LIGHTING_PROTO=1
     )
 endif(CONFIG_CHIP_PW_RPC_LIGHTING_PROTO)
@@ -445,7 +455,7 @@ if (CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
         ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/locking_service.proto_library/nanopb
         ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/locking_service.proto_library/nanopb_rpc
     )
-    list(APPEND CHIP_DEFINES 
+    list(APPEND CHIP_DEFINES
         CHIP_PW_RPC_LOCKING_PROTO=1
     )
 endif(CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
@@ -454,7 +464,7 @@ endif(CONFIG_CHIP_PW_RPC)
 
 if (CONFIG_CHIP_OTA_REQUESTOR)
     target_include_directories(${APP_TARGET} PRIVATE
-        ${CHIP_ROOT}/zzz_generated/ota-requestor-app
+        ${CHIP_ROOT}/examples/platform/mbed/ota/
         ${CHIP_ROOT}/src/app/clusters/ota-requestor
         ${CHIP_ROOT}/src/platform
         ${CHIP_ROOT}/src/platform/mbed
@@ -462,18 +472,34 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
     )
 
     target_sources(${APP_TARGET} PRIVATE
-        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/callback-stub.cpp
-        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/CHIPClusters.cpp
-        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
-
+        ${CHIP_ROOT}/examples/platform/mbed/ota/OTARequestorDriverImpl.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
-
         ${CHIP_ROOT}/src/platform/mbed/OTAImageProcessorImpl.cpp
     )
 
-    list(APPEND CHIP_DEFINES 
+if (NOT ${APP_TARGET} MATCHES "shell")
+    target_sources(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+    )
+else()
+    include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+    chip_configure_data_model(${APP_TARGET}
+        ZAP_FILE ${CHIP_ROOT}/examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.zap
+        GEN_DIR ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated
+    )
+    target_include_directories(${APP_TARGET} PRIVATE
+                           ${GEN_DIR}/ota-requestor-app
+    )
+    target_sources(${APP_TARGET} PRIVATE
+               ${GEN_DIR}//ota-requestor-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
+    )
+endif()
+
+    list(APPEND CHIP_DEFINES
         CHIP_OTA_REQUESTOR=1
     )
 endif(CONFIG_CHIP_OTA_REQUESTOR)
@@ -508,16 +534,16 @@ if(BOOT_ENABLED)
             "-DMBED_APP_SIZE=${APP_SIZE}"
     )
 
-    list(APPEND CHIP_DEFINES 
+    list(APPEND CHIP_DEFINES
         BOOT_ENABLED=1
     )
 endif()
 
 
-target_include_directories(${APP_TARGET} PRIVATE 
+target_include_directories(${APP_TARGET} PRIVATE
                            ${CHIP_INCLUDES}
 )
 
 target_compile_definitions(${APP_TARGET} PRIVATE
-                           ${CHIP_DEFINES}                      
+                           ${CHIP_DEFINES}
 )

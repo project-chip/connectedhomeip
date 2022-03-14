@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -43,24 +43,30 @@ namespace Internal {
 /* itemID and subID are limited to 10 bits, even though their types are uint16_t */
 
 // Keys stored in the Chip-factory namespace
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SerialNum           = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SerialNum             = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                            .itemID   = 0x0001 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceId         = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceId           = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                              .itemID   = 0x0002 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceCert       = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceCert         = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                                .itemID   = 0x0003 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceICACerts   = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceICACerts     = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                                    .itemID   = 0x0004 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDevicePrivateKey = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDevicePrivateKey   = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                                      .itemID   = 0x0005 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_HardwareVersion     = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_HardwareVersion       = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                                  .itemID   = 0x0006 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ManufacturingDate   = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ManufacturingDate     = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                                    .itemID   = 0x0007 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SetupPinCode        = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SetupPinCode          = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                               .itemID   = 0x0008 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SetupDiscriminator  = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SetupDiscriminator    = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                                     .itemID   = 0x0009 } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pIterationCount = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+                                                                                       .itemID   = 0x000a } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pSalt           = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+                                                                             .itemID   = 0x000b } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pVerifier       = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+                                                                                 .itemID   = 0x000c } };
 
 // Keys stored in the Chip-config namespace
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_FabricId           = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
@@ -87,6 +93,8 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_CountryCode        = 
                                                                              .itemID   = 0x001b } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Breadcrumb         = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
                                                                             .itemID   = 0x001c } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_UniqueId           = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
+                                                                          .itemID   = 0x001d } };
 
 /* Internal for the KVS interface. */
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_key   = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,

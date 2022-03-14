@@ -22,10 +22,6 @@
 #include "AppEvent.h"
 #include <app/server/Server.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-
 #include "FreeRTOS.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -33,6 +29,13 @@
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/GenericOTARequestorDriver.h>
+#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#endif
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -49,6 +52,7 @@
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
+using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -61,6 +65,24 @@ static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 
 AppTask AppTask::sAppTask;
+
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+static OTARequestor sRequestorCore;
+static GenericOTARequestorDriver sRequestorUser;
+static BDXDownloader sDownloader;
+static OTAImageProcessorImpl sImageProcessor;
+
+void InitializeOTARequestor(void)
+{
+    // Initialize and interconnect the Requestor and Image Processor objects
+    SetRequestorInstance(&sRequestorCore);
+
+    sRequestorCore.Init(&Server::GetInstance(), &sRequestorUser, &sDownloader);
+    sImageProcessor.SetOTADownloader(&sDownloader);
+    sDownloader.SetImageProcessorDelegate(&sImageProcessor);
+    sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
+}
+#endif
 
 int AppTask::StartAppTask()
 {
@@ -335,7 +357,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         }
         else if (AppEvent::kAppEventButtonType_LongPressed == aEvent->ButtonEvent.Type)
         {
-            ConfigurationMgr().InitiateFactoryReset();
+            chip::Server::GetInstance().ScheduleFactoryReset();
         }
         break;
 

@@ -158,19 +158,7 @@ private:
                                    char ** txtFields, size_t & numTxtFields)
     {
         auto optionalMrp = params.GetMRPConfig();
-        // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value change or device type change.
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-        chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
-        ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
-        // Increment default MRP retry intervals by SED poll period to be on the safe side
-        // and avoid unnecessary retransmissions.
-        if (optionalMrp.HasValue())
-        {
-            auto mrp = optionalMrp.Value();
-            optionalMrp.SetValue(ReliableMessageProtocolConfig(mrp.mIdleRetransTimeout + sedPollingConfig.SlowPollingIntervalMS,
-                                                               mrp.mActiveRetransTimeout + sedPollingConfig.FastPollingIntervalMS));
-        }
-#endif
+
         if (optionalMrp.HasValue())
         {
             auto mrp = optionalMrp.Value();
@@ -432,6 +420,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     // TODO - Don't announce records that haven't been updated.
     AdvertiseRecords();
 
+    ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
+
     return CHIP_NO_ERROR;
 }
 
@@ -621,6 +611,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     // TODO - Don't announce records that haven't been updated.
     AdvertiseRecords();
 
+    ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
+
     return CHIP_NO_ERROR;
 }
 
@@ -679,32 +671,32 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
     AddCommonTxtEntries<CommissionAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
 
     // the following sub types only apply to commissionable node advertisements
+    char txtDiscriminator[chip::Dnssd::kKeyLongDiscriminatorMaxLength + 3];
+    char txtCommissioningMode[chip::Dnssd::kKeyCommissioningModeMaxLength + 4];
+    char txtRotatingDeviceId[chip::Dnssd::kKeyRotatingDeviceIdMaxLength + 4];
+    char txtPairingHint[chip::Dnssd::kKeyPairingInstructionMaxLength + 4];
+    char txtPairingInstr[chip::Dnssd::kKeyPairingInstructionMaxLength + 4];
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         // a discriminator always exists
-        char txtDiscriminator[chip::Dnssd::kKeyLongDiscriminatorMaxLength + 3];
         snprintf(txtDiscriminator, sizeof(txtDiscriminator), "D=%d", params.GetLongDiscriminator());
         txtFields[numTxtFields++] = txtDiscriminator;
 
-        char txtCommissioningMode[chip::Dnssd::kKeyCommissioningModeMaxLength + 4];
         snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", static_cast<int>(params.GetCommissioningMode()));
         txtFields[numTxtFields++] = txtCommissioningMode;
 
-        char txtRotatingDeviceId[chip::Dnssd::kKeyRotatingDeviceIdMaxLength + 4];
         if (params.GetRotatingDeviceId().HasValue())
         {
             snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", params.GetRotatingDeviceId().Value());
             txtFields[numTxtFields++] = txtRotatingDeviceId;
         }
 
-        char txtPairingHint[chip::Dnssd::kKeyPairingInstructionMaxLength + 4];
         if (params.GetPairingHint().HasValue())
         {
             snprintf(txtPairingHint, sizeof(txtPairingHint), "PH=%d", params.GetPairingHint().Value());
             txtFields[numTxtFields++] = txtPairingHint;
         }
 
-        char txtPairingInstr[chip::Dnssd::kKeyPairingInstructionMaxLength + 4];
         if (params.GetPairingInstruction().HasValue())
         {
             snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", params.GetPairingInstruction().Value());

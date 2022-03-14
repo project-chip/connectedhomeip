@@ -19,11 +19,11 @@
 #include <WindowApp.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip::Credentials;
@@ -112,9 +112,6 @@ WindowApp::Cover * WindowApp::GetCover(chip::EndpointId endpoint)
 
 CHIP_ERROR WindowApp::Init()
 {
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
-
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
@@ -201,8 +198,6 @@ void WindowApp::Finish()
 
 void WindowApp::DispatchEvent(const WindowApp::Event & event)
 {
-    Cover * cover = nullptr;
-
     switch (event.mId)
     {
     case EventId::ResetWarning:
@@ -218,7 +213,7 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
         break;
 
     case EventId::Reset:
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
         break;
 
     case EventId::UpPressed:
@@ -296,33 +291,56 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
             GetCover().LiftDown();
         }
         break;
-
-    case EventId::LiftUp:
-    case EventId::LiftDown:
-        cover = GetCover(event.mEndpoint);
-        if (cover)
-        {
-            cover->GotoLift(event.mId);
-        }
+    case EventId::AttributeChange:
+        DispatchEventAttributeChange(event.mEndpoint, event.mAttributeId);
         break;
-
-    case EventId::TiltUp:
-    case EventId::TiltDown:
-        cover = GetCover(event.mEndpoint);
-        if (cover)
-        {
-            cover->GotoTilt(event.mId);
-        }
+    default:
         break;
+    }
+}
 
-    case EventId::StopMotion:
-        cover = GetCover(event.mEndpoint);
-        if (cover)
-        {
-            cover->StopMotion();
-        }
+void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute)
+{
+    Cover * cover = GetCover(endpoint);
+
+    if (nullptr == cover)
+    {
+        emberAfWindowCoveringClusterPrint("Ep[%u] not supported AttributeId=%u\n", endpoint, (unsigned int) attribute);
+        return;
+    }
+
+    switch (attribute)
+    {
+    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
+    case Attributes::TargetPositionLiftPercent100ths::Id:
+        cover->LiftGoToTarget();
         break;
-
+    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
+    case Attributes::TargetPositionTiltPercent100ths::Id:
+        cover->TiltGoToTarget();
+        break;
+    /* RO OperationalStatus */
+    case Attributes::OperationalStatus::Id:
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        emberAfWindowCoveringClusterPrint("Global OpState: %02X\n", (unsigned int) OperationalStatusGet(endpoint).global);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        break;
+    /* RW Mode */
+    case Attributes::Mode::Id:
+        emberAfWindowCoveringClusterPrint("Mode set: ignored");
+        break;
+    /* ### ATTRIBUTEs CHANGEs IGNORED ### */
+    /* RO Type: not supposed to dynamically change */
+    case Attributes::Type::Id:
+    /* RO EndProductType: not supposed to dynamically change */
+    case Attributes::EndProductType::Id:
+    /* RO ConfigStatus: set by WC server */
+    case Attributes::ConfigStatus::Id:
+    /* RO SafetyStatus: set by WC server */
+    case Attributes::SafetyStatus::Id:
+    /* ============= Positions for Position Aware ============= */
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
     default:
         break;
     }
@@ -405,17 +423,13 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     ConfigStatus configStatus = { .operational             = 1,
                                   .online                  = 1,
                                   .liftIsReversed          = 0,
-                                  .liftIsPA                = 1,
-                                  .tiltIsPA                = 1,
+                                  .liftIsPA                = HasFeaturePaLift(endpoint),
+                                  .tiltIsPA                = HasFeaturePaTilt(endpoint),
                                   .liftIsEncoderControlled = 1,
                                   .tiltIsEncoderControlled = 1 };
     ConfigStatusSet(endpoint, configStatus);
 
-    // Attribute: Id 10 OperationalStatus
-    OperationalStatus operationalStatus = { .global = OperationalState::Stall,
-                                            .lift   = OperationalState::Stall,
-                                            .tilt   = OperationalState::Stall };
-    OperationalStatusSet(endpoint, operationalStatus);
+    OperationalStatusSetWithGlobalUpdated(endpoint, mOperationalStatus);
 
     // Attribute: Id 13 EndProductType
     EndProductTypeSet(endpoint, EMBER_ZCL_WC_END_PRODUCT_TYPE_INTERIOR_BLIND);
@@ -435,13 +449,18 @@ void WindowApp::Cover::Finish()
     WindowApp::Instance().DestroyTimer(mTiltTimer);
 }
 
-void WindowApp::Cover::LiftUp()
+void WindowApp::Cover::LiftDown()
 {
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
     chip::Percent100ths percent100ths = 5000; // set at middle
 
+    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::LiftDown - Out of Memory for WorkData"));
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
         percent100ths = current.Value();
@@ -454,16 +473,25 @@ void WindowApp::Cover::LiftUp()
     {
         percent100ths = 10000;
     }
-    LiftPositionSet(mEndpoint, percent100ths);
+
+    data->mEndpointId   = mEndpoint;
+    data->percent100ths = percent100ths;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleLiftPositionSet, reinterpret_cast<intptr_t>(data));
 }
 
-void WindowApp::Cover::LiftDown()
+void WindowApp::Cover::LiftUp()
 {
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
     chip::Percent100ths percent100ths = 5000; // set at middle
 
+    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::LiftUp - Out of Memory for WorkData"));
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
         percent100ths = current.Value();
@@ -476,75 +504,73 @@ void WindowApp::Cover::LiftDown()
     {
         percent100ths = 0;
     }
-    LiftPositionSet(mEndpoint, percent100ths);
+
+    data->mEndpointId   = mEndpoint;
+    data->percent100ths = percent100ths;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleLiftPositionSet, reinterpret_cast<intptr_t>(data));
 }
 
-void WindowApp::Cover::GotoLift(EventId action)
+void WindowApp::Cover::LiftUpdate(bool newTarget)
 {
-    chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::app::DataModel::Nullable<chip::Percent100ths> target;
+    NPercent100ths current, target;
+
+    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::LiftUpdate - Out of Memory for WorkData"));
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+
     Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
 
-    if (current.IsNull() || target.IsNull())
+    OperationalStatus opStatus = OperationalStatusGet(mEndpoint);
+    OperationalState opState   = ComputeOperationalState(target, current);
+
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    /* If Triggered by a TARGET update */
+    if (newTarget)
     {
-        return;
+        mLiftTimer->Stop(); // Cancel previous motion if any
+        mLiftOpState = opState;
     }
 
-    if (EventId::None != action)
+    if (mLiftOpState == opState)
     {
-        mLiftAction = action;
-    }
-
-    if (EventId::LiftUp == mLiftAction)
-    {
-        if (current.Value() < target.Value())
+        /* Actuator still need to move, not reached/crossed Target yet */
+        switch (mLiftOpState)
         {
-            LiftUp();
-        }
-        else
-        {
-            mLiftAction = EventId::None;
-        }
-    }
-    else
-    {
-        if (current.Value() > target.Value())
-        {
+        case OperationalState::MovingDownOrClose:
             LiftDown();
-        }
-        else
-        {
-            mLiftAction = EventId::None;
+            break;
+        case OperationalState::MovingUpOrOpen:
+            LiftUp();
+            break;
+        default:
+            break;
         }
     }
+    else /* CURRENT reached TARGET or crossed it */
+    {
+        /* Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end */
 
-    if (EventId::None != mLiftAction && mLiftTimer)
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        Attributes::CurrentPositionLiftPercent100ths::Set(mEndpoint, target);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+        mLiftOpState = OperationalState::Stall;
+    }
+    opStatus.lift = mLiftOpState;
+
+    data->mEndpointId = mEndpoint;
+    data->opStatus    = opStatus;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleOperationalStatusSetWithGlobalUpdate, reinterpret_cast<intptr_t>(data));
+
+    if ((OperationalState::Stall != mLiftOpState) && mLiftTimer)
     {
         mLiftTimer->Start();
     }
-}
-
-void WindowApp::Cover::TiltUp()
-{
-    EmberAfStatus status;
-    chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::Percent100ths percent100ths = 5000; // set at middle
-
-    status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-
-    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
-        percent100ths = current.Value();
-
-    if (percent100ths < 9000)
-    {
-        percent100ths += 1000;
-    }
-    else
-    {
-        percent100ths = 10000;
-    }
-    TiltPositionSet(mEndpoint, percent100ths);
 }
 
 void WindowApp::Cover::TiltDown()
@@ -553,7 +579,43 @@ void WindowApp::Cover::TiltDown()
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
     chip::Percent100ths percent100ths = 5000; // set at middle
 
+    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::TiltDown - Out of Memory for WorkData"));
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        percent100ths = current.Value();
+
+    if (percent100ths < 9000)
+    {
+        percent100ths += 1000;
+    }
+    else
+    {
+        percent100ths = 10000;
+    }
+
+    data->mEndpointId   = mEndpoint;
+    data->percent100ths = percent100ths;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleTiltPositionSet, reinterpret_cast<intptr_t>(data));
+}
+
+void WindowApp::Cover::TiltUp()
+{
+    EmberAfStatus status;
+    chip::app::DataModel::Nullable<chip::Percent100ths> current;
+    chip::Percent100ths percent100ths = 5000; // set at middle
+
+    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::TiltUp - Out of Memory for WorkData"));
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
         percent100ths = current.Value();
@@ -566,50 +628,70 @@ void WindowApp::Cover::TiltDown()
     {
         percent100ths = 0;
     }
-    TiltPositionSet(mEndpoint, percent100ths);
+
+    data->mEndpointId   = mEndpoint;
+    data->percent100ths = percent100ths;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleTiltPositionSet, reinterpret_cast<intptr_t>(data));
 }
 
-void WindowApp::Cover::GotoTilt(EventId action)
+void WindowApp::Cover::TiltUpdate(bool newTarget)
 {
-    chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::app::DataModel::Nullable<chip::Percent100ths> target;
+    NPercent100ths current, target;
+
+    CoverWorkData * data = chip::Platform::New<CoverWorkData>();
+    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::TiltUpdate - Out of Memory for WorkData"));
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+
     Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
 
-    if (current.IsNull() || target.IsNull())
+    OperationalStatus opStatus = OperationalStatusGet(mEndpoint);
+    OperationalState opState   = ComputeOperationalState(target, current);
+
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    /* If Triggered by a TARGET update */
+    if (newTarget)
     {
-        return;
+        mTiltTimer->Stop(); // Cancel previous motion if any
+        mTiltOpState = opState;
     }
 
-    if (EventId::None != action)
+    if (mTiltOpState == opState)
     {
-        mTiltAction = action;
-    }
-
-    if (EventId::TiltUp == mTiltAction)
-    {
-        if (current.Value() < target.Value())
+        /* Actuator still need to move, not reached/crossed Target yet */
+        switch (mTiltOpState)
         {
-            TiltUp();
-        }
-        else
-        {
-            mTiltAction = EventId::None;
-        }
-    }
-    else
-    {
-        if (current.Value() > target.Value())
-        {
+        case OperationalState::MovingDownOrClose:
             TiltDown();
-        }
-        else
-        {
-            mTiltAction = EventId::None;
+            break;
+        case OperationalState::MovingUpOrOpen:
+            TiltUp();
+            break;
+        default:
+            break;
         }
     }
+    else /* CURRENT reached TARGET or crossed it */
+    {
+        /* Actuator finalize the movement AND CURRENT Must be equal to TARGET at the end */
 
-    if (EventId::None != mTiltAction && mTiltTimer)
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        Attributes::CurrentPositionTiltPercent100ths::Set(mEndpoint, target);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+        mTiltOpState = OperationalState::Stall;
+    }
+    opStatus.tilt = mTiltOpState;
+
+    data->mEndpointId = mEndpoint;
+    data->opStatus    = opStatus;
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleOperationalStatusSetWithGlobalUpdate, reinterpret_cast<intptr_t>(data));
+
+    if ((OperationalState::Stall != mTiltOpState) && mTiltTimer)
     {
         mTiltTimer->Start();
     }
@@ -617,7 +699,9 @@ void WindowApp::Cover::GotoTilt(EventId action)
 
 EmberAfWcType WindowApp::Cover::CycleType()
 {
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     EmberAfWcType type = TypeGet(mEndpoint);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     switch (type)
     {
@@ -635,22 +719,12 @@ EmberAfWcType WindowApp::Cover::CycleType()
     default:
         type = EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT;
     }
-    TypeSet(mEndpoint, type);
-    return type;
-}
 
-void WindowApp::Cover::StopMotion()
-{
-    mLiftAction = EventId::None;
-    if (mLiftTimer)
-    {
-        mLiftTimer->Stop();
-    }
-    mTiltAction = EventId::None;
-    if (mTiltTimer)
-    {
-        mTiltTimer->Stop();
-    }
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    TypeSet(mEndpoint, type);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    return type;
 }
 
 void WindowApp::Cover::OnLiftTimeout(WindowApp::Timer & timer)
@@ -658,7 +732,7 @@ void WindowApp::Cover::OnLiftTimeout(WindowApp::Timer & timer)
     WindowApp::Cover * cover = static_cast<WindowApp::Cover *>(timer.mContext);
     if (cover)
     {
-        cover->GotoLift();
+        cover->LiftContinueToTarget();
     }
 }
 
@@ -667,6 +741,30 @@ void WindowApp::Cover::OnTiltTimeout(WindowApp::Timer & timer)
     WindowApp::Cover * cover = static_cast<WindowApp::Cover *>(timer.mContext);
     if (cover)
     {
-        cover->GotoTilt();
+        cover->TiltContinueToTarget();
     }
+}
+
+void WindowApp::Cover::ScheduleTiltPositionSet(intptr_t arg)
+{
+    WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
+    TiltPositionSet(data->mEndpointId, data->percent100ths);
+
+    chip::Platform::Delete(data);
+}
+
+void WindowApp::Cover::ScheduleLiftPositionSet(intptr_t arg)
+{
+    WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
+    LiftPositionSet(data->mEndpointId, data->percent100ths);
+
+    chip::Platform::Delete(data);
+}
+
+void WindowApp::Cover::ScheduleOperationalStatusSetWithGlobalUpdate(intptr_t arg)
+{
+    WindowApp::Cover::CoverWorkData * data = reinterpret_cast<WindowApp::Cover::CoverWorkData *>(arg);
+    OperationalStatusSetWithGlobalUpdated(data->mEndpointId, data->opStatus);
+
+    chip::Platform::Delete(data);
 }

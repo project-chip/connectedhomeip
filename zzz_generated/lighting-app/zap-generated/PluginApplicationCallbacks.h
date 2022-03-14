@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
+    MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterColorControlPluginServerInitCallback();                                                                                  \
@@ -31,6 +32,7 @@
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
+    MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
@@ -39,9 +41,7 @@
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
     MatterOccupancySensingPluginServerInitCallback();                                                                              \
-    MatterOnOffPluginClientInitCallback();                                                                                         \
     MatterOnOffPluginServerInitCallback();                                                                                         \
-    MatterOnOffSwitchConfigurationPluginServerInitCallback();                                                                      \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterSwitchPluginServerInitCallback();                                                                                        \

@@ -32,6 +32,8 @@
 #include <lib/support/ErrorStr.h>
 #include <setup_payload/SetupPayload.h>
 
+#include "esp_log.h"
+
 using namespace ::chip;
 
 namespace chip {
@@ -54,13 +56,13 @@ void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, 
  */
 CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
-    CHIP_ERROR err;
     mCB                              = cb;
     RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
 
+    ReturnErrorOnFailure(Platform::MemoryInit());
+
     // Initialize the CHIP stack.
-    err = PlatformMgr().InitChipStack();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
     if (flags.Has(RendezvousInformationFlag::kBLE))
     {
@@ -79,19 +81,12 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
         ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
     }
 
-    err = Platform::MemoryInit();
-    SuccessOrExit(err);
-
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 
     // Start a task to run the CHIP Device event loop.
-    err = PlatformMgr().StartEventLoopTask();
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return PlatformMgr().StartEventLoopTask();
 }
 } // namespace DeviceManager
 } // namespace chip
@@ -99,6 +94,13 @@ exit:
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t mask, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
+    TaskHandle_t task = xTaskGetCurrentTaskHandle();
+    const char * name = pcTaskGetName(task);
+    if (strcmp(name, "CHIP"))
+    {
+        ESP_LOGE("all-clusters-app", "Attribute changed on non-Matter task '%s'\n", name);
+    }
+
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
     if (cb != nullptr)

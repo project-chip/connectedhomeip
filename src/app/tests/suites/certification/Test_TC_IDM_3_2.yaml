@@ -1,0 +1,239 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.3.2. [TC-IDM-3.2] Write Response Action from DUT to TH.
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH sends the Write Request Message to the DUT to write one attribute
+          on a given cluster and endpoint. The Message should contain one valid
+          CommandDataIB, which has the specific Endpoint, Specific Cluster and
+          Specific Attribute. On receipt of this message, DUT should send a
+          write response action with the modified attribute value to the TH."
+      verification:
+          "In case of chip tool, here is an example command to use
+          ./chip-tool levelcontrol write on-level 2 1 1"
+      disabled: true
+
+    - label:
+          "TH sends a Write Request Message to the DUT to all endpoints. On
+          receipt of this message, DUT should send a Write Response action with
+          the attribute value to the DUT."
+      verification:
+          "In case of chip tool, here is an example command to use
+          ./chip-tool any write-by-id 0x0008 0x0010 1 1 0xffff"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Write Request Message to the DUT to write an
+          attribute of data type bool. DUT responds with the Write Response
+          action with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use
+          ./chip-tool basic write local-config-disabled 1 1 0"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Write Request Message to the DUT to write an
+          attribute of data type string. DUT responds with the Write Response
+          action with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use
+          ./chip-tool basic write node-label 1 1 0"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Write Request Message to the DUT to write an
+          attribute of data type unsigned integer. DUT responds with the Write
+          Response action with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use
+          ./chip-tool any write-by-id 0x0008 0x0010 1 1 1"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Write Request Message to the DUT to write an
+          attribute of data type signed integer. DUT responds with the Write
+          Response action with the right attribute value."
+      verification:
+          "write to an attribute of type signed integer to the Harness"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Write Request Message to the DUT to write an
+          attribute of data type floating point. DUT responds with the Write
+          Response action with the right attribute value."
+      verification: "write to an attribute of type floating to the Harness"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Write Request Message to the DUT to write an
+          attribute of data type Octet String. DUT responds with the Write
+          Response action with the right attribute value."
+      verification: "write to an attribute of type oct string to the Harness"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Write Request Message to the DUT to write an
+          attribute of data type Struct. DUT responds with the Write Response
+          action with the right attribute value."
+      verification: "write to an attribute of type Struct to the Harness"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Write Request Message to the DUT to write an
+          attribute of data type List. DUT responds with the Write Response
+          action with the right attribute value."
+      verification: "write to an attribute of type list to the Harness"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Write Request Message to the DUT to write an
+          attribute of data type enum. DUT responds with the Write Response
+          action with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use
+          ./chip-tool any write-by-id 0x0204 0 1 1 1"
+      disabled: true
+
+    - label:
+          "[Optional] TH sends the Write Request Message to the DUT to write an
+          attribute of data type bitmap. DUT responds with the Write Response
+          action with the right attribute value."
+      verification:
+          "In case of chip tool, here is an example command to use
+          ./chip-tool colorcontrol write-by-id 0x000f 1 1 1"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to read any attribute
+          to an unsupported node. DUT responds with the Write Response action"
+      verification:
+          "Unsupported for TE8 -
+          https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/4999"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to read any attribute
+          to an unsupported Endpoint. DUT responds with the Write Response
+          action"
+      verification:
+          "In case of chip tool, here is an example command to use ./chip-tool
+          onoff on 1 20"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to read any attribute
+          to an unsupported cluster. DUT responds with the Write Response action"
+      verification:
+          "In case of chip tool, here is an example command to use ./chip-tool
+          any command-by-id 0x0003 0 1 1 2"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to read an unsupported
+          attribute DUT responds with the Write Response action"
+      verification:
+          "In case of chip tool, here is an example command to use
+          ./chip-tool any read-by-id 0x03 -900 1 1"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to read an attribute
+          which is not writable. DUT responds with the Write Response action"
+      verification:
+          "In case of chip tool, here is an example command to use
+          ./out/debug/chip-tool any write-by-id 0x0028 1 test 5 0"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to write to an
+          attribute in the path that requires a privilege that is not granted
+          for the cluster in the path. DUT responds with the Write Response
+          action"
+      verification: "Unsupported in TE8 - Out of scope"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to write to an
+          attribute in the path that is fabric scoped, and the associated fabric
+          does not match the accessing fabric DUT responds with the Write
+          Response action"
+      verification: "Unsupported in TE8 - Out of scope"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to write one attribute
+          on a given cluster and endpoint. The Message should contain one valid
+          CommandDataIB, which has the specific Endpoint, Specific Cluster and
+          Specific Attribute. On receipt of this message, DUT should send a
+          write response action with the modified attribute value to the TH.
+          Repeat the above steps 3 times."
+      verification:
+          "In case of chip tool, here is an example command to use
+          ./chip-tool basic write node-label TE8 1 1 ./chip-tool basic
+          write node-label TE7 1 1 ./chip-tool basic write node-label TE6 1
+          1"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to modify the value of
+          one attribute on a given cluster and endpoint to null. The Message
+          should contain one valid CommandDataIB, which has the specific
+          Endpoint, Specific Cluster and Specific Attribute. On receipt of this
+          message, DUT should send a write response action with the modified
+          attribute value to the TH."
+      verification: "Need to get more info"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to append an attribute
+          value On receipt of this message, DUT should send a write response
+          action with the modified attribute value to the TH."
+      verification: "Need to get more info"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to delete an attribute
+          value On receipt of this message, DUT should send a write response
+          action with the modified attribute value to the TH."
+      verification: "Need to get more info"
+      disabled: true
+
+    - label:
+          "TH sends the Write Request Message to the DUT to modify the value of
+          one attribute on a given cluster and endpoint to null. The Message
+          should contain one valid CommandDataIB, which has the specific
+          Endpoint, Specific Cluster and Specific Attribute. Set
+          SuppressResponse to True."
+      verification: "Need to get more info"
+      disabled: true
+
+    - label:
+          "TH sends a ReadRequest message to the DUT to read any attribute on
+          any cluster. DUT returns with a report data action with the attribute
+          values and the dataversion of the cluster. TH sends a Write Request
+          Message to the DUT to modify the value of one attribute no DataVersion
+          indicated. TH sends a second Write Request Message to the DUT to
+          modify the value of an attribute with the dataversion field set to the
+          value received earlier."
+      verification:
+          "Unsupported in TE8
+          https://github.com/project-chip/connectedhomeip/issues/15812"
+      disabled: true

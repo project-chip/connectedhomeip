@@ -26,11 +26,15 @@ extern NSString * const kNetworkPasswordDefaultsKey;
 extern NSString * const kFabricIdKey;
 
 CHIPDeviceController * InitializeCHIP(void);
+void CHIPRestartController(CHIPDeviceController * controller);
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
 void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
 void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key);
 uint64_t CHIPGetNextAvailableDeviceID(void);
+NSString * KeyForPairedDevice(uint64_t id);
+uint64_t CHIPGetLastPairedDeviceId(void);
 void CHIPSetNextAvailableDeviceID(uint64_t id);
+void CHIPSetDevicePaired(uint64_t id, BOOL paired);
 BOOL CHIPIsDevicePaired(uint64_t id);
 BOOL CHIPGetConnectedDevice(CHIPDeviceConnectionCallback completionHandler);
 BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallback completionHandler);

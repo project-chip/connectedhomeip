@@ -96,7 +96,7 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
             {
                 ClusterStatus clusterStatus;
                 ReturnErrorOnFailure(reader.Get(clusterStatus));
-                PRETTY_PRINT("\tcluster-status = 0x%" PRIx8 ",", clusterStatus);
+                PRETTY_PRINT("\tcluster-status = 0x%x,", clusterStatus);
             }
 #endif // CHIP_DETAIL_LOGGING
         }
@@ -195,12 +195,12 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 
     const char * desc = nullptr;
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    constexpr char generalFormat[] = "General error: 0x%02" PRIx8;
-    constexpr char clusterFormat[] = "Cluster-specific error: 0x%02" PRIx8;
+    constexpr char generalFormat[] = "General error: 0x%02x";
+    constexpr char clusterFormat[] = "Cluster-specific error: 0x%02x";
 
-    // Formatting an 8-bit int will take at most 2 chars, and replace the '%'
-    // and the format letter(s) for PRIx8, so a buffer big enough to hold our
-    // format string will also hold our formatted string.
+    // Formatting an 8-bit int will take at most 2 chars, and replace the '%02x'
+    // so a buffer big enough to hold our format string will also hold our
+    // formatted string.
     constexpr size_t formattedSize = max(sizeof(generalFormat), sizeof(clusterFormat));
     char formattedString[formattedSize];
 

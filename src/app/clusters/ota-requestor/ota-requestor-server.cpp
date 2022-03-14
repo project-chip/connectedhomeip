@@ -22,15 +22,16 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/EventLogging.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/util/attribute-storage.h>
-#include <platform/OTARequestorInterface.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
+using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs;
 
 namespace {
 
@@ -45,6 +46,10 @@ public:
     // TODO: Implement Read/Write for OtaSoftwareUpdateRequestorAttrAccess
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+private:
+    CHIP_ERROR ReadDefaultOtaProviders(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 };
 
 OtaSoftwareUpdateRequestorAttrAccess gAttrAccess;
@@ -54,7 +59,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Read(const ConcreteReadAttribut
     switch (aPath.mAttributeId)
     {
     case Attributes::DefaultOtaProviders::Id:
-        return aEncoder.Encode(DataModel::List<uint8_t>());
+        return ReadDefaultOtaProviders(aEncoder);
     default:
         break;
     }
@@ -67,14 +72,70 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Write(const ConcreteDataAttribu
     switch (aPath.mAttributeId)
     {
     case Attributes::DefaultOtaProviders::Id: {
-        DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> list;
-        ReturnErrorOnFailure(aDecoder.Decode(list));
-        // Ignore the list for now
-        break;
+        return WriteDefaultOtaProviders(aPath, aDecoder);
     }
     default:
         break;
     }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::ReadDefaultOtaProviders(AttributeValueEncoder & aEncoder)
+{
+    chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return aEncoder.EncodeEmptyList();
+    }
+
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        auto iterator = requestor->GetDefaultOTAProviderListIterator();
+        while (iterator.Next())
+        {
+            ProviderLocation::Type pl = iterator.GetValue();
+            ReturnErrorOnFailure(encoder.Encode(pl));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath,
+                                                                          AttributeValueDecoder & aDecoder)
+{
+    chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    switch (aPath.mListOp)
+    {
+    case ConcreteDataAttributePath::ListOperation::ReplaceAll: {
+        DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> list;
+        ReturnErrorOnFailure(aDecoder.Decode(list));
+
+        // With chunking, a single large list is converted to a list of AttributeDataIBs. The first AttributeDataIB contains an
+        // empty list (to signal this is a replace so clear out contents) followed by a succession of single AttributeDataIBs for
+        // each entry to be added.
+        size_t count = 0;
+        ReturnErrorOnFailure(list.ComputeSize(&count));
+        VerifyOrReturnError(count == 0, CHIP_ERROR_INVALID_ARGUMENT);
+        return requestor->ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex());
+    }
+    case ConcreteDataAttributePath::ListOperation::ReplaceItem:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    case ConcreteDataAttributePath::ListOperation::DeleteItem:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    case ConcreteDataAttributePath::ListOperation::AppendItem: {
+        OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType item;
+        ReturnErrorOnFailure(aDecoder.Decode(item));
+        return requestor->AddDefaultOtaProvider(item);
+    }
+    default:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -134,12 +195,12 @@ EmberAfStatus OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpoint
     return Attributes::UpdateStateProgress::Get(endpointId, value);
 }
 
-void OtaRequestorServerOnStateTransition(DataModel::Nullable<OTAUpdateStateEnum> previousState, OTAUpdateStateEnum newState,
-                                         OTAChangeReasonEnum reason, DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
+void OtaRequestorServerOnStateTransition(OTAUpdateStateEnum previousState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason,
+                                         DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
 {
-    if (!previousState.IsNull() && previousState.Value() == newState)
+    if (previousState == newState)
     {
-        ChipLogError(Zcl, "Previous state and new state are the same, no event to log");
+        ChipLogError(Zcl, "Previous state and new state are the same (%d), no event to log", to_underlying(newState));
         return;
     }
 

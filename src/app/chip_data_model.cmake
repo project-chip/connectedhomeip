@@ -54,14 +54,7 @@ endfunction()
 #                   supported by the application.
 #
 function(chip_configure_data_model APP_TARGET)
-    cmake_parse_arguments(ARG "INCLUDE_CLIENT_CALLBACKS;INCLUDE_SERVER" "ZAP_FILE;GEN_DIR" "" ${ARGN})
-
-    if (ARG_INCLUDE_CLIENT_CALLBACKS)
-        target_sources(${APP_TARGET} PRIVATE
-            ${CHIP_APP_BASE_DIR}/util/im-client-callbacks.cpp
-            ${ARG_GEN_DIR}/CHIPClientCallbacks.cpp
-        )
-    endif()
+    cmake_parse_arguments(ARG "INCLUDE_SERVER" "ZAP_FILE;GEN_DIR" "" ${ARGN})
 
     if (ARG_INCLUDE_SERVER)
         target_sources(${APP_TARGET} PRIVATE
@@ -70,6 +63,10 @@ function(chip_configure_data_model APP_TARGET)
             ${CHIP_APP_BASE_DIR}/server/OnboardingCodesUtil.cpp
             ${CHIP_APP_BASE_DIR}/server/Server.cpp
             ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
+        )
+
+        target_compile_options(${APP_TARGET} PUBLIC
+           "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
         )
     endif()
 
@@ -81,12 +78,10 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
         ${CHIP_APP_BASE_DIR}/util/af-event.cpp
-        ${CHIP_APP_BASE_DIR}/util/af-main-common.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-size-util.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
-        ${CHIP_APP_BASE_DIR}/util/chip-message-send.cpp
         ${CHIP_APP_BASE_DIR}/util/client-api.cpp
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp

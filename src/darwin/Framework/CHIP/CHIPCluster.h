@@ -33,4 +33,49 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)new NS_UNAVAILABLE;
 @end
 
+/**
+ * CHIPReadParams
+ *    This is used to control the behavior of attribute reads and subscribes.
+ *    If not provided (i.e. nil passed for the CHIPReadParams argument), will be
+ *    treated as if a default-initialized object was passed in.
+ */
+@interface CHIPReadParams : NSObject
+
+/**
+ * Whether the read/subscribe is fabric-filtered. nil (the default value) is
+ * treated as YES.
+ *
+ * If YES, the read/subscribe is fabric-filtered and will only see things
+ * associated with the fabric of the reader/subscriber.
+ *
+ * If NO, the read/subscribe is not fabric-filtered and will see all
+ * non-fabric-sensitive data for the given attribute path.
+ */
+@property (strong, nonatomic, nullable) NSNumber * fabricFiltered;
+
+- (instancetype)init;
+@end
+
+/**
+ * CHIPSubscribeParams
+ *    This is used to control the behavior of attribute subscribes.  If not
+ *    provided (i.e. nil passed for the CHIPSubscribeParams argument), will be
+ *    treated as if a default-initialized object was passed in.
+ */
+@interface CHIPSubscribeParams : CHIPReadParams
+
+/**
+ * Whether the subscribe should allow previous subscriptions to stay in
+ * place. nil (the default value) is treated as NO.
+ *
+ * If NO, the subscribe will cancel any existing subscriptions to the target
+ * node when it sets up the new one.
+ *
+ * If YES, the subscribe will allow any previous subscriptions to remain.
+ */
+@property (strong, nonatomic, nullable) NSNumber * keepPreviousSubscriptions;
+
+- (instancetype)init;
+@end
+
 NS_ASSUME_NONNULL_END

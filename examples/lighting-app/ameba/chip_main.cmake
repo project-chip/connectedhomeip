@@ -16,6 +16,8 @@ list(
     #OTARequestor
     ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/OTARequestor.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
 )
 endif (matter_enable_ota_requestor)
@@ -23,10 +25,8 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/lighting-app/zap-generated/CHIPClientCallbacks.cpp
     ${chip_dir}/zzz_generated/lighting-app/zap-generated/callback-stub.cpp
     ${chip_dir}/zzz_generated/lighting-app/zap-generated/IMClusterCommandHandler.cpp
-    ${chip_dir}/zzz_generated/lighting-app/zap-generated/CHIPClusters.cpp
 
     ${chip_dir}/examples/lighting-app/lighting-common/color_format/color_format.cpp
 
@@ -81,6 +81,7 @@ list(
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
+    -DMATTER_LIGHTING_APP=1
 )
 
 if (matter_enable_ota_requestor)

@@ -50,11 +50,18 @@ executable("chip-lighting-app") {
   include_dirs = [ "include" ]
 
   if (chip_enable_pw_rpc) {
-    defines = [ "PW_RPC_ENABLED" ]
+    defines = [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+    ]
 
     sources += [
+      "${chip_root}/examples/platform/linux/Rpc.cpp",
       "${dir_pigweed}/targets/host/system_rpc_server.cc",
-      "Rpc.cpp",
     ]
 
     deps += [
@@ -62,7 +69,6 @@ executable("chip-lighting-app") {
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_log",
       "$dir_pw_rpc:server",
-      "$dir_pw_rpc:synchronized_channel_output",
       "$dir_pw_rpc/system_server:facade",
       "$dir_pw_stream:socket_stream",
       "$dir_pw_stream:sys_io_stream",
@@ -70,12 +76,15 @@ executable("chip-lighting-app") {
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:rpc_services",
     ]
 
     deps += pw_build_LINK_DEPS
+
+    include_dirs += [ "${chip_root}/examples/common" ]
   } else {
     # The system_rpc_server.cc file is in pigweed and doesn't compile with
     # -Wconversion, remove check for RPC build only.

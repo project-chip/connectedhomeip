@@ -36,7 +36,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   declare_args() {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
-        (host_cpu == "x64" || host_cpu == "arm64")
+        (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
     enable_pylib = false
   }
 
@@ -70,6 +70,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "${chip_root}/src/ble",
       "${chip_root}/src/controller",
       "${chip_root}/src/credentials",
+      "${chip_root}/src/credentials:default_attestation_verifier",
       "${chip_root}/src/crypto",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
@@ -108,6 +109,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/examples/shell/standalone:chip-shell",
         "${chip_root}/src/app/tests/integration:chip-im-initiator",
         "${chip_root}/src/app/tests/integration:chip-im-responder",
+        "${chip_root}/src/lib/address_resolve:address-resolve-tool",
         "${chip_root}/src/messaging/tests/echo:chip-echo-requester",
         "${chip_root}/src/messaging/tests/echo:chip-echo-responder",
         "${chip_root}/src/qrcodetool",
@@ -436,19 +438,19 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_k32w_lighting_app_build) {
     group("k32w_lighting_app") {
-      deps = [ "${chip_root}/examples/lighting-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
+      deps = [ "${chip_root}/examples/lighting-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
     }
   }
 
   if (enable_k32w_lock_app_build) {
     group("k32w_lock_app") {
-      deps = [ "${chip_root}/examples/lock-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
+      deps = [ "${chip_root}/examples/lock-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
     }
   }
 
   if (enable_k32w_shell_app_build) {
     group("k32w_shell_app") {
-      deps = [ "${chip_root}/examples/shell/k32w(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
+      deps = [ "${chip_root}/examples/shell/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
     }
   }
 

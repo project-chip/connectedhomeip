@@ -26,6 +26,7 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
@@ -99,16 +100,17 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     TransportMgr<LoopbackTransport> transportMgr;
+    FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
 
-    CHIP_ERROR err;
-
-    err = transportMgr.Init("LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(
+        inSuite,
+        CHIP_NO_ERROR ==
+            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
 }
 
 void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
@@ -128,14 +130,17 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
+    FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
 
-    err = transportMgr.Init("LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(
+        inSuite,
+        CHIP_NO_ERROR ==
+            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
 
     callback.mSuite = inSuite;
 
@@ -220,14 +225,17 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
+    FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
 
-    err = transportMgr.Init("LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(
+        inSuite,
+        CHIP_NO_ERROR ==
+            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
 
     callback.mSuite = inSuite;
 
@@ -298,14 +306,17 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
+    FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
 
-    err = transportMgr.Init("LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(
+        inSuite,
+        CHIP_NO_ERROR ==
+            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
 
     callback.mSuite = inSuite;
 
@@ -404,14 +415,17 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
+    FabricTable fabricTable;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
 
-    err = transportMgr.Init("LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(
+        inSuite,
+        CHIP_NO_ERROR ==
+            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
     TestSessionReleaseCallback callback;
@@ -459,6 +473,196 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
+void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    uint16_t payload_len = sizeof(PAYLOAD);
+
+    TestSessMgrCallback callback;
+    callback.LargeMessageSent = false;
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TransportMgr<LoopbackTransport> transportMgr;
+    FabricTable fabricTable;
+    SessionManager sessionManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(
+        inSuite,
+        CHIP_NO_ERROR ==
+            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
+
+    callback.mSuite = inSuite;
+
+    sessionManager.SetMessageDelegate(&callback);
+
+    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+    SessionHolder localToRemoteSession;
+    SessionHolder remoteToLocalSession;
+
+    SecurePairingUsingTestSecret pairing1(1, 2);
+    err =
+        sessionManager.NewPairing(localToRemoteSession, peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SecurePairingUsingTestSecret pairing2(2, 1);
+    err = sessionManager.NewPairing(remoteToLocalSession, peer, kDestinationNodeId, &pairing2,
+                                    CryptoContext::SessionRole::kResponder, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    callback.ReceiveHandlerCallCount = 0;
+
+    PayloadHeader payloadHeader;
+    EncryptedPacketBufferHandle preparedMessage;
+
+    // Set the exchange ID for this header.
+    payloadHeader.SetExchangeID(0);
+
+    // Set the protocol ID and message type for this header.
+    payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
+
+    payloadHeader.SetInitiator(true);
+
+    err = sessionManager.PrepareMessage(localToRemoteSession.Get(), payloadHeader, std::move(buffer), preparedMessage);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = sessionManager.SendPreparedMessage(localToRemoteSession.Get(), preparedMessage);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+
+    // Now advance our message counter by 5.
+    EncryptedPacketBufferHandle newMessage;
+    for (size_t i = 0; i < 5; ++i)
+    {
+        buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
+        NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+        err = sessionManager.PrepareMessage(localToRemoteSession.Get(), payloadHeader, std::move(buffer), newMessage);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+
+    err = sessionManager.SendPreparedMessage(localToRemoteSession.Get(), newMessage);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
+
+    // Now resend our original message.  It should be rejected as a duplicate.
+
+    err = sessionManager.SendPreparedMessage(localToRemoteSession.Get(), preparedMessage);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
+
+    sessionManager.Shutdown();
+}
+
+void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    uint16_t payload_len = sizeof(PAYLOAD);
+
+    TestSessMgrCallback callback;
+    callback.LargeMessageSent = false;
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TransportMgr<LoopbackTransport> transportMgr;
+    FabricTable fabricTable;
+    SessionManager sessionManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == transportMgr.Init("LOOPBACK"));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(
+        inSuite,
+        CHIP_NO_ERROR ==
+            sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage, &fabricTable));
+
+    callback.mSuite = inSuite;
+
+    sessionManager.SetMessageDelegate(&callback);
+
+    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+    SessionHolder localToRemoteSession;
+    SessionHolder remoteToLocalSession;
+
+    SecurePairingUsingTestSecret pairing1(1, 2);
+    err =
+        sessionManager.NewPairing(localToRemoteSession, peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SecurePairingUsingTestSecret pairing2(2, 1);
+    err = sessionManager.NewPairing(remoteToLocalSession, peer, kDestinationNodeId, &pairing2,
+                                    CryptoContext::SessionRole::kResponder, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    callback.ReceiveHandlerCallCount = 0;
+
+    PayloadHeader payloadHeader;
+    EncryptedPacketBufferHandle preparedMessage;
+
+    // Set the exchange ID for this header.
+    payloadHeader.SetExchangeID(0);
+
+    // Set the protocol ID and message type for this header.
+    payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
+
+    payloadHeader.SetInitiator(true);
+
+    err = sessionManager.PrepareMessage(localToRemoteSession.Get(), payloadHeader, std::move(buffer), preparedMessage);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = sessionManager.SendPreparedMessage(localToRemoteSession.Get(), preparedMessage);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+
+    // Now advance our message counter by at least
+    // CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE + 2, so preparedMessage will be
+    // out of the window.
+    EncryptedPacketBufferHandle newMessage;
+    for (size_t i = 0; i < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE + 2; ++i)
+    {
+        buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
+        NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+        err = sessionManager.PrepareMessage(localToRemoteSession.Get(), payloadHeader, std::move(buffer), newMessage);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+
+    err = sessionManager.SendPreparedMessage(localToRemoteSession.Get(), newMessage);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
+
+    // Now resend our original message.  It should be rejected as a duplicate.
+
+    err = sessionManager.SendPreparedMessage(localToRemoteSession.Get(), preparedMessage);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
+
+    sessionManager.Shutdown();
+}
+
 // Test Suite
 
 /**
@@ -472,6 +676,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("Send Encrypted Packet Test",     SendEncryptedPacketTest),
     NL_TEST_DEF("Send Bad Encrypted Packet Test", SendBadEncryptedPacketTest),
     NL_TEST_DEF("Drop stale connection Test",     StaleConnectionDropTest),
+    NL_TEST_DEF("Old counter Test",               SendPacketWithOldCounterTest),
+    NL_TEST_DEF("Too-old counter Test",           SendPacketWithTooOldCounterTest),
 
     NL_TEST_SENTINEL()
 };

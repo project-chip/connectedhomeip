@@ -35,13 +35,6 @@ class DLL_EXPORT AccountLoginCluster : public ClusterBase
 public:
     AccountLoginCluster() : ClusterBase(app::Clusters::AccountLogin::Id) {}
     ~AccountLoginCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR GetSetupPINRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::CharSpan tempAccountIdentifier);
-    CHIP_ERROR LoginRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN);
-    CHIP_ERROR LogoutRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
@@ -56,14 +49,6 @@ class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
 public:
     ApplicationLauncherCluster() : ClusterBase(app::Clusters::ApplicationLauncher::Id) {}
     ~ApplicationLauncherCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR HideAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              uint16_t catalogVendorId, chip::CharSpan applicationId);
-    CHIP_ERROR LaunchAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::CharSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId);
-    CHIP_ERROR StopAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              uint16_t catalogVendorId, chip::CharSpan applicationId);
 };
 
 class DLL_EXPORT AudioOutputCluster : public ClusterBase
@@ -71,12 +56,6 @@ class DLL_EXPORT AudioOutputCluster : public ClusterBase
 public:
     AudioOutputCluster() : ClusterBase(app::Clusters::AudioOutput::Id) {}
     ~AudioOutputCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR RenameOutputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t index, chip::CharSpan name);
-    CHIP_ERROR SelectOutputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t index);
 };
 
 class DLL_EXPORT ChannelCluster : public ClusterBase
@@ -84,14 +63,6 @@ class DLL_EXPORT ChannelCluster : public ClusterBase
 public:
     ChannelCluster() : ClusterBase(app::Clusters::Channel::Id) {}
     ~ChannelCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ChangeChannelByNumberRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t majorNumber, uint16_t minorNumber);
-    CHIP_ERROR ChangeChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    chip::CharSpan match);
-    CHIP_ERROR SkipChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint16_t count);
 };
 
 class DLL_EXPORT ContentLauncherCluster : public ClusterBase
@@ -99,12 +70,13 @@ class DLL_EXPORT ContentLauncherCluster : public ClusterBase
 public:
     ContentLauncherCluster() : ClusterBase(app::Clusters::ContentLauncher::Id) {}
     ~ContentLauncherCluster() {}
+};
 
-    // Cluster Commands
-    CHIP_ERROR LaunchContentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    bool autoPlay, chip::CharSpan data);
-    CHIP_ERROR LaunchURLRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::CharSpan contentURL, chip::CharSpan displayString, chip::CharSpan providerName);
+class DLL_EXPORT DescriptorCluster : public ClusterBase
+{
+public:
+    DescriptorCluster() : ClusterBase(app::Clusters::Descriptor::Id) {}
+    ~DescriptorCluster() {}
 };
 
 class DLL_EXPORT KeypadInputCluster : public ClusterBase
@@ -112,9 +84,13 @@ class DLL_EXPORT KeypadInputCluster : public ClusterBase
 public:
     KeypadInputCluster() : ClusterBase(app::Clusters::KeypadInput::Id) {}
     ~KeypadInputCluster() {}
+};
 
-    // Cluster Commands
-    CHIP_ERROR SendKeyRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t keyCode);
+class DLL_EXPORT LevelControlCluster : public ClusterBase
+{
+public:
+    LevelControlCluster() : ClusterBase(app::Clusters::LevelControl::Id) {}
+    ~LevelControlCluster() {}
 };
 
 class DLL_EXPORT MediaInputCluster : public ClusterBase
@@ -122,14 +98,6 @@ class DLL_EXPORT MediaInputCluster : public ClusterBase
 public:
     MediaInputCluster() : ClusterBase(app::Clusters::MediaInput::Id) {}
     ~MediaInputCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR HideInputStatusRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR RenameInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index,
-                                  chip::CharSpan name);
-    CHIP_ERROR SelectInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t index);
-    CHIP_ERROR ShowInputStatusRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
@@ -137,21 +105,13 @@ class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
 public:
     MediaPlaybackCluster() : ClusterBase(app::Clusters::MediaPlayback::Id) {}
     ~MediaPlaybackCluster() {}
+};
 
-    // Cluster Commands
-    CHIP_ERROR FastForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PauseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PlayRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SeekRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t position);
-    CHIP_ERROR SkipBackwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint64_t deltaPositionMilliseconds);
-    CHIP_ERROR SkipForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint64_t deltaPositionMilliseconds);
-    CHIP_ERROR StartOverRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+class DLL_EXPORT OnOffCluster : public ClusterBase
+{
+public:
+    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
+    ~OnOffCluster() {}
 };
 
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
@@ -159,10 +119,6 @@ class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
 public:
     TargetNavigatorCluster() : ClusterBase(app::Clusters::TargetNavigator::Id) {}
     ~TargetNavigatorCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR NavigateTargetRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t target, chip::CharSpan data);
 };
 
 } // namespace Controller

@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
+    MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterAccountLoginPluginClientInitCallback();                                                                                  \
     MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
     MatterApplicationBasicPluginClientInitCallback();                                                                              \
@@ -31,10 +32,10 @@
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterBinaryInputBasicPluginServerInitCallback();                                                                              \
     MatterBindingPluginServerInitCallback();                                                                                       \
-    MatterBridgedDeviceBasicPluginServerInitCallback();                                                                            \
     MatterChannelPluginClientInitCallback();                                                                                       \
     MatterColorControlPluginServerInitCallback();                                                                                  \
     MatterContentLauncherPluginClientInitCallback();                                                                               \
+    MatterDescriptorPluginClientInitCallback();                                                                                    \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterDoorLockPluginServerInitCallback();                                                                                      \
@@ -48,6 +49,7 @@
     MatterIasZonePluginServerInitCallback();                                                                                       \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterKeypadInputPluginClientInitCallback();                                                                                   \
+    MatterLevelControlPluginClientInitCallback();                                                                                  \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
     MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterMediaInputPluginClientInitCallback();                                                                                    \
@@ -55,6 +57,7 @@
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginServerInitCallback();                                                                     \
     MatterOccupancySensingPluginServerInitCallback();                                                                              \
+    MatterOnOffPluginClientInitCallback();                                                                                         \
     MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterPressureMeasurementPluginServerInitCallback();                                                                           \

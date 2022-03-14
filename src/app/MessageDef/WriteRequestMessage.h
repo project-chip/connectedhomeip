@@ -23,8 +23,8 @@
 #pragma once
 
 #include "AttributeDataIBs.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -40,10 +40,9 @@ enum class Tag : uint8_t
     kTimedRequest        = 1,
     kWriteRequests       = 2,
     kMoreChunkedMessages = 3,
-    kIsFabricFiltered    = 4,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
     /**
@@ -98,19 +97,9 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
-
-    /**
-     *  @brief Get IsFabricFiltered boolean
-     *
-     *  @param [in] apIsFabricFiltered    A pointer to apIsFabricFiltered
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetIsFabricFiltered(bool * const apIsFabricFiltered) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     /**
@@ -122,7 +111,7 @@ public:
 
     /**
      *  @brief flag action as part of a timed write transaction
-     *  @param [in] aSuppressResponse true if client need to signal suppress response
+     *  @param [in] aTimedRequest true if client need to signal this is a timed request
      *  @return A reference to *this
      */
     WriteRequestMessage::Builder & TimedRequest(const bool aTimedRequest);
@@ -142,12 +131,6 @@ public:
     WriteRequestMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
     AttributeDataIBs::Builder & GetWriteRequests() { return mWriteRequests; };
-
-    /**
-     *  @brief  limits the data written within fabric-scoped lists to the accessing fabric
-     *  @return A reference to *this
-     */
-    WriteRequestMessage::Builder & IsFabricFiltered(const bool aIsFabricFiltered);
 
     /**
      *  @brief Mark the end of this WriteRequestMessage

@@ -26,33 +26,43 @@
 class ClusterCommand : public ModelCommand, public chip::app::CommandSender::Callback
 {
 public:
-    ClusterCommand() : ModelCommand("command-by-id")
+    ClusterCommand(CredentialIssuerCommands * credsIssuerConfig) : ModelCommand("command-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
         AddArgument("payload", &mPayload);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         ModelCommand::AddArguments();
     }
 
-    ClusterCommand(chip::ClusterId clusterId) : ModelCommand("command-by-id"), mClusterId(clusterId)
+    ClusterCommand(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
+        ModelCommand("command-by-id", credsIssuerConfig), mClusterId(clusterId)
     {
         AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
         AddArgument("payload", &mPayload);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         ModelCommand::AddArguments();
     }
 
-    ClusterCommand(const char * commandName) : ModelCommand(commandName)
+    ClusterCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
+        ModelCommand(commandName, credsIssuerConfig)
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
     }
 
     ~ClusterCommand() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ClusterCommand::SendCommand(device, endpointId, mClusterId, mCommandId, mPayload);
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), mClusterId, mCommandId, mPayload);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
+    {
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, senderNodeId, mClusterId, mCommandId, mPayload);
     }
 
     /////////// CommandSender Callback Interface /////////
@@ -63,7 +73,7 @@ public:
         if (CHIP_NO_ERROR != error)
         {
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
-            SetCommandExitStatus(error);
+            mError = error;
             return;
         }
 
@@ -73,7 +83,7 @@ public:
             if (CHIP_NO_ERROR != error)
             {
                 ChipLogError(chipTool, "Response Failure: Can not decode Data");
-                SetCommandExitStatus(error);
+                mError = error;
                 return;
             }
         }
@@ -82,13 +92,13 @@ public:
     virtual void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
-        SetCommandExitStatus(error);
+        mError = error;
     }
 
     virtual void OnDone(chip::app::CommandSender * client) override
     {
         mCommandSender.reset();
-        SetCommandExitStatus(CHIP_NO_ERROR);
+        SetCommandExitStatus(mError);
     }
 
     template <class T>
@@ -100,8 +110,30 @@ public:
         mCommandSender =
             std::make_unique<chip::app::CommandSender>(this, device->GetExchangeManager(), mTimedInteractionTimeoutMs.HasValue());
         VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(mCommandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
+        ReturnErrorOnFailure(mCommandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs,
+                                                                        mSuppressResponse.ValueOr(false)));
         ReturnErrorOnFailure(mCommandSender->SendCommandRequest(device->GetSecureSession().Value()));
+        return CHIP_NO_ERROR;
+    }
+
+    template <class T>
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId,
+                                chip::ClusterId clusterId, chip::CommandId commandId, const T & value)
+    {
+        chip::app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, clusterId, commandId,
+                                                     (chip::app::CommandPathFlags::kGroupIdValid) };
+
+        chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
+
+        auto commandSender =
+            chip::Platform::MakeUnique<chip::app::CommandSender>(this, exchangeManager, mTimedInteractionTimeoutMs.HasValue());
+        VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
+
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex, senderNodeId);
+        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(chip::SessionHandle(session)));
+        commandSender.release();
+
         return CHIP_NO_ERROR;
     }
 
@@ -109,7 +141,9 @@ private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
+    chip::Optional<bool> mSuppressResponse;
 
+    CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;
     std::unique_ptr<chip::app::CommandSender> mCommandSender;
 };

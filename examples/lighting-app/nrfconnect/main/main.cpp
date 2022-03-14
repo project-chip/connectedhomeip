@@ -18,11 +18,9 @@
 
 #include "AppTask.h"
 
-#include <lib/support/CHIPMem.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemError.h>
 
-#include <kernel.h>
+#include <logging/log.h>
 
 #ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
@@ -35,73 +33,28 @@
 LOG_MODULE_REGISTER(app);
 
 using namespace ::chip;
-using namespace ::chip::Inet;
-using namespace ::chip::DeviceLayer;
 
-int main(void)
+int main()
 {
-#ifdef CONFIG_CHIP_PW_RPC
-    chip::rpc::Init();
-#endif
-
-    int ret        = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#ifdef CONFIG_CHIP_PW_RPC
+    rpc::Init();
+#endif
+
 #ifdef CONFIG_USB_DEVICE_STACK
-    ret = usb_enable(nullptr);
-    if (ret)
+    err = System::MapErrorZephyr(usb_enable(nullptr));
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("Failed to initialize USB device");
-        err = chip::System::MapErrorZephyr(ret);
-        goto exit;
     }
 #endif
 
-    err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
-        LOG_ERR("Platform::MemoryInit() failed");
-        goto exit;
+        err = GetAppTask().StartApp();
     }
 
-    LOG_INF("Init CHIP stack");
-    err = PlatformMgr().InitChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("PlatformMgr().InitChipStack() failed");
-        goto exit;
-    }
-
-    LOG_INF("Starting CHIP task");
-    err = PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
-        goto exit;
-    }
-
-    LOG_INF("Init Thread stack");
-    err = ThreadStackMgr().InitThreadStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("ThreadStackMgr().InitThreadStack() failed");
-        goto exit;
-    }
-
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
-        goto exit;
-    }
-
-    ret = GetAppTask().StartApp();
-    if (ret != 0)
-    {
-        err = chip::System::MapErrorZephyr(ret);
-    }
-
-exit:
     LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
     return err == CHIP_NO_ERROR ? EXIT_SUCCESS : EXIT_FAILURE;
 }

@@ -34,6 +34,18 @@
         {
             "name": "idl_structure_member",
             "path": "partials/idl/structure_member.zapt"
+        },
+        {
+            "name": "idl_command_request_response",
+            "path": "partials/idl/command_request_response.zapt"
+        },
+        {
+            "name": "idl_command_request_struct",
+            "path": "partials/idl/command_request_struct.zapt"
+        },
+        {
+            "name": "idl_command_response_struct",
+            "path": "partials/idl/command_response_struct.zapt"
         }
     ],
     "templates": [
@@ -68,11 +80,6 @@
             "output": "CHIPClientCallbacks.h"
         },
         {
-            "path": "templates/app/CHIPClientCallbacks-src.zapt",
-            "name": "CHIP Client Callbacks",
-            "output": "CHIPClientCallbacks.cpp"
-        },
-        {
             "path": "templates/app/im-cluster-command-handler.zapt",
             "name": "CHIP Client Callbacks for Interaction Model",
             "output": "IMClusterCommandHandler.cpp"
@@ -81,11 +88,6 @@
             "path": "templates/app/CHIPClusters.zapt",
             "name": "C++ ZCL API Header",
             "output": "CHIPClusters.h"
-        },
-        {
-            "path": "templates/app/CHIPClusters-src.zapt",
-            "name": "C++ ZCL API",
-            "output": "CHIPClusters.cpp"
         },
         {
             "path": "templates/app/MatterIDL.zapt",

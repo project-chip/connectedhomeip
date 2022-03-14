@@ -21,16 +21,18 @@
 
 #include "TestCommand.h"
 
-class Test_TC_DM_1_3_Simulated : public TestCommand
+class Test_TC_DM_1_3_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_DM_1_3_Simulated() : TestCommand("Test_TC_DM_1_3_Simulated"), mTestIndex(0)
+    Test_TC_DM_1_3_SimulatedSuite() : TestCommand("Test_TC_DM_1_3_Simulated"), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DM_1_3_Simulated() {}
+    ~Test_TC_DM_1_3_SimulatedSuite() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -66,8 +68,8 @@ public:
             err = TestLogOnOffTestStartup_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Query Interaction Model Version\n");
-            err = TestQueryInteractionModelVersion_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Query Data Model Revision\n");
+            err = TestQueryDataModelRevision_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Query Vendor Name\n");
@@ -154,8 +156,18 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 21;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
 
     //
     // Tests methods
@@ -173,16 +185,15 @@ private:
         return Log("*** Basic Cluster Tests Ready");
     }
 
-    CHIP_ERROR TestQueryInteractionModelVersion_2()
+    CHIP_ERROR TestQueryDataModelRevision_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        ChipLogError(chipTool,
-                     "[Endpoint: 0x%08x Cluster: Basic Attribute: InteractionModelVersion] Query Interaction Model Version",
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Basic Attribute: DataModelRevision] Query Data Model Revision",
                      endpoint);
 
         ClearAttributeAndCommandPaths();
         mAttributePath = chip::app::ConcreteAttributePath(endpoint, chip::app::Clusters::Basic::Id,
-                                                          chip::app::Clusters::Basic::Attributes::InteractionModelVersion::Id);
+                                                          chip::app::Clusters::Basic::Attributes::DataModelRevision::Id);
         return CHIP_NO_ERROR;
     }
 
@@ -388,16 +399,18 @@ private:
     }
 };
 
-class Test_TC_DM_3_3_Simulated : public TestCommand
+class Test_TC_DM_3_3_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_DM_3_3_Simulated() : TestCommand("Test_TC_DM_3_3_Simulated"), mTestIndex(0)
+    Test_TC_DM_3_3_SimulatedSuite() : TestCommand("Test_TC_DM_3_3_Simulated"), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DM_3_3_Simulated() {}
+    ~Test_TC_DM_3_3_SimulatedSuite() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -476,8 +489,18 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
 
     //
     // Tests methods
@@ -559,15 +582,257 @@ private:
     }
 };
 
+class Test_TC_DM_2_3_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DM_2_3_SimulatedSuite() : TestCommand("Test_TC_DM_2_3_Simulated"), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DM_2_3_SimulatedSuite() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DM_2_3_Simulated\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DM_2_3_Simulated\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for Arm Fail Safe\n");
+            err = TestWaitForArmFailSafe_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Wait for Set Regulatory Config\n");
+            err = TestWaitForSetRegulatoryConfig_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait for Attestation Certificate Chain Request\n");
+            err = TestWaitForAttestationCertificateChainRequest_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait for Attestation Certificate Chain Request\n");
+            err = TestWaitForAttestationCertificateChainRequest_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Wait for Attestation Request\n");
+            err = TestWaitForAttestationRequest_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait for CSR Request\n");
+            err = TestWaitForCsrRequest_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait for Add Trusted Root Certificate Request\n");
+            err = TestWaitForAddTrustedRootCertificateRequest_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait for Add Op NOC\n");
+            err = TestWaitForAddOpNoc_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait for Commissioning Complete\n");
+            err = TestWaitForCommissioningComplete_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 3000ms\n");
+            err = TestWait3000ms_9();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 10;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForArmFailSafe_0()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: General Commissioning Command: ArmFailSafe] Wait for Arm Fail Safe",
+                     endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath = chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::GeneralCommissioning::Id,
+                                                      chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForSetRegulatoryConfig_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(
+            chipTool,
+            "[Endpoint: 0x%08x Cluster: General Commissioning Command: SetRegulatoryConfig] Wait for Set Regulatory Config",
+            endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath = chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::GeneralCommissioning::Id,
+                                                      chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForAttestationCertificateChainRequest_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool,
+                     "[Endpoint: 0x%08x Cluster: Operational Credentials Command: CertificateChainRequest] Wait for Attestation "
+                     "Certificate Chain Request",
+                     endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath =
+            chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::OperationalCredentials::Id,
+                                           chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForAttestationCertificateChainRequest_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool,
+                     "[Endpoint: 0x%08x Cluster: Operational Credentials Command: CertificateChainRequest] Wait for Attestation "
+                     "Certificate Chain Request",
+                     endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath =
+            chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::OperationalCredentials::Id,
+                                           chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForAttestationRequest_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool,
+                     "[Endpoint: 0x%08x Cluster: Operational Credentials Command: AttestationRequest] Wait for Attestation Request",
+                     endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath =
+            chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::OperationalCredentials::Id,
+                                           chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForCsrRequest_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Operational Credentials Command: CSRRequest] Wait for CSR Request",
+                     endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath = chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::OperationalCredentials::Id,
+                                                      chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForAddTrustedRootCertificateRequest_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool,
+                     "[Endpoint: 0x%08x Cluster: Operational Credentials Command: AddTrustedRootCertificate] Wait for Add Trusted "
+                     "Root Certificate Request",
+                     endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath =
+            chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::OperationalCredentials::Id,
+                                           chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForAddOpNoc_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Operational Credentials Command: AddNOC] Wait for Add Op NOC", endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath = chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::OperationalCredentials::Id,
+                                                      chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWaitForCommissioningComplete_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        ChipLogError(
+            chipTool,
+            "[Endpoint: 0x%08x Cluster: General Commissioning Command: CommissioningComplete] Wait for Commissioning Complete",
+            endpoint);
+
+        ClearAttributeAndCommandPaths();
+        mCommandPath =
+            chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::GeneralCommissioning::Id,
+                                           chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait3000ms_9()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
+};
+
 std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 {
     if (testName == "Test_TC_DM_1_3_Simulated")
     {
-        return std::unique_ptr<Test_TC_DM_1_3_Simulated>(new Test_TC_DM_1_3_Simulated());
+        return std::unique_ptr<Test_TC_DM_1_3_SimulatedSuite>(new Test_TC_DM_1_3_SimulatedSuite());
     }
     if (testName == "Test_TC_DM_3_3_Simulated")
     {
-        return std::unique_ptr<Test_TC_DM_3_3_Simulated>(new Test_TC_DM_3_3_Simulated());
+        return std::unique_ptr<Test_TC_DM_3_3_SimulatedSuite>(new Test_TC_DM_3_3_SimulatedSuite());
+    }
+    if (testName == "Test_TC_DM_2_3_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DM_2_3_SimulatedSuite>(new Test_TC_DM_2_3_SimulatedSuite());
     }
 
     return nullptr;
@@ -578,4 +843,5 @@ void PrintTestCommands()
     ChipLogError(chipTool, "Supported commands:");
     ChipLogError(chipTool, "\t* Test_TC_DM_1_3_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_DM_3_3_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DM_2_3_Simulated");
 }

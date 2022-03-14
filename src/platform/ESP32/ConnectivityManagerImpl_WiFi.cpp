@@ -19,6 +19,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
 
 #include <lib/support/CodeUtils.h>
@@ -402,8 +403,10 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
             // Set a default station configuration.
             wifi_config_t wifiConfig;
             memset(&wifiConfig, 0, sizeof(wifiConfig));
-            memcpy(wifiConfig.sta.ssid, CONFIG_DEFAULT_WIFI_SSID, strlen(CONFIG_DEFAULT_WIFI_SSID) + 1);
-            memcpy(wifiConfig.sta.password, CONFIG_DEFAULT_WIFI_PASSWORD, strlen(CONFIG_DEFAULT_WIFI_PASSWORD) + 1);
+            memcpy(wifiConfig.sta.ssid, CONFIG_DEFAULT_WIFI_SSID,
+                   std::min(sizeof(wifiConfig.sta.ssid), strlen(CONFIG_DEFAULT_WIFI_SSID)));
+            memcpy(wifiConfig.sta.password, CONFIG_DEFAULT_WIFI_PASSWORD,
+                   std::min(sizeof(wifiConfig.sta.password), strlen(CONFIG_DEFAULT_WIFI_PASSWORD)));
             wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
             wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
             esp_err_t err              = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
@@ -835,7 +838,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     memset(&wifiConfig, 0, sizeof(wifiConfig));
 
     uint16_t discriminator;
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupDiscriminator(discriminator));
+    ReturnErrorOnFailure(GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
     snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03X-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
              discriminator, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
     wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;

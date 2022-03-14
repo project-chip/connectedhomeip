@@ -46,26 +46,4 @@ CHIP_ERROR DeviceProxy::SendCommands(app::CommandSender * commandObj, Optional<S
     return commandObj->SendCommandRequest(GetSecureSession().Value(), timeout);
 }
 
-void DeviceProxy::AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
-                                       Callback::Cancelable * onFailureCallback, app::TLVDataFilter tlvDataFilter)
-{
-    // Interaction model uses the object instead of a sequence number as the identifier of transactions.
-    // Since the objects can be identified by its pointer which fits into a uint64 value (the type of NodeId), we use it for the
-    // "node id" field in callback manager.
-    static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
-    chip::NodeId transactionId = reinterpret_cast<chip::NodeId>(commandObj);
-    mCallbacksMgr.AddResponseCallback(transactionId, 0 /* seqNum, always 0 for IM before #6559 */, onSuccessCallback,
-                                      onFailureCallback, tlvDataFilter);
-}
-
-void DeviceProxy::CancelIMResponseHandler(void * commandObj)
-{
-    // Interaction model uses the object instead of a sequence number as the identifier of transactions.
-    // Since the objects can be identified by its pointer which fits into a uint64 value (the type of NodeId), we use it for the
-    // "node id" field in callback manager.
-    static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
-    chip::NodeId transactionId = reinterpret_cast<chip::NodeId>(commandObj);
-    mCallbacksMgr.CancelResponseCallback(transactionId, 0 /* seqNum, always 0 for IM before #6559 */);
-}
-
 } // namespace chip

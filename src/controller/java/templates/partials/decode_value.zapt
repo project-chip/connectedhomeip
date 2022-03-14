@@ -5,13 +5,15 @@ jobject {{target}};
 if (!{{source}}.HasValue()) {
   chip::JniReferences::GetInstance().CreateOptional(nullptr, {{target}});
 } else {
-  {{>decode_value target=target source=(concat source ".Value()") cluster=cluster depth=(incrementDepth depth) isOptional=false omitDeclaration=true}}
+  jobject {{target}}InsideOptional;
+  {{>decode_value target=(concat target "InsideOptional") source=(concat source ".Value()") cluster=cluster depth=(incrementDepth depth) isOptional=false omitDeclaration=true earlyReturn=earlyReturn}}
+  chip::JniReferences::GetInstance().CreateOptional({{target}}InsideOptional, {{target}});
 }
 {{else if isNullable}}
 if ({{source}}.IsNull()) {
   {{target}} = nullptr;
 } else {
-  {{>decode_value target=target source=(concat source ".Value()") cluster=cluster depth=(incrementDepth depth) isNullable=false omitDeclaration=true}}
+  {{>decode_value target=target source=(concat source ".Value()") cluster=cluster depth=(incrementDepth depth) isNullable=false omitDeclaration=true earlyReturn=earlyReturn}}
 }
 {{else if isArray}}
   chip::JniReferences::GetInstance().CreateArrayList({{target}});
@@ -20,22 +22,27 @@ if ({{source}}.IsNull()) {
   while (iter_{{target}}_{{depth}}.Next())
   {
     auto & entry_{{depth}} = iter_{{target}}_{{depth}}.GetValue();
-    {{>decode_value target=(concat "newElement_" depth) source=(concat "entry_" depth) cluster=cluster depth=(incrementDepth depth) isArray=false forceNotList=true omitDeclaration=false}}
-    chip::JniReferences::GetInstance().AddToArrayList({{target}}, newElement_{{depth}});
+    {{>decode_value target=(concat "newElement_" depth) source=(concat "entry_" depth) cluster=cluster depth=(incrementDepth depth) isArray=false forceNotList=true omitDeclaration=false earlyReturn=earlyReturn}}
+    chip::JniReferences::GetInstance().AddToList({{target}}, newElement_{{depth}});
   }
 {{else}}
   {{#if_is_struct type}}
     {{#zcl_struct_items_by_struct_name type}}
-      {{>decode_value target=(concat ../target "_" (asLowerCamelCase label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster depth=(incrementDepth depth) omitDeclaration=false}}
+      {{>decode_value target=(concat ../target "_" (asLowerCamelCase label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster depth=(incrementDepth depth) omitDeclaration=false earlyReturn=../earlyReturn}}
     {{/zcl_struct_items_by_struct_name}}
 
     jclass {{asLowerCamelCase type}}StructClass;
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}}", {{asLowerCamelCase type}}StructClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}}"));
-    chip::JniClass structJniClass({{asLowerCamelCase type}}StructClass);
+    if (err != CHIP_NO_ERROR) {
+      ChipLogError(Zcl, "Could not find class ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}}");
+      return {{earlyReturn}};
+    }
     jmethodID {{asLowerCamelCase type}}StructCtor = env->GetMethodID({{asLowerCamelCase type}}StructClass, "<init>"
-        , "({{#zcl_struct_items_by_struct_name type}}{{#if isOptional}}Ljava/util/Optional;{{else}}{{#if_is_struct type}}Lchip/devicecontroller/ChipStructs${{../cluster}}Cluster{{asUpperCamelCase type}};{{else}}{{#if isArray}}Ljava/util/ArrayList;{{else if (isString type)}}{{#if (isOctetString type)}}[B{{else}}Ljava/lang/String;{{/if}}{{else}}{{asJniSignature type null cluster true}}{{/if}}{{/if_is_struct}}{{/if}}{{/zcl_struct_items_by_struct_name}})V");
-    VerifyOrReturn({{asLowerCamelCase type}}StructCtor != nullptr, ChipLogError(Zcl, "Could not find ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}} constructor"));
+        , "({{#zcl_struct_items_by_struct_name type}}{{asJniSignature type null ../cluster true}}{{/zcl_struct_items_by_struct_name}})V");
+    if ({{asLowerCamelCase type}}StructCtor == nullptr) {
+      ChipLogError(Zcl, "Could not find ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}} constructor");
+      return {{earlyReturn}};
+    }
 
     {{target}} = env->NewObject({{asLowerCamelCase type}}StructClass, {{asLowerCamelCase type}}StructCtor
       {{#zcl_struct_items_by_struct_name type}}

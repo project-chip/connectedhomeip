@@ -28,7 +28,10 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
+using namespace chip::Uint8;
+using chip::CharSpan;
 
 /** @brief Media PlayBack Cluster Init
  *
@@ -127,8 +130,8 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds));
 }
 
-void MediaPlaybackManager::HandleSeekRequest(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                             const uint64_t & positionMilliseconds)
+void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                      const uint64_t & positionMilliseconds)
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds));
 }
@@ -138,7 +141,7 @@ void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackRe
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0));
 }
 
-void MediaPlaybackManager::HandleStartOverRequest(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
+void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0));
 }
@@ -258,7 +261,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
 {
     Structs::PlaybackPosition::Type response;
     response.updatedAt = 0;
-    response.position  = 0;
+    response.position  = Nullable<uint64_t>(0);
 
     jobject positionObj;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -283,7 +286,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
         jclass inputClass    = env->GetObjectClass(positionObj);
         jfieldID positionId  = env->GetFieldID(inputClass, "position", "J");
         jfieldID updatedAtId = env->GetFieldID(inputClass, "updatedAt", "J");
-        response.position    = static_cast<uint64_t>(env->GetIntField(positionObj, positionId));
+        response.position    = Nullable<uint64_t>(static_cast<uint64_t>(env->GetIntField(positionObj, positionId)));
         response.updatedAt   = static_cast<uint64_t>(env->GetIntField(positionObj, updatedAtId));
     }
 

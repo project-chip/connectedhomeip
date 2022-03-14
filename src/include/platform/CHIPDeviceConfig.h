@@ -160,9 +160,14 @@
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
  * The CHIP-assigned vendor id for the organization responsible for producing the device.
+ *
+ * Default is the Test VendorID of 0xFFF1.
+ *
+ * Un-overridden default must match the default test DAC
+ * (see src/credentials/examples/DeviceAttestationCredsExample.cpp).
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 9050
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 #endif
 
 /**
@@ -179,9 +184,13 @@
  *
  * The unique id assigned by the device vendor to identify the product or device type.  This
  * number is scoped to the device vendor id.
+ *
+ * Un-overridden default must either match one of the given development certs
+ * or have a DeviceAttestationCredentialsProvider implemented.
+ * (see src/credentials/examples/DeviceAttestationCredsExample.cpp)
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 65279
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8001
 #endif
 
 /**
@@ -239,6 +248,16 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
+ *
+ * The default conservative initial duration (in seconds) to set in the FailSafe for the commissioning
+ * flow to complete successfully. This may vary depending on the speed or sleepiness of the Commissionee.
+ */
+#ifndef CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
+#define CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC 60
+#endif // CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
+
+/**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
  *
  * The default amount of time (in whole seconds) that the device will remain in "user selected"
@@ -249,6 +268,27 @@
 #ifndef CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
 #define CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC 30
 #endif // CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
+
+/**
+ * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+ *
+ * Enables the use of a hard-coded default unique ID utilized for the rotating device ID calculation.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID                                                                            \
+    {                                                                                                                              \
+        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff                             \
+    }
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+ *
+ * Unique ID length in bytes. The value should be 16-bytes or longer.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 16
+#endif
 
 // -------------------- WiFi Station Configuration --------------------
 
@@ -725,7 +765,7 @@
  * Amount of services available for advertising using SRP.
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
-#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_DEVICE_ADMINS + 1)
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_FABRICS + 1)
 #endif
 
 /**
@@ -818,6 +858,92 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS
 #define CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS 90000
+#endif
+
+// -------------------- Test Setup (PASE) Configuration --------------------
+
+/**
+ * @def CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+ *
+ * @brief
+ *   Enable use of test setup parameters for testing purposes only.
+ *
+ *  @note
+ *    WARNING: This option makes it possible to circumvent basic chip security functionality.
+ *    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+ */
+// TODO: When the SDK code is production ready this should be set to 0 and each platform
+// will need to enable it indivually when needed.
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+
+/**
+ * @def CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+ *
+ * @brief
+ *   Test Spake2p passcode to use if actual passcode value is not provisioned in the device memory.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+ *
+ * @brief
+ *   Test setup discriminator to use if actual discriminator value is not provisioned in the device memory.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+ *
+ * @brief
+ *   Test Spake2p iteration count to use if actual iteration count value is not provisioned in the device memory.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT 1000
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
+ *
+ * @brief
+ *   Test Spake2p Salt to use if actual salt value is not provisioned in the device memory.
+ * @note
+ *   The value is base-64 encoded string.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT "U1BBS0UyUCBLZXkgU2FsdA=="
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER
+ *
+ * @brief
+ *   Test Spake2p Verifier to use if actual verifier value is not provisioned in the device memory.
+ * @note
+ *   The value is base-64 encoded string.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER                                                                               \
+    "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/"  \
+    "NH6Rmzw=="
+#endif
+
+#else
+
+#undef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+#undef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+#undef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+#undef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
+#undef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER
+
 #endif
 
 // -------------------- Event Logging Configuration --------------------
@@ -1035,15 +1161,6 @@
 #endif
 
 // -------------------- Device DNS-SD Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_DNSSD
- *
- * Enable support to use DNS-SD for service advertising and discovery in CHIP.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-#define CHIP_DEVICE_CONFIG_ENABLE_DNSSD 0
-#endif
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY

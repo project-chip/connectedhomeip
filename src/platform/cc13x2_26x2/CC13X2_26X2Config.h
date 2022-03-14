@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2020 Texas Instruments Incorporated
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,6 +46,7 @@ public:
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
+    static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_MfrDeviceId;
     static const Key kConfigKey_MfrDeviceCert;
     static const Key kConfigKey_MfrDeviceICACerts;
@@ -68,6 +69,9 @@ public:
     static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_KVS_key;   // special key for KVS system, key storage
     static const Key kConfigKey_KVS_value; // special key for KVS system, value storage
+    static const Key kConfigKey_Spake2pIterationCount;
+    static const Key kConfigKey_Spake2pSalt;
+    static const Key kConfigKey_Spake2pVerifier;
 
     static CHIP_ERROR Init(void);
 

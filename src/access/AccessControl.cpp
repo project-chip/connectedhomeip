@@ -61,6 +61,99 @@ bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Priv
     return false;
 }
 
+constexpr bool IsValidCaseNodeId(NodeId aNodeId)
+{
+    return chip::IsOperationalNodeId(aNodeId) || (chip::IsCASEAuthTag(aNodeId) && ((aNodeId & chip::kTagVersionMask) != 0));
+}
+
+constexpr bool IsValidGroupNodeId(NodeId aNodeId)
+{
+    return chip::IsGroupId(aNodeId) && chip::IsValidGroupId(chip::GroupIdFromNodeId(aNodeId));
+}
+
+#if CHIP_PROGRESS_LOGGING
+
+char GetAuthModeStringForLogging(AuthMode authMode)
+{
+    switch (authMode)
+    {
+    case AuthMode::kNone:
+        return 'n';
+    case AuthMode::kPase:
+        return 'p';
+    case AuthMode::kCase:
+        return 'c';
+    case AuthMode::kGroup:
+        return 'g';
+    }
+    return 'u';
+}
+
+constexpr int kCharsPerCatForLogging = 11; // including final null terminator
+
+char * GetCatStringForLogging(char * buf, size_t size, const CATValues & cats)
+{
+    if (size == 0)
+    {
+        return nullptr;
+    }
+    char * p         = buf;
+    char * const end = buf + size;
+    *p               = '\0';
+    // Format string chars needed:
+    //   1 for comma (optional)
+    //   2 for 0x prefix
+    //   8 for 32-bit hex value
+    //   1 for null terminator (at end)
+    constexpr char fmtWithoutComma[] = "0x%08" PRIX32;
+    constexpr char fmtWithComma[]    = ",0x%08" PRIX32;
+    constexpr int countWithoutComma  = 10;
+    constexpr int countWithComma     = countWithoutComma + 1;
+    bool withComma                   = false;
+    for (auto cat : cats.values)
+    {
+        if (cat == chip::kUndefinedCAT)
+        {
+            break;
+        }
+        snprintf(p, static_cast<size_t>(end - p), withComma ? fmtWithComma : fmtWithoutComma, cat);
+        p += withComma ? countWithComma : countWithoutComma;
+        if (p >= end)
+        {
+            // Output was truncated.
+            p = end - ((size < 4) ? size : 4);
+            while (*p)
+            {
+                // Indicate truncation if possible.
+                *p++ = '.';
+            }
+            break;
+        }
+        withComma = true;
+    }
+    return buf;
+}
+
+char GetPrivilegeStringForLogging(Privilege privilege)
+{
+    switch (privilege)
+    {
+    case Privilege::kView:
+        return 'v';
+    case Privilege::kProxyView:
+        return 'p';
+    case Privilege::kOperate:
+        return 'o';
+    case Privilege::kManage:
+        return 'm';
+    case Privilege::kAdminister:
+        return 'a';
+    }
+    return 'u';
+}
+
+#endif // CHIP_PROGRESS_LOGGING
+
 } // namespace
 
 namespace chip {
@@ -68,25 +161,64 @@ namespace Access {
 
 AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
 AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
-AccessControl::Delegate AccessControl::mDefaultDelegate;
 
-CHIP_ERROR AccessControl::Init()
+CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate)
 {
-    ChipLogDetail(DataManagement, "AccessControl::Init");
-    return mDelegate.Init();
+    VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    ChipLogProgress(DataManagement, "AccessControl: initializing");
+
+    // delegate can never be null. This was already checked
+    CHIP_ERROR retval = delegate->Init();
+    if (retval == CHIP_NO_ERROR)
+    {
+        mDelegate = delegate;
+    }
+
+    return retval;
 }
 
 CHIP_ERROR AccessControl::Finish()
 {
-    ChipLogDetail(DataManagement, "AccessControl::Finish");
-    return mDelegate.Finish();
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(DataManagement, "AccessControl: finishing");
+    CHIP_ERROR retval = mDelegate->Finish();
+    mDelegate         = nullptr;
+    return retval;
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
-    // Don't check if using default delegate (e.g. test code that isn't testing access control)
-    ReturnErrorCodeIf(&mDelegate == &mDefaultDelegate, CHIP_NO_ERROR);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+#if CHIP_PROGRESS_LOGGING
+    {
+        constexpr size_t kMaxCatsToLog = 6;
+        char catLogBuf[kMaxCatsToLog * kCharsPerCatForLogging];
+        ChipLogProgress(DataManagement,
+                        "AccessControl: checking f=%u a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%" PRIu16 " p=%c",
+                        subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
+                        ChipLogValueX64(subjectDescriptor.subject),
+                        GetCatStringForLogging(catLogBuf, sizeof(catLogBuf), subjectDescriptor.cats),
+                        ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
+    }
+#endif
+
+    // TODO(#13867): this will go away
+    if (mDelegate->TemporaryCheckOverride())
+    {
+        ChipLogProgress(DataManagement, "AccessControl: temporary check override (this will go away)");
+        return CHIP_NO_ERROR;
+    }
+
+    // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
+    if (subjectDescriptor.authMode == AuthMode::kPase)
+    {
+        ChipLogProgress(DataManagement, "AccessControl: implicit admin (PASE)");
+        return CHIP_NO_ERROR;
+    }
 
     EntryIterator iterator;
     ReturnErrorOnFailure(Entries(iterator, &subjectDescriptor.fabricIndex));
@@ -96,6 +228,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     {
         AuthMode authMode = AuthMode::kNone;
         ReturnErrorOnFailure(entry.GetAuthMode(authMode));
+        // Operational PASE not supported for v1.0.
+        VerifyOrReturnError(authMode == AuthMode::kCase || authMode == AuthMode::kGroup, CHIP_ERROR_INCORRECT_STATE);
         if (authMode != subjectDescriptor.authMode)
         {
             continue;
@@ -119,25 +253,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 ReturnErrorOnFailure(entry.GetSubject(i, subject));
                 if (IsOperationalNodeId(subject))
                 {
-                    if (subject == subjectDescriptor.subject)
-                    {
-                        subjectMatched = true;
-                        break;
-                    }
-                }
-                else if (IsGroupId(subject))
-                {
-                    VerifyOrReturnError(authMode == AuthMode::kGroup, CHIP_ERROR_INVALID_ARGUMENT);
-                    if (subject == subjectDescriptor.subject)
-                    {
-                        subjectMatched = true;
-                        break;
-                    }
-                }
-                // TODO: Add the implicit admit for PASE after the spec is updated.
-                else if (IsPAKEKeyId(subject))
-                {
-                    VerifyOrReturnError(authMode == AuthMode::kPase, CHIP_ERROR_INVALID_ARGUMENT);
+                    VerifyOrReturnError(authMode == AuthMode::kCase, CHIP_ERROR_INCORRECT_STATE);
                     if (subject == subjectDescriptor.subject)
                     {
                         subjectMatched = true;
@@ -146,8 +262,17 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 }
                 else if (IsCASEAuthTag(subject))
                 {
-                    VerifyOrReturnError(authMode == AuthMode::kCase, CHIP_ERROR_INVALID_ARGUMENT);
+                    VerifyOrReturnError(authMode == AuthMode::kCase, CHIP_ERROR_INCORRECT_STATE);
                     if (subjectDescriptor.cats.CheckSubjectAgainstCATs(subject))
+                    {
+                        subjectMatched = true;
+                        break;
+                    }
+                }
+                else if (IsGroupId(subject))
+                {
+                    VerifyOrReturnError(authMode == AuthMode::kGroup, CHIP_ERROR_INCORRECT_STATE);
+                    if (subject == subjectDescriptor.subject)
                     {
                         subjectMatched = true;
                         break;
@@ -155,7 +280,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 }
                 else
                 {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
+                    // Operational PASE not supported for v1.0.
+                    return CHIP_ERROR_INCORRECT_STATE;
                 }
             }
             if (!subjectMatched)
@@ -181,7 +307,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 {
                     continue;
                 }
-                // TODO: check against target.deviceType (requires lookup)
+                // TODO(#14431): device type target not yet supported (add lookup/match when supported)
                 targetMatched = true;
                 break;
             }
@@ -196,7 +322,74 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 
     // No entry was found which passed all checks: access is denied.
+    ChipLogProgress(DataManagement, "AccessControl: denied");
     return CHIP_ERROR_ACCESS_DENIED;
+}
+
+bool AccessControl::IsValid(const Entry & entry)
+{
+    const char * log = "unexpected error";
+    IgnoreUnusedVariable(log); // logging may be disabled
+
+    AuthMode authMode;
+    FabricIndex fabricIndex;
+    Privilege privilege;
+    size_t subjectCount = 0;
+    size_t targetCount  = 0;
+
+    SuccessOrExit(entry.GetAuthMode(authMode));
+    SuccessOrExit(entry.GetFabricIndex(fabricIndex));
+    SuccessOrExit(entry.GetPrivilege(privilege));
+    SuccessOrExit(entry.GetSubjectCount(subjectCount));
+    SuccessOrExit(entry.GetTargetCount(targetCount));
+
+    ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
+                    GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode), static_cast<int>(subjectCount),
+                    static_cast<int>(targetCount));
+
+    // Fabric index must be defined.
+    VerifyOrExit(fabricIndex != kUndefinedFabricIndex, log = "invalid fabric index");
+
+    if (authMode != AuthMode::kCase)
+    {
+        // Operational PASE not supported for v1.0 (so must be group).
+        VerifyOrExit(authMode == AuthMode::kGroup, log = "invalid auth mode");
+
+        // Privilege must not be administer.
+        VerifyOrExit(privilege != Privilege::kAdminister, log = "invalid privilege");
+    }
+
+    for (size_t i = 0; i < subjectCount; ++i)
+    {
+        NodeId subject;
+        SuccessOrExit(entry.GetSubject(i, subject));
+        const bool kIsCase  = authMode == AuthMode::kCase;
+        const bool kIsGroup = authMode == AuthMode::kGroup;
+        ChipLogProgress(DataManagement, "  validating subject 0x" ChipLogFormatX64, ChipLogValueX64(subject));
+        VerifyOrExit((kIsCase && IsValidCaseNodeId(subject)) || (kIsGroup && IsValidGroupNodeId(subject)), log = "invalid subject");
+    }
+
+    for (size_t i = 0; i < targetCount; ++i)
+    {
+        Entry::Target target;
+        SuccessOrExit(entry.GetTarget(i, target));
+        const bool kHasCluster    = target.flags & Entry::Target::kCluster;
+        const bool kHasEndpoint   = target.flags & Entry::Target::kEndpoint;
+        const bool kHasDeviceType = target.flags & Entry::Target::kDeviceType;
+        VerifyOrExit((kHasCluster || kHasEndpoint || kHasDeviceType) && !(kHasEndpoint && kHasDeviceType) &&
+                         (!kHasCluster || IsValidClusterId(target.cluster)) &&
+                         (!kHasEndpoint || IsValidEndpointId(target.endpoint)) &&
+                         (!kHasDeviceType || IsValidDeviceTypeId(target.deviceType)),
+                     log = "invalid target");
+        // TODO(#14431): device type target not yet supported (remove check when supported)
+        VerifyOrExit(!kHasDeviceType, log = "device type target not yet supported");
+    }
+
+    return true;
+
+exit:
+    ChipLogError(DataManagement, "AccessControl: %s", log);
+    return false;
 }
 
 AccessControl & GetAccessControl()
@@ -206,6 +399,7 @@ AccessControl & GetAccessControl()
 
 void SetAccessControl(AccessControl & accessControl)
 {
+    ChipLogProgress(DataManagement, "AccessControl: setting");
     globalAccessControl = &accessControl;
 }
 

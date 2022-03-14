@@ -29,7 +29,11 @@ pw_python_package("chip_rpc") {
       install_requires = [ "ipython" ]
     }
   }
-  sources = [ "chip_rpc/console.py" ]
+  sources = [
+    "chip_rpc/console.py",
+    "chip_rpc/plugins/device_toolbar.py",
+    "chip_rpc/plugins/helper_scripts.py",
+  ]
   python_deps = [
     "$dir_pw_console/py",
     "$dir_pw_hdlc/py",
@@ -38,11 +42,14 @@ pw_python_package("chip_rpc") {
     "$dir_pw_rpc/py",
     "${chip_root}/examples/common/pigweed:attributes_service.python",
     "${chip_root}/examples/common/pigweed:button_service.python",
+    "${chip_root}/examples/common/pigweed:descriptor_service.python",
     "${chip_root}/examples/common/pigweed:device_service.python",
     "${chip_root}/examples/common/pigweed:echo_service.python",
     "${chip_root}/examples/common/pigweed:lighting_service.python",
     "${chip_root}/examples/common/pigweed:locking_service.python",
-    "${chip_root}/examples/ipv6only-app/common:wifi_service.python",
+    "${chip_root}/examples/common/pigweed:ot_cli_service.python",
+    "${chip_root}/examples/common/pigweed:thread_service.python",
+    "${chip_root}/examples/common/pigweed:wifi_service.python",
   ]
 }
 

@@ -35,8 +35,11 @@ public:
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
+    bool IsFirstImageRun() override { return false; }
+    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
+    void SetOTAImageFile(CharSpan name) { mImageFile = name; }
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -59,6 +62,7 @@ private:
     static uint8_t mSlotId;       // Bootloader storage slot
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
+    CharSpan mImageFile;
 };
 
 } // namespace chip

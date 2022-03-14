@@ -38,6 +38,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/P6/NetworkCommissioningDriver.h>
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
@@ -65,11 +68,22 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 } // namespace
 
+using namespace ::chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
+
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::P6WiFiDriver::GetInstance()));
+} // namespace
+
+void NetWorkCommissioningInstInit()
+{
+    sWiFiNetworkCommissioningInstance.Init();
+}
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -124,7 +138,7 @@ CHIP_ERROR AppTask::Init()
         P6_LOG("funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
-
+    NetWorkCommissioningInstInit();
     P6_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
     err = LightMgr().Init();
     if (err != CHIP_NO_ERROR)
@@ -321,7 +335,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = Function::kNoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 

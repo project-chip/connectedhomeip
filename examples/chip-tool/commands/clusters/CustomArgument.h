@@ -19,15 +19,20 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
 
 namespace {
-static constexpr char kPayloadHexPrefix[]                 = "hex:";
-static constexpr char kPayloadSignedPrefix[]              = "s:";
-static constexpr char kPayloadUnkPayloadSignedPrefix[]    = "u:";
-static constexpr size_t kPayloadHexPrefixLen              = ArraySize(kPayloadHexPrefix) - 1;              // ignore null character
-static constexpr size_t kPayloadSignedPrefixLen           = ArraySize(kPayloadSignedPrefix) - 1;           // ignore null character
-static constexpr size_t kPayloadUnkPayloadSignedPrefixLen = ArraySize(kPayloadUnkPayloadSignedPrefix) - 1; // ignore null character
+static constexpr char kPayloadHexPrefix[]         = "hex:";
+static constexpr char kPayloadSignedPrefix[]      = "s:";
+static constexpr char kPayloadUnsignedPrefix[]    = "u:";
+static constexpr char kPayloadFloatPrefix[]       = "f:";
+static constexpr char kPayloadDoublePrefix[]      = "d:";
+static constexpr size_t kPayloadHexPrefixLen      = ArraySize(kPayloadHexPrefix) - 1;      // ignore null character
+static constexpr size_t kPayloadSignedPrefixLen   = ArraySize(kPayloadSignedPrefix) - 1;   // ignore null character
+static constexpr size_t kPayloadUnsignedPrefixLen = ArraySize(kPayloadUnsignedPrefix) - 1; // ignore null character
+static constexpr size_t kPayloadFloatPrefixLen    = ArraySize(kPayloadFloatPrefix) - 1;    // ignore null character
+static constexpr size_t kPayloadDoublePrefixLen   = ArraySize(kPayloadDoublePrefix) - 1;   // ignore null character
 } // namespace
 
 class CustomArgumentParser
@@ -58,6 +63,14 @@ public:
             else if (IsSignedNumberPrefix(value))
             {
                 return CustomArgumentParser::PutSignedFromString(writer, tag, value);
+            }
+            else if (IsFloatNumberPrefix(value))
+            {
+                return CustomArgumentParser::PutFloatFromString(writer, tag, value);
+            }
+            else if (IsDoubleNumberPrefix(value))
+            {
+                return CustomArgumentParser::PutDoubleFromString(writer, tag, value);
             }
 
             return CustomArgumentParser::PutCharString(writer, tag, value);
@@ -139,36 +152,43 @@ private:
     static CHIP_ERROR PutCharString(chip::TLV::TLVWriter * writer, chip::TLV::Tag tag, Json::Value & value)
     {
         size_t size = strlen(value.asCString());
-
-        chip::Platform::ScopedMemoryBuffer<char> buffer;
-        VerifyOrReturnError(buffer.Calloc(size), CHIP_ERROR_NO_MEMORY);
-        strncpy(buffer.Get(), value.asCString(), size);
-
-        return chip::app::DataModel::Encode(*writer, tag, chip::CharSpan(buffer.Get(), size));
+        return chip::app::DataModel::Encode(*writer, tag, chip::CharSpan(value.asCString(), size));
     }
 
     static CHIP_ERROR PutUnsignedFromString(chip::TLV::TLVWriter * writer, chip::TLV::Tag tag, Json::Value & value)
     {
-        size_t size = strlen(value.asCString());
         char numberAsString[21];
+        chip::Platform::CopyString(numberAsString, value.asCString() + kPayloadUnsignedPrefixLen);
 
-        chip::Platform::ScopedMemoryBuffer<char> buffer;
-        strncpy(numberAsString, value.asCString() + kPayloadUnkPayloadSignedPrefixLen, size - kPayloadUnkPayloadSignedPrefixLen);
-
-        auto numberAsUint = std::stoull(numberAsString, nullptr, 0);
-        return chip::app::DataModel::Encode(*writer, tag, static_cast<uint64_t>(numberAsUint));
+        auto number = std::stoull(numberAsString, nullptr, 0);
+        return chip::app::DataModel::Encode(*writer, tag, static_cast<uint64_t>(number));
     }
 
     static CHIP_ERROR PutSignedFromString(chip::TLV::TLVWriter * writer, chip::TLV::Tag tag, Json::Value & value)
     {
-        size_t size = strlen(value.asCString());
         char numberAsString[21];
+        chip::Platform::CopyString(numberAsString, value.asCString() + kPayloadSignedPrefixLen);
 
-        chip::Platform::ScopedMemoryBuffer<char> buffer;
-        strncpy(numberAsString, value.asCString() + kPayloadSignedPrefixLen, size - kPayloadSignedPrefixLen);
+        auto number = std::stoll(numberAsString, nullptr, 0);
+        return chip::app::DataModel::Encode(*writer, tag, static_cast<int64_t>(number));
+    }
 
-        auto numberAsInt = std::stoll(numberAsString, nullptr, 0);
-        return chip::app::DataModel::Encode(*writer, tag, static_cast<int64_t>(numberAsInt));
+    static CHIP_ERROR PutFloatFromString(chip::TLV::TLVWriter * writer, chip::TLV::Tag tag, Json::Value & value)
+    {
+        char numberAsString[21];
+        chip::Platform::CopyString(numberAsString, value.asCString() + kPayloadFloatPrefixLen);
+
+        auto number = std::stof(numberAsString);
+        return chip::app::DataModel::Encode(*writer, tag, number);
+    }
+
+    static CHIP_ERROR PutDoubleFromString(chip::TLV::TLVWriter * writer, chip::TLV::Tag tag, Json::Value & value)
+    {
+        char numberAsString[21];
+        chip::Platform::CopyString(numberAsString, value.asCString() + kPayloadDoublePrefixLen);
+
+        auto number = std::stod(numberAsString);
+        return chip::app::DataModel::Encode(*writer, tag, number);
     }
 
     static bool IsOctetString(Json::Value & value)
@@ -178,12 +198,22 @@ private:
 
     static bool IsUnsignedNumberPrefix(Json::Value & value)
     {
-        return (strncmp(value.asCString(), kPayloadUnkPayloadSignedPrefix, kPayloadUnkPayloadSignedPrefixLen) == 0);
+        return (strncmp(value.asCString(), kPayloadUnsignedPrefix, kPayloadUnsignedPrefixLen) == 0);
     }
 
     static bool IsSignedNumberPrefix(Json::Value & value)
     {
         return (strncmp(value.asCString(), kPayloadSignedPrefix, kPayloadSignedPrefixLen) == 0);
+    }
+
+    static bool IsFloatNumberPrefix(Json::Value & value)
+    {
+        return (strncmp(value.asCString(), kPayloadFloatPrefix, kPayloadFloatPrefixLen) == 0);
+    }
+
+    static bool IsDoubleNumberPrefix(Json::Value & value)
+    {
+        return (strncmp(value.asCString(), kPayloadDoublePrefix, kPayloadDoublePrefixLen) == 0);
     }
 };
 
@@ -224,6 +254,10 @@ public:
 
         return writer.CopyElement(tag, reader);
     }
+
+    // We trust our consumers to do the encoding of our data correctly, so don't
+    // need to know whether we are being encoded for a write.
+    static constexpr bool kIsFabricScoped = false;
 
 private:
     uint8_t * mData                       = nullptr;

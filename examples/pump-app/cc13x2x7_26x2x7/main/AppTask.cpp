@@ -23,11 +23,6 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
-
 #include "FreeRTOS.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -36,6 +31,14 @@
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#endif
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -72,6 +75,26 @@ static Button_Handle sAppRightHandle;
 
 AppTask AppTask::sAppTask;
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+static OTARequestor sRequestorCore;
+static DefaultOTARequestorStorage sRequestorStorage;
+static GenericOTARequestorDriver sRequestorUser;
+static BDXDownloader sDownloader;
+static OTAImageProcessorImpl sImageProcessor;
+
+void InitializeOTARequestor(void)
+{
+    // Initialize and interconnect the Requestor and Image Processor objects
+    SetRequestorInstance(&sRequestorCore);
+
+    sRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    sRequestorCore.Init(chip::Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    sImageProcessor.SetOTADownloader(&sDownloader);
+    sDownloader.SetImageProcessorDelegate(&sImageProcessor);
+    sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
+}
+#endif
+
 int AppTask::StartAppTask()
 {
     int ret = 0;
@@ -103,7 +126,7 @@ int AppTask::Init()
     cc13x2_26x2LogInit();
 
     // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    Platform::MemoryInit();
 
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
@@ -146,12 +169,12 @@ int AppTask::Init()
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
+    DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
 #endif
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
-    chip::Server::GetInstance().Init();
+    Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -192,8 +215,12 @@ int AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+    InitializeOTARequestor();
+#endif
+
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
     return 0;
 }
@@ -352,7 +379,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         }
         else if (AppEvent::kAppEventButtonType_LongPressed == aEvent->ButtonEvent.Type)
         {
-            ConfigurationMgr().InitiateFactoryReset();
+            chip::Server::GetInstance().ScheduleFactoryReset();
         }
         break;
 
@@ -380,7 +407,7 @@ void AppTask::InitOnOffClusterState()
     status = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, false);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Init On/Off state  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Init On/Off state  %x", status);
     }
 }
 
@@ -397,98 +424,98 @@ void AppTask::UpdateClusterState()
     status          = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, onOffState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating On/Off state  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating On/Off state  %x", status);
     }
 
     int16_t maxPressure = PumpMgr().GetMaxPressure();
     status              = PumpConfigurationAndControl::Attributes::MaxPressure::Set(PCC_CLUSTER_ENDPOINT, maxPressure);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %x", status);
     }
 
     uint16_t maxSpeed = PumpMgr().GetMaxSpeed();
     status            = PumpConfigurationAndControl::Attributes::MaxSpeed::Set(PCC_CLUSTER_ENDPOINT, maxSpeed);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %x", status);
     }
 
     uint16_t maxFlow = PumpMgr().GetMaxFlow();
     status           = PumpConfigurationAndControl::Attributes::MaxFlow::Set(PCC_CLUSTER_ENDPOINT, maxFlow);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %x", status);
     }
 
     int16_t minConstPress = PumpMgr().GetMinConstPressure();
     status                = PumpConfigurationAndControl::Attributes::MinConstPressure::Set(PCC_CLUSTER_ENDPOINT, minConstPress);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %x", status);
     }
 
     int16_t maxConstPress = PumpMgr().GetMaxConstPressure();
     status                = PumpConfigurationAndControl::Attributes::MaxConstPressure::Set(PCC_CLUSTER_ENDPOINT, maxConstPress);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %x", status);
     }
 
     int16_t minCompPress = PumpMgr().GetMinCompPressure();
     status               = PumpConfigurationAndControl::Attributes::MinCompPressure::Set(PCC_CLUSTER_ENDPOINT, minCompPress);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %x", status);
     }
 
     int16_t maxCompPress = PumpMgr().GetMaxCompPressure();
     status               = PumpConfigurationAndControl::Attributes::MaxCompPressure::Set(PCC_CLUSTER_ENDPOINT, maxCompPress);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %x", status);
     }
 
     uint16_t minConstSpeed = PumpMgr().GetMinConstSpeed();
     status                 = PumpConfigurationAndControl::Attributes::MinConstSpeed::Set(PCC_CLUSTER_ENDPOINT, minConstSpeed);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %x", status);
     }
 
     uint16_t maxConstSpeed = PumpMgr().GetMaxConstSpeed();
     status                 = PumpConfigurationAndControl::Attributes::MaxConstSpeed::Set(PCC_CLUSTER_ENDPOINT, maxConstSpeed);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %x", status);
     }
 
     uint16_t minConstFlow = PumpMgr().GetMinConstFlow();
     status                = PumpConfigurationAndControl::Attributes::MinConstFlow::Set(PCC_CLUSTER_ENDPOINT, minConstFlow);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %x", status);
     }
 
     uint16_t maxConstFlow = PumpMgr().GetMaxConstFlow();
     status                = PumpConfigurationAndControl::Attributes::MaxConstFlow::Set(PCC_CLUSTER_ENDPOINT, maxConstFlow);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %x", status);
     }
 
     int16_t minConstTemp = PumpMgr().GetMinConstTemp();
     status               = PumpConfigurationAndControl::Attributes::MinConstTemp::Set(PCC_CLUSTER_ENDPOINT, minConstTemp);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %x", status);
     }
 
     int16_t maxConstTemp = PumpMgr().GetMaxConstTemp();
     status               = PumpConfigurationAndControl::Attributes::MaxConstTemp::Set(PCC_CLUSTER_ENDPOINT, maxConstTemp);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %x", status);
     }
 }
 

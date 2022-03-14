@@ -39,19 +39,17 @@ using namespace chip;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 
-constexpr int16_t kDefaultAbsMinHeatSetpointLimit    = 700;  // 7C (44.5 F) is the default
-constexpr int16_t kDefaultAbsMaxHeatSetpointLimit    = 3000; // 30C (86 F) is the default
-constexpr int16_t kDefaultMinHeatSetpointLimit       = 700;  // 7C (44.5 F) is the default
-constexpr int16_t kDefaultMaxHeatSetpointLimit       = 3000; // 30C (86 F) is the default
-constexpr int16_t kDefaultAbsMinCoolSetpointLimit    = 1600; // 16C (61 F) is the default
-constexpr int16_t kDefaultAbsMaxCoolSetpointLimit    = 3200; // 32C (90 F) is the default
-constexpr int16_t kDefaultMinCoolSetpointLimit       = 1600; // 16C (61 F) is the default
-constexpr int16_t kDefaultMaxCoolSetpointLimit       = 3200; // 32C (90 F) is the default
-constexpr int16_t kDefaultHeatingSetpoint            = 2000;
-constexpr int16_t kDefaultCoolingSetpoint            = 2600;
-constexpr uint8_t kInvalidControlSequenceOfOperation = 0xff;
-constexpr uint8_t kInvalidRequestedSystemMode        = 0xff;
-constexpr int8_t kDefaultDeadBand                    = 25; // 2.5C is the default
+constexpr int16_t kDefaultAbsMinHeatSetpointLimit = 700;  // 7C (44.5 F) is the default
+constexpr int16_t kDefaultAbsMaxHeatSetpointLimit = 3000; // 30C (86 F) is the default
+constexpr int16_t kDefaultMinHeatSetpointLimit    = 700;  // 7C (44.5 F) is the default
+constexpr int16_t kDefaultMaxHeatSetpointLimit    = 3000; // 30C (86 F) is the default
+constexpr int16_t kDefaultAbsMinCoolSetpointLimit = 1600; // 16C (61 F) is the default
+constexpr int16_t kDefaultAbsMaxCoolSetpointLimit = 3200; // 32C (90 F) is the default
+constexpr int16_t kDefaultMinCoolSetpointLimit    = 1600; // 16C (61 F) is the default
+constexpr int16_t kDefaultMaxCoolSetpointLimit    = 3200; // 32C (90 F) is the default
+constexpr int16_t kDefaultHeatingSetpoint         = 2000;
+constexpr int16_t kDefaultCoolingSetpoint         = 2600;
+constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
 
 // IMPORTANT NOTE:
 // No Side effects are permitted in emberAfThermostatClusterServerPreAttributeChangedCallback
@@ -316,18 +314,21 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     case ControlSequenceOfOperation::Id: {
         uint8_t requestedCSO;
         requestedCSO = *value;
-        if (requestedCSO > EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_AND_HEATING_WITH_REHEAT)
+        if (requestedCSO > to_underlying(ThermostatControlSequence::kCoolingAndHeatingWithReheat))
             return imcode::InvalidValue;
         return imcode::Success;
     }
 
     case SystemMode::Id: {
-        uint8_t ControlSequenceOfOperation = kInvalidControlSequenceOfOperation;
-        uint8_t RequestedSystemMode        = kInvalidRequestedSystemMode;
-        ControlSequenceOfOperation::Get(endpoint, &ControlSequenceOfOperation);
-        RequestedSystemMode = *value;
-        if (ControlSequenceOfOperation > EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_AND_HEATING_WITH_REHEAT ||
-            RequestedSystemMode > EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_FAN_ONLY)
+        ThermostatControlSequence ControlSequenceOfOperation;
+        EmberAfStatus status = ControlSequenceOfOperation::Get(endpoint, &ControlSequenceOfOperation);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            return imcode::InvalidValue;
+        }
+        auto RequestedSystemMode = static_cast<ThermostatSystemMode>(*value);
+        if (ControlSequenceOfOperation > ThermostatControlSequence::kCoolingAndHeatingWithReheat ||
+            RequestedSystemMode > ThermostatSystemMode::kFanOnly)
         {
             return imcode::InvalidValue;
         }
@@ -335,18 +336,17 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         {
             switch (ControlSequenceOfOperation)
             {
-            case EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_ONLY:
-            case EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_WITH_REHEAT:
-                if (RequestedSystemMode == EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_HEAT ||
-                    RequestedSystemMode == EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_EMERGENCY_HEATING)
+            case ThermostatControlSequence::kCoolingOnly:
+            case ThermostatControlSequence::kCoolingWithReheat:
+                if (RequestedSystemMode == ThermostatSystemMode::kHeat ||
+                    RequestedSystemMode == ThermostatSystemMode::kEmergencyHeating)
                     return imcode::InvalidValue;
                 else
                     return imcode::Success;
 
-            case EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_HEATING_ONLY:
-            case EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_HEATING_WITH_REHEAT:
-                if (RequestedSystemMode == EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_COOL ||
-                    RequestedSystemMode == EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_PRECOOLING)
+            case ThermostatControlSequence::kHeatingOnly:
+            case ThermostatControlSequence::kHeatingWithReheat:
+                if (RequestedSystemMode == ThermostatSystemMode::kCool || RequestedSystemMode == ThermostatSystemMode::kPrecooling)
                     return imcode::InvalidValue;
                 else
                     return imcode::Success;

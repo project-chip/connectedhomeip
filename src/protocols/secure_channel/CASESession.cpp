@@ -110,14 +110,18 @@ void CASESession::Clear()
 
     mState = kInitialized;
 
-    CloseExchange();
+    AbortExchange();
 }
 
-void CASESession::CloseExchange()
+void CASESession::AbortExchange()
 {
     if (mExchangeCtxt != nullptr)
     {
-        mExchangeCtxt->Close();
+        // The only time we reach this is if we are getting destroyed in the
+        // middle of our handshake.  In that case, there is no point trying to
+        // do MRP resends of the last message we sent, so abort the exchange
+        // instead of just closing it.
+        mExchangeCtxt->Abort();
         mExchangeCtxt = nullptr;
     }
 }
@@ -228,6 +232,12 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_PROGRESS_LOGGING
+    char peerAddrBuff[Transport::PeerAddress::kMaxToStringSize];
+    peerAddress.ToString(peerAddrBuff);
+    ChipLogProgress(SecureChannel, "Establishing CASE session to %s", peerAddrBuff);
+#endif
+
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -264,8 +274,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
 {
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
-    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %" PRIu8,
-                 mState);
+    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u", mState);
     // Discard the exchange so that Clear() doesn't try closing it.  The
     // exchange will handle that.
     DiscardExchange();
@@ -750,7 +759,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 
     P256ECDSASignature tbsData2Signature;
 
-    P256PublicKey remoteCredential;
+    NodeId responderNodeId;
+    P256PublicKey responderPublicKey;
 
     uint8_t responderRandom[kSigmaParamRandomNumberSize];
     ByteSpan responderNOC;
@@ -835,7 +845,11 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 
     // Validate responder identity located in msg_r2_encrypted
     // Constructing responder identity
-    SuccessOrExit(err = Validate_and_RetrieveResponderID(responderNOC, responderICAC, remoteCredential));
+    SuccessOrExit(err = ValidatePeerIdentity(responderNOC, responderICAC, responderNodeId, responderPublicKey));
+
+    // Verify that responderNodeId (from responderNOC) matches one that was included
+    // in the computation of the Destination Identifier when generating Sigma1.
+    VerifyOrReturnError(GetPeerNodeId() == responderNodeId, CHIP_ERROR_INVALID_CASE_PARAMETER);
 
     // Construct msg_R2_Signed and validate the signature in msg_r2_encrypted
     msg_r2_signed_len = TLV::EstimateStructOverhead(sizeof(uint16_t), responderNOC.size(), responderICAC.size(),
@@ -853,7 +867,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = decryptedDataTlvReader.GetBytes(tbsData2Signature, tbsData2Signature.Length()));
 
     // Validate signature
-    SuccessOrExit(err = remoteCredential.ECDSA_validate_msg_signature(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature));
+    SuccessOrExit(err = responderPublicKey.ECDSA_validate_msg_signature(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature));
 
     // Retrieve session resumption ID
     SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_TBEData_ResumptionID)));
@@ -1037,7 +1051,8 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
 
     P256ECDSASignature tbsData3Signature;
 
-    P256PublicKey remoteCredential;
+    NodeId initiatorNodeId;
+    P256PublicKey initiatorPublicKey;
 
     ByteSpan initiatorNOC;
     ByteSpan initiatorICAC;
@@ -1100,7 +1115,8 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     // Step 5/6
     // Validate initiator identity located in msg->Start()
     // Constructing responder identity
-    SuccessOrExit(err = Validate_and_RetrieveResponderID(initiatorNOC, initiatorICAC, remoteCredential));
+    SuccessOrExit(err = ValidatePeerIdentity(initiatorNOC, initiatorICAC, initiatorNodeId, initiatorPublicKey));
+    SetPeerNodeId(initiatorNodeId);
 
     // Step 4 - Construct Sigma3 TBS Data
     msg_r3_signed_len = TLV::EstimateStructOverhead(sizeof(uint16_t), initiatorNOC.size(), initiatorICAC.size(),
@@ -1123,7 +1139,7 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     //        current flow of code, a malicious node can trigger a DoS style attack on the device.
     //        The same change should be made in Sigma2 processing.
     // Step 7 - Validate Signature
-    SuccessOrExit(err = remoteCredential.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature));
+    SuccessOrExit(err = initiatorPublicKey.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature));
 
     SuccessOrExit(err = mCommissioningHash.Finish(messageDigestSpan));
 
@@ -1253,19 +1269,20 @@ CHIP_ERROR CASESession::ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const ByteSpan & responderNOC, const ByteSpan & responderICAC,
-                                                         Crypto::P256PublicKey & responderID)
+CHIP_ERROR CASESession::ValidatePeerIdentity(const ByteSpan & peerNOC, const ByteSpan & peerICAC, NodeId & peerNodeId,
+                                             Crypto::P256PublicKey & peerPublicKey)
 {
     ReturnErrorCodeIf(mFabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(SetEffectiveTime());
 
     PeerId peerId;
-    FabricId rawFabricId;
-    ReturnErrorOnFailure(
-        mFabricInfo->VerifyCredentials(responderNOC, responderICAC, mValidContext, peerId, rawFabricId, responderID));
+    FabricId peerNOCFabricId;
+    ReturnErrorOnFailure(mFabricInfo->VerifyCredentials(peerNOC, peerICAC, mValidContext, peerId, peerNOCFabricId, peerPublicKey));
 
-    SetPeerNodeId(peerId.GetNodeId());
+    VerifyOrReturnError(mFabricInfo->GetFabricId() == peerNOCFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+    peerNodeId = peerId.GetNodeId();
 
     return CHIP_NO_ERROR;
 }
@@ -1468,7 +1485,7 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
 }
 
 CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                                System::PacketBufferHandle & msg)
+                                                const System::PacketBufferHandle & msg)
 {
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 

@@ -26,7 +26,7 @@
 #pragma once
 
 // Include configuration header
-#include <system/SystemConfig.h>
+#include <system/SystemPacketBufferInternal.h>
 
 // Include dependent headers
 #include <lib/support/BufferWriter.h>
@@ -46,43 +46,6 @@
 
 class PacketBufferTest;
 
-/*
- * Preprocessor definitions related to packet buffer memory configuration.
- * These are not part of the public PacketBuffer interface; they are present
- * here so that certain public functions can have definitions optimized for
- * particular configurations.
- */
-
-#undef CHIP_SYSTEM_PACKETBUFFER_STORE                // One of the following constants:
-#define CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_POOL 1   //   Default lwIP allocation
-#define CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM 2 //   Custom lwIP allocation
-#define CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL 3   //   Internal fixed pool
-#define CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP 4   //   Platform::MemoryAlloc
-
-#undef CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE // True if RightSize() has a nontrivial implementation
-#undef CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK      // True if Check() has a nontrivial implementation
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if LWIP_PBUF_FROM_CUSTOM_POOLS
-#define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
-#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 1
-#define CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK 0
-#else
-#define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_POOL
-#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 0
-#define CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK 0
-#endif
-#else
-#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
-#define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL
-#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 0
-#define CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK 0
-#else
-#define CHIP_SYSTEM_PACKETBUFFER_STORE CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
-#define CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE 1
-#define CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK CHIP_CONFIG_MEMORY_DEBUG_CHECKS
-#endif
-#endif
-
 namespace chip {
 namespace System {
 
@@ -96,7 +59,7 @@ struct pbuf
     uint16_t tot_len;
     uint16_t len;
     uint16_t ref;
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
     uint16_t alloc_size;
 #endif
 };
@@ -160,7 +123,7 @@ public:
     /**
      * The maximum size buffer an application can allocate with no protocol header reserve.
      */
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
     static constexpr uint16_t kMaxSizeWithoutReserve = LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE);
 #else
     static constexpr uint16_t kMaxSizeWithoutReserve = CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX;
@@ -187,20 +150,19 @@ public:
      */
     uint16_t AllocSize() const
     {
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_POOL ||                                                  \
-    CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
         return kMaxSizeWithoutReserve;
-#elif CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+#elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
         return this->alloc_size;
-#elif CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
+#elif CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL
         // Temporary workaround for custom pbufs by assuming size to be PBUF_POOL_BUFSIZE
         if (this->flags & PBUF_FLAG_IS_CUSTOM)
             return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - kStructureSize;
         else
             return LWIP_MEM_ALIGN_SIZE(memp_sizes[this->pool]) - kStructureSize;
 #else
-#error "Unimplemented CHIP_SYSTEM_PACKETBUFFER_STORE case"
-#endif // CHIP_SYSTEM_PACKETBUFFER_STORE
+#error "Unimplemented PacketBuffer storage case"
+#endif
     }
 
     /**
@@ -396,7 +358,7 @@ private:
     static constexpr uint16_t kBlockSize = PacketBuffer::kStructureSize + PacketBuffer::kMaxSizeWithoutReserve;
 
     // Note: this condition includes DOXYGEN to work around a Doxygen error. DOXYGEN is never defined in any actual build.
-#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL || defined(DOXYGEN)
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || defined(DOXYGEN)
     typedef union
     {
         pbuf Header;
@@ -405,7 +367,7 @@ private:
     static BufferPoolElement sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE];
     static PacketBuffer * sFreeList;
     static PacketBuffer * BuildFreeList();
-#endif // CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_POOL || defined(DOXYGEN)
+#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || defined(DOXYGEN)
 
 #if CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
     static void InternalCheck(const PacketBuffer * buffer);
@@ -582,7 +544,7 @@ public:
      */
     void RightSize()
     {
-#if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHTSIZE
         InternalRightSize();
 #endif
     }
@@ -719,7 +681,7 @@ private:
 
     bool operator==(const PacketBufferHandle & aOther) { return mBuffer == aOther.mBuffer; }
 
-#if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
+#if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHTSIZE
     void InternalRightSize();
 #endif
 

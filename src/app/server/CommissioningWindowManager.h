@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server/AppDelegate.h>
+#include <app/server/CommissioningModeProvider.h>
+#include <lib/dnssd/Advertiser.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 
@@ -34,10 +36,20 @@ enum class CommissioningWindowAdvertisement
 
 class Server;
 
-class CommissioningWindowManager : public SessionEstablishmentDelegate
+class CommissioningWindowManager : public SessionEstablishmentDelegate, public app::CommissioningModeProvider
 {
 public:
-    CommissioningWindowManager(Server * server) : mAppDelegate(nullptr), mServer(server) {}
+    CommissioningWindowManager() {}
+
+    CHIP_ERROR Init(Server * server)
+    {
+        if (server == nullptr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        mServer = server;
+        return CHIP_NO_ERROR;
+    }
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
 
@@ -54,12 +66,14 @@ public:
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
     CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                               PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
-                                               uint16_t passcodeID);
+                                               Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt);
 
     void CloseCommissioningWindow();
 
     app::Clusters::AdministratorCommissioning::CommissioningWindowStatus CommissioningWindowStatus() const { return mWindowStatus; }
+
+    // CommissioningModeProvider implemetation.
+    Dnssd::CommissioningMode GetCommissioningMode() const override;
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -95,9 +109,6 @@ private:
 
     bool mIsBLE = true;
 
-    bool mOriginalDiscriminatorCached = false;
-    uint16_t mOriginalDiscriminator   = 0;
-
     SessionIDAllocator * mIDAllocator = nullptr;
     PASESession mPairingSession;
 
@@ -106,12 +117,14 @@ private:
     uint8_t mFailedCommissioningAttempts = 0;
 
     bool mUseECM = false;
-    PASEVerifier mECMPASEVerifier;
+    Spake2pVerifier mECMPASEVerifier;
     uint16_t mECMDiscriminator = 0;
-    uint16_t mECMPasscodeID    = 0;
-    uint32_t mECMIterations    = 0;
-    uint32_t mECMSaltLength    = 0;
-    uint8_t mECMSalt[kPBKDFMaximumSaltLen];
+    // mListeningForPASE is true only when we are listening for
+    // PBKDFParamRequest messages.
+    bool mListeningForPASE  = false;
+    uint32_t mECMIterations = 0;
+    uint32_t mECMSaltLength = 0;
+    uint8_t mECMSalt[kSpake2p_Max_PBKDF_Salt_Length];
 };
 
 } // namespace chip

@@ -33,25 +33,23 @@ using Entry         = AccessControl::Entry;
 using EntryIterator = AccessControl::EntryIterator;
 using Target        = Entry::Target;
 
-AccessControl accessControl(Examples::GetAccessControlDelegate());
+AccessControl accessControl;
 
-constexpr ClusterId kOnOffCluster         = 0x0006;
-constexpr ClusterId kLevelControlCluster  = 0x0008;
-constexpr ClusterId kAccessControlCluster = 0x001F;
-constexpr ClusterId kColorControlCluster  = 0x0300;
+constexpr ClusterId kOnOffCluster         = 0x0000'0006;
+constexpr ClusterId kLevelControlCluster  = 0x0000'0008;
+constexpr ClusterId kAccessControlCluster = 0x0000'001F;
+constexpr ClusterId kColorControlCluster  = 0x0000'0300;
 
-constexpr DeviceTypeId kColorLightDeviceType = 0x0102;
-
-constexpr NodeId kPaseVerifier0 = 0xFFFFFFFB0000'0000;
-constexpr NodeId kPaseVerifier1 = 0xFFFFFFFB0000'0001;
-constexpr NodeId kPaseVerifier3 = 0xFFFFFFFB0000'0003;
-constexpr NodeId kPaseVerifier5 = 0xFFFFFFFB0000'0005;
+constexpr NodeId kPaseVerifier0 = NodeIdFromPAKEKeyId(0x0000);
+constexpr NodeId kPaseVerifier1 = NodeIdFromPAKEKeyId(0x0001);
+constexpr NodeId kPaseVerifier3 = NodeIdFromPAKEKeyId(0x0003);
 
 constexpr NodeId kOperationalNodeId0 = 0x0123456789ABCDEF;
 constexpr NodeId kOperationalNodeId1 = 0x1234567812345678;
 constexpr NodeId kOperationalNodeId2 = 0x1122334455667788;
 constexpr NodeId kOperationalNodeId3 = 0x1111111111111111;
 constexpr NodeId kOperationalNodeId4 = 0x2222222222222222;
+constexpr NodeId kOperationalNodeId5 = 0x3333333333333333;
 
 constexpr CASEAuthTag kCASEAuthTag0 = 0x0001'0001;
 constexpr CASEAuthTag kCASEAuthTag1 = 0x0002'0001;
@@ -59,18 +57,18 @@ constexpr CASEAuthTag kCASEAuthTag2 = 0xABCD'0002;
 constexpr CASEAuthTag kCASEAuthTag3 = 0xABCD'0008;
 constexpr CASEAuthTag kCASEAuthTag4 = 0xABCD'ABCD;
 
-constexpr NodeId kCASEAuthTagAsNodeId0 = kMinCASEAuthTag | kCASEAuthTag0;
-constexpr NodeId kCASEAuthTagAsNodeId1 = kMinCASEAuthTag | kCASEAuthTag1;
-constexpr NodeId kCASEAuthTagAsNodeId2 = kMinCASEAuthTag | kCASEAuthTag2;
-constexpr NodeId kCASEAuthTagAsNodeId3 = kMinCASEAuthTag | kCASEAuthTag3;
-constexpr NodeId kCASEAuthTagAsNodeId4 = kMinCASEAuthTag | kCASEAuthTag4;
+constexpr NodeId kCASEAuthTagAsNodeId0 = NodeIdFromCASEAuthTag(kCASEAuthTag0);
+constexpr NodeId kCASEAuthTagAsNodeId1 = NodeIdFromCASEAuthTag(kCASEAuthTag1);
+constexpr NodeId kCASEAuthTagAsNodeId2 = NodeIdFromCASEAuthTag(kCASEAuthTag2);
+constexpr NodeId kCASEAuthTagAsNodeId3 = NodeIdFromCASEAuthTag(kCASEAuthTag3);
+constexpr NodeId kCASEAuthTagAsNodeId4 = NodeIdFromCASEAuthTag(kCASEAuthTag4);
 
-constexpr NodeId kGroup2 = 0xFFFFFFFFFFFF'0002;
-constexpr NodeId kGroup4 = 0xFFFFFFFFFFFF'0004;
-constexpr NodeId kGroup6 = 0xFFFFFFFFFFFF'0006;
-constexpr NodeId kGroup8 = 0xFFFFFFFFFFFF'0008;
+constexpr NodeId kGroup2 = NodeIdFromGroupId(0x0002);
+constexpr NodeId kGroup4 = NodeIdFromGroupId(0x0004);
+constexpr NodeId kGroup6 = NodeIdFromGroupId(0x0006);
+constexpr NodeId kGroup8 = NodeIdFromGroupId(0x0008);
 
-constexpr AuthMode authModes[] = { AuthMode::kPase, AuthMode::kCase, AuthMode::kGroup };
+constexpr AuthMode authModes[] = { AuthMode::kCase, AuthMode::kGroup };
 
 constexpr FabricIndex fabricIndexes[] = { 1, 2, 3 };
 
@@ -78,11 +76,6 @@ constexpr Privilege privileges[] = { Privilege::kView, Privilege::kProxyView, Pr
                                      Privilege::kAdminister };
 
 constexpr NodeId subjects[][3] = { {
-                                       kPaseVerifier0,
-                                       kPaseVerifier3,
-                                       kPaseVerifier5,
-                                   },
-                                   {
                                        kOperationalNodeId0,
                                        kCASEAuthTagAsNodeId1,
                                        kCASEAuthTagAsNodeId2,
@@ -96,7 +89,424 @@ constexpr NodeId subjects[][3] = { {
 constexpr Target targets[] = {
     { .flags = Target::kCluster, .cluster = kOnOffCluster },
     { .flags = Target::kEndpoint, .endpoint = 3 },
-    { .flags = Target::kDeviceType, .deviceType = kColorLightDeviceType },
+    { .flags = Target::kCluster | Target::kEndpoint, .cluster = kLevelControlCluster, .endpoint = 5 },
+};
+
+constexpr FabricIndex invalidFabricIndexes[] = { kUndefinedFabricIndex };
+
+// clang-format off
+constexpr NodeId validCaseSubjects[] = {
+    0x0000'0000'0000'0001, // min operational
+    0x0000'0000'0000'0002,
+    0x0123'4567'89AB'CDEF,
+    0xFFFF'FFEF'FFFF'FFFE,
+    0xFFFF'FFEF'FFFF'FFFF, // max operational
+
+    NodeIdFromCASEAuthTag(0x0000'0001),
+    NodeIdFromCASEAuthTag(0x0000'0002),
+    NodeIdFromCASEAuthTag(0x0000'FFFE),
+    NodeIdFromCASEAuthTag(0x0000'FFFF),
+
+    NodeIdFromCASEAuthTag(0x0001'0001),
+    NodeIdFromCASEAuthTag(0x0001'0002),
+    NodeIdFromCASEAuthTag(0x0001'FFFE),
+    NodeIdFromCASEAuthTag(0x0001'FFFF),
+
+    NodeIdFromCASEAuthTag(0xFFFE'0001),
+    NodeIdFromCASEAuthTag(0xFFFE'0002),
+    NodeIdFromCASEAuthTag(0xFFFE'FFFE),
+    NodeIdFromCASEAuthTag(0xFFFE'FFFF),
+
+    NodeIdFromCASEAuthTag(0xFFFF'0001),
+    NodeIdFromCASEAuthTag(0xFFFF'0002),
+    NodeIdFromCASEAuthTag(0xFFFF'FFFE),
+    NodeIdFromCASEAuthTag(0xFFFF'FFFF),
+};
+// clang-format on
+
+// clang-format off
+constexpr NodeId validGroupSubjects[] = {
+    NodeIdFromGroupId(0x0001), // start of fabric-scoped
+    NodeIdFromGroupId(0x0002),
+    NodeIdFromGroupId(0x7FFE),
+    NodeIdFromGroupId(0x7FFF), // end of fabric-scoped
+    NodeIdFromGroupId(0x8000), // start of universal
+    NodeIdFromGroupId(0x8001),
+    NodeIdFromGroupId(0xFFFB),
+    NodeIdFromGroupId(0xFFFC), // end of universal
+    NodeIdFromGroupId(0xFFFD), // all proxies
+    NodeIdFromGroupId(0xFFFE), // all non sleepy
+    NodeIdFromGroupId(0xFFFF), // all nodes
+};
+// clang-format on
+
+// clang-format off
+constexpr NodeId validPaseSubjects[] = {
+    NodeIdFromPAKEKeyId(0x0000), // start
+    NodeIdFromPAKEKeyId(0x0001),
+    NodeIdFromPAKEKeyId(0xFFFE),
+    NodeIdFromPAKEKeyId(0xFFFF), // end
+};
+// clang-format on
+
+// clang-format off
+constexpr NodeId invalidSubjects[] = {
+    0x0000'0000'0000'0000, // unspecified
+
+    0xFFFF'FFF0'0000'0000, // start reserved
+    0xFFFF'FFF0'0000'0001,
+    0xFFFF'FFF0'FFFF'FFFE,
+    0xFFFF'FFF0'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF1'0000'0000, // start reserved
+    0xFFFF'FFF1'0000'0001,
+    0xFFFF'FFF1'FFFF'FFFE,
+    0xFFFF'FFF1'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF2'0000'0000, // start reserved
+    0xFFFF'FFF2'0000'0001,
+    0xFFFF'FFF2'FFFF'FFFE,
+    0xFFFF'FFF2'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF3'0000'0000, // start reserved
+    0xFFFF'FFF3'0000'0001,
+    0xFFFF'FFF3'FFFF'FFFE,
+    0xFFFF'FFF3'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF4'0000'0000, // start reserved
+    0xFFFF'FFF4'0000'0001,
+    0xFFFF'FFF4'FFFF'FFFE,
+    0xFFFF'FFF4'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF5'0000'0000, // start reserved
+    0xFFFF'FFF5'0000'0001,
+    0xFFFF'FFF5'FFFF'FFFE,
+    0xFFFF'FFF5'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF6'0000'0000, // start reserved
+    0xFFFF'FFF6'0000'0001,
+    0xFFFF'FFF6'FFFF'FFFE,
+    0xFFFF'FFF6'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF7'0000'0000, // start reserved
+    0xFFFF'FFF7'0000'0001,
+    0xFFFF'FFF7'FFFF'FFFE,
+    0xFFFF'FFF7'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF8'0000'0000, // start reserved
+    0xFFFF'FFF8'0000'0001,
+    0xFFFF'FFF8'FFFF'FFFE,
+    0xFFFF'FFF8'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF9'0000'0000, // start reserved
+    0xFFFF'FFF9'0000'0001,
+    0xFFFF'FFF9'FFFF'FFFE,
+    0xFFFF'FFF9'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFFA'0000'0000, // start reserved
+    0xFFFF'FFFA'0000'0001,
+    0xFFFF'FFFA'FFFF'FFFE,
+    0xFFFF'FFFA'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFFB'0001'0000, // PASE with unused bits used
+    0xFFFF'FFFB'0001'0001, // PASE with unused bits used
+    0xFFFF'FFFB'0001'FFFE, // PASE with unused bits used
+    0xFFFF'FFFB'0001'FFFF, // PASE with unused bits used
+
+    0xFFFF'FFFB'FFFE'0000, // PASE with unused bits used
+    0xFFFF'FFFB'FFFE'0001, // PASE with unused bits used
+    0xFFFF'FFFB'FFFE'FFFE, // PASE with unused bits used
+    0xFFFF'FFFB'FFFE'FFFF, // PASE with unused bits used
+
+    0xFFFF'FFFB'FFFF'0000, // PASE with unused bits used
+    0xFFFF'FFFB'FFFF'0001, // PASE with unused bits used
+    0xFFFF'FFFB'FFFF'FFFE, // PASE with unused bits used
+    0xFFFF'FFFB'FFFF'FFFF, // PASE with unused bits used
+
+    0xFFFF'FFFC'0000'0000, // start reserved
+    0xFFFF'FFFC'0000'0001,
+    0xFFFF'FFFC'FFFF'FFFE,
+    0xFFFF'FFFC'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFFD'0000'0000, // CAT with version 0
+    0xFFFF'FFFD'0001'0000, // CAT with version 0
+    0xFFFF'FFFD'FFFE'0000, // CAT with version 0
+    0xFFFF'FFFD'FFFF'0000, // CAT with version 0
+
+    0xFFFF'FFFE'0000'0000, // start temporary local
+    0xFFFF'FFFE'0000'0001,
+    0xFFFF'FFFE'FFFF'FFFE,
+    0xFFFF'FFFE'FFFF'FFFF, // end temporary local (used for placeholder)
+
+    0xFFFF'FFFF'0000'0000, // start reserved
+    0xFFFF'FFFF'0000'0001,
+    0xFFFF'FFFF'FFFE'FFFE,
+    0xFFFF'FFFF'FFFE'FFFF, // end reserved
+
+    0xFFFF'FFFF'FFFF'0000, // group 0
+};
+// clang-format on
+
+// clang-format off
+constexpr ClusterId validClusters[] = {
+    0x0000'0000, // start std
+    0x0000'0001,
+    0x0000'7FFE,
+    0x0000'7FFF, // end std
+
+    0x0001'FC00, // start MS
+    0x0001'FC01,
+    0x0001'FFFD,
+    0x0001'FFFE, // end MS
+
+    0xFFFD'FC00, // start MS
+    0xFFFD'FC01,
+    0xFFFD'FFFD,
+    0xFFFD'FFFE, // end MS
+
+    0xFFFE'FC00, // start MS
+    0xFFFE'FC01,
+    0xFFFE'FFFD,
+    0xFFFE'FFFE, // end MS
+};
+// clang-format on
+
+// clang-format off
+constexpr ClusterId invalidClusters[] = {
+    0x0000'8000, // start unused
+    0x0000'8001,
+    0x0000'FBFE,
+    0x0000'FBFF, // end unused
+    0x0000'FC00, // start MS
+    0x0000'FC01,
+    0x0000'FFFD,
+    0x0000'FFFE, // end MS
+    0x0000'FFFF, // wildcard
+
+    0x0001'0000, // start std
+    0x0001'0001,
+    0x0001'7FFE,
+    0x0001'7FFF, // end std
+    0x0001'8000, // start unused
+    0x0001'8001,
+    0x0001'FBFE,
+    0x0001'FBFF, // end unused
+    0x0001'FFFF, // wildcard
+
+    0xFFFE'0000, // start std
+    0xFFFE'0001,
+    0xFFFE'7FFE,
+    0xFFFE'7FFF, // end std
+    0xFFFE'8000, // start unused
+    0xFFFE'8001,
+    0xFFFE'FBFE,
+    0xFFFE'FBFF, // end unused
+    0xFFFE'FFFF, // wildcard
+
+    0xFFFF'0000, // start std
+    0xFFFF'0001,
+    0xFFFF'7FFE,
+    0xFFFF'7FFF, // end std
+    0xFFFF'8000, // start unused
+    0xFFFF'8001,
+    0xFFFF'FBFE,
+    0xFFFF'FBFF, // end unused
+    0xFFFF'FC00, // start MS
+    0xFFFF'FC01,
+    0xFFFF'FFFD,
+    0xFFFF'FFFE, // end MS
+    0xFFFF'FFFF, // wildcard
+};
+// clang-format on
+
+// clang-format off
+constexpr EndpointId validEndpoints[] = {
+    0x0000, // start
+    0x0001,
+    0xFFFD,
+    0xFFFE, // end
+};
+// clang-format on
+
+// clang-format off
+constexpr EndpointId invalidEndpoints[] = {
+    kInvalidEndpointId
+};
+// clang-format on
+
+// clang-format off
+constexpr DeviceTypeId validDeviceTypes[] = {
+    0x0000'0000, // start
+    0x0000'0001,
+    0x0000'BFFE,
+    0x0000'BFFF, // end
+
+    0x0001'0000, // start
+    0x0001'0001,
+    0x0001'BFFE,
+    0x0001'BFFF, // end
+
+    0xFFFD'0000, // start
+    0xFFFD'0001,
+    0xFFFD'BFFE,
+    0xFFFD'BFFF, // end
+
+    0xFFFE'0000, // start
+    0xFFFE'0001,
+    0xFFFE'BFFE,
+    0xFFFE'BFFF, // end
+};
+// clang-format on
+
+// clang-format off
+constexpr DeviceTypeId invalidDeviceTypes[] = {
+    0x0000'C000, // start unused
+    0x0000'C001,
+    0x0000'FFFD,
+    0x0000'FFFE, // end unused
+    0x0000'FFFF, // wildcard
+
+    0x0001'C000, // start unused
+    0x0001'C001,
+    0x0001'FFFD,
+    0x0001'FFFE, // end unused
+    0x0001'FFFF, // wildcard
+
+    0xFFFE'C000, // start unused
+    0xFFFE'C001,
+    0xFFFE'FFFD,
+    0xFFFE'FFFE, // end unused
+    0xFFFE'FFFF, // wildcard
+
+    0xFFFF'0000, // start used
+    0xFFFF'0001,
+    0xFFFF'BFFE,
+    0xFFFF'BFFF, // end used
+    0xFFFF'C000, // start unused
+    0xFFFF'C001,
+    0xFFFF'FFFD,
+    0xFFFF'FFFE, // end unused
+    0xFFFF'FFFF, // wildcard
+};
+// clang-format on
+
+// For testing, supports one subject and target, allows any value (valid or invalid)
+class TestEntryDelegate : public Entry::Delegate
+{
+public:
+    void Release() override {}
+
+    CHIP_ERROR GetAuthMode(AuthMode & authMode) const override
+    {
+        authMode = mAuthMode;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const override
+    {
+        fabricIndex = mFabricIndex;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetPrivilege(Privilege & privilege) const override
+    {
+        privilege = mPrivilege;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetAuthMode(AuthMode authMode) override
+    {
+        mAuthMode = authMode;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) override
+    {
+        mFabricIndex = fabricIndex;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetPrivilege(Privilege privilege) override
+    {
+        mPrivilege = privilege;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetSubjectCount(size_t & count) const override
+    {
+        count = mSubjectCount;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetSubject(size_t index, NodeId & subject) const override
+    {
+        VerifyOrDie(index < mSubjectCount);
+        subject = mSubject;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetSubject(size_t index, NodeId subject) override
+    {
+        VerifyOrDie(index < mSubjectCount);
+        mSubject = subject;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR AddSubject(size_t * index, NodeId subject) override
+    {
+        VerifyOrDie(mSubjectCount == 0);
+        mSubjectCount = 1;
+        mSubject      = subject;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR RemoveSubject(size_t index) override
+    {
+        VerifyOrDie(mSubjectCount == 1);
+        mSubjectCount = 0;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetTargetCount(size_t & count) const override
+    {
+        count = mTargetCount;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetTarget(size_t index, Target & target) const override
+    {
+        VerifyOrDie(index < mTargetCount);
+        target = mTarget;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetTarget(size_t index, const Target & target) override
+    {
+        VerifyOrDie(index < mTargetCount);
+        mTarget = target;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR AddTarget(size_t * index, const Target & target) override
+    {
+        VerifyOrDie(mTargetCount == 0);
+        mTargetCount = 1;
+        mTarget      = target;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR RemoveTarget(size_t index) override
+    {
+        VerifyOrDie(mTargetCount == 1);
+        mTargetCount = 0;
+        return CHIP_NO_ERROR;
+    }
+
+    FabricIndex mFabricIndex = 1;
+    Privilege mPrivilege     = Privilege::kView;
+    AuthMode mAuthMode       = AuthMode::kCase;
+    NodeId mSubject          = kOperationalNodeId0;
+    Target mTarget           = { .flags = Target::kCluster, .cluster = kOnOffCluster };
+    size_t mSubjectCount     = 1;
+    size_t mTargetCount      = 1;
 };
 
 bool operator==(const Target & a, const Target & b)
@@ -322,8 +732,8 @@ constexpr EntryData entryData1[] = {
     {
         .fabricIndex = 2,
         .privilege   = Privilege::kManage,
-        .authMode    = AuthMode::kPase,
-        .subjects    = { kPaseVerifier1 },
+        .authMode    = AuthMode::kCase,
+        .subjects    = { kOperationalNodeId5 },
         .targets     = { { .flags = Target::kCluster | Target::kEndpoint, .cluster = kOnOffCluster, .endpoint = 2 } },
     },
     {
@@ -335,14 +745,12 @@ constexpr EntryData entryData1[] = {
                      { .flags = Target::kCluster, .cluster = kOnOffCluster },
                      { .flags = Target::kEndpoint, .endpoint = 2 } },
     },
-    // entry 6
     {
         .fabricIndex = 1,
         .privilege   = Privilege::kAdminister,
         .authMode    = AuthMode::kCase,
         .subjects    = { kCASEAuthTagAsNodeId0 },
     },
-    // entry 7
     {
         .fabricIndex = 2,
         .privilege   = Privilege::kManage,
@@ -350,7 +758,6 @@ constexpr EntryData entryData1[] = {
         .subjects    = { kCASEAuthTagAsNodeId3, kCASEAuthTagAsNodeId1 },
         .targets     = { { .flags = Target::kCluster, .cluster = kOnOffCluster } },
     },
-    // entry 8
     {
         .fabricIndex = 2,
         .privilege   = Privilege::kOperate,
@@ -371,6 +778,27 @@ struct CheckData
 };
 
 constexpr CheckData checkData1[] = {
+    // Checks for implicit PASE
+    { .subjectDescriptor = { .fabricIndex = 0, .authMode = AuthMode::kPase, .subject = kPaseVerifier0 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subject = kPaseVerifier0 },
+      .requestPath       = { .cluster = 3, .endpoint = 4 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier0 },
+      .requestPath       = { .cluster = 5, .endpoint = 6 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+      .requestPath       = { .cluster = 5, .endpoint = 6 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 3, .authMode = AuthMode::kPase, .subject = kPaseVerifier3 },
+      .requestPath       = { .cluster = 7, .endpoint = 8 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = true },
     // Checks for entry 0
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId3 },
       .requestPath       = { .cluster = kAccessControlCluster, .endpoint = 0 },
@@ -396,10 +824,6 @@ constexpr CheckData checkData1[] = {
       .requestPath       = { .cluster = 1, .endpoint = 2 },
       .privilege         = Privilege::kAdminister,
       .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subject = kOperationalNodeId3 },
-      .requestPath       = { .cluster = 1, .endpoint = 2 },
-      .privilege         = Privilege::kAdminister,
-      .allow             = false },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = kOperationalNodeId3 },
       .requestPath       = { .cluster = 1, .endpoint = 2 },
       .privilege         = Privilege::kAdminister,
@@ -418,10 +842,6 @@ constexpr CheckData checkData1[] = {
       .privilege         = Privilege::kOperate,
       .allow             = false },
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
-      .requestPath       = { .cluster = 11, .endpoint = 13 },
-      .privilege         = Privilege::kView,
-      .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subject = kOperationalNodeId1 },
       .requestPath       = { .cluster = 11, .endpoint = 13 },
       .privilege         = Privilege::kView,
       .allow             = false },
@@ -454,10 +874,6 @@ constexpr CheckData checkData1[] = {
       .requestPath       = { .cluster = 1, .endpoint = 2 },
       .privilege         = Privilege::kAdminister,
       .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kOperationalNodeId4 },
-      .requestPath       = { .cluster = 1, .endpoint = 2 },
-      .privilege         = Privilege::kAdminister,
-      .allow             = false },
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kOperationalNodeId4 },
       .requestPath       = { .cluster = 1, .endpoint = 2 },
       .privilege         = Privilege::kAdminister,
@@ -479,10 +895,6 @@ constexpr CheckData checkData1[] = {
       .requestPath       = { .cluster = kOnOffCluster, .endpoint = 11 },
       .privilege         = Privilege::kOperate,
       .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subject = kOperationalNodeId1 },
-      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 11 },
-      .privilege         = Privilege::kOperate,
-      .allow             = false },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
       .requestPath       = { .cluster = 123, .endpoint = 11 },
       .privilege         = Privilege::kOperate,
@@ -492,39 +904,31 @@ constexpr CheckData checkData1[] = {
       .privilege         = Privilege::kManage,
       .allow             = false },
     // Checks for entry 4
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId5 },
       .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
       .privilege         = Privilege::kManage,
       .allow             = true },
-    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId5 },
       .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
       .privilege         = Privilege::kManage,
       .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kPaseVerifier1 },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kOperationalNodeId5 },
       .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
       .privilege         = Privilege::kManage,
       .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kPaseVerifier1 },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId3 },
       .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
       .privilege         = Privilege::kManage,
       .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier0 },
-      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
-      .privilege         = Privilege::kManage,
-      .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier3 },
-      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
-      .privilege         = Privilege::kManage,
-      .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId5 },
       .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 2 },
       .privilege         = Privilege::kManage,
       .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId5 },
       .requestPath       = { .cluster = kOnOffCluster, .endpoint = 1 },
       .privilege         = Privilege::kManage,
       .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId5 },
       .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
       .privilege         = Privilege::kAdminister,
       .allow             = false },
@@ -542,10 +946,6 @@ constexpr CheckData checkData1[] = {
       .privilege         = Privilege::kProxyView,
       .allow             = true },
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = kGroup2 },
-      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
-      .privilege         = Privilege::kProxyView,
-      .allow             = false },
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kGroup2 },
       .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
       .privilege         = Privilege::kProxyView,
       .allow             = false },
@@ -646,6 +1046,671 @@ void MetaTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, entryData1, entryData1Count) != CHIP_NO_ERROR);
 }
 
+void TestAclValidateAuthModeSubject(nlTestSuite * inSuite, void * inContext)
+{
+    TestEntryDelegate delegate; // outlive entry
+    Entry entry;
+
+    // Use prepared entry for valid cases
+    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kView) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }) == CHIP_NO_ERROR);
+
+    // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
+    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+
+    // CASE and group may have empty subjects list
+    {
+        NL_TEST_ASSERT(inSuite, entry.RemoveSubject(0) == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+
+        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+
+        NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
+    }
+
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    for (auto subject : validCaseSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
+    for (auto subject : validGroupSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    // Use test entry for invalid cases (to ensure it can hold invalid data)
+    entry.SetDelegate(delegate);
+
+    // Operational PASE not supported
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kPase) == CHIP_NO_ERROR);
+    for (auto subject : validPaseSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    for (auto subject : validGroupSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : validPaseSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : invalidSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
+    for (auto subject : validCaseSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : validPaseSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : invalidSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kPase) == CHIP_NO_ERROR);
+    for (auto subject : validCaseSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : validGroupSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : invalidSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kNone) == CHIP_NO_ERROR);
+    for (auto subject : validCaseSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : validGroupSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : validPaseSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+    for (auto subject : invalidSubjects)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, subject) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    // Next cases have no subject
+    NL_TEST_ASSERT(inSuite, entry.RemoveSubject(0) == CHIP_NO_ERROR);
+
+    // PASE must have subject
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kPase) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    // None is not a real auth mode but also shouldn't work with no subject
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kNone) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+}
+
+void TestAclValidateFabricIndex(nlTestSuite * inSuite, void * inContext)
+{
+    TestEntryDelegate delegate; // outlive entry
+    Entry entry;
+
+    // Use prepared entry for valid cases
+    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kView) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }) == CHIP_NO_ERROR);
+
+    // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
+    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+
+    for (auto fabricIndex : fabricIndexes)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    // Use test entry for invalid cases (to ensure it can hold invalid data)
+    entry.SetDelegate(delegate);
+
+    for (auto fabricIndex : invalidFabricIndexes)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+}
+
+void TestAclValidatePrivilege(nlTestSuite * inSuite, void * inContext)
+{
+    TestEntryDelegate delegate; // outlive entry
+    Entry entry;
+
+    // Use prepared entry for valid cases
+    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kView) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }) == CHIP_NO_ERROR);
+
+    // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
+    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+
+    for (auto privilege : privileges)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetPrivilege(privilege) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    // Use test entry for invalid cases (to ensure it can hold invalid data)
+    entry.SetDelegate(delegate);
+
+    // Cannot grant administer privilege to group auth mode
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kAdminister) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, entry.SetSubject(0, kGroup4) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+}
+
+void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
+{
+    TestEntryDelegate delegate; // outlive entry
+    Entry entry;
+
+    // Use prepared entry for valid cases
+    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kView) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }) == CHIP_NO_ERROR);
+
+    // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
+    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+
+    for (auto cluster : validClusters)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kCluster, .cluster = cluster }) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    for (auto endpoint : validEndpoints)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kEndpoint, .endpoint = endpoint }) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    // TODO(#14431): device type target not yet supported (flip != to == when supported)
+    for (auto deviceType : validDeviceTypes)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kDeviceType, .deviceType = deviceType }) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    for (auto cluster : validClusters)
+    {
+        for (auto endpoint : validEndpoints)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    // TODO(#14431): device type target not yet supported (flip != to == when supported)
+    for (auto cluster : validClusters)
+    {
+        for (auto deviceType : validDeviceTypes)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(
+                    0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    // Use test entry for invalid cases (to ensure it can hold invalid data)
+    entry.SetDelegate(delegate);
+
+    // Cannot target endpoint and device type
+    for (auto endpoint : validEndpoints)
+    {
+        for (auto deviceType : validDeviceTypes)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(
+                    0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    // Cannot target all
+    for (auto cluster : validClusters)
+    {
+        for (auto endpoint : validEndpoints)
+        {
+            for (auto deviceType : validDeviceTypes)
+            {
+                NL_TEST_ASSERT(inSuite,
+                               entry.SetTarget(0,
+                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                                 .cluster    = cluster,
+                                                 .endpoint   = endpoint,
+                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                accessControl.DeleteEntry(1);
+            }
+        }
+    }
+
+    // Cannot target none
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = 0 }) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    for (auto cluster : invalidClusters)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kCluster, .cluster = cluster }) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    for (auto endpoint : invalidEndpoints)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kEndpoint, .endpoint = endpoint }) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    for (auto deviceType : invalidDeviceTypes)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kDeviceType, .deviceType = deviceType }) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    for (auto cluster : invalidClusters)
+    {
+        for (auto endpoint : invalidEndpoints)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    for (auto cluster : invalidClusters)
+    {
+        for (auto endpoint : validEndpoints)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    for (auto cluster : validClusters)
+    {
+        for (auto endpoint : invalidEndpoints)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(0, { .flags = Target::kCluster | Target::kEndpoint, .cluster = cluster, .endpoint = endpoint }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    for (auto cluster : invalidClusters)
+    {
+        for (auto deviceType : invalidDeviceTypes)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(
+                    0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    for (auto cluster : invalidClusters)
+    {
+        for (auto deviceType : validDeviceTypes)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(
+                    0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    for (auto cluster : validClusters)
+    {
+        for (auto deviceType : invalidDeviceTypes)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(
+                    0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    for (auto endpoint : invalidEndpoints)
+    {
+        for (auto deviceType : invalidDeviceTypes)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(
+                    0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    for (auto endpoint : invalidEndpoints)
+    {
+        for (auto deviceType : validDeviceTypes)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(
+                    0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    for (auto endpoint : validEndpoints)
+    {
+        for (auto deviceType : invalidDeviceTypes)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                entry.SetTarget(
+                    0, { .flags = Target::kEndpoint | Target::kDeviceType, .endpoint = endpoint, .deviceType = deviceType }) ==
+                    CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            accessControl.DeleteEntry(1);
+        }
+    }
+
+    for (auto cluster : invalidClusters)
+    {
+        for (auto endpoint : invalidEndpoints)
+        {
+            for (auto deviceType : invalidDeviceTypes)
+            {
+                NL_TEST_ASSERT(inSuite,
+                               entry.SetTarget(0,
+                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                                 .cluster    = cluster,
+                                                 .endpoint   = endpoint,
+                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                accessControl.DeleteEntry(1);
+            }
+        }
+    }
+
+    for (auto cluster : invalidClusters)
+    {
+        for (auto endpoint : invalidEndpoints)
+        {
+            for (auto deviceType : validDeviceTypes)
+            {
+                NL_TEST_ASSERT(inSuite,
+                               entry.SetTarget(0,
+                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                                 .cluster    = cluster,
+                                                 .endpoint   = endpoint,
+                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                accessControl.DeleteEntry(1);
+            }
+        }
+    }
+
+    for (auto cluster : invalidClusters)
+    {
+        for (auto endpoint : validEndpoints)
+        {
+            for (auto deviceType : invalidDeviceTypes)
+            {
+                NL_TEST_ASSERT(inSuite,
+                               entry.SetTarget(0,
+                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                                 .cluster    = cluster,
+                                                 .endpoint   = endpoint,
+                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                accessControl.DeleteEntry(1);
+            }
+        }
+    }
+
+    for (auto cluster : validClusters)
+    {
+        for (auto endpoint : invalidEndpoints)
+        {
+            for (auto deviceType : invalidDeviceTypes)
+            {
+                NL_TEST_ASSERT(inSuite,
+                               entry.SetTarget(0,
+                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                                 .cluster    = cluster,
+                                                 .endpoint   = endpoint,
+                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                accessControl.DeleteEntry(1);
+            }
+        }
+    }
+
+    for (auto cluster : invalidClusters)
+    {
+        for (auto endpoint : validEndpoints)
+        {
+            for (auto deviceType : validDeviceTypes)
+            {
+                NL_TEST_ASSERT(inSuite,
+                               entry.SetTarget(0,
+                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                                 .cluster    = cluster,
+                                                 .endpoint   = endpoint,
+                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                accessControl.DeleteEntry(1);
+            }
+        }
+    }
+
+    for (auto cluster : validClusters)
+    {
+        for (auto endpoint : invalidEndpoints)
+        {
+            for (auto deviceType : validDeviceTypes)
+            {
+                NL_TEST_ASSERT(inSuite,
+                               entry.SetTarget(0,
+                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                                 .cluster    = cluster,
+                                                 .endpoint   = endpoint,
+                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                accessControl.DeleteEntry(1);
+            }
+        }
+    }
+
+    for (auto cluster : validClusters)
+    {
+        for (auto endpoint : validEndpoints)
+        {
+            for (auto deviceType : invalidDeviceTypes)
+            {
+                NL_TEST_ASSERT(inSuite,
+                               entry.SetTarget(0,
+                                               { .flags      = Target::kCluster | Target::kEndpoint | Target::kDeviceType,
+                                                 .cluster    = cluster,
+                                                 .endpoint   = endpoint,
+                                                 .deviceType = deviceType }) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+                NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+                accessControl.DeleteEntry(1);
+            }
+        }
+    }
+}
+
 void TestCheck(nlTestSuite * inSuite, void * inContext)
 {
     LoadAccessControl(accessControl, entryData1, entryData1Count);
@@ -709,6 +1774,7 @@ void TestFabricFilteredCreateEntry(nlTestSuite * inSuite, void * inContext)
             Entry entry;
             NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
 
             size_t outIndex            = 999;
             FabricIndex outFabricIndex = 123;
@@ -826,14 +1892,11 @@ void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
                 switch (authMode)
                 {
                 default:
-                case AuthMode::kPase:
+                case AuthMode::kCase:
                     subjectIndex = 0;
                     break;
-                case AuthMode::kCase:
-                    subjectIndex = 1;
-                    break;
                 case AuthMode::kGroup:
-                    subjectIndex = 2;
+                    subjectIndex = 1;
                     break;
                 }
 
@@ -862,8 +1925,8 @@ void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
                 NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(subjectCount) == CHIP_NO_ERROR);
                 NL_TEST_ASSERT(inSuite, entry.GetTargetCount(targetCount) == CHIP_NO_ERROR);
 
-                NL_TEST_ASSERT(inSuite, subjectCount == 3);
-                NL_TEST_ASSERT(inSuite, targetCount == 3);
+                NL_TEST_ASSERT(inSuite, subjectCount == ArraySize(subjects[0]));
+                NL_TEST_ASSERT(inSuite, targetCount == ArraySize(targets));
 
                 for (size_t i = 0; i < ArraySize(subjects[subjectIndex]); ++i)
                 {
@@ -886,34 +1949,33 @@ void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
 void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
 {
     Entry entry;
-    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
+    size_t index;
 
+    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kAdminister) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
-
     NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster, 1, 0, 0 }) == CHIP_NO_ERROR);
-
-    size_t index = 999;
+    index = 999;
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, int(index) == 0);
 
+    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kManage) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kPase) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, 0x0000000011111111) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId1) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kEndpoint, 0, 2, 0 }) == CHIP_NO_ERROR);
-
     index = 999;
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, int(index) == 1);
 
+    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(3) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kOperate) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, 0x0000000022222222) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kDeviceType, 0, 0, 3 }) == CHIP_NO_ERROR);
-
+    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kGroup2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster, 2, 0, 0 }) == CHIP_NO_ERROR);
     index = 999;
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, int(index) == 2);
@@ -945,16 +2007,14 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, entry.GetPrivilege(privilege) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, privilege == Privilege::kManage);
     NL_TEST_ASSERT(inSuite, entry.GetAuthMode(authMode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, authMode == AuthMode::kPase);
+    NL_TEST_ASSERT(inSuite, authMode == AuthMode::kCase);
     NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(count) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, count == 1);
     NL_TEST_ASSERT(inSuite, entry.GetSubject(0, subject) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, subject == 0x0000000011111111);
+    NL_TEST_ASSERT(inSuite, subject == kOperationalNodeId1);
     NL_TEST_ASSERT(inSuite, entry.GetTargetCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 2);
+    NL_TEST_ASSERT(inSuite, count == 1);
     NL_TEST_ASSERT(inSuite, entry.GetTarget(0, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, target.flags == Target::kCluster && target.cluster == 1);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(1, target) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, target.flags == Target::kEndpoint && target.endpoint == 2);
 
     NL_TEST_ASSERT(inSuite, accessControl.ReadEntry(2, entry) == CHIP_NO_ERROR);
@@ -965,19 +2025,13 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, entry.GetAuthMode(authMode) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, authMode == AuthMode::kGroup);
     NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 2);
+    NL_TEST_ASSERT(inSuite, count == 1);
     NL_TEST_ASSERT(inSuite, entry.GetSubject(0, subject) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, subject == 0x0000000011111111);
-    NL_TEST_ASSERT(inSuite, entry.GetSubject(1, subject) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, subject == 0x0000000022222222);
+    NL_TEST_ASSERT(inSuite, subject == kGroup2);
     NL_TEST_ASSERT(inSuite, entry.GetTargetCount(count) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, count == 3);
+    NL_TEST_ASSERT(inSuite, count == 1);
     NL_TEST_ASSERT(inSuite, entry.GetTarget(0, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, target.flags == Target::kCluster && target.cluster == 1);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(1, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, target.flags == Target::kEndpoint && target.endpoint == 2);
-    NL_TEST_ASSERT(inSuite, entry.GetTarget(2, target) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, target.flags == Target::kDeviceType && target.deviceType == 3);
+    NL_TEST_ASSERT(inSuite, target.flags == Target::kCluster && target.cluster == 2);
 
     NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
 
@@ -990,9 +2044,9 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, 0x33333333CCCCCCCC) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster | Target::kEndpoint, 11, 22, 0 }) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster | Target::kDeviceType, 33, 0, 44 }) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(
-        inSuite, entry.AddTarget(nullptr, { Target::kCluster | Target::kDeviceType, 0xAAAA5555, 0, 0xBBBB6666 }) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { Target::kCluster | Target::kEndpoint, 33, 44, 0 }) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   entry.AddTarget(nullptr, { Target::kCluster | Target::kEndpoint, 0xAAAAFC01, 0x6666, 0 }) == CHIP_NO_ERROR);
 
     index = 999;
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
@@ -1020,11 +2074,11 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
                    target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 11 && target.endpoint == 22);
     NL_TEST_ASSERT(inSuite, entry.GetTarget(1, target) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   target.flags == (Target::kCluster | Target::kDeviceType) && target.cluster == 33 && target.deviceType == 44);
+                   target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 33 && target.endpoint == 44);
     NL_TEST_ASSERT(inSuite, entry.GetTarget(2, target) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   target.flags == (Target::kCluster | Target::kDeviceType) && target.cluster == 0xAAAA5555 &&
-                       target.deviceType == 0xBBBB6666);
+                   target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 0xAAAAFC01 &&
+                       target.endpoint == 0x6666);
 
     NL_TEST_ASSERT(inSuite, entry.RemoveSubject(1) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(count) == CHIP_NO_ERROR);
@@ -1043,8 +2097,8 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
                    target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 11 && target.endpoint == 22);
     NL_TEST_ASSERT(inSuite, entry.GetTarget(1, target) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   target.flags == (Target::kCluster | Target::kDeviceType) && target.cluster == 0xAAAA5555 &&
-                       target.deviceType == 0xBBBB6666);
+                   target.flags == (Target::kCluster | Target::kEndpoint) && target.cluster == 0xAAAAFC01 &&
+                       target.endpoint == 0x6666);
     NL_TEST_ASSERT(inSuite, entry.GetTarget(2, target) != CHIP_NO_ERROR);
 }
 
@@ -1054,21 +2108,15 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
     memcpy(data, entryData1, sizeof(data));
     NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
 
-    EntryData updateData;
     for (size_t i = 0; i < ArraySize(data); ++i)
     {
-        updateData.authMode    = authModes[i % 3];
-        updateData.fabricIndex = fabricIndexes[i % 3];
-        updateData.privilege   = privileges[i % 3];
+        EntryData updateData;
+        updateData.authMode    = authModes[i % ArraySize(authModes)];
+        updateData.fabricIndex = fabricIndexes[i % ArraySize(fabricIndexes)];
+        updateData.privilege   = privileges[i % (ArraySize(privileges) - 1)];
 
-        if (i < 3)
-        {
-            updateData.AddSubject(nullptr, subjects[i][i]);
-        }
-        else
-        {
-            updateData.AddTarget(nullptr, targets[i - 3]);
-        }
+        updateData.AddSubject(nullptr, subjects[i % ArraySize(authModes)][i % ArraySize(subjects[0])]);
+        updateData.AddTarget(nullptr, targets[i % ArraySize(targets)]);
 
         data[i] = updateData;
 
@@ -1085,8 +2133,9 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 
 int Setup(void * inContext)
 {
+    AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate(nullptr);
     SetAccessControl(accessControl);
-    GetAccessControl().Init();
+    VerifyOrDie(GetAccessControl().Init(delegate) == CHIP_NO_ERROR);
     return SUCCESS;
 }
 
@@ -1117,6 +2166,10 @@ int TestAccessControl()
         NL_TEST_DEF("TestCreateReadEntry", TestCreateReadEntry),
         NL_TEST_DEF("TestUpdateEntry", TestUpdateEntry),
         NL_TEST_DEF("TestDeleteEntry", TestDeleteEntry),
+        NL_TEST_DEF("TestAclValidateFabricIndex", TestAclValidateFabricIndex),
+        NL_TEST_DEF("TestAclValidatePrivilege", TestAclValidatePrivilege),
+        NL_TEST_DEF("TestAclValidateAuthModeSubject", TestAclValidateAuthModeSubject),
+        NL_TEST_DEF("TestAclValidateTarget", TestAclValidateTarget),
         NL_TEST_DEF("TestSubjectsTargets", TestSubjectsTargets),
         NL_TEST_DEF("TestIterator", TestIterator),
         NL_TEST_DEF("TestFabricFilteredReadEntry", TestFabricFilteredReadEntry),

@@ -1,8 +1,8 @@
 FROM alpine:3.14
 
 RUN apk add --no-cache \
-  nodejs=14.18.1-r0 \
-  openjdk11=11.0.12_p7-r0 \
+  nodejs=14.19.0-r0 \
+  openjdk11=11.0.14_p9-r0 \
   npm=7.17.0-r0 \
   python3=3.9.5-r2 \
   pixman-dev=0.40.0-r2 \

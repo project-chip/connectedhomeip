@@ -1,3 +1,20 @@
+/*
+ *   Copyright (c) 2021-2022 Project CHIP Authors
+ *   All rights reserved.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
 package com.tcl.chip.chiptvserver.service;
 
 import android.content.Context;
@@ -6,12 +23,14 @@ import chip.appserver.ChipAppServer;
 import chip.platform.AndroidBleManager;
 import chip.platform.AndroidChipPlatform;
 import chip.platform.ChipMdnsCallbackImpl;
+import chip.platform.DiagnosticDataProviderImpl;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
 import com.tcl.chip.tvapp.ChannelManagerStub;
 import com.tcl.chip.tvapp.Clusters;
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
+import com.tcl.chip.tvapp.DACProviderStub;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
 import com.tcl.chip.tvapp.MediaInputManagerStub;
@@ -61,6 +80,7 @@ public class MatterServant {
                   break;
               }
             });
+    tvApp.setDACProvider(new DACProviderStub());
 
     Context applicationContext = context.getApplicationContext();
     AndroidChipPlatform chipPlatform =
@@ -69,7 +89,8 @@ public class MatterServant {
             new PreferencesKeyValueStoreManager(applicationContext),
             new PreferencesConfigurationManager(applicationContext),
             new NsdManagerServiceResolver(applicationContext),
-            new ChipMdnsCallbackImpl());
+            new ChipMdnsCallbackImpl(),
+            new DiagnosticDataProviderImpl(applicationContext));
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();

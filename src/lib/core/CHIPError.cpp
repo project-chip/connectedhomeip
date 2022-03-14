@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -350,8 +350,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INVALID_ACCESS_TOKEN.AsInteger():
         desc = "Invalid access token";
         break;
-    case CHIP_ERROR_WRONG_CERT_SUBJECT.AsInteger():
-        desc = "Wrong certificate subject";
+    case CHIP_ERROR_WRONG_CERT_DN.AsInteger():
+        desc = "Wrong certificate distinguished name";
         break;
     case CHIP_ERROR_INVALID_PROVISIONING_BUNDLE.AsInteger():
         desc = "Invalid provisioning bundle";
@@ -545,9 +545,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION.AsInteger():
         desc = "Incompatible data schema version";
         break;
-    case CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION.AsInteger():
-        desc = "Update Required Version mismatch";
-        break;
     case CHIP_ERROR_ACCESS_DENIED.AsInteger():
         desc = "The CHIP message is not granted access";
         break;
@@ -691,6 +688,12 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB.AsInteger():
         desc = "Malformed Interaction Model Data Version Filter IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Status Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Timed Request Message";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

@@ -19,13 +19,15 @@
 #pragma once
 
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CommissionableDataProvider.h>
 
+#include "app/server/OnboardingCodesUtil.h"
 #include "app/server/Server.h"
 #include "credentials/FabricTable.h"
 #include "device_service/device_service.rpc.pb.h"
 #include "platform/ConfigurationManager.h"
+#include "platform/DiagnosticDataProvider.h"
 #include "platform/PlatformManager.h"
-#include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
 namespace rpc {
@@ -50,6 +52,26 @@ public:
     {
         // TODO: auto err = DeviceLayer::SoftwareUpdateMgr().CheckNow();
         return pw::Status::Unimplemented();
+    }
+
+    virtual pw::Status SetPairingState(const chip_rpc_PairingState & request, pw_protobuf_Empty & response)
+    {
+        if (request.pairing_enabled)
+        {
+            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingMode(DeviceLayer::ConnectivityMgr().kFastAdvertising);
+        }
+        else
+        {
+            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        }
+        return pw::OkStatus();
+    }
+
+    virtual pw::Status GetPairingState(const pw_protobuf_Empty & request, chip_rpc_PairingState & response)
+    {
+        response.pairing_enabled = DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled();
+        return pw::OkStatus();
     }
 
     virtual pw::Status GetDeviceState(const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
@@ -105,23 +127,31 @@ public:
         }
 
         uint32_t code;
-        if (DeviceLayer::ConfigurationMgr().GetSetupPinCode(code) == CHIP_NO_ERROR)
+        if (DeviceLayer::GetCommissionableDataProvider()->GetSetupPasscode(code) == CHIP_NO_ERROR)
         {
             response.pairing_info.code = code;
             response.has_pairing_info  = true;
         }
 
         uint16_t discriminator;
-        if (DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR)
+        if (DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR)
         {
             response.pairing_info.discriminator = static_cast<uint32_t>(discriminator);
             response.has_pairing_info           = true;
         }
 
-        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
+        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) ==
             CHIP_NO_ERROR)
         {
             snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
+        }
+
+        std::string qrCodeText;
+        if (GetQRCode(qrCodeText, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
+        {
+            snprintf(response.pairing_info.qr_code, sizeof(response.pairing_info.qr_code), "%s", qrCodeText.c_str());
+            GetQRCodeUrl(response.pairing_info.qr_code_url, sizeof(response.pairing_info.qr_code_url), qrCodeText);
+            response.has_pairing_info = true;
         }
 
         return pw::OkStatus();
@@ -129,8 +159,9 @@ public:
 
     virtual pw::Status SetPairingInfo(const chip_rpc_PairingInfo & request, pw_protobuf_Empty & response)
     {
-        if (DeviceLayer::ConfigurationMgr().StoreSetupPinCode(request.code) != CHIP_NO_ERROR ||
-            DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)
+        if (DeviceLayer::GetCommissionableDataProvider()->SetSetupPasscode(request.code) != CHIP_NO_ERROR ||
+            DeviceLayer::GetCommissionableDataProvider()->SetSetupDiscriminator(request.discriminator) !=
+                CHIP_NO_ERROR)
         {
             return pw::Status::Unknown();
         }

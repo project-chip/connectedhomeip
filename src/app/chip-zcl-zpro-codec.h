@@ -41,38 +41,3 @@ typedef struct
     uint8_t sequence;
     uint8_t radius;
 } EmberApsFrame;
-
-/**
- * @brief Encode an APS frame into the given buffer.  Returns the number of
- * bytes of buffer used by the encoding or 0 if the given buffer is not big
- * enough.  If buffer is null, no encoding will happen; the function will
- * instead return the number of bytes that would be needed to encode the APS
- * frame.
- *
- * @param[in] buffer The buffer to write to.  If null, the call is in "count the
- *                   bytes" mode, and no writing will happen.
- * @parem[in] buf_length The size of the buffer.  Ignored if buffer is null.
- * @param[in] apsFrame The frame to encode.
- *
- * @return
- *   - If buffer is null, the number of bytes needed to encode.  If this number
- *     does not fit in a uint16_t, 0 will be returned.
- *   - If buffer is non-null but buf_length is not enough to hold the
- *     EmberApsFrame, 0.
- *   - If buffer is non-null and buf_length is large enough, the number of bytes
- *     placed in buffer.
- */
-uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame);
-
-/**
- * @brief Encode the given informations into the given BufferWriter.
- * Returns the number of bytes of buffer used by the encoding or 0 if
- * the given buffer is not big enough.
- *
- * @return
- *   - If the buffer length is not enough to hold the EmberApsFrame, 0.
- *   - If the buffer length is large enough, the number of bytes placed in buffer.
- */
-uint16_t doEncodeApsFrame(chip::Encoding::LittleEndian::BufferWriter & buf, chip::ClusterId clusterId,
-                          chip::EndpointId sourceEndpoint, chip::EndpointId destinationEndpoint, EmberApsOption options,
-                          chip::GroupId groupId, uint8_t sequence, uint8_t radius, bool isMeasuring);

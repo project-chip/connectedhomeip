@@ -55,11 +55,9 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
                    error:(NSError * __autoreleasing *)error;
 
 - (void)setListenPort:(uint16_t)port;
-- (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId;
 
-- (BOOL)isDevicePaired:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (nullable CHIPDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error;
 - (BOOL)getConnectedDevice:(uint64_t)deviceID
                      queue:(dispatch_queue_t)queue
@@ -71,6 +69,12 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
                                   discriminator:(NSUInteger)discriminator
                                        setupPIN:(NSUInteger)setupPIN
                                           error:(NSError * __autoreleasing *)error;
+
+/**
+ * Temporary until PairingDelegate is fixed to clearly communicate this
+ * information to consumers.
+ */
+- (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -93,6 +97,8 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  * @param[in] queue The queue on which the callbacks will be delivered
  */
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
+
+- (void)setKeyValueStoreManagerPath:(const char *)keyValueStorePath;
 
 /**
  * Start the CHIP Stack. Repeated calls to startup without calls to shutdown in between are NO-OPs. Use the isRunning property to
