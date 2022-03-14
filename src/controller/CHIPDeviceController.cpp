@@ -335,7 +335,7 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
     }
 
     FabricIndex ourIndex = kUndefinedFabricIndex;
-    CHIP_ERROR err = GetFabricIndex(&ourIndex);
+    CHIP_ERROR err       = GetFabricIndex(&ourIndex);
     if (err != CHIP_NO_ERROR)
     {
         // We can't really do CASE, now can we?
