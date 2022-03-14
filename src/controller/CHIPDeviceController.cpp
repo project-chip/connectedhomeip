@@ -718,6 +718,11 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
 void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device)
 {
     mCommissioneeDevicePool.ReleaseObject(device);
+    // Make sure that there will be no dangling pointer
+    if (mDeviceBeingCommissioned == device)
+    {
+        mDeviceBeingCommissioned = nullptr;
+    }
 }
 
 CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** out_device)
@@ -860,7 +865,6 @@ exit:
         if (device != nullptr)
         {
             ReleaseCommissioneeDevice(device);
-            mDeviceBeingCommissioned = nullptr;
         }
     }
 
@@ -945,7 +949,6 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         // for IP commissioning, we have taken a reference to the
         // operational node to send the completion command.
         ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
-        mDeviceBeingCommissioned = nullptr;
     }
 
     if (mPairingDelegate != nullptr)
@@ -1439,7 +1442,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     {
         // Commissioning delegate will only return error if it failed to perform the appropriate commissioning step.
         // In this case, we should call back the commissioning complete and call session error
-        if (mPairingDelegate != nullptr)
+        if (mPairingDelegate != nullptr && mDeviceBeingCommissioned != nullptr)
         {
             mPairingDelegate->OnCommissioningComplete(mDeviceBeingCommissioned->GetDeviceId(), status);
         }
@@ -1460,7 +1463,6 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
             // Let's release the device that's being paired, if pairing was successful,
             // and the device is available on the operational network.
             commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
-            commissioner->mDeviceBeingCommissioned = nullptr;
             if (commissioner->mCommissioningDelegate != nullptr)
             {
                 CommissioningDelegate::CommissioningReport report;
@@ -1517,7 +1519,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
         //
         // Run the above cases under valgrind/asan to validate no additional leaks.
         commissioner->ReleaseCommissioneeDevice(commissioner->mDeviceBeingCommissioned);
-        commissioner->mDeviceBeingCommissioned = nullptr;
     }
 }
 
