@@ -262,6 +262,56 @@ FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
+void FailSafeCleanup(FailSafeContext & failSafeContext)
+{
+    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(failSafeContext.GetFabricIndex());
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to FailSafeCleanup");
+
+    if (fabricInfo)
+    {
+        // If an AddNOC or UpdateNOC command has been successfully invoked, terminate all CASE sessions associated with the Fabric
+        // whose Fabric Index is recorded in the Fail-Safe context (see ArmFailSafe Command) by clearing any associated Secure
+        // Session Context at the Server.
+        if (failSafeContext.NocCommandHasBeenInvoked())
+        {
+            CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
+
+            if (caseSessionManager)
+            {
+                caseSessionManager->ReleaseSession(fabricInfo->GetPeerId());
+            }
+        }
+
+        // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
+        // against the Fabric Index stored in the Fail-Safe Context for the Fabric Index that was the subject of the AddNOC
+        // command.
+        if (failSafeContext.AddNocCommandHasBeenInvoked())
+        {
+            Server::GetInstance().GetFabricTable().Delete(fabricInfo->GetFabricIndex());
+        }
+
+        // If an UpdateNOC command had been successfully invoked, revert the state of operational key pair, NOC and ICAC for that
+        // Fabric to the state prior to the Fail-Safe timer being armed, for the Fabric Index that was the subject of the UpdateNOC
+        // command.
+        if (failSafeContext.UpdateNocCommandHasBeenInvoked())
+        {
+            // TODO: Revert the state of operational key pair, NOC and ICAC
+        }
+    }
+}
+
+void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        if (event->CommissioningComplete.Status != CHIP_NO_ERROR)
+        {
+            FailSafeCleanup(DeviceControlServer::DeviceControlSvr().GetFailSafeContext());
+        }
+    }
+}
+
 } // anonymous namespace
 
 // As per specifications section 11.22.5.1. Constant RESP_MAX
@@ -340,6 +390,8 @@ void MatterOperationalCredentialsPluginServerInitCallback(void)
     registerAttributeAccessOverride(&gAttrAccess);
 
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
+
+    DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 }
 
 namespace {
@@ -595,7 +647,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index just allocated.
-    failSafeContext.SetNocCommandInvoked(fabricIndex);
+    failSafeContext.SetAddNocCommandInvoked(fabricIndex);
 
 exit:
 
@@ -661,7 +713,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index associated with the UpdateNOC command being invoked.
-    failSafeContext.SetNocCommandInvoked(fabricIndex);
+    failSafeContext.SetUpdateNocCommandInvoked(fabricIndex);
 
 exit:
 

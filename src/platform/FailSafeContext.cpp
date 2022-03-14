@@ -43,8 +43,9 @@ void FailSafeContext::CommissioningFailedTimerComplete()
     event.CommissioningComplete.Status = CHIP_ERROR_TIMEOUT;
     CHIP_ERROR status                  = PlatformMgr().PostEvent(&event);
 
-    mFailSafeArmed            = false;
-    mNocCommandHasBeenInvoked = false;
+    mFailSafeArmed                  = false;
+    mAddNocCommandHasBeenInvoked    = false;
+    mUpdateNocCommandHasBeenInvoked = false;
 
     if (status != CHIP_NO_ERROR)
     {
@@ -62,8 +63,9 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
 
 CHIP_ERROR FailSafeContext::DisarmFailSafe()
 {
-    mFailSafeArmed            = false;
-    mNocCommandHasBeenInvoked = false;
+    mFailSafeArmed                  = false;
+    mAddNocCommandHasBeenInvoked    = false;
+    mUpdateNocCommandHasBeenInvoked = false;
     DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
