@@ -356,11 +356,11 @@ CHIP_ERROR AdvertiserMinMdns::RemoveServices()
 
 OperationalQueryAllocator::Allocator * AdvertiserMinMdns::FindOperationalAllocator(const FullQName & qname)
 {
-    for (auto it = mOperationalResponders.begin(); it != mOperationalResponders.end(); it++)
+    for (auto & it : mOperationalResponders)
     {
-        if (it->GetAllocator()->GetResponder(QType::SRV, qname) != nullptr)
+        if (it.GetAllocator()->GetResponder(QType::SRV, qname) != nullptr)
         {
-            return it->GetAllocator();
+            return it.GetAllocator();
         }
     }
 
@@ -848,9 +848,9 @@ void AdvertiserMinMdns::AdvertiseRecords()
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
         queryData.SetIsBootAdvertising(true);
 
-        for (auto it = mOperationalResponders.begin(); it != mOperationalResponders.end(); it++)
+        for (auto & it : mOperationalResponders)
         {
-            it->GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
+            it.GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
         }
         mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
         mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
@@ -863,9 +863,9 @@ void AdvertiserMinMdns::AdvertiseRecords()
     }
 
     // Once all automatic broadcasts are done, allow immediate replies once.
-    for (auto it = mOperationalResponders.begin(); it != mOperationalResponders.end(); it++)
+    for (auto & it : mOperationalResponders)
     {
-        it->GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
+        it.GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
     }
     mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
     mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
