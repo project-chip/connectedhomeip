@@ -1501,13 +1501,10 @@ const unsigned theBackoffComplianceTestVectorLength =
 
 void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
 {
-    TestContext & ctx       = *reinterpret_cast<TestContext *>(inContext);
-    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-
     for (unsigned i = 0; i < theBackoffComplianceTestVectorLength; i++)
     {
         struct BackoffComplianceTestVector * test = &theBackoffComplianceTestVector[i];
-        System::Clock::Timestamp backoff          = rm->GetBackoff(test->backoffBase, test->sendCount);
+        System::Clock::Timestamp backoff          = ReliableMessageMgr::GetBackoff(test->backoffBase, test->sendCount);
         ChipLogProgress(Test, "Backoff # %d: %d", test->sendCount, (uint32_t) backoff.count());
 
         NL_TEST_ASSERT(inSuite, backoff >= test->backoffMin);

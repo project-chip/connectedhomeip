@@ -110,7 +110,7 @@ public:
      *
      *  @retval  The backoff time value, including jitter.
      */
-    System::Clock::Timestamp GetBackoff(System::Clock::Timestamp backoffBase, uint8_t sendCount);
+    static System::Clock::Timestamp GetBackoff(System::Clock::Timestamp backoffBase, uint8_t sendCount);
 
     /**
      *  Start retranmisttion of cached encryped packet for current entry.
