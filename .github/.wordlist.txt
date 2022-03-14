@@ -326,7 +326,8 @@ DefaultSuccess
 definedValue
 DehumidificationControl
 DelayedActionTime
-delayedActionTimeSec
+delayedApplyActionTimeSec
+delayedQueryActionTimeSec
 delayQuery
 demangle
 deployable
