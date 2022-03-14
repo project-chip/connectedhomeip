@@ -696,6 +696,7 @@ LinkSoftwareAndDocumentationPack
 LinuxOTAImageProcessor
 LinuxOTARequestorDriver
 LocalConfigDisabled
+localedef
 localhost
 LocalizationConfiguration
 localstatedir
@@ -802,6 +803,8 @@ MX
 mydir
 MyPASSWORD
 MySSID
+NAMESERVER
+nameserver
 namespacing
 nano
 natively
@@ -822,6 +825,7 @@ NitrogenDioxideConcentrationMeasurement
 nl
 NLUnitTest
 NLUnitTests
+nmcli
 noc
 NodeId
 nongnu
@@ -1268,6 +1272,7 @@ USERINTERFACE
 UserLabel
 usermod
 usr
+UTF
 util
 utils
 UUID

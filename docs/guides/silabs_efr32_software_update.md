@@ -1,8 +1,8 @@
 # Matter Software Update with EFR32 example applications
 
-The Over The Air (OTA) Software Update functionality can be added to any of the ERF32 example applications
+The Over The Air (OTA) Software Update functionality can be added to any of the EFR32 example applications
 by passing the `chip_enable_ota_requestor=true` option to the build script. This option is supposed to be
-enabled by default for all of the EFR32 example applications. 
+enabled by default for all of the EFR32 example applications.
 
 ## Running the OTA Download scenario
 
@@ -74,7 +74,7 @@ where operationalDataset is obtained from the OpenThread Border Router.
   "deviceSoftwareVersionModel":
   [     
       { "vendorId": 65521, "productId": 32773, "softwareVersion": 1, "softwareVersionString": "1.0.0", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersi
-on": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "/home/selissia/work/chip/bootloader/image2k.ota" }
+on": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "chip-efr32-lighting-example.ota" }
   ]
 }
 ```
