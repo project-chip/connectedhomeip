@@ -156,8 +156,7 @@ else
     # Generate bootloader file
     BUILD_DIR_TRIMMED="${BUILD_DIR:2}"
     S37_PATH=$(find "$BUILD_DIR_TRIMMED" -type f -name "*.s37")
-    if [ -z "$S37_PATH" ]
-    then
+    if [ -z "$S37_PATH" ]; then
         echo "Bootloader could not be built"
     else
         TARGET_PATH=${S37_PATH%????}
