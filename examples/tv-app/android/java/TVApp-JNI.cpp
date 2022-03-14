@@ -19,11 +19,13 @@
 #include "TvApp-JNI.h"
 #include "ChannelManager.h"
 #include "ContentLauncherManager.h"
+#include "JNIDACProvider.h"
 #include "KeypadInputManager.h"
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
 #include "WakeOnLanManager.h"
+#include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
@@ -118,4 +120,13 @@ JNI_METHOD(void, setMediaPlaybackManager)(JNIEnv *, jobject, jint endpoint, jobj
 JNI_METHOD(void, setChannelManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
 {
     ChannelManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
+{
+    if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
+    {
+        JNIDACProvider * p = new JNIDACProvider(provider);
+        chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
+    }
 }

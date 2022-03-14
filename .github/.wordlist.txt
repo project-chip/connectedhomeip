@@ -334,6 +334,8 @@ depottools
 deps
 desc
 descheduled
+detokenization
+detokenizer
 dev
 devcontainer
 devCtrl
@@ -696,6 +698,7 @@ LinkSoftwareAndDocumentationPack
 LinuxOTAImageProcessor
 LinuxOTARequestorDriver
 LocalConfigDisabled
+localedef
 localhost
 LocalizationConfiguration
 localstatedir
@@ -802,6 +805,7 @@ MX
 mydir
 MyPASSWORD
 MySSID
+nameserver
 namespacing
 nano
 natively
@@ -822,6 +826,7 @@ NitrogenDioxideConcentrationMeasurement
 nl
 NLUnitTest
 NLUnitTests
+nmcli
 noc
 NodeId
 nongnu
@@ -1031,6 +1036,7 @@ RGB
 riscv
 rloc
 rmw
+rodata
 Rollershade
 rootfs
 RPC
@@ -1174,6 +1180,7 @@ TestCluster
 TestConstraints
 TestEmptyString
 TestGenExample
+TestGroupDemoConfig
 TestMultiRead
 TESTPASSWD
 TestPICS
@@ -1207,6 +1214,7 @@ tngvndl
 TODO
 toJson
 tokenized
+tokenizer
 toolchain
 toolchains
 topologies
@@ -1268,6 +1276,7 @@ USERINTERFACE
 UserLabel
 usermod
 usr
+UTF
 util
 utils
 UUID
@@ -1373,19 +1382,3 @@ zephyrproject
 Zigbee
 zigbeealliance
 zigbeethread
-libshell
-TestGroupDemoConfig
-ACLs
-AddNOC
-CHIPConfig
-CHIPProjectAppConfig
-CaseAdminNode
-DataVersion
-ProxyView
-ReadAttribute
-WriteAttribute
-kAdminister
-kManage
-kOperate
-kView
-xFFFFFFFD

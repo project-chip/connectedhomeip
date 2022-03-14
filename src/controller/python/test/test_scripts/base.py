@@ -378,7 +378,11 @@ class BaseTestHelper:
     def TestCloseSession(self, nodeid: int):
         self.logger.info(f"Closing sessions with device {nodeid}")
         try:
-            self.devCtrl.CloseSession(nodeid)
+            err = self.devCtrl.CloseSession(nodeid)
+            if err != 0:
+                self.logger.exception(
+                    f"Failed to close sessions with device {nodeid}: {err}")
+                return False
             return True
         except Exception as ex:
             self.logger.exception(
@@ -445,8 +449,20 @@ class BaseTestHelper:
             "Resolve: node id = {:08x}".format(nodeid))
         try:
             self.devCtrl.ResolveNode(nodeid=nodeid)
-            addr = self.devCtrl.GetAddressAndPort(nodeid)
+            addr = None
+
+            start = time.time()
+            while not addr:
+                addr = self.devCtrl.GetAddressAndPort(nodeid)
+                if time.time() - start > 10:
+                    self.logger.exception(f"Timeout waiting for address...")
+                    break
+
+                if not addr:
+                    time.sleep(0.2)
+
             if not addr:
+                self.logger.exception(f"Addr is missing...")
                 return False
             self.logger.info(f"Resolved address: {addr[0]}:{addr[1]}")
             return True

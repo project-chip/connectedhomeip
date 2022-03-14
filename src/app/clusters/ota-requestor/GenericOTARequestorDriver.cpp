@@ -39,20 +39,40 @@ namespace chip {
 namespace DeviceLayer {
 namespace {
 
-constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
-constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
-
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
+
+constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
+constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
+constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
 
 GenericOTARequestorDriver * ToDriver(void * context)
 {
     return static_cast<GenericOTARequestorDriver *>(context);
 }
 
-constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
-
 } // namespace
+
+void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
+{
+    mRequestor      = requestor;
+    mImageProcessor = processor;
+
+    if (mImageProcessor->IsFirstImageRun())
+    {
+        SystemLayer().ScheduleLambda([this] {
+            CHIP_ERROR error = mImageProcessor->ConfirmCurrentImage();
+
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(SoftwareUpdate, "Failed to confirm image: %" CHIP_ERROR_FORMAT, error.Format());
+                return;
+            }
+
+            mRequestor->NotifyUpdateApplied();
+        });
+    }
+}
 
 bool GenericOTARequestorDriver::CanConsent()
 {
@@ -83,11 +103,27 @@ bool GenericOTARequestorDriver::ProviderLocationsEqual(const ProviderLocationTyp
 
 void GenericOTARequestorDriver::HandleError(UpdateFailureState state, CHIP_ERROR error) {}
 
-void GenericOTARequestorDriver::HandleIdleState()
+void GenericOTARequestorDriver::HandleIdleState(IdleStateReason reason)
 {
-    // Default provider timer runs if and only if the OTARequestor's update state is kIdle.
-    // Must (re)start the timer every time we enter the kIdle state
-    StartDefaultProviderTimer();
+    switch (reason)
+    {
+    case IdleStateReason::kUnknown:
+        ChipLogProgress(SoftwareUpdate, "Unknown idle state reason so set the periodic timer for a next attempt");
+        StartDefaultProviderTimer();
+        break;
+    case IdleStateReason::kIdle:
+        // There is no current OTA update in progress so start the periodic query timer
+        StartDefaultProviderTimer();
+        break;
+    case IdleStateReason::kInvalidSession:
+        // An invalid session is detected which may be temporary so try to query again
+        ProviderLocationType providerLocation;
+        if (DetermineProviderLocation(providerLocation) == true)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
+        }
+        break;
+    }
 }
 
 void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)

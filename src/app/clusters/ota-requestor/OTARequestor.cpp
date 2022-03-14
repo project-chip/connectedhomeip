@@ -159,6 +159,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             memcpy(fileDesignator.data(), update.fileDesignator.data(), update.fileDesignator.size());
             fileDesignator.reduce_size(update.fileDesignator.size());
             requestorCore->mFileDesignator = fileDesignator;
+            requestorCore->StoreCurrentUpdateInfo();
 
             requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
                                                                 System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
@@ -198,10 +199,12 @@ void OTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
 
     ChipLogError(SoftwareUpdate, "Received QueryImage failure response: %" CHIP_ERROR_FORMAT, error.Format());
 
+    // A previously valid CASE session may have become invalid
     if (error == CHIP_ERROR_TIMEOUT)
     {
         ChipLogError(SoftwareUpdate, "CASE session may be invalid, tear down session");
         requestorCore->DisconnectFromProvider();
+        error = CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY;
     }
 
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
@@ -506,11 +509,8 @@ void OTARequestor::ApplyUpdate()
     ConnectToProvider(kApplyUpdate);
 }
 
-void OTARequestor::NotifyUpdateApplied(uint32_t version)
+void OTARequestor::NotifyUpdateApplied()
 {
-    // New version is executing so update where applicable
-    mCurrentVersion = version;
-
     // Log the VersionApplied event
     uint16_t productId;
     if (DeviceLayer::ConfigurationMgr().GetProductId(productId) != CHIP_NO_ERROR)
@@ -520,7 +520,7 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
         return;
     }
 
-    OtaRequestorServerOnVersionApplied(version, productId);
+    OtaRequestorServerOnVersionApplied(mCurrentVersion, productId);
 
     // There is no response for a notify so consider this OTA complete
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
@@ -585,7 +585,21 @@ void OTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
     OtaRequestorServerSetUpdateStateProgress(percent);
 }
 
-void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason)
+IdleStateReason OTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
+{
+    if (error == CHIP_NO_ERROR)
+    {
+        return IdleStateReason::kIdle;
+    }
+    else if (error == CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY)
+    {
+        return IdleStateReason::kInvalidSession;
+    }
+
+    return IdleStateReason::kUnknown;
+}
+
+void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
 {
     // Set server UpdateState attribute
     OtaRequestorServerSetUpdateState(newState);
@@ -607,12 +621,12 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
     }
     OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
-    // Inform the driver that the OTARequestor has entered the kIdle state. A driver implementation
-    // may choose to restart the default provider timer in this case
     if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
     {
-        // TODO: Make this API a general state change
-        mOtaRequestorDriver->HandleIdleState();
+        IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
+
+        // Inform the driver that the OTARequestor has entered the Idle state
+        mOtaRequestorDriver->HandleIdleState(idleStateReason);
     }
 
     mCurrentUpdateState = newState;
@@ -631,7 +645,7 @@ void OTARequestor::RecordErrorUpdateState(UpdateFailureState failureState, CHIP_
     OtaRequestorServerOnDownloadError(mTargetVersion, imageProcessor->GetBytesDownloaded(), progressPercent, platformCode);
 
     // Whenever an error occurs, always reset to Idle state
-    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, reason);
+    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, reason, error);
 }
 
 CHIP_ERROR OTARequestor::GenerateUpdateToken()
@@ -777,6 +791,22 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
     cluster.Associate(&deviceProxy, mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnNotifyUpdateAppliedResponse, OnNotifyUpdateAppliedFailure);
+}
+
+void OTARequestor::StoreCurrentUpdateInfo()
+{
+    // TODO: change OTA requestor storage interface to store both values at once
+    CHIP_ERROR error = mStorage->StoreCurrentProviderLocation(mProviderLocation.Value());
+
+    if (error == CHIP_NO_ERROR)
+    {
+        mStorage->StoreUpdateToken(mUpdateToken);
+    }
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to store current update: %" CHIP_ERROR_FORMAT, error.Format());
+    }
 }
 
 // Invoked when the device becomes commissioned

@@ -178,7 +178,7 @@ public:
     virtual void ApplyUpdate() = 0;
 
     // Initiate the session to send NotifyUpdateApplied command
-    virtual void NotifyUpdateApplied(uint32_t version) = 0;
+    virtual void NotifyUpdateApplied() = 0;
 
     // Get image update progress in percents unit
     virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;

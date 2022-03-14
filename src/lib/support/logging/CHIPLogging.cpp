@@ -36,6 +36,28 @@
 
 #include <atomic>
 
+#if CHIP_PW_TOKENIZER_LOGGING
+
+extern "C" void pw_tokenizer_HandleEncodedMessageWithPayload(uintptr_t levels, const uint8_t encoded_message[], size_t size_bytes)
+{
+    uint8_t log_category = levels >> 8 & 0xFF;
+    uint8_t log_module   = levels & 0xFF;
+    char * buffer        = (char *) malloc(2 * size_bytes + 1);
+
+    if (buffer)
+    {
+        for (int i = 0; i < size_bytes; i++)
+        {
+            sprintf(buffer + 2 * i, "%02x", encoded_message[i]);
+        }
+        buffer[2 * size_bytes] = '\0';
+        chip::Logging::Log(log_module, log_category, "%s", buffer);
+        free(buffer);
+    }
+}
+
+#endif
+
 namespace chip {
 namespace Logging {
 

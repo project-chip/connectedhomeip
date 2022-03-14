@@ -39,7 +39,6 @@ public:
     }
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) override { return false; }
 };
 
 NoneResolver gResolver;
@@ -64,11 +63,6 @@ CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
 CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-bool ResolverProxy::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
-{
-    return false;
 }
 
 } // namespace Dnssd

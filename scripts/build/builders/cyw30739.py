@@ -64,11 +64,26 @@ class Cyw30739Builder(GnBuilder):
         runner,
         app: Cyw30739App = Cyw30739App.LIGHT,
         board: Cyw30739Board = Cyw30739Board.CYW930739M2EVB_01,
+        release: bool = False,
+        progress_logging: bool = True
     ):
         super(Cyw30739Builder, self).__init__(
             root=app.BuildRoot(root), runner=runner)
         self.app = app
         self.board = board
+        self.release = release
+        self.progress_logging = progress_logging
+
+    def GnBuildArgs(self):
+        args = []
+
+        if not self.progress_logging:
+            args.append('chip_progress_logging=false')
+
+        if self.release:
+            args.append('is_debug=false')
+
+        return args
 
     def build_outputs(self):
         items = {}
