@@ -162,7 +162,7 @@ else
         TARGET_PATH=${S37_PATH%????}
         OTA_PATH="$TARGET_PATH".ota
         commander gbl create "$TARGET_PATH".gbl --app "$S37_PATH"
-        GBL_PATH="$TARGET_PATH".ota
+        GBL_PATH="$TARGET_PATH".gbl
         ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 1 -vs "1.0" -da sha256 "$GBL_PATH" "$OTA_PATH"
     fi
 fi
