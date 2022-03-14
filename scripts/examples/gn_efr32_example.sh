@@ -157,9 +157,9 @@ else
     BUILD_DIR_TRIMMED="${BUILD_DIR:2}"
     S37_PATH=$(find "$BUILD_DIR_TRIMMED" -type f -name "*.s37")
     TARGET_PATH=${S37_PATH%????}
-    OTA_PATH="${TARGET_PATH}".ota
-    commander gbl create $TARGET_PATH.gbl --app $S37_PATH
+    OTA_PATH="$TARGET_PATH".ota
+    commander gbl create "$TARGET_PATH".gbl --app "$S37_PATH"
 
     GBL_PATH=$(find "$BUILD_DIR_TRIMMED" -type f -name "*.gbl")
-    ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 1 -vs "1.0" -da sha256 $GBL_PATH $OTA_PATH
+    ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 1 -vs "1.0" -da sha256 "$GBL_PATH" "$OTA_PATH"
 fi
