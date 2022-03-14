@@ -46,17 +46,17 @@ public:
      *   Caller is responsible to take care of any special formatting needs (e.g. byte
      *   order, null terminators, consistency checks or versioning).
      *
-     *   This API allows for determining a-priori the size of a stored key. Whenever
-     *   the passed `size` is smaller than needed and a key exists in storage, the error
+     *   This API allows for determining the size of a stored value. Whenever
+     *   the passed `size` is smaller than needed and the key exists in storage, the error
      *   CHIP_ERROR_BUFFER_TOO_SMALL will be given, and the `size` will be updated to the
-     *   size of the stored key. It is legal to use `nullptr` for `buffer` if `size` is 0.
+     *   size of the stored value. It is legal to use `nullptr` for `buffer` if `size` is 0.
      *
      *   If a key is found and the `buffer`'s `size` is large enough, then the value will
      *   be copied to `buffer` and `size` will be updated to the actual size used.
      *
-     *   The easiest way to determine if a key exists (and its size if so) is to pass
+     *   The easiest way to determine if a key exists (and the value's size if so) is to pass
      *   `size` of 0, which is always valid to do, and will return CHIP_ERROR_BUFFER_TOO_SMALL
-     *   if the value exists and CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if the
+     *   if the key exists and CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if the
      *   key is not found.
      *
      * @param[in]      key Key to lookup
@@ -65,7 +65,7 @@ public:
      *
      * @return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND the key is not found in storage.
      * @return CHIP_ERROR_BUFFER_TOO_SMALL the provided buffer is not big enough.  In this case
-     *                                     "size" will indicate the needed buffer size Some data
+     *                                     "size" will indicate the needed buffer size. Some data
      *                                     may or may not be placed in "buffer" in this case; consumers
      *                                     should not rely on that behavior. CHIP_ERROR_BUFFER_TOO_SMALL
      *                                     combined with setting "size" to 0 means the actual size was
