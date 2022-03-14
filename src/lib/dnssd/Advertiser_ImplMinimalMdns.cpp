@@ -376,9 +376,16 @@ OperationalQueryAllocator::Allocator * AdvertiserMinMdns::FindEmptyOperationalAl
         return nullptr;
     }
 
-    mOperationalResponders.PushBack(result);
-    LogErrorOnFailure(mResponseSender.AddQueryResponder(result->GetAllocator()->GetQueryResponder()));
+    CHIP_ERROR err = mResponseSender.AddQueryResponder(result->GetAllocator()->GetQueryResponder());
 
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to register query responder: %" CHIP_ERROR_FORMAT, err.Format());
+        Platform::Delete(result);
+        return nullptr;
+    }
+
+    mOperationalResponders.PushBack(result);
     return result->GetAllocator();
 }
 
