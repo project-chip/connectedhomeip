@@ -98,43 +98,58 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], kStringValue2, strlen(kStringValue2)));
 
-    // Read in too small a buffer
-    memset(&buf[0], 0, sizeof(buf));
-    size = static_cast<uint16_t>(strlen(kStringValue2) - 1);
-    err = storage.SyncGetKeyValue("key2", &buf[0], size);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    // Make sure we get told of the right amount to read
-    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
-
-    // Read in too small a buffer, which is nullptr (i.e. just try to find if key exists)
-    size = static_cast<uint16_t>(strlen(kStringValue2) - 1);
-    err = storage.SyncGetKeyValue("key2", nullptr, size);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
-    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
-
-    // Read in too small a buffer, which is not nullptr (i.e. just try to find if key exists)
-    size = 0;
-    err = storage.SyncGetKeyValue("key2", &buf[0], size);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
-
+    // Pre-clear buffer to make sure next operations don't change contents
     uint8_t all_zeroes[sizeof(buf)];
     memset(&buf[0], 0, sizeof(buf));
     memset(&all_zeroes[0], 0, sizeof(all_zeroes));
 
-    // Key not found never cares about output args
+    // Read in too small a buffer: no data read, but correct size given
+    memset(&buf[0], 0, sizeof(buf));
+    size = static_cast<uint16_t>(strlen(kStringValue2) - 1);
+    err = storage.SyncGetKeyValue("key2", &buf[0], size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
+    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
+
+    // Read in too small a buffer, which is nullptr and size == 0: check correct size given
     size = 0;
+    err = storage.SyncGetKeyValue("key2", nullptr, size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
+    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
+
+    // Read in too small a buffer, which is nullptr and size != 0: error
+    size = static_cast<uint16_t>(strlen(kStringValue2) - 1);
+    err = storage.SyncGetKeyValue("key2", nullptr, size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
+
+    // Read in zero size buffer, which is also nullptr (i.e. just try to find if key exists without
+    // using a buffer).
+    size = 0;
+    err = storage.SyncGetKeyValue("key2", nullptr, size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
+    NL_TEST_ASSERT(inSuite, size == strlen(kStringValue2));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
+
+    // When key not found, size is not touched.
+    size = sizeof(buf);
     err = storage.SyncGetKeyValue("keyDOES_NOT_EXIST", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    NL_TEST_ASSERT(inSuite, sizeof(buf) == size);
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
 
+    size = 0;
     err = storage.SyncGetKeyValue("keyDOES_NOT_EXIST", nullptr, size);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    NL_TEST_ASSERT(inSuite, 0 == size);
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], sizeof(buf)));
 
+    // Even when key not found, cannot pass nullptr with size != 0.
     size = static_cast<uint16_t>(sizeof(buf));
     err = storage.SyncGetKeyValue("keyDOES_NOT_EXIST", nullptr, size);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, sizeof(buf) == size);
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], size));
 
     // Attempt an empty key write with either nullptr or zero size works
@@ -153,6 +168,11 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     err = storage.SyncGetKeyValue("key2", &buf[0], size);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, size == 0);
+
+    // Failure to set key if buffer is nullptr and size != 0
+    size = 10;
+    err = storage.SyncSetKeyValue("key4", nullptr, size);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 
     // Can delete empty key
     err = storage.SyncDeleteKeyValue("key2");
