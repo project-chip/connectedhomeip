@@ -252,7 +252,6 @@ private:
     }
 
     IntrusiveList<OperationalQueryAllocator> mOperationalResponders;
-    // TODO: replace mQueryResponderAllocatorOperational
 
     // Max number of records for commissionable = 7 x PTR (base + 6 sub types - _S, _L, _D, _T, _C, _A), SRV, TXT, A, AAAA
     static constexpr size_t kMaxCommissionRecords = 11;
