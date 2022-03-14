@@ -49,7 +49,7 @@ declare_args() {
   enable_sleepy_device = false
 
   # OTA timeout in seconds
-  OTA_periodic_query_timeout = 30
+  OTA_periodic_query_timeout = 86400
 
   # Wifi related stuff - they are overriden by gn -args="use_wf200=true"
   use_wf200 = false
