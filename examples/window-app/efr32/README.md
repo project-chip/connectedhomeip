@@ -5,6 +5,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 <hr>
 
 -   [CHIP EFR32 Window Covering Example](#chip-efr32-window-covering-example)
+
     -   [Introduction](#introduction)
     -   [Building](#building)
         -   [Note](#note)
@@ -13,6 +14,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
     -   [Running Pigweed RPC console](#running-pigweed-rpc-console)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -324,3 +326,9 @@ combination with JLinkRTTClient as follows:
           $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2
 
 <a name="running-pigweed-rpc-console"></a>
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)

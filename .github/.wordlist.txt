@@ -805,6 +805,7 @@ MX
 mydir
 MyPASSWORD
 MySSID
+NAMESERVER
 nameserver
 namespacing
 nano
@@ -1294,6 +1295,7 @@ virtualenv
 visualstudio
 vlatest
 VLEDs
+vn
 vnc
 vous
 VPN
@@ -1382,3 +1384,19 @@ zephyrproject
 Zigbee
 zigbeealliance
 zigbeethread
+libshell
+TestGroupDemoConfig
+ACLs
+AddNOC
+CHIPConfig
+CHIPProjectAppConfig
+CaseAdminNode
+DataVersion
+ProxyView
+ReadAttribute
+WriteAttribute
+kAdminister
+kManage
+kOperate
+kView
+xFFFFFFFD
