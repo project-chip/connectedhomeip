@@ -727,7 +727,12 @@ CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, chip::Callbac
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params)
 {
-    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
+    if (mDefaultCommissioner == nullptr)
+    {
+        ChipLogError(Controller, "No default commissioner is specified");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission);
 }
 
@@ -864,7 +869,12 @@ exit:
 
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningParameters & params)
 {
-    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
+    if (mDefaultCommissioner == nullptr)
+    {
+        ChipLogError(Controller, "No default commissioner is specified");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
     return Commission(remoteDeviceId);
 }
 
@@ -885,6 +895,13 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    if (mDefaultCommissioner == nullptr)
+    {
+        ChipLogError(Controller, "No default commissioner is specified");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     ChipLogProgress(Controller, "Commission called for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
 
     mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
