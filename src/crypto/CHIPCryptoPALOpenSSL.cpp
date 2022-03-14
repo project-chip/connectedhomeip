@@ -1944,9 +1944,9 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
 
 
 /**
- *  @brief Mbedtls P256 key builder for Operatinal and Ephermal keys.
+ *  @brief Openssl P256 key builder for Operatinal and Ephermal keys.
  **/
-class MbedTlsDefaultP256KeypairBuilder : public P256KeypairBuilder {
+class OpensslDefaultP256KeypairBuilder : public P256KeypairBuilder {
 public:
 
     virtual P256Keypair * BuildP256KeyPairForOperationalKey(uint64_t fabricIndex) override;
@@ -1954,7 +1954,7 @@ public:
     virtual P256Keypair * BuildP256KeyPairForEphermalUsage() override;
 };
 
-P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(uint64_t fabricIndex)
+P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(uint64_t fabricIndex)
 {
     (void)fabricIndex;
     P256Keypair * keypair = nullptr;
@@ -1963,7 +1963,7 @@ P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKe
     return keypair;
 }
 
-P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForEphermalUsage()
+P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForEphermalUsage()
 {
     P256Keypair * keypair = nullptr;
     keypair = Platform::New<P256Keypair>();
@@ -1973,9 +1973,9 @@ P256Keypair * MbedTlsDefaultP256KeypairBuilder::BuildP256KeyPairForEphermalUsage
 
 
 /**
- *  @brief Default Key Builder for Mbedtls
+ *  @brief Default Key Builder for Openssl
  **/
-MbedTlsDefaultP256KeypairBuilder gDefaultP256KeyPairBuilder;
+OpensslDefaultP256KeypairBuilder gDefaultP256KeyPairBuilder;
 P256KeypairBuilder *gP256KeypairBuilder = &gDefaultP256KeyPairBuilder;
 
 
