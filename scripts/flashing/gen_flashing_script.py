@@ -21,5 +21,4 @@ platform = importlib.import_module(sys.argv[1] + '_firmware_utils')
 del sys.argv[1]
 
 if __name__ == '__main__':
-    platform.Flasher().gbl_create(sys.argv)
     sys.exit(platform.Flasher().make_wrapper(sys.argv))

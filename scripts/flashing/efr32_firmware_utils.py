@@ -53,6 +53,8 @@ import sys
 
 import firmware_utils
 
+import glob
+
 # Additional options that can be use to configure an `Flasher`
 # object (as dictionary keys) and/or passed as command line options.
 EFR32_OPTIONS = {
@@ -110,6 +112,11 @@ class Flasher(firmware_utils.Flasher):
     def __init__(self, **options):
         super().__init__(platform='EFR32', module=__name__, **options)
         self.define_options(EFR32_OPTIONS)
+        self.run_tool(
+            'commander',
+            ['gbl', 'create', self.DEVICE_ARGUMENTS, 'chip-efr32-lighting-example.gbl', '--app',  glob.glob("*.s37")],
+            name='GblCreate')
+        
 
     # Common command line arguments for commander device subcommands.
     DEVICE_ARGUMENTS = [{'optional': 'serialno'}, {
@@ -137,15 +144,6 @@ class Flasher(firmware_utils.Flasher):
             'commander',
             ['flash', self.DEVICE_ARGUMENTS, image],
             name='Flash')
-
-    def gbl_create(self, argv):
-        """Create gbl file"""
-        self.parser.description = 'Generate a flashing script.'
-
-        return self.run_tool(
-            'commander',
-            ['gbl', 'create', self.DEVICE_ARGUMENTS, argv[5], '--app', argv[2]],
-            name='GblCreate')
 
     def reset(self):
         """Reset the device."""
@@ -175,9 +173,6 @@ class Flasher(firmware_utils.Flasher):
         if self.option.reset:
             if self.reset().err:
                 return self
-
-        return self
-
 
 if __name__ == '__main__':
     sys.exit(Flasher().flash_command(sys.argv))
