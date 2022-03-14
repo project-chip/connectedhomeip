@@ -752,11 +752,17 @@ P256Keypair * HSMDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(ui
     keypair->SetKeyId(kKeyId_case_operational_keyid);
 
     if (initkey == 0){
+        // For the first time, initialize the key and
+        // Set provision = true. This will ensure key is not deleted in HSM.
         keypair->Initialize();
         keypair->provisioned_key = true;
         initkey = 1;
     }
     else{
+        //fabricIndex - keyid mapping not implemented yet
+        // Re-use the existing key.
+        // Set provision = true. This will only get the handle to existing key and
+        // extract the public key.
         keypair->provisioned_key = true;
         keypair->Initialize();
     }

@@ -329,6 +329,7 @@ CHIP_ERROR CASESession::SendSigma1()
 
     // Generate an ephemeral keypair
     mEphemeralKey = GetP256KeypairBuilder()->BuildP256KeyPairForEphermalUsage();
+    VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Fill in the random value
     ReturnErrorOnFailure(DRBG_get_bytes(mInitiatorRandom, sizeof(mInitiatorRandom)));
@@ -551,6 +552,7 @@ CHIP_ERROR CASESession::SendSigma2()
 
     // Generate an ephemeral keypair
     mEphemeralKey = GetP256KeypairBuilder()->BuildP256KeyPairForEphermalUsage();
+    VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Generate a Shared Secret
     ReturnErrorOnFailure(mEphemeralKey->ECDH_derive_secret(mRemotePubKey, mSharedSecret));
