@@ -769,6 +769,11 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 
     MoveToState(ClientState::SubscriptionActive);
 
+    if (mReadPrepareParams.mResubscribePolicy != nullptr)
+    {
+        mNumRetries = 0;
+    }
+
     RefreshLivenessCheckTimer();
 
     return CHIP_NO_ERROR;
