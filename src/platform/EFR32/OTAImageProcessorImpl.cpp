@@ -164,7 +164,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    ByteSpan block   = imageProcessor->mBlock;
+    ByteSpan block        = imageProcessor->mBlock;
     CHIP_ERROR chip_error = imageProcessor->ProcessHeader(block);
 
     if (chip_error != CHIP_NO_ERROR)
@@ -174,7 +174,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, (uint8_t *)(block.data()), block.size());
+    err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, (uint8_t *) (block.data()), block.size());
 
     if (err)
     {
@@ -201,8 +201,8 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         ReturnErrorOnFailure(error);
 
         // SL TODO -- store version somewhere
-        ChipLogProgress(SoftwareUpdate, "Image Header software version: %ld payload size: %lu",
-                        header.mSoftwareVersion, (long unsigned int)header.mPayloadSize);
+        ChipLogProgress(SoftwareUpdate, "Image Header software version: %ld payload size: %lu", header.mSoftwareVersion,
+                        (long unsigned int) header.mPayloadSize);
         mParams.totalFileBytes = header.mPayloadSize;
         mHeaderParser.Clear();
     }
