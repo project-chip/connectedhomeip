@@ -26,6 +26,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -33,6 +34,7 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 #include <credentials/FabricTable.h>
+#include <setup_payload/SetupPayload.h>
 #include <system/TimeSource.h>
 
 #include <app/server/Server.h>
@@ -249,6 +251,14 @@ CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t buff
     return mdnsAdvertiser.GetCommissionableInstanceName(buffer, bufferLen);
 }
 
+CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminator)
+{
+    VerifyOrReturnError(discriminator.ValueOr(0) <= kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
+    mEphemeralDiscriminator = discriminator;
+
+    return CHIP_NO_ERROR;
+}
+
 /// Set MDNS operational advertisement
 CHIP_ERROR DnssdServer::AdvertiseOperational()
 {
@@ -329,12 +339,21 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         advertiseParameters.SetProductId(chip::Optional<uint16_t>::Value(value));
     }
 
-    if (DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(value) != CHIP_NO_ERROR)
+    uint16_t discriminator = 0;
+    CHIP_ERROR error       = DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
-        value = 840;
+        ChipLogError(Discovery,
+                     "Setup discriminator read error (%" CHIP_ERROR_FORMAT ")! Critical error, will not be commissionable.",
+                     error.Format());
+        return error;
     }
-    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>((value >> 8) & 0x0F)).SetLongDiscriminator(value);
+
+    // Override discriminator with temporary one if one is set
+    discriminator = mEphemeralDiscriminator.ValueOr(discriminator);
+
+    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>((discriminator >> 8) & 0x0F))
+        .SetLongDiscriminator(discriminator);
 
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
         DeviceLayer::ConfigurationMgr().GetDeviceTypeId(value) == CHIP_NO_ERROR)

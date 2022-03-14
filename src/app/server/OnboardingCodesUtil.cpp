@@ -25,6 +25,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
@@ -97,17 +98,25 @@ CHIP_ERROR GetSetupPayload(chip::SetupPayload & aSetupPayload, chip::RendezvousI
     aSetupPayload.version               = 0;
     aSetupPayload.rendezvousInformation = aRendezvousFlags;
 
-    err = ConfigurationMgr().GetSetupPinCode(aSetupPayload.setUpPINCode);
+    err = GetCommissionableDataProvider()->GetSetupPasscode(aSetupPayload.setUpPINCode);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
+        ChipLogError(AppServer, "GetCommissionableDataProvider()->GetSetupPasscode() failed: %s",
+                     chip::ErrorStr(err));
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+        ChipLogProgress(AppServer, "*** Using default EXAMPLE passcode %u ***",
+                        static_cast<unsigned>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));
+        aSetupPayload.setUpPINCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
+#else
         return err;
+#endif
     }
 
-    err = ConfigurationMgr().GetSetupDiscriminator(aSetupPayload.discriminator);
+    err = GetCommissionableDataProvider()->GetSetupDiscriminator(aSetupPayload.discriminator);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
+        ChipLogProgress(AppServer, "GetCommissionableDataProvider()->GetSetupDiscriminator() failed: %s",
+                        chip::ErrorStr(err));
         return err;
     }
 

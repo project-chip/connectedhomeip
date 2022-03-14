@@ -16,12 +16,17 @@
  *    limitations under the License.
  */
 
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "Options.h"
 
 #include <app/server/OnboardingCodesUtil.h>
-#include <platform/CHIPDeviceLayer.h>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/Base64.h>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -48,7 +53,10 @@ enum
     kDeviceOption_Command                   = 0x100d,
     kDeviceOption_PICS                      = 0x100e,
     kDeviceOption_KVS                       = 0x100f,
-    kDeviceOption_InterfaceId               = 0x1010
+    kDeviceOption_InterfaceId               = 0x1010,
+    kDeviceOption_Spake2pVerifierBase64     = 0x1011,
+    kDeviceOption_Spake2pSaltBase64         = 0x1012,
+    kDeviceOption_Spake2pIterations         = 0x1013,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -70,6 +78,9 @@ OptionDef sDeviceOptionDefs[] = {
     { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
     { "discriminator", kArgumentRequired, kDeviceOption_Discriminator },
     { "passcode", kArgumentRequired, kDeviceOption_Passcode },
+    { "spake2p-verifier-base64", kArgumentRequired, kDeviceOption_Spake2pVerifierBase64 },
+    { "spake2p-salt-base64", kArgumentRequired, kDeviceOption_Spake2pSaltBase64 },
+    { "spake2p-iterations", kArgumentRequired, kDeviceOption_Spake2pIterations },
     { "secured-device-port", kArgumentRequired, kDeviceOption_SecuredDevicePort },
     { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
     { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
@@ -115,7 +126,22 @@ const char * sDeviceOptionHelp =
     "       A 12-bit unsigned integer match the value which a device advertises during commissioning.\n"
     "\n"
     "  --passcode <passcode>\n"
-    "       A 27-bit unsigned integer, which serves as proof of possession during commissioning.\n"
+    "       A 27-bit unsigned integer, which serves as proof of possession during commissioning. \n"
+    "       If not provided to compute a verifier, the --spake2p-verifier-base64 must be provided. \n"
+    "\n"
+    "  --spake2p-verifier-base64 <PASE verifier as base64>\n"
+    "       A raw concatenation of 'W0' and 'L' (67 bytes) as base64 to override the verifier\n"
+    "       auto-computed from the passcode, if provided.\n"
+    "\n"
+    "  --spake2p-salt-base64 <PASE salt as base64>\n"
+    "       16-32 bytes of salt to use for the PASE verifier, as base64. If omitted, will be generated\n"
+    "       randomly. If a --spake2p-verifier-base64 is passed, it must match against the salt otherwise\n"
+    "       failure will arise.\n"
+    "\n"
+    "  --spake2p-iterations <PASE PBKDF iterations>\n"
+    "       Number of PBKDF iterations to use. If omitted, will be 1000. If a --spake2p-verifier-base64 is\n"
+    "       passed, the iteration counts must match that used to generate the verifier otherwise failure will\n"
+    "       arise.\n"
     "\n"
     "  --secured-device-port <port>\n"
     "       A 16-bit unsigned integer specifying the listen port to use for secure device messages (default is 5540).\n"
@@ -139,6 +165,27 @@ const char * sDeviceOptionHelp =
     "  --interface-id <interface>\n"
     "       A interface id to advertise on.\n"
     "\n";
+
+bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
+{
+    size_t maxBase64Size = BASE64_ENCODED_LEN(maxSize);
+    outVector.resize(maxSize);
+
+    size_t argLen = strlen(arg);
+    if (argLen > maxBase64Size)
+    {
+        return false;
+    }
+
+    size_t decodedLen = chip::Base64Decode32(arg, argLen, reinterpret_cast<uint8_t *>(outVector.data()));
+    if (decodedLen == 0)
+    {
+        return false;
+    }
+
+    outVector.resize(decodedLen);
+    return true;
+}
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -200,6 +247,79 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_Passcode:
         LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
         break;
+
+    case kDeviceOption_Spake2pSaltBase64: {
+        constexpr size_t kMaxSize = chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length;
+        std::vector<uint8_t> saltVector;
+
+        bool success = Base64ArgToVector(aValue, kMaxSize, saltVector);
+
+        if (!success)
+        {
+            PrintArgError("%s: ERROR: Base64 format for argument %s was invalid\n", aProgram, aName);
+            retval = false;
+            break;
+        }
+
+        if ((saltVector.size() < chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length) ||
+            (saltVector.size() > chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length))
+        {
+            PrintArgError("%s: ERROR: argument %s not in range [%zu, %zu]\n", aProgram, aName,
+                          chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length, chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
+            retval = false;
+            break;
+        }
+
+        LinuxDeviceOptions::GetInstance().spake2pSalt.SetValue(std::move(saltVector));
+        break;
+    }
+
+    case kDeviceOption_Spake2pVerifierBase64: {
+        constexpr size_t kMaxSize = chip::Crypto::kSpake2p_VerifierSerialized_Length;
+        std::vector<uint8_t> serializedVerifier;
+
+        bool success = Base64ArgToVector(aValue, kMaxSize, serializedVerifier);
+
+        if (!success)
+        {
+            PrintArgError("%s: ERROR: Base64 format for argument %s was invalid\n", aProgram, aName);
+            retval = false;
+            break;
+        }
+
+        if (serializedVerifier.size() != chip::Crypto::kSpake2p_VerifierSerialized_Length)
+        {
+            PrintArgError("%s: ERROR: argument %s should contain base64 for a %zu bytes octet string \n", aProgram, aName,
+                          chip::Crypto::kSpake2p_VerifierSerialized_Length);
+            retval = false;
+            break;
+        }
+
+        LinuxDeviceOptions::GetInstance().spake2pVerifier.SetValue(std::move(serializedVerifier));
+        break;
+    }
+
+    case kDeviceOption_Spake2pIterations: {
+        errno              = 0;
+        uint32_t iterCount = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if (errno == ERANGE)
+        {
+            PrintArgError("%s: ERROR: argument %s was not parsable as an integer\n", aProgram, aName);
+            retval = false;
+            break;
+        }
+        else if ((iterCount < chip::Crypto::kSpake2p_Min_PBKDF_Iterations) ||
+                 (iterCount > chip::Crypto::kSpake2p_Max_PBKDF_Iterations))
+        {
+            PrintArgError("%s: ERROR: argument %s not in range [%zu, %zu]\n", aProgram, aName,
+                          chip::Crypto::kSpake2p_Min_PBKDF_Iterations, chip::Crypto::kSpake2p_Max_PBKDF_Iterations);
+            retval = false;
+            break;
+        }
+
+        LinuxDeviceOptions::GetInstance().spake2pIterations = iterCount;
+        break;
+    }
 
     case kDeviceOption_SecuredDevicePort:
         LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(atoi(aValue));

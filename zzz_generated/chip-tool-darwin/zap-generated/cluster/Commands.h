@@ -1126,8 +1126,10 @@ public:
         : ModelCommand("open-commissioning-window")
     {
         AddArgument("CommissioningTimeout", 0, UINT16_MAX, &mCommissioningTimeout);
+        AddArgument("PAKEVerifier", &mPAKEVerifier);
         AddArgument("Discriminator", 0, UINT16_MAX, &mDiscriminator);
         AddArgument("Iterations", 0, UINT32_MAX, &mIterations);
+        AddArgument("Salt", &mSalt);
         ModelCommand::AddArguments();
     }
 
@@ -2759,6 +2761,7 @@ public:
     ApplicationLauncherLaunchApp()
         : ModelCommand("launch-app")
     {
+        AddArgument("Data", &mData);
         ModelCommand::AddArguments();
     }
 
@@ -17927,6 +17930,7 @@ public:
     {
         AddArgument("Intent", 0, UINT8_MAX, &mIntent);
         AddArgument("RequestedProtocol", 0, UINT8_MAX, &mRequestedProtocol);
+        AddArgument("TransferFileDesignator", &mTransferFileDesignator);
         ModelCommand::AddArguments();
     }
 
@@ -18581,6 +18585,7 @@ public:
     DoorLockLockDoor()
         : ModelCommand("lock-door")
     {
+        AddArgument("PinCode", &mPinCode);
         ModelCommand::AddArguments();
     }
 
@@ -18615,6 +18620,7 @@ public:
         : ModelCommand("set-credential")
     {
         AddArgument("OperationType", 0, UINT8_MAX, &mOperationType);
+        AddArgument("CredentialData", &mCredentialData);
         AddArgument("UserIndex", 0, UINT16_MAX, &mUserIndex);
         AddArgument("UserStatus", 0, UINT8_MAX, &mUserStatus);
         AddArgument("UserType", 0, UINT8_MAX, &mUserType);
@@ -18809,6 +18815,7 @@ public:
     DoorLockUnlockDoor()
         : ModelCommand("unlock-door")
     {
+        AddArgument("PinCode", &mPinCode);
         ModelCommand::AddArguments();
     }
 
@@ -18843,6 +18850,7 @@ public:
         : ModelCommand("unlock-with-timeout")
     {
         AddArgument("Timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("PinCode", &mPinCode);
         ModelCommand::AddArguments();
     }
 
@@ -35521,6 +35529,7 @@ public:
     NetworkCommissioningAddOrUpdateThreadNetwork()
         : ModelCommand("add-or-update-thread-network")
     {
+        AddArgument("OperationalDataset", &mOperationalDataset);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
         ModelCommand::AddArguments();
     }
@@ -35561,6 +35570,8 @@ public:
     NetworkCommissioningAddOrUpdateWiFiNetwork()
         : ModelCommand("add-or-update-wi-fi-network")
     {
+        AddArgument("Ssid", &mSsid);
+        AddArgument("Credentials", &mCredentials);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
         ModelCommand::AddArguments();
     }
@@ -35603,6 +35614,7 @@ public:
     NetworkCommissioningConnectNetwork()
         : ModelCommand("connect-network")
     {
+        AddArgument("NetworkID", &mNetworkID);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
         ModelCommand::AddArguments();
     }
@@ -35643,6 +35655,7 @@ public:
     NetworkCommissioningRemoveNetwork()
         : ModelCommand("remove-network")
     {
+        AddArgument("NetworkID", &mNetworkID);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
         ModelCommand::AddArguments();
     }
@@ -35683,6 +35696,7 @@ public:
     NetworkCommissioningReorderNetwork()
         : ModelCommand("reorder-network")
     {
+        AddArgument("NetworkID", &mNetworkID);
         AddArgument("NetworkIndex", 0, UINT8_MAX, &mNetworkIndex);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
         ModelCommand::AddArguments();
@@ -35726,6 +35740,7 @@ public:
     NetworkCommissioningScanNetworks()
         : ModelCommand("scan-networks")
     {
+        AddArgument("Ssid", &mSsid);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
         ModelCommand::AddArguments();
     }
@@ -36781,6 +36796,7 @@ public:
     OtaSoftwareUpdateProviderApplyUpdateRequest()
         : ModelCommand("apply-update-request")
     {
+        AddArgument("UpdateToken", &mUpdateToken);
         AddArgument("NewVersion", 0, UINT32_MAX, &mNewVersion);
         ModelCommand::AddArguments();
     }
@@ -36821,6 +36837,7 @@ public:
     OtaSoftwareUpdateProviderNotifyUpdateApplied()
         : ModelCommand("notify-update-applied")
     {
+        AddArgument("UpdateToken", &mUpdateToken);
         AddArgument("SoftwareVersion", 0, UINT32_MAX, &mSoftwareVersion);
         ModelCommand::AddArguments();
     }
@@ -36865,6 +36882,7 @@ public:
         AddArgument("HardwareVersion", 0, UINT16_MAX, &mHardwareVersion);
         AddArgument("Location", &mLocation);
         AddArgument("RequestorCanConsent", 0, 1, &mRequestorCanConsent);
+        AddArgument("MetadataForProvider", &mMetadataForProvider);
         ModelCommand::AddArguments();
     }
 
@@ -37101,6 +37119,7 @@ public:
         AddArgument("ProviderNodeId", 0, UINT64_MAX, &mProviderNodeId);
         AddArgument("VendorId", 0, UINT16_MAX, &mVendorId);
         AddArgument("AnnouncementReason", 0, UINT8_MAX, &mAnnouncementReason);
+        AddArgument("MetadataForNode", &mMetadataForNode);
         AddArgument("Endpoint", 0, UINT16_MAX, &mEndpoint);
         ModelCommand::AddArguments();
     }
@@ -39865,6 +39884,9 @@ public:
     OperationalCredentialsAddNOC()
         : ModelCommand("add-noc")
     {
+        AddArgument("NOCValue", &mNOCValue);
+        AddArgument("ICACValue", &mICACValue);
+        AddArgument("IPKValue", &mIPKValue);
         AddArgument("CaseAdminNode", 0, UINT64_MAX, &mCaseAdminNode);
         AddArgument("AdminVendorId", 0, UINT16_MAX, &mAdminVendorId);
         ModelCommand::AddArguments();
@@ -39912,6 +39934,7 @@ public:
     OperationalCredentialsAddTrustedRootCertificate()
         : ModelCommand("add-trusted-root-certificate")
     {
+        AddArgument("RootCertificate", &mRootCertificate);
         ModelCommand::AddArguments();
     }
 
@@ -39947,6 +39970,7 @@ public:
     OperationalCredentialsAttestationRequest()
         : ModelCommand("attestation-request")
     {
+        AddArgument("AttestationNonce", &mAttestationNonce);
         ModelCommand::AddArguments();
     }
 
@@ -39984,6 +40008,7 @@ public:
     OperationalCredentialsCSRRequest()
         : ModelCommand("csrrequest")
     {
+        AddArgument("CSRNonce", &mCSRNonce);
         ModelCommand::AddArguments();
     }
 
@@ -40098,6 +40123,7 @@ public:
     OperationalCredentialsRemoveTrustedRootCertificate()
         : ModelCommand("remove-trusted-root-certificate")
     {
+        AddArgument("TrustedRootIdentifier", &mTrustedRootIdentifier);
         ModelCommand::AddArguments();
     }
 
@@ -40172,6 +40198,8 @@ public:
     OperationalCredentialsUpdateNOC()
         : ModelCommand("update-noc")
     {
+        AddArgument("NOCValue", &mNOCValue);
+        AddArgument("ICACValue", &mICACValue);
         ModelCommand::AddArguments();
     }
 
