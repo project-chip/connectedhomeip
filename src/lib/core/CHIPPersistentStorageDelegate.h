@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <stddef.h>
-#include <stdint.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
+#include <stddef.h>
+#include <stdint.h>
 
 namespace chip {
 

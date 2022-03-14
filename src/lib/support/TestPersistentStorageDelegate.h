@@ -102,7 +102,7 @@ public:
         else
         {
             const uint8_t * bytes = static_cast<const uint8_t *>(value);
-            mStorage[key] = std::vector<uint8_t>(bytes, bytes + size);
+            mStorage[key]         = std::vector<uint8_t>(bytes, bytes + size);
             return CHIP_NO_ERROR;
         }
     }
