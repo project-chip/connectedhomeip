@@ -197,14 +197,16 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
 
     System::Clock::Timestamp backoff = backoffBase;
 
-    // Generate fixed point equivalent of 1.6^retryCount
+    // Implement `t = i⋅MRP_BACKOFF_BASE^max(0,n−MRP_BACKOFF_THRESHOLD)` from Section 4.11.2.1. Retransmissions
+
+    // Generate fixed point equivalent of `retryCount = max(0,n−MRP_BACKOFF_THRESHOLD)`
     int retryCount = sendCount - MRP_BACKOFF_THRESHOLD;
     if (retryCount < 0)
         retryCount = 0; // Enforce floor
     if (retryCount > 4)
         retryCount = 4; // Enforce reasonable maximum after 5 tries
 
-    // Implement `t = i⋅MRP_BACKOFF_BASE^max(0,n−MRP_BACKOFF_THRESHOLD)` from Section 4.15.2.1. Retransmissions
+    // Generate fixed point equivalent of `backoff = i⋅1.6^retryCount`
     unsigned backoffNum   = 1;
     unsigned backoffDenom = 1;
     for (int i = 0; i < retryCount; i++)
