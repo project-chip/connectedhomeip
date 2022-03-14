@@ -35,6 +35,7 @@
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/IntrusiveList.h>
 #include <lib/support/StringBuilder.h>
 
 // Enable detailed mDNS logging for received queries
@@ -98,6 +99,54 @@ void LogQuery(const QueryData & data)
 void LogQuery(const QueryData & data) {}
 #endif
 
+// Max number of records for operational = PTR, SRV, TXT, A, AAAA, I subtype.
+constexpr size_t kMaxOperationalRecords = 6;
+
+/// Represents an allocated operational responder.
+///
+/// Wraps a QueryResponderAllocator.
+class OperationalQueryAllocator : public chip::IntrusiveListNodeBase
+{
+public:
+    using Allocator = QueryResponderAllocator<kMaxOperationalRecords>;
+
+    /// Prefer to use `::New` for allocations instead of this direct call
+    explicit OperationalQueryAllocator(Allocator * allocator) : mAllocator(allocator) {}
+    ~OperationalQueryAllocator()
+    {
+        chip::Platform::Delete(mAllocator);
+        mAllocator = nullptr;
+    }
+
+    Allocator * GetAllocator() { return mAllocator; }
+    const Allocator * GetAllocator() const { return mAllocator; }
+
+    /// Allocate a new entry for this type.
+    ///
+    /// May return null on allocation failures.
+    static OperationalQueryAllocator * New()
+    {
+        Allocator * allocator = chip::Platform::New<Allocator>();
+
+        if (allocator == nullptr)
+        {
+            return nullptr;
+        }
+
+        OperationalQueryAllocator * result = chip::Platform::New<OperationalQueryAllocator>(allocator);
+        if (result == nullptr)
+        {
+            chip::Platform::Delete(allocator);
+            return nullptr;
+        }
+
+        return result;
+    }
+
+private:
+    Allocator * mAllocator = nullptr;
+};
+
 class AdvertiserMinMdns : public ServiceAdvertiser,
                           public MdnsPacketDelegate, // receive query packets
                           public ParserDelegate      // parses queries
@@ -106,12 +155,8 @@ public:
     AdvertiserMinMdns() : mResponseSender(&GlobalMinimalMdnsServer::Server())
     {
         GlobalMinimalMdnsServer::Instance().SetQueryDelegate(this);
-        for (auto & allocator : mQueryResponderAllocatorOperational)
-        {
-            mResponseSender.AddQueryResponder(allocator.GetQueryResponder());
-        }
-        mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissionable.GetQueryResponder());
-        mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissioner.GetQueryResponder());
+        LogErrorOnFailure(mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissionable.GetQueryResponder()));
+        LogErrorOnFailure(mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissioner.GetQueryResponder()));
     }
     ~AdvertiserMinMdns() {}
 
@@ -143,7 +188,8 @@ private:
     bool ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr);
 
     FullQName GetCommissioningTxtEntries(const CommissionAdvertisingParameters & params);
-    FullQName GetOperationalTxtEntries(const OperationalAdvertisingParameters & params);
+    FullQName GetOperationalTxtEntries(OperationalQueryAllocator::Allocator * allocator,
+                                       const OperationalAdvertisingParameters & params);
 
     struct CommonTxtEntryStorage
     {
@@ -205,17 +251,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    // Max number of records for operational = PTR, SRV, TXT, A, AAAA, I subtype.
-    static constexpr size_t kMaxOperationalRecords  = 6;
-    static constexpr size_t kMaxOperationalNetworks = 5;
-    QueryResponderAllocator<kMaxOperationalRecords> mQueryResponderAllocatorOperational[kMaxOperationalNetworks];
+    IntrusiveList<OperationalQueryAllocator> mOperationalResponders;
+    // TODO: replace mQueryResponderAllocatorOperational
+
     // Max number of records for commissionable = 7 x PTR (base + 6 sub types - _S, _L, _D, _T, _C, _A), SRV, TXT, A, AAAA
     static constexpr size_t kMaxCommissionRecords = 11;
     QueryResponderAllocator<kMaxCommissionRecords> mQueryResponderAllocatorCommissionable;
     QueryResponderAllocator<kMaxCommissionRecords> mQueryResponderAllocatorCommissioner;
 
-    QueryResponderAllocator<kMaxOperationalRecords> * FindOperationalAllocator(const FullQName & qname);
-    QueryResponderAllocator<kMaxOperationalRecords> * FindEmptyOperationalAllocator();
+    OperationalQueryAllocator::Allocator * FindOperationalAllocator(const FullQName & qname);
+    OperationalQueryAllocator::Allocator * FindEmptyOperationalAllocator();
 
     ResponseSender mResponseSender;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
@@ -289,38 +334,53 @@ void AdvertiserMinMdns::Shutdown()
 
 CHIP_ERROR AdvertiserMinMdns::RemoveServices()
 {
-    for (auto & allocator : mQueryResponderAllocatorOperational)
+    while (mOperationalResponders.begin() != mOperationalResponders.end())
     {
-        allocator.Clear();
+        auto it = mOperationalResponders.begin();
+
+        // Need to free the memory once it is out of the list
+        OperationalQueryAllocator * ptr = &*it;
+
+        // Mark as unused
+        ptr->GetAllocator()->Clear();
+        LogErrorOnFailure(mResponseSender.RemoveQueryResponder(ptr->GetAllocator()->GetQueryResponder()));
+        mOperationalResponders.Remove(ptr);
+
+        // Finally release the memory
+        chip::Platform::Delete(ptr);
     }
+
     mQueryResponderAllocatorCommissionable.Clear();
     mQueryResponderAllocatorCommissioner.Clear();
     return CHIP_NO_ERROR;
 }
 
-QueryResponderAllocator<AdvertiserMinMdns::kMaxOperationalRecords> *
-AdvertiserMinMdns::FindOperationalAllocator(const FullQName & qname)
+OperationalQueryAllocator::Allocator * AdvertiserMinMdns::FindOperationalAllocator(const FullQName & qname)
 {
-    for (auto & allocator : mQueryResponderAllocatorOperational)
+    for (auto it = mOperationalResponders.begin(); it != mOperationalResponders.end(); it++)
     {
-        if (allocator.GetResponder(QType::SRV, qname) != nullptr)
+        if (it->GetAllocator()->GetResponder(QType::SRV, qname) != nullptr)
         {
-            return &allocator;
+            return it->GetAllocator();
         }
     }
+
     return nullptr;
 }
 
-QueryResponderAllocator<AdvertiserMinMdns::kMaxOperationalRecords> * AdvertiserMinMdns::FindEmptyOperationalAllocator()
+OperationalQueryAllocator::Allocator * AdvertiserMinMdns::FindEmptyOperationalAllocator()
 {
-    for (auto & allocator : mQueryResponderAllocatorOperational)
+    OperationalQueryAllocator * result = OperationalQueryAllocator::New();
+
+    if (result == nullptr)
     {
-        if (allocator.IsEmpty())
-        {
-            return &allocator;
-        }
+        return nullptr;
     }
-    return nullptr;
+
+    mOperationalResponders.PushBack(result);
+    LogErrorOnFailure(mResponseSender.AddQueryResponder(result->GetAllocator()->GetQueryResponder()));
+
+    return result->GetAllocator();
 }
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
@@ -377,7 +437,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!operationalAllocator->AddResponder<TxtResponder>(TxtResourceRecord(instanceName, GetOperationalTxtEntries(params)))
+    if (!operationalAllocator
+             ->AddResponder<TxtResponder>(TxtResourceRecord(instanceName, GetOperationalTxtEntries(operationalAllocator, params)))
              .SetReportAdditional(hostName)
              .IsValid())
     {
@@ -616,11 +677,12 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     return CHIP_NO_ERROR;
 }
 
-FullQName AdvertiserMinMdns::GetOperationalTxtEntries(const OperationalAdvertisingParameters & params)
+FullQName AdvertiserMinMdns::GetOperationalTxtEntries(OperationalQueryAllocator::Allocator * allocator,
+                                                      const OperationalAdvertisingParameters & params)
 {
     char * txtFields[OperationalAdvertisingParameters::kTxtMaxNumber];
     size_t numTxtFields = 0;
-    auto * allocator    = mQueryResponderAllocatorOperational;
+
     struct CommonTxtEntryStorage commonStorage;
     AddCommonTxtEntries<OperationalAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
     if (numTxtFields == 0)
@@ -787,9 +849,9 @@ void AdvertiserMinMdns::AdvertiseRecords()
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
         queryData.SetIsBootAdvertising(true);
 
-        for (auto & allocator : mQueryResponderAllocatorOperational)
+        for (auto it = mOperationalResponders.begin(); it != mOperationalResponders.end(); it++)
         {
-            allocator.GetQueryResponder()->ClearBroadcastThrottle();
+            it->GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
         }
         mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
         mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
@@ -802,9 +864,9 @@ void AdvertiserMinMdns::AdvertiseRecords()
     }
 
     // Once all automatic broadcasts are done, allow immediate replies once.
-    for (auto & allocator : mQueryResponderAllocatorOperational)
+    for (auto it = mOperationalResponders.begin(); it != mOperationalResponders.end(); it++)
     {
-        allocator.GetQueryResponder()->ClearBroadcastThrottle();
+        it->GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
     }
     mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
     mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
