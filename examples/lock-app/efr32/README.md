@@ -295,4 +295,5 @@ tracking code inside the `trackAlloc` and `trackFree` function
 ## OTA Software Update
 
 For the description of Software Update process with EFR32 example applications
-see [EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
