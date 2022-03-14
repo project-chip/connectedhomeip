@@ -50,7 +50,7 @@ declare_args() {
 
   # OTA timeout in seconds
   OTA_periodic_query_timeout = 86400
-  
+
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   use_wf200 = false
   use_rs911x = false
