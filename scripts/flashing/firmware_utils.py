@@ -405,7 +405,7 @@ class Flasher:
             required=True,
             help='flashing script name')
         self.argv0 = argv[0]
-        args = self.parser.parse_args(argv[1:])
+        args = self.parser.parse_args(argv[1:5])
 
         # Give platform-specific code a chance to manipulate the arguments
         # for the wrapper script.
