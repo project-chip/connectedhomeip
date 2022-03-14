@@ -68,9 +68,7 @@ public:
     void ProcessAnnounceOTAProviders(const ProviderLocationType & providerLocation,
                                      app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) override;
     void SendQueryImage() override;
-
-    // Returns the next available Provider location
-    bool DetermineProviderLocation(ProviderLocationType & providerLocation) override;
+    bool GetNextProviderLocation(ProviderLocationType & providerLocation) override;
 
 protected:
     void StartDefaultProviderTimer();

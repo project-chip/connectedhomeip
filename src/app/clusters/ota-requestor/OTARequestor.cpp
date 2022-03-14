@@ -170,7 +170,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
                           update.softwareVersion, requestorCore->mCurrentVersion);
 
             requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
-            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
+            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kUpToDate,
                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
 
@@ -178,12 +178,12 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
     }
     case OTAQueryStatus::kBusy:
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnQuery, OTAChangeReasonEnum::kDelayByProvider);
-        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::Busy,
+        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kBusy,
                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         break;
     case OTAQueryStatus::kNotAvailable:
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
-        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::NotAvailable,
+        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kNotAvailable,
                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         break;
     default:
@@ -459,9 +459,6 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
     default:
         break;
     }
-
-    // Give driver a chance to schedule another query
-    requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::ConnectionFailed, chip::System::Clock::Seconds32(0));
 }
 
 // Sends the QueryImage command to the Provider currently set in the OTARequestor
@@ -478,7 +475,7 @@ void OTARequestor::TriggerImmediateQueryInternal()
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
     ProviderLocationType providerLocation;
-    if (mOtaRequestorDriver->DetermineProviderLocation(providerLocation) != true)
+    if (mOtaRequestorDriver->GetNextProviderLocation(providerLocation) != true)
     {
         ChipLogError(SoftwareUpdate, "No OTA Providers available");
         return kNoProviderKnown;
