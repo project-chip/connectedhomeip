@@ -78,7 +78,7 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
 OTAProviderExample::OTAProviderExample()
 {
     memset(mOTAFilePath, 0, kFilepathBufLen);
-    mQueryImageBehavior   = kRespondWithNotAvailable;
+    mQueryImageBehavior        = kRespondWithNotAvailable;
     mDelayedQueryActionTimeSec = 0;
     mDelayedApplyActionTimeSec = 0;
     mCandidates.clear();

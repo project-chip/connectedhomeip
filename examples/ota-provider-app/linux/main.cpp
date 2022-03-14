@@ -43,18 +43,18 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 // TODO: this should probably be done dynamically
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 
-constexpr uint16_t kOptionFilepath             = 'f';
-constexpr uint16_t kOptionOtaImageList         = 'o';
-constexpr uint16_t kOptionQueryImageStatus     = 'q';
-constexpr uint16_t kOptionIgnoreQueryImage     = 'x';
-constexpr uint16_t kOptionIgnoreApplyUpdate    = 'y';
-constexpr uint16_t kOptionUserConsentState     = 'u';
-constexpr uint16_t kOptionUpdateAction         = 'a';
+constexpr uint16_t kOptionFilepath                  = 'f';
+constexpr uint16_t kOptionOtaImageList              = 'o';
+constexpr uint16_t kOptionQueryImageStatus          = 'q';
+constexpr uint16_t kOptionIgnoreQueryImage          = 'x';
+constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
+constexpr uint16_t kOptionUserConsentState          = 'u';
+constexpr uint16_t kOptionUpdateAction              = 'a';
 constexpr uint16_t kOptionDelayedQueryActionTimeSec = 't';
 constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
-constexpr uint16_t kOptionSoftwareVersion      = 's';
-constexpr uint16_t kOptionSoftwareVersionStr   = 'S';
-constexpr uint16_t kOptionUserConsentNeeded    = 'c';
+constexpr uint16_t kOptionSoftwareVersion           = 's';
+constexpr uint16_t kOptionSoftwareVersionStr        = 'S';
+constexpr uint16_t kOptionUserConsentNeeded         = 'c';
 
 OTAProviderExample gOtaProvider;
 chip::ota::DefaultUserConsentProvider gUserConsentProvider;
