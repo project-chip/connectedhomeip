@@ -225,11 +225,9 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     }
 
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    // If mIsChunkedReport is not set, then we are generating our first report chunk, record the current tick for checking dirty
-    // read handlers.
-    if (!mIsChunkedReport)
+    if (!IsReporting())
     {
-        mCurrentReportTick = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtyTick();
+        mCurrentReportsBeginTick = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtyTick();
     }
     mIsChunkedReport        = aMoreChunks;
     bool noResponseExpected = IsType(InteractionType::Read) && !mIsChunkedReport;
@@ -257,7 +255,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     }
     if (!aMoreChunks)
     {
-        mLastReportTick = mCurrentReportTick;
+        mPreviousReportsBeginTick = mCurrentReportsBeginTick;
         ClearDirty();
     }
     return err;
@@ -755,24 +753,33 @@ void ReadHandler::ResetPathIterator()
     mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
 }
 
-void ReadHandler::SetDirty(const ClusterInfo * apAttributeChanged)
+void ReadHandler::SetDirty(const ClusterInfo & apAttributeChanged)
 {
     ConcreteAttributePath path;
+
+    /*
+     * Since we reset the iterator to the beginning of the current cluster instead of the beginning of the whole report, we might
+     * miss the change and regard this ReadHandler as a clean ReadHandler by mistake. So we record the time when this ReadHandler
+     * was marked as a dirty ReadHandler, and another time when the Readhandler reports attribute change, then we can tell if the
+     * ReadHandler is clean by checking these timestamps.
+     * The timestamp are represented by a ticker which will be bumped by 1 everytime when the ReportingEnging is noticed for an
+     * attribute change.
+     */
     mDirtyTick     = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtyTick();
     mOverrideDirty = true;
 
     // We won't reset the path iterator for every SetDirty call to reduce the number of full report data.
     // The iterator will be reset after finished each report session.
-    if (apAttributeChanged == nullptr ||
-        (mAttributePathExpandIterator.Get(path) && path.mEndpointId == apAttributeChanged->mEndpointId &&
-         path.mClusterId == apAttributeChanged->mClusterId) ||
-        apAttributeChanged->HasAttributeWildcard())
+    if ((mAttributePathExpandIterator.Get(path) && path.mEndpointId == apAttributeChanged.mEndpointId &&
+         path.mClusterId == apAttributeChanged.mClusterId) ||
+        apAttributeChanged.HasAttributeWildcard())
     {
         ChipLogDetail(
             DataManagement,
             "The dirty path is the path we are current reporting, reset the iterator to the beginning of current cluster");
-        // Only reset the iterator when we may generate a inconsistent report.
-        // For any changes happen between chunks, we will try to deliver it in next report.
+        // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
+        // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
+        // the state of the cluster as present on the server
         mAttributePathExpandIterator.ResetCurrentCluster();
         mAttributeEncoderState = AttributeValueEncoder::AttributeEncodeState();
     }

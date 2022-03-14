@@ -111,11 +111,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         ConcreteAttributePath readPath;
 
         ChipLogDetail(DataManagement, "Building Reports for ReadHandler with LastReportTick = %" PRIu64 " DirtyTick = %" PRIu64,
-                      apReadHandler->mLastReportTick, apReadHandler->mDirtyTick);
+                      apReadHandler->mPreviousReportsBeginTick, apReadHandler->mDirtyTick);
 
-        // IsChunkedReport also indicated if we are in the middle of chunks.
-        // If this is the first chunk of the report, reset the path iterator for a clean start.
-        if (!apReadHandler->IsChunkedReport())
+        // This ReadHandler is not generating reports, so we reset the iterator for a clean start.
+        if (!apReadHandler->IsReporting())
         {
             apReadHandler->ResetPathIterator();
         }
@@ -131,7 +130,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 mGlobalDirtySet.ForEachActiveObject([&](auto * dirtyPath) {
                     if (dirtyPath->IsAttributePathSupersetOf(readPath))
                     {
-                        if (dirtyPath->mTickTouched > apReadHandler->mLastReportTick)
+                        // The attribute change might have not been reported if the attribute change happens after the last time
+                        // when this report handler generated reports.
+                        if (dirtyPath->mTickTouched > apReadHandler->mPreviousReportsBeginTick)
                         {
                             concretePathDirty = true;
                             return Loop::Break;
@@ -632,7 +633,7 @@ CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
             {
                 if (aClusterInfo.IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(aClusterInfo))
                 {
-                    handler->SetDirty(&aClusterInfo);
+                    handler->SetDirty(aClusterInfo);
                     break;
                 }
             }
@@ -682,7 +683,7 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     {
         mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
             if ((path->IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(*path)) &&
-                aReadHandler.mLastReportTick < path->mTickTouched)
+                aReadHandler.mPreviousReportsBeginTick < path->mTickTouched)
             {
                 intersected = true;
                 return Loop::Break;

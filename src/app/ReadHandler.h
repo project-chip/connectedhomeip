@@ -147,6 +147,9 @@ public:
 
     bool IsType(InteractionType type) const { return (mInteractionType == type); }
     bool IsChunkedReport() { return mIsChunkedReport; }
+    // Is reporting indicates whether we are in the middle of a series chunks. As we will set mIsChunkedReport on the first chunk
+    // and clear that flag on the last chunk, we can use mIsChunkedReport to indicate this state.
+    bool IsReporting() { return mIsChunkedReport; }
     bool IsPriming() { return mIsPrimingReports; }
     bool IsActiveSubscription() const { return mActiveSubscription; }
     bool IsFabricFiltered() const { return mIsFabricFiltered; }
@@ -157,8 +160,8 @@ public:
     /**
      * Marked the attribute as dirty, and reset the internal path iterator when required.
      */
-    void SetDirty(const ClusterInfo * apAttributeChanged);
-    bool IsDirty() const { return (mDirtyTick > mLastReportTick) || mOverrideDirty; }
+    void SetDirty(const ClusterInfo & apAttributeChanged);
+    bool IsDirty() const { return (mDirtyTick > mPreviousReportsBeginTick) || mOverrideDirty; }
     void ClearDirty() { mOverrideDirty = false; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
@@ -267,7 +270,9 @@ private:
     // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
     bool mHoldReport = false;
     // The timestamp when this read handler was marked as a dirty read handler.
-    uint64_t mDirtyTick      = 0;
+    uint64_t mDirtyTick = 0;
+    // This flag is used for generating urgent events, in this case, we use an override dirty flag so ReportEngine can generate
+    // report data for this read handler.
     bool mOverrideDirty      = false;
     bool mActiveSubscription = false;
     // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during sending
@@ -281,12 +286,29 @@ private:
     // becomes false, we are allowed to send an empty report to keep the
     // subscription alive on the client.
     bool mHoldSync = false;
+
     // For subscriptions, we record the timestamp when we started to generate the last report.
-    // The mCurrentReportTick records the timestamp for the current report, which won;t be used for checking if this
+    // The mCurrentReportsBeginTick records the timestamp for the current report, which won;t be used for checking if this
     // ReadHandler is dirty.
-    // mLastReportTick will be set to mCurrentReportTick after we sent the last chunk of the current report.
-    uint64_t mLastReportTick         = 0;
-    uint64_t mCurrentReportTick      = 0;
+    // mPreviousReportsBeginTick will be set to mCurrentReportsBeginTick after we sent the last chunk of the current report.
+    uint64_t mPreviousReportsBeginTick = 0;
+    uint64_t mCurrentReportsBeginTick  = 0;
+    /*
+     *           (mDirtyTick = b > a, this is a dirty read handler)
+     *        +- Start Report -> mCurrentReportsBeginTick = c
+     *        |      +- SetDirty (Attribute Y) -> mDirtyTick = d
+     *        |      |     +- Last Chunk -> mPreviousReportBeginTick = mCurrentReportsBeginTick = c
+     *        |      |     |   +- (mDirtyTick = d) > (mPreviousReportBeginTick = c), this is a dirty read handler
+     *        |      |     |   |  Attribute X has a dirty tick less than c, Attribute Y has a dirty tick larger than c
+     *        |      |     |   |  So Y will be included in the report but X will not be inclued in this report.
+     * -a--b--c------d-----e---f---> Tick
+     *  |  |
+     *  |  +- SetDirty (Attribute X) (mDirtyTick = b)
+     *  +- mPreviousReportTick
+     * For read handler, if mDirtyTick > mPreviousReportTick, then we regard it as a dirty read handler, and it should generate
+     * report on timeout reached.
+     */
+
     uint32_t mLastWrittenEventsBytes = 0;
     SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.
