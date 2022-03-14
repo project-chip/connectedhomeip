@@ -51,6 +51,8 @@ __all__ = ["ChipDeviceController"]
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, c_uint32)
 _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
     None, c_uint64, c_uint32)
+_DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
+    None, c_uint64, c_uint8, c_uint32)
 # void (*)(Device *, CHIP_ERROR).
 #
 # CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
@@ -265,6 +267,22 @@ class ChipDeviceController():
     def GetTestCommissionerUsed(self):
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissionerUsed()
+        )
+
+    def ResetTestCommissioner(self):
+        self._dmLib.pychip_ResetCommissioningTests()
+
+    def SetTestCommissionerSimulateFailureOnStage(self, stage: int):
+        return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage(
+                stage)
+
+    def SetTestCommissionerSimulateFailureOnReport(self, stage: int):
+        return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport(
+                stage)
+
+    def CheckTestCommissionerCallbacks(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_TestCommissioningCallbacks()
         )
 
     def CommissionIP(self, ipaddr, setupPinCode, nodeid):
@@ -903,6 +921,10 @@ class ChipDeviceController():
                 c_void_p, _DevicePairingDelegate_OnCommissioningCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = c_uint32
 
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.argtypes = [
+                c_void_p, _DevicePairingDelegate_OnCommissioningStatusUpdateFunct]
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = c_uint32
+
             self._dmLib.pychip_DeviceController_UpdateDevice.argtypes = [
                 c_void_p, c_uint64]
             self._dmLib.pychip_DeviceController_UpdateDevice.restype = c_uint32
@@ -931,3 +953,12 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = c_uint32
             self._dmLib.pychip_TestCommissionerUsed.argtypes = []
             self._dmLib.pychip_TestCommissionerUsed.restype = c_bool
+
+            self._dmLib.pychip_TestCommissioningCallbacks.argtypes = []
+            self._dmLib.pychip_ResetCommissioningTests.argtypes = []
+            self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage.argtypes = [
+                c_uint8]
+            self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage.restype = c_bool
+            self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.argtypes = [
+                c_uint8]
+            self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.restype = c_bool

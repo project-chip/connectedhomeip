@@ -150,6 +150,12 @@ public:
      *   Called when the commissioning process is complete (with success or error)
      */
     virtual void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) {}
+    virtual void OnCommissioningSuccess(PeerId peerId) {}
+    virtual void OnCommissioningFailure(PeerId peerId, CHIP_ERROR error, CommissioningStage stageFailed,
+                                        Optional<Credentials::AttestationVerificationResult> additionalErrorInfo)
+    {}
+
+    virtual void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) {}
 };
 
 struct CommissionerInitParams : public ControllerInitParams
@@ -758,6 +764,7 @@ private:
     }
 
     static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
+    void SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus);
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;

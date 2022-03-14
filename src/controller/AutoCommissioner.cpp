@@ -312,18 +312,27 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
 
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
+    CompletionStatus completionStatus;
+    completionStatus.err = err;
     if (err != CHIP_NO_ERROR)
     {
+        completionStatus.failedStage = MakeOptional(report.stageCompleted);
         ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
-        if ((report.stageCompleted == CommissioningStage::kAttestationVerification) &&
-            ((report.Get<AdditionalErrorInfo>().attestationResult ==
-              Credentials::AttestationVerificationResult::kDacProductIdMismatch) ||
-             (report.Get<AdditionalErrorInfo>().attestationResult ==
-              Credentials::AttestationVerificationResult::kDacVendorIdMismatch)))
+        if (report.stageCompleted == CommissioningStage::kAttestationVerification)
         {
-            ChipLogError(Controller,
-                         "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
-                         "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
+            if (report.Is<AdditionalErrorInfo>())
+            {
+                completionStatus.attestationResult = MakeOptional(report.Get<AdditionalErrorInfo>().attestationResult);
+                if ((report.Get<AdditionalErrorInfo>().attestationResult ==
+                     Credentials::AttestationVerificationResult::kDacProductIdMismatch) ||
+                    (report.Get<AdditionalErrorInfo>().attestationResult ==
+                     Credentials::AttestationVerificationResult::kDacVendorIdMismatch))
+                {
+                    ChipLogError(Controller,
+                                 "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
+                                 "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
+                }
+            }
         }
     }
     else
@@ -383,7 +392,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             ReleaseDAC();
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = nullptr;
-            mParams                  = CommissioningParameters();
             mDeviceCommissioningInfo = ReadCommissioningInfo();
             return CHIP_NO_ERROR;
         default:
@@ -410,7 +418,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mParams.SetCompletionStatus(err);
+    mParams.SetCompletionStatus(completionStatus);
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage), GetCommandTimeout(nextStage));
     return CHIP_NO_ERROR;
 }

@@ -1330,6 +1330,25 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
     commissioner->CommissioningStageComplete(error);
 }
 
+void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus)
+{
+    if (mPairingDelegate == nullptr)
+    {
+        return;
+    }
+    mPairingDelegate->OnCommissioningComplete(nodeId, completionStatus.err);
+    PeerId peerId(GetCompressedFabricId(), nodeId);
+    if (completionStatus.err == CHIP_NO_ERROR)
+    {
+        mPairingDelegate->OnCommissioningSuccess(peerId);
+    }
+    else
+    {
+        mPairingDelegate->OnCommissioningFailure(peerId, completionStatus.err, completionStatus.failedStage.ValueOr(kError),
+                                                 completionStatus.attestationResult);
+    }
+}
+
 void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
@@ -1337,6 +1356,10 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     NodeId nodeId            = mDeviceBeingCommissioned->GetDeviceId();
     mDeviceBeingCommissioned = nullptr;
 
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnCommissioningStatusUpdate(PeerId(GetCompressedFabricId(), nodeId), mCommissioningStage, err);
+    }
     if (mCommissioningDelegate == nullptr)
     {
         return;
@@ -1347,10 +1370,11 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     {
         // Commissioning delegate will only return error if it failed to perform the appropriate commissioning step.
         // In this case, we should call back the commissioning complete and call session error
-        if (mPairingDelegate != nullptr && mDeviceBeingCommissioned != nullptr)
-        {
-            mPairingDelegate->OnCommissioningComplete(nodeId, status);
-        }
+        CompletionStatus completionStatus;
+        completionStatus.err         = status;
+        completionStatus.failedStage = MakeOptional(report.stageCompleted);
+        SendCommissioningCompleteCallbacks(nodeId, completionStatus);
+        mCommissioningStage = CommissioningStage::kSecurePairing;
     }
 }
 
@@ -1620,7 +1644,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                   Optional<System::Clock::Timeout> timeout)
 {
     ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'", StageToString(step),
-                    params.GetCompletionStatus().AsString());
+                    params.GetCompletionStatus().err.AsString());
 
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.
@@ -1945,10 +1969,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kCleanup:
-        if (mPairingDelegate != nullptr)
-        {
-            mPairingDelegate->OnCommissioningComplete(proxy->GetDeviceId(), params.GetCompletionStatus());
-        }
+        SendCommissioningCompleteCallbacks(proxy->GetDeviceId(), params.GetCompletionStatus());
         CommissioningStageComplete(CHIP_NO_ERROR);
         mCommissioningStage = CommissioningStage::kSecurePairing;
         break;

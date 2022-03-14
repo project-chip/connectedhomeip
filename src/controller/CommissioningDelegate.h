@@ -66,6 +66,14 @@ struct NOCChainGenerationParameters
     ByteSpan signature;
 };
 
+struct CompletionStatus
+{
+    CompletionStatus() : err(CHIP_NO_ERROR), failedStage(NullOptional), attestationResult(NullOptional) {}
+    CHIP_ERROR err;
+    Optional<CommissioningStage> failedStage;
+    Optional<Credentials::AttestationVerificationResult> attestationResult;
+};
+
 constexpr uint16_t kDefaultFailsafeTimeout = 60;
 class CommissioningParameters
 {
@@ -198,7 +206,7 @@ public:
 
     // Status to send when calling CommissioningComplete on the PairingDelegate during the kCleanup step. The AutoCommissioner uses
     // this to pass through any error messages received during commissioning.
-    CHIP_ERROR GetCompletionStatus() { return completionStatus; }
+    CompletionStatus GetCompletionStatus() { return completionStatus; }
 
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
@@ -312,7 +320,7 @@ public:
         mLocationCapability = MakeOptional(capability);
         return *this;
     }
-    void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
+    void SetCompletionStatus(CompletionStatus status) { completionStatus = status; }
 
 private:
     // Items that can be set by the commissioner
@@ -337,7 +345,7 @@ private:
     Optional<uint16_t> mRemoteProductId;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDefaultRegulatoryLocation;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mLocationCapability;
-    CHIP_ERROR completionStatus = CHIP_NO_ERROR;
+    CompletionStatus completionStatus;
 };
 
 struct RequestedCertificate
