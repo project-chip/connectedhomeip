@@ -1219,8 +1219,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     request.caseAdminNode = adminSubject;
     request.adminVendorId = mVendorId;
 
-    ReturnErrorOnFailure(SendCommand<OperationalCredentialsCluster>(mDeviceBeingCommissioned, request,
-                                                                    OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
+    ReturnErrorOnFailure(
+        SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse, OnAddNOCFailureResponse));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
