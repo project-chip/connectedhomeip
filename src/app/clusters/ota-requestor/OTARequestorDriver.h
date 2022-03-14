@@ -62,6 +62,14 @@ enum class UpdateNotFoundReason
     ConnectionFailed,
 };
 
+// The reasons for why the OTA Requestor has entered idle state
+enum class IdleStateReason
+{
+    kUnknown,
+    kIdle,
+    kInvalidSession,
+};
+
 // Interface class to abstract the OTA-related business logic. Each application
 // must implement this interface. All calls must be non-blocking unless stated otherwise
 class OTARequestorDriver
@@ -80,8 +88,8 @@ public:
     /// Called when an error occurs at any OTA requestor operation
     virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
 
-    // Called when the OTA Requestor enters the kIdle update state
-    virtual void HandleIdleState() = 0;
+    // Called when the OTA Requestor has entered the Idle state for which the driver may need to take various actions
+    virtual void HandleIdleState(IdleStateReason reason) = 0;
 
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;
