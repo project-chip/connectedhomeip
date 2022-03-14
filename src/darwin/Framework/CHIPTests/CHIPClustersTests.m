@@ -13144,7 +13144,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 
 - (void)testSendClusterTest_TC_I_2_3_000000_WaitForCommissionee
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"1.Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForCommissionee(expectation, queue, 305414945);
@@ -13214,7 +13214,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 }
 - (void)testSendClusterTest_TC_I_2_3_000004_UserPrompt
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Manually check DUT executes a breathe effect"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"check DUT executes a breathe effect"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     UserPrompt(expectation, queue, @"DUT executes a breathe effect");
@@ -13249,7 +13249,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 }
 - (void)testSendClusterTest_TC_I_2_3_000006_UserPrompt
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Manually check DUT executes an okay effect"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"check DUT executes an okay effect"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     UserPrompt(expectation, queue, @"DUT executes an okay effect");
@@ -13284,7 +13284,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 }
 - (void)testSendClusterTest_TC_I_2_3_000008_UserPrompt
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Manually check DUT executes a channel change effect"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"check DUT executes a channel change effect"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     UserPrompt(expectation, queue, @"DUT executes a channel change effect");
@@ -13319,7 +13319,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 }
 - (void)testSendClusterTest_TC_I_2_3_000010_UserPrompt
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Manually check DUT executes a breathe effect"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"check DUT executes a breathe effect"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     UserPrompt(expectation, queue, @"DUT executes a breathe effect");
@@ -13425,8 +13425,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 }
 - (void)testSendClusterTest_TC_I_2_3_000016_UserPrompt
 {
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Manually check DUT stops the breathe effect as soon as possible."];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check DUT stops the breathe effect as soon as possible."];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     UserPrompt(expectation, queue, @"DUT stops the breathe effect as soon as possible");
@@ -13435,8 +13434,8 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 - (void)testSendClusterTest_TC_I_2_3_000017_TriggerEffect
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"9.TH sends TriggerEffect command to DUT, with the effect identifier field set to 0x00 "
-                                         @"(blink) and the effect variant field set to 0x42 (unknown)."];
+        [self expectationWithDescription:@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 "
+                                         @"blink and the effect variant field set to 0x42 unknown"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -13448,8 +13447,8 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     params.effectVariant = [NSNumber numberWithUnsignedChar:66];
     [cluster triggerEffectWithParams:params
                    completionHandler:^(NSError * _Nullable err) {
-                       NSLog(@"9.TH sends TriggerEffect command to DUT, with the effect identifier field set to 0x00 (blink) and "
-                             @"the effect variant field set to 0x42 (unknown). Error: %@",
+                       NSLog(@"TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink and the "
+                             @"effect variant field set to 0x42 unknown Error: %@",
                            err);
 
                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -13461,7 +13460,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 }
 - (void)testSendClusterTest_TC_I_2_3_000018_UserPrompt
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Manually check DUT executes a blink effect."];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check DUT executes a blink effect."];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     UserPrompt(expectation, queue, @"DUT executes a blink effect");
@@ -13497,7 +13496,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 - (void)testSendClusterTest_TC_I_2_3_000020_UserPrompt
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Manually check DUT stops any effect that may be still running as soon as possible."];
+        [self expectationWithDescription:@"Check DUT stops any effect that may be still running as soon as possible"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     UserPrompt(expectation, queue, @"DUT stops any effect that may be still running as soon as possible");
@@ -17413,7 +17412,7 @@ NSNumber * _Nonnull CurrentLevelValue;
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
-    params.commissioningTimeout = [NSNumber numberWithUnsignedShort:1U];
+    params.commissioningTimeout = [NSNumber numberWithUnsignedShort:120U];
     [cluster openBasicCommissioningWindowWithParams:params
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"TH_CR1 opens a commissioning window on DUT_CE Error: %@", err);
