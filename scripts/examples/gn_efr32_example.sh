@@ -154,7 +154,7 @@ else
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
 
     # Generate bootloader file
-    BUILD_DIR_TRIMMED="${BUILD_DIR:2}" 
+    BUILD_DIR_TRIMMED="${BUILD_DIR:2}"
     S37_PATH=$(find "$BUILD_DIR_TRIMMED" -type f -name "*.s37")
     TARGET_PATH=${S37_PATH%????}
     OTA_PATH="${TARGET_PATH}".ota
