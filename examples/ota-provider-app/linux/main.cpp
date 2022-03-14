@@ -50,7 +50,8 @@ constexpr uint16_t kOptionIgnoreQueryImage     = 'x';
 constexpr uint16_t kOptionIgnoreApplyUpdate    = 'y';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionUpdateAction         = 'a';
-constexpr uint16_t kOptionDelayedActionTimeSec = 't';
+constexpr uint16_t kOptionDelayedQueryActionTimeSec = 't';
+constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
 constexpr uint16_t kOptionSoftwareVersion      = 's';
 constexpr uint16_t kOptionSoftwareVersionStr   = 'S';
 constexpr uint16_t kOptionUserConsentNeeded    = 'c';
@@ -61,7 +62,8 @@ chip::ota::DefaultUserConsentProvider gUserConsentProvider;
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUnknown;
 static OTAApplyUpdateAction gOptionUpdateAction                       = OTAApplyUpdateAction::kProceed;
-static uint32_t gDelayedActionTimeSec                                 = 0;
+static uint32_t gDelayedQueryActionTimeSec                            = 0;
+static uint32_t gDelayedApplyActionTimeSec                            = 0;
 static const char * gOtaFilepath                                      = nullptr;
 static const char * gOtaImageListFilepath                             = nullptr;
 static chip::ota::UserConsentState gUserConsentState                  = chip::ota::UserConsentState::kUnknown;
@@ -220,8 +222,11 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             retval = false;
         }
         break;
-    case kOptionDelayedActionTimeSec:
-        gDelayedActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+    case kOptionDelayedQueryActionTimeSec:
+        gDelayedQueryActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        break;
+    case kOptionDelayedApplyActionTimeSec:
+        gDelayedApplyActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUserConsentState:
         if (aValue == NULL)
@@ -285,7 +290,8 @@ OptionDef cmdLineOptionsDef[] = {
     { "ignoreQueryImage", chip::ArgParser::kArgumentRequired, kOptionIgnoreQueryImage },
     { "ignoreApplyUpdate", chip::ArgParser::kArgumentRequired, kOptionIgnoreApplyUpdate },
     { "applyUpdateAction", chip::ArgParser::kArgumentRequired, kOptionUpdateAction },
-    { "delayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
+    { "delayedQueryActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedQueryActionTimeSec },
+    { "delayedApplyActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedApplyActionTimeSec },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
     { "softwareVersionStr", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersionStr },
@@ -308,10 +314,12 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -a/--applyUpdateAction <proceed | awaitNextAction | discontinue>\n"
                              "        Value for the Action field in the first ApplyUpdateResponse.\n"
                              "        For all subsequent responses, the value of proceed will be used.\n"
-                             "  -t/--delayedActionTimeSec <time>\n"
-                             "        Value in seconds for the DelayedActionTime field in the QueryImageResponse\n"
-                             "        and ApplyUpdateResponse. Value will revert back to 0 seconds on subsequent\n"
-                             "        QueryImageResponses and ApplyUpdateResponses."
+                             "  -t/--delayedQueryActionTimeSec <time>\n"
+                             "        Value in seconds for the DelayedActionTime field in the QueryImageResponse.\n"
+                             "        Value will revert back to 0 seconds on subsequent QueryImageResponses.\n"
+                             "  -p/--delayedApplyActionTimeSec <time>\n"
+                             "        Value in seconds for the DelayedActionTime field in the ApplyUpdateResponse.\n"
+                             "        Value will revert back to 0 seconds on subsequent ApplyUpdateResponses.\n"
                              "  -u/--userConsentState <granted | denied | deferred>\n"
                              "        The user consent state for the first QueryImageResponse. For all subsequent\n"
                              "        responses, the value of granted state will be used.\n"
@@ -357,7 +365,8 @@ void ApplicationInit()
     gOtaProvider.SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
     gOtaProvider.SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
     gOtaProvider.SetApplyUpdateAction(gOptionUpdateAction);
-    gOtaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
+    gOtaProvider.SetDelayedQueryActionTimeSec(gDelayedQueryActionTimeSec);
+    gOtaProvider.SetDelayedApplyActionTimeSec(gDelayedApplyActionTimeSec);
     if (gSoftwareVersion.HasValue())
     {
         gOtaProvider.SetSoftwareVersion(gSoftwareVersion.Value());
