@@ -135,6 +135,7 @@ public:
 
     CHIP_ERROR Init(System::Layer * systemLayer) override;
     CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) override;
+    void Shutdown() override;
 
     // Dnssd::OperationalResolveDelegate
 

@@ -20,6 +20,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <core/CHIPBuildConfig.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -77,6 +78,12 @@ CHIP_ERROR CHIPCommand::Run()
     CHIP_ERROR err = StartWaiting(GetWaitDuration());
 
     Shutdown();
+
+    // Commissioners may have active lookups in case of timeouts shut down all active
+    // resolves before destroying commissioners.
+    //
+    // safe to call since chip thrad and event queue are stopped, preventing any thread races.
+    chip::AddressResolve::Resolver::Instance().Shutdown();
 
     //
     // We can call DeviceController::Shutdown() safely without grabbing the stack lock

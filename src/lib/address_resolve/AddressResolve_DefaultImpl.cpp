@@ -183,6 +183,8 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 
 CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle)
 {
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     handle.ResetForLookup(mTimeSource.GetMonotonicTimestamp(), request);
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(request.GetPeerId(), Inet::IPAddressType::kAny));
     mActiveLookups.PushBack(&handle);
@@ -195,6 +197,30 @@ CHIP_ERROR Resolver::Init(System::Layer * systemLayer)
     mSystemLayer = systemLayer;
     Dnssd::Resolver::Instance().SetOperationalDelegate(this);
     return CHIP_NO_ERROR;
+}
+
+void Resolver::Shutdown()
+{
+    while (mActiveLookups.begin() != mActiveLookups.end())
+    {
+        auto current = mActiveLookups.begin();
+
+        const PeerId peerId     = current->GetRequest().GetPeerId();
+        NodeListener * listener = current->GetListener();
+
+        mActiveLookups.Erase(current);
+
+        // Failure callback only called after iterator was cleared:
+        // This allows failure handlers to deallocate structures that may
+        // contain the active lookup data as a member (intrusive lists members)
+        listener->OnNodeAddressResolutionFailed(peerId, CHIP_ERROR_SHUT_DOWN);
+    }
+
+    // Re-arm of timer is expected to cancel any active timer as the
+    // internal list of active lookups is empty at this point.
+    ReArmTimer();
+
+    mSystemLayer = nullptr;
 }
 
 void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData)

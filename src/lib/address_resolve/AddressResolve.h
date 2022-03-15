@@ -193,6 +193,12 @@ public:
     ///     in progress)
     virtual CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) = 0;
 
+    /// Shut down any active resolves
+    ///
+    /// Will immediately fail any scheduled resolve calls and will refuse to register
+    /// any new lookups until re-initialized.
+    virtual void Shutdown() = 0;
+
     /// Expected to be provided by the implementation.
     static Resolver & Instance();
 };
