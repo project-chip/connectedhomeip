@@ -56,7 +56,7 @@ declare_args() {
   use_rs911x_sockets = false
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
-  
+
   # Enables LCD Qr Code on supported devices
   show_qr_code = true
 }
