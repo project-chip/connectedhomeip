@@ -244,7 +244,6 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
@@ -267,9 +266,9 @@ CHIPDevice * GetConnectedDevice(void)
 
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = temp_3;
         }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
@@ -299,9 +298,9 @@ CHIPDevice * GetConnectedDevice(void)
 
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
         }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[2] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).privilege = [NSNumber numberWithUnsignedChar:3];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).authMode = [NSNumber numberWithUnsignedChar:3];
         {
@@ -331,6 +330,7 @@ CHIPDevice * GetConnectedDevice(void)
 
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).targets = temp_3;
         }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         aclArgument = temp_0;
     }
@@ -366,8 +366,6 @@ CHIPDevice * GetConnectedDevice(void)
                      {
                          id actualValue = value;
                          XCTAssertEqual([actualValue count], 3);
-                         XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
                          XCTAssertEqual(
@@ -437,7 +435,7 @@ CHIPDevice * GetConnectedDevice(void)
                                  .deviceType
                              == nil);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex unsignedCharValue], 1);
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).privilege unsignedCharValue], 1);
                          XCTAssertEqual(
@@ -520,7 +518,7 @@ CHIPDevice * GetConnectedDevice(void)
                                  .deviceType
                              == nil);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).fabricIndex unsignedCharValue], 1);
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex unsignedCharValue], 1);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).privilege unsignedCharValue], 3);
                          XCTAssertEqual(
@@ -602,6 +600,8 @@ CHIPDevice * GetConnectedDevice(void)
                                      .targets[2])
                                  .deviceType
                              == nil);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[2]).fabricIndex unsignedCharValue], 1);
                      }
 
                      [expectation fulfill];
@@ -622,14 +622,13 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
@@ -640,6 +639,7 @@ CHIPDevice * GetConnectedDevice(void)
             NSMutableArray * temp_3 = [[NSMutableArray alloc] init];
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
         }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         aclArgument = temp_0;
     }
@@ -676,21 +676,21 @@ CHIPDevice * GetConnectedDevice(void)
                          id actualValue = value;
                          XCTAssertEqual([actualValue count], 2);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-                         XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex unsignedCharValue], 1);
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).privilege unsignedCharValue], 1);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).authMode unsignedCharValue], 2);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).subjects == nil);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).targets == nil);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[1]).fabricIndex unsignedCharValue], 1);
                      }
 
                      [expectation fulfill];
@@ -711,18 +711,18 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:3];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         aclArgument = temp_0;
     }
@@ -758,13 +758,13 @@ CHIPDevice * GetConnectedDevice(void)
                          id actualValue = value;
                          XCTAssertEqual([actualValue count], 1);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-                         XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                      }
 
                      [expectation fulfill];
@@ -785,18 +785,18 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:1];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         aclArgument = temp_0;
     }
@@ -832,13 +832,13 @@ CHIPDevice * GetConnectedDevice(void)
                          id actualValue = value;
                          XCTAssertEqual([actualValue count], 1);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-                         XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                      }
 
                      [expectation fulfill];
@@ -859,14 +859,13 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
@@ -875,6 +874,7 @@ CHIPDevice * GetConnectedDevice(void)
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
         }
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         aclArgument = temp_0;
     }
@@ -910,13 +910,13 @@ CHIPDevice * GetConnectedDevice(void)
                          id actualValue = value;
                          XCTAssertEqual([actualValue count], 1);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-                         XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                      }
 
                      [expectation fulfill];
@@ -937,14 +937,13 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
@@ -957,6 +956,7 @@ CHIPDevice * GetConnectedDevice(void)
 
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
         }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         aclArgument = temp_0;
     }
@@ -992,13 +992,13 @@ CHIPDevice * GetConnectedDevice(void)
                          id actualValue = value;
                          XCTAssertEqual([actualValue count], 1);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-                         XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                      }
 
                      [expectation fulfill];
@@ -1019,14 +1019,13 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
         {
@@ -1054,6 +1053,7 @@ CHIPDevice * GetConnectedDevice(void)
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = temp_3;
         }
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         aclArgument = temp_0;
     }
@@ -1089,13 +1089,13 @@ CHIPDevice * GetConnectedDevice(void)
                          id actualValue = value;
                          XCTAssertEqual([actualValue count], 1);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-                         XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                      }
 
                      [expectation fulfill];
@@ -1116,14 +1116,13 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[1] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).privilege = [NSNumber numberWithUnsignedChar:1];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).subjects = nil;
@@ -1231,6 +1230,7 @@ CHIPDevice * GetConnectedDevice(void)
 
             ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).targets = temp_3;
         }
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         aclArgument = temp_0;
     }
@@ -1266,13 +1266,13 @@ CHIPDevice * GetConnectedDevice(void)
                          id actualValue = value;
                          XCTAssertEqual([actualValue count], 1);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-                         XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                      }
 
                      [expectation fulfill];
@@ -1293,11 +1293,11 @@ CHIPDevice * GetConnectedDevice(void)
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPAccessControlClusterAccessControlEntry alloc] init];
-        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).privilege = [NSNumber numberWithUnsignedChar:5];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).authMode = [NSNumber numberWithUnsignedChar:2];
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).subjects = nil;
         ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).targets = nil;
+        ((CHIPAccessControlClusterAccessControlEntry *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         aclArgument = temp_0;
     }
@@ -1334,13 +1334,13 @@ CHIPDevice * GetConnectedDevice(void)
                          id actualValue = value;
                          XCTAssertEqual([actualValue count], 1);
                          XCTAssertEqual(
-                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-                         XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).privilege unsignedCharValue], 5);
                          XCTAssertEqual(
                              [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).authMode unsignedCharValue], 2);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).subjects == nil);
                          XCTAssertTrue(((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).targets == nil);
+                         XCTAssertEqual(
+                             [((CHIPAccessControlClusterAccessControlEntry *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                      }
 
                      [expectation fulfill];
@@ -48178,14 +48178,14 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
-        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:257U];
         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
 
         temp_0[1] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
-        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupId = [NSNumber numberWithUnsignedShort:258U];
         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
 
         groupKeyMapArgument = temp_0;
     }
@@ -48221,16 +48221,13 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
                                       id actualValue = value;
                                       XCTAssertEqual([actualValue count], 2);
                                       XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
-                                                             actualValue[0]).fabricIndex unsignedCharValue],
-                                          1);
-                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
                                                              actualValue[0]).groupId unsignedShortValue],
                                           257U);
                                       XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
                                                              actualValue[0]).groupKeySetID unsignedShortValue],
                                           417U);
                                       XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
-                                                             actualValue[1]).fabricIndex unsignedCharValue],
+                                                             actualValue[0]).fabricIndex unsignedCharValue],
                                           1);
                                       XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
                                                              actualValue[1]).groupId unsignedShortValue],
@@ -48238,6 +48235,9 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
                                       XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
                                                              actualValue[1]).groupKeySetID unsignedShortValue],
                                           418U);
+                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *)
+                                                             actualValue[1]).fabricIndex unsignedCharValue],
+                                          1);
                                   }
 
                                   [expectation fulfill];
@@ -48266,21 +48266,21 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
                                      id actualValue = value;
                                      XCTAssertEqual([actualValue count], 2);
                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *)
-                                                            actualValue[0]).fabricIndex unsignedCharValue],
-                                         1);
-                                     XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *)
                                                             actualValue[0]).groupId unsignedShortValue],
                                          257U);
                                      XCTAssertTrue([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupName
                                          isEqualToString:@"Group #1"]);
                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *)
-                                                            actualValue[1]).fabricIndex unsignedCharValue],
+                                                            actualValue[0]).fabricIndex unsignedCharValue],
                                          1);
                                      XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *)
                                                             actualValue[1]).groupId unsignedShortValue],
                                          258U);
                                      XCTAssertTrue([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupName
                                          isEqualToString:@"Group #2"]);
+                                     XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *)
+                                                            actualValue[1]).fabricIndex unsignedCharValue],
+                                         1);
                                  }
 
                                  [expectation fulfill];
@@ -48648,11 +48648,11 @@ NSNumber * _Nonnull ourFabricIndex;
                               {
                                   id actualValue = value;
                                   XCTAssertEqual([actualValue count], 1);
+                                  XCTAssertTrue([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label
+                                      isEqualToString:@""]);
                                   XCTAssertEqualObjects(
                                       ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex,
                                       ourFabricIndex);
-                                  XCTAssertTrue([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label
-                                      isEqualToString:@""]);
                               }
 
                               [expectation fulfill];
@@ -48716,11 +48716,11 @@ NSNumber * _Nonnull ourFabricIndex;
                               {
                                   id actualValue = value;
                                   XCTAssertEqual([actualValue count], 1);
+                                  XCTAssertTrue([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label
+                                      isEqualToString:@"Batcave"]);
                                   XCTAssertEqualObjects(
                                       ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex,
                                       ourFabricIndex);
-                                  XCTAssertTrue([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label
-                                      isEqualToString:@"Batcave"]);
                               }
 
                               [expectation fulfill];
@@ -49010,11 +49010,11 @@ NSNumber * _Nonnull ourFabricIndex;
         ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[1] = [[CHIPBindingClusterTargetStruct alloc] init];
-        ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPBindingClusterTargetStruct *) temp_0[1]).node = [NSNumber numberWithUnsignedLongLong:1ULL];
         ((CHIPBindingClusterTargetStruct *) temp_0[1]).group = [NSNumber numberWithUnsignedShort:1U];
         ((CHIPBindingClusterTargetStruct *) temp_0[1]).endpoint = [NSNumber numberWithUnsignedShort:1U];
         ((CHIPBindingClusterTargetStruct *) temp_0[1]).cluster = [NSNumber numberWithUnsignedInt:6UL];
+        ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         bindingArgument = temp_0;
     }
@@ -49041,19 +49041,19 @@ NSNumber * _Nonnull ourFabricIndex;
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPBindingClusterTargetStruct alloc] init];
-        ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPBindingClusterTargetStruct *) temp_0[0]).group = [NSNumber numberWithUnsignedShort:1U];
+        ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[1] = [[CHIPBindingClusterTargetStruct alloc] init];
-        ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPBindingClusterTargetStruct *) temp_0[1]).node = [NSNumber numberWithUnsignedLongLong:1ULL];
         ((CHIPBindingClusterTargetStruct *) temp_0[1]).endpoint = [NSNumber numberWithUnsignedShort:1U];
         ((CHIPBindingClusterTargetStruct *) temp_0[1]).cluster = [NSNumber numberWithUnsignedInt:6UL];
+        ((CHIPBindingClusterTargetStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         temp_0[2] = [[CHIPBindingClusterTargetStruct alloc] init];
-        ((CHIPBindingClusterTargetStruct *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPBindingClusterTargetStruct *) temp_0[2]).node = [NSNumber numberWithUnsignedLongLong:2ULL];
         ((CHIPBindingClusterTargetStruct *) temp_0[2]).endpoint = [NSNumber numberWithUnsignedShort:1U];
+        ((CHIPBindingClusterTargetStruct *) temp_0[2]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         bindingArgument = temp_0;
     }
@@ -49089,15 +49089,15 @@ NSNumber * _Nonnull ourFabricIndex;
                          {
                              id actualValue = value;
                              XCTAssertEqual([actualValue count], 3);
-                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).group unsignedShortValue], 1U);
-                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).node unsignedLongLongValue], 1ULL);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).endpoint unsignedShortValue], 1U);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).cluster unsignedIntValue], 6UL);
-                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex unsignedCharValue], 1);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).node unsignedLongLongValue], 2ULL);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).endpoint unsignedShortValue], 1U);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex unsignedCharValue], 1);
                          }
 
                          [expectation fulfill];
@@ -49118,9 +49118,9 @@ NSNumber * _Nonnull ourFabricIndex;
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPBindingClusterTargetStruct alloc] init];
-        ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
         ((CHIPBindingClusterTargetStruct *) temp_0[0]).node = [NSNumber numberWithUnsignedLongLong:3ULL];
         ((CHIPBindingClusterTargetStruct *) temp_0[0]).endpoint = [NSNumber numberWithUnsignedShort:1U];
+        ((CHIPBindingClusterTargetStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:0];
 
         bindingArgument = temp_0;
     }
@@ -49156,9 +49156,9 @@ NSNumber * _Nonnull ourFabricIndex;
                          {
                              id actualValue = value;
                              XCTAssertEqual([actualValue count], 1);
-                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).node unsignedLongLongValue], 3ULL);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).endpoint unsignedShortValue], 1U);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                          }
 
                          [expectation fulfill];
@@ -49187,15 +49187,15 @@ NSNumber * _Nonnull ourFabricIndex;
                          {
                              id actualValue = value;
                              XCTAssertEqual([actualValue count], 3);
-                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).group unsignedShortValue], 1U);
-                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).node unsignedLongLongValue], 1ULL);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).endpoint unsignedShortValue], 1U);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).cluster unsignedIntValue], 6UL);
-                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex unsignedCharValue], 1);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).node unsignedLongLongValue], 2ULL);
                              XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).endpoint unsignedShortValue], 1U);
+                             XCTAssertEqual([((CHIPBindingClusterTargetStruct *) actualValue[2]).fabricIndex unsignedCharValue], 1);
                          }
 
                          [expectation fulfill];

@@ -6484,21 +6484,21 @@ namespace Structs {
 namespace TargetStruct {
 enum class Fields
 {
-    kFabricIndex = 0,
     kNode        = 1,
     kGroup       = 2,
     kEndpoint    = 3,
     kCluster     = 4,
+    kFabricIndex = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     Optional<chip::NodeId> node;
     Optional<chip::GroupId> group;
     Optional<chip::EndpointId> endpoint;
     Optional<chip::ClusterId> cluster;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6644,21 +6644,21 @@ using DecodableType = Type;
 namespace AccessControlEntry {
 enum class Fields
 {
-    kFabricIndex = 0,
     kPrivilege   = 1,
     kAuthMode    = 2,
     kSubjects    = 3,
     kTargets     = 4,
+    kFabricIndex = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    Privilege privilege           = static_cast<Privilege>(0);
-    AuthMode authMode             = static_cast<AuthMode>(0);
+    Privilege privilege = static_cast<Privilege>(0);
+    AuthMode authMode   = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
     DataModel::Nullable<DataModel::List<const Structs::Target::Type>> targets;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -6676,11 +6676,11 @@ private:
 struct DecodableType
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    Privilege privilege           = static_cast<Privilege>(0);
-    AuthMode authMode             = static_cast<AuthMode>(0);
+    Privilege privilege = static_cast<Privilege>(0);
+    AuthMode authMode   = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
     DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6695,15 +6695,15 @@ public:
 namespace ExtensionEntry {
 enum class Fields
 {
-    kFabricIndex = 0,
     kData        = 1,
+    kFabricIndex = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan data;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -15050,23 +15050,23 @@ namespace Structs {
 namespace FabricDescriptor {
 enum class Fields
 {
-    kFabricIndex   = 0,
     kRootPublicKey = 1,
     kVendorId      = 2,
     kFabricId      = 3,
     kNodeId        = 4,
     kLabel         = 5,
+    kFabricIndex   = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan rootPublicKey;
     uint16_t vendorId       = static_cast<uint16_t>(0);
     chip::FabricId fabricId = static_cast<chip::FabricId>(0);
     chip::NodeId nodeId     = static_cast<chip::NodeId>(0);
     chip::CharSpan label;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -15089,17 +15089,17 @@ using DecodableType = Type;
 namespace NOCStruct {
 enum class Fields
 {
-    kFabricIndex = 0,
     kNoc         = 1,
     kIcac        = 2,
+    kFabricIndex = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan noc;
     DataModel::Nullable<chip::ByteSpan> icac;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -15804,19 +15804,19 @@ namespace Structs {
 namespace GroupInfoMapStruct {
 enum class Fields
 {
-    kFabricIndex = 0,
     kGroupId     = 1,
     kEndpoints   = 2,
     kGroupName   = 3,
+    kFabricIndex = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    chip::GroupId groupId         = static_cast<chip::GroupId>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     DataModel::List<const chip::EndpointId> endpoints;
     Optional<chip::CharSpan> groupName;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -15834,10 +15834,10 @@ private:
 struct DecodableType
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    chip::GroupId groupId         = static_cast<chip::GroupId>(0);
+    chip::GroupId groupId = static_cast<chip::GroupId>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
     Optional<chip::CharSpan> groupName;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -15852,17 +15852,17 @@ public:
 namespace GroupKeyMapStruct {
 enum class Fields
 {
-    kFabricIndex   = 0,
     kGroupId       = 1,
     kGroupKeySetID = 2,
+    kFabricIndex   = 254,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::GroupId groupId         = static_cast<chip::GroupId>(0);
     uint16_t groupKeySetID        = static_cast<uint16_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
