@@ -40,7 +40,8 @@ enum class PairingNetworkType
 class PairingCommandBridge : public CHIPCommandBridge
 {
 public:
-    PairingCommandBridge(const char * commandName, PairingMode mode, PairingNetworkType networkType) : CHIPCommandBridge(commandName), mPairingMode(mode),  mNetworkType(networkType)
+    PairingCommandBridge(const char * commandName, PairingMode mode, PairingNetworkType networkType) :
+        CHIPCommandBridge(commandName), mPairingMode(mode), mNetworkType(networkType)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         switch (networkType)
@@ -99,5 +100,4 @@ private:
     uint32_t mSetupPINCode;
     char * mOnboardingPayload;
     char * ipAddress;
-
 };

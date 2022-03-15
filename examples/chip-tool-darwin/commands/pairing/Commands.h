@@ -23,41 +23,31 @@
 class PairQRCode : public PairingCommandBridge
 {
 public:
-    PairQRCode() :
-        PairingCommandBridge("qrcode", PairingMode::QRCode, PairingNetworkType::None)
-        {}
+    PairQRCode() : PairingCommandBridge("qrcode", PairingMode::QRCode, PairingNetworkType::None) {}
 };
 
 class PairManualCode : public PairingCommandBridge
 {
 public:
-    PairManualCode() :
-        PairingCommandBridge("manualcode", PairingMode::ManualCode, PairingNetworkType::None)
-        {}
+    PairManualCode() : PairingCommandBridge("manualcode", PairingMode::ManualCode, PairingNetworkType::None) {}
 };
 
 class PairWithIPAddress : public PairingCommandBridge
 {
 public:
-    PairWithIPAddress() :
-        PairingCommandBridge("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet)
-        {}
+    PairWithIPAddress() : PairingCommandBridge("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet) {}
 };
 
 class PairBleWiFi : public PairingCommandBridge
 {
 public:
-    PairBleWiFi() :
-        PairingCommandBridge("ble-wifi", PairingMode::Ble, PairingNetworkType::WiFi)
-        {}
+    PairBleWiFi() : PairingCommandBridge("ble-wifi", PairingMode::Ble, PairingNetworkType::WiFi) {}
 };
 
 class PairBleThread : public PairingCommandBridge
 {
 public:
-    PairBleThread() :
-        PairingCommandBridge("ble-thread", PairingMode::Ble, PairingNetworkType::Thread)
-        {}
+    PairBleThread() : PairingCommandBridge("ble-thread", PairingMode::Ble, PairingNetworkType::Thread) {}
 };
 
 void registerCommandsPairing(Commands & commands)
@@ -65,11 +55,8 @@ void registerCommandsPairing(Commands & commands)
     const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<PairQRCode>(),
-        make_unique<PairManualCode>(),
-        make_unique<PairWithIPAddress>(),
-        make_unique<PairBleWiFi>(),
-        make_unique<PairBleThread>(),
+        make_unique<PairQRCode>(),  make_unique<PairManualCode>(), make_unique<PairWithIPAddress>(),
+        make_unique<PairBleWiFi>(), make_unique<PairBleThread>(),
     };
 
     commands.Register(clusterName, clusterCommands);

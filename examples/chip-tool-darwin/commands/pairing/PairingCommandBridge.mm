@@ -16,8 +16,8 @@
  *
  */
 
-#import <CHIP/CHIPError_Internal.h>
 #import <CHIP/CHIPCommissioningParameters.h>
+#import <CHIP/CHIPError_Internal.h>
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
 
@@ -79,11 +79,7 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
 void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
 {
     SetUpPairingDelegate();
-    [CurrentCommissioner() pairDevice:mNodeId
-                        discriminator:mDiscriminator
-                         setupPINCode:mSetupPINCode
-                                error:error];
-
+    [CurrentCommissioner() pairDevice:mNodeId discriminator:mDiscriminator setupPINCode:mSetupPINCode error:error];
 }
 
 void PairingCommandBridge::PairWithPayload(NSError * __autoreleasing * error)
