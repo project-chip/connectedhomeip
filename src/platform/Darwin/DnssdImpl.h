@@ -21,8 +21,8 @@
 #include <lib/dnssd/platform/Dnssd.h>
 #include <lib/support/CHIPMemString.h>
 
-#include <string>
 #include <string.h>
+#include <string>
 #include <vector>
 
 namespace chip {
