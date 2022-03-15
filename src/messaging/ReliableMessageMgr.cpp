@@ -207,8 +207,8 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
         retryCount = 4; // Enforce reasonable maximum after 5 tries
 
     // Generate fixed point equivalent of `backoff = i⋅1.6^retryCount`
-    unsigned backoffNum   = 1;
-    unsigned backoffDenom = 1;
+    uint32_t backoffNum   = 1;
+    uint32_t backoffDenom = 1;
     for (int i = 0; i < retryCount; i++)
     {
         backoffNum *= MRP_BACKOFF_BASE_NUMERATOR;
@@ -218,7 +218,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
 
     // Implement jitter scaler: `t *= (1.0+random(0,1)⋅MRP_BACKOFF_JITTER)`
     // where jitter is random multiplier from 1.000 to 1.250:
-    unsigned jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU16() % MRP_BACKOFF_JITTER_MAX;
+    uint32_t jitter = MRP_BACKOFF_JITTER_BASE + Crypto::GetRandU16() % MRP_BACKOFF_JITTER_MAX;
     backoff         = backoff * jitter / MRP_BACKOFF_JITTER_BASE;
 
     return backoff;
