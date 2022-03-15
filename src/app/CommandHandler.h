@@ -194,16 +194,17 @@ public:
     }
 
     /**
-     * API for adding a data response. Will encode Protocols::InteractionModel::Status::Failure status code when it failed to encode
-     * the command data.  The template parameter T is generally expected to be a ClusterName::Commands::CommandName::Type struct,
-     * but any object that can be encoded using the DataModel::Encode machinery and exposes the right command id will work.
+     * API for adding a response, i.e. I will try to encode a data response (response command), if it failed to encode the response
+     * data, it will encode Protocols::InteractionModel::Status::Failure status code instead. The template parameter T is generally
+     * expected to be a ClusterName::Commands::CommandName::Type struct, but any object that can be encoded using the
+     * DataModel::Encode machinery and exposes the right command id will work.
      *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
      * @param [in] aData the data for the response.
      */
     template <typename CommandData>
-    CHIP_ERROR AddResponseDataOrFailureStatus(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    CHIP_ERROR AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
         CHIP_ERROR err = AddResponseData(aRequestCommandPath, aData);
         if (err != CHIP_NO_ERROR)

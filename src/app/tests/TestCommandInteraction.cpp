@@ -546,7 +546,7 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
 
     auto path = MakeTestCommandPath();
 
-    err = commandHandler.AddResponseData(ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId), Fields());
+    err = commandHandler.AddResponse(ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId), Fields());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandHandler.Finalize(commandPacket);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -574,8 +574,7 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
 
     auto path = MakeTestCommandPath();
 
-    err = commandHandler.AddResponseDataOrFailureStatus(ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId),
-                                                        BadFields());
+    err = commandHandler.AddResponse(ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId), BadFields());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandHandler.Finalize(commandPacket);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

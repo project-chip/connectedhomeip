@@ -262,21 +262,21 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
 {
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
 {
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->RemoveNetwork(req.networkID));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
@@ -298,7 +298,7 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
 {
     Commands::NetworkConfigResponse::Type response;
     response.networkingStatus = ToClusterObjectEnum(mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex));
-    ctx.mCommandHandler.AddResponseData(ctx.mRequestPath, response);
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
 void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t interfaceStatus)
@@ -316,7 +316,7 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
     response.networkingStatus = ToClusterObjectEnum(commissioningError);
     response.debugText        = errorText;
     response.errorValue       = interfaceStatus;
-    commandHandle->AddResponseData(mPath, response);
+    commandHandle->AddResponse(mPath, response);
 
     mLastNetworkIDLen = mConnectingNetworkIDLen;
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);

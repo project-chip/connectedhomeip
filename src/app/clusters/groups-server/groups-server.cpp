@@ -148,7 +148,7 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
 
     response.groupId = commandData.groupId;
     response.status  = GroupAdd(fabricIndex, commandPath.mEndpointId, commandData.groupId, commandData.groupName);
-    err              = commandObj->AddResponseData(commandPath, response);
+    err              = commandObj->AddResponse(commandPath, response);
     if (CHIP_NO_ERROR != err)
     {
         ChipLogDetail(Zcl, "GroupsCluster: AddGroup failed: %s", err.AsString());
@@ -185,7 +185,7 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
 exit:
     response.groupId = groupId;
     response.status  = status;
-    err              = commandObj->AddResponseData(commandPath, response);
+    err              = commandObj->AddResponse(commandPath, response);
     if (CHIP_NO_ERROR != err)
     {
         ChipLogDetail(Zcl, "GroupsCluster: ViewGroup failed: %s", err.AsString());
@@ -289,7 +289,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
         iter = provider->IterateEndpoints(fabricIndex);
         VerifyOrExit(nullptr != iter, status = EMBER_ZCL_STATUS_FAILURE);
 
-        err = commandObj->AddResponseData(commandPath, GroupMembershipResponse(commandData, commandPath.mEndpointId, iter));
+        err = commandObj->AddResponse(commandPath, GroupMembershipResponse(commandData, commandPath.mEndpointId, iter));
         iter->Release();
         status = (CHIP_NO_ERROR == err) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     }
@@ -324,7 +324,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
     response.groupId = commandData.groupId;
     response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupId);
 
-    err = commandObj->AddResponseData(commandPath, response);
+    err = commandObj->AddResponse(commandPath, response);
     if (CHIP_NO_ERROR != err)
     {
         ChipLogDetail(Zcl, "GroupsCluster: RemoveGroup failed: %s", err.AsString());

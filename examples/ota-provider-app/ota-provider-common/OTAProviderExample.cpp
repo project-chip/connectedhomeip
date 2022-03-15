@@ -303,7 +303,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     // Reset delay back to 0 for subsequent uses
     mDelayedQueryActionTimeSec = 0;
 
-    VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrReturnError(commandObj->AddResponse(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -337,7 +337,7 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     // Reset back to success case for subsequent uses
     mUpdateAction = OTAApplyUpdateAction::kProceed;
 
-    VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrReturnError(commandObj->AddResponse(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }

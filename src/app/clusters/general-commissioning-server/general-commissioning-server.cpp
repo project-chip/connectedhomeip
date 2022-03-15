@@ -147,12 +147,12 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
                      Failure);
         response.errorCode = CommissioningError::kOk;
-        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+        CheckSuccess(commandObj->AddResponse(commandPath, response), Failure);
     }
     else
     {
         response.errorCode = CommissioningError::kBusyWithOtherAdmin;
-        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+        CheckSuccess(commandObj->AddResponse(commandPath, response), Failure);
     }
 
     return true;
@@ -175,7 +175,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
 
     Commands::CommissioningCompleteResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    CheckSuccess(commandObj->AddResponse(commandPath, response), Failure);
 
     return true;
 }
@@ -191,7 +191,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
     Commands::SetRegulatoryConfigResponse::Type response;
     response.errorCode = CommissioningError::kOk;
-    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    CheckSuccess(commandObj->AddResponse(commandPath, response), Failure);
 
     return true;
 }

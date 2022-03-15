@@ -482,7 +482,7 @@ CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, const ConcreteComma
         payload.debugText.Emplace(to_send);
     }
 
-    return commandObj->AddResponseData(path, payload);
+    return commandObj->AddResponse(path, payload);
 }
 
 OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
@@ -714,7 +714,7 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     }
 
     response.certificate = derBufSpan;
-    SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+    SuccessOrExit(err = commandObj->AddResponse(commandPath, response));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -773,7 +773,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 
         response.attestationElements = attestationElementsSpan;
         response.signature           = signatureSpan;
-        SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+        SuccessOrExit(err = commandObj->AddResponse(commandPath, response));
     }
 
 exit:
@@ -860,7 +860,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
         response.NOCSRElements        = nocsrElementsSpan;
         response.attestationSignature = signatureSpan;
-        SuccessOrExit(err = commandObj->AddResponseData(commandPath, response));
+        SuccessOrExit(err = commandObj->AddResponse(commandPath, response));
     }
 
 exit:

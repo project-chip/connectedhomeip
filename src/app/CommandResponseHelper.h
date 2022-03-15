@@ -36,7 +36,7 @@ public:
 
     CHIP_ERROR Success(const CommandData & aResponse)
     {
-        CHIP_ERROR err = mCommandHandler->AddResponseData(mCommandPath, aResponse);
+        CHIP_ERROR err = mCommandHandler->AddResponse(mCommandPath, aResponse);
         if (err == CHIP_NO_ERROR)
         {
             mSentResponse = true;

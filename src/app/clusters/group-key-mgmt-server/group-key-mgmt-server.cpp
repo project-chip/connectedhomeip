@@ -436,7 +436,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     }
     response.groupKeySet.epochKey2.SetNull();
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
+    CHIP_ERROR err = commandObj->AddResponse(commandPath, response);
     if (CHIP_NO_ERROR != err)
     {
         ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetRead failed: %s", ErrorStr(err));
@@ -528,7 +528,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
         return true;
     }
 
-    CHIP_ERROR err = commandObj->AddResponseData(commandPath, KeySetReadAllIndicesResponse(keysIt));
+    CHIP_ERROR err = commandObj->AddResponse(commandPath, KeySetReadAllIndicesResponse(keysIt));
     if (CHIP_NO_ERROR != err)
     {
         ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetReadAllIndices failed: %s", ErrorStr(err));

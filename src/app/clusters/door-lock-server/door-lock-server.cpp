@@ -2190,7 +2190,7 @@ CHIP_ERROR DoorLockServer::sendGetWeekDayScheduleResponse(chip::app::CommandHand
         response.endMinute   = Optional<uint8_t>(endMinute);
     }
 
-    return commandObj->AddResponseData(commandPath, response);
+    return commandObj->AddResponse(commandPath, response);
 }
 
 bool DoorLockServer::yearDayIndexValid(chip::EndpointId endpointId, uint8_t yearDayIndex)
@@ -2259,7 +2259,7 @@ CHIP_ERROR DoorLockServer::sendGetYearDayScheduleResponse(chip::app::CommandHand
         response.localEndTime   = Optional<uint32_t>(localEndTime);
     }
 
-    return commandObj->AddResponseData(commandPath, response);
+    return commandObj->AddResponse(commandPath, response);
 }
 
 EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
