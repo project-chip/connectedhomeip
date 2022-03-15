@@ -32,6 +32,8 @@ class HostApp(Enum):
     TESTS = auto()
     SHELL = auto()
     CERT_TOOL = auto()
+    OTA_PROVIDER = auto()
+    OTA_REQUESTOR = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -56,6 +58,10 @@ class HostApp(Enum):
             return 'shell/standalone'
         elif self == HostApp.CERT_TOOL:
             return '..'
+        elif self == HostApp.OTA_PROVIDER:
+            return 'ota-provider-app/linux'
+        elif self == HostApp.OTA_REQUESTOR:
+            return 'ota-requestor-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -95,6 +101,12 @@ class HostApp(Enum):
         elif self == HostApp.CERT_TOOL:
             yield 'chip-cert'
             yield 'chip-cert.map'
+        elif self == HostApp.OTA_PROVIDER:
+            yield 'ota-requestor-app'
+            yield 'ota-requestor-app.map'
+        elif self == HostApp.OTA_REQUESTOR:
+            yield 'ota-provider-app'
+            yield 'ota-provider-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
