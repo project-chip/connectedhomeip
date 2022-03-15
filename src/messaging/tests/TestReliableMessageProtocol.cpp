@@ -1501,7 +1501,9 @@ const unsigned theBackoffComplianceTestVectorLength =
 
 void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
 {
-    for (uint32_t j = 0; j < 3; j++) {
+    // Run 3x iterations to thoroughly test random jitter always results in backoff within bounds.
+    for (uint32_t j = 0; j < 3; j++)
+    {
         for (uint32_t i = 0; i < theBackoffComplianceTestVectorLength; i++)
         {
             struct BackoffComplianceTestVector * test = &theBackoffComplianceTestVector[i];

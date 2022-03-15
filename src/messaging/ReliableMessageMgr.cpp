@@ -189,11 +189,11 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
 
 System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp backoffBase, uint8_t sendCount)
 {
-    static constexpr uint32_t MRP_BACKOFF_JITTER_BASE = 1000;
-    static constexpr uint32_t MRP_BACKOFF_JITTER_MAX = 250;
-    static constexpr uint32_t MRP_BACKOFF_BASE_NUMERATOR = 16;
+    static constexpr uint32_t MRP_BACKOFF_JITTER_BASE      = 1000;
+    static constexpr uint32_t MRP_BACKOFF_JITTER_MAX       = 250;
+    static constexpr uint32_t MRP_BACKOFF_BASE_NUMERATOR   = 16;
     static constexpr uint32_t MRP_BACKOFF_BASE_DENOMENATOR = 10;
-    static constexpr uint32_t MRP_BACKOFF_THRESHOLD = 1;
+    static constexpr uint32_t MRP_BACKOFF_THRESHOLD        = 1;
 
     System::Clock::Timestamp backoff = backoffBase;
 
