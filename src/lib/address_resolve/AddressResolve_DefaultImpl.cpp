@@ -221,6 +221,7 @@ void Resolver::Shutdown()
     ReArmTimer();
 
     mSystemLayer = nullptr;
+    Dnssd::Resolver::Instance().SetOperationalDelegate(nullptr);
 }
 
 void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData)
