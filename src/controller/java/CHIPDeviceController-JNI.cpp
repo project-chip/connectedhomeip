@@ -500,7 +500,7 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
 }
 
 JNI_METHOD(jlong, generateCompressedFabricId)
-(JNIEnv *env, jobject self, jbyteArray rcac, jbyteArray noc)
+(JNIEnv * env, jobject self, jbyteArray rcac, jbyteArray noc)
 {
     chip::DeviceLayer::StackLock lock;
     CompressedFabricId compressedFabricId;
@@ -513,9 +513,10 @@ JNI_METHOD(jlong, generateCompressedFabricId)
     err = ExtractNodeIdFabricIdCompressedFabricIdFromOpCerts(jniRcac.byteSpan(), jniNoc.byteSpan(), compressedFabricId, fabricId,
                                                              nodeId);
 
-    if (err != CHIP_NO_ERROR) {
-      ChipLogError(Controller, "Failed to extract compressed fabric ID.");
-      JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to extract compressed fabric ID.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
 
     return static_cast<jlong>(compressedFabricId);
