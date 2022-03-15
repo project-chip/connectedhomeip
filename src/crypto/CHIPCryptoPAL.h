@@ -440,7 +440,7 @@ private:
 };
 
 #ifndef CHIP_CONFIG_P256_CONCRETE_KEYPAIR_TYPE
-    #define CHIP_CONFIG_P256_CONCRETE_KEYPAIR_TYPE P256Keypair
+#define CHIP_CONFIG_P256_CONCRETE_KEYPAIR_TYPE P256Keypair
 #endif
 
 /**
@@ -1479,19 +1479,19 @@ public:
     virtual void Release() = 0;
 };
 
-
 /**
  *  @brief P256 key builder for Operatinal and Ephermal keys.
  **/
-class P256KeypairBuilder {
+class P256KeypairBuilder
+{
 public:
-    virtual ~P256KeypairBuilder(){}
+    virtual ~P256KeypairBuilder() {}
 
     /**
      * @brief Create the keypair for given fabric Index.
      * @return Return reference to P256 Keypair
      **/
-    virtual P256Keypair * BuildP256KeyPairForOperationalKey (uint64_t fabricIndex) = 0;
+    virtual P256Keypair * BuildP256KeyPairForOperationalKey(uint64_t fabricIndex) = 0;
 
     /**
      * @brief Create the ephermal keypair for CASE.
@@ -1510,7 +1510,6 @@ P256KeypairBuilder * GetP256KeypairBuilder();
  *  @brief Set the Keypair builder.
  **/
 void SetP256KeypairBuilder(P256KeypairBuilder * builder);
-
 
 /**
  *  @brief Derives the Operational Group Key using the Key Derivation Function (KDF) from the given epoch key.
