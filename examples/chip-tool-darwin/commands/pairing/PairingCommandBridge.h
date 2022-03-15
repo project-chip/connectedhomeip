@@ -99,5 +99,5 @@ private:
     uint32_t mSetupPINCode;
     char * mOnboardingPayload;
     char * ipAddress;
-    
+
 };
