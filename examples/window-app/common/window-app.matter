@@ -96,7 +96,6 @@ server cluster AdministratorCommissioning = 60 {
     INT16U discriminator = 2;
     INT32U iterations = 3;
     OCTET_STRING salt = 4;
-    INT16U passcodeID = 5;
   }
 
   timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
@@ -872,6 +871,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster TimeFormatLocalization = 44 {

@@ -37,6 +37,7 @@ static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "CommissioningModeProvider.h",
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",
     "Dnssd.cpp",
@@ -55,6 +56,7 @@ static_library("server") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",

@@ -77,16 +77,18 @@ SessionManager::~SessionManager() {}
 
 CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                                 Transport::MessageCounterManagerInterface * messageCounterManager,
-                                chip::PersistentStorageDelegate * storageDelegate)
+                                chip::PersistentStorageDelegate * storageDelegate, FabricTable * fabricTable)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(storageDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mState                 = State::kInitialized;
     mSystemLayer           = systemLayer;
     mTransportMgr          = transportMgr;
     mMessageCounterManager = messageCounterManager;
+    mFabricTable           = fabricTable;
 
     // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
     (void) mGlobalEncryptedMessageCounter.Init();
@@ -115,6 +117,17 @@ void SessionManager::Shutdown()
     mCB           = nullptr;
 }
 
+/**
+ * @brief Notification that a fabric was removed.
+ *        This function doesn't call ExpireAllPairingsForFabric
+ *        since the CASE session might still be open to send a response
+ *        on the removed fabric.
+ */
+void SessionManager::FabricRemoved(FabricIndex fabricIndex)
+{
+    mGroupPeerMsgCounter.FabricRemoved(fabricIndex);
+}
+
 CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {
@@ -132,8 +145,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
     switch (sessionHandle->GetSessionType())
     {
-    case Transport::Session::SessionType::kGroup: {
-        auto groupSession = sessionHandle->AsGroupSession();
+    case Transport::Session::SessionType::kGroupOutgoing: {
+        auto groupSession = sessionHandle->AsOutgoingGroupSession();
         auto * groups     = Credentials::GetGroupDataProvider();
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
@@ -249,8 +262,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
     switch (sessionHandle->GetSessionType())
     {
-    case Transport::Session::SessionType::kGroup: {
-        auto groupSession = sessionHandle->AsGroupSession();
+    case Transport::Session::SessionType::kGroupOutgoing: {
+        auto groupSession = sessionHandle->AsOutgoingGroupSession();
         multicastAddress  = Transport::PeerAddress::Multicast(groupSession->GetFabricIndex(), groupSession->GetGroupId());
         destination       = &multicastAddress;
         char addressStr[Transport::PeerAddress::kMaxToStringSize];
@@ -258,11 +271,11 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to %d"
-                        " at monotonic time: %" PRId64
+                        " at monotonic time: " ChipLogFormatX64
                         " msec to Multicast IPV6 address : %s with GroupID of %d and fabric Id of %d",
-                        "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(), groupSession->GetGroupId(),
-                        System::SystemClock().GetMonotonicMilliseconds64().count(), addressStr, groupSession->GetGroupId(),
-                        groupSession->GetFabricIndex());
+                        "encrypted group", &preparedMessage, preparedMessage.GetMessageCounter(), groupSession->GetGroupId(),
+                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()), addressStr,
+                        groupSession->GetGroupId(), groupSession->GetFabricIndex());
     }
     break;
     case Transport::Session::SessionType::kSecure: {
@@ -276,10 +289,10 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " (%u) at monotonic time: %" PRId64 " msec",
+                        " (%u) at monotonic time: " ChipLogFormatX64 " msec",
                         "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(),
                         ChipLogValueX64(secure->GetPeerNodeId()), secure->GetFabricIndex(),
-                        System::SystemClock().GetMonotonicMilliseconds64().count());
+                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()));
     }
     break;
     case Transport::Session::SessionType::kUnauthenticated: {
@@ -289,9 +302,10 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " at monotonic time: %" PRId64 " msec",
+                        " at monotonic time: " ChipLogFormatX64 " msec",
                         sessionHandle->GetSessionTypeString(), &preparedMessage, preparedMessage.GetMessageCounter(),
-                        ChipLogValueX64(kUndefinedNodeId), System::SystemClock().GetMonotonicMilliseconds64().count());
+                        ChipLogValueX64(kUndefinedNodeId),
+                        ChipLogValueX64(System::SystemClock().GetMonotonicMilliseconds64().count()));
     }
     break;
     default:
@@ -725,17 +739,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     if (mCB != nullptr)
     {
         // TODO : When MCSP is done, clean up session creation logic
-        Optional<SessionHandle> session =
-            CreateGroupSession(groupContext.group_id, groupContext.fabric_index, packetHeader.GetSourceNodeId().Value());
-
-        VerifyOrReturn(session.HasValue(), ChipLogError(Inet, "Error when creating group session handle."));
-        Transport::GroupSession * groupSession = session.Value()->AsGroupSession();
-
-        CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, groupSession, peerAddress, msg->Start(), msg->TotalLength());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), peerAddress,
+        Transport::IncomingGroupSession groupSession(groupContext.group_id, groupContext.fabric_index,
+                                                     packetHeader.GetSourceNodeId().Value());
+        CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, &groupSession, peerAddress, msg->Start(), msg->TotalLength());
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(groupSession), peerAddress,
                                SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
-
-        RemoveGroupSession(groupSession);
     }
 }
 

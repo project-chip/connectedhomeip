@@ -12,6 +12,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -289,3 +291,9 @@ console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
 modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)

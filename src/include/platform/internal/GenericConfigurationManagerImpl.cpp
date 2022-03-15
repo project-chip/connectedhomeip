@@ -36,6 +36,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -50,6 +51,176 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+#if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
+
+// Legacy version of CommissionableDataProvider used for a grace period
+// to a transition where all ConfigurationManager customers move to
+// provide their own impl of CommissionableDataProvider interface.
+
+template <class ConfigClass>
+class LegacyTemporaryCommissionableDataProvider : public CommissionableDataProvider
+{
+public:
+    // GenericConfigurationManagerImpl will own a LegacyTemporaryCommissionableDataProvider which
+    // *refers back to that GenericConfigurationManagerImpl*, due to how CRTP-based
+    // storage APIs are defined. This is a bit unclean, but only applicable to the
+    // transition path when `CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER` is true.
+    // This circular dependency is NOT needed by CommissionableDataProvider, but required
+    // to keep legacy code running.
+    LegacyTemporaryCommissionableDataProvider(GenericConfigurationManagerImpl<ConfigClass> & configManager) :
+        mGenericConfigManager(configManager)
+    {}
+
+    CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
+    CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override;
+    CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override;
+    CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf) override;
+    CHIP_ERROR GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & outVerifierLen) override;
+    CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override;
+    CHIP_ERROR SetSetupPasscode(uint32_t setupPasscode) override;
+
+private:
+    GenericConfigurationManagerImpl<ConfigClass> & mGenericConfigManager;
+};
+
+template <class ConfigClass>
+CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSetupPasscode(uint32_t & setupPasscode)
+{
+    CHIP_ERROR err;
+
+    err = mGenericConfigManager.ReadConfigValue(ConfigClass::kConfigKey_SetupPinCode, setupPasscode);
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        setupPasscode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
+        err           = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::SetSetupPasscode(uint32_t setupPasscode)
+{
+    return mGenericConfigManager.WriteConfigValue(ConfigClass::kConfigKey_SetupPinCode, setupPasscode);
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSetupDiscriminator(uint16_t & setupDiscriminator)
+{
+    CHIP_ERROR err;
+    uint32_t val;
+
+    err = mGenericConfigManager.ReadConfigValue(ConfigClass::kConfigKey_SetupDiscriminator, val);
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        val = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+        err = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+    SuccessOrExit(err);
+
+    setupDiscriminator = static_cast<uint16_t>(val);
+
+exit:
+    return err;
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::SetSetupDiscriminator(uint16_t setupDiscriminator)
+{
+    return mGenericConfigManager.WriteConfigValue(ConfigClass::kConfigKey_SetupDiscriminator,
+                                                  static_cast<uint32_t>(setupDiscriminator));
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pIterationCount(uint32_t & iterationCount)
+{
+    CHIP_ERROR err = mGenericConfigManager.ReadConfigValue(ConfigClass::kConfigKey_Spake2pIterationCount, iterationCount);
+
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        iterationCount = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT;
+        err            = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pSalt(MutableByteSpan & saltBuf)
+{
+    static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
+
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
+    size_t saltB64Len                       = 0;
+
+    err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pSalt, saltB64, sizeof(saltB64), saltB64Len);
+
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        saltB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT);
+        ReturnErrorCodeIf(saltB64Len > sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(saltB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT, saltB64Len);
+        err = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
+
+    ReturnErrorOnFailure(err);
+    size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
+
+    ReturnErrorCodeIf(saltLen > saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(saltBuf.data(), saltB64, saltLen);
+    saltBuf.reduce_size(saltLen);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pVerifier(MutableByteSpan & verifierBuf,
+                                                                                      size_t & verifierLen)
+{
+    static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
+        BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
+
+    CHIP_ERROR err                                            = CHIP_NO_ERROR;
+    char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
+    size_t verifierB64Len                                     = 0;
+
+    err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64),
+                                                   verifierB64Len);
+
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        verifierB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER);
+        ReturnErrorCodeIf(verifierB64Len > sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(verifierB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER, verifierB64Len);
+        err = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
+
+    ReturnErrorOnFailure(err);
+    verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
+    ReturnErrorCodeIf(verifierLen > verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(verifierBuf.data(), verifierB64, verifierLen);
+    verifierBuf.reduce_size(verifierLen);
+
+    return err;
+}
+
+#endif // CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
+
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 {
@@ -57,6 +228,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
+#endif
+
+#if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
+    // Using a temporary singleton here because the overall GenericConfigurationManagerImpl is
+    // a singleton. This is TEMPORARY code to set the table for clients to set their own
+    // implementation properly, without loss of functionality for legacy in the meantime.
+    static LegacyTemporaryCommissionableDataProvider<ConfigClass> sLegacyTemporaryCommissionableDataProvider(*this);
+
+    SetCommissionableDataProvider(&sLegacyTemporaryCommissionableDataProvider);
 #endif
 
     char uniqueId[kMaxUniqueIDLength + 1];
@@ -325,136 +505,6 @@ void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSetupPinCode(uint32_t & setupPinCode)
-{
-    CHIP_ERROR err;
-
-    err = ReadConfigValue(ConfigClass::kConfigKey_SetupPinCode, setupPinCode);
-#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        setupPinCode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
-        err          = CHIP_NO_ERROR;
-    }
-#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSetupPinCode(uint32_t setupPinCode)
-{
-    return WriteConfigValue(ConfigClass::kConfigKey_SetupPinCode, setupPinCode);
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSetupDiscriminator(uint16_t & setupDiscriminator)
-{
-    CHIP_ERROR err;
-    uint32_t val;
-
-    err = ReadConfigValue(ConfigClass::kConfigKey_SetupDiscriminator, val);
-#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        val = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
-        err = CHIP_NO_ERROR;
-    }
-#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
-    SuccessOrExit(err);
-
-    setupDiscriminator = static_cast<uint16_t>(val);
-
-exit:
-    return err;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSetupDiscriminator(uint16_t setupDiscriminator)
-{
-    return WriteConfigValue(ConfigClass::kConfigKey_SetupDiscriminator, static_cast<uint32_t>(setupDiscriminator));
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pIterationCount(uint32_t & iterationCount)
-{
-    CHIP_ERROR err = ReadConfigValue(ConfigClass::kConfigKey_Spake2pIterationCount, iterationCount);
-
-#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        iterationCount = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT;
-        err            = CHIP_NO_ERROR;
-    }
-#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)
-{
-    static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
-
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
-    size_t saltB64Len                       = 0;
-
-    err = ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pSalt, saltB64, sizeof(saltB64), saltB64Len);
-
-#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        saltB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT);
-        ReturnErrorCodeIf(saltB64Len > sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(saltB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT, saltB64Len);
-        err = CHIP_NO_ERROR;
-    }
-#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
-
-    ReturnErrorOnFailure(err);
-    saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
-    ReturnErrorCodeIf(saltLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(buf, saltB64, saltLen);
-
-    return CHIP_NO_ERROR;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)
-{
-    static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
-        BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
-
-    CHIP_ERROR err                                            = CHIP_NO_ERROR;
-    char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
-    size_t verifierB64Len                                     = 0;
-
-    err = ReadConfigValueStr(ConfigClass::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64), verifierB64Len);
-
-#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        verifierB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER);
-        ReturnErrorCodeIf(verifierB64Len > sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(verifierB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER, verifierB64Len);
-        err = CHIP_NO_ERROR;
-    }
-#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
-
-    ReturnErrorOnFailure(err);
-    verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
-    ReturnErrorCodeIf(verifierLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(buf, verifierB64, verifierLen);
-
-    return err;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRegulatoryLocation(uint8_t & location)
 {
     return GetLocationCapability(location);
@@ -656,7 +706,7 @@ GenericConfigurationManagerImpl<ConfigClass>::GetBLEDeviceIdentificationInfo(Ble
     SuccessOrExit(err);
     deviceIdInfo.SetProductId(id);
 
-    err = GetSetupDiscriminator(discriminator);
+    err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
     SuccessOrExit(err);
     deviceIdInfo.SetDeviceDiscriminator(discriminator);
 
@@ -778,22 +828,25 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         ChipLogProgress(DeviceLayer, "  Hardware Version: %" PRIu16, hardwareVer);
     }
 
+    CommissionableDataProvider * cdp = GetCommissionableDataProvider();
+
     {
-        uint32_t setupPINCode;
-        if (GetSetupPinCode(setupPINCode) != CHIP_NO_ERROR)
+        uint32_t setupPasscode;
+        if ((cdp == nullptr) || (cdp->GetSetupPasscode(setupPasscode) != CHIP_NO_ERROR))
         {
-            setupPINCode = 0;
+            setupPasscode = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Setup Pin Code: %" PRIu32 "", setupPINCode);
+        ChipLogProgress(DeviceLayer, "  Setup Pin Code (0 for UNKNOWN/ERROR): %" PRIu32 "", setupPasscode);
     }
 
     {
         uint16_t setupDiscriminator;
-        if (GetSetupDiscriminator(setupDiscriminator) != CHIP_NO_ERROR)
+        if ((cdp == nullptr) || (cdp->GetSetupDiscriminator(setupDiscriminator) != CHIP_NO_ERROR))
         {
-            setupDiscriminator = 0;
+            setupDiscriminator = 0xFFFF;
         }
-        ChipLogProgress(DeviceLayer, "  Setup Discriminator: %" PRIu16 " (0x%" PRIX16 ")", setupDiscriminator, setupDiscriminator);
+        ChipLogProgress(DeviceLayer, "  Setup Discriminator (0xFFFF for UNKNOWN/ERROR): %" PRIu16 " (0x%" PRIX16 ")",
+                        setupDiscriminator, setupDiscriminator);
     }
 
     {

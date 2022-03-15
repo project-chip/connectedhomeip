@@ -94,7 +94,7 @@ public:
      *  Schedule the event delivery
      *
      */
-    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten);
+    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten);
 
     /*
      * Resets the tracker that tracks the currently serviced read handler.
@@ -164,7 +164,6 @@ private:
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState);
 
-    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
     CHIP_ERROR ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten);
     void GetMinEventLogPosition(uint32_t & aMinLogPosition);
 

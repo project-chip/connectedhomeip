@@ -32,6 +32,10 @@ function getManualTests()
     'Test_TC_DD_3_6',
     'Test_TC_DD_3_9',
     'Test_TC_DD_3_10',
+    'Test_TC_DD_3_11',
+    'Test_TC_DD_3_12',
+    'Test_TC_DD_3_13',
+    'Test_TC_DD_3_14',
     'Test_TC_DD_4_1',
   ];
 
@@ -66,8 +70,11 @@ function getManualTests()
 
   const DeviceManagement = [
     'Test_TC_DM_1_2',
+    'Test_TC_DM_1_4',
     'Test_TC_DM_2_3',
+    'Test_TC_DM_2_4',
     'Test_TC_DM_3_2',
+    'Test_TC_DM_3_4',
   ];
 
   const DiagnosticsLogs = [
@@ -93,17 +100,17 @@ function getManualTests()
   const GeneralDiagnostics = [
     'Test_TC_GENDIAG_1_1',
     'Test_TC_GENDIAG_1_2',
+    'Test_TC_GENDIAG_2_1',
   ];
 
   const Identify = [
-    'Test_TC_I_1_1',
-    'Test_TC_I_2_1',
     'Test_TC_I_2_2',
     'Test_TC_I_2_3',
   ];
 
   const IlluminanceMeasurement = [
     'Test_TC_ILL_2_1',
+    'Test_TC_ILL_2_2',
   ];
 
   const InteractionDataModel = [
@@ -119,10 +126,13 @@ function getManualTests()
     'Test_TC_IDM_5_2',
     'Test_TC_IDM_6_1',
     'Test_TC_IDM_6_2',
+    'Test_TC_IDM_6_3',
+    'Test_TC_IDM_6_4',
   ];
 
   const MediaControl = [
     'Test_TC_MC_3_12',
+    'Test_TC_MC_3_13',
     'Test_TC_MC_4_1',
     'Test_TC_MC_8_2',
     'Test_TC_MC_9_2',
@@ -159,12 +169,20 @@ function getManualTests()
     'Test_TC_MF_1_22',
     'Test_TC_MF_1_23',
     'Test_TC_MF_1_24',
+    'Test_TC_MF_1_25',
+    'Test_TC_MF_1_26',
+    'Test_TC_MF_1_27',
+    'Test_TC_MF_1_28',
   ];
 
   const ModeSelect = [
     'Test_TC_MOD_1_1',
     'Test_TC_MOD_1_2',
     'Test_TC_MOD_2_1',
+    'Test_TC_MOD_2_2',
+    'Test_TC_MOD_3_1',
+    'Test_TC_MOD_3_2',
+    'Test_TC_MOD_3_3',
   ];
 
   const OTASoftwareUpdate = [
@@ -180,11 +198,14 @@ function getManualTests()
     'Test_TC_SU_3_2',
     'Test_TC_SU_3_3',
     'Test_TC_SU_3_4',
+    'Test_TC_SU_4_1',
+    'Test_TC_SU_4_2',
   ];
 
   const PowerSourceConfiguration = [
     'Test_TC_PSCFG_1_1',
     'Test_TC_PSCFG_2_1',
+    'Test_TC_PSCFG_3_1',
   ];
 
   const SecureChannel = [
@@ -206,6 +227,30 @@ function getManualTests()
 
   const WindowCovering = [
     'Test_TC_WNCV_2_3',
+    'Test_TC_WNCV_6_1',
+  ];
+
+  const FlowMeasurement = [
+    'Test_TC_FLW_3_1',
+  ];
+
+  const OccupancySensing = [
+    'Test_TC_OCC_2_3',
+    'Test_TC_OCC_2_4',
+    'Test_TC_OCC_3_1',
+  ];
+
+  const OnOff = [
+    'Test_TC_OO_2_4',
+  ];
+
+  const PressureMeasurement = [
+    'Test_TC_PRS_2_2',
+    'Test_TC_PRS_2_3',
+  ];
+
+  const PowerSource = [
+    'Test_TC_PS_2_2',
   ];
 
   const tests = [
@@ -232,6 +277,11 @@ function getManualTests()
     SoftwareDiagnostics, //
     WiFiNetworkDiagnostics, //
     WindowCovering, //
+    FlowMeasurement, //
+    OccupancySensing, //
+    OnOff, //
+    PressureMeasurement, //
+    PowerSource, //
 
   ];
   return tests.flat(1);
@@ -305,6 +355,11 @@ function getTests()
     'Test_TC_FLW_2_2',
   ];
 
+  const Identify = [
+    'Test_TC_I_1_1',
+    'Test_TC_I_2_1',
+  ];
+
   const IlluminanceMeasurement = [
     'Test_TC_ILL_1_1',
   ];
@@ -327,6 +382,17 @@ function getTests()
 
   const MediaControl = [
     'Test_TC_MC_1_1',
+    'Test_TC_MC_1_2',
+    'Test_TC_MC_1_3',
+    'Test_TC_MC_1_4',
+    'Test_TC_MC_1_5',
+    'Test_TC_MC_1_6',
+    'Test_TC_MC_1_7',
+    'Test_TC_MC_1_8',
+    'Test_TC_MC_1_9',
+    'Test_TC_MC_1_10',
+    'Test_TC_MC_1_11',
+    'Test_TC_MC_1_12',
     'Test_TC_MC_2_1',
     'Test_TC_MC_3_1',
     'Test_TC_MC_3_2',
@@ -361,6 +427,7 @@ function getTests()
 
   const PowerSource = [
     'Test_TC_PS_1_1',
+    'Test_TC_PS_2_1',
   ];
 
   const PressureMeasurement = [
@@ -373,6 +440,7 @@ function getTests()
     'Test_TC_PCC_2_1',
     'Test_TC_PCC_2_2',
     'Test_TC_PCC_2_3',
+    'Test_TC_PCC_2_4',
   ];
 
   const RelativeHumidityMeasurement = [
@@ -406,6 +474,7 @@ function getTests()
 
   const ThreadNetworkDiagnostics = [
     'Test_TC_DIAG_TH_NW_1_1',
+    'Test_TC_DIAG_TH_NW_1_2',
   ];
 
   const WiFiNetworkDiagnostics = [
@@ -463,6 +532,10 @@ function getTests()
     'TestBinding',
   ];
 
+  const MultiAdmin = [
+    'TestMultiAdmin',
+  ];
+
   const SoftwareDiagnostics = [
     'Test_TC_SWDIAG_1_1',
     'Test_TC_SWDIAG_2_1',
@@ -495,6 +568,7 @@ function getTests()
     ElectricalMeasurement, //
     EthernetNetworkDiagnostics, //
     FlowMeasurement, //
+    Identify, //
     IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
@@ -513,6 +587,7 @@ function getTests()
     WindowCovering, //
     TV, //
     Others, //
+    MultiAdmin, //
     SoftwareDiagnostics, //
     Subscriptions, //
     DoorLock, //

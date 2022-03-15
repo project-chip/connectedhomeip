@@ -316,7 +316,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
             GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
             if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
             {
-                groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsGroupSession()->GetGroupId();
+                groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
             }
 
             emberAfScenesClusterStoreCurrentSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
@@ -383,7 +383,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
     GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
     if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
     {
-        groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsGroupSession()->GetGroupId();
+        groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     }
 
     emberAfScenesClusterRecallSavedSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
@@ -526,7 +526,7 @@ bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint
 {
     if (emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::OnOff::Id, true))
     {
-        return emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::StartUpOnOff::Id, true);
+        return emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id, true);
     }
 
     return false;

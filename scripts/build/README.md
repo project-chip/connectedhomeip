@@ -54,7 +54,7 @@ Usage examples:
    argument order (artifact copying is an argument for the build command)
 
     ```
-    ./scripts/build/build_examples.py --target qpg-qpg6100-lock build --copy-artifacts-to /tmp/artifacts
+    ./scripts/build/build_examples.py --target qpg-lock build --copy-artifacts-to /tmp/artifacts
     ```
 
 5. Find out all possible targets for compiling the 'light' app:

@@ -175,6 +175,24 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     return numActive;
 }
 
+void InteractionModelEngine::CloseTransactionsFromFabricIndex(FabricIndex aFabricIndex)
+{
+    //
+    // Walk through all existing subscriptions and shut down those whose subscriber matches
+    // that which just came in.
+    //
+    mReadHandlers.ForEachActiveObject([this, aFabricIndex](ReadHandler * handler) {
+        if (handler->GetAccessingFabricIndex() == aFabricIndex)
+        {
+            ChipLogProgress(InteractionModel, "Deleting expired ReadHandler for NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                            ChipLogValueX64(handler->GetInitiatorNodeId()), aFabricIndex);
+            mReadHandlers.ReleaseObject(handler);
+        }
+
+        return Loop::Continue;
+    });
+}
+
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())

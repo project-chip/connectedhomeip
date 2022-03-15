@@ -42,16 +42,22 @@ public:
     CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
-    virtual CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endPointId) = 0;
+    virtual CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endPointIds) = 0;
 
     virtual CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId)
     {
         return CHIP_ERROR_BAD_REQUEST;
     };
 
+    void Shutdown() override
+    {
+        mOnDeviceConnectedCallback.Cancel();
+        mOnDeviceConnectionFailureCallback.Cancel();
+    }
+
 private:
     chip::NodeId mNodeId;
-    chip::EndpointId mEndPointId;
+    std::vector<chip::EndpointId> mEndPointId;
 
     static void OnDeviceConnectedFn(void * context, ChipDevice * device);
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);

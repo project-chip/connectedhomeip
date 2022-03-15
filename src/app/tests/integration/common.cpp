@@ -32,6 +32,7 @@
 #include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceLayer.h>
 
+chip::FabricTable gFabricTable;
 chip::Messaging::ExchangeManager gExchangeManager;
 chip::SessionManager gSessionManager;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;

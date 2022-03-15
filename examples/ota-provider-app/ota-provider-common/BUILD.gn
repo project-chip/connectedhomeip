@@ -33,7 +33,6 @@ chip_data_model("ota-provider-common") {
     "DefaultUserConsentProvider.h",
     "OTAProviderExample.cpp",
     "OTAProviderExample.h",
-    "UserConsentDelegate.h",
   ]
 
   deps = [ "${chip_root}/src/protocols/bdx" ]

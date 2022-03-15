@@ -21,6 +21,8 @@
 #include <app/clusters/bindings/PendingNotificationMap.h>
 #include <app/server/Server.h>
 #include <app/util/binding-table.h>
+#include <credentials/FabricTable.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 
@@ -37,6 +39,13 @@ namespace chip {
  *
  */
 using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
+
+struct BindingManagerInitParams
+{
+    FabricTable * mFabricTable               = nullptr;
+    CASESessionManager * mCASESessionManager = nullptr;
+    PersistentStorageDelegate * mStorage     = nullptr;
+};
 
 using BindingAddedHandler = void (*)(const EmberBindingTableEntry & binding);
 
@@ -72,7 +81,7 @@ public:
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    void SetAppServer(Server * appServer);
+    CHIP_ERROR Init(const BindingManagerInitParams & params);
 
     /*
      * Notifies the BindingManager that a new unicast binding is created.
@@ -124,8 +133,8 @@ private:
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
+    BindingManagerInitParams mInitParams;
     BindingAddedHandler mBindingAddedHandler;
-    Server * mAppServer = nullptr;
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

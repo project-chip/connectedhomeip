@@ -96,7 +96,6 @@ server cluster AdministratorCommissioning = 60 {
     INT16U discriminator = 2;
     INT32U iterations = 3;
     OCTET_STRING salt = 4;
-    INT16U passcodeID = 5;
   }
 
   timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
@@ -611,9 +610,9 @@ server cluster SoftwareDiagnostics = 52 {
 }
 
 server cluster TemperatureMeasurement = 1026 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly global attribute int16u clusterRevision = 65533;
 }
 

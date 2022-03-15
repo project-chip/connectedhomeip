@@ -78,8 +78,9 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
 OTAProviderExample::OTAProviderExample()
 {
     memset(mOTAFilePath, 0, kFilepathBufLen);
-    mQueryImageBehavior   = kRespondWithNotAvailable;
-    mDelayedActionTimeSec = 0;
+    mQueryImageBehavior        = kRespondWithNotAvailable;
+    mDelayedQueryActionTimeSec = 0;
+    mDelayedApplyActionTimeSec = 0;
     mCandidates.clear();
 }
 
@@ -158,7 +159,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     uint8_t updateToken[kUpdateTokenLen]  = { 0 };
     char strBuf[kUpdateTokenStrLen]       = { 0 };
     char uriBuf[kUriMaxLen]               = { 0 };
-    uint32_t delayedActionTimeSec         = mDelayedActionTimeSec;
+    uint32_t delayedQueryActionTimeSec    = mDelayedQueryActionTimeSec;
     bool requestorCanConsent              = commandData.requestorCanConsent.ValueOr(false);
     QueryImageResponse::Type response;
 
@@ -203,7 +204,10 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
             }
         }
 
-        if (queryStatus == OTAQueryStatus::kUpdateAvailable && mUserConsentDelegate != nullptr)
+        // If mUserConsentNeeded (set by the CLI) is true and requestor is capable of taking user consent
+        // then delegate obtaining user consent to the requestor
+        if (mUserConsentDelegate && queryStatus == OTAQueryStatus::kUpdateAvailable &&
+            (requestorCanConsent && mUserConsentNeeded) == false)
         {
             UserConsentState state = mUserConsentDelegate->GetUserConsentState(
                 GetUserConsentSubject(commandObj, commandPath, commandData, newSoftwareVersion));
@@ -243,6 +247,9 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         break;
     }
 
+    // Reset with default success behavior
+    mQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+
     if (queryStatus == OTAQueryStatus::kUpdateAvailable)
     {
         GenerateUpdateToken(updateToken, kUpdateTokenLen);
@@ -278,7 +285,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     }
 
     response.status = queryStatus;
-    response.delayedActionTime.Emplace(delayedActionTimeSec);
+    response.delayedActionTime.Emplace(delayedQueryActionTimeSec);
     if (mUserConsentNeeded && requestorCanConsent)
     {
         response.userConsentNeeded.Emplace(true);
@@ -292,6 +299,9 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     {
         response.metadataForRequestor.Emplace(chip::ByteSpan());
     }
+
+    // Reset delay back to 0 for subsequent uses
+    mDelayedQueryActionTimeSec = 0;
 
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
 
@@ -320,7 +330,13 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
 
     ApplyUpdateResponse::Type response;
     response.action            = mUpdateAction;
-    response.delayedActionTime = mDelayedActionTimeSec;
+    response.delayedActionTime = mDelayedApplyActionTimeSec;
+
+    // Reset delay back to 0 for subsequent uses
+    mDelayedApplyActionTimeSec = 0;
+    // Reset back to success case for subsequent uses
+    mUpdateAction = OTAApplyUpdateAction::kProceed;
+
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
 
     return EMBER_ZCL_STATUS_SUCCESS;

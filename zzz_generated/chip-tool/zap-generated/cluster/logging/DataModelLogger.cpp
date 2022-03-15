@@ -1623,14 +1623,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
-            return err;
-        }
-    }
-    {
         CHIP_ERROR err = LogValue("ProviderNodeID", indent + 1, value.providerNodeID);
         if (err != CHIP_NO_ERROR)
         {
@@ -1643,6 +1635,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
             return err;
         }
     }
@@ -2094,6 +2094,63 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricSensitiveInt8u", indent + 1, value.fabricSensitiveInt8u);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricSensitiveInt8u'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("OptionalFabricSensitiveInt8u", indent + 1, value.optionalFabricSensitiveInt8u);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OptionalFabricSensitiveInt8u'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NullableFabricSensitiveInt8u", indent + 1, value.nullableFabricSensitiveInt8u);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NullableFabricSensitiveInt8u'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NullableOptionalFabricSensitiveInt8u", indent + 1, value.nullableOptionalFabricSensitiveInt8u);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1,
+                                       "Struct truncated due to invalid value for 'NullableOptionalFabricSensitiveInt8u'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricSensitiveCharString", indent + 1, value.fabricSensitiveCharString);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricSensitiveCharString'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricSensitiveStruct", indent + 1, value.fabricSensitiveStruct);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricSensitiveStruct'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricSensitiveInt8uList", indent + 1, value.fabricSensitiveInt8uList);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricSensitiveInt8uList'");
             return err;
         }
     }
@@ -4186,7 +4243,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
 {
     ChipLogProgress(
-        chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI "DataVersion: %" PRIu32,
+        chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI " DataVersion: %" PRIu32,
         path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId), path.mDataVersion.ValueOr(0));
 
     switch (path.mClusterId)
@@ -6434,6 +6491,47 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case FanControl::Id: {
+        switch (path.mAttributeId)
+        {
+        case FanControl::Attributes::FanMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("fan mode", 1, value);
+        }
+        case FanControl::Attributes::FanModeSequence::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("fan mode sequence", 1, value);
+        }
+        case FanControl::Attributes::ServerGeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ServerGeneratedCommandList", 1, value);
+        }
+        case FanControl::Attributes::ClientGeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClientGeneratedCommandList", 1, value);
+        }
+        case FanControl::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case FanControl::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case FanControl::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case FixedLabel::Id: {
         switch (path.mAttributeId)
         {
@@ -8310,17 +8408,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case TemperatureMeasurement::Attributes::MeasuredValue::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasuredValue", 1, value);
         }
         case TemperatureMeasurement::Attributes::MinMeasuredValue::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MinMeasuredValue", 1, value);
         }
         case TemperatureMeasurement::Attributes::MaxMeasuredValue::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
         }
@@ -8366,22 +8464,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("boolean", 1, value);
         }
         case TestCluster::Attributes::Bitmap8::Id: {
-            uint8_t value;
+            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap8", 1, value);
         }
         case TestCluster::Attributes::Bitmap16::Id: {
-            uint16_t value;
+            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap16", 1, value);
         }
         case TestCluster::Attributes::Bitmap32::Id: {
-            uint32_t value;
+            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap32", 1, value);
         }
         case TestCluster::Attributes::Bitmap64::Id: {
-            uint64_t value;
+            chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap64", 1, value);
         }
@@ -8609,22 +8707,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("nullable_boolean", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap8::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap8", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap16::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
+            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap16", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap32::Id: {
-            chip::app::DataModel::Nullable<uint32_t> value;
+            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap32", 1, value);
         }
         case TestCluster::Attributes::NullableBitmap64::Id: {
-            chip::app::DataModel::Nullable<uint64_t> value;
+            chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap64", 1, value);
         }
@@ -8905,7 +9003,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("remote sensing", 1, value);
         }
         case Thermostat::Attributes::ControlSequenceOfOperation::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::ThermostatControlSequence value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("control sequence of operation", 1, value);
         }

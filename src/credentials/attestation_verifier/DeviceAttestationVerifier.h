@@ -222,7 +222,7 @@ public:
     /**
      * @brief Verify an attestation information payload against a DAC/PAI chain.
      *
-     * @param[in] attestationInfo All of the information required to verify the attestation.
+     * @param[in] info All of the information required to verify the attestation.
      * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
      *                         VerifyAttestationInformation()
      */

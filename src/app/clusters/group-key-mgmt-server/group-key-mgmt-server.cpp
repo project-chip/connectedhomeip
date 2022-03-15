@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/command-id.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/GroupDataProvider.h>
@@ -285,10 +286,19 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
 {
-    auto fabric     = commandObj->GetAccessingFabricIndex();
-    auto * provider = GetGroupDataProvider();
+    auto provider = GetGroupDataProvider();
+    auto fabric   = Server::GetInstance().GetFabricTable().FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
 
-    if (nullptr == provider)
+    if (nullptr == provider || nullptr == fabric)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
+    }
+
+    uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
+    MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
+    CHIP_ERROR err = fabric->GetCompressedId(compressed_fabric_id);
+    if (CHIP_NO_ERROR != err)
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return true;
@@ -347,7 +357,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     }
 
     // Set KeySet
-    CHIP_ERROR err = provider->SetKeySet(fabric, keyset);
+    err = provider->SetKeySet(fabric->GetFabricIndex(), compressed_fabric_id, keyset);
     if (CHIP_NO_ERROR == err)
     {
         ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite OK");

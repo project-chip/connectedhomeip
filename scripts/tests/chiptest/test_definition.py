@@ -15,26 +15,25 @@
 
 import logging
 import os
-import time
-from datetime import datetime
-import typing
 import threading
-from pathlib import Path
-import platform
-
-from enum import Enum, auto
+import time
+import typing
 from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum, auto
 from random import randrange
 
 TEST_NODE_ID = '0x12344321'
 
 
 class App:
+
     def __init__(self, runner, command):
         self.process = None
         self.outpipe = None
         self.runner = runner
         self.command = command
+        self.cv_stopped = threading.Condition()
         self.stopped = False
         self.lastLogIndex = 0
 
@@ -47,13 +46,17 @@ class App:
             self.__updateSetUpCode(outpipe)
             self.process = process
             self.outpipe = outpipe
-            self.stopped = False
+            with self.cv_stopped:
+                self.stopped = False
+                self.cv_stopped.notify()
             return True
         return False
 
     def stop(self):
         if self.process:
-            self.stopped = True
+            with self.cv_stopped:
+                self.stopped = True
+                self.cv_stopped.notify()
             self.process.kill()
             self.process.wait(10)
             self.process = None
@@ -88,24 +91,26 @@ class App:
                        self.process, self.outpipe)
         return True
 
-    def poll(self):
-        # When the server is manually stopped, process polling is overriden so the other
-        # processes that depends on the accessory beeing alive does not stop.
-        if self.stopped:
-            return None
-        return self.process.poll()
-
     def kill(self):
         if self.process:
             self.process.kill()
 
-    def wait(self, duration):
-        if self.process:
-            self.process.wait(duration)
+    def wait(self, timeout=None):
+        while True:
+            code = self.process.wait(timeout)
+            with self.cv_stopped:
+                if not self.stopped:
+                    return code
+                # When the server is manually stopped, process waiting is
+                # overridden so the other processes that depends on the
+                # accessory beeing alive does not stop.
+                while self.stopped:
+                    self.cv_stopped.wait()
 
     def __startServer(self, runner, command, discriminator):
         logging.debug(
-            'Executing application under test with discriminator %s.' % discriminator)
+            'Executing application under test with discriminator %s.' %
+            discriminator)
         app_cmd = command + ['--discriminator', str(discriminator)]
         app_cmd = app_cmd + ['--interface-id', str(-1)]
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
@@ -118,8 +123,8 @@ class App:
             waitForString, self.lastLogIndex)
         while not ready:
             if server_process.poll() is not None:
-                died_str = 'Server died while waiting for %s, returncode %d' % (
-                    waitForString, server_process.returncode)
+                died_str = ('Server died while waiting for %s, returncode %d' %
+                            (waitForString, server_process.returncode))
                 logging.error(died_str)
                 raise Exception(died_str)
             if time.time() - start_time > 10:
@@ -147,6 +152,7 @@ class TestTarget(Enum):
 class ApplicationPaths:
     chip_tool: typing.List[str]
     all_clusters_app: typing.List[str]
+    door_lock_app: typing.List[str]
     tv_app: typing.List[str]
 
 
@@ -196,7 +202,9 @@ class TestDefinition:
     target: TestTarget
 
     def Run(self, runner, apps_register, paths: ApplicationPaths):
-        """Executes the given test case using the provided runner for execution."""
+        """
+        Executes the given test case using the provided runner for execution.
+        """
         runner.capture_delegate = ExecutionCapture()
 
         try:
@@ -205,12 +213,10 @@ class TestDefinition:
             elif self.target == TestTarget.TV:
                 app_cmd = paths.tv_app
             elif self.target == TestTarget.DOOR_LOCK:
-                logging.info(
-                    "Ignore test - test is made for door lock which is not supported yet")
-                return
+                app_cmd = paths.door_lock_app
             else:
-                raise Exception(
-                    "Unknown test target - don't know which application to run")
+                raise Exception("Unknown test target - "
+                                "don't know which application to run")
 
             tool_cmd = paths.chip_tool
 
@@ -226,16 +232,21 @@ class TestDefinition:
                     os.unlink(f)
 
             app = App(runner, app_cmd)
-            app.factoryReset()  # Remove server application storage, so it will be commissionable again
+            # Remove server application storage (factory reset),
+            # so it will be commissionable again.
+            app.factoryReset()
             app.start(str(randrange(1, 4096)))
             apps_register.add("default", app)
 
-            runner.RunSubprocess(tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode],
-                                 name='PAIR', dependencies=[apps_register])
+            runner.RunSubprocess(
+                tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode],
+                name='PAIR', dependencies=[apps_register])
 
-            runner.RunSubprocess(tool_cmd + ['tests', self.run_name],
-                                 name='TEST', dependencies=[apps_register])
-        except:
+            runner.RunSubprocess(
+                tool_cmd + ['tests', self.run_name],
+                name='TEST', dependencies=[apps_register])
+
+        except Exception:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
             runner.capture_delegate.LogContents()
             raise

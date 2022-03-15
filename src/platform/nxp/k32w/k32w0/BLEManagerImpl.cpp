@@ -26,6 +26,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/CommissionableDataProvider.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -799,7 +801,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     ChipBLEDeviceIdentificationInfo mDeviceIdInfo = { 0 };
     uint8_t mDeviceIdInfoLength                   = 0;
 
-    chipErr = ConfigurationMgr().GetSetupDiscriminator(discriminator);
+    chipErr = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
     if (chipErr != CHIP_NO_ERROR)
     {
         return chipErr;

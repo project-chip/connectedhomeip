@@ -164,7 +164,6 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
 
     Controller::SetupParams initParams;
     initParams.storageDelegate                = sStorageAdapter;
-    initParams.deviceAddressUpdateDelegate    = nullptr;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = context->mAdapter.get();
     initParams.operationalKeypair             = &ephemeralKey;

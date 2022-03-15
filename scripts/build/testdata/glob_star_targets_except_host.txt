@@ -16,7 +16,7 @@ android-x64-chip-tool
 android-x86-chip-tool
 cyw30739-cyw930739m2evb_01-light
 cyw30739-cyw930739m2evb_01-lock
-cyw30739-cyw930739m2evb_01-ota-requestor
+cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging
 efr32-brd4161a-light
 efr32-brd4161a-light-rpc
 efr32-brd4161a-lock
@@ -62,6 +62,9 @@ nrf-nrf5340dk-lock
 nrf-nrf5340dk-pump
 nrf-nrf5340dk-pump-controller
 nrf-nrf5340dk-shell
-qpg-qpg6100-lock
+qpg-light
+qpg-lock
+qpg-persistent-storage
+qpg-shell
 telink-tlsr9518adk80d-light
 tizen-arm-light

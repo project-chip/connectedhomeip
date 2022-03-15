@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <lib/core/OTAImageHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
@@ -35,15 +36,20 @@ public:
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
+    bool IsFirstImageRun() override { return false; }
+    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
+    void SetOTAImageFile(CharSpan name) { mImageFile = name; }
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
     static void HandlePrepareDownload(intptr_t context);
     static void HandleFinalize(intptr_t context);
+    static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
+    CHIP_ERROR ProcessHeader(ByteSpan & block);
 
     /**
      * Called to allocate memory for mBlock if necessary and set it to block
@@ -59,6 +65,8 @@ private:
     static uint8_t mSlotId;       // Bootloader storage slot
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
+    OTAImageHeaderParser mHeaderParser;
+    CharSpan mImageFile;
 };
 
 } // namespace chip

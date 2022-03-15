@@ -37,6 +37,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -787,20 +788,22 @@ CHIP_ERROR ChipDN::EncodeToASN1(ASN1Writer & writer) const
         {
             ASN1_START_SET
             {
-                char chipAttrStr[kChip64bitAttrUTF8Length + 1];
+                char chipAttrStr[kChip64bitAttrUTF8Length];
                 CharSpan asn1Attr;
                 uint8_t asn1Tag;
                 chip::ASN1::OID attrOID = rdn[i].mAttrOID;
 
                 if (IsChip64bitDNAttr(attrOID))
                 {
-                    snprintf(chipAttrStr, sizeof(chipAttrStr), ChipLogFormatX64, ChipLogValueX64(rdn[i].mChipVal));
+                    ReturnErrorOnFailure(
+                        Encoding::Uint64ToHex(rdn[i].mChipVal, chipAttrStr, sizeof(chipAttrStr), Encoding::HexFlags::kUppercase));
                     asn1Attr = CharSpan(chipAttrStr, kChip64bitAttrUTF8Length);
                     asn1Tag  = kASN1UniversalTag_UTF8String;
                 }
                 else if (IsChip32bitDNAttr(attrOID))
                 {
-                    snprintf(chipAttrStr, sizeof(chipAttrStr), "%08" PRIX32, static_cast<uint32_t>(rdn[i].mChipVal));
+                    ReturnErrorOnFailure(Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), chipAttrStr,
+                                                               sizeof(chipAttrStr), Encoding::HexFlags::kUppercase));
                     asn1Attr = CharSpan(chipAttrStr, kChip32bitAttrUTF8Length);
                     asn1Tag  = kASN1UniversalTag_UTF8String;
                 }
@@ -1010,7 +1013,7 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
     }
     if (!foundNodeId || !foundFabricId)
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     *outNodeId   = nodeId;
@@ -1051,7 +1054,7 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
         }
     }
 
-    return CHIP_ERROR_INVALID_ARGUMENT;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats)

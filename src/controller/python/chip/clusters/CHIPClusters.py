@@ -148,7 +148,6 @@ class ChipClusters:
                         "discriminator": "int",
                         "iterations": "int",
                         "salt": "bytes",
-                        "passcodeID": "int",
                     },
                 },
             0x00000002: {
@@ -2287,6 +2286,58 @@ class ChipClusters:
                     "attributeId": 0x00000008,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFF8: {
+                    "attributeName": "ServerGeneratedCommandList",
+                    "attributeId": 0x0000FFF8,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFF9: {
+                    "attributeName": "ClientGeneratedCommandList",
+                    "attributeId": 0x0000FFF9,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFC: {
+                    "attributeName": "FeatureMap",
+                    "attributeId": 0x0000FFFC,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                    "reportable": True,
+                },
+            },
+    }
+    _FAN_CONTROL_CLUSTER_INFO = {
+            "clusterName": "FanControl",
+            "clusterId": 0x00000202,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "FanMode",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000001: {
+                    "attributeName": "FanModeSequence",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
                 },
                 0x0000FFF8: {
                     "attributeName": "ServerGeneratedCommandList",
@@ -5275,6 +5326,13 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x0000002B: {
+                    "attributeName": "ListFabricScoped",
+                    "attributeId": 0x0000002B,
+                    "type": "",
+                    "reportable": True,
+                    "writable": True,
+                },
                 0x00000030: {
                     "attributeName": "TimedWriteBoolean",
                     "attributeId": 0x00000030,
@@ -6700,6 +6758,7 @@ class ChipClusters:
     0x00000101: _DOOR_LOCK_CLUSTER_INFO,
     0x00000B04: _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
     0x00000037: _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+    0x00000202: _FAN_CONTROL_CLUSTER_INFO,
     0x00000040: _FIXED_LABEL_CLUSTER_INFO,
     0x00000404: _FLOW_MEASUREMENT_CLUSTER_INFO,
     0x00000030: _GENERAL_COMMISSIONING_CLUSTER_INFO,
@@ -6766,6 +6825,7 @@ class ChipClusters:
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "ElectricalMeasurement": _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         "EthernetNetworkDiagnostics": _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+        "FanControl": _FAN_CONTROL_CLUSTER_INFO,
         "FixedLabel": _FIXED_LABEL_CLUSTER_INFO,
         "FlowMeasurement": _FLOW_MEASUREMENT_CLUSTER_INFO,
         "GeneralCommissioning": _GENERAL_COMMISSIONING_CLUSTER_INFO,

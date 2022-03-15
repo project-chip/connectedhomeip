@@ -35,9 +35,7 @@
  *
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
-class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate,
-                                       public chip::PersistentStorageDelegate,
-                                       public chip::FabricStorage
+class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate, public chip::PersistentStorageDelegate
 {
 public:
     ~AndroidDeviceControllerWrapper();
@@ -65,11 +63,6 @@ public:
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
-
-    // FabricStorage implementation
-    CHIP_ERROR SyncStore(chip::FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override;
-    CHIP_ERROR SyncLoad(chip::FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override;
-    CHIP_ERROR SyncDelete(chip::FabricIndex fabricIndex, const char * key) override;
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {

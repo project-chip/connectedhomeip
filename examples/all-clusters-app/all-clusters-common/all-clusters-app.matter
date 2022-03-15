@@ -99,7 +99,6 @@ server cluster AdministratorCommissioning = 60 {
     INT16U discriminator = 2;
     INT32U iterations = 3;
     OCTET_STRING salt = 4;
-    INT16U passcodeID = 5;
   }
 
   timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
@@ -1458,8 +1457,8 @@ server cluster GeneralDiagnostics = 51 {
 
 server cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicy : ENUM8 {
-    kStandard = 0;
-    kTrustFirst = 1;
+    kTrustFirst = 0;
+    kCacheAndSync = 1;
   }
 
   struct GroupKeyMapStruct {
@@ -2193,9 +2192,9 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   struct ProviderLocation {
-    fabric_idx fabricIndex = 0;
     node_id providerNodeID = 1;
     endpoint_no endpoint = 2;
+    fabric_idx fabricIndex = 254;
   }
 
   info event StateTransition = 0 {
@@ -2801,9 +2800,9 @@ server cluster TargetNavigator = 1285 {
 }
 
 server cluster TemperatureMeasurement = 1026 {
-  readonly attribute int16s measuredValue = 0;
-  readonly attribute int16s minMeasuredValue = 1;
-  readonly attribute int16s maxMeasuredValue = 2;
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
   readonly global attribute int16u clusterRevision = 65533;
 }
@@ -2814,6 +2813,34 @@ server cluster TestCluster = 1295 {
     kValueA = 1;
     kValueB = 2;
     kValueC = 3;
+  }
+
+  bitmap Bitmap16MaskMap : BITMAP16 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x4000;
+  }
+
+  bitmap Bitmap32MaskMap : BITMAP32 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x40000000;
+  }
+
+  bitmap Bitmap64MaskMap : BITMAP64 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x4000000000000000;
+  }
+
+  bitmap Bitmap8MaskMap : BITMAP8 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x40;
   }
 
   bitmap SimpleBitmap : BITMAP8 {
@@ -2855,6 +2882,13 @@ server cluster TestCluster = 1295 {
 
   struct TestFabricScoped {
     fabric_idx fabricIndex = 0;
+    INT8U fabricSensitiveInt8u = 1;
+    optional INT8U optionalFabricSensitiveInt8u = 2;
+    nullable INT8U nullableFabricSensitiveInt8u = 3;
+    optional nullable INT8U nullableOptionalFabricSensitiveInt8u = 4;
+    CHAR_STRING fabricSensitiveCharString = 5;
+    SimpleStruct fabricSensitiveStruct = 6;
+    INT8U fabricSensitiveInt8uList[] = 7;
   }
 
   struct NestedStructList {
@@ -2887,10 +2921,10 @@ server cluster TestCluster = 1295 {
   }
 
   attribute boolean boolean = 0;
-  attribute bitmap8 bitmap8 = 1;
-  attribute bitmap16 bitmap16 = 2;
-  attribute bitmap32 bitmap32 = 3;
-  attribute bitmap64 bitmap64 = 4;
+  attribute Bitmap8MaskMap bitmap8 = 1;
+  attribute Bitmap16MaskMap bitmap16 = 2;
+  attribute Bitmap32MaskMap bitmap32 = 3;
+  attribute Bitmap64MaskMap bitmap64 = 4;
   attribute int8u int8u = 5;
   attribute int16u int16u = 6;
   attribute int24u int24u = 7;
@@ -2929,15 +2963,15 @@ server cluster TestCluster = 1295 {
   attribute int16u rangeRestrictedInt16u = 40;
   attribute int16s rangeRestrictedInt16s = 41;
   attribute LONG_OCTET_STRING listLongOctetString[] = 42;
-  readonly attribute TestFabricScoped listFabricScoped[] = 43;
+  attribute TestFabricScoped listFabricScoped[] = 43;
   attribute boolean timedWriteBoolean = 48;
   attribute boolean generalErrorBoolean = 49;
   attribute boolean clusterErrorBoolean = 50;
   attribute nullable boolean nullableBoolean = 32768;
-  attribute nullable bitmap8 nullableBitmap8 = 32769;
-  attribute nullable bitmap16 nullableBitmap16 = 32770;
-  attribute nullable bitmap32 nullableBitmap32 = 32771;
-  attribute nullable bitmap64 nullableBitmap64 = 32772;
+  attribute nullable Bitmap8MaskMap nullableBitmap8 = 32769;
+  attribute nullable Bitmap16MaskMap nullableBitmap16 = 32770;
+  attribute nullable Bitmap32MaskMap nullableBitmap32 = 32771;
+  attribute nullable Bitmap64MaskMap nullableBitmap64 = 32772;
   attribute nullable int8u nullableInt8u = 32773;
   attribute nullable int16u nullableInt16u = 32774;
   attribute nullable int24u nullableInt24u = 32775;
@@ -3091,6 +3125,31 @@ server cluster Thermostat = 513 {
     kHeatAndCoolSetpoints = 2;
   }
 
+  enum ThermostatControlSequence : ENUM8 {
+    kCoolingOnly = 0;
+    kCoolingWithReheat = 1;
+    kHeatingOnly = 2;
+    kHeatingWithReheat = 3;
+    kCoolingAndHeating = 4;
+    kCoolingAndHeatingWithReheat = 5;
+  }
+
+  enum ThermostatRunningMode : ENUM8 {
+    kOff = 0;
+    kCool = 3;
+    kHeat = 4;
+  }
+
+  enum ThermostatSystemMode : ENUM8 {
+    kOff = 0;
+    kAuto = 1;
+    kCool = 3;
+    kHeat = 4;
+    kEmergencyHeating = 5;
+    kPrecooling = 6;
+    kFanOnly = 7;
+  }
+
   bitmap DayOfWeek : BITMAP8 {
     kSunday = 0x1;
     kMonday = 0x2;
@@ -3128,7 +3187,7 @@ server cluster Thermostat = 513 {
   attribute int16s minCoolSetpointLimit = 23;
   attribute int16s maxCoolSetpointLimit = 24;
   attribute int8s minSetpointDeadBand = 25;
-  attribute enum8 controlSequenceOfOperation = 27;
+  attribute ThermostatControlSequence controlSequenceOfOperation = 27;
   attribute enum8 systemMode = 28;
   readonly attribute enum8 startOfWeek = 32;
   readonly attribute int8u numberOfWeeklyTransitions = 33;

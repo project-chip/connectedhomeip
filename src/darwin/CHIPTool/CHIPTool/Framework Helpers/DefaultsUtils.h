@@ -26,6 +26,7 @@ extern NSString * const kNetworkPasswordDefaultsKey;
 extern NSString * const kFabricIdKey;
 
 CHIPDeviceController * InitializeCHIP(void);
+void CHIPRestartController(CHIPDeviceController * controller);
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
 void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
 void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key);

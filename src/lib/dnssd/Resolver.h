@@ -301,12 +301,28 @@ enum class DiscoveryFilterType : uint8_t
 struct DiscoveryFilter
 {
     DiscoveryFilterType type;
-    uint64_t code;
-    const char * instanceName;
+    uint64_t code             = 0;
+    const char * instanceName = nullptr;
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
-    DiscoveryFilter(DiscoveryFilterType newType) : type(newType) {}
-    DiscoveryFilter(DiscoveryFilterType newType, uint64_t newCode) : type(newType), code(newCode) {}
-    DiscoveryFilter(DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
+    DiscoveryFilter(const DiscoveryFilterType newType) : type(newType) {}
+    DiscoveryFilter(const DiscoveryFilterType newType, uint64_t newCode) : type(newType), code(newCode) {}
+    DiscoveryFilter(const DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName)
+    {}
+    bool operator==(const DiscoveryFilter & other) const
+    {
+        if (type != other.type)
+        {
+            return false;
+        }
+        if (type == DiscoveryFilterType::kInstanceName)
+        {
+            return (instanceName != nullptr) && (other.instanceName != nullptr) && (strcmp(instanceName, other.instanceName) == 0);
+        }
+        else
+        {
+            return code == other.code;
+        }
+    }
 };
 enum class DiscoveryType
 {
@@ -395,17 +411,6 @@ public:
      * `OnNodeIdResolutionFailed` method, respectively.
      */
     virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
-
-    /**
-     * Explicit attempt to resolve a NodeID without performing network operations.
-     *
-     * If the required entry exists in an internal cache, this will call the
-     * underlying delegate `OnNodeIdResolved` and will return true;
-     *
-     * Returns false if the corresponding entry does not exist in the internal cache.
-     * This will NEVER call `OnNodeIdResolutionFailed` and this method does not block.
-     */
-    virtual bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) = 0;
 
     /**
      * Finds all commissionable nodes matching the given filter.

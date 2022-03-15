@@ -30,7 +30,9 @@
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
+#include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
@@ -47,66 +49,6 @@ static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UI
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fabric index should not be valid");
-
-// KVS store is sensitive to length of key strings, based on the underlying
-// platform. Keeping them short.
-constexpr char kFabricTableKeyPrefix[] = "Fabric";
-constexpr char kFabricTableCountKey[]  = "NumFabrics";
-
-class DLL_EXPORT FabricStorage
-{
-public:
-    virtual ~FabricStorage() {}
-
-    /**
-     * Gets called when fabric data needs to be stored.
-     **/
-    virtual CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) = 0;
-
-    /**
-     * Gets called when fabric data needs to be loaded.
-     **/
-    virtual CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) = 0;
-
-    /**
-     * Gets called when fabric data needs to be removed.
-     **/
-    virtual CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) = 0;
-};
-
-/**
- * @brief A default implementation of Fabric storage that preserves legacy behavior of using
- *        the Persistent storage delegate directly.
- *
- *        This class automatically prefixes the Fabric Storage Keys with the FabricIndex.
- *        The keys are formatted like so: "F%02X/" + key.
- *
- */
-class DLL_EXPORT SimpleFabricStorage : public FabricStorage
-{
-public:
-    SimpleFabricStorage(){};
-    SimpleFabricStorage(PersistentStorageDelegate * storage) : mStorage(storage){};
-    ~SimpleFabricStorage() override { mStorage = nullptr; };
-
-    CHIP_ERROR Initialize(PersistentStorageDelegate * storage)
-    {
-        VerifyOrReturnError(mStorage == nullptr || storage == mStorage, CHIP_ERROR_INCORRECT_STATE);
-        mStorage = storage;
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override;
-
-    CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override;
-
-    CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override;
-
-private:
-    const static int MAX_KEY_SIZE = 32;
-
-    PersistentStorageDelegate * mStorage = nullptr;
-};
 
 /**
  * Defines state of a pairing established by a fabric.
@@ -154,6 +96,16 @@ public:
 
     FabricId GetFabricId() const { return mFabricId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
+
+    CompressedFabricId GetCompressedId() const { return mOperationalId.GetCompressedFabricId(); }
+
+    CHIP_ERROR GetCompressedId(MutableByteSpan & compressedFabricId) const
+    {
+        ReturnErrorCodeIf(compressedFabricId.size() != sizeof(uint64_t), CHIP_ERROR_INVALID_ARGUMENT);
+        Encoding::BigEndian::Put64(compressedFabricId.data(), GetCompressedId());
+        return CHIP_NO_ERROR;
+    }
+
     uint16_t GetVendorId() const { return mVendorId; }
 
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
@@ -252,11 +204,21 @@ public:
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
        root public key of the fabric. The generated compressed ID is returned via compressedPeerId
        output parameter */
-    CHIP_ERROR GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
+    CHIP_ERROR GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
 
     friend class FabricTable;
 
 private:
+    static constexpr size_t MetadataTLVMaxSize()
+    {
+        return TLV::EstimateStructOverhead(sizeof(VendorId), kFabricLabelMaxLengthInBytes);
+    }
+
+    static constexpr size_t OpKeyTLVMaxSize()
+    {
+        return TLV::EstimateStructOverhead(sizeof(uint16_t), Crypto::P256SerializedKeypair::Capacity());
+    }
+
     PeerId mOperationalId;
 
     FabricIndex mFabric                                 = kUndefinedFabricIndex;
@@ -275,13 +237,9 @@ private:
 
     FabricId mFabricId = 0;
 
-    static constexpr size_t kKeySize = sizeof(kFabricTableKeyPrefix) + 2 * sizeof(FabricIndex);
-
-    static CHIP_ERROR GenerateKey(FabricIndex id, char * key, size_t len);
-
-    CHIP_ERROR CommitToStorage(FabricStorage * storage);
-    CHIP_ERROR LoadFromStorage(FabricStorage * storage);
-    static CHIP_ERROR DeleteFromStorage(FabricStorage * storage, FabricIndex fabricIndex);
+    CHIP_ERROR CommitToStorage(PersistentStorageDelegate * storage);
+    CHIP_ERROR LoadFromStorage(PersistentStorageDelegate * storage);
+    static CHIP_ERROR DeleteFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex);
 
     void ReleaseCert(MutableByteSpan & cert);
     void ReleaseOperationalCerts()
@@ -295,9 +253,7 @@ private:
 
     struct StorableFabricInfo
     {
-        uint16_t mFabric;   /* This field is serialized in LittleEndian byte order */
-        uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
-        uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
+        uint8_t mFabricIndex;
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
 
         uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
@@ -320,6 +276,7 @@ class DLL_EXPORT FabricTableDelegate
     friend class FabricTable;
 
 public:
+    FabricTableDelegate(bool ownedByFabricTable = false) : mOwnedByFabricTable(ownedByFabricTable) {}
     virtual ~FabricTableDelegate() {}
     /**
      * Gets called when a fabric is deleted from KVS store.
@@ -338,6 +295,7 @@ public:
 
 private:
     FabricTableDelegate * mNext = nullptr;
+    bool mOwnedByFabricTable    = false;
 };
 
 /**
@@ -411,6 +369,8 @@ class DLL_EXPORT FabricTable
 {
 public:
     FabricTable() { Reset(); }
+    ~FabricTable();
+
     CHIP_ERROR Store(FabricIndex index);
     CHIP_ERROR LoadFromStorage(FabricInfo * info);
 
@@ -440,7 +400,7 @@ public:
 
     void Reset();
 
-    CHIP_ERROR Init(FabricStorage * storage);
+    CHIP_ERROR Init(PersistentStorageDelegate * storage);
     CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
 
     uint8_t FabricCount() const { return mFabricCount; }
@@ -452,7 +412,7 @@ public:
 
 private:
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
-    FabricStorage * mStorage = nullptr;
+    PersistentStorageDelegate * mStorage = nullptr;
 
     FabricTableDelegate * mDelegate = nullptr;
 

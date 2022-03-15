@@ -17,6 +17,7 @@
 
 #include <app/clusters/bindings/PendingNotificationMap.h>
 #include <app/util/binding-table.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
@@ -36,7 +37,7 @@ void ClearBindingTable(BindingTable & table)
     auto iter = table.begin();
     while (iter != table.end())
     {
-        iter = table.RemoveAt(iter);
+        table.RemoveAt(iter);
     }
 }
 
@@ -140,6 +141,8 @@ int TestPeindingNotificationMap()
         nullptr,
         nullptr,
     };
+    chip::TestPersistentStorageDelegate storage;
+    BindingTable::GetInstance().SetPersistentStorage(&storage);
     nlTestRunner(&theSuite, nullptr);
     return (nlTestRunnerStats(&theSuite));
 }

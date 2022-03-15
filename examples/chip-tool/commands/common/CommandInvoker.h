@@ -117,19 +117,14 @@ public:
 
         ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, aRequestData));
 
-        Optional<SessionHandle> session = exchangeManager->GetSessionManager()->CreateGroupSession(groupId, fabric, sourceNodeId);
-        if (!session.HasValue())
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        Transport::OutgoingGroupSession session(groupId, fabric, sourceNodeId);
 
         // this (invoker) and commandSender will be deleted by the onDone call before the return of SendGroupCommandRequest
         // this (invoker) should not be used after the SendGroupCommandRequest call
-        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(session.Value()));
+        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(SessionHandle(session)));
 
         // this (invoker) and commandSender are already deleted and are not to be used
         commandSender.release();
-        exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
 
         return CHIP_NO_ERROR;
     }

@@ -34,8 +34,8 @@ public:
     }
 };
 
-{{>test_cluster tests=(getTests) credsIssuerConfigArg=true}}
-{{>test_cluster tests=(getManualTests) credsIssuerConfigArg=true}}
+{{>test_cluster tests=(getTests) credsIssuerConfigArg=true needsWaitDuration=true}}
+{{>test_cluster tests=(getManualTests) credsIssuerConfigArg=true needsWaitDuration=true}}
 
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {

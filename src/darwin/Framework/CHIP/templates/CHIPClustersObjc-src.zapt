@@ -3,6 +3,7 @@
 {{#if (chip_has_client_clusters)}}
 #import <Foundation/Foundation.h>
 
+#import "CHIPAttributeCacheContainer_Internal.h"
 #import "CHIPCallbackBridge_internal.h"
 #import "CHIPCluster_internal.h"
 #import "CHIPClustersObjc_internal.h"
@@ -144,6 +145,30 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
               params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]
           );
       }, subscriptionEstablishedHandler);
+}
+
++ (void) read{{>attribute}}WithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIP{{>attribute_data_callback_name}}CallbackBridge(queue,
+      completionHandler,
+      ^(Cancelable * success, Cancelable * failure) {
+          if (attributeCacheContainer.cppAttributeCache) {
+              chip::app::ConcreteAttributePath path;
+              using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+              path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+              path.mClusterId = TypeInfo::GetClusterId();
+              path.mAttributeId = TypeInfo::GetAttributeId();
+              TypeInfo::DecodableType value;
+              CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+              auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
+              if (err == CHIP_NO_ERROR)
+              {
+                successFn->mCall(successFn->mContext, value);
+              }
+              return err;
+          }
+          return CHIP_ERROR_NOT_FOUND;
+      });
 }
 
 {{/if}}

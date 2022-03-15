@@ -93,6 +93,7 @@
             if (!xpcConnection) {
                 CHIP_LOG_ERROR("Cannot connect to XPC server for remote controller");
                 completion(self.workQueue, nil);
+                return;
             }
             xpcConnection.remoteObjectInterface = self.remoteDeviceServerProtocol;
             xpcConnection.exportedInterface = self.remoteDeviceClientProtocol;

@@ -250,18 +250,20 @@ class ClusterObjectTests:
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
         fabricIndex = res[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
 
-        logger.info("8: Read without fabric filter")
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
-            raise AssertionError("Expect more elements in the response")
-
-        logger.info("9: Read with fabric filter")
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=True)
-        if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
-            raise AssertionError("Expect exact one element in the response")
-        if res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped][0].fabricIndex != fabricIndex:
-            raise AssertionError(
-                "Expect the fabric index matches the one current reading")
+        #
+        # TODO: Enable this back once Issue #15688 has been resolved.
+        #
+        # logger.info("8: Read without fabric filter")
+        # res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
+        # if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
+        #     raise AssertionError("Expect more elements in the response")
+        # logger.info("9: Read with fabric filter")
+        # res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=True)
+        # if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
+        #     raise AssertionError("Expect exact one element in the response")
+        # if res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped][0].fabricIndex != fabricIndex:
+        #     raise AssertionError(
+        #         "Expect the fabric index matches the one current reading")
 
     async def TriggerAndWaitForEvents(cls, devCtrl, req):
         # We trigger sending an event a couple of times just to be safe.
@@ -286,14 +288,14 @@ class ClusterObjectTests:
     async def TestReadEventRequests(cls, devCtrl, expectEventsNum):
         logger.info("1: Reading Ex Cx Ex")
         req = [
-            (1, Clusters.TestCluster.Events.TestEvent),
+            (1, Clusters.TestCluster.Events.TestEvent, 0),
         ]
 
         await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
 
         logger.info("2: Reading Ex Cx E*")
         req = [
-            (1, Clusters.TestCluster),
+            (1, Clusters.TestCluster, 0),
         ]
 
         await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
@@ -308,6 +310,13 @@ class ClusterObjectTests:
         logger.info("4: Reading E* C* E*")
         req = [
             '*'
+        ]
+
+        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
+
+        logger.info("5: Reading Ex Cx E* Urgency")
+        req = [
+            (1, Clusters.TestCluster, 1),
         ]
 
         await cls.TriggerAndWaitForEvents(cls, devCtrl, req)

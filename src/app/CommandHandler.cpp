@@ -344,7 +344,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     err = commandPath.GetCommandId(&commandId);
     SuccessOrExit(err);
 
-    groupId = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetGroupId();
+    groupId = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     fabric  = GetAccessingFabricIndex();
 
     ChipLogDetail(DataManagement,

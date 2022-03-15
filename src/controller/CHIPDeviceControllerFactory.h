@@ -31,6 +31,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace chip {
@@ -39,9 +40,6 @@ namespace Controller {
 
 struct SetupParams
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate = nullptr;
-#endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
     PersistentStorageDelegate * storageDelegate = nullptr;
@@ -77,7 +75,6 @@ struct SetupParams
 // We're blocked because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
-    FabricStorage * fabricStorage                                 = nullptr;
     System::Layer * systemLayer                                   = nullptr;
     PersistentStorageDelegate * fabricIndependentStorage          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
@@ -141,6 +138,41 @@ public:
     //
     void ReleaseSystemState() { mSystemState->Release(); }
 
+    class ControllerFabricDelegate final : public FabricTableDelegate
+    {
+    public:
+        ControllerFabricDelegate() {}
+        ControllerFabricDelegate(SessionManager * sessionManager) : FabricTableDelegate(true), mSessionManager(sessionManager) {}
+
+        CHIP_ERROR Init(SessionManager * sessionManager)
+        {
+            VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+            mSessionManager = sessionManager;
+            return CHIP_NO_ERROR;
+        };
+
+        void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
+        {
+            if (mSessionManager != nullptr)
+            {
+                mSessionManager->FabricRemoved(fabricIndex);
+            }
+            Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+            if (groupDataProvider != nullptr)
+            {
+                groupDataProvider->RemoveFabric(fabricIndex);
+            }
+        };
+
+        void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+
+        void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+
+    private:
+        SessionManager * mSessionManager = nullptr;
+    };
+
 private:
     DeviceControllerFactory(){};
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
@@ -148,7 +180,6 @@ private:
     CHIP_ERROR InitSystemState();
 
     uint16_t mListenPort;
-    FabricStorage * mFabricStorage                        = nullptr;
     DeviceControllerSystemState * mSystemState            = nullptr;
     PersistentStorageDelegate * mFabricIndependentStorage = nullptr;
 };

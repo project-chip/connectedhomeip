@@ -101,6 +101,7 @@ void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
         CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.node.Value());
         if (err != CHIP_NO_ERROR)
         {
+            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
             ChipLogProgress(
                 Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                 ChipLogValueX64(entry.node.Value()), err.Format());
@@ -128,7 +129,7 @@ CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeVa
     return encoder.EncodeList([&](const auto & subEncoder) {
         for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
         {
-            if (entry.type == EMBER_UNICAST_BINDING)
+            if (entry.local == endpoint && entry.type == EMBER_UNICAST_BINDING)
             {
                 Binding::Structs::TargetStruct::Type value = {
                     .fabricIndex = entry.fabricIndex,
@@ -139,7 +140,7 @@ CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeVa
                 };
                 ReturnErrorOnFailure(subEncoder.Encode(value));
             }
-            else if (entry.type == EMBER_MULTICAST_BINDING)
+            else if (entry.local == endpoint && entry.type == EMBER_MULTICAST_BINDING)
             {
                 Binding::Structs::TargetStruct::Type value = {
                     .fabricIndex = entry.fabricIndex,
@@ -177,17 +178,17 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         ReturnErrorOnFailure(decoder.Decode(newBindingList));
         ReturnErrorOnFailure(CheckValidBindingList(newBindingList, accessingFabricIndex));
 
-        // Clear all entries for the current accessing fabric
+        // Clear all entries for the current accessing fabric and endpoint
         auto bindingTableIter = BindingTable::GetInstance().begin();
         while (bindingTableIter != BindingTable::GetInstance().end())
         {
-            if (bindingTableIter->fabricIndex == accessingFabricIndex)
+            if (bindingTableIter->local == path.mEndpointId && bindingTableIter->fabricIndex == accessingFabricIndex)
             {
                 if (bindingTableIter->type == EMBER_UNICAST_BINDING)
                 {
                     BindingManager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
                 }
-                bindingTableIter = BindingTable::GetInstance().RemoveAt(bindingTableIter);
+                ReturnErrorOnFailure(BindingTable::GetInstance().RemoveAt(bindingTableIter));
             }
             else
             {

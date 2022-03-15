@@ -33,6 +33,7 @@ public:
         AddArgument("attribute-value", &mAttributeValue);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         ModelCommand::AddArguments();
     }
 
@@ -43,6 +44,7 @@ public:
         AddArgument("attribute-value", &mAttributeValue);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         ModelCommand::AddArguments();
     }
 
@@ -51,13 +53,14 @@ public:
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
     }
 
     ~WriteAttribute() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, mAttributeValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), mClusterId, mAttributeId, mAttributeValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId) override
@@ -103,7 +106,8 @@ public:
         attributePathParams.mClusterId   = clusterId;
         attributePathParams.mAttributeId = attributeId;
 
-        mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), this, mTimedInteractionTimeoutMs);
+        mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), this, mTimedInteractionTimeoutMs,
+                                                                mSuppressResponse.ValueOr(false));
 
         ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, mDataVersion));
 
@@ -128,15 +132,8 @@ public:
         VerifyOrReturnError(writeClient != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(writeClient->EncodeAttribute(attributePathParams, value, mDataVersion));
 
-        chip::Optional<chip::SessionHandle> session =
-            exchangeManager->GetSessionManager()->CreateGroupSession(groupId, fabricIndex, senderNodeId);
-        if (!session.HasValue())
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        CHIP_ERROR err = writeClient->SendWriteRequest(session.Value());
-        exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
-        ReturnErrorOnFailure(err);
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex, senderNodeId);
+        ReturnErrorOnFailure(writeClient->SendWriteRequest(chip::SessionHandle(session)));
         writeClient.release();
 
         return CHIP_NO_ERROR;
@@ -148,6 +145,7 @@ private:
     CHIP_ERROR mError = CHIP_NO_ERROR;
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
     chip::Optional<chip::DataVersion> mDataVersion = chip::NullOptional;
+    chip::Optional<bool> mSuppressResponse;
     CustomArgument mAttributeValue;
     std::unique_ptr<chip::app::WriteClient> mWriteClient;
 };

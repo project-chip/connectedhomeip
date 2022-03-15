@@ -56,6 +56,10 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSUInteger clusterId, NSUInteger commandId, id fields, void (^completion)(id _Nullable values, NSError * _Nullable error));
 @property (readwrite, strong) void (^handleSubscribeAttribute)(id controller, uint64_t nodeId, NSUInteger endpointId,
     NSUInteger clusterId, NSUInteger attributeId, NSUInteger minInterval, NSUInteger maxInterval, void (^establishedHandler)(void));
+@property (readwrite, strong) void (^handleSubscribeAttributeCache)
+    (id controller, uint64_t nodeId, void (^completion)(NSError * _Nullable error));
+@property (readwrite, strong) void (^handleReadAttributeCache)(id controller, uint64_t nodeId, NSUInteger endpointId,
+    NSUInteger clusterId, NSUInteger attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error));
 
 @end
 
@@ -153,6 +157,29 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         XCTAssertNotNil(self.handleSubscribeAttribute);
         self.handleSubscribeAttribute(
             controller, nodeId, endpointId, clusterId, attributeId, minInterval, maxInterval, establishedHandler);
+    });
+}
+
+- (void)subscribeAttributeCacheWithController:(id _Nullable)controller
+                                       nodeId:(uint64_t)nodeId
+                                   completion:(void (^)(NSError * _Nullable error))completion
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        XCTAssertNotNil(self.handleSubscribeAttributeCache);
+        self.handleSubscribeAttributeCache(controller, nodeId, completion);
+    });
+}
+
+- (void)readAttributeCacheWithController:(id _Nullable)controller
+                                  nodeId:(uint64_t)nodeId
+                              endpointId:(NSUInteger)endpointId
+                               clusterId:(NSUInteger)clusterId
+                             attributeId:(NSUInteger)attributeId
+                              completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        XCTAssertNotNil(self.handleReadAttributeCache);
+        self.handleReadAttributeCache(controller, nodeId, endpointId, clusterId, attributeId, completion);
     });
 }
 
@@ -1610,6 +1637,225 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [self waitForExpectations:[NSArray arrayWithObjects:anySharedRemoteControllerCallExpectation, deviceAcquired, nil]
                       timeout:kTimeoutInSeconds];
+}
+
+- (void)testSubscribeAttributeCacheSuccess
+{
+    uint64_t myNodeId = 9876543210;
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
+
+    __auto_type uuid = self.controllerUUID;
+    __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
+    _handleSubscribeAttributeCache = ^(id controller, uint64_t nodeId, void (^completion)(NSError * _Nullable error)) {
+        NSLog(@"Subscribe attribute cache called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        [callExpectation fulfill];
+        completion(nil);
+    };
+
+    _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+    [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
+                                                  deviceId:myNodeId
+                                               clientQueue:dispatch_get_main_queue()
+                                                completion:^(NSError * _Nullable error) {
+                                                    NSLog(@"Subscribe completion called with error: %@", error);
+                                                    XCTAssertNil(error);
+                                                    [responseExpectation fulfill];
+                                                }];
+
+    [self waitForExpectations:@[ callExpectation, responseExpectation, self.xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
+}
+
+- (void)testSubscribeAttributeCacheFailure
+{
+    uint64_t myNodeId = 9876543210;
+    NSError * myError = [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil];
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
+
+    __auto_type uuid = self.controllerUUID;
+    __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
+    _handleSubscribeAttributeCache = ^(id controller, uint64_t nodeId, void (^completion)(NSError * _Nullable error)) {
+        NSLog(@"Subscribe attribute cache called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        [callExpectation fulfill];
+        completion(myError);
+    };
+
+    _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+    [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
+                                                  deviceId:myNodeId
+                                               clientQueue:dispatch_get_main_queue()
+                                                completion:^(NSError * _Nullable error) {
+                                                    NSLog(@"Subscribe completion called with error: %@", error);
+                                                    XCTAssertNotNil(error);
+                                                    [responseExpectation fulfill];
+                                                }];
+
+    [self waitForExpectations:@[ callExpectation, responseExpectation, _xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
+}
+
+- (void)testReadAttributeCacheSuccess
+{
+    uint64_t myNodeId = 9876543210;
+    NSUInteger myEndpointId = 100;
+    NSUInteger myClusterId = 200;
+    NSUInteger myAttributeId = 300;
+    NSArray * myValues =
+        [NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:myEndpointId],
+                                               @"endpointId", [NSNumber numberWithUnsignedInteger:myClusterId], @"clusterId",
+                                               [NSNumber numberWithUnsignedInteger:myAttributeId], @"attributeId",
+                                               [NSDictionary dictionaryWithObjectsAndKeys:@"SignedInteger", @"type",
+                                                             [NSNumber numberWithInteger:123456], @"value", nil],
+                                               @"data", nil]];
+    XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Cache subscription complete"];
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
+
+    __auto_type uuid = self.controllerUUID;
+    __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
+    _handleSubscribeAttributeCache = ^(id controller, uint64_t nodeId, void (^completion)(NSError * _Nullable error)) {
+        NSLog(@"Subscribe attribute cache called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion(nil);
+    };
+
+    _handleReadAttributeCache = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
+        NSUInteger attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+        NSLog(@"Read attribute cache called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        XCTAssertEqual(endpointId, myEndpointId);
+        XCTAssertEqual(clusterId, myClusterId);
+        XCTAssertEqual(attributeId, myAttributeId);
+        [callExpectation fulfill];
+        completion(myValues, nil);
+    };
+
+    [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
+                                                  deviceId:myNodeId
+                                               clientQueue:dispatch_get_main_queue()
+                                                completion:^(NSError * _Nullable error) {
+                                                    NSLog(@"Subscribe completion called with error: %@", error);
+                                                    XCTAssertNil(error);
+                                                    [subscribeExpectation fulfill];
+                                                }];
+    [self waitForExpectations:@[ subscribeExpectation ] timeout:kTimeoutInSeconds];
+
+    _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+    [attributeCacheContainer
+        readAttributeWithEndpointId:myEndpointId
+                          clusterId:myClusterId
+                        attributeId:myAttributeId
+                        clientQueue:dispatch_get_main_queue()
+                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"Read cached value: %@", values);
+                             XCTAssertNotNil(values);
+                             XCTAssertNil(error);
+                             XCTAssertTrue([myValues isEqualTo:values]);
+                             [responseExpectation fulfill];
+                         }];
+    [self waitForExpectations:@[ callExpectation, responseExpectation, _xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
+}
+
+- (void)testReadAttributeCacheFailure
+{
+    uint64_t myNodeId = 9876543210;
+    NSUInteger myEndpointId = 100;
+    NSUInteger myClusterId = 200;
+    NSUInteger myAttributeId = 300;
+    NSError * myError = [NSError errorWithDomain:CHIPErrorDomain code:CHIPErrorCodeGeneralError userInfo:nil];
+    XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Cache subscription complete"];
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
+
+    __auto_type uuid = self.controllerUUID;
+    __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
+    _handleSubscribeAttributeCache = ^(id controller, uint64_t nodeId, void (^completion)(NSError * _Nullable error)) {
+        NSLog(@"Subscribe attribute cache called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        completion(nil);
+    };
+
+    _handleReadAttributeCache = ^(id controller, uint64_t nodeId, NSUInteger endpointId, NSUInteger clusterId,
+        NSUInteger attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+        NSLog(@"Read attribute cache called");
+        XCTAssertTrue([controller isEqualToString:uuid]);
+        XCTAssertEqual(nodeId, myNodeId);
+        XCTAssertEqual(endpointId, myEndpointId);
+        XCTAssertEqual(clusterId, myClusterId);
+        XCTAssertEqual(attributeId, myAttributeId);
+        [callExpectation fulfill];
+        completion(nil, myError);
+    };
+
+    [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
+                                                  deviceId:myNodeId
+                                               clientQueue:dispatch_get_main_queue()
+                                                completion:^(NSError * _Nullable error) {
+                                                    NSLog(@"Subscribe completion called with error: %@", error);
+                                                    XCTAssertNil(error);
+                                                    [subscribeExpectation fulfill];
+                                                }];
+    [self waitForExpectations:@[ subscribeExpectation ] timeout:kTimeoutInSeconds];
+
+    _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+    [attributeCacheContainer
+        readAttributeWithEndpointId:myEndpointId
+                          clusterId:myClusterId
+                        attributeId:myAttributeId
+                        clientQueue:dispatch_get_main_queue()
+                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"Read cached value: %@", values);
+                             XCTAssertNil(values);
+                             XCTAssertNotNil(error);
+                             [responseExpectation fulfill];
+                         }];
+    [self waitForExpectations:@[ callExpectation, responseExpectation, _xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
+}
+
+- (void)testXPCConnectionFailure
+{
+    uint64_t myNodeId = 9876543210;
+    NSUInteger myEndpointId = 100;
+    NSUInteger myClusterId = 200;
+    NSUInteger myAttributeId = 300;
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"Read response received"];
+
+    // Test with a device controller which wouldn't connect to XPC listener successfully
+    __auto_type failingDeviceController = [CHIPDeviceController sharedControllerWithId:_controllerUUID
+                                                                       xpcConnectBlock:^NSXPCConnection * {
+                                                                           return nil;
+                                                                       }];
+
+    [failingDeviceController getConnectedDevice:myNodeId
+                                          queue:dispatch_get_main_queue()
+                              completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                                  XCTAssertNotNil(device);
+                                  XCTAssertNil(error);
+                                  NSLog(@"Device acquired. Reading...");
+                                  [device readAttributeWithEndpointId:myEndpointId
+                                                            clusterId:myClusterId
+                                                          attributeId:myAttributeId
+                                                          clientQueue:dispatch_get_main_queue()
+                                                           completion:^(id _Nullable value, NSError * _Nullable error) {
+                                                               NSLog(@"Read value: %@", value);
+                                                               XCTAssertNil(value);
+                                                               XCTAssertNotNil(error);
+                                                               [responseExpectation fulfill];
+                                                           }];
+                              }];
+
+    [self waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds];
 }
 
 @end
