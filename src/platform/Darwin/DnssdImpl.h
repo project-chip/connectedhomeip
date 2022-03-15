@@ -19,6 +19,7 @@
 
 #include <dns_sd.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <lib/support/CHIPMemString.h>
 
 #include <cstring>
 #include <string>
