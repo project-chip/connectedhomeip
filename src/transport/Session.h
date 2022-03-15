@@ -19,6 +19,7 @@
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/PeerId.h>
+#include <lib/core/ScopedNodeId.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/SessionHolder.h>
 #include <transport/raw/PeerAddress.h>
