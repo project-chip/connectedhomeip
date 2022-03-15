@@ -32,7 +32,7 @@ using chip::Shell::streamer_get;
 namespace {
 
 // max > 1
-ssize_t ReadLine(char * buffer, size_t max)
+size_t ReadLine(char * buffer, size_t max)
 {
     size_t line_sz = 0;
 
@@ -191,7 +191,7 @@ void Engine::RunMainLoop()
     while (true)
     {
         char * line = static_cast<char *>(Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));
-        if (ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE) == 0)
+        if (ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE) == 0u)
         {
             // Stop loop in case of empty read (Ctrl-D).
             break;
