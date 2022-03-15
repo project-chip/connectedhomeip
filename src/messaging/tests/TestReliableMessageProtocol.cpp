@@ -1501,14 +1501,16 @@ const unsigned theBackoffComplianceTestVectorLength =
 
 void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
 {
-    for (unsigned i = 0; i < theBackoffComplianceTestVectorLength; i++)
-    {
-        struct BackoffComplianceTestVector * test = &theBackoffComplianceTestVector[i];
-        System::Clock::Timestamp backoff          = ReliableMessageMgr::GetBackoff(test->backoffBase, test->sendCount);
-        ChipLogProgress(Test, "Backoff # %d: %d", test->sendCount, (uint32_t) backoff.count());
+    for (uint32_t j = 0; j < 3; j++) {
+        for (uint32_t i = 0; i < theBackoffComplianceTestVectorLength; i++)
+        {
+            struct BackoffComplianceTestVector * test = &theBackoffComplianceTestVector[i];
+            System::Clock::Timestamp backoff          = ReliableMessageMgr::GetBackoff(test->backoffBase, test->sendCount);
+            ChipLogProgress(Test, "Backoff # %d: %d", test->sendCount, (uint32_t) backoff.count());
 
-        NL_TEST_ASSERT(inSuite, backoff >= test->backoffMin);
-        NL_TEST_ASSERT(inSuite, backoff <= test->backoffMax);
+            NL_TEST_ASSERT(inSuite, backoff >= test->backoffMin);
+            NL_TEST_ASSERT(inSuite, backoff <= test->backoffMax);
+        }
     }
 }
 
