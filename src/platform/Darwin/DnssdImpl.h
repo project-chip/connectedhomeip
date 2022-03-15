@@ -21,7 +21,7 @@
 #include <lib/dnssd/platform/Dnssd.h>
 #include <lib/support/CHIPMemString.h>
 
-#include <cstring>
+#include <string.h>
 #include <string>
 #include <vector>
 
@@ -57,7 +57,7 @@ struct RegisterContext : public GenericContext
         Platform::CopyString(mType, sType);
     }
 
-    bool matches(const char * sType) { return (::std::strcmp(mType, sType) == 0); }
+    bool matches(const char * sType) { return (strcmp(mType, sType) == 0); }
 };
 
 struct BrowseContext : public GenericContext
