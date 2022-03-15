@@ -698,8 +698,8 @@ public:
 private:
     DevicePairingDelegate * mPairingDelegate;
 
-    DeviceProxy * mDeviceBeingCommissioned       = nullptr;
-    CommissioneeDeviceProxy * mDeviceBeingPaired = nullptr;
+    DeviceProxy * mDeviceBeingCommissioned           = nullptr;
+    CommissioneeDeviceProxy * mDeviceInProcessOfPase = nullptr;
 
     /* This field is true when device pairing information changes, e.g. a new device is paired, or
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to

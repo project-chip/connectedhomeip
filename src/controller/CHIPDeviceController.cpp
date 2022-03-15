@@ -632,7 +632,7 @@ DeviceCommissioner::DeviceCommissioner() :
     mPairingDelegate         = nullptr;
     mPairedDevicesUpdated    = false;
     mDeviceBeingCommissioned = nullptr;
-    mDeviceBeingPaired       = nullptr;
+    mDeviceInProcessOfPase   = nullptr;
 }
 
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
@@ -683,7 +683,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
     // Check to see if pairing in progress before shutting down
-    CommissioneeDeviceProxy * device = mDeviceBeingPaired;
+    CommissioneeDeviceProxy * device = mDeviceInProcessOfPase;
     if (device != nullptr && device->IsSessionSetupInProgress())
     {
         ChipLogDetail(Controller, "Setup in progress, stopping setup before shutting down");
@@ -799,7 +799,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     uint16_t keyID = 0;
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mDeviceBeingPaired == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mDeviceInProcessOfPase == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // This will initialize the commissionee device pool if it has not already been initialized.
     err = InitializePairedDeviceList();
@@ -830,7 +830,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     device = mCommissioneeDevicePool.CreateObject();
     VerifyOrExit(device != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    mDeviceBeingPaired = device;
+    mDeviceInProcessOfPase = device;
 
     {
         FabricIndex fabricIndex = mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex;
@@ -887,7 +887,7 @@ exit:
         if (device != nullptr)
         {
             ReleaseCommissioneeDevice(device);
-            mDeviceBeingPaired = nullptr;
+            mDeviceInProcessOfPase = nullptr;
         }
     }
 
@@ -909,7 +909,7 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
         ChipLogError(Controller, "Invalid device for commissioning " ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    if (!device->IsSecureConnected() && device != mDeviceBeingPaired)
+    if (!device->IsSecureConnected() && device != mDeviceInProcessOfPase)
     {
         // We should not end up in this state because we won't attempt to establish more than one connection at a time.
         ChipLogError(Controller, "Device is not connected and not being paired " ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
@@ -970,13 +970,13 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
-    if (mDeviceBeingPaired != nullptr)
+    if (mDeviceInProcessOfPase != nullptr)
     {
         // Release the commissionee device. For BLE, this is stored,
         // for IP commissioning, we have taken a reference to the
         // operational node to send the completion command.
-        ReleaseCommissioneeDevice(mDeviceBeingPaired);
-        mDeviceBeingPaired = nullptr;
+        ReleaseCommissioneeDevice(mDeviceInProcessOfPase);
+        mDeviceInProcessOfPase = nullptr;
     }
 
     if (mPairingDelegate != nullptr)
@@ -1001,10 +1001,10 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 void DeviceCommissioner::OnSessionEstablished()
 {
     // PASE session established.
-    CommissioneeDeviceProxy * device = mDeviceBeingPaired;
+    CommissioneeDeviceProxy * device = mDeviceInProcessOfPase;
 
     // We are in the callback for this pairing. Reset so we can pair another device.
-    mDeviceBeingPaired = nullptr;
+    mDeviceInProcessOfPase = nullptr;
 
     VerifyOrReturn(device != nullptr, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
 
