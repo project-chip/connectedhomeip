@@ -63,6 +63,8 @@ if [ "$#" == "0" ]; then
             Monitor & log memory usage at runtime. (Default false)
         enable_openthread_cli
             Enables openthread cli without matter shell. (Default true)
+        show_qr_code
+            Enables QR code on LCD for devices with an LCD
         setupDiscriminator
             Discriminatoor value used for BLE connexion. (Default 3840)
         setupPinCode
@@ -80,7 +82,8 @@ if [ "$#" == "0" ]; then
             Periodic query timeout variable for OTA in seconds
         Presets
         --sed
-            enable sleepy end device, set thread mtd and disables uart for minimum power consumption
+            enable sleepy end device, set thread mtd
+            For minimum consumption, disable openthread cli and qr code
         --wifi <wf200 | rs911x>
             build wifi example variant for given exansion board
     "
@@ -119,7 +122,7 @@ else
                 shift
                 ;;
             --sed)
-                optArgs+="enable_sleepy_device=true chip_openthread_ftd=false enable_openthread_cli=false "
+                optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
                 shift
                 ;;
             *)
