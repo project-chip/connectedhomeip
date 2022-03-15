@@ -13,6 +13,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
     -   [Running RPC console](#running-rpc-console)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -259,18 +261,21 @@ combination with JLinkRTTClient as follows:
 
     **Matter shell**
 
-        -   'switch on'    : Sends On command to bound device
+    **_OnOff Cluster_**
 
-        -   'switch off'   : Sends Off command to bound device
+        -  'switch onoff on'            : Sends unicast On command to bound device
+        -  'switch onoff off'           : Sends unicast Off command to bound device
+        -  'switch onoff toggle'        : Sends unicast Toggle command to bound device
 
-        -   'switch toggle : Sends Toggle command to bound device
+        -  'switch groups onoff on'     : Sends On group command to bound group
+        -  'switch groups onoff off'    : Sends On group command to bound group
+        -  'switch groups onoff toggle' : Sends On group command to bound group
 
 *   You can provision and control the Chip device using the python controller,
-    Chip tool standalone, Android or iOS app
-
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+    standalone, Android or iOS app
 
-    Here is an example with the CHIPTool:
+    Here is an example with the CHIPTool for unicast commands only:
 
     ```
     chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
@@ -278,6 +283,25 @@ combination with JLinkRTTClient as follows:
     chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": null }]' <lighting-node-id> 0
 
     chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6}]' 1 1
+    ```
+
+    Here is an example with the CHIPTool for groups commands only:
+
+    ```
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
+
+    chip-tool tests TestGroupDemoConfig --nodeId 1
+
+    chip-tool tests TestGroupDemoConfig --nodeId <lighting-node-id>
+
+    chip-tool binding write binding '[{"fabricIndex": 1, "group": 257}]' 1 1
+    ```
+
+    To run the example with unicast and groups commands, run the group
+    configuration commands and replace the last one with binding this command
+
+    ```
+    chip-tool binding write binding '[{"fabricIndex": 1, "group": 257},{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6} ]' 1 1
     ```
 
 ### Notes
@@ -340,3 +364,9 @@ console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
 modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)

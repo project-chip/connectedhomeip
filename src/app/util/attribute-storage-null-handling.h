@@ -21,6 +21,7 @@
 #include <lib/support/TypeTraits.h>
 
 #include <limits>
+#include <type_traits>
 
 namespace chip {
 namespace app {
@@ -122,6 +123,51 @@ public:
 
     // Utility that lets consumers treat a StorageType instance as a uint8_t*
     // for writing to the attribute store.
+    static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return reinterpret_cast<uint8_t *>(&value); }
+};
+
+template <typename T>
+struct NumericAttributeTraits<BitFlags<T>>
+{
+    using StorageType = T;
+    using WorkingType = BitFlags<T>;
+
+    static constexpr void WorkingToStorage(WorkingType workingValue, StorageType & storageValue)
+    {
+        storageValue = static_cast<StorageType>(workingValue.Raw());
+    }
+
+    static constexpr WorkingType StorageToWorking(StorageType storageValue) { return WorkingType(storageValue); }
+
+    static constexpr void SetNull(StorageType & value)
+    {
+        //
+        // When setting to null, store a value that has all bits set. This aliases to the same behavior
+        // we do for other integral types, ensuring consistency across all underlying integral types in the data store as well as
+        // re-using logic for serialization/de-serialization of that data in the IM.
+        //
+        value = static_cast<StorageType>(std::numeric_limits<std::underlying_type_t<T>>::max());
+    }
+
+    static constexpr bool IsNullValue(StorageType value)
+    {
+        //
+        // While we store a nullable bitmap value by setting all its bits, we can be a bit more conservative when actually
+        // testing for null since the spec only mandates that the MSB be reserved for nullable bitmaps.
+        //
+        constexpr auto msbSetValue = std::underlying_type_t<T>(1) << (std::numeric_limits<std::underlying_type_t<T>>::digits - 1);
+        return !!(std::underlying_type_t<T>(value) & msbSetValue);
+    }
+
+    static constexpr bool CanRepresentValue(bool isNullable, StorageType value)
+    {
+        //
+        // We permit the full-range of the underlying StorageType if !isNullable,
+        // and the restricted range otherwise.
+        //
+        return !isNullable || !IsNullValue(value);
+    }
+
     static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return reinterpret_cast<uint8_t *>(&value); }
 };
 

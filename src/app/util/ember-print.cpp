@@ -42,6 +42,7 @@ void emberAfPrint(int category, const char * format, ...)
 #endif
 }
 
+#if !CHIP_PW_TOKENIZER_LOGGING
 void emberAfPrintln(int category, const char * format, ...)
 {
 #if _CHIP_USE_LOGGING
@@ -54,6 +55,7 @@ void emberAfPrintln(int category, const char * format, ...)
     }
 #endif
 }
+#endif
 
 // TODO: add unit tests.
 

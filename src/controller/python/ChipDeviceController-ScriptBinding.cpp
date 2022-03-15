@@ -83,7 +83,6 @@ typedef void (*ChipThreadTaskRunnerFunct)(intptr_t context);
 }
 
 namespace {
-chip::SimpleFabricStorage sFabricStorage;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sSsidBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sCredsBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sThreadBuf;
@@ -211,15 +210,9 @@ chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter()
 
 ChipError::StorageType pychip_DeviceController_StackInit()
 {
-    CHIP_ERROR err;
-
     VerifyOrDie(sStorageAdapter != nullptr);
 
-    err = sFabricStorage.Initialize(sStorageAdapter);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
     FactoryInitParams factoryParams;
-    factoryParams.fabricStorage            = &sFabricStorage;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
     factoryParams.enableServerInteractions = true;
 
@@ -349,22 +342,11 @@ ChipError::StorageType pychip_DeviceController_SetWiFiCredentials(const char * s
     return CHIP_NO_ERROR.AsInteger();
 }
 
-void CloseSessionCallback(DeviceProxy * device, ChipError::StorageType err)
-{
-    if (device != nullptr)
-    {
-        device->Disconnect();
-    }
-    if (!ChipError::IsSuccess(err))
-    {
-        ChipLogError(Controller, "Close session callback was called with an error:  %d", err);
-    }
-}
-
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    return pychip_GetConnectedDeviceByNodeId(devCtrl, nodeid, CloseSessionCallback);
+    return devCtrl->DisconnectDevice(nodeid).AsInteger();
 }
+
 ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl,
                                                                       const char * peerAddrStr, uint32_t setupPINCode,
                                                                       chip::NodeId nodeid)
@@ -598,9 +580,7 @@ ChipError::StorageType pychip_GetConnectedDeviceByNodeId(chip::Controller::Devic
 {
     VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     auto * callbacks = new GetDeviceCallbacks(callback);
-    // callback(nullptr, 0);
     return devCtrl->GetConnectedDevice(nodeId, &callbacks->mOnSuccess, &callbacks->mOnFailure).AsInteger();
-    // return CHIP_NO_ERROR.AsInteger();
 }
 
 ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,

@@ -24,6 +24,7 @@
 
 #include <dfu/dfu_target.h>
 #include <dfu/dfu_target_mcuboot.h>
+#include <dfu/mcuboot.h>
 #include <sys/reboot.h>
 
 namespace chip {
@@ -61,9 +62,14 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_done(true)));
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
-    return DeviceLayer::SystemLayer().StartTimer(
+    return SystemLayer().StartTimer(
         System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS),
-        [](System::Layer *, void * /* context */) { sys_reboot(SYS_REBOOT_WARM); }, nullptr /* context */);
+        [](System::Layer *, void * /* context */) {
+            PlatformMgr().HandleServerShuttingDown();
+            k_msleep(CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS);
+            sys_reboot(SYS_REBOOT_WARM);
+        },
+        nullptr /* context */);
 #else
     return CHIP_NO_ERROR;
 #endif
@@ -93,6 +99,16 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
             mDownloader->EndDownload(error);
         }
     });
+}
+
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    return mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    return System::MapErrorZephyr(boot_write_img_confirmed());
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)

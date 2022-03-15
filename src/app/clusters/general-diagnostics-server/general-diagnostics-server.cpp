@@ -206,7 +206,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
         Events::BootReason::Type event{ static_cast<EmberAfBootReasonType>(bootReason) };
         EventNumber eventNumber;
 
-        CHIP_ERROR err = LogEvent(event, 0, eventNumber, EventOptions::Type::kUrgent);
+        CHIP_ERROR err = LogEvent(event, 0, eventNumber);
         if (CHIP_NO_ERROR != err)
         {
             ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
@@ -233,7 +233,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
                 reinterpret_cast<const HardwareFaultType *>(previous.data()), previous.size());
             Events::HardwareFaultChange::Type event{ currentList, previousList };
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber, EventOptions::Type::kUrgent))
+            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
             {
                 ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record HardwareFault event");
             }
@@ -259,7 +259,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
                 DataModel::List<const RadioFaultType>(reinterpret_cast<const RadioFaultType *>(previous.data()), previous.size());
             Events::RadioFaultChange::Type event{ currentList, previousList };
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber, EventOptions::Type::kUrgent))
+            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
             {
                 ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record RadioFault event");
             }
@@ -285,7 +285,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
                 reinterpret_cast<const NetworkFaultType *>(previous.data()), previous.size());
             Events::NetworkFaultChange::Type event{ currentList, previousList };
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber, EventOptions::Type::kUrgent))
+            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
             {
                 ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record NetworkFault event");
             }

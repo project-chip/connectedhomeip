@@ -232,6 +232,12 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_PROGRESS_LOGGING
+    char peerAddrBuff[Transport::PeerAddress::kMaxToStringSize];
+    peerAddress.ToString(peerAddrBuff);
+    ChipLogProgress(SecureChannel, "Establishing CASE session to %s", peerAddrBuff);
+#endif
+
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);

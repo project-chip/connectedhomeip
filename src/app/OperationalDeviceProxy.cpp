@@ -30,6 +30,7 @@
 #include "CommandSender.h"
 #include "ReadPrepareParams.h"
 
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/Resolver.h>
@@ -43,8 +44,7 @@ using namespace chip::Callback;
 namespace chip {
 
 CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                           Dnssd::ResolverProxy * resolver)
+                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -55,15 +55,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         break;
 
     case State::NeedsAddress:
-        VerifyOrReturnError(resolver != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        if (resolver->ResolveNodeIdFromInternalCache(mPeerId, Inet::IPAddressType::kAny))
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = resolver->ResolveNodeId(mPeerId, Inet::IPAddressType::kAny);
-        }
+        err = LookupPeerAddress();
         EnqueueConnectionCallbacks(onConnection, onFailure);
         break;
 
@@ -87,7 +79,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
 
     default:
         err = CHIP_ERROR_INCORRECT_STATE;
-    };
+    }
 
     if (err != CHIP_NO_ERROR && onFailure != nullptr)
     {
@@ -101,6 +93,13 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
                                                     const ReliableMessageProtocolConfig & config)
 {
     VerifyOrReturnLogError(mState != State::Uninitialized, CHIP_ERROR_INCORRECT_STATE);
+
+#if CHIP_DETAIL_LOGGING
+    char peerAddrBuff[Transport::PeerAddress::kMaxToStringSize];
+    addr.ToString(peerAddrBuff);
+
+    ChipLogDetail(Controller, "Updating device address to %s while in state %d", peerAddrBuff, static_cast<int>(mState));
+#endif
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     mDeviceAddress = addr;
@@ -222,9 +221,11 @@ void OperationalDeviceProxy::HandleCASEConnectionFailure(void * context, CASECli
 
     device->mState = State::Initialized;
 
+    device->CloseCASESession();
     device->DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
     device->DequeueConnectionFailureCallbacks(error, /* executeCallback */ true);
-    device->CloseCASESession();
+    // Do not touch device anymore; it might have been destroyed by a failure
+    // callback.
 }
 
 void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * client)
@@ -238,14 +239,18 @@ void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * cl
     if (err != CHIP_NO_ERROR)
     {
         device->HandleCASEConnectionFailure(context, client, err);
+        // Do not touch device anymore; it might have been destroyed by a
+        // HandleCASEConnectionFailure.
     }
     else
     {
         device->mState = State::SecureConnected;
 
+        device->CloseCASESession();
         device->DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, /* executeCallback */ false);
         device->DequeueConnectionSuccessCallbacks(/* executeCallback */ true);
-        device->CloseCASESession();
+        // Do not touch device anymore; it might have been destroyed by a
+        // success callback.
     }
 }
 
@@ -309,6 +314,33 @@ OperationalDeviceProxy::~OperationalDeviceProxy()
         // Make sure we don't leak it.
         mInitParams.clientPool->Release(mCASEClient);
     }
+}
+
+CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
+{
+    if (mAddressLookupHandle.IsInList())
+    {
+        ChipLogProgress(Discovery, "Operational node lookup already in progress. Will NOT start a new one.");
+        return CHIP_NO_ERROR;
+    }
+
+    AddressResolve::NodeLookupRequest request(mPeerId);
+
+    return AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
+}
+
+void OperationalDeviceProxy::OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result)
+{
+    UpdateDeviceData(result.address, result.mrpConfig);
+}
+
+void OperationalDeviceProxy::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)
+{
+    ChipLogError(Discovery, "Operational discovery failed for 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                 ChipLogValueX64(peerId.GetNodeId()), reason.Format());
+
+    DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
+    DequeueConnectionFailureCallbacks(reason, /* executeCallback */ true);
 }
 
 } // namespace chip

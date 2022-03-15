@@ -30,6 +30,20 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
+{
+public:
+    ApplicationBasicCluster() : ClusterBase(app::Clusters::ApplicationBasic::Id) {}
+    ~ApplicationBasicCluster() {}
+};
+
+class DLL_EXPORT ContentLauncherCluster : public ClusterBase
+{
+public:
+    ContentLauncherCluster() : ClusterBase(app::Clusters::ContentLauncher::Id) {}
+    ~ContentLauncherCluster() {}
+};
+
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:
@@ -37,11 +51,32 @@ public:
     ~GeneralCommissioningCluster() {}
 };
 
+class DLL_EXPORT KeypadInputCluster : public ClusterBase
+{
+public:
+    KeypadInputCluster() : ClusterBase(app::Clusters::KeypadInput::Id) {}
+    ~KeypadInputCluster() {}
+};
+
+class DLL_EXPORT OnOffCluster : public ClusterBase
+{
+public:
+    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
+    ~OnOffCluster() {}
+};
+
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
     OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
     ~OperationalCredentialsCluster() {}
+};
+
+class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
+{
+public:
+    TargetNavigatorCluster() : ClusterBase(app::Clusters::TargetNavigator::Id) {}
+    ~TargetNavigatorCluster() {}
 };
 
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase

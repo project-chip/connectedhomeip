@@ -61,12 +61,12 @@ System::Clock::Timeout BDXDownloader::GetTimeout()
 void BDXDownloader::Reset()
 {
     mPrevBlockCounter = 0;
-    DeviceLayer::SystemLayer().StartTimer(mTimeout, TransferTimeoutCheckHandler, this);
+    DeviceLayer::SystemLayer().CancelTimer(TransferTimeoutCheckHandler, this);
 }
 
 bool BDXDownloader::HasTransferTimedOut()
 {
-    uint32_t curBlockCounter = mBdxTransfer.GetNextBlockNum();
+    uint32_t curBlockCounter = mBdxTransfer.GetNextQueryNum();
 
     if (curBlockCounter > mPrevBlockCounter)
     {

@@ -47,7 +47,10 @@ declare_args() {
   # Enable Sleepy end device
   enable_sleepy_device = false
 
-  # Wifi related stuff - they are overriden by gn -args="use_wf200=true"
+  # OTA timeout in seconds
+  OTA_periodic_query_timeout = 86400
+
+  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   use_wf200 = false
   use_rs911x = false
   use_rs911x_sockets = false
@@ -98,6 +101,7 @@ efr32_sdk("sdk") {
   defines = [
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
   ]
 
   if (chip_enable_pw_rpc) {

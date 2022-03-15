@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/server/CommissioningModeProvider.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
@@ -74,6 +75,10 @@ public:
         mFabricTable = table;
     }
 
+    // Set the commissioning mode provider to use.  Null provider will mean we
+    // assume the commissioning mode is kDisabled.
+    void SetCommissioningModeProvider(CommissioningModeProvider * provider) { mCommissioningModeProvider = provider; }
+
     /// Callback from Discovery Expiration timer
     /// Checks if discovery has expired and if so,
     /// kicks off extend discovery (when enabled)
@@ -95,9 +100,8 @@ public:
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
 
-    /// (Re-)starts the Dnssd server
-    /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1)
-    /// - if device has been commissioned, then commissioning mode will be disabled.
+    /// (Re-)starts the Dnssd server, using the commissioning mode from our
+    /// commissioning mode provider.
     void StartServer();
 
     /// (Re-)starts the Dnssd server, using the provided commissioning mode.
@@ -107,6 +111,17 @@ public:
 
     /// Generates the (random) instance name that a CHIP device is to use for pre-commissioning DNS-SD
     CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen);
+
+    /**
+     * @brief Overrides configuration so that commissionable advertisement will use an
+     *        ephemeral discriminator such as one set for ECM. If the Optional has no
+     *        value, the default basic discriminator is used as usual.
+     *
+     * @param[in] discriminator Ephemeral discriminator to override if it HasValue(), otherwise reverts
+     *                          to default.
+     * @return CHIP_NO_ERROR on success or CHIP_ERROR_INVALID_ARGUMENT on invalid value
+     */
+    CHIP_ERROR SetEphemeralDiscriminator(Optional<uint16_t> discriminator);
 
 private:
     /// Overloaded utility method for commissioner and commissionable advertisement
@@ -138,14 +153,15 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
 
-    FabricTable * mFabricTable = nullptr;
-
-    // Helper for StartServer.
-    void StartServer(Optional<Dnssd::CommissioningMode> mode);
+    FabricTable * mFabricTable                             = nullptr;
+    CommissioningModeProvider * mCommissioningModeProvider = nullptr;
 
     uint16_t mSecuredPort          = CHIP_PORT;
     uint16_t mUnsecuredPort        = CHIP_UDC_PORT;
     Inet::InterfaceId mInterfaceId = Inet::InterfaceId::Null();
+
+    // Ephemeral discriminator to use instead of the default if set
+    Optional<uint16_t> mEphemeralDiscriminator;
 
     /// schedule next discovery expiration
     CHIP_ERROR ScheduleDiscoveryExpiration();

@@ -197,6 +197,11 @@ public:
      */
     void Shutdown();
 
+    /**
+     * @brief Notification that a fabric was removed.
+     */
+    void FabricRemoved(FabricIndex fabricIndex);
+
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
     /**

@@ -36,8 +36,11 @@ public:
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
+    bool IsFirstImageRun() override { return false; }
+    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
+    void SetOTAImageFile(CharSpan name) { mImageFile = name; }
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -64,6 +67,7 @@ private:
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
     uint32_t mSoftwareVersion;
+    CharSpan mImageFile;
 };
 
 } // namespace chip

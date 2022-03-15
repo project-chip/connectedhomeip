@@ -25,6 +25,11 @@
 namespace chip {
 namespace Controller {
 
+AutoCommissioner::AutoCommissioner()
+{
+    SetCommissioningParameters(CommissioningParameters());
+}
+
 AutoCommissioner::~AutoCommissioner()
 {
     ReleaseDAC();
@@ -352,8 +357,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             break;
         case CommissioningStage::kSendOpCertSigningRequest: {
             NOCChainGenerationParameters nocParams;
-            nocParams.nocsrElements = report.Get<AttestationResponse>().attestationElements;
-            nocParams.signature     = report.Get<AttestationResponse>().signature;
+            nocParams.nocsrElements = report.Get<CSRResponse>().nocsrElements;
+            nocParams.signature     = report.Get<CSRResponse>().signature;
             mParams.SetNOCChainGenerationParameters(nocParams);
         }
         break;

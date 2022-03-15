@@ -30,6 +30,7 @@ import chip.platform.PreferencesKeyValueStoreManager;
 import com.tcl.chip.tvapp.ChannelManagerStub;
 import com.tcl.chip.tvapp.Clusters;
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
+import com.tcl.chip.tvapp.DACProviderStub;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
 import com.tcl.chip.tvapp.MediaInputManagerStub;
@@ -79,6 +80,7 @@ public class MatterServant {
                   break;
               }
             });
+    tvApp.setDACProvider(new DACProviderStub());
 
     Context applicationContext = context.getApplicationContext();
     AndroidChipPlatform chipPlatform =

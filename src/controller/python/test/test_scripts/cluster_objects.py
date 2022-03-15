@@ -287,14 +287,14 @@ class ClusterObjectTests:
     async def TestReadEventRequests(cls, devCtrl, expectEventsNum):
         logger.info("1: Reading Ex Cx Ex")
         req = [
-            (1, Clusters.TestCluster.Events.TestEvent),
+            (1, Clusters.TestCluster.Events.TestEvent, 0),
         ]
 
         await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
 
         logger.info("2: Reading Ex Cx E*")
         req = [
-            (1, Clusters.TestCluster),
+            (1, Clusters.TestCluster, 0),
         ]
 
         await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
@@ -309,6 +309,13 @@ class ClusterObjectTests:
         logger.info("4: Reading E* C* E*")
         req = [
             '*'
+        ]
+
+        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
+
+        logger.info("5: Reading Ex Cx E* Urgency")
+        req = [
+            (1, Clusters.TestCluster, 1),
         ]
 
         await cls.TriggerAndWaitForEvents(cls, devCtrl, req)

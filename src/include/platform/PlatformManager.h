@@ -118,6 +118,18 @@ public:
     PlatformManagerDelegate * GetDelegate() const { return mDelegate; }
 
     /**
+     * Should be called after initializing all layers of the Matter stack to
+     * run all needed post-startup actions.
+     */
+    void HandleServerStarted();
+
+    /**
+     * Should be called before shutting down the Matter stack or restarting the
+     * application to run all needed pre-shutdown actions.
+     */
+    void HandleServerShuttingDown();
+
+    /**
      * ScheduleWork can be called after InitChipStack has been called.  Calls
      * that happen before either StartEventLoopTask or RunEventLoop will queue
      * the work up but that work will NOT run until one of those functions is
@@ -340,6 +352,16 @@ inline CHIP_ERROR PlatformManager::AddEventHandler(EventHandlerFunct handler, in
 inline void PlatformManager::RemoveEventHandler(EventHandlerFunct handler, intptr_t arg)
 {
     static_cast<ImplClass *>(this)->_RemoveEventHandler(handler, arg);
+}
+
+inline void PlatformManager::HandleServerStarted()
+{
+    static_cast<ImplClass *>(this)->_HandleServerStarted();
+}
+
+inline void PlatformManager::HandleServerShuttingDown()
+{
+    static_cast<ImplClass *>(this)->_HandleServerShuttingDown();
 }
 
 inline void PlatformManager::ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)

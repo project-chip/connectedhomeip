@@ -194,6 +194,10 @@ list(APPEND CHIP_CFLAGS
     \"-D__LINUX_ERRNO_EXTENSIONS__=1\"
 )
 
+list(APPEND CHIP_CFLAGS
+    \"-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>\"
+)
+
 if (CONFIG_MBED_BSD_SOCKET_TRACE)
     list(APPEND CHIP_CFLAGS
         \"-DMBED_BSD_SOCKET_TRACE=1\"
@@ -344,6 +348,10 @@ list(APPEND CHIP_DEFINES
     __LINUX_ERRNO_EXTENSIONS__=1
 )
 
+list(APPEND CHIP_DEFINES
+    CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>
+)
+
 if (CONFIG_MBED_BSD_SOCKET_TRACE)
     list(APPEND CHIP_DEFINES
         MBED_BSD_SOCKET_TRACE=1
@@ -456,6 +464,7 @@ endif(CONFIG_CHIP_PW_RPC)
 
 if (CONFIG_CHIP_OTA_REQUESTOR)
     target_include_directories(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/examples/platform/mbed/ota/
         ${CHIP_ROOT}/src/app/clusters/ota-requestor
         ${CHIP_ROOT}/src/platform
         ${CHIP_ROOT}/src/platform/mbed
@@ -463,10 +472,12 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
     )
 
     target_sources(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/examples/platform/mbed/ota/OTARequestorDriverImpl.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/GenericOTARequestorDriver.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
         ${CHIP_ROOT}/src/platform/mbed/OTAImageProcessorImpl.cpp
-        ${CHIP_ROOT}/src/platform/mbed/OTARequestorDriverImpl.cpp
     )
 
 if (NOT ${APP_TARGET} MATCHES "shell")
