@@ -39,9 +39,10 @@ void FailSafeContext::CommissioningFailedTimerComplete()
     // successfully invoked, conduct clean-up steps.
 
     ChipDeviceEvent event;
-    event.Type                         = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.Status = CHIP_ERROR_TIMEOUT;
-    CHIP_ERROR status                  = PlatformMgr().PostEvent(&event);
+    event.Type                                  = DeviceEventType::kCommissioningComplete;
+    event.CommissioningComplete.PeerFabricIndex = mFabricIndex;
+    event.CommissioningComplete.Status          = CHIP_ERROR_TIMEOUT;
+    CHIP_ERROR status                           = PlatformMgr().PostEvent(&event);
 
     mFailSafeArmed                  = false;
     mAddNocCommandHasBeenInvoked    = false;
