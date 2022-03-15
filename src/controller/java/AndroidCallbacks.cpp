@@ -253,7 +253,8 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     chip::JniClass attributeStateJniCls(attributeStateCls);
     jmethodID attributeStateCtor = env->GetMethodID(attributeStateCls, "<init>", "(Ljava/lang/Object;[BLjava/lang/String;)V");
     VerifyOrReturn(attributeStateCtor != nullptr, ChipLogError(Controller, "Could not find AttributeState constructor"));
-    jobject attributeStateObj = env->NewObject(attributeStateCls, attributeStateCtor, value, jniByteArray.jniValue(), jsonString.jniValue());
+    jobject attributeStateObj =
+        env->NewObject(attributeStateCls, attributeStateCtor, value, jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(attributeStateObj != nullptr, ChipLogError(Controller, "Could not create AttributeState object"));
 
     // Add AttributeState to NodeState
