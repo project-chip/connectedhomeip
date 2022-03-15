@@ -1986,7 +1986,6 @@ P256KeypairBuilder* GetP256KeypairBuilder()
 
 
 void SetP256KeypairBuilder(P256KeypairBuilder* builder){
-    printf("%s\n", __FUNCTION__);
     gP256KeypairBuilder = builder;
 }
 

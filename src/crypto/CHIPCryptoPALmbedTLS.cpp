@@ -1710,6 +1710,10 @@ P256KeypairBuilder* GetP256KeypairBuilder()
     return gP256KeypairBuilder;
 }
 
+void SetP256KeypairBuilder(P256KeypairBuilder* builder){
+    gP256KeypairBuilder = builder;
+}
+
 
 } // namespace Crypto
 } // namespace chip
