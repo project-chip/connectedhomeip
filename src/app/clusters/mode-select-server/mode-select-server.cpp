@@ -146,7 +146,8 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 }
                 else
                 {
-                    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Successfully initialized CurrentMode to %u", startUpMode.Value());
+                    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Successfully initialized CurrentMode to %u",
+                                   startUpMode.Value());
                 }
             }
         }
@@ -169,12 +170,12 @@ namespace {
  */
 inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpointId)
 {
-    return  emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::CurrentMode::Id, true) &&
-            emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::StartUpMode::Id, true);
+    return emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::CurrentMode::Id, true) &&
+        emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::StartUpMode::Id, true);
 }
 #endif
 
-} // anonymous namespace implementation
+} // namespace
 
 void MatterModeSelectPluginServerInitCallback(void)
 {
@@ -189,9 +190,9 @@ void MatterModeSelectPluginServerInitCallback(void)
  * @param size          Attribute size
  * @param value         Attribute value
  */
-InteractionModel::Status
-MatterModeSelectClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
-                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+InteractionModel::Status MatterModeSelectClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
+                                                                                  EmberAfAttributeType attributeType, uint16_t size,
+                                                                                  uint8_t * value)
 {
     const EndpointId endpointId = attributePath.mEndpointId;
     InteractionModel::Status result;
