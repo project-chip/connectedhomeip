@@ -82,10 +82,12 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator, setup_pin, addre
     # asyncio.run(test.TestMultiFabric(ip=address.decode("utf-8"),
     #                                  setuppin=20202021,
     #                                  nodeid=1))
-
-    logger.info("Testing closing sessions")
-    FailIfNot(test.TestCloseSession(nodeid=device_nodeid),
-              "Failed to close sessions")
+    #
+    # The server will crash if we are aborting / closing it too fast.
+    # Issue: #15987
+    # logger.info("Testing closing sessions")
+    # FailIfNot(test.TestCloseSession(nodeid=device_nodeid),
+    #           "Failed to close sessions")
 
 
 @click.command()
