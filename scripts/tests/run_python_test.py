@@ -57,11 +57,11 @@ def EnqueueLogOutput(fp, tag, q):
     fp.close()
 
 
-def RedirectQueueThread(fp, tag, queue):
+def RedirectQueueThread(fp, tag, queue) -> threading.Thread:
     log_queue_thread = threading.Thread(target=EnqueueLogOutput, args=(
         fp, tag, queue))
-    log_queue_thread.daemon = True
     log_queue_thread.start()
+    return log_queue_thread
 
 
 def DumpLogOutput(q: queue.Queue, timeout: int = 0):
@@ -88,6 +88,7 @@ def main(app: str, factoryreset: bool, wait_before_test: int, app_params: str, s
             raise Exception("Failed to remove /tmp/chip* for factory reset.")
 
     log_queue = queue.Queue()
+    log_cooking_threads = []
 
     app_process = None
     if app:
@@ -98,10 +99,10 @@ def main(app: str, factoryreset: bool, wait_before_test: int, app_params: str, s
         logging.info(f"Execute: {app_args}")
         app_process = subprocess.Popen(
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
-        RedirectQueueThread(app_process.stdout,
-                            b"[\33[34mAPP \33[0m][\33[33mSTDOUT\33[0m]", log_queue)
-        RedirectQueueThread(app_process.stderr,
-                            b"[\33[34mAPP \33[0m][\33[31mSTDERR\33[0m]", log_queue)
+        log_cooking_threads.append(RedirectQueueThread(app_process.stdout,
+                                                       b"[\33[34mAPP \33[0m][\33[33mSTDOUT\33[0m]", log_queue))
+        log_cooking_threads.append(RedirectQueueThread(app_process.stderr,
+                                                       b"[\33[34mAPP \33[0m][\33[31mSTDERR\33[0m]", log_queue))
 
     try:
         DumpLogOutput(log_queue, wait_before_test)
@@ -113,10 +114,10 @@ def main(app: str, factoryreset: bool, wait_before_test: int, app_params: str, s
     logging.info(f"Execute: {script_command}")
     test_script_process = subprocess.Popen(
         script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    RedirectQueueThread(test_script_process.stdout,
-                        b"[\33[32mTEST\33[0m][\33[33mSTDOUT\33[0m]", log_queue)
-    RedirectQueueThread(test_script_process.stderr,
-                        b"[\33[32mTEST\33[0m][\33[31mSTDERR\33[0m]", log_queue)
+    log_cooking_threads.append(RedirectQueueThread(test_script_process.stdout,
+                                                   b"[\33[32mTEST\33[0m][\33[33mSTDOUT\33[0m]", log_queue))
+    log_cooking_threads.append(RedirectQueueThread(test_script_process.stderr,
+                                                   b"[\33[32mTEST\33[0m][\33[31mSTDERR\33[0m]", log_queue))
 
     test_script_exit_code = test_script_process.poll()
     while test_script_exit_code is None:
@@ -137,6 +138,11 @@ def main(app: str, factoryreset: bool, wait_before_test: int, app_params: str, s
             except queue.Empty:
                 pass
             test_app_exit_code = app_process.poll()
+
+    # There are some logs not cooked, so we wait until we have processed all logs.
+    # This procedure should be very fast since the related processes are finished.
+    for thread in log_cooking_threads:
+        thread.join()
 
     try:
         DumpLogOutput(log_queue)
