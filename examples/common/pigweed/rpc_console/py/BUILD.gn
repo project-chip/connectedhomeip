@@ -20,16 +20,13 @@ import("$dir_pw_build/python_dist.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 pw_python_package("chip_rpc") {
-  generate_setup = {
-    metadata = {
-      name = "chip_rpc"
-      version = "0.0.1"
-    }
-    options = {
-      install_requires = [ "ipython" ]
-    }
-  }
+  setup = [
+    "pyproject.toml",
+    "setup.cfg",
+    "setup.py",
+  ]
   sources = [
+    "chip_rpc/__init__.py",
     "chip_rpc/console.py",
     "chip_rpc/plugins/device_toolbar.py",
     "chip_rpc/plugins/helper_scripts.py",
