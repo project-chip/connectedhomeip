@@ -159,6 +159,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             memcpy(fileDesignator.data(), update.fileDesignator.data(), update.fileDesignator.size());
             fileDesignator.reduce_size(update.fileDesignator.size());
             requestorCore->mFileDesignator = fileDesignator;
+            requestorCore->StoreCurrentUpdateInfo();
 
             requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
                                                                 System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
@@ -169,7 +170,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
                           update.softwareVersion, requestorCore->mCurrentVersion);
 
             requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
-            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
+            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kUpToDate,
                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
 
@@ -177,12 +178,12 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
     }
     case OTAQueryStatus::kBusy:
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kDelayedOnQuery, OTAChangeReasonEnum::kDelayByProvider);
-        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::Busy,
+        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kBusy,
                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         break;
     case OTAQueryStatus::kNotAvailable:
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
-        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::NotAvailable,
+        requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kNotAvailable,
                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         break;
     default:
@@ -458,9 +459,6 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
     default:
         break;
     }
-
-    // Give driver a chance to schedule another query
-    requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::ConnectionFailed, chip::System::Clock::Seconds32(0));
 }
 
 // Sends the QueryImage command to the Provider currently set in the OTARequestor
@@ -477,7 +475,7 @@ void OTARequestor::TriggerImmediateQueryInternal()
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
     ProviderLocationType providerLocation;
-    if (mOtaRequestorDriver->DetermineProviderLocation(providerLocation) != true)
+    if (mOtaRequestorDriver->GetNextProviderLocation(providerLocation) != true)
     {
         ChipLogError(SoftwareUpdate, "No OTA Providers available");
         return kNoProviderKnown;
@@ -508,11 +506,8 @@ void OTARequestor::ApplyUpdate()
     ConnectToProvider(kApplyUpdate);
 }
 
-void OTARequestor::NotifyUpdateApplied(uint32_t version)
+void OTARequestor::NotifyUpdateApplied()
 {
-    // New version is executing so update where applicable
-    mCurrentVersion = version;
-
     // Log the VersionApplied event
     uint16_t productId;
     if (DeviceLayer::ConfigurationMgr().GetProductId(productId) != CHIP_NO_ERROR)
@@ -522,7 +517,7 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
         return;
     }
 
-    OtaRequestorServerOnVersionApplied(version, productId);
+    OtaRequestorServerOnVersionApplied(mCurrentVersion, productId);
 
     // There is no response for a notify so consider this OTA complete
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
@@ -793,6 +788,22 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
     cluster.Associate(&deviceProxy, mProviderLocation.Value().endpoint);
 
     return cluster.InvokeCommand(args, this, OnNotifyUpdateAppliedResponse, OnNotifyUpdateAppliedFailure);
+}
+
+void OTARequestor::StoreCurrentUpdateInfo()
+{
+    // TODO: change OTA requestor storage interface to store both values at once
+    CHIP_ERROR error = mStorage->StoreCurrentProviderLocation(mProviderLocation.Value());
+
+    if (error == CHIP_NO_ERROR)
+    {
+        mStorage->StoreUpdateToken(mUpdateToken);
+    }
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to store current update: %" CHIP_ERROR_FORMAT, error.Format());
+    }
 }
 
 // Invoked when the device becomes commissioned

@@ -238,6 +238,8 @@ private:
 
     void OnDone() override;
 
+    void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) override;
+
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override;
 
     void ReportError(CHIP_ERROR err);
@@ -274,6 +276,7 @@ private:
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
                 minInterval:(uint16_t)minInterval
                 maxInterval:(uint16_t)maxInterval
+                     params:(nullable CHIPSubscribeParams *)params
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
 {
@@ -284,18 +287,30 @@ private:
         });
         return;
     }
-    AttributePathParams attributePath; // Wildcard endpoint, cluster, attribute.
-    ReadPrepareParams params(device->GetSecureSession().Value());
-    params.mMinIntervalFloorSeconds = minInterval;
-    params.mMaxIntervalCeilingSeconds = maxInterval;
-    params.mpAttributePathParamsList = &attributePath;
-    params.mAttributePathParamsListSize = 1;
+
+    // Wildcard endpoint, cluster, attribute.
+    auto attributePath = std::make_unique<AttributePathParams>();
+    ReadPrepareParams readParams(device->GetSecureSession().Value());
+    readParams.mMinIntervalFloorSeconds = minInterval;
+    readParams.mMaxIntervalCeilingSeconds = maxInterval;
+    readParams.mpAttributePathParamsList = attributePath.get();
+    readParams.mAttributePathParamsListSize = 1;
+    readParams.mKeepSubscriptions
+        = (params != nil) && (params.keepPreviousSubscriptions != nil) && [params.keepPreviousSubscriptions boolValue];
 
     auto callback = std::make_unique<SubscriptionCallback>(queue, reportHandler, subscriptionEstablishedHandler);
     auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
         callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
-    CHIP_ERROR err = readClient->SendRequest(params);
+    CHIP_ERROR err;
+    if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+        err = readClient->SendRequest(readParams);
+    } else {
+        // SendAutoResubscribeRequest cleans up the params, even on failure.
+        attributePath.release();
+        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+    }
+
     if (err != CHIP_NO_ERROR) {
         dispatch_async(queue, ^{
             reportHandler(nil, [CHIPError errorForCHIPErrorCode:err]);
@@ -1266,12 +1281,31 @@ void SubscriptionCallback::OnDone()
     }
 }
 
+void SubscriptionCallback::OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams)
+{
+    VerifyOrDie((aReadPrepareParams.mAttributePathParamsListSize == 0 && aReadPrepareParams.mpAttributePathParamsList == nullptr)
+        || (aReadPrepareParams.mAttributePathParamsListSize == 1 && aReadPrepareParams.mpAttributePathParamsList != nullptr));
+    if (aReadPrepareParams.mpAttributePathParamsList) {
+        delete aReadPrepareParams.mpAttributePathParamsList;
+    }
+
+    VerifyOrDie((aReadPrepareParams.mDataVersionFilterListSize == 0 && aReadPrepareParams.mpDataVersionFilterList == nullptr)
+        || (aReadPrepareParams.mDataVersionFilterListSize == 1 && aReadPrepareParams.mpDataVersionFilterList != nullptr));
+    if (aReadPrepareParams.mpDataVersionFilterList != nullptr) {
+        delete aReadPrepareParams.mpDataVersionFilterList;
+    }
+
+    VerifyOrDie((aReadPrepareParams.mEventPathParamsListSize == 0 && aReadPrepareParams.mpEventPathParamsList == nullptr)
+        || (aReadPrepareParams.mEventPathParamsListSize == 1 && aReadPrepareParams.mpEventPathParamsList != nullptr));
+    if (aReadPrepareParams.mpEventPathParamsList) {
+        delete aReadPrepareParams.mpEventPathParamsList;
+    }
+}
+
 void SubscriptionCallback::OnSubscriptionEstablished(uint64_t aSubscriptionId)
 {
     if (mSubscriptionEstablishedHandler) {
         dispatch_async(mQueue, mSubscriptionEstablishedHandler);
-        // Don't need it anymore.
-        mSubscriptionEstablishedHandler = nil;
     }
 }
 

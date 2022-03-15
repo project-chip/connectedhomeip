@@ -39,20 +39,40 @@ namespace chip {
 namespace DeviceLayer {
 namespace {
 
-constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
-constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
-
 using namespace app::Clusters::OtaSoftwareUpdateRequestor;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Structs;
+
+constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
+constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
+constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
 
 GenericOTARequestorDriver * ToDriver(void * context)
 {
     return static_cast<GenericOTARequestorDriver *>(context);
 }
 
-constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
-
 } // namespace
+
+void GenericOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
+{
+    mRequestor      = requestor;
+    mImageProcessor = processor;
+
+    if (mImageProcessor->IsFirstImageRun())
+    {
+        SystemLayer().ScheduleLambda([this] {
+            CHIP_ERROR error = mImageProcessor->ConfirmCurrentImage();
+
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(SoftwareUpdate, "Failed to confirm image: %" CHIP_ERROR_FORMAT, error.Format());
+                return;
+            }
+
+            mRequestor->NotifyUpdateApplied();
+        });
+    }
+}
 
 bool GenericOTARequestorDriver::CanConsent()
 {
@@ -96,12 +116,8 @@ void GenericOTARequestorDriver::HandleIdleState(IdleStateReason reason)
         StartDefaultProviderTimer();
         break;
     case IdleStateReason::kInvalidSession:
-        // An invalid session is detected which may be temporary so try to query again
-        ProviderLocationType providerLocation;
-        if (DetermineProviderLocation(providerLocation) == true)
-        {
-            DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
-        }
+        // An invalid session is detected which may be temporary so try to query the same provider again
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
         break;
     }
 }
@@ -125,19 +141,18 @@ void GenericOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, Syst
 
     switch (reason)
     {
-    case UpdateNotFoundReason::UpToDate:
+    case UpdateNotFoundReason::kUpToDate:
         willTryAnotherQuery = false;
         break;
-    case UpdateNotFoundReason::Busy:
+    case UpdateNotFoundReason::kBusy:
         willTryAnotherQuery = true;
         break;
-    case UpdateNotFoundReason::ConnectionFailed:
-    case UpdateNotFoundReason::NotAvailable: {
+    case UpdateNotFoundReason::kNotAvailable: {
         // IMPLEMENTATION CHOICE:
         // This implementation schedules a query only if a different provider is available
         Optional<ProviderLocationType> lastUsedProvider;
         mRequestor->GetProviderLocation(lastUsedProvider);
-        if ((DetermineProviderLocation(providerLocation) != true) ||
+        if ((GetNextProviderLocation(providerLocation) != true) ||
             (lastUsedProvider.HasValue() && ProviderLocationsEqual(providerLocation, lastUsedProvider.Value())))
         {
             willTryAnotherQuery = false;
@@ -298,7 +313,7 @@ void GenericOTARequestorDriver::DefaultProviderTimerHandler(System::Layer * syst
 
     // Determine which provider to query next
     ProviderLocationType providerLocation;
-    if (DetermineProviderLocation(providerLocation) != true)
+    if (GetNextProviderLocation(providerLocation) != true)
     {
         StartDefaultProviderTimer();
         return;
@@ -333,10 +348,11 @@ void GenericOTARequestorDriver::StopDefaultProviderTimer()
 }
 
 /**
- * Returns the next available Provider location. The algorithm is to simply loop through the list of DefaultOtaProviders and return
- * the next value (based on the last used provider). If no suitable candidate is found, FALSE is returned.
+ * Returns the next available Provider location. The algorithm is to simply loop through the list of DefaultOtaProviders as a
+ * circular list and return the next value (based on the last used provider). If the list of DefaultOtaProviders is empty, FALSE is
+ * returned.
  */
-bool GenericOTARequestorDriver::DetermineProviderLocation(ProviderLocationType & providerLocation)
+bool GenericOTARequestorDriver::GetNextProviderLocation(ProviderLocationType & providerLocation)
 {
     Optional<ProviderLocationType> lastUsedProvider;
     mRequestor->GetProviderLocation(lastUsedProvider);

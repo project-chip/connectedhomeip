@@ -75,6 +75,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (strong, nonatomic, nullable) NSNumber * keepPreviousSubscriptions;
 
+/**
+ * Whether the subscription should automatically try to re-establish if it
+ * drops.  nil (the default value) is treated as YES.
+ *
+ * If NO, loss of subscription will simply lead to an error report.  Some
+ * subscription APIs do not support this value.
+ *
+ * If YES, loss of subscription will lead to an automatic resubscription
+ * attempt.  If this succeeds, the subscriptionEstablished callback will be
+ * called again.
+ *
+ */
+@property (strong, nonatomic, nullable) NSNumber * autoResubscribe;
+
 - (instancetype)init;
 @end
 
