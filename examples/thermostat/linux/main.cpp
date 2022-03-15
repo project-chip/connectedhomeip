@@ -21,8 +21,8 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/util/af.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/util/af.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
 using namespace chip;
@@ -31,12 +31,10 @@ using namespace chip::app;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
-    DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
-    Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0,
-            &sLinuxWiFiDriver);
+DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sLinuxWiFiDriver);
 } // namespace
 #endif
-
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
