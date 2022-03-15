@@ -733,14 +733,22 @@ function octetStringEscapedForCLiteral(value)
 {
   // Escape control characters, things outside the ASCII range, and single
   // quotes (because that's our string terminator).
-  return value.replace(/\p{Control}|\P{ASCII}|"/gu, ch => {
-    let code = ch.charCodeAt(0);
-    code     = code.toString(16);
+  var notASCII = [...value].some(char => 32 > char.charCodeAt(0) || char.charCodeAt(0) > 126 || char == "\"");
+  if (!notASCII){
+    return value
+  }
+
+  // Since there is a character that is not ASCII, convert all to string literal.
+  returnString = "";
+  for (var i = 0; i < value.length; i++) {
+    code = value[i].charCodeAt(0).toString(16);
     if (code.length == 1) {
       code = "0" + code;
     }
-    return "\\x" + code;
-  });
+    returnString += "\\x" + code;
+  }
+
+  return returnString;
 }
 
 // Structs may not always provide values for optional members.
