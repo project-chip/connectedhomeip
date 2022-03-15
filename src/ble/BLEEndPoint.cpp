@@ -588,16 +588,13 @@ CHIP_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj,
 
 void BLEEndPoint::AddRef()
 {
-    if (mRefCount == UINT32_MAX)
-    {
-        return;
-    }
-
+    VerifyOrDie(mRefCount < UINT32_MAX);
     mRefCount++;
 }
 
 void BLEEndPoint::Release()
 {
+    VerifyOrDie(mRefCount > 0u);
     // Decrement the ref count.  When it reaches zero, NULL out the pointer to the chip::System::Layer
     // object. This effectively declared the object free and ready for re-allocation.
     mRefCount--;
