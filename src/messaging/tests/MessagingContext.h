@@ -100,8 +100,8 @@ public:
         return addr;
     }
 
-    static const uint16_t kBobKeyId      = 1;
-    static const uint16_t kAliceKeyId    = 2;
+    static const uint16_t kBobKeyId   = 1;
+    static const uint16_t kAliceKeyId = 2;
     NodeId GetBobNodeId() const;
     NodeId GetAliceNodeId() const;
     GroupId GetFriendsGroupId() const { return mFriendsGroupId; }
@@ -147,8 +147,8 @@ private:
     chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
 
     FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
-    FabricIndex mBobFabricIndex = kUndefinedFabricIndex;
-    GroupId mFriendsGroupId = 0x0101;
+    FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
+    GroupId mFriendsGroupId       = 0x0101;
     Transport::PeerAddress mAliceAddress;
     Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;

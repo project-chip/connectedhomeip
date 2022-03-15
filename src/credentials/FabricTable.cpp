@@ -809,7 +809,8 @@ CHIP_ERROR formatKey(FabricIndex fabricIndex, MutableCharSpan formattedKey, cons
     return err;
 }
 
-CHIP_ERROR FabricInfo::BuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey, ByteSpan nodePrivateKey)
+CHIP_ERROR FabricInfo::BuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
+                                   ByteSpan nodePrivateKey)
 {
     Reset();
 
