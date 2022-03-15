@@ -564,6 +564,8 @@ typedef void (*ChannelLineupStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> &);
 typedef void (*ChannelCurrentChannelStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &);
+typedef void (*DoorLockSupportedOperatingModesAttributeCallback)(
+    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>);
 typedef void (*GeneralCommissioningBasicCommissioningInfoStructAttributeCallback)(
     void *, const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType &);
 typedef void (*MediaPlaybackSampledPositionStructAttributeCallback)(
@@ -3358,6 +3360,34 @@ public:
                                                                            CHIPActionBlock action,
                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge
+    : public CHIPCallbackBridge<DoorLockSupportedOperatingModesAttributeCallback>
+{
+public:
+    CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<DoorLockSupportedOperatingModesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value);
+};
+
+class CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge
+    : public CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge
+{
+public:
+    CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action,
+                                                                           SubscriptionEstablishedHandler establishedHandler) :
+        CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
