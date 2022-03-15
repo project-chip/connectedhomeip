@@ -42,11 +42,11 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/CHIPMem.h>
 
 #include <string.h>
 
@@ -1942,13 +1942,12 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & 
     }
 }
 
-
 /**
  *  @brief Openssl P256 key builder for Operatinal and Ephermal keys.
  **/
-class OpensslDefaultP256KeypairBuilder : public P256KeypairBuilder {
+class OpensslDefaultP256KeypairBuilder : public P256KeypairBuilder
+{
 public:
-
     virtual P256Keypair * BuildP256KeyPairForOperationalKey(uint64_t fabricIndex) override;
 
     virtual P256Keypair * BuildP256KeyPairForEphermalUsage() override;
@@ -1956,9 +1955,9 @@ public:
 
 P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKey(uint64_t fabricIndex)
 {
-    (void)fabricIndex;
+    (void) fabricIndex;
     P256Keypair * keypair = nullptr;
-    keypair = Platform::New<P256Keypair>();
+    keypair               = Platform::New<P256Keypair>();
     keypair->Initialize();
     return keypair;
 }
@@ -1966,30 +1965,26 @@ P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForOperationalKe
 P256Keypair * OpensslDefaultP256KeypairBuilder::BuildP256KeyPairForEphermalUsage()
 {
     P256Keypair * keypair = nullptr;
-    keypair = Platform::New<P256Keypair>();
+    keypair               = Platform::New<P256Keypair>();
     keypair->Initialize();
     return keypair;
 }
-
 
 /**
  *  @brief Default Key Builder for Openssl
  **/
 OpensslDefaultP256KeypairBuilder gDefaultP256KeyPairBuilder;
-P256KeypairBuilder *gP256KeypairBuilder = &gDefaultP256KeyPairBuilder;
+P256KeypairBuilder * gP256KeypairBuilder = &gDefaultP256KeyPairBuilder;
 
-
-P256KeypairBuilder* GetP256KeypairBuilder()
+P256KeypairBuilder * GetP256KeypairBuilder()
 {
     return gP256KeypairBuilder;
 }
 
-
-void SetP256KeypairBuilder(P256KeypairBuilder* builder){
-    printf("%s\n", __FUNCTION__);
+void SetP256KeypairBuilder(P256KeypairBuilder * builder)
+{
     gP256KeypairBuilder = builder;
 }
-
 
 } // namespace Crypto
 } // namespace chip

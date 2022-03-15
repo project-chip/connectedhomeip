@@ -606,9 +606,8 @@ CommissionerDiscoveryController * GetCommissionerDiscoveryController()
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-
 #ifdef ENABLE_HSM_EC_KEY
-    HSMDefaultP256KeypairBuilder gHsmP256KeyPairBuilder;
+HSMDefaultP256KeypairBuilder gHsmP256KeyPairBuilder;
 #endif //#ifdef ENABLE_HSM_EC_KEY
 
 void ChipLinuxAppMainLoop()
@@ -642,10 +641,9 @@ void ChipLinuxAppMainLoop()
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
-
 #ifdef ENABLE_HSM_EC_KEY
     {
-        P256KeypairBuilder *pP256KeypairBuilder = &gHsmP256KeyPairBuilder;
+        P256KeypairBuilder * pP256KeypairBuilder = &gHsmP256KeyPairBuilder;
         SetP256KeypairBuilder(pP256KeypairBuilder);
     }
 #endif //#ifdef ENABLE_HSM_EC_KEY
